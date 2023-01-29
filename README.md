@@ -1,9 +1,11 @@
 # spotPython
 
+Sequential Parameter Optimization in Python
+
 # Development
 
 
-## Styleguide 
+## Styleguide
 
 Follow the Google Python Style Guide from [https://google.github.io/styleguide/pyguide.html]([https://google.github.io/styleguide/pyguide.html).
 
