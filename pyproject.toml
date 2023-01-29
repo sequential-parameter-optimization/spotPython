@@ -1,0 +1,47 @@
+[build-system]
+requires = ["scipy",
+            "setuptools>=61.0",
+            "graphviz",
+            "numpy",
+            "scikit-learn",
+            "matplotlib"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spotPython"
+version = "0.0.1"
+authors = [
+  { name="T. Bartz-Beielstein", email="tbb@bartzundbartz.de" }
+]
+description = "spotPython - Sequential Parameter Optimization in Python"
+readme = "README.md"
+license = { text="AGPL-3.0-or-later" }
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Operating System :: OS Independent",
+]
+# PEP 621 dependencies declaration
+# adapt to your dependencies manager
+dependencies = [
+  "mkdocstrings-python"
+]
+
+[project.urls]
+"Homepage" = "https://www.spotseven.de"
+
+[tool.setuptools]
+# ...
+# By default, include-package-data is true in pyproject.toml, so you do
+# NOT have to specify this line.
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
