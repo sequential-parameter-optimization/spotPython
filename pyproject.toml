@@ -1,12 +1,15 @@
 [build-system]
-requires = [
-  "setuptools>=61.0",
-  "setuptools_scm[toml]"
-]
+requires = ["scipy",
+            "setuptools>=61.0",
+            "graphviz",
+            "numpy",
+            "scikit-learn",
+            "matplotlib"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "spotPython"
+version = "0.0.4"
 authors = [
   { name="T. Bartz-Beielstein", email="tbb@bartzundbartz.de" }
 ]
@@ -23,20 +26,16 @@ classifiers = [
 # PEP 621 dependencies declaration
 # adapt to your dependencies manager
 dependencies = [
-  "matplotlib",
-  "numpy",
-  "pandas",
-  "scikit-learn",
-  "scipy",
+  "mkdocstrings-python"
 ]
-dynamic = ["version"]
 
 [project.urls]
 "Homepage" = "https://www.spotseven.de"
-Issues = "https://github.com/sequential-parameter-optimization/spotPython/issues"
-Repository = "https://github.com/sequential-parameter-optimization/spotPython"
 
 [tool.setuptools]
+# ...
+# By default, include-package-data is true in pyproject.toml, so you do
+# NOT have to specify this line.
 include-package-data = true
 
 [tool.setuptools.packages.find]
@@ -45,12 +44,4 @@ where = ["src"]
 [tool.black]
 line-length = 120
 target-version = ["py310"]
-
-[tool.setuptools_scm]
-write_to = "src/spotPython/_version.py"
-
-[tool.pytest.ini_options]
-addopts = [
-    "--import-mode=importlib",
-]
 
