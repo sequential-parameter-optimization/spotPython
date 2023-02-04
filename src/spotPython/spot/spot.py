@@ -29,7 +29,7 @@ from spotPython.utils.progress import progress_bar
 
 logger = logging.getLogger(__name__)
 # configure the handler and formatter as needed
-py_handler = logging.FileHandler(f"{__name__}.log", mode='w')
+py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
 py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
 # add formatter to the handler
 py_handler.setFormatter(py_formatter)
@@ -118,30 +118,30 @@ class Spot:
         return self.__class__.__name__
 
     def __init__(
-            self,
-            fun,
-            lower,
-            upper,
-            fun_evals=15,
-            fun_repeats=1,
-            fun_control={},
-            max_time=inf,
-            noise=False,
-            tolerance_x=0,
-            var_type=["num"],
-            infill_criterion="y",
-            n_points=1,
-            ocba_delta=0,
-            seed=123,
-            log_level=50,
-            show_models=False,
-            show_progress=False,
-            design=None,
-            design_control={},
-            surrogate=None,
-            surrogate_control={},
-            optimizer=None,
-            optimizer_control={},
+        self,
+        fun,
+        lower,
+        upper,
+        fun_evals=15,
+        fun_repeats=1,
+        fun_control={},
+        max_time=inf,
+        noise=False,
+        tolerance_x=0,
+        var_type=["num"],
+        infill_criterion="y",
+        n_points=1,
+        ocba_delta=0,
+        seed=123,
+        log_level=50,
+        show_models=False,
+        show_progress=False,
+        design=None,
+        design_control={},
+        surrogate=None,
+        surrogate_control={},
+        optimizer=None,
+        optimizer_control={},
     ):
         # small value:
         self.eps = sqrt(spacing(1))
@@ -180,15 +180,13 @@ class Spot:
         # Infill points:
         self.n_points = n_points
         # Objective function related information:
-        self.fun_control = {"sigma": 0,
-                            "seed": None}
+        self.fun_control = {"sigma": 0, "seed": None}
         self.fun_control.update(fun_control)
         # Design related information:
         self.design = design
         if design is None:
             self.design = spacefilling(k=self.k, seed=self.seed)
-        self.design_control = {"init_size": 10,
-                               "repeats": 1}
+        self.design_control = {"init_size": 10, "repeats": 1}
         self.design_control.update(design_control)
         # Surrogate related information:
         self.surrogate = surrogate
@@ -196,15 +194,15 @@ class Spot:
             "noise": self.noise,
             "model_optimizer": differential_evolution,
             "model_fun_evals": None,
-            "min_theta": -3.,
-            "max_theta": 3.,
+            "min_theta": -3.0,
+            "max_theta": 3.0,
             "n_theta": 1,
             "n_p": 1,
             "optim_p": False,
             "cod_type": "norm",
             "var_type": self.var_type,
             "seed": 124,
-            "use_cod_y": False
+            "use_cod_y": False,
         }
         self.surrogate_control.update(surrogate_control)
         # If no surrogate model is specified, use the internal
@@ -225,12 +223,11 @@ class Spot:
                 optim_p=self.surrogate_control["optim_p"],
                 cod_type=self.surrogate_control["cod_type"],
                 var_type=self.surrogate_control["var_type"],
-                use_cod_y=self.surrogate_control["use_cod_y"]
+                use_cod_y=self.surrogate_control["use_cod_y"],
             )
         # Optimizer related information:
         self.optimizer = optimizer
-        self.optimizer_control = {"max_iter": 1000,
-                                  "seed": 125}
+        self.optimizer_control = {"max_iter": 1000, "seed": 125}
         self.optimizer_control.update(optimizer_control)
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
@@ -249,7 +246,7 @@ class Spot:
     def to_red_dim(self):
         self.all_lower = self.lower
         self.all_upper = self.upper
-        self.ident = (self.upper-self.lower) == 0
+        self.ident = (self.upper - self.lower) == 0
         self.lower = self.lower[~self.ident]
         self.upper = self.upper[~self.ident]
         self.red_dim = self.ident.any()
@@ -277,9 +274,12 @@ class Spot:
             (object): spot
         """
         # (S-2) Initial Design:
-        X0 = self.generate_design(size=self.design_control["init_size"],
-                                  repeats=self.design_control["repeats"],
-                                  lower=self.lower, upper=self.upper)
+        X0 = self.generate_design(
+            size=self.design_control["init_size"],
+            repeats=self.design_control["repeats"],
+            lower=self.lower,
+            upper=self.upper,
+        )
         X0 = repair_non_numeric(X0, self.var_type)
         self.X = X0
         # (S-3): Eval initial design:
@@ -300,7 +300,7 @@ class Spot:
         # (S-9) Termination Criteria, Conditions:
 
         timeout_start = time.time()
-        while (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time*60):
+        while (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60):
             # OCBA (only if noise)
             if self.noise and self.ocba_delta > 0:  # and self.fun_repeats > 0 and self.design_control["repeats"] > 0:
                 X_ocba = get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
@@ -320,10 +320,10 @@ class Spot:
                 X0 = repeat(X0, self.fun_repeats, axis=0)
             # 2. No X0 found. Then generate self.n_points new solutions:
             else:
-                self.design = spacefilling(k=self.k, seed=self.seed+self.counter)
-                X0 = self.generate_design(size=self.n_points,
-                                          repeats=self.design_control["repeats"],
-                                          lower=self.lower, upper=self.upper)
+                self.design = spacefilling(k=self.k, seed=self.seed + self.counter)
+                X0 = self.generate_design(
+                    size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper
+                )
                 X0 = repair_non_numeric(X0, self.var_type)
                 logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
             # (S-18): Evaluating New Solutions:
@@ -353,9 +353,9 @@ class Spot:
             # progress bar:
             if self.show_progress:
                 if isfinite(self.fun_evals):
-                    progress_bar(self.counter/self.fun_evals)
+                    progress_bar(self.counter / self.fun_evals)
                 else:
-                    progress_bar((time.time()-timeout_start)/(self.max_time*60))
+                    progress_bar((time.time() - timeout_start) / (self.max_time * 60))
         return self
 
     def generate_design(self, size, repeats, lower, upper):
@@ -396,21 +396,22 @@ class Spot:
         new_X = np.zeros([self.n_points, self.k], dtype=float)
 
         for i in range(self.n_points):
-            if self.optimizer.__name__ == 'dual_annealing':
+            if self.optimizer.__name__ == "dual_annealing":
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            elif self.optimizer.__name__ == 'differential_evolution':
-                result = self.optimizer(func=self.infill,
-                                        bounds=self.de_bounds,
-                                        maxiter=self.optimizer_control["max_iter"],
-                                        seed=self.optimizer_control["seed"],
-                                        # popsize=10,
-                                        # updating="deferred"
-                                        )
-            elif self.optimizer.__name__ == 'direct':
+            elif self.optimizer.__name__ == "differential_evolution":
+                result = self.optimizer(
+                    func=self.infill,
+                    bounds=self.de_bounds,
+                    maxiter=self.optimizer_control["max_iter"],
+                    seed=self.optimizer_control["seed"],
+                    # popsize=10,
+                    # updating="deferred"
+                )
+            elif self.optimizer.__name__ == "direct":
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds, eps=1e-2)
-            elif self.optimizer.__name__ == 'shgo':
+            elif self.optimizer.__name__ == "shgo":
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            elif self.optimizer.__name__ == 'basinhopping':
+            elif self.optimizer.__name__ == "basinhopping":
                 result = self.optimizer(func=self.infill, x0=self.min_X)
             else:
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
@@ -507,12 +508,15 @@ class Spot:
             plt.legend(loc="best")
             # plt.title(self.surrogate.__class__.__name__ + ". " + str(self.counter) + ": " + str(self.min_y))
             if self.noise:
-                plt.title(str(self.counter) + ". y (noise): "
-                          + str(np.round(self.min_y, 6)) + " y mean: "
-                          + str(np.round(self.min_mean_y, 6)))
+                plt.title(
+                    str(self.counter)
+                    + ". y (noise): "
+                    + str(np.round(self.min_y, 6))
+                    + " y mean: "
+                    + str(np.round(self.min_mean_y, 6))
+                )
             else:
-                plt.title(str(self.counter) + ". y: "
-                          + str(np.round(self.min_y, 6)))
+                plt.title(str(self.counter) + ". y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
     def print_results(self):
@@ -546,18 +550,12 @@ class Spot:
         fig = pylab.figure(figsize=(9, 6))
         n_grid = 100
         # lower and upper
-        x = np.linspace(
-            self.lower[i], self.upper[i], num=n_grid
-        )
-        y = np.linspace(
-            self.lower[j], self.upper[j], num=n_grid
-        )
+        x = np.linspace(self.lower[i], self.upper[i], num=n_grid)
+        y = np.linspace(self.lower[j], self.upper[j], num=n_grid)
         X, Y = meshgrid(x, y)
         # Predict based on the optimized results
         z0 = np.mean(np.array([self.lower, self.upper]), axis=0)
-        zz = array(
-            [self.surrogate.predict(array([self.chg(x, y, z0, i, j)])) for x, y in zip(ravel(X), ravel(Y))]
-        )
+        zz = array([self.surrogate.predict(array([self.chg(x, y, z0, i, j)])) for x, y in zip(ravel(X), ravel(Y))])
         zs = zz[:, 0]
         Z = zs.reshape(X.shape)
         if min_z is None:
@@ -584,6 +582,6 @@ class Spot:
     def print_importance(self):
         theta = np.power(10, self.surrogate.theta)
         print("Importance relative to the most important parameter:")
-        imp = 100*theta/np.max(theta)
+        imp = 100 * theta / np.max(theta)
         for i in range(len(imp)):
             print("Parameter", i, ": ", imp[i])
