@@ -1,7 +1,7 @@
 from sys import stdout
 
 
-def progress_bar(progress, bar_length=10):
+def progress_bar(progress, bar_length=10, message="spotPython tuning:"):
     """
     Displays or updates a console progress bar.
     See: https://stackoverflow.com/a/15860757
@@ -10,6 +10,7 @@ def progress_bar(progress, bar_length=10):
         (float) progress: a float between 0 and 1. Any int will be converted to a float.
         A value under 0 represents a halt.
         A value at 1 or bigger represents 100%.
+        A message text.
     """
 
     status = ""
@@ -25,7 +26,7 @@ def progress_bar(progress, bar_length=10):
         progress = 1
         status = "Done...\r\n"
     block = int(round(bar_length * progress))
-    text = "spotPython tuning: [{0}] {1:.2f}% {2}\r".format(
+    text = message + " [{0}] {1:.2f}% {2}\r".format(
         "#" * block + "-" * (bar_length - block), progress * 100, status
     )
     stdout.write(text)

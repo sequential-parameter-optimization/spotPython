@@ -844,8 +844,7 @@ class Kriging(surrogates):
         X = copy.deepcopy(nat_X)
         if self.cod_type == "norm":
             for i in range(self.k):
-                X[i] = (X[i] - self.nat_range_X[i][0]) / float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
-                # TODO: Implement range correction if range == 0:
+                # TODO: Check Implementation of range correction if range == 0:
                 # rangex <- xmax - xmin
                 # rangey <- ymax - ymin
                 # xmin[rangex == 0] <- xmin[rangex == 0] - 0.5
@@ -853,6 +852,11 @@ class Kriging(surrogates):
                 # rangex[rangex == 0] <- 1
                 # logger.debug(f"self.nat_range_X[{i}]:\n {self.nat_range_X[i]}")
                 # logger.debug(f"X[{i}]:\n {X[i]}")
+                rangex = float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
+                if rangex == 0:
+                    self.nat_range_X[i][0] = self.nat_range_X[i][0] - 0.5
+                    self.nat_range_X[i][1] = self.nat_range_X[i][1] + 0.5
+                X[i] = (X[i] - self.nat_range_X[i][0]) / float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
             return X
         elif self.cod_type == "std":
             for i in range(self.k):
