@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.random import default_rng
+from random import random
 
 
 class analytical:
@@ -560,4 +561,35 @@ class analytical:
         if self.fun_control["sigma"] > 0:
             return self.add_noise(y)
         else:
+            return y
+
+    def fun_random_error(self, X, fun_control=None):
+        """Return errors for testing spot stability.
+
+        Args:
+            X (array): input
+
+        Returns:
+            (float): objective function value.
+        """
+        if fun_control is not None:
+            self.fun_control = fun_control
+        try:
+            X.shape[1]
+        except ValueError as err:
+            print("error message:", err)
+            X = np.array(X)
+        if len(X.shape) < 2:
+            X = np.array([X])
+        y = np.array([], dtype=float)
+        for i in range(X.shape[0]):
+            # provoke error:
+            if random() < 0.1:
+                y = np.append(y, np.nan)
+            else:
+                y = np.append(y, np.sum(X[i]))
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
+        else:
+            print(y)
             return y
