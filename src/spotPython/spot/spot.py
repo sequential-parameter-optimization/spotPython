@@ -75,6 +75,7 @@ class Spot:
             If zero (which is the default), every new solution is accepted.
         ocba_delta (int): OCBA increment (only used if `noise==True`)
         var_type (list): list of type information, can be either "num" or "factor"
+        var_name (list): list of variable names, e.g., ["x1", "x2"]
         infill_criterion (string): Can be `"y"`, `"s"`, `"ei"` (negative expected improvement), or `"all"`.
         n_points (int): number of infill points
         seed (int): initial seed
@@ -129,6 +130,7 @@ class Spot:
         noise=False,
         tolerance_x=0,
         var_type=["num"],
+        var_name=None,
         infill_criterion="y",
         n_points=1,
         ocba_delta=0,
@@ -149,6 +151,7 @@ class Spot:
         self.lower = lower
         self.upper = upper
         self.var_type = var_type
+        self.var_name = var_name
         # Reduce dim based on lower == upper logic:
         # modifies lower, upper, and var_type
         self.to_red_dim()
@@ -252,6 +255,9 @@ class Spot:
         self.red_dim = self.ident.any()
         self.all_var_type = self.var_type
         self.var_type = [x for x, y in zip(self.all_var_type, self.ident) if not y]
+        if self.var_name is not None:
+            self.all_var_name = self.var_name
+            self.var_name = [x for x, y in zip(self.all_var_name, self.ident) if not y]
 
     def to_all_dim(self, X0):
         n = X0.shape[0]
@@ -524,7 +530,7 @@ class Spot:
         Print results from the run:
             1. min y
             2. min X
-            If `noise == True`, additinally the following values are printed:
+            If `noise == True`, additionally the following values are printed:
             3. min mean y
             4. min mean X
         """
@@ -566,16 +572,23 @@ class Spot:
         ax = fig.add_subplot(221)
         # plot predicted values:
         plt.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
-        plt.xlabel("x" + str(i))
-        plt.ylabel("x" + str(j))
+        if self.var_name is None:
+            plt.xlabel("x" + str(i))
+            plt.ylabel("x" + str(j))
+        else:
+            plt.xlabel("x" + str(i) + ": " + self.var_name[i])
+            plt.ylabel("x" + str(j) + ": " + self.var_name[j])
         plt.title("Surrogate")
         pylab.colorbar()
         #
         ax = fig.add_subplot(222, projection="3d")
         ax.plot_surface(X, Y, Z, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
-        ax.set_xlabel("x" + str(i))
-        ax.set_ylabel("x" + str(j))
-        #
+        if self.var_name is None:
+            plt.xlabel("x" + str(i))
+            plt.ylabel("x" + str(j))
+        else:
+            plt.xlabel("x" + str(i) + ": " + self.var_name[i])
+            plt.ylabel("x" + str(j) + ": " + self.var_name[j])
         #
         pylab.show()
 
