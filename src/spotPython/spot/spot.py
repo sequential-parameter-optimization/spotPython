@@ -294,6 +294,8 @@ class Spot:
         else:
             X_all = X0
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
+        # TODO: Error if only nan values are returned
+        logger.debug("New y value: %s", self.y)
         self.X, self.y = remove_nan(self.X, self.y)
         self.update_stats()
         # (S-4): Imputation:
