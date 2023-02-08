@@ -539,18 +539,18 @@ class Spot:
         print(f"min y: {self.min_y}")
         res = self.to_all_dim(self.min_X.reshape(1, -1))
         for i in range(res.shape[1]):
-            if self.var_name is None:
+            if self.all_var_name is None:
                 print("x" + str(i) + ":", res[0][i])
             else:
-                print(self.var_name[i] + ":", res[0][i])
+                print(self.all_var_name[i] + ":", res[0][i])
         if self.noise:
             res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
             print(f"min mean y: {self.min_mean_y}")
             for i in range(res.shape[1]):
-                if self.var_name is None:
+                if self.self.all_var_name is None:
                     print("x" + str(i) + ":", res[0][i])
                 else:
-                    print(self.var_name[i] + ":", res[0][i])
+                    print(self.all_var_name[i] + ":", res[0][i])
 
     def chg(self, x, y, z0, i, j):
         z0[i] = x
