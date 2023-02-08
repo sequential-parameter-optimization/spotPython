@@ -537,10 +537,20 @@ class Spot:
             4. min mean X
         """
         print(f"min y: {self.min_y}")
-        print(f"min X: {self.to_all_dim(self.min_X.reshape(1, -1))}")
+        res = self.to_all_dim(self.min_X.reshape(1, -1))
+        for i in range(res.shape[1]):
+            if self.var_name is None:
+                print("x" + str(i) + ":", res[0][i])
+            else:
+                print(self.var_name[i] + ":", res[0][i])
         if self.noise:
+            res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
             print(f"min mean y: {self.min_mean_y}")
-            print(f"min mean X: {self.to_all_dim(self.min_mean_X.reshape(1, -1))}")
+            for i in range(res.shape[1]):
+                if self.var_name is None:
+                    print("x" + str(i) + ":", res[0][i])
+                else:
+                    print(self.var_name[i] + ":", res[0][i])
 
     def chg(self, x, y, z0, i, j):
         z0[i] = x
@@ -598,5 +608,9 @@ class Spot:
         theta = np.power(10, self.surrogate.theta)
         print("Importance relative to the most important parameter:")
         imp = 100 * theta / np.max(theta)
-        for i in range(len(imp)):
-            print("Parameter", i, ": ", imp[i])
+        if self.var_name is None:
+            for i in range(len(imp)):
+                print("x", i, ": ", imp[i])
+        else:
+            for i in range(len(imp)):
+                print(self.var_name[i] + ": ", imp[i])
