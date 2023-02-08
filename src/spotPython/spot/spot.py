@@ -361,9 +361,9 @@ class Spot:
             # progress bar:
             if self.show_progress:
                 if isfinite(self.fun_evals):
-                    progress_bar(self.counter / self.fun_evals)
+                    progress_bar(progress=self.counter / self.fun_evals)
                 else:
-                    progress_bar((time.time() - timeout_start) / (self.max_time * 60))
+                    progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60))
         return self
 
     def generate_design(self, size, repeats, lower, upper):
