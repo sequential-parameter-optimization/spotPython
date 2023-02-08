@@ -26,8 +26,6 @@ def progress_bar(progress, bar_length=10, message="spotPython tuning:"):
         progress = 1
         status = "Done...\r\n"
     block = int(round(bar_length * progress))
-    text = message + " [{0}] {1:.2f}% {2}\r".format(
-        "#" * block + "-" * (bar_length - block), progress * 100, status
-    )
+    text = message + " [{0}] {1:.2f}% {2}\r".format("#" * block + "-" * (bar_length - block), progress * 100, status)
     stdout.write(text)
     stdout.flush()
