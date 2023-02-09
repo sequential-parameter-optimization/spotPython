@@ -333,7 +333,7 @@ class Kriging(surrogates):
         self.nat_to_cod_init()
         if self.n_theta > self.k:
             self.n_theta = self.k
-            logger.warning("Warning: More theta values than dimensions. `n_theta` set to `k`.")
+            logger.warning("More theta values than dimensions. `n_theta` set to `k`.")
         self.theta = zeros(self.n_theta)
         # TODO: Currently not used:
         self.x0_theta = ones((self.n_theta,)) * self.n / (100 * self.k)
