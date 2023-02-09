@@ -321,7 +321,7 @@ class Spot:
             # Condition: select only X= that have min distance
             # to existing solutions
             X0, X0_ind = selectNew(A=X0, X=self.X, tolerance=self.tolerance_x)
-            logger.debug("XO values are new: %s", X0_ind)
+            logger.debug("XO values are new: %s %s", X0_ind, X0)
             # 1. There are X0 that fullfil the condition.
             # Note: The number of new X0 can be smaller than self.n_points!
             if X0.shape[0] > 0:
@@ -605,12 +605,15 @@ class Spot:
         pylab.show()
 
     def print_importance(self):
-        theta = np.power(10, self.surrogate.theta)
-        print("Importance relative to the most important parameter:")
-        imp = 100 * theta / np.max(theta)
-        if self.var_name is None:
-            for i in range(len(imp)):
-                print("x", i, ": ", imp[i])
+        if self.surrogate.n_theta > 1:
+            theta = np.power(10, self.surrogate.theta)
+            print("Importance relative to the most important parameter:")
+            imp = 100 * theta / np.max(theta)
+            if self.var_name is None:
+                for i in range(len(imp)):
+                    print("x", i, ": ", imp[i])
+            else:
+                for i in range(len(imp)):
+                    print(self.var_name[i] + ": ", imp[i])
         else:
-            for i in range(len(imp)):
-                print(self.var_name[i] + ": ", imp[i])
+            print("Importantance requires more than one theta values (n_theta>1).")
