@@ -131,6 +131,7 @@ class Spot:
         tolerance_x=0,
         var_type=["num"],
         var_name=None,
+        all_var_name=None,
         infill_criterion="y",
         n_points=1,
         ocba_delta=0,
@@ -152,6 +153,7 @@ class Spot:
         self.upper = upper
         self.var_type = var_type
         self.var_name = var_name
+        self.all_var_name = all_var_name
         # Reduce dim based on lower == upper logic:
         # modifies lower, upper, and var_type
         self.to_red_dim()
@@ -547,7 +549,7 @@ class Spot:
             res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
             print(f"min mean y: {self.min_mean_y}")
             for i in range(res.shape[1]):
-                if self.self.all_var_name is None:
+                if self.all_var_name is None:
                     print("x" + str(i) + ":", res[0][i])
                 else:
                     print(self.all_var_name[i] + ":", res[0][i])
