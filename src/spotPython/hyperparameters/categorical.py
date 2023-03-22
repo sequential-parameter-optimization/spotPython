@@ -1,3 +1,6 @@
+import json
+
+
 def one_hot_encode(strings) -> dict:
     """One hot encode a list of strings.
     Arguments:
@@ -43,9 +46,6 @@ def sum_encoded_values(strings, encoding_dict) -> int:
     for i, value in enumerate(result[::-1]):
         decimal_result += value * (2**i)
     return decimal_result
-
-
-import json
 
 
 def get_one_hot(alg: str, hyper_param: str, d: dict = None, filename: str = "data.json") -> dict:
