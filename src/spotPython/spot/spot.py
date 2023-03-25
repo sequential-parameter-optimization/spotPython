@@ -18,7 +18,7 @@ from numpy import meshgrid
 from numpy import ravel
 from numpy import array
 from numpy import append
-from spotPython.utils.compare import selectNew, find_equal_in_lists
+from spotPython.utils.compare import selectNew
 from spotPython.utils.aggregate import aggregate_mean_var
 from spotPython.utils.repair import remove_nan
 from spotPython.budget.ocba import get_ocba_X
@@ -251,7 +251,7 @@ class Spot:
     def to_red_dim(self):
         self.all_lower = self.lower
         self.all_upper = self.upper
-        self.ident = find_equal_in_lists(a=self.lower, b=self.upper)
+        self.ident = (self.upper - self.lower) == 0
         self.lower = self.lower[~self.ident]
         self.upper = self.upper[~self.ident]
         self.red_dim = self.ident.any()
