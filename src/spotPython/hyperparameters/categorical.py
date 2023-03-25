@@ -107,13 +107,15 @@ def add_missing_elements(a: list, b: list) -> list:
 def find_closest_key(integer_value: int, encoding_dict: dict) -> str:
     """
     Given an integer value and an encoding dictionary that maps keys to binary values,
-    this function finds the key in the dictionary whose binary value is closest to the binary representation of the integer value.
+    this function finds the key in the dictionary whose binary value is closest to the binary
+    representation of the integer value.
 
     Arguments:
         integer_value (int): The integer value to find the closest key for.
         encoding_dict (dict): The encoding dictionary that maps keys to binary values.
     Returns:
-        str: The key in the encoding dictionary whose binary value is closest to the binary representation of the integer value.
+        str: The key in the encoding dictionary whose binary value is
+        closest to the binary representation of the integer value.
     Example:
         >>> encoding_dict = {'A': [1, 0, 0], 'B': [0, 1, 0], 'C': [0, 0, 1]}
             find_closest_key(6, encoding_dict)
