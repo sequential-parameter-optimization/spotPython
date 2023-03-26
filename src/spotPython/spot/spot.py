@@ -606,16 +606,33 @@ class Spot:
         #
         pylab.show()
 
-    def print_importance(self):
-        if self.surrogate.n_theta > 1:
-            theta = np.power(10, self.surrogate.theta)
-            print("Importance relative to the most important parameter:")
-            imp = 100 * theta / np.max(theta)
-            if self.var_name is None:
-                for i in range(len(imp)):
-                    print("x", i, ": ", imp[i])
-            else:
-                for i in range(len(imp)):
-                    print(self.var_name[i] + ": ", imp[i])
+
+def print_importance(self, threshold=0.1, filename=None) -> None:
+    """Print importance of each parameter and plot it.
+    Args:
+        threshold (float):  Only parameters with importance >= threshold are printed.
+        filename (str):     If not None, the plot is saved to the file.
+    Returns:
+        None
+    """
+    if self.surrogate.n_theta > 1:
+        theta = np.power(10, self.surrogate.theta)
+        print("Importance relative to the most important parameter:")
+        imp = 100 * theta / np.max(theta)
+        imp = imp[imp >= threshold]
+        if self.var_name is None:
+            for i in range(len(imp)):
+                print("x", i, ": ", imp[i])
+            plt.bar(range(len(imp)), imp)
+            plt.xticks(range(len(imp)), ["x" + str(i) for i in range(len(imp))])
         else:
-            print("Importantance requires more than one theta values (n_theta>1).")
+            var_name = [self.var_name[i] for i in range(len(imp)) if imp[i] >= threshold]
+            for i in range(len(imp)):
+                print(var_name[i] + ": ", imp[i])
+            plt.bar(range(len(imp)), imp)
+            plt.xticks(range(len(imp)), var_name)
+        if filename is not None:
+            plt.savefig(filename)
+        plt.show()
+    else:
+        print("Importantance requires more than one theta values (n_theta>1).")
