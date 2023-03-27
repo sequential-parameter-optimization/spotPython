@@ -63,10 +63,15 @@ def transform_power_2(x):
 
 def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     """
-    Transform the values of the hyperparameters according to the transform function specified in f_c if the hyperparameter is of type "int", or "float" or "num".
-    Let f_c = {"core_model_hyper_dict":{ "leaf_prediction": { "levels": ["mean", "model", "adaptive"], "type": "factor", "default": "mean", "core_model_parameter_type": "str"},  "max_depth": { "type": "int", "default": 20, "transform": "transform_power_2", "lower": 2, "upper": 20}}} and v = {'max_depth': 20,'leaf_prediction': 'mean'} and def transform_power_2(x): return 2**x.
+    Transform the values of the hyperparameters according to the transform function specified in f_c
+    if the hyperparameter is of type "int", or "float" or "num".
+    Let f_c = {"core_model_hyper_dict":{ "leaf_prediction":
+    { "levels": ["mean", "model", "adaptive"], "type": "factor", "default": "mean", "core_model_parameter_type": "str"},
+    "max_depth": { "type": "int", "default": 20, "transform": "transform_power_2", "lower": 2, "upper": 20}}}
+    and v = {'max_depth': 20,'leaf_prediction': 'mean'} and def transform_power_2(x): return 2**x.
     The function takes f_c and v as input and returns a dictionary with the same structure as v.
-    The function transforms the values of the hyperparameters according to the transform function specified in f_c if the hyperparameter is of type "int", or "float" or "num".
+    The function transforms the values of the hyperparameters according to the transform function
+    specified in f_c if the hyperparameter is of type "int", or "float" or "num".
     For example, transform_hyper_parameter_values(f_c, v) returns {'max_depth': 1048576, 'leaf_prediction': 'mean'}.
     Args:
         fun_control (dict): A dictionary containing the information about the core model and the hyperparameters.
@@ -76,7 +81,9 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     Example:
         >>> import copy
         >>> from spotPython.utils.transform import transform_hyper_parameter_values
-        >>> fun_control = {"core_model_hyper_dict": {"leaf_prediction": {"levels": ["mean", "model", "adaptive"], "type": "factor", "default": "mean", "core_model_parameter_type": "str"}, "max_depth": {"type": "int", "default": 20, "transform": "transform_power_2", "lower": 2, "upper": 20}}}
+        >>> fun_control = {"core_model_hyper_dict": {"leaf_prediction": {"levels": ["mean", "model", "adaptive"],
+        "type": "factor", "default": "mean", "core_model_parameter_type": "str"},
+        "max_depth": {"type": "int", "default": 20, "transform": "transform_power_2", "lower": 2, "upper": 20}}}
         >>> hyper_parameter_values = {'max_depth': 20, 'leaf_prediction': 'mean'}
         >>> transform_hyper_parameter_values(fun_control, hyper_parameter_values)
         {'max_depth': 1048576, 'leaf_prediction': 'mean'}

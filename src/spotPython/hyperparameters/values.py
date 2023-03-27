@@ -1,5 +1,89 @@
-from spotPython.utils.convert import class_for_name
 import numpy as np
+import copy
+
+from spotPython.utils.convert import class_for_name
+from spotPython.utils.transform import transform_hyper_parameter_values
+
+
+def assign_values(X: np.array, var_list: list):
+    """
+    This function takes an np.array X and a list of variable names as input arguments
+    and returns a dictionary where the keys are the variable names and the values are assigned from X.
+
+    Parameters:
+        X (np.array): A 2D numpy array where each column represents a variable.
+        var_list (list): A list of strings representing variable names.
+
+    Returns:
+        dict: A dictionary where keys are variable names and values are assigned from X.
+
+    Example:
+        >>> import numpy as np
+        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> var_list = ['a', 'b']
+        >>> result = assign_values(X, var_list)
+        >>> print(result)
+        {'a': array([1, 3, 5]), 'b': array([2, 4, 6])}
+    """
+    result = {}
+    for i, var_name in enumerate(var_list):
+        result[var_name] = X[:, i]
+    return result
+
+
+def iterate_dict_values(var_dict: dict):
+    """
+    This function takes a dictionary of variables as input arguments and returns an iterator that
+    yields the values from the arrays in the dictionary.
+
+    Parameters:
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+
+    Returns:
+        iterator: An iterator that yields the values from the arrays in the dictionary.
+
+    Example:
+        >>> import numpy as np
+        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+        >>> for values in iterate_dict_values(var_dict):
+        ...     print(values)
+        {'a': 1, 'b': 2}
+        {'a': 3, 'b': 4}
+        {'a': 5, 'b': 6}
+    """
+    n = len(next(iter(var_dict.values())))
+    for i in range(n):
+        yield {key: value[i] for key, value in var_dict.items()}
+
+
+def convert_keys(d: dict, var_type: list):
+    """
+    Convert values in a dictionary to integers based on a list of variable types.
+
+    This function takes a dictionary `d` and a list of variable types `var_type` as arguments.
+    For each key in the dictionary,
+    if the corresponding entry in `var_type` is not equal to `"num"`,
+    the value associated with that key is converted to an integer.
+
+    Args:
+        d (dict): The input dictionary.
+        var_type (list): A list of variable types. If the entry is not `"num"` the corresponding
+        value will be converted to the type `"int"`.
+
+    Returns:
+        dict: The modified dictionary with values converted to integers based on `var_type`.
+
+    Example:
+        >>> d = {'a': '1.1', 'b': '2', 'c': '3.1'}
+        >>> var_type = ["int", "num", "int"]
+        >>> convert_keys(d, var_type)
+        {'a': 1, 'b': '2', 'c': 3}
+    """
+    keys = list(d.keys())
+    for i in range(len(keys)):
+        if var_type[i] not in ["num", "float"]:
+            d[keys[i]] = int(d[keys[i]])
+    return d
 
 
 def modify_hyper_parameter_levels(fun_control, hyperparameter, levels):
@@ -308,3 +392,105 @@ def get_bound_values(fun_control: dict, bound: str, as_list=False) -> list or np
         return b
     else:
         return np.array(b)
+
+
+def replace_levels_with_positions(hyper_dict, hyper_dict_values):
+    """Replace the levels with the position in the levels list.
+    The function that takes two dictionaries.
+    The first contains as hyperparameters as keys.
+    If the hyperparameter has the key "levels",
+    then the value of the corresponding hyperparameter in the second dictionary is
+    replaced by the position of the value in the list of levels.
+    The function returns a dictionary with the same keys as the second dictionary.
+    For example, if the second dictionary is {"a": 1, "b": "model1", "c": 3}
+    and the first dictionary is {
+        "a": {"type": "int"},
+        "b": {"levels": ["model4", "model5", "model1"]},
+        "d": {"type": "float"}},
+    then the function should return {"a": 1, "b": 2, "c": 3}.
+    Args:
+        hyper_dict (dict): dictionary with levels
+        hyper_dict_values (dict): dictionary with values
+    Returns:
+        (dict): dictionary with values
+    Example:
+        >>> hyper_dict = {"leaf_prediction": {
+        "levels": ["mean", "model", "adaptive"],
+        "type": "factor",
+        "default": "mean",
+        "core_model_parameter_type": "str"},
+        "leaf_model": {
+            "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
+            "type": "factor",
+            "default": "LinearRegression",
+            "core_model_parameter_type": "instance"},
+        "splitter": {
+            "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
+            "type": "factor",
+            "default": "EBSTSplitter",
+            "core_model_parameter_type": "instance()"},
+        "binary_split": {
+            "levels": [0, 1],
+            "type": "factor",
+            "default": 0,
+            "core_model_parameter_type": "bool"},
+        "stop_mem_management": {
+            "levels": [0, 1],
+            "type": "factor",
+            "default": 0,
+            "core_model_parameter_type": "bool"}}
+        >>> hyper_dict_values = {"leaf_prediction": "mean",
+        "leaf_model": "linear_model.LinearRegression",
+        "splitter": "EBSTSplitter",
+        "binary_split": 0,
+        "stop_mem_management": 0}
+        >>> replace_levels_with_position(hyper_dict, hyper_dict_values)
+        {'leaf_prediction': 0,
+        'leaf_model': 0,
+        'splitter': 0,
+        'binary_split': 0,
+        'stop_mem_management': 0}
+    """
+    hyper_dict_values_new = copy.deepcopy(hyper_dict_values)
+    for key, value in hyper_dict_values.items():
+        if key in hyper_dict.keys():
+            if "levels" in hyper_dict[key].keys():
+                hyper_dict_values_new[key] = hyper_dict[key]["levels"].index(value)
+    return hyper_dict_values_new
+
+
+def get_values_from_dict(dictionary) -> np.array:
+    """Get the values from a dictionary as a list.
+    Generate an np.array that contains the values of the keys of a dictionary
+    in the same order as the keys of the dictionary.
+    Args:
+        dictionary (dict): dictionary with values
+    Returns:
+        (np.array): array with values
+    Example:
+        >>> d = {"a": 1, "b": 2, "c": 3}
+        >>> get_values_from_dict(d)
+        array([1, 2, 3])
+    """
+    return np.array(list(dictionary.values()))
+
+
+def get_values_from_var_dict(var_dict: dict, fun_control: dict):
+    """This function takes a dictionary of variables and a dictionary of function control.
+    Args:
+        var_dict (dict): A dictionary of variables.
+        fun_control (dict): A dictionary of function control.
+    Returns:
+        dict: A dictionary of hyper parameter values. Transformations are applied to the values.
+    Example:
+        >>> import numpy as np
+        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+        >>> fun_control = {'var_type': ['int', 'int']}
+        >>> get_values_from_var_dict(var_dict, fun_control)
+        {'a': [1, 3, 5], 'b': [2, 4, 6]}
+    """
+    for values in iterate_dict_values(var_dict):
+        values = convert_keys(values, fun_control["var_type"])
+        values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
+        values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
+    return values
