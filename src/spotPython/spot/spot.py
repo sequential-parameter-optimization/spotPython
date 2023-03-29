@@ -529,7 +529,7 @@ class Spot:
                 plt.title(str(self.counter) + ". y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
-    def print_results(self):
+    def print_results(self) -> list[str]:
         """
         Print results from the run:
             1. min y
@@ -537,22 +537,32 @@ class Spot:
             If `noise == True`, additionally the following values are printed:
             3. min mean y
             4. min mean X
+        Args:
+            None
+        Returns:
+            output (list): list of results
         """
+        output = []
         print(f"min y: {self.min_y}")
         res = self.to_all_dim(self.min_X.reshape(1, -1))
         for i in range(res.shape[1]):
             if self.all_var_name is None:
                 print("x" + str(i) + ":", res[0][i])
+                output.append(["x" + str(i), res[0][i]])
             else:
                 print(self.all_var_name[i] + ":", res[0][i])
+                output.append([self.all_var_name[i], res[0][i]])
         if self.noise:
             res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
             print(f"min mean y: {self.min_mean_y}")
             for i in range(res.shape[1]):
                 if self.all_var_name is None:
                     print("x" + str(i) + ":", res[0][i])
+                    output.append(["x" + str(i), res[0][i]])
                 else:
                     print(self.all_var_name[i] + ":", res[0][i])
+                    output.append([self.all_var_name[i], res[0][i]])
+        return output
 
     def chg(self, x, y, z0, i, j):
         z0[i] = x
@@ -606,28 +616,32 @@ class Spot:
         #
         pylab.show()
 
-    def print_importance(self, threshold=0.1, filename=None) -> None:
-        """Print importance of each parameter and plot it.
+    def print_importance(self, threshold=0.1, filename=None) -> list[str]:
+        """Print and/or plot importance of each parameter.
         Args:
-            threshold (float):  Only parameters with importance >= threshold are printed.
-            filename (str):     If not None, the plot is saved to the file.
+            threshold (float):
+                Parameters with importance less than `threshold` are not printed.
+            filename (str):
+                If `filename` is not `None`, the importance is saved to the file.
         Returns:
-            None
+            list[str]:
         """
+        output = []
         if self.surrogate.n_theta > 1:
             theta = np.power(10, self.surrogate.theta)
-            print("Importance relative to the most important parameter:")
             imp = 100 * theta / np.max(theta)
             imp = imp[imp >= threshold]
             if self.var_name is None:
                 for i in range(len(imp)):
                     print("x", i, ": ", imp[i])
+                    output.append("x" + str(i) + ": " + str(imp[i]))
                 plt.bar(range(len(imp)), imp)
                 plt.xticks(range(len(imp)), ["x" + str(i) for i in range(len(imp))])
             else:
                 var_name = [self.var_name[i] for i in range(len(imp)) if imp[i] >= threshold]
                 for i in range(len(imp)):
                     print(var_name[i] + ": ", imp[i])
+                    output.append([var_name[i], imp[i]])
                 plt.bar(range(len(imp)), imp)
                 plt.xticks(range(len(imp)), var_name)
             if filename is not None:
@@ -635,3 +649,4 @@ class Spot:
             plt.show()
         else:
             print("Importantance requires more than one theta values (n_theta>1).")
+        return output
