@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import json
 
 from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
@@ -494,3 +495,49 @@ def get_values_from_var_dict(var_dict: dict, fun_control: dict):
         values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
         values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
     return values
+
+
+def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename) -> dict:
+    """Add the core model to the function control dictionary.
+    Args:
+        core_model (class): The core model.
+        fun_control (dict): The function control dictionary.
+        hyper_dict (dict): The hyper parameter dictionary.
+        filename (str): The name of the json file that contains the hyper parameter dictionary. Optional. Default is None.
+    Returns:
+        (dict): The function control dictionary.
+    Example:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+    """
+    fun_control.update({"core_model": core_model})
+    if filename is None:
+        river_hyper_dict = hyper_dict().load()
+    else:
+        with open("river_hyper_dict.json", "r") as f:
+            river_hyper_dict = json.load(f)
+    hyper_dict().load()
+    fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
+    return fun_control
+
+
+def get_default_hyperparameters_for_core_model(fun_control, hyper_dict) -> dict:
+    X0 = get_default_hyperparameters_for_fun(fun_control, hyper_dict)
+    var_dict = assign_values(X0, fun_control["var_name"])
+    values = get_values_from_var_dict(var_dict, fun_control)
+    return values
+
+
+def get_default_hyperparameters_for_fun(fun_control, hyper_dict) -> np.array:
+    X0 = get_default_values(fun_control)
+    river_hyper_dict_default = hyper_dict().load()
+    X0 = replace_levels_with_positions(river_hyper_dict_default[fun_control["core_model"].__name__], X0)
+    X0 = get_values_from_dict(X0)
+    X0 = np.array([X0])
+    X0.shape[1]
+    return X0
