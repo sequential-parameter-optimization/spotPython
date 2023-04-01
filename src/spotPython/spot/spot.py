@@ -464,25 +464,42 @@ class Spot:
         else:
             return self.surrogate.predict(x.reshape(1, -1))
 
-    def plot_progress(self, show=True, log_y=False):
-        """
-        Generate progress plot, i.e., plot y versus x values.
-        Usually called after the run is finished.
-
+    def plot_progress(
+        self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300
+    ) -> None:
+        """Plot the progress of the hyperparameter tuning (optimization).
         Args:
-            show (bool, optional): Show plot. Defaults to True.
-            log_y (bool, optional): log y-axis. Defaults to False.
+            show (bool): Show the plot.
+            log_x (bool): Use logarithmic scale for x-axis.
+            log_y (bool): Use logarithmic scale for y-axis.
+            filename (str): Filename to save the plot.
+            style (list): Style of the plot. Default: ['k', 'ro-'], i.e., the initial points are plotted as a black line
+            and the subsequent points as red dots connected by a line.
+        Returns:
+            None
         """
         fig = pylab.figure(figsize=(9, 6))
-        # TODO: Consider y_min of the initial design, e.g., via:
-        # best_y = list(itertools.repeat(min(y), self.init_size))
         s_y = pd.Series(self.y)
         s_c = s_y.cummin()
-
+        n_init = self.design_control["init_size"] * self.design_control["repeats"]
         ax = fig.add_subplot(211)
-        ax.plot(range(len(s_c)), s_c)
+        ax.plot(
+            range(1, n_init + 1),
+            s_c[:n_init],
+            style[0],
+            range(1, n_init + 1),
+            [s_c[:n_init].min()] * n_init,
+            style[1],
+            range(n_init, len(s_c)),
+            s_c[n_init:],
+            style[2],
+        )
+        if log_x:
+            ax.set_xscale("log")
         if log_y:
             ax.set_yscale("log")
+        if filename is not None:
+            pylab.savefig(filename, dpi=dpi, bbox_inches="tight")
         if show:
             pylab.show()
 
@@ -531,47 +548,6 @@ class Spot:
                 plt.title(str(self.counter) + ". y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
-    # def print_results_old(self, print_screen=True) -> list[str]:
-    #     """
-    #     Print results from the run:
-    #         1. min y
-    #         2. min X
-    #         If `noise == True`, additionally the following values are printed:
-    #         3. min mean y
-    #         4. min mean X
-    #     Args:
-    #         None
-    #     Returns:
-    #         output (list): list of results
-    #     """
-    #     output = []
-    #     if print_screen:
-    #         print(f"min y: {self.min_y}")
-    #     res = self.to_all_dim(self.min_X.reshape(1, -1))
-    #     for i in range(res.shape[1]):
-    #         if self.all_var_name is None:
-    #             if print_screen:
-    #                 print("x" + str(i) + ":", res[0][i])
-    #             output.append(["x" + str(i), res[0][i]])
-    #         else:
-    #             if print_screen:
-    #                 print(self.all_var_name[i] + ":", res[0][i])
-    #             output.append([self.all_var_name[i], res[0][i]])
-    #     if self.noise:
-    #         res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
-    #         if print_screen:
-    #             print(f"min mean y: {self.min_mean_y}")
-    #         for i in range(res.shape[1]):
-    #             if self.all_var_name is None:
-    #                 if print_screen:
-    #                     print("x" + str(i) + ":", res[0][i])
-    #                 output.append(["x" + str(i), res[0][i]])
-    #             else:
-    #                 if print_screen:
-    #                     print(self.all_var_name[i] + ":", res[0][i])
-    #                 output.append([self.all_var_name[i], res[0][i]])
-    #     return output
-
     def print_results(self, print_screen=True) -> list[str]:
         """Print results from the run:
             1. min y
@@ -609,16 +585,23 @@ class Spot:
         z0[j] = y
         return z0
 
-    def plot_contour(self, i=0, j=1, min_z=None, max_z=None, show=True):
-        """
-        This function plots surrogates of any dimension.
+    def plot_contour(
+        self, i=0, j=1, min_z=None, max_z=None, show=True, filename=None, n_grid=25, contour_levels=10, dpi=200
+    ) -> None:
+        """Plot the contour of any dimension.
         Args:
-            show (boolean):
-                If `True`, the plots are displayed.
-                If `False`, `plt.show()` should be called outside this function.
+            i (int): the first dimension
+            j (int): the second dimension
+            min_z (float): the minimum value of z
+            max_z (float): the maximum value of z
+            show (bool): show the plot
+            filename (str): save the plot to a file
+            n_grid (int): number of grid points
+            contour_levels (int): number of contour levels
+        Returns:
+            None
         """
         fig = pylab.figure(figsize=(9, 6))
-        n_grid = 100
         # lower and upper
         x = np.linspace(self.lower[i], self.upper[i], num=n_grid)
         y = np.linspace(self.lower[j], self.upper[j], num=n_grid)
@@ -632,7 +615,6 @@ class Spot:
             min_z = np.min(Z)
         if max_z is None:
             max_z = np.max(Z)
-        contour_levels = 30
         ax = fig.add_subplot(221)
         # plot predicted values:
         plt.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
@@ -644,7 +626,6 @@ class Spot:
             plt.ylabel("x" + str(j) + ": " + self.var_name[j])
         plt.title("Surrogate")
         pylab.colorbar()
-        #
         ax = fig.add_subplot(222, projection="3d")
         ax.plot_surface(X, Y, Z, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
         if self.var_name is None:
@@ -653,8 +634,10 @@ class Spot:
         else:
             plt.xlabel("x" + str(i) + ": " + self.var_name[i])
             plt.ylabel("x" + str(j) + ": " + self.var_name[j])
-        #
-        pylab.show()
+        if filename:
+            pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0),
+        if show:
+            pylab.show()
 
     def print_importance(self, threshold=0.1, print_screen=True) -> list:
         """Print importance of each variable and return the results as a list.
@@ -686,7 +669,7 @@ class Spot:
             print("Importantance requires more than one theta values (n_theta>1).")
         return output
 
-    def plot_importance(self, threshold=0.1, filename=None) -> None:
+    def plot_importance(self, threshold=0.1, filename=None, dpi=300) -> None:
         """Plot the importance of each variable.
         Args:
             threshold (float):  The threshold of the importance.
@@ -706,5 +689,5 @@ class Spot:
                 plt.bar(range(len(imp[idx])), imp[idx])
                 plt.xticks(range(len(imp[idx])), var_name)
             if filename is not None:
-                plt.savefig(filename)
+                plt.savefig(filename, bbox_inches="tight", dpi=dpi)
             plt.show()
