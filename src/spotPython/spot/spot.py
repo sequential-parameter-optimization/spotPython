@@ -573,16 +573,16 @@ class Spot:
     #     return output
 
     def print_results(self, print_screen=True) -> list[str]:
-        """ Print results from the run:
-                1. min y
-                2. min X
-                If `noise == True`, additionally the following values are printed:
-                3. min mean y
-                4. min mean X
-            Args:
-                print_screen (bool, optional): print results to screen
-            Returns:
-                output (list): list of results
+        """Print results from the run:
+            1. min y
+            2. min X
+            If `noise == True`, additionally the following values are printed:
+            3. min mean y
+            4. min mean X
+        Args:
+            print_screen (bool, optional): print results to screen
+        Returns:
+            output (list): list of results
         """
         output = []
         if print_screen:
@@ -656,7 +656,7 @@ class Spot:
         #
         pylab.show()
 
-    def print_importance(self, threshold=0.1, print_screen=True) -> list[str]:
+    def print_importance(self, threshold=0.1, print_screen=True) -> list:
         """Print importance of each variable and return the results as a list.
         Args:
             threshold (float): threshold for printing
