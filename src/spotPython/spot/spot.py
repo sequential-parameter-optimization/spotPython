@@ -107,6 +107,8 @@ class Spot:
         optimizer (object): optimizer. If `None`, `scipy.optimize`'s `differential_evolution` is used.
         optimizer_control (dict): information about the optimizer stored as a dictionary with the following entries:
             "max_iter": `1000`.
+    Returns:
+        object: `Spot` object
 
     Note:
         Description in the source code refers to [bart21i]:
@@ -529,39 +531,77 @@ class Spot:
                 plt.title(str(self.counter) + ". y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
-    def print_results(self) -> list[str]:
-        """
-        Print results from the run:
-            1. min y
-            2. min X
-            If `noise == True`, additionally the following values are printed:
-            3. min mean y
-            4. min mean X
-        Args:
-            None
-        Returns:
-            output (list): list of results
+    # def print_results_old(self, print_screen=True) -> list[str]:
+    #     """
+    #     Print results from the run:
+    #         1. min y
+    #         2. min X
+    #         If `noise == True`, additionally the following values are printed:
+    #         3. min mean y
+    #         4. min mean X
+    #     Args:
+    #         None
+    #     Returns:
+    #         output (list): list of results
+    #     """
+    #     output = []
+    #     if print_screen:
+    #         print(f"min y: {self.min_y}")
+    #     res = self.to_all_dim(self.min_X.reshape(1, -1))
+    #     for i in range(res.shape[1]):
+    #         if self.all_var_name is None:
+    #             if print_screen:
+    #                 print("x" + str(i) + ":", res[0][i])
+    #             output.append(["x" + str(i), res[0][i]])
+    #         else:
+    #             if print_screen:
+    #                 print(self.all_var_name[i] + ":", res[0][i])
+    #             output.append([self.all_var_name[i], res[0][i]])
+    #     if self.noise:
+    #         res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
+    #         if print_screen:
+    #             print(f"min mean y: {self.min_mean_y}")
+    #         for i in range(res.shape[1]):
+    #             if self.all_var_name is None:
+    #                 if print_screen:
+    #                     print("x" + str(i) + ":", res[0][i])
+    #                 output.append(["x" + str(i), res[0][i]])
+    #             else:
+    #                 if print_screen:
+    #                     print(self.all_var_name[i] + ":", res[0][i])
+    #                 output.append([self.all_var_name[i], res[0][i]])
+    #     return output
+
+    def print_results(self, print_screen=True) -> list[str]:
+        """ Print results from the run:
+                1. min y
+                2. min X
+                If `noise == True`, additionally the following values are printed:
+                3. min mean y
+                4. min mean X
+            Args:
+                print_screen (bool, optional): print results to screen
+            Returns:
+                output (list): list of results
         """
         output = []
-        print(f"min y: {self.min_y}")
+        if print_screen:
+            print(f"min y: {self.min_y}")
         res = self.to_all_dim(self.min_X.reshape(1, -1))
         for i in range(res.shape[1]):
-            if self.all_var_name is None:
-                print("x" + str(i) + ":", res[0][i])
-                output.append(["x" + str(i), res[0][i]])
-            else:
-                print(self.all_var_name[i] + ":", res[0][i])
-                output.append([self.all_var_name[i], res[0][i]])
+            var_name = "x" + str(i) if self.all_var_name is None else self.all_var_name[i]
+            if print_screen:
+                print(var_name + ":", res[0][i])
+            output.append([var_name, res[0][i]])
         if self.noise:
             res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
-            print(f"min mean y: {self.min_mean_y}")
+            if print_screen:
+                print(f"min mean y: {self.min_mean_y}")
             for i in range(res.shape[1]):
-                if self.all_var_name is None:
-                    print("x" + str(i) + ":", res[0][i])
-                    output.append(["x" + str(i), res[0][i]])
-                else:
-                    print(self.all_var_name[i] + ":", res[0][i])
-                    output.append([self.all_var_name[i], res[0][i]])
+                var_name = "x" + str(i) if self.all_var_name is None else self.all_var_name[i]
+                if print_screen:
+                    print(var_name + ":", res[0][i])
+                output.append([var_name, res[0][i]])
         return output
 
     def chg(self, x, y, z0, i, j):
@@ -616,37 +656,55 @@ class Spot:
         #
         pylab.show()
 
-    def print_importance(self, threshold=0.1, filename=None) -> list[str]:
-        """Print and/or plot importance of each parameter.
+    def print_importance(self, threshold=0.1, print_screen=True) -> list[str]:
+        """Print importance of each variable and return the results as a list.
         Args:
-            threshold (float):
-                Parameters with importance less than `threshold` are not printed.
-            filename (str):
-                If `filename` is not `None`, the importance is saved to the file.
+            threshold (float): threshold for printing
+            print_screen (boolean): if `True`, values are also printed on the screen. Default is `True`.
         Returns:
-            list[str]:
+            output (list): list of results
         """
         output = []
         if self.surrogate.n_theta > 1:
             theta = np.power(10, self.surrogate.theta)
             imp = 100 * theta / np.max(theta)
-            imp = imp[imp >= threshold]
+            # imp = imp[imp >= threshold]
             if self.var_name is None:
                 for i in range(len(imp)):
-                    print("x", i, ": ", imp[i])
-                    output.append("x" + str(i) + ": " + str(imp[i]))
-                plt.bar(range(len(imp)), imp)
-                plt.xticks(range(len(imp)), ["x" + str(i) for i in range(len(imp))])
+                    if imp[i] >= threshold:
+                        if print_screen:
+                            print("x", i, ": ", imp[i])
+                        output.append("x" + str(i) + ": " + str(imp[i]))
             else:
-                var_name = [self.var_name[i] for i in range(len(imp)) if imp[i] >= threshold]
+                var_name = [self.var_name[i] for i in range(len(imp))]
                 for i in range(len(imp)):
-                    print(var_name[i] + ": ", imp[i])
+                    if imp[i] >= threshold:
+                        if print_screen:
+                            print(var_name[i] + ": ", imp[i])
                     output.append([var_name[i], imp[i]])
-                plt.bar(range(len(imp)), imp)
-                plt.xticks(range(len(imp)), var_name)
-            if filename is not None:
-                plt.savefig(filename)
-            plt.show()
         else:
             print("Importantance requires more than one theta values (n_theta>1).")
         return output
+
+    def plot_importance(self, threshold=0.1, filename=None) -> None:
+        """Plot the importance of each variable.
+        Args:
+            threshold (float):  The threshold of the importance.
+            filename (str): The filename of the plot.
+        Returns:
+            None
+        """
+        if self.surrogate.n_theta > 1:
+            theta = np.power(10, self.surrogate.theta)
+            imp = 100 * theta / np.max(theta)
+            idx = np.where(imp > threshold)[0]
+            if self.var_name is None:
+                plt.bar(range(len(imp[idx])), imp[idx])
+                plt.xticks(range(len(imp[idx])), ["x" + str(i) for i in idx])
+            else:
+                var_name = [self.var_name[i] for i in idx]
+                plt.bar(range(len(imp[idx])), imp[idx])
+                plt.xticks(range(len(imp[idx])), var_name)
+            if filename is not None:
+                plt.savefig(filename)
+            plt.show()

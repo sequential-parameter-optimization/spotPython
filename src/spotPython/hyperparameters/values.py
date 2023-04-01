@@ -503,7 +503,8 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename)
         core_model (class): The core model.
         fun_control (dict): The function control dictionary.
         hyper_dict (dict): The hyper parameter dictionary.
-        filename (str): The name of the json file that contains the hyper parameter dictionary. Optional. Default is None.
+        filename (str): The name of the json file that contains the hyper parameter dictionary.
+        Optional. Default is None.
     Returns:
         (dict): The function control dictionary.
     Example:
