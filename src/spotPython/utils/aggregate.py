@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 def aggregate_mean_var(X, y, sort=False):
     """
     Aggregate array to mean.
@@ -14,6 +15,18 @@ def aggregate_mean_var(X, y, sort=False):
         (numpy.ndarray): aggregated `X` values, shape `(n-m, k)`, if `m` duplicates in `X`.
         (numpy.ndarray): aggregated (mean per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
         (numpy.ndarray): aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
+
+    Example:
+        >>> X = np.array([[1, 2], [3, 4], [1, 2]])
+        >>> y = np.array([1, 2, 3])
+        >>> X_agg, y_mean, y_var = aggregate_mean_var(X, y)
+        >>> print(X_agg)
+        [[1. 2.]
+         [3. 4.]]
+        >>> print(y_mean)
+        [2. 2.]
+        >>> print(y_var)
+        [1. 0.]
     """
     # Create a DataFrame from X and y
     df = pd.DataFrame(X)
