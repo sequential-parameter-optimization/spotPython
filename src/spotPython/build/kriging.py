@@ -329,7 +329,7 @@ class Kriging(surrogates):
         self.num_mask = array(list(map(lambda x: x == "num", self.var_type)))
         self.factor_mask = array(list(map(lambda x: x == "factor", self.var_type)))
         self.int_mask = array(list(map(lambda x: x == "int", self.var_type)))
-        self.ordered_mask = array(list(map(lambda x: x == "int" or x == "num", self.var_type)))
+        self.ordered_mask = array(list(map(lambda x: x == "int" or x == "num" or x == "float", self.var_type)))
         self.nat_to_cod_init()
         if self.n_theta > self.k:
             self.n_theta = self.k
