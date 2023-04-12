@@ -271,18 +271,70 @@ class Spot:
         for i in range(k):
             if self.ident[i]:
                 X[:, i] = self.all_lower[i]
-                j = j + 1
+                j += 1
             else:
                 X[:, i] = X0[:, i - j]
         return X
 
-    def run(self):
-        """
-        Run spot.
+    def to_all_dim_if_needed(self, X):
+        if self.red_dim:
+            return self.to_all_dim(X)
+        else:
+            return X
 
-        Returns:
-            (object): spot
-        """
+    def get_X_ocba(self):
+        if self.noise and self.ocba_delta > 0:
+            return get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
+        else:
+            return None
+
+    def get_new_X0(self):
+        X0 = self.suggest_new_X()
+        X0 = repair_non_numeric(X0, self.var_type)
+        # (S-16) Duplicate Handling:
+        # Condition: select only X= that have min distance
+        # to existing solutions
+        X0, X0_ind = selectNew(A=X0, X=self.X, tolerance=self.tolerance_x)
+        logger.debug("XO values are new: %s %s", X0_ind, X0)
+        # 1. There are X0 that fullfil the condition.
+        # Note: The number of new X0 can be smaller than self.n_points!
+        if X0.shape[0] > 0:
+            return repeat(X0, self.fun_repeats, axis=0)
+        # 2. No X0 found. Then generate self.n_points new solutions:
+        else:
+            self.design = spacefilling(k=self.k, seed=self.seed + self.counter)
+            X0 = self.generate_design(
+                size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper
+            )
+            X0 = repair_non_numeric(X0, self.var_type)
+            logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
+            return X0
+
+    def append_X_ocba(self, X_ocba, X0):
+        if self.noise and self.ocba_delta > 0:
+            return append(X_ocba, X0, axis=0)
+        else:
+            return X0
+
+    def run(self):
+        self.initialize_design()
+        # (S-5) Calling the spotLoop Function
+        # and
+        # (S-9) Termination Criteria, Conditions:
+        timeout_start = time.time()
+        while self.should_continue(timeout_start):
+            self.update_design()
+            # (S-10): Subset Selection for the Surrogate:
+            # Not implemented yet.
+            # Update stats
+            self.update_stats()
+            # (S-11) Surrogate Fit:
+            self.fit_surrogate()
+            # progress bar:
+            self.show_progress_if_needed(timeout_start)
+        return self
+
+    def initialize_design(self):
         # (S-2) Initial Design:
         X0 = self.generate_design(
             size=self.design_control["init_size"],
@@ -293,10 +345,7 @@ class Spot:
         X0 = repair_non_numeric(X0, self.var_type)
         self.X = X0
         # (S-3): Eval initial design:
-        if self.red_dim:
-            X_all = self.to_all_dim(X0)
-        else:
-            X_all = X0
+        X_all = self.to_all_dim_if_needed(X0)
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
         # TODO: Error if only nan values are returned
         logger.debug("New y value: %s", self.y)
@@ -304,71 +353,38 @@ class Spot:
         self.update_stats()
         # (S-4): Imputation:
         # Not implemented yet.
+        # (S-11) Surrogate Fit:
+        self.fit_surrogate()
 
+    def should_continue(self, timeout_start):
+        return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
+
+    def update_design(self):
+        # OCBA (only if noise)
+        X_ocba = self.get_X_ocba()
+        # (S-15) Compile Surrogate Results:
+        X0 = self.get_new_X0()
+        # (S-18): Evaluating New Solutions:
+        X0 = self.append_X_ocba(X_ocba, X0)
+        X_all = self.to_all_dim_if_needed(X0)
+        y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        X0, y0 = remove_nan(X0, y0)
+        # Append New Solutions:
+        self.X = np.append(self.X, X0, axis=0)
+        self.y = np.append(self.y, y0)
+
+    def fit_surrogate(self):
         self.surrogate.fit(self.X, self.y)
+        if self.show_models:
+            self.plot_model()
 
-        # (S-5) Calling the spotLoop Function
-        # and
-        # (S-9) Termination Criteria, Conditions:
-
-        timeout_start = time.time()
-        while (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60):
-            # OCBA (only if noise)
-            if self.noise and self.ocba_delta > 0:  # and self.fun_repeats > 0 and self.design_control["repeats"] > 0:
-                X_ocba = get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
-            else:
-                X_ocba = None
-            # (S-15) Compile Surrogate Results:
-            X0 = self.suggest_new_X()
-            X0 = repair_non_numeric(X0, self.var_type)
-            # (S-16) Duplicate Handling:
-            # Condition: select only X= that have min distance
-            # to existing solutions
-            X0, X0_ind = selectNew(A=X0, X=self.X, tolerance=self.tolerance_x)
-            logger.debug("XO values are new: %s %s", X0_ind, X0)
-            # 1. There are X0 that fullfil the condition.
-            # Note: The number of new X0 can be smaller than self.n_points!
-            if X0.shape[0] > 0:
-                X0 = repeat(X0, self.fun_repeats, axis=0)
-            # 2. No X0 found. Then generate self.n_points new solutions:
-            else:
-                self.design = spacefilling(k=self.k, seed=self.seed + self.counter)
-                X0 = self.generate_design(
-                    size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper
-                )
-                X0 = repair_non_numeric(X0, self.var_type)
-                logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
-            # (S-18): Evaluating New Solutions:
-            if self.noise and self.ocba_delta > 0:
-                X0 = append(X_ocba, X0, axis=0)
-            if self.red_dim:
-                X_all = self.to_all_dim(X0)
-            else:
-                X_all = X0
-            y0 = self.fun(X=X_all, fun_control=self.fun_control)
-            X0, y0 = remove_nan(X0, y0)
-            # Append New Solutions:
-            self.X = np.append(self.X, X0, axis=0)
-            self.y = np.append(self.y, y0)
-
-            # (S-10): Subset Selection for the Surrogate:
-            # Not implemented yet.
-
-            # Update stats
-            self.update_stats()
-
-            # (S-11) Surrogate Fit:
-            self.surrogate.fit(self.X, self.y)
-
-            if self.show_models:
-                self.plot_model()
-            # progress bar:
-            if self.show_progress:
-                if isfinite(self.fun_evals):
-                    progress_bar(progress=self.counter / self.fun_evals)
-                else:
-                    progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60))
-        return self
+    def show_progress_if_needed(self, timeout_start):
+        if not self.show_progress:
+            return
+        if isfinite(self.fun_evals):
+            progress_bar(progress=self.counter / self.fun_evals)
+        else:
+            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60))
 
     def generate_design(self, size, repeats, lower, upper):
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)
@@ -407,10 +423,11 @@ class Spot:
         # (S-14a) Optimization on the surrogate:
         new_X = np.zeros([self.n_points, self.k], dtype=float)
 
+        optimizer_name = self.optimizer.__name__
         for i in range(self.n_points):
-            if self.optimizer.__name__ == "dual_annealing":
+            if optimizer_name == "dual_annealing":
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            elif self.optimizer.__name__ == "differential_evolution":
+            elif optimizer_name == "differential_evolution":
                 result = self.optimizer(
                     func=self.infill,
                     bounds=self.de_bounds,
@@ -419,11 +436,11 @@ class Spot:
                     # popsize=10,
                     # updating="deferred"
                 )
-            elif self.optimizer.__name__ == "direct":
+            elif optimizer_name == "direct":
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds, eps=1e-2)
-            elif self.optimizer.__name__ == "shgo":
+            elif optimizer_name == "shgo":
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            elif self.optimizer.__name__ == "basinhopping":
+            elif optimizer_name == "basinhopping":
                 result = self.optimizer(func=self.infill, x0=self.min_X)
             else:
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
@@ -449,20 +466,12 @@ class Spot:
         Note:
             This is step (S-12) in [bart21i].
         """
-        # (S-12) Objective Function on the Surrogate (Predict)
-        # res = self.surrogate.predict(x.reshape(1, -1))
-        # if isinstance(self.surrogate, Kriging):
-        #     if self.infill_criterion == "ei":
-        #         y = -1.0 * res[2]  # ei
-        #     else:
-        #         y = res[0]  # f
-        # else:
-        #     y = res  # sklearn etc.
-        # return y
+        # Reshape x to have shape (1, -1) because the predict method expects a 2D array
+        x_reshaped = x.reshape(1, -1)
         if isinstance(self.surrogate, Kriging):
-            return self.surrogate.predict(x.reshape(1, -1), return_val=self.infill_criterion)
+            return self.surrogate.predict(x_reshaped, return_val=self.infill_criterion)
         else:
-            return self.surrogate.predict(x.reshape(1, -1))
+            return self.surrogate.predict(x_reshaped)
 
     def plot_progress(
         self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300
@@ -581,6 +590,24 @@ class Spot:
         return output
 
     def chg(self, x, y, z0, i, j):
+        """
+        Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.
+
+        Args:
+            x (int or float): The new value for the element at index `i`.
+            y (int or float): The new value for the element at index `j`.
+            z0 (list or numpy.ndarray): The array to be modified.
+            i (int): The index of the element to be changed to `x`.
+            j (int): The index of the element to be changed to `y`.
+
+        Returns:
+            list or numpy.ndarray: The modified array.
+
+        Example:
+            >>> z0 = [1, 2, 3]
+            >>> chg(4, 5, z0, 0, 2)
+            [4, 2, 5]
+        """
         z0[i] = x
         z0[j] = y
         return z0
