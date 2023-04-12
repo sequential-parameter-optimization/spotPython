@@ -8,14 +8,13 @@ from numpy import array
 from numpy import log
 from numpy import power
 from numpy import abs
-from numpy import eye
 from numpy import sum
 from numpy import diag
 from numpy import pi
 from numpy import ones, zeros
 from numpy import spacing, empty_like
 from numpy import float64
-from numpy import append, ndarray, multiply, isinf, linspace, meshgrid, ravel
+from numpy import append, ndarray, isinf, linspace, meshgrid, ravel, diag_indices_from, empty
 from numpy.linalg import cholesky, solve, LinAlgError, cond
 from scipy.optimize import differential_evolution
 from scipy.linalg import cholesky as scipy_cholesky
@@ -239,12 +238,9 @@ class Kriging(surrogates):
         """
         Determine search bounds for model_optimizer, e.g., differential evolution.
         """
-        de_bounds = []
-        for i in range(self.n_theta):
-            de_bounds.append([self.min_theta, self.max_theta])
+        de_bounds = [[self.min_theta, self.max_theta] for _ in range(self.n_theta)]
         if self.optim_p:
-            for i in range(self.n_p):
-                de_bounds.append([self.min_p, self.max_p])
+            de_bounds += [[self.min_p, self.max_p] for _ in range(self.n_p)]
             if self.noise:
                 de_bounds.append([self.min_Lambda, self.max_Lambda])
         else:
@@ -262,16 +258,44 @@ class Kriging(surrogates):
                 1d-array with theta, p, and Lambda values. Order is important.
 
         """
-        for i in range(self.n_theta):
-            self.theta[i] = new_theta_p_Lambda[i]
+        self.theta = new_theta_p_Lambda[:self.n_theta]
         if self.optim_p:
-            for i in range(self.n_p):
-                self.p[i] = new_theta_p_Lambda[i + self.n_theta]
+            self.p = new_theta_p_Lambda[self.n_theta:self.n_theta + self.n_p]
             if self.noise:
                 self.Lambda = new_theta_p_Lambda[self.n_theta + self.n_p]
         else:
             if self.noise:
                 self.Lambda = new_theta_p_Lambda[self.n_theta]
+
+    def optimize_model(self):
+        if self.model_optimizer.__name__ == 'dual_annealing':
+            result = self.model_optimizer(func=self.fun_likelihood,
+                                          bounds=self.de_bounds)
+        elif self.model_optimizer.__name__ == 'differential_evolution':
+            result = self.model_optimizer(func=self.fun_likelihood,
+                                          bounds=self.de_bounds,
+                                          maxiter=self.model_fun_evals,
+                                          seed=self.seed)
+        elif self.model_optimizer.__name__ == 'direct':
+            result = self.model_optimizer(func=self.fun_likelihood,
+                                          bounds=self.de_bounds,
+                                          # maxfun=self.model_fun_evals,
+                                          eps=1e-2)
+        elif self.model_optimizer.__name__ == 'shgo':
+            result = self.model_optimizer(func=self.fun_likelihood,
+                                          bounds=self.de_bounds)
+        elif self.model_optimizer.__name__ == 'basinhopping':
+            result = self.model_optimizer(func=self.fun_likelihood,
+                                          x0=mean(self.de_bounds, axis=1))
+        else:
+            result = self.model_optimizer(func=self.fun_likelihood, bounds=self.de_bounds)
+        return result["x"]
+
+    def update_log(self):
+        self.log["negLnLike"] = append(self.log["negLnLike"], self.negLnLike)
+        self.log["theta"] = append(self.log["theta"], self.theta)
+        self.log["p"] = append(self.log["p"], self.p)
+        self.log["Lambda"] = append(self.log["Lambda"], self.Lambda)
 
     def fit(self, nat_X, nat_y):
         """
@@ -355,40 +379,15 @@ class Kriging(surrogates):
         self.Lambda = None
         # build_Psi() and build_U() are called in fun_likelihood
         self.set_de_bounds()
-        if self.model_optimizer.__name__ == 'dual_annealing':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds)
-        elif self.model_optimizer.__name__ == 'differential_evolution':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds,
-                                          maxiter=self.model_fun_evals,
-                                          seed=self.seed)
-        elif self.model_optimizer.__name__ == 'direct':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds,
-                                          # maxfun=self.model_fun_evals,
-                                          eps=1e-2)
-        elif self.model_optimizer.__name__ == 'shgo':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds)
-        elif self.model_optimizer.__name__ == 'basinhopping':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          x0=mean(self.de_bounds, axis=1))
-        else:
-            result = self.model_optimizer(func=self.fun_likelihood, bounds=self.de_bounds)
         # Finally, set new theta and p values and update the surrogate again
         # for new_theta_p_Lambda in de_results["x"]:
-        new_theta_p_Lambda = result["x"]
+        new_theta_p_Lambda = self.optimize_model()
         self.extract_from_bounds(new_theta_p_Lambda)
         self.build_Psi()
         self.build_U()
         # TODO: check if the following line is necessary!
         self.likelihood()
-        self.log["negLnLike"] = append(self.log["negLnLike"], self.negLnLike)
-        self.log["theta"] = append(self.log["theta"], self.theta)
-        self.log["p"] = append(self.log["p"], self.p)
-        self.log["Lambda"] = append(self.log["Lambda"], self.Lambda)
-        # TODO: return self
+        self.update_log()
 
     def fun_likelihood(self, new_theta_p_Lambda):
         """
@@ -408,28 +407,42 @@ class Kriging(surrogates):
         """
         self.extract_from_bounds(new_theta_p_Lambda)
         if self.__is_any__(power(10.0, self.theta), 0):
-            # print(f"Failure in fun_likelihood: 10^theta == 0. Setting negLnLike to {self.pen_val:.2f}.")
             logger.warning("Failure in fun_likelihood: 10^theta == 0. Setting negLnLike to %s", self.pen_val)
             return self.pen_val
         self.build_Psi()
         if (self.inf_Psi or self.cnd_Psi > 1e9):
-            # print(f"\nFailure in fun_likelihood: Psi is ill conditioned ({self.cnd_Psi}).")
-            # print(f"Setting negLnLike to {self.pen_val:.2f}.")
             logger.warning("Failure in fun_likelihood: Psi is ill conditioned: %s", self.cnd_Psi)
             logger.warning("Setting negLnLike to: %s", self.pen_val)
             return self.pen_val
-        else:
-            try:
-                self.build_U()
-            except Exception as err:
-                f = self.pen_val
-                print(f"Error in fun_likelihood(). Call to build_U() failed. {err=}, {type(err)=}")
-                print(f"Setting negLnLike to {self.pen_val:.2f}.")
-                return f
-            self.likelihood()
-            return self.negLnLike
+
+        try:
+            self.build_U()
+        except Exception as error:
+            penalty_value = self.pen_val
+            print("Error in fun_likelihood(). Call to build_U() failed.")
+            print("error=%s, type(error)=%s" % (error, type(error)))
+            print("Setting negLnLike to %.2f." % self.pen_val)
+            return penalty_value
+        self.likelihood()
+        return self.negLnLike
 
     def __is_any__(self, x, v):
+        """
+        Check if any element in `x` is equal to `v`.
+
+        This function checks if any element in the input array `x` is equal to the value `v`.
+        If `x` is not an instance of `ndarray`, it is first converted to a numpy array.
+
+        Args:
+            x (ndarray or array-like):
+                Input array to check for the presence of value `v`.
+            v (scalar):
+                Value to check for in the input array `x`.
+
+        Returns:
+            bool:
+                True if any element in `x` is equal to `v`, False otherwise.
+        """
         if not isinstance(x, ndarray):
             x = array([x])
         return any(x == v)
@@ -463,9 +476,9 @@ class Kriging(surrogates):
         except LinAlgError as err:
             print(f"Building Psi failed:\n {self.Psi}. {err=}, {type(err)=}")
         if self.noise:
-            self.Psi = self.Psi + multiply(eye(self.n), self.Lambda)
+            self.Psi[diag_indices_from(self.Psi)] += self.Lambda
         else:
-            self.Psi = self.Psi + multiply(eye(self.n), self.eps)
+            self.Psi[diag_indices_from(self.Psi)] += self.eps
         if (isinf(self.Psi)).any():
             self.inf_Psi = True
         self.cnd_Psi = cond(self.Psi)
@@ -478,10 +491,7 @@ class Kriging(surrogates):
             scipy (bool): Use `scipy_cholesky`. If `False`, numpy's `cholesky` is used.
         """
         try:
-            if scipy:
-                self.U = scipy_cholesky(self.Psi, lower=True)
-            else:
-                self.U = cholesky(self.Psi)
+            self.U = scipy_cholesky(self.Psi, lower=True) if scipy else cholesky(self.Psi)
             self.U = self.U.T
         except LinAlgError as err:
             print(f"build_U() Cholesky failed for Psi:\n {self.Psi}. {err=}, {type(err)=}")
@@ -501,21 +511,13 @@ class Kriging(surrogates):
 
         """
         # (2.20) in [Forr08a]:
-        mu = (
-                 self.one.T.dot(
-                     solve(self.U, solve(self.U.T, self.cod_y))
-                 )
-             ) / self.one.T.dot(solve(self.U, solve(self.U.T, self.one)))
+        U_T_inv_one = solve(self.U.T, self.one)
+        U_T_inv_cod_y = solve(self.U.T, self.cod_y)
+        mu = self.one.T.dot(solve(self.U, U_T_inv_cod_y)) / self.one.T.dot(solve(self.U, U_T_inv_one))
         self.mu = mu
         # (2.31) in [Forr08a]
-        self.SigmaSqr = (
-                            (self.cod_y - self.one.dot(self.mu)).T.dot(
-                                solve(
-                                    self.U,
-                                    solve(self.U.T, (self.cod_y - self.one.dot(self.mu))),
-                                )
-                            )
-                        ) / self.n
+        cod_y_minus_mu = self.cod_y - self.one.dot(self.mu)
+        self.SigmaSqr = cod_y_minus_mu.T.dot(solve(self.U, solve(self.U.T, cod_y_minus_mu))) / self.n
         # (2.32) in [Forr08a]
         self.LnDetPsi = 2.0 * sum(log(abs(diag(self.U))))
         self.negLnLike = -1.0 * (-(self.n / 2.0) * log(self.SigmaSqr) - 0.5 * self.LnDetPsi)
@@ -638,22 +640,16 @@ class Kriging(surrogates):
                 raise TypeError("13.1: Input to predict was not convertible to the size of X")
         else:
             raise TypeError(f"type of the given input is an {type(nat_X)} instead of an ndarray")
-
-        # Iterate through the Input
-        y = array([], dtype=float)
-        s = array([], dtype=float)
-        ei = array([], dtype=float)
-
-        for i in range(X.shape[0]):
-            # logger.debug(f"13.2: predict() Step 2: x (reshaped nat_X):\n {x}")
+        n = X.shape[0]
+        y = empty(n, dtype=float)
+        s = empty(n, dtype=float)
+        ei = empty(n, dtype=float)
+        for i in range(n):
             if nat:
                 x = self.nat_to_cod_x(X[i, :])
             else:
                 x = X[i, :]
-            y0, s0, ei0 = self.predict_coded(x)
-            y = append(y, y0)
-            s = append(s, s0)
-            ei = append(ei, ei0)
+            y[i], s[i], ei[i] = self.predict_coded(x)
         if return_val == "y":
             return y
         elif return_val == "s":
@@ -716,20 +712,14 @@ class Kriging(surrogates):
                 predicted error.
         """
         self.build_psi_vec(cod_x)
-        f = self.mu + self.psi.T.dot(
-            solve(self.U, solve(
-                self.U.T, self.cod_y - self.one.dot(self.mu)))
-        )
-        try:
-            if self.noise:
-                Lambda = self.Lambda
-            else:
-                Lambda = 0.0
-            # Error in [Forr08a, p.87]:
-            SSqr = self.SigmaSqr * (1 + Lambda - self.psi.T.dot(solve(self.U, solve(self.U.T, self.psi))))
-        except Exception as err:
-            print(f"Could not determine SSqr. Wrong or missing Lambda? {err=}, {type(err)=}")
-
+        U_T_inv = solve(self.U.T, self.cod_y - self.one.dot(self.mu))
+        f = self.mu + self.psi.T.dot(solve(self.U, U_T_inv))
+        if self.noise:
+            Lambda = self.Lambda
+        else:
+            Lambda = 0.0
+        # Error in [Forr08a, p.87]:
+        SSqr = self.SigmaSqr * (1 + Lambda - self.psi.T.dot(solve(self.U, solve(self.U.T, self.psi))))
         SSqr = power(abs(SSqr[0]), 0.5)[0]
         EI = self.exp_imp(y0=f[0], s0=SSqr)
         return f[0], SSqr, EI
@@ -755,15 +745,16 @@ class Kriging(surrogates):
         y_min = min(self.cod_y)
         if s0 <= 0.0:
             EI = 0.0
-        elif s0 > 0.0:
+        else:
+            y_min_y0 = y_min - y0
             EI_one = w * (
-                    (y_min - y0)
-                    * (0.5 + 0.5 * erf((1.0 / sqrt(2.0)) * ((y_min - y0) / s0)))
+                    y_min_y0
+                    * (0.5 + 0.5 * erf((1.0 / sqrt(2.0)) * (y_min_y0 / s0)))
             )
             EI_two = (
                     (1.0 - w)
                     * (s0 * (1.0 / sqrt(2.0 * pi)))
-                    * (exp(-(1.0 / 2.0) * ((y_min - y0) ** 2.0 / s0 ** 2.0)))
+                    * (exp(-(1.0 / 2.0) * ((y_min_y0) ** 2.0 / s0 ** 2.0)))
             )
             EI = EI_one + EI_two
         return EI
@@ -783,10 +774,7 @@ class Kriging(surrogates):
         """
         if points is None:
             points = self.gen.lhd(n_samples)
-        values = zeros(len(points))
-        for enu, point in enumerate(points):
-            s0 = self.predict(cod_X=point, nat=True, return_val="s")
-            values[enu] = s0
+        values = [self.predict(cod_X=point, nat=True, return_val="s") for point in points]
         return mean(values), std(values)
 
     def cod_to_nat_x(self, cod_X):
@@ -802,8 +790,8 @@ class Kriging(surrogates):
         if self.cod_type == "norm":
             for i in range(self.k):
                 X[i] = (
-                               X[i] * float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
-                       ) + self.nat_range_X[i][0]
+                    X[i] * float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
+                ) + self.nat_range_X[i][0]
             return X
         elif self.cod_type == "std":
             for i in range(self.k):
@@ -821,14 +809,13 @@ class Kriging(surrogates):
             (array):
                 An array of observed values in real-world units.
         """
-        if self.cod_type == "norm":
-            return (
-                           cod_y * (self.nat_range_y[1] - self.nat_range_y[0])
-                   ) + self.nat_range_y[0]
-        elif self.cod_type == "std":
-            return cod_y * self.nat_std_y + self.nat_mean_y
-        else:
-            return cod_y
+        return (
+            cod_y * (self.nat_range_y[1] - self.nat_range_y[0]) + self.nat_range_y[0]
+            if self.cod_type == "norm"
+            else cod_y * self.nat_std_y + self.nat_mean_y
+            if self.cod_type == "std"
+            else cod_y
+        )
 
     def nat_to_cod_x(self, nat_X):
         """
@@ -856,7 +843,9 @@ class Kriging(surrogates):
                 if rangex == 0:
                     self.nat_range_X[i][0] = self.nat_range_X[i][0] - 0.5
                     self.nat_range_X[i][1] = self.nat_range_X[i][1] + 0.5
-                X[i] = (X[i] - self.nat_range_X[i][0]) / float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
+                X[i] = (X[i] - self.nat_range_X[i][0]) / float(
+                    self.nat_range_X[i][1] - self.nat_range_X[i][0]
+                )
             return X
         elif self.cod_type == "std":
             for i in range(self.k):
@@ -876,15 +865,13 @@ class Kriging(surrogates):
                 A normalized array of coded (model) units in the range of [0,1].
 
         """
-        if self.use_cod_y:
-            if self.cod_type == "norm":
-                return (nat_y - self.nat_range_y[0]) / (self.nat_range_y[1] - self.nat_range_y[0])
-            elif self.cod_type == "std":
-                return (nat_y - self.nat_mean_y) / self.nat_std_y
-            else:
-                return nat_y
-        else:
-            return nat_y
+        return (
+            (nat_y - self.nat_range_y[0]) / (self.nat_range_y[1] - self.nat_range_y[0])
+            if self.use_cod_y and self.cod_type == "norm"
+            else (nat_y - self.nat_mean_y) / self.nat_std_y
+            if self.use_cod_y and self.cod_type == "std"
+            else nat_y
+        )
 
     def nat_to_cod_init(self):
         """
