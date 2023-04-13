@@ -1,9 +1,9 @@
-from .designs import designs
+from numpy import ones, repeat, zeros, ndarray
 from scipy.stats.qmc import LatinHypercube
-from numpy import repeat
 from spotPython.utils.transform import scale
-from numpy import zeros
-from numpy import ones
+from typing import Optional, Union
+
+from .designs import designs
 
 
 class spacefilling(designs):
@@ -20,7 +20,13 @@ class spacefilling(designs):
         super().__init__(k, seed)
         self.sampler = LatinHypercube(d=self.k, seed=self.seed)
 
-    def scipy_lhd(self, n, repeats=1, lower=None, upper=None):
+    def scipy_lhd(
+        self,
+        n: int,
+        repeats: int = 1,
+        lower: Optional[Union[int, float]] = None,
+        upper: Optional[Union[int, float]] = None,
+    ) -> ndarray:
         """
         Latin hypercube sampling based on scipy.
 

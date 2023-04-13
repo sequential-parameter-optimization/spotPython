@@ -1,7 +1,8 @@
 import copy
+import numpy as np
 
 
-def scale(X, lower, upper):
+def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
     """
     Sample scaling from unit hypercube to different bounds.
 
@@ -40,12 +41,10 @@ def scale(X, lower, upper):
     # Checking that X is within (0,1) interval
     if (X.max() > 1.0) or (X.min() < 0.0):
         raise ValueError("Sample is not in unit hypercube")
-
-    for i in range(X.shape[1]):
-        if lower[i] == upper[i]:
-            X[:, i] = lower[i]
-        else:
-            X[:, i] = X[:, i] * (upper[i] - lower[i]) + lower[i]
+    # Vectorized scaling operation
+    X = (upper - lower) * X + lower
+    # Handling case where lower == upper
+    X[:, lower == upper] = lower[lower == upper]
     return X
 
 
@@ -59,6 +58,24 @@ def transform_power_10_int(x: int) -> int:
 
 def transform_power_2(x):
     return 2**x
+
+
+def transform_power(base: int, x: int, as_int: bool = False) -> float:
+    """
+    Raises a given base to the power of x.
+
+    Args:
+        base (int): The base to raise to the power of x.
+        x (int): The exponent.
+        as_int (bool): If True, returns the result as an integer.
+
+    Returns:
+        float: The result of raising the base to the power of x.
+    """
+    result = base**x
+    if as_int:
+        result = int(result)
+    return result
 
 
 def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
