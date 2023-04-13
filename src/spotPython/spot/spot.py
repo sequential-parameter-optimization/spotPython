@@ -408,7 +408,7 @@ class Spot:
             self.min_mean_y = min(self.mean_y)
             self.min_mean_X = self.mean_X[argmin(self.mean_y)]
 
-    def suggest_new_X(self):
+    def suggest_new_X_old(self):
         """
         Compute `n_points` new infill points in natural units.
         The optimizer searches in the ranges from `lower_j` to `upper_j`.
@@ -444,6 +444,42 @@ class Spot:
                 result = self.optimizer(func=self.infill, x0=self.min_X)
             else:
                 result = self.optimizer(func=self.infill, bounds=self.de_bounds)
+            new_X[i][:] = result.x
+        return new_X
+
+    def suggest_new_X(self):
+        """
+        Compute `n_points` new infill points in natural units.
+        The optimizer searches in the ranges from `lower_j` to `upper_j`.
+        The method `infill()` is used as the objective function.
+
+        Returns:
+            (numpy.ndarray): `n_points` infill points in natural units, each of dim k
+
+        Note:
+            This is step (S-14a) in [bart21i].
+        """
+        # (S-14a) Optimization on the surrogate:
+        new_X = np.zeros([self.n_points, self.k], dtype=float)
+
+        optimizer_name = self.optimizer.__name__
+
+        optimizers = {
+            "dual_annealing": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds),
+            "differential_evolution": lambda: self.optimizer(
+                func=self.infill,
+                bounds=self.de_bounds,
+                maxiter=self.optimizer_control["max_iter"],
+                seed=self.optimizer_control["seed"],
+            ),
+            "direct": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds, eps=1e-2),
+            "shgo": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds),
+            "basinhopping": lambda: self.optimizer(func=self.infill, x0=self.min_X),
+            "default": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds),
+        }
+
+        for i in range(self.n_points):
+            result = optimizers.get(optimizer_name, optimizers["default"])()
             new_X[i][:] = result.x
         return new_X
 

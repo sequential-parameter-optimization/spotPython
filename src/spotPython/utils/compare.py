@@ -1,26 +1,28 @@
+from typing import Tuple
+from typing import List
+
 import numpy as np
 
 
-def selectNew(A, X, tolerance=0):
+def selectNew(A: np.ndarray, X: np.ndarray, tolerance: float = 0) -> Tuple[np.ndarray, np.ndarray]:
     """
     Select rows from A that are not in X.
 
     Args:
         A (numpy.ndarray): A array with new values
         X (numpy.ndarray): X array with known values
+        tolerance (float): tolerance value for comparison
 
     Returns:
         (numpy.ndarray): array with unknown (new) values
         (numpy.ndarray): array with `True` if value is new, otherwise `False`.
     """
-    ind = np.zeros(A.shape[0], dtype=bool)
-    for i in range(X.shape[0]):
-        B = np.abs(A - X[i, :])
-        ind = ind + np.all(B <= tolerance, axis=1)
+    B = np.abs(A[:, None] - X)
+    ind = np.any(np.all(B <= tolerance, axis=2), axis=1)
     return A[~ind], ~ind
 
 
-def find_equal_in_lists(a, b):
+def find_equal_in_lists(a: List[int], b: List[int]) -> List[int]:
     """Find equal values in two lists.
 
     Args:
@@ -35,10 +37,6 @@ def find_equal_in_lists(a, b):
         >>> find_equal_in_lists(a, b)
         [1, 1, 1, 1, 1]
     """
-    equal = []
-    for i in range(len(a)):
-        if a[i] == b[i]:
-            equal.append(1)
-        else:
-            equal.append(0)
+    equal = [1 if a[i] == b[i] else 0 for i in range(len(a))]
+    return equal
     return equal

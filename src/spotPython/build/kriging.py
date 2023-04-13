@@ -27,6 +27,9 @@ from scipy.spatial.distance import cdist
 from spotPython.utils.repair import repair_non_numeric
 from spotPython.utils.aggregate import aggregate_mean_var
 import logging
+import numpy as np
+from typing import List
+
 
 logger = logging.getLogger(__name__)
 # configure the handler and formatter as needed
@@ -297,7 +300,7 @@ class Kriging(surrogates):
         self.log["p"] = append(self.log["p"], self.p)
         self.log["Lambda"] = append(self.log["Lambda"], self.Lambda)
 
-    def fit(self, nat_X, nat_y):
+    def fit_old(self, nat_X, nat_y):
         """
         The function fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model, i.e.,
         the following internal values are computed:
@@ -388,6 +391,123 @@ class Kriging(surrogates):
         # TODO: check if the following line is necessary!
         self.likelihood()
         self.update_log()
+
+    def fit(self, nat_X, nat_y):
+        """
+        The function fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model, i.e.,
+        the following internal values are computed:
+
+        1. `theta`, `p`, and `Lambda` values via optimization of the function `fun_likelihood()`.
+        2. Correlation matrix `Psi` via `rebuildPsi()`.
+
+        Args:
+            nat_X (array):
+                sample points
+            nat_y (array):
+                function values
+
+        Returns:
+            surrogate (object):
+                Fitted estimator.
+
+        Attributes:
+            theta (numpy.ndarray):
+                Kriging theta values. Shape (k,).
+            p (numpy.ndarray):
+                Kriging p values. Shape (k,).
+            LnDetPsi (numpy.float64):
+                Determinant Psi matrix.
+            Psi (numpy.matrix):
+                Correlation matrix Psi. Shape (n,n).
+            psi (numpy.ndarray):
+                psi vector. Shape (n,).
+            one (numpy.ndarray):
+                vector of ones. Shape (n,).
+            mu (numpy.float64):
+                Kriging expected mean value mu.
+            U (numpy.matrix):
+                Kriging U matrix, Cholesky decomposition. Shape (n,n).
+            SigmaSqr (numpy.float64):
+                Sigma squared value.
+            Lambda (float):
+                lambda noise value.
+
+        """
+        self.initialize_variables(nat_X, nat_y)
+        self.set_variable_types()
+        self.nat_to_cod_init()
+        self.set_theta_values()
+        self.initialize_matrices()
+        # build_Psi() and build_U() are called in fun_likelihood
+        self.set_de_bounds()
+        # Finally, set new theta and p values and update the surrogate again
+        # for new_theta_p_Lambda in de_results["x"]:
+        new_theta_p_Lambda = self.optimize_model()
+        self.extract_from_bounds(new_theta_p_Lambda)
+        self.build_Psi()
+        self.build_U()
+        # TODO: check if the following line is necessary!
+        self.likelihood()
+        self.update_log()
+
+    def initialize_variables(self, nat_X: np.ndarray, nat_y: np.ndarray) -> None:
+        """
+        Initialize variables for the class instance.
+
+        Args:
+            nat_X (np.ndarray): The independent variable data.
+            nat_y (np.ndarray): The dependent variable data.
+
+        Example:
+            >>> initialize_variables(np.array([[1, 2], [3, 4]]), np.array([1, 2]))
+        """
+        self.nat_X = copy.deepcopy(nat_X)
+        self.nat_y = copy.deepcopy(nat_y)
+        self.n = self.nat_X.shape[0]
+        self.k = self.nat_X.shape[1]
+        self.cod_X = np.empty_like(self.nat_X)
+        self.cod_y = np.empty_like(self.nat_y)
+
+    def set_variable_types(self) -> None:
+        """
+        Set the variable types for the class instance.
+
+        Example:
+            >>> set_variable_types()
+        """
+        # assume all variable types are "num" if "num" is
+        # specified once:
+        if len(self.var_type) < self.k:
+            self.var_type = self.var_type * self.k
+            logger.warning("Warning: All variable types forced to 'num'.")
+        self.num_mask = np.array(list(map(lambda x: x == "num", self.var_type)))
+        self.factor_mask = np.array(list(map(lambda x: x == "factor", self.var_type)))
+        self.int_mask = np.array(list(map(lambda x: x == "int", self.var_type)))
+        self.ordered_mask = np.array(list(map(lambda x: x == "int" or x == "num" or x == "float", self.var_type)))
+
+    def set_theta_values(self) -> None:
+        """ Set the theta values for the class instance."""
+        if self.n_theta > self.k:
+            self.n_theta = self.k
+            logger.warning("More theta values than dimensions. `n_theta` set to `k`.")
+        self.theta: List[float] = zeros(self.n_theta)
+        # TODO: Currently not used:
+        self.x0_theta: List[float] = ones((self.n_theta,)) * self.n / (100 * self.k)
+
+    def initialize_matrices(self) -> None:
+        """ Initialize the matrices for the class instance."""
+        self.p = ones(self.n_p) * 2.0
+        self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+        self.negLnLike = None
+        self.gen = spacefilling(k=self.k, seed=self.seed)
+        self.LnDetPsi = None
+        self.Psi = zeros((self.n, self.n), dtype=float64)
+        self.psi = zeros((self.n, 1))
+        self.one = ones(self.n)
+        self.mu = None
+        self.U = None
+        self.SigmaSqr = None
+        self.Lambda = None
 
     def fun_likelihood(self, new_theta_p_Lambda):
         """
@@ -659,7 +779,7 @@ class Kriging(surrogates):
         else:
             return y, s, -1.0 * ei
 
-    def build_psi_vec(self, cod_x):
+    def build_psi_vec(self, cod_x: ndarray) -> None:
         """
         Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,
         `regression_predict_coded`. Modifies `self.psi`.
