@@ -326,19 +326,24 @@ def get_values_from_dict(dictionary) -> np.array:
     return np.array(list(dictionary.values()))
 
 
-def return_values_from_var_dict_list(var_dict: dict, fun_control: dict) -> list:
+def return_conf_list_from_var_dict(var_dict: dict, fun_control: dict) -> list:
     """This function takes a dictionary of variables and a dictionary of function control.
     Args:
         var_dict (dict): A dictionary of variables.
         fun_control (dict): A dictionary of function control.
     Returns:
         list A list of dictionaries of hyper parameter values. Transformations are applied to the values.
-    Example:
+    Examples:
         >>> import numpy as np
-        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-        >>> fun_control = {'var_type': ['int', 'int']}
-        >>> return_values_from_var_dict(var_dict, fun_control)
-        {'a': [1, 3, 5], 'b': [2, 4, 6]}
+            var_dict = {'a': np.array([1]),
+                        'b': np.array([2])}
+            fun_control = {'var_type': ['int', 'int']}
+            return_conf_list_from_var_dict(var_dict, fun_control)
+            var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+            fun_control = {'var_type': ['int', 'int']}
+            return_conf_list_from_var_dict(var_dict, fun_control)
+            {'a': [1, 3, 5], 'b': [2, 4, 6]}
+
     """
     conf_list = []
     for values in iterate_dict_values(var_dict):
@@ -347,27 +352,6 @@ def return_values_from_var_dict_list(var_dict: dict, fun_control: dict) -> list:
         values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
         conf_list.append(values)
     return conf_list
-
-
-def return_values_from_var_dict(var_dict: dict, fun_control: dict) -> list:
-    """This function takes a dictionary of variables and a dictionary of function control.
-    Args:
-        var_dict (dict): A dictionary of variables.
-        fun_control (dict): A dictionary of function control.
-    Returns:
-        list A list of dictionaries of hyper parameter values. Transformations are applied to the values.
-    Example:
-        >>> import numpy as np
-        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-        >>> fun_control = {'var_type': ['int', 'int']}
-        >>> return_values_from_var_dict(var_dict, fun_control)
-        {'a': [1, 3, 5], 'b': [2, 4, 6]}
-    """
-    for values in iterate_dict_values(var_dict):
-        values = convert_keys(values, fun_control["var_type"])
-        values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
-        values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
-    return values
 
 
 def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename) -> dict:
@@ -403,7 +387,7 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename)
 def get_default_hyperparameters_for_core_model(fun_control, hyper_dict) -> dict:
     X0 = get_default_hyperparameters_for_fun(fun_control, hyper_dict)
     var_dict = assign_values(X0, fun_control["var_name"])
-    values = return_values_from_var_dict(var_dict, fun_control)
+    values = return_conf_list_from_var_dict(var_dict, fun_control)[0]
     return values
 
 
