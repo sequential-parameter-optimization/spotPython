@@ -1,11 +1,25 @@
-import numpy as np
-import copy
-import json
-
 from spotPython.utils.convert import class_for_name
+from spotPython.utils.transform import transform_hyper_parameter_values
 
 
-def get_values(var_dict, fun_control):
+def get_one_config_from_var_dict(var_dict, fun_control):
+    """Get one configuration from a dictionary of variables.
+    This function takes a dictionary of variables as input arguments and returns a dictionary
+    with the values from the arrays in the dictionary.
+    Args:
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+        fun_control (dict): A dictionary which (at least) has an entry with the following key:
+            - "var_type": A list of variable types. If the entry is not "num" the corresponding
+            value will be converted to the type "int".
+    Returns:
+        dict: A dictionary with the values from the arrays in the dictionary.
+    Example:
+        >>> import numpy as np
+        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+        >>> fun_control = {"var_type": ["int", "num"]}
+        >>> get_one_config_from_var_dict(var_dict, fun_control)
+        {'a': 1, 'b': 2}
+    """
     for values in iterate_dict_values(var_dict):
         values = convert_keys(values, fun_control["var_type"])
         values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
@@ -68,7 +82,7 @@ def convert_keys(d: dict, var_type: list):
     return d
 
 
-def get_dict_with_levels_and_types(fun_control, v):
+def get_dict_with_levels_and_types(fun_control, v) -> dict:
     """Get dictionary with levels and types.
     The function is maps the numerical output of the hyperparameter optimization to the corresponding levels
     of the hyperparameter needed by the core model, i.e., the tuned algorithm.
@@ -165,40 +179,3 @@ def get_dict_with_levels_and_types(fun_control, v):
         else:
             new_dict[key] = v[key]
     return new_dict
-
-
-def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
-    """
-    Transform the values of the hyperparameters according to the transform function specified in f_c
-    if the hyperparameter is of type "int", or "float" or "num".
-    Let f_c = {"core_model_hyper_dict":{ "leaf_prediction":
-    { "levels": ["mean", "model", "adaptive"], "type": "factor", "default": "mean", "core_model_parameter_type": "str"},
-    "max_depth": { "type": "int", "default": 20, "transform": "transform_power_2", "lower": 2, "upper": 20}}}
-    and v = {'max_depth': 20,'leaf_prediction': 'mean'} and def transform_power_2(x): return 2**x.
-    The function takes f_c and v as input and returns a dictionary with the same structure as v.
-    The function transforms the values of the hyperparameters according to the transform function
-    specified in f_c if the hyperparameter is of type "int", or "float" or "num".
-    For example, transform_hyper_parameter_values(f_c, v) returns {'max_depth': 1048576, 'leaf_prediction': 'mean'}.
-    Args:
-        fun_control (dict): A dictionary containing the information about the core model and the hyperparameters.
-        hyper_parameter_values (dict): A dictionary containing the values of the hyperparameters.
-    Returns:
-        dict: A dictionary containing the values of the hyperparameters.
-    Example:
-        >>> import copy
-        >>> from spotPython.utils.transform import transform_hyper_parameter_values
-        >>> fun_control = {"core_model_hyper_dict": {"leaf_prediction": {"levels": ["mean", "model", "adaptive"],
-        "type": "factor", "default": "mean", "core_model_parameter_type": "str"},
-        "max_depth": {"type": "int", "default": 20, "transform": "transform_power_2", "lower": 2, "upper": 20}}}
-        >>> hyper_parameter_values = {'max_depth': 20, 'leaf_prediction': 'mean'}
-        >>> transform_hyper_parameter_values(fun_control, hyper_parameter_values)
-        {'max_depth': 1048576, 'leaf_prediction': 'mean'}
-    """
-    hyper_parameter_values = copy.deepcopy(hyper_parameter_values)
-    for key, value in hyper_parameter_values.items():
-        if (
-            fun_control["core_model_hyper_dict"][key]["type"] in ["int", "float", "num"]
-            and fun_control["core_model_hyper_dict"][key]["transform"] != "None"
-        ):
-            hyper_parameter_values[key] = eval(fun_control["core_model_hyper_dict"][key]["transform"])(value)
-    return hyper_parameter_values
