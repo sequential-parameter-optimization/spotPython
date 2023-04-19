@@ -84,17 +84,17 @@ def convert_keys(d: dict, var_type: list):
 
 def get_dict_with_levels_and_types(fun_control, v) -> dict:
     """Get dictionary with levels and types.
-    The function is maps the numerical output of the hyperparameter optimization to the corresponding levels
+    The function maps the numerical output of the hyperparameter optimization to the corresponding levels
     of the hyperparameter needed by the core model, i.e., the tuned algorithm.
-    The function takes the dictionaries d and v and returns a new dictionary with the same keys as v
-    but with the values of the levels of the keys from d.
+    The function takes the dictionaries fun_control and v and returns a new dictionary with the same keys as v
+    but with the values of the levels of the keys from fun_control.
     If the key value in the dictionary is 0, it takes the first value from the list,
     if it is 1, it takes the second and so on.
-    If a key is not in d, it takes the key from v.
+    If a key is not in fun_control, it takes the key from v.
     If the core_model_parameter_type value is instance, it returns the class of the value from the module
     via getattr("class", value).
     For example,
-    if d = {"HoeffdingTreeRegressor":{
+    if fun_control = {"HoeffdingTreeRegressor":{
         "leaf_prediction": {
             "levels": ["mean", "model", "adaptive"],
             "type": "factor",
@@ -151,13 +151,13 @@ def get_dict_with_levels_and_types(fun_control, v) -> dict:
         new_dict (dict): dictionary with levels and types
 
     Example:
-        >>> d = {"HoeffdingTreeRegressor":{
+        >>> fun_control = {"HoeffdingTreeRegressor":{
                 "leaf_prediction": {"levels": ["mean", "model", "adaptive"],
                                     "type": "factor",
                                     "default": "mean",
                                     "core_model_parameter_type": "str"}}}
             v = {"leaf_prediction": 0}
-            get_dict_with_levels_and_types(d, v)
+            get_dict_with_levels_and_types(fun_control, v)
             {"leaf_prediction": "mean"}
     """
     d = fun_control["core_model_hyper_dict"]
