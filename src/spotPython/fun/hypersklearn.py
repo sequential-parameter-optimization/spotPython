@@ -87,7 +87,6 @@ class HyperSklearn:
         logger.debug("weighted res from eval_oml_horizon: %s", y)
         return y
 
-    
     def check_weights(self):
         if len(self.fun_control["weights"]) != 3:
             raise ValueError("The weights array must be of length 3.")
