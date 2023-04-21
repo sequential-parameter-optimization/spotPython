@@ -10,7 +10,7 @@ from spotPython.hyperparameters.prepare import (
 )
 
 
-def assign_values(X: np.array, var_list: list):
+def assign_values(X: np.array, var_list: list)->dict:
     """
     This function takes an np.array X and a list of variable names as input arguments
     and returns a dictionary where the keys are the variable names and the values are assigned from X.
@@ -36,7 +36,7 @@ def assign_values(X: np.array, var_list: list):
     return result
 
 
-def modify_hyper_parameter_levels(fun_control, hyperparameter, levels):
+def modify_hyper_parameter_levels(fun_control, hyperparameter, levels)->dict:
     """
 
     Args:
@@ -60,7 +60,7 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels):
     return fun_control
 
 
-def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds):
+def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds)->dict:
     """
 
     Args:
@@ -84,8 +84,8 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds):
     return fun_control
 
 
-def get_default_values(fun_control):
-    """Get the values from the "default" keys from the dictionary fun_control as a list.
+def get_default_values(fun_control)->dict:
+    """Get the values from the "default" keys from the dictionary fun_control as a dict.
     If the key of the value has as "type" the value "int" or "float", convert the value to the corresponding type.
     Args:
         fun_control (dict): dictionary with levels and types
@@ -137,7 +137,7 @@ def get_default_values(fun_control):
     return new_dict
 
 
-def get_var_type(fun_control):
+def get_var_type(fun_control)->list:
     """Get the types of the values from the dictionary fun_control as a list.
     Args:
         fun_control (dict): dictionary with levels and types
@@ -178,7 +178,7 @@ def get_var_type(fun_control):
     )
 
 
-def get_var_name(fun_control):
+def get_var_name(fun_control)->list:
     """Get the names of the values from the dictionary fun_control as a list.
     Args:
         fun_control (dict): dictionary with names
@@ -245,7 +245,7 @@ def get_bound_values(fun_control: dict, bound: str, as_list=False) -> list or np
         return np.array(b)
 
 
-def replace_levels_with_positions(hyper_dict, hyper_dict_values):
+def replace_levels_with_positions(hyper_dict, hyper_dict_values)->dict:
     """Replace the levels with the position in the levels list.
     The function that takes two dictionaries.
     The first contains as hyperparameters as keys.
