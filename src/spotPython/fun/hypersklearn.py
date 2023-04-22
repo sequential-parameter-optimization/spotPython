@@ -5,9 +5,7 @@ from sklearn.pipeline import make_pipeline
 from spotPython.utils.convert import get_Xy_from_df
 
 
-from spotPython.hyperparameters.values import (
-    assign_values,
-)
+from spotPython.hyperparameters.values import assign_values
 from spotPython.hyperparameters.prepare import (
     get_one_config_from_var_dict,
 )
@@ -78,7 +76,17 @@ class HyperSklearn:
             df_eval = np.nan
         return df_eval, df_preds
 
-    def fun_sklearn(self, X, fun_control=None, return_model=False, return_df=False):
+    def get_sklearn_df_eval_preds(self, model):
+        try:
+            df_eval, df_preds = self.evaluate_model(model, self.fun_control)
+        except Exception as err:
+            print(f"Error in get_sklearn_df_eval_preds(). Call to evaluate_model failed. {err=}, {type(err)=}")
+            print("Setting df_eval and df.preds to np.nan")
+            df_eval = np.nan
+            df_preds = np.nan
+        return df_eval, df_preds
+
+    def fun_sklearn(self, X, fun_control=None):
         z_res = np.array([], dtype=float)
         self.fun_control.update(fun_control)
         self.check_X_shape(X)
@@ -88,16 +96,11 @@ class HyperSklearn:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:
                 model = self.fun_control["core_model"](**config)
-            if return_model:
-                return model
             try:
-                df_eval, df_preds = self.evaluate_model(model, self.fun_control)
+                df_eval, _ = self.evaluate_model(model, self.fun_control)
             except Exception as err:
                 print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+                print("Setting df_eval to np.nan")
                 df_eval = np.nan
-                df_preds = np.nan
-            if return_df:
-                return df_eval, df_preds
-            # weights can be used to turn acc in neg. acc to get a minimization problem
             z_res = np.append(z_res, fun_control["weights"] * df_eval)
         return z_res
