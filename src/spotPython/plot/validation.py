@@ -65,25 +65,28 @@ def plot_roc(model_list, fun_control, alpha=0.8, model_names=None):
     visual adjustments without recalculation. In this example, we will demonstrate
     how to use the visualization API by comparing ROC curves.
     """
+    X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
     X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
     ax = plt.gca()
     for i, model in enumerate(model_list):
-        model.fit(X_test, y_test)
+        model.fit(X_train, y_train)
         if model_names is not None:
             model_name = model_names[i]
         else:
             model_name = None
-        RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax, alpha=alpha, name=model_name)
+        y_pred = model.predict(X_test)
+        RocCurveDisplay.from_predictions(y_test, y_pred, ax=ax, alpha=alpha, name=model_name)
     plt.show()
 
 
-def plot_confusion_matrix(clf, fun_control, target_names=None, title=None):
+def plot_confusion_matrix(model, fun_control, target_names=None, title=None):
     """
     Plotting a confusion matrix
-
     """
+    X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
     X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
-    pred = clf.predict(X_test)
+    model.fit(X_train, y_train)
+    pred = model.predict(X_test)
     fig, ax = plt.subplots(figsize=(10, 5))
     ConfusionMatrixDisplay.from_predictions(y_test, pred, ax=ax)
     if target_names is not None:

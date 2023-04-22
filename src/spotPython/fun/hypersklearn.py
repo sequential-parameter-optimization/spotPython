@@ -90,7 +90,12 @@ class HyperSklearn:
                 model = self.fun_control["core_model"](**config)
             if return_model:
                 return model
-            df_eval, df_preds = self.evaluate_model(model, self.fun_control)
+            try:
+                df_eval, df_preds = self.evaluate_model(model, self.fun_control)
+            except Exception as err:
+                print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+                df_eval = np.nan
+                df_preds = np.nan
             if return_df:
                 return df_eval, df_preds
             # weights can be used to turn acc in neg. acc to get a minimization problem
