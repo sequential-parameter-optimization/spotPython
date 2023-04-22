@@ -2,6 +2,7 @@ from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
+from spotPython.utils.convert import get_Xy_from_df
 
 
 from spotPython.hyperparameters.values import (
@@ -64,15 +65,10 @@ class HyperSklearn:
         if X.shape[1] != len(self.fun_control["var_name"]):
             raise Exception
 
-    def get_Xy_from_df(self, df, target_column) -> tuple:
-        X = df.drop(columns=[target_column])
-        y = df[target_column]
-        return X, y
-
     def evaluate_model(self, model, fun_control):
         try:
-            X_train, y_train = self.get_Xy_from_df(fun_control["train"], fun_control["target_column"])
-            X_test, y_test = self.get_Xy_from_df(fun_control["test"], fun_control["target_column"])
+            X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
+            X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
             model.fit(X_train, y_train)
             df_preds = model.predict(X_test)
             df_eval = fun_control["metric_sklearn"](y_test, df_preds)
@@ -88,11 +84,15 @@ class HyperSklearn:
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
         for config in get_one_config_from_var_dict(var_dict, self.fun_control):
-            model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
+            if self.fun_control["prep_model"] is not None:
+                model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
+            else:
+                model = self.fun_control["core_model"](**config)
             if return_model:
                 return model
             df_eval, df_preds = self.evaluate_model(model, self.fun_control)
             if return_df:
                 return df_eval, df_preds
-            z_res = np.append(z_res, df_eval)
+            # weights can be used to turn acc in neg. acc to get a minimization problem
+            z_res = np.append(z_res, fun_control["weights"] * df_eval)
         return z_res
