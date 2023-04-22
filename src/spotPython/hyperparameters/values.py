@@ -1,6 +1,9 @@
 import numpy as np
 import copy
 import json
+from sklearn.pipeline import make_pipeline
+from river import compose
+
 
 from spotPython.hyperparameters.prepare import (
     transform_hyper_parameter_values,
@@ -382,6 +385,26 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename)
     hyper_dict().load()
     fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
     return fun_control
+
+
+def get_one_sklearn_model_from_X(X, fun_control=None):
+    var_dict = assign_values(X, fun_control["var_name"])
+    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    if fun_control["prep_model"] is not None:
+        model = make_pipeline(fun_control["prep_model"], fun_control["core_model"](**config))
+    else:
+        model = fun_control["core_model"](**config)
+    return model
+
+
+def get_one_river_model_from_X(X, fun_control=None):
+    var_dict = assign_values(X, fun_control["var_name"])
+    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    if fun_control["prep_model"] is not None:
+        model = compose.Pipeline(fun_control["prep_model"], fun_control["core_model"](**config))
+    else:
+        model = fun_control["core_model"](**config)
+    return model
 
 
 def get_default_hyperparameters_for_core_model(fun_control, hyper_dict) -> dict:

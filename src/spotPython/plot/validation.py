@@ -94,3 +94,30 @@ def plot_confusion_matrix(model, fun_control, target_names=None, title=None):
         ax.yaxis.set_ticklabels(target_names)
     if title is not None:
         _ = ax.set_title(title)
+
+
+def plot_actual_vs_predicted(y_test, y_pred, title=None):
+    fig, axs = plt.subplots(ncols=2, figsize=(8, 4))
+    PredictionErrorDisplay.from_predictions(
+        y_test,
+        y_pred=y_pred,
+        kind="actual_vs_predicted",
+        subsample=100,
+        ax=axs[0],
+        random_state=0,
+        scatter_kwargs={"alpha": 0.5},
+    )
+    axs[0].set_title("Actual vs. Predicted values")
+    PredictionErrorDisplay.from_predictions(
+        y_test,
+        y_pred=y_pred,
+        kind="residual_vs_predicted",
+        subsample=100,
+        ax=axs[1],
+        random_state=0,
+    )
+    axs[1].set_title("Residuals vs. Predicted Values")
+    if title is not None:
+        fig.suptitle(title)
+    plt.tight_layout()
+    plt.show()
