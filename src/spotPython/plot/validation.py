@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import PredictionErrorDisplay
 from spotPython.utils.convert import get_Xy_from_df
 from sklearn.metrics import RocCurveDisplay
+from sklearn.metrics import ConfusionMatrixDisplay
 
 
 def plot_cv_predictions(model, fun_control):
@@ -74,3 +75,19 @@ def plot_roc(model_list, fun_control, alpha=0.8, model_names=None):
             model_name = None
         RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax, alpha=alpha, name=model_name)
     plt.show()
+
+
+def plot_confusion_matrix(clf, fun_control, target_names=None, title=None):
+    """
+    Plotting a confusion matrix
+
+    """
+    X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
+    pred = clf.predict(X_test)
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ConfusionMatrixDisplay.from_predictions(y_test, pred, ax=ax)
+    if target_names is not None:
+        ax.xaxis.set_ticklabels(target_names)
+        ax.yaxis.set_ticklabels(target_names)
+    if title is not None:
+        _ = ax.set_title(title)
