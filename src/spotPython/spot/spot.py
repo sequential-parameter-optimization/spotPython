@@ -316,8 +316,8 @@ class Spot:
         else:
             return X0
 
-    def run(self):
-        self.initialize_design()
+    def run(self, X_start=None):
+        self.initialize_design(X_start)
         # (S-5) Calling the spotLoop Function
         # and
         # (S-9) Termination Criteria, Conditions:
@@ -334,7 +334,7 @@ class Spot:
             self.show_progress_if_needed(timeout_start)
         return self
 
-    def initialize_design(self):
+    def initialize_design(self, X_start=None):
         # (S-2) Initial Design:
         X0 = self.generate_design(
             size=self.design_control["init_size"],
@@ -342,6 +342,11 @@ class Spot:
             lower=self.lower,
             upper=self.upper,
         )
+        if X_start is not None:
+            try:
+                X0 = append(X_start, X0, axis=0)
+            except ValueError:
+                logger.warning("X_start has wrong shape. Ignoring it.")
         X0 = repair_non_numeric(X0, self.var_type)
         self.X = X0
         # (S-3): Eval initial design:
