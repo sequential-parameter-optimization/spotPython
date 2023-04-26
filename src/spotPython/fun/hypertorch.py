@@ -2,8 +2,7 @@ from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
-from spotPython.utils.convert import get_Xy_from_df
-from spotPython.utils.data import load_data
+from spotPython.utils.file import load_data
 import torch.nn as nn
 import torch.optim as optim
 import torch
@@ -72,7 +71,7 @@ class HyperTorch:
     def evaluate_model(self, model, fun_control):
         # TODO: config anpassen
         try:
-            lr = fun_control["lr"]
+            lr = fun_control["META"]["lr"]["default"]
             checkpoint_dir = fun_control["checkpoint_dir"]
             data_dir = fun_control["data_dir"]
 
@@ -100,7 +99,7 @@ class HyperTorch:
 
             # TODO:
             # trainset, testset = load_data(data_dir)
-            
+
             trainset = fun_control["train"]
 
             test_abs = int(len(trainset) * 0.8)
@@ -108,18 +107,18 @@ class HyperTorch:
 
             trainloader = torch.utils.data.DataLoader(
                 train_subset,
-                batch_size=int(fun_control["core_model_hyper_dict"]["batch_size"]),
+                batch_size=int(fun_control["META"]["batch_size"]["default"]),
                 shuffle=True,
                 num_workers=8,
             )
             valloader = torch.utils.data.DataLoader(
                 val_subset,
-                batch_size=int(fun_control["core_model_hyper_dict"]["batch_size"]),
+                batch_size=int(fun_control["META"]["batch_size"]["default"]),
                 shuffle=True,
                 num_workers=8,
             )
 
-            for epoch in range(10):  # loop over the dataset multiple times
+            for epoch in range(3):  # loop over the dataset multiple times
                 running_loss = 0.0
                 epoch_steps = 0
                 for i, data in enumerate(trainloader, 0):
