@@ -9,7 +9,7 @@ import numpy as np
 
 
 class Net_CIFAR10(nn.Module):
-    def __init__(self, l1, l2, lr, batch_size):
+    def __init__(self, l1, l2, lr, batch_size, epochs):
         super(Net_CIFAR10, self).__init__()
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
@@ -20,6 +20,7 @@ class Net_CIFAR10(nn.Module):
         #
         self.lr = lr
         self.batch_size = batch_size
+        self.epochs = epochs
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
@@ -70,7 +71,7 @@ class Net_CIFAR10(nn.Module):
                 num_workers=8,
             )
 
-            for epoch in range(3):  # loop over the dataset multiple times
+            for epoch in range(self.epochs):  # loop over the dataset multiple times
                 running_loss = 0.0
                 epoch_steps = 0
                 for i, data in enumerate(trainloader, 0):
