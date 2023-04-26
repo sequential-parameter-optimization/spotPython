@@ -29,9 +29,9 @@ py_handler.setFormatter(py_formatter)
 logger.addHandler(py_handler)
 
 
-class HyperSklearn:
+class HyperTorch:
     """
-    Hyperparameter Tuning for Sklearn.
+    Hyperparameter Tuning for Torch.
 
     Args:
         seed (int): seed.
@@ -76,11 +76,11 @@ class HyperSklearn:
             checkpoint_dir = fun_control["checkpoint_dir"]
             data_dir = fun_control["data_dir"]
 
-            X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
-            X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
-            model.fit(X_train, y_train)
-            df_preds = model.predict(X_test)
-            df_eval = fun_control["metric_sklearn"](y_test, df_preds)
+            # X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
+            # X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
+            # model.fit(X_train, y_train)
+            # df_preds = model.predict(X_test)
+            # df_eval = fun_control["metric_sklearn"](y_test, df_preds)
             #
             device = "cpu"
             # if torch.cuda.is_available():
@@ -92,21 +92,31 @@ class HyperSklearn:
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
-            if checkpoint_dir:
-                model_state, optimizer_state = torch.load(os.path.join(checkpoint_dir, "checkpoint"))
-                model.load_state_dict(model_state)
-                optimizer.load_state_dict(optimizer_state)
+            # TODO:
+            # if checkpoint_dir:
+            #     model_state, optimizer_state = torch.load(os.path.join(checkpoint_dir, "checkpoint"))
+            #     model.load_state_dict(model_state)
+            #     optimizer.load_state_dict(optimizer_state)
 
-            trainset, testset = load_data(data_dir)
+            # TODO:
+            # trainset, testset = load_data(data_dir)
+            
+            trainset = fun_control["train"]
 
             test_abs = int(len(trainset) * 0.8)
             train_subset, val_subset = random_split(trainset, [test_abs, len(trainset) - test_abs])
 
             trainloader = torch.utils.data.DataLoader(
-                train_subset, batch_size=int(config["batch_size"]), shuffle=True, num_workers=8
+                train_subset,
+                batch_size=int(fun_control["core_model_hyper_dict"]["batch_size"]),
+                shuffle=True,
+                num_workers=8,
             )
             valloader = torch.utils.data.DataLoader(
-                val_subset, batch_size=int(config["batch_size"]), shuffle=True, num_workers=8
+                val_subset,
+                batch_size=int(fun_control["core_model_hyper_dict"]["batch_size"]),
+                shuffle=True,
+                num_workers=8,
             )
 
             for epoch in range(10):  # loop over the dataset multiple times
@@ -138,6 +148,7 @@ class HyperSklearn:
                 val_steps = 0
                 total = 0
                 correct = 0
+                pred_list = []
                 for i, data in enumerate(valloader, 0):
                     with torch.no_grad():
                         inputs, labels = data
@@ -145,6 +156,7 @@ class HyperSklearn:
 
                         outputs = model(inputs)
                         _, predicted = torch.max(outputs.data, 1)
+                        pred_list.append(predicted)
                         total += labels.size(0)
                         correct += (predicted == labels).sum().item()
 
@@ -157,19 +169,19 @@ class HyperSklearn:
                 path = os.path.join(checkpoint_dir, "checkpoint")
                 torch.save((model.state_dict(), optimizer.state_dict()), path)
             df_eval = val_loss / val_steps
-            df_preds = np.nan
+            df_preds = pred_list
             # accuracy = correct / total
         except Exception as err:
-            print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+            print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
         return df_eval, df_preds
 
-    def get_sklearn_df_eval_preds(self, model):
+    def get_torch_df_eval_preds(self, model):
         try:
             df_eval, df_preds = self.evaluate_model(model, self.fun_control)
         except Exception as err:
-            print(f"Error in get_sklearn_df_eval_preds(). Call to evaluate_model failed. {err=}, {type(err)=}")
+            print(f"Error in get_torch_df_eval_preds(). Call to evaluate_model failed. {err=}, {type(err)=}")
             print("Setting df_eval and df.preds to np.nan")
             df_eval = np.nan
             df_preds = np.nan
@@ -188,7 +200,7 @@ class HyperSklearn:
             try:
                 df_eval, _ = self.evaluate_model(model, self.fun_control)
             except Exception as err:
-                print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+                print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")
                 df_eval = np.nan
             z_res = np.append(z_res, fun_control["weights"] * df_eval)
