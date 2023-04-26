@@ -121,9 +121,33 @@ class Net_CIFAR10(nn.Module):
                 # torch.save((self.state_dict(), optimizer.state_dict()), path)
             df_eval = val_loss / val_steps
             df_preds = pred_list
-            # accuracy = correct / total
+            accuracy = correct / total
+            print(f"Accuracy of the network on the validation data: {accuracy}")
         except Exception as err:
             print(f"Error in Net_CIFAR10. Call to evaluate() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
         return df_eval, df_preds
+
+    def test_accuracy(self, fun_control):
+        device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+        print(f"Using {device} device")
+        self.to(device)
+
+        # trainset, testset = load_data()
+        testset = fun_control["test"]
+
+        testloader = torch.utils.data.DataLoader(testset, batch_size=self.batch_size, shuffle=False, num_workers=2)
+
+        correct = 0
+        total = 0
+        with torch.no_grad():
+            for data in testloader:
+                images, labels = data
+                images, labels = images.to(device), labels.to(device)
+                outputs = self(images)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        return correct / total
