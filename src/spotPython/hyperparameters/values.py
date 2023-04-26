@@ -378,12 +378,13 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename)
     """
     fun_control.update({"core_model": core_model})
     if filename is None:
-        river_hyper_dict = hyper_dict().load()
+        new_hyper_dict = hyper_dict().load()
     else:
         with open("river_hyper_dict.json", "r") as f:
-            river_hyper_dict = json.load(f)
+            new_hyper_dict = json.load(f)
     hyper_dict().load()
-    fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
+    fun_control.update({"core_model_hyper_dict": new_hyper_dict[core_model.__name__]})
+    fun_control.update({"META": new_hyper_dict["META"]})
     return fun_control
 
 
