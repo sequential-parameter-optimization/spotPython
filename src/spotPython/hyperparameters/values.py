@@ -384,7 +384,6 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename)
             new_hyper_dict = json.load(f)
     hyper_dict().load()
     fun_control.update({"core_model_hyper_dict": new_hyper_dict[core_model.__name__]})
-    fun_control.update({"META": new_hyper_dict["META"]})
     return fun_control
 
 
