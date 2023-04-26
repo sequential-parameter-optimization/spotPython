@@ -21,6 +21,9 @@ class Net_CIFAR10(nn.Module):
         self.lr = lr
         self.batch_size = batch_size
         self.epochs = epochs
+        if torch.cuda.device_count() > 1:
+            print("We will use", torch.cuda.device_count(), "GPUs!")
+        self = nn.DataParallel(self)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
