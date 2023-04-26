@@ -165,8 +165,8 @@ class HyperTorch:
 
                 # TODO:
                 # with tune.checkpoint_dir(epoch) as checkpoint_dir:
-                path = os.path.join(checkpoint_dir, "checkpoint")
-                torch.save((model.state_dict(), optimizer.state_dict()), path)
+                # path = os.path.join(checkpoint_dir, "checkpoint")
+                # torch.save((model.state_dict(), optimizer.state_dict()), path)
             df_eval = val_loss / val_steps
             df_preds = pred_list
             # accuracy = correct / total
