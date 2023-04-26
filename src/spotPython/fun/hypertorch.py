@@ -5,7 +5,6 @@ from sklearn.pipeline import make_pipeline
 from spotPython.utils.file import load_data
 import torch.nn as nn
 import torch.optim as optim
-import torch
 import os
 from torch.utils.data import random_split
 
