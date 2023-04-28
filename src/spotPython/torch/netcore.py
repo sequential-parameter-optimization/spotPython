@@ -8,31 +8,15 @@ from torch.utils.data import random_split
 import numpy as np
 
 
-class Net_CIFAR10(nn.Module):
-    def __init__(self, l1, l2, lr, batch_size, epochs):
-        super(Net_CIFAR10, self).__init__()
-        self.conv1 = nn.Conv2d(3, 6, 5)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.conv2 = nn.Conv2d(6, 16, 5)
-        self.fc1 = nn.Linear(16 * 5 * 5, l1)
-        self.fc2 = nn.Linear(l1, l2)
-        self.fc3 = nn.Linear(l2, 10)
-        #
+class Net_Core(nn.Module):
+    def __init__(self, lr, batch_size, epochs):
+        super(Net_Core, self).__init__()
         self.lr = lr
         self.batch_size = batch_size
         self.epochs = epochs
         if torch.cuda.device_count() > 1:
             print("We will use", torch.cuda.device_count(), "GPUs!")
         self = nn.DataParallel(self)
-
-    def forward(self, x):
-        x = self.pool(F.relu(self.conv1(x)))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 16 * 5 * 5)
-        x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
 
     def evaluate(self, fun_control):
         try:
@@ -58,7 +42,7 @@ class Net_CIFAR10(nn.Module):
 
             trainset = fun_control["train"]
 
-            test_abs = int(len(trainset) * 0.8)
+            test_abs = int(len(trainset) * 0.6)
             train_subset, val_subset = random_split(trainset, [test_abs, len(trainset) - test_abs])
 
             trainloader = torch.utils.data.DataLoader(
@@ -128,7 +112,7 @@ class Net_CIFAR10(nn.Module):
             accuracy = correct / total
             print(f"Accuracy of the network on the validation data: {accuracy}")
         except Exception as err:
-            print(f"Error in Net_CIFAR10. Call to evaluate() failed. {err=}, {type(err)=}")
+            print(f"Error in Net_Core. Call to evaluate() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
         return df_eval, df_preds
