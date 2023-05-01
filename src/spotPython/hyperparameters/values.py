@@ -387,23 +387,24 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename)
     return fun_control
 
 
-def get_one_sklearn_model_from_X(X, fun_control=None):
+def get_one_core_model_from_X(X, fun_control=None):
     var_dict = assign_values(X, fun_control["var_name"])
     config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    core_model = fun_control["core_model"](**config)
+    return core_model
+
+
+def get_one_sklearn_model_from_X(X, fun_control=None):
+    core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
-        model = make_pipeline(fun_control["prep_model"], fun_control["core_model"](**config))
-    else:
-        model = fun_control["core_model"](**config)
+        model = make_pipeline(fun_control["prep_model"], core_model)
     return model
 
 
 def get_one_river_model_from_X(X, fun_control=None):
-    var_dict = assign_values(X, fun_control["var_name"])
-    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
-        model = compose.Pipeline(fun_control["prep_model"], fun_control["core_model"](**config))
-    else:
-        model = fun_control["core_model"](**config)
+        model = compose.Pipeline(fun_control["prep_model"], core_model)
     return model
 
 

@@ -1,11 +1,6 @@
 from torch import nn
 import torch.nn.functional as F
-from spotPython.utils.file import load_data
-import torch.optim as optim
 import torch
-import os
-from torch.utils.data import random_split
-import numpy as np
 import spotPython.torch.netcore as netcore
 
 
