@@ -4,8 +4,8 @@ from numpy import array
 from sklearn.pipeline import make_pipeline
 
 
-from spotPython.hyperparameters.values import assign_values
-from spotPython.hyperparameters.prepare import (
+from spotPython.hyperparameters.values import (
+    assign_values,
     get_one_config_from_var_dict,
 )
 
