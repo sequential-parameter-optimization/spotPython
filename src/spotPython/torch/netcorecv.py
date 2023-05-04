@@ -22,7 +22,7 @@ class Net_Core_CV(nn.Module):
             print("We will use", torch.cuda.device_count(), "GPUs!")
         self = nn.DataParallel(self)
 
-    def evaluate(self, fun_control):
+    def evaluate(self, dataset):
         try:
             # device = "cpu"
             # if torch.cuda.is_available():
@@ -44,21 +44,19 @@ class Net_Core_CV(nn.Module):
             # TODO:
             # trainset, testset = load_data(data_dir)
 
-            trainset = fun_control["train"]
+            # dataset = fun_control["train"]
             kfold = KFold(n_splits=self.k_folds, shuffle=True)
 
-            # test_abs = int(len(trainset) * 0.6)
-            # train_subset, val_subset = random_split(trainset, [test_abs, len(trainset) - test_abs])
-            for fold, (train_ids, val_ids) in enumerate(kfold.split(trainset)):
+            # test_abs = int(len(dataset) * 0.6)
+            # train_subset, val_subset = random_split(dataset, [test_abs, len(dataset) - test_abs])
+            for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
                 print(f"Fold {fold}")
                 # Sample elements randomly from a given list of ids, no replacement.
                 train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
                 val_subsampler = torch.utils.data.SubsetRandomSampler(val_ids)
                 # Define data loaders for training and testing data in this fold
-                trainloader = torch.utils.data.DataLoader(
-                    trainset, batch_size=self.batch_size, sampler=train_subsampler
-                )
-                valloader = torch.utils.data.DataLoader(trainset, batch_size=self.batch_size, sampler=val_subsampler)
+                trainloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, sampler=train_subsampler)
+                valloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, sampler=val_subsampler)
                 self.reset_weights()
                 for epoch in range(self.epochs):  # loop over the dataset multiple times
                     running_loss = 0.0
@@ -131,26 +129,3 @@ class Net_Core_CV(nn.Module):
             if hasattr(layer, "reset_parameters"):
                 print(f"Reset trainable parameters of layer = {layer}")
                 layer.reset_parameters()
-
-    def test_accuracy(self, fun_control):
-        device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-        print(f"Using {device} device")
-        self.to(device)
-
-        # trainset, testset = load_data()
-        testset = fun_control["test"]
-
-        testloader = torch.utils.data.DataLoader(testset, batch_size=self.batch_size, shuffle=False, num_workers=2)
-
-        correct = 0
-        total = 0
-        with torch.no_grad():
-            for data in testloader:
-                images, labels = data
-                images, labels = images.to(device), labels.to(device)
-                outputs = self(images)
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-
-        return correct / total
