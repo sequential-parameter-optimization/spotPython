@@ -22,7 +22,7 @@ class Net_Core_CV(nn.Module):
             print("We will use", torch.cuda.device_count(), "GPUs!")
         self = nn.DataParallel(self)
 
-    def evaluate(self, dataset):
+    def evaluate_cv(self, dataset, shuffle=False):
         try:
             # device = "cpu"
             # if torch.cuda.is_available():
@@ -45,7 +45,7 @@ class Net_Core_CV(nn.Module):
             # trainset, testset = load_data(data_dir)
 
             # dataset = fun_control["train"]
-            kfold = KFold(n_splits=self.k_folds, shuffle=True)
+            kfold = KFold(n_splits=self.k_folds, shuffle=shuffle)
 
             # test_abs = int(len(dataset) * 0.6)
             # train_subset, val_subset = random_split(dataset, [test_abs, len(dataset) - test_abs])

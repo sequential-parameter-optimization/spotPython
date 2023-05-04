@@ -191,7 +191,7 @@ class HyperTorch:
                 model = self.fun_control["core_model"](**config)
             try:
                 # df_eval, _ = self.evaluate_model(model=model, config = **config)
-                df_eval, _ = model.evaluate(dataset=fun_control["train"])
+                df_eval, _ = model.evaluate_cv(dataset=fun_control["train"], shuffle=True)
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")
