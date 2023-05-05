@@ -6,7 +6,7 @@ from sklearn.pipeline import make_pipeline
 
 from spotPython.hyperparameters.values import (
     assign_values,
-    get_one_config_from_var_dict,
+    generate_one_config_from_var_dict,
 )
 
 import logging
@@ -184,7 +184,7 @@ class HyperTorch:
         self.fun_control.update(fun_control)
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
-        for config in get_one_config_from_var_dict(var_dict, self.fun_control):
+        for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:

@@ -1,5 +1,11 @@
 from tabulate import tabulate
-from spotPython.hyperparameters.values import get_default_values, get_bound_values, get_var_name, get_var_type
+from spotPython.hyperparameters.values import (
+    get_default_values,
+    get_bound_values,
+    get_var_name,
+    get_var_type,
+    get_transform,
+)
 
 
 def get_stars(input_list) -> list:
@@ -51,6 +57,7 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
                 "default": defaults,
                 "lower": get_bound_values(fun_control, "lower", as_list=True),
                 "upper": get_bound_values(fun_control, "upper", as_list=True),
+                "transform": get_transform(fun_control),
             },
             headers="keys",
             tablefmt=tablefmt,
@@ -69,12 +76,13 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
                 "lower": get_bound_values(fun_control, "lower", as_list=True),
                 "upper": get_bound_values(fun_control, "upper", as_list=True),
                 "tuned": tuned,
+                "transform": get_transform(fun_control),
                 "importance": importance,
                 "stars": stars,
             },
             headers="keys",
             numalign="right",
-            floatfmt=("", "", "", "", "", "", ".2f"),
+            floatfmt=("", "", "", "", "", "", "", ".2f"),
             tablefmt=tablefmt,
         )
     return tab

@@ -8,8 +8,8 @@ from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
 
 
-def get_one_config_from_var_dict(var_dict, fun_control):
-    """Get one configuration from a dictionary of variables.
+def generate_one_config_from_var_dict(var_dict, fun_control) -> dict:
+    """Generate one configuration from a dictionary of variables (as a generator).
     This function takes a dictionary of variables as input arguments and returns a dictionary
     with the values from the arrays in the dictionary.
     Args:
@@ -23,7 +23,7 @@ def get_one_config_from_var_dict(var_dict, fun_control):
         >>> import numpy as np
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {"var_type": ["int", "num"]}
-        >>> get_one_config_from_var_dict(var_dict, fun_control)
+        >>> generate_one_config_from_var_dict(var_dict, fun_control)
         {'a': 1, 'b': 2}
     """
     for values in iterate_dict_values(var_dict):
@@ -31,6 +31,33 @@ def get_one_config_from_var_dict(var_dict, fun_control):
         values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
         values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
         yield values
+
+
+def return_conf_list_from_var_dict(var_dict: dict, fun_control: dict) -> list:
+    """This function takes a dictionary of variables and a dictionary of function control.
+    It performs similar steps as generate_one_config_from_var_dict()
+    but returns a list of dictionaries of hyper parameter values.
+    Args:
+        var_dict (dict): A dictionary of variables.
+        fun_control (dict): A dictionary of function control.
+    Returns:
+        list A list of dictionaries of hyper parameter values. Transformations are applied to the values.
+    Examples:
+        >>> import numpy as np
+            var_dict = {'a': np.array([1]),
+                        'b': np.array([2])}
+            fun_control = {'var_type': ['int', 'int']}
+            return_conf_list_from_var_dict(var_dict, fun_control)
+            var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+            fun_control = {'var_type': ['int', 'int']}
+            return_conf_list_from_var_dict(var_dict, fun_control)
+            {'a': [1, 3, 5], 'b': [2, 4, 6]}
+
+    """
+    conf_list = []
+    for values in generate_one_config_from_var_dict(var_dict, fun_control):
+        conf_list.append(values)
+    return conf_list
 
 
 def iterate_dict_values(var_dict: dict):
@@ -355,6 +382,52 @@ def get_var_type(fun_control) -> list:
     )
 
 
+def get_transform(fun_control) -> list:
+    """Get the transformations of the values from the dictionary fun_control as a list.
+    Args:
+        fun_control (dict): dictionary with levels and types
+    Returns:
+        (list): list with transformations
+    Example:
+        >>> d = {"core_model_hyper_dict":{
+            "leaf_prediction": {
+                "levels": ["mean", "model", "adaptive"],
+                "type": "factor",
+                "default": "mean",
+                "transform": "None",
+                "core_model_parameter_type": "str"},
+            "leaf_model": {
+                "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
+                "type": "factor",
+                "default": "LinearRegression",
+                "transform": "None",
+                "core_model_parameter_type": "instance"},
+            "splitter": {
+                "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
+                "type": "factor",
+                "default": "EBSTSplitter",
+                "transform": "None",
+                "core_model_parameter_type": "instance()"},
+            "binary_split": {
+                "levels": [0, 1],
+                "type": "factor",
+                "default": 0,
+                "transform": "None",
+                "core_model_parameter_type": "bool"},
+            "stop_mem_management": {                                                         "levels": [0, 1],
+                "type": "factor",
+                "default": 0,
+                "transform": "None",
+                "core_model_parameter_type": "bool"}}}
+
+        get_transform(d)
+        ['None', 'None', 'None', 'None', 'None']
+    """
+    return list(
+        fun_control["core_model_hyper_dict"][key]["transform"] for key in fun_control["core_model_hyper_dict"].keys()
+    )
+
+
 def get_var_name(fun_control) -> list:
     """Get the names of the values from the dictionary fun_control as a list.
     Args:
@@ -503,34 +576,6 @@ def get_values_from_dict(dictionary) -> np.array:
     return np.array(list(dictionary.values()))
 
 
-def return_conf_list_from_var_dict(var_dict: dict, fun_control: dict) -> list:
-    """This function takes a dictionary of variables and a dictionary of function control.
-    Args:
-        var_dict (dict): A dictionary of variables.
-        fun_control (dict): A dictionary of function control.
-    Returns:
-        list A list of dictionaries of hyper parameter values. Transformations are applied to the values.
-    Examples:
-        >>> import numpy as np
-            var_dict = {'a': np.array([1]),
-                        'b': np.array([2])}
-            fun_control = {'var_type': ['int', 'int']}
-            return_conf_list_from_var_dict(var_dict, fun_control)
-            var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-            fun_control = {'var_type': ['int', 'int']}
-            return_conf_list_from_var_dict(var_dict, fun_control)
-            {'a': [1, 3, 5], 'b': [2, 4, 6]}
-
-    """
-    conf_list = []
-    for values in iterate_dict_values(var_dict):
-        values = convert_keys(values, fun_control["var_type"])
-        values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
-        values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
-        conf_list.append(values)
-    return conf_list
-
-
 def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename) -> dict:
     """Add the core model to the function control dictionary.
     Args:
@@ -582,18 +627,18 @@ def get_one_river_model_from_X(X, fun_control=None):
     return model
 
 
-def get_default_hyperparameters_for_core_model(fun_control, hyper_dict) -> dict:
-    X0 = get_default_hyperparameters_for_fun(fun_control, hyper_dict)
-    var_dict = assign_values(X0, fun_control["var_name"])
-    values = return_conf_list_from_var_dict(var_dict, fun_control)[0]
-    return values
-
-
-def get_default_hyperparameters_for_fun(fun_control, hyper_dict) -> np.array:
+def get_default_hyperparameters_as_array(fun_control, hyper_dict) -> np.array:
     X0 = get_default_values(fun_control)
-    river_hyper_dict_default = hyper_dict().load()
-    X0 = replace_levels_with_positions(river_hyper_dict_default[fun_control["core_model"].__name__], X0)
+    X0 = replace_levels_with_positions(hyper_dict[fun_control["core_model"].__name__], X0)
     X0 = get_values_from_dict(X0)
     X0 = np.array([X0])
     X0.shape[1]
     return X0
+
+
+def get_default_hyperparameters_for_core_model(fun_control) -> dict:
+    values = get_default_values(fun_control)
+    values = convert_keys(values, fun_control["var_type"])
+    values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
+    values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
+    return values

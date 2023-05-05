@@ -1,4 +1,4 @@
-# import os
+import os
 import numpy as np
 
 from sklearn.model_selection import KFold
@@ -58,6 +58,11 @@ class Net_Core_CV(nn.Module):
                 trainloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, sampler=train_subsampler)
                 valloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, sampler=val_subsampler)
                 self.reset_weights()
+                # Define best_score, counter, and patience for early stopping:
+                best_score = None
+                counter = 0
+                patience = 10
+                # path = os.path.join(".", "checkpoint")
                 for epoch in range(self.epochs):  # loop over the dataset multiple times
                     running_loss = 0.0
                     epoch_steps = 0
@@ -103,9 +108,25 @@ class Net_Core_CV(nn.Module):
                 print("Accuracy for fold %d: %d %%" % (fold, 100.0 * correct / total))
                 print("--------------------------------")
                 self.results[fold] = 100.0 * (correct / total)
+                # early stopping:
+                # https://stackoverflow.com/questions/60200088/how-to-make-early-stopping-in-image-classification-pytorch
+                if best_score is None:
+                    best_score = val_loss
+                else:
+                    # Check if val_loss improves or not.
+                    if val_loss < best_score:
+                        # val_loss improves, we update the latest best_score,
+                        # and save the current model
+                        best_score = val_loss
+                        # TODO:
+                        # torch.save({'state_dict':self.state_dict()}, path)
+                    else:
+                        # val_loss does not improve, we increase the counter,
+                        # stop training if it exceeds the amount of patience
+                        counter += 1
+                        if counter >= patience:
+                            break
                 # TODO:
-                # with tune.checkpoint_dir(epoch) as checkpoint_dir:
-                # path = os.path.join(checkpoint_dir, "checkpoint")
                 # torch.save((self.state_dict(), optimizer.state_dict()), path)
             # Print fold results
             print(f"k-fold CV results for {self.k_folds} folds")

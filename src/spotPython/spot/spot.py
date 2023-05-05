@@ -25,6 +25,7 @@ from spotPython.budget.ocba import get_ocba_X
 import logging
 import time
 from spotPython.utils.progress import progress_bar
+import plotly.graph_objects as go
 
 
 logger = logging.getLogger(__name__)
@@ -759,3 +760,21 @@ class Spot:
             if filename is not None:
                 plt.savefig(filename, bbox_inches="tight", dpi=dpi)
             plt.show()
+
+    def parallel_plot(self):
+        X = self.X
+        y = self.y
+        df = pd.DataFrame(np.concatenate((X, y.reshape(-1, 1)), axis=1), columns=self.var_name + ["y"])
+
+        fig = go.Figure(
+            data=go.Parcoords(
+                line=dict(color=df["y"], colorscale="Jet", showscale=True, cmin=min(df["y"]), cmax=max(df["y"])),
+                dimensions=list(
+                    [
+                        dict(range=[min(df.iloc[:, i]), max(df.iloc[:, i])], label=df.columns[i], values=df.iloc[:, i])
+                        for i in range(len(df.columns) - 1)
+                    ]
+                ),
+            )
+        )
+        fig.show()
