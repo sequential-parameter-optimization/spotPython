@@ -178,8 +178,8 @@ class Net_Core_CV(nn.Module):
     def evaluate_cv(self, dataset, shuffle=False):
         try:
             device = getDevice()
-            if torch.cuda.device_count() > 1:
-                self = nn.DataParallel(self)
+            # if torch.cuda.device_count() > 1:
+            #     self = nn.DataParallel(self)
             self.to(device)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=self.lr)
@@ -206,13 +206,13 @@ class Net_Core_CV(nn.Module):
 
     def evaluate_hold_out(self, dataset, shuffle):
         lr = self.lr
-        del self.lr
+        # del self.lr
         epochs = self.epochs
-        del self.epochs
+        # del self.epochs
         try:
             device = getDevice()
-            if torch.cuda.device_count() > 1:
-                self = nn.DataParallel(self)
+            # if torch.cuda.device_count() > 1:
+            #     self = nn.DataParallel(self)
             self.to(device)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=lr)
@@ -227,8 +227,8 @@ class Net_Core_CV(nn.Module):
             print(f"Error in Net_Core_CV. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
-        self.lr = lr
-        self.epochs = epochs
+        # self.lr = lr
+        # self.epochs = epochs
         return df_eval, df_preds
 
     def create_data_loaders(self, dataset, shuffle):
