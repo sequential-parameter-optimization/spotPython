@@ -199,30 +199,36 @@ class Net_Core_CV(nn.Module):
             df_eval = sum(self.results.values()) / len(self.results.values())
             df_preds = np.nan
         except Exception as err:
-            print(f"Error in Net_Core. Call to evaluate() failed. {err=}, {type(err)=}")
+            print(f"Error in Net_Core_CV. Call to evaluate_cv() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
         return df_eval, df_preds
 
     def evaluate_hold_out(self, dataset, shuffle):
+        lr = self.lr
+        del self.lr
+        epochs = self.epochs
+        del self.epochs
         try:
             device = getDevice()
             if torch.cuda.device_count() > 1:
                 self = nn.DataParallel(self)
             self.to(device)
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(self.parameters(), lr=self.lr)
+            optimizer = optim.Adam(self.parameters(), lr=lr)
             trainloader, valloader = self.create_data_loaders(dataset, shuffle)
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
-            for epoch in range(self.epochs):
+            for epoch in range(epochs):
                 self.train_hold_out(trainloader, criterion, optimizer, device=device, epoch=epoch)
                 scheduler.step()
             df_eval = self.validate_hold_out(valloader=valloader, criterion=criterion, device=device)
             df_preds = np.nan
         except Exception as err:
-            print(f"Error in Net_Core. Call to evaluate() failed. {err=}, {type(err)=}")
+            print(f"Error in Net_Core_CV. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
+        self.lr = lr
+        self.epochs = epochs
         return df_eval, df_preds
 
     def create_data_loaders(self, dataset, shuffle):
