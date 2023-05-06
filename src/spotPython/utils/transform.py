@@ -89,7 +89,9 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     The function takes fun_control and v as input and returns a dictionary with the same structure as v.
     The function transforms the values of the hyperparameters according to the transform function
     specified in fun_control if the hyperparameter is of type "int", or "float" or "num".
-    For example, transform_hyper_parameter_values(fun_control, v) returns {'max_depth': 1048576, 'leaf_prediction': 'mean'}.
+
+    For example, transform_hyper_parameter_values(fun_control, v) returns
+     {'max_depth': 1048576, 'leaf_prediction': 'mean'}.
     Args:
         fun_control (dict): A dictionary containing the information about the core model and the hyperparameters.
         hyper_parameter_values (dict): A dictionary containing the values of the hyperparameters.

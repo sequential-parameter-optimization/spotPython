@@ -1,4 +1,3 @@
-import os
 import numpy as np
 from sklearn.model_selection import KFold
 import torch
@@ -46,8 +45,10 @@ class Net_Core_CV(nn.Module):
     #             train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
     #             val_subsampler = torch.utils.data.SubsetRandomSampler(val_ids)
     #             # Define data loaders for training and testing data in this fold
-    #             trainloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, sampler=train_subsampler)
-    #             valloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, sampler=val_subsampler)
+    #             trainloader = torch.utils.data.DataLoader(dataset,
+    #               batch_size=self.batch_size, sampler=train_subsampler)
+    #             valloader = torch.utils.data.DataLoader(dataset,
+    #               batch_size=self.batch_size, sampler=val_subsampler)
     #             self.reset_weights()
     #             # Define best_score, counter, and patience for early stopping:
     #             best_score = None
@@ -100,7 +101,8 @@ class Net_Core_CV(nn.Module):
     #             print("--------------------------------")
     #             self.results[fold] = 100.0 * (correct / total)
     #             # early stopping:
-    #             # https://stackoverflow.com/questions/60200088/how-to-make-early-stopping-in-image-classification-pytorch
+    #             # https://stackoverflow.com/questions/60200088/
+    #                   how-to-make-early-stopping-in-image-classification-pytorch
     #             if best_score is None:
     #                 best_score = val_loss
     #             else:
@@ -201,7 +203,7 @@ class Net_Core_CV(nn.Module):
             df_preds = np.nan
         return df_eval, df_preds
 
-    def evaluate_hold_out(self, dataset):
+    def evaluate_hold_out(self, dataset, shuffle):
         try:
             device = getDevice()
             self.to(device)
@@ -209,30 +211,33 @@ class Net_Core_CV(nn.Module):
                 self = nn.DataParallel(self)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=self.lr)
-            trainloader, valloader = self.create_data_loaders(dataset)
+            trainloader, valloader = self.create_data_loaders(dataset, shuffle)
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
             for epoch in range(self.epochs):
-                self.train_hold_out(trainloader, criterion, optimizer, device=device)
+                self.train_hold_out(trainloader, criterion, optimizer, device=device, epoch=epoch)
                 scheduler.step()
             df_eval = self.validate_hold_out(valloader=valloader, criterion=criterion, device=device)
+            df_preds = np.nan
         except Exception as err:
             print(f"Error in Net_Core. Call to evaluate() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
         return df_eval, df_preds
 
-    def create_data_loaders(self, dataset):
+    def create_data_loaders(self, dataset, shuffle):
         test_abs = int(len(dataset) * 0.6)
         train_subset, val_subset = random_split(dataset, [test_abs, len(dataset) - test_abs])
         trainloader = torch.utils.data.DataLoader(
-            train_subset, batch_size=int(self.batch_size), shuffle=True, num_workers=8, pin_memory=True
+            train_subset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=8, pin_memory=True
         )
         valloader = torch.utils.data.DataLoader(
-            val_subset, batch_size=int(self.batch_size), shuffle=True, num_workers=8, pin_memory=True
+            val_subset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=8, pin_memory=True
         )
         return trainloader, valloader
 
-    def train_hold_out(self, trainloader, criterion, optimizer, device):
+    def train_hold_out(self, trainloader, criterion, optimizer, device, epoch):
+        running_loss = 0.0
+        epoch_steps = 0
         for i, data in enumerate(trainloader, 0):
             inputs, labels = data
             inputs, labels = inputs.to(device), labels.to(device)
@@ -242,6 +247,12 @@ class Net_Core_CV(nn.Module):
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=1.0)
             optimizer.step()
+            # print statistics
+            running_loss += loss.item()
+            epoch_steps += 1
+            if i % 2000 == 1999:  # print every 2000 mini-batches
+                print("[%d, %5d] loss: %.3f" % (epoch + 1, i + 1, running_loss / epoch_steps))
+                running_loss = 0.0
 
     def validate_hold_out(self, valloader, criterion, device):
         val_loss = 0.0
@@ -261,4 +272,8 @@ class Net_Core_CV(nn.Module):
                 loss = criterion(outputs, labels)
                 val_loss += loss.cpu().numpy()
                 val_steps += 1
-        return val_loss / val_steps
+        accuracy = correct / total
+        loss = val_loss / val_steps
+        print(f"Accuracy on hold-out set: {accuracy}")
+        print(f"Loss on hold-out set: {loss}")
+        return loss

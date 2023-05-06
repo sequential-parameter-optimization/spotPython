@@ -13,12 +13,9 @@ import logging
 from sklearn.metrics import mean_absolute_error
 
 logger = logging.getLogger(__name__)
-# configure the handler and formatter as needed
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
 py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-# add formatter to the handler
 py_handler.setFormatter(py_formatter)
-# add handler to the logger
 logger.addHandler(py_handler)
 
 
@@ -49,6 +46,7 @@ class HyperTorch:
             "var_name": [],
             "var_type": [],
             "prep_model": None,
+            "shuffle": True,
         }
         self.log_level = self.fun_control["log_level"]
         logger.setLevel(self.log_level)
@@ -67,14 +65,19 @@ class HyperTorch:
         self.fun_control.update(fun_control)
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
+        # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:
                 model = self.fun_control["core_model"](**config)
             try:
-                # df_eval, _ = self.evaluate_model(model=model, config = **config)
-                df_eval, _ = model.evaluate_cv(dataset=fun_control["train"], shuffle=True)
+                if self.fun_control["eval"] == "cv":
+                    df_eval, _ = model.evaluate_cv(dataset=fun_control["train"], shuffle=self.fun_control["shuffle"])
+                else:
+                    df_eval, _ = model.evaluate_hold_out(
+                        dataset=fun_control["train"], shuffle=self.fun_control["shuffle"]
+                    )
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")

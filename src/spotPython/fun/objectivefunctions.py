@@ -37,6 +37,40 @@ class analytical:
             )
         return noise_y
 
+    def fun_branin_factor(self, X, fun_control=None):
+        """
+        This function calculates the Branin function with an additional factor based on the value of x3.
+        :param X: A 2D numpy array with shape (n, 3) where n is the number of samples.
+        :param fun_control: A dictionary containing control parameters for the function.
+            If None, self.fun_control is used.
+        :return: A 1D numpy array with shape (n,) containing the calculated values.
+        """
+        if fun_control is None:
+            fun_control = self.fun_control
+        if len(X.shape) == 1:
+            X = np.array([X])
+        if X.shape[1] != 3:
+            raise Exception("X must have shape (n, 3)")
+        x1 = X[:, 0]
+        x2 = X[:, 1]
+        x3 = X[:, 2]
+        a = 1
+        b = 5.1 / (4 * np.pi**2)
+        c = 5 / np.pi
+        r = 6
+        s = 10
+        t = 1 / (8 * np.pi)
+        y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s
+        for j in range(X.shape[0]):
+            if x3[j] == 1:
+                y[j] = y[j] + 10
+            elif x3[j] == 2:
+                y[j] = y[j] - 10
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
+        else:
+            return y
+
     def fun_linear(self, X, fun_control=None):
         """Linear function.
 
@@ -225,65 +259,6 @@ class analytical:
             for i in y:
                 # noise_y = np.append(
                 #     noise_y, i + np.random.normal(loc=0, scale=self.sigma, size=1)
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
-        else:
-            return y
-
-    def fun_branin_factor(self, X, fun_control=None):
-        """Branin function with factor variable x_3.
-
-        The 2-dim Branin, or Branin-Hoo, function has three global minima.
-        The recommended values of a, b, c, r, s and t are: a = 1, b = 5.1 / (4*pi**2),
-        c = 5 / π, r = 6, s = 10 and t = 1 / (8*pi).
-
-        Input Domain:
-        This function is usually evaluated on the square  x1 in  [-5, 10] x x2 in [0, 15]
-        and with x3 from the set {0, 1, 2}, i.e., x3 is a factor variable with three levels.
-
-        Global Minimum:
-        f(x) = 0.397887 -1  at (-pi, 12.275, 2), (pi, 2.275, 2), and (9.42478, 2.475, 2).
-
-        Args:
-            X (array): input value
-
-        Returns:
-            (float): function value
-
-        """
-        if fun_control is None:
-            fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
-            X = np.array([X])
-        if X.shape[1] != 3:
-            raise Exception
-        x1 = X[:, 0]
-        x2 = X[:, 1]
-        x3 = X[:, 2]
-        a = 1
-        b = 5.1 / (4 * np.pi**2)
-        c = 5 / np.pi
-        r = 6
-        s = 10
-        t = 1 / (8 * np.pi)
-        y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s
-        for j in range(X.shape[0]):
-            if x3[j] == 1:
-                y[j] = y[j] + 10
-            elif x3[j] == 2:
-                y[j] = y[j] - 10
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
                 noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
             return noise_y
         else:
