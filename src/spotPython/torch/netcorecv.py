@@ -15,9 +15,10 @@ class Net_Core_CV(nn.Module):
         self.epochs = epochs
         self.k_folds = k_folds
         self.results = {}
-        if torch.cuda.device_count() > 1:
-            print("We will use", torch.cuda.device_count(), "GPUs!")
-        self = nn.DataParallel(self)
+        # TODO: move the following to the net initialization:
+        # if torch.cuda.device_count() > 1:
+        #     print("We will use", torch.cuda.device_count(), "GPUs!")
+        # self = nn.DataParallel(self)
 
     # def evaluate_cv_old(self, dataset, shuffle=False):
     #     try:
@@ -177,9 +178,9 @@ class Net_Core_CV(nn.Module):
     def evaluate_cv(self, dataset, shuffle=False):
         try:
             device = getDevice()
-            self.to(device)
             if torch.cuda.device_count() > 1:
                 self = nn.DataParallel(self)
+            self.to(device)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=self.lr)
             kfold = KFold(n_splits=self.k_folds, shuffle=shuffle)
@@ -206,9 +207,9 @@ class Net_Core_CV(nn.Module):
     def evaluate_hold_out(self, dataset, shuffle):
         try:
             device = getDevice()
-            self.to(device)
             if torch.cuda.device_count() > 1:
                 self = nn.DataParallel(self)
+            self.to(device)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=self.lr)
             trainloader, valloader = self.create_data_loaders(dataset, shuffle)
