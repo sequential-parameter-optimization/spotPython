@@ -536,7 +536,7 @@ class Spot:
         ax = fig.add_subplot(211)
         ax.plot(
             range(1, n_init + 1),
-            s_c[:n_init],
+            s_y[:n_init],
             style[0],
             range(1, n_init + 1),
             [s_c[:n_init].min()] * n_init,

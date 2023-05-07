@@ -12,7 +12,8 @@ def fun_control_init():
                 'n_samples': None,
                 'target_column': None,
                 'shuffle': None,
-                'k_folds': None,}
+                'k_folds': None,
+                'device': None}
     """
     fun_control = {
         "data": None,
@@ -23,5 +24,6 @@ def fun_control_init():
         "shuffle": None,
         "eval": None,
         "k_folds": None,
+        "device": None,
     }
     return fun_control
