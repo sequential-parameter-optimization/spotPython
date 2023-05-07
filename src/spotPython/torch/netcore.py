@@ -88,19 +88,20 @@ class Net_Core(nn.Module):
             device = getDevice()
             self.to(device)
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(self.parameters(), lr=lr)
+            # TODO: optimizer = optim.Adam(self.parameters(), lr=lr)
+            optimizer = optim.SGD(self.parameters(), lr=lr, momentum=0.9)
             if test_dataset is None:
                 trainloader, valloader = self.create_train_val_data_loaders(dataset, shuffle)
             else:
                 trainloader, valloader = self.create_train_test_data_loaders(dataset, shuffle, test_dataset)
-            scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+            # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
             # Early stopping parameters
             patience = 5
             best_val_loss = float("inf")
             counter = 0
             for epoch in range(epochs):
                 self.train_hold_out(trainloader, criterion, optimizer, device=device, epoch=epoch)
-                scheduler.step()
+                # TODO: scheduler.step()
                 # Early stopping check
                 val_accuracy, val_loss = self.validate_hold_out(valloader=valloader, criterion=criterion, device=device)
                 if val_loss < best_val_loss:
@@ -111,13 +112,13 @@ class Net_Core(nn.Module):
                     if counter >= patience:
                         print(f"Early stopping at epoch {epoch}")
                         break
-            df_eval = best_val_loss
+            df_eval = val_loss
             df_preds = np.nan
         except Exception as err:
             print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
-        print(f"Returned to Spot: Best validation loss: {df_eval}")
+        print(f"Returned to Spot: Validation loss: {df_eval}")
         return df_eval, df_preds
 
     def create_train_val_data_loaders(self, dataset, shuffle):
