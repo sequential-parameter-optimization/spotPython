@@ -72,9 +72,15 @@ class HyperTorch:
             else:
                 model = self.fun_control["core_model"](**config)
             try:
-                if self.fun_control["eval"] == "cv":
+                if self.fun_control["eval"] == "train_cv":
                     df_eval, _ = model.evaluate_cv(dataset=fun_control["train"], shuffle=self.fun_control["shuffle"])
-                else:
+                elif self.fun_control["eval"] == "test_hold_out":
+                    df_eval, _ = model.evaluate_hold_out(
+                        dataset=fun_control["train"],
+                        shuffle=self.fun_control["shuffle"],
+                        test_dataset=fun_control["test"],
+                    )
+                else:  # eval == "train_hold_out"
                     df_eval, _ = model.evaluate_hold_out(
                         dataset=fun_control["train"], shuffle=self.fun_control["shuffle"]
                     )

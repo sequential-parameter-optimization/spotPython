@@ -200,7 +200,7 @@ class Net_Core_CV(nn.Module):
             df_preds = np.nan
         return df_eval, df_preds
 
-    def evaluate_hold_out(self, dataset, shuffle):
+    def evaluate_hold_out(self, dataset, shuffle, test_dataset=None):
         lr = self.lr
         epochs = self.epochs
         try:
@@ -208,7 +208,10 @@ class Net_Core_CV(nn.Module):
             self.to(device)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=lr)
-            trainloader, valloader = self.create_data_loaders(dataset, shuffle)
+            if test_dataset is None:
+                trainloader, valloader = self.create_train_val_data_loaders(dataset, shuffle)
+            else:
+                trainloader, valloader = self.create_train_test_data_loaders(dataset, shuffle, test_dataset)
             scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
             for epoch in range(epochs):
                 self.train_hold_out(trainloader, criterion, optimizer, device=device, epoch=epoch)
@@ -222,7 +225,7 @@ class Net_Core_CV(nn.Module):
             df_preds = np.nan
         return df_eval, df_preds
 
-    def create_data_loaders(self, dataset, shuffle):
+    def create_train_val_data_loaders(self, dataset, shuffle):
         test_abs = int(len(dataset) * 0.6)
         train_subset, val_subset = random_split(dataset, [test_abs, len(dataset) - test_abs])
         trainloader = torch.utils.data.DataLoader(
@@ -232,6 +235,15 @@ class Net_Core_CV(nn.Module):
             val_subset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=8, pin_memory=True
         )
         return trainloader, valloader
+
+    def create_train_test_data_loaders(self, dataset, shuffle, test_dataset):
+        trainloader = torch.utils.data.DataLoader(
+            dataset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=8, pin_memory=True
+        )
+        testloader = torch.utils.data.DataLoader(
+            test_dataset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=8, pin_memory=True
+        )
+        return trainloader, testloader
 
     def train_hold_out(self, trainloader, criterion, optimizer, device, epoch):
         running_loss = 0.0
