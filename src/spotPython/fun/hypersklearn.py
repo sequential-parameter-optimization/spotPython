@@ -6,7 +6,7 @@ from spotPython.utils.convert import get_Xy_from_df
 
 
 from spotPython.hyperparameters.values import assign_values
-from spotPython.hyperparameters.prepare import (
+from spotPython.hyperparameters.values import (
     generate_one_config_from_var_dict,
 )
 
