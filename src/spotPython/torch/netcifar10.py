@@ -1,25 +1,17 @@
 from torch import nn
 import torch.nn.functional as F
-import torch
-import spotPython.torch.netcore as netcore
+import spotPython.torch.netcorecv as netcorecv
 
 
-class Net_CIFAR10(netcore.Net_Core):
-    def __init__(self, l1, l2, lr, batch_size, epochs):
-        super(Net_CIFAR10, self).__init__(lr=lr, batch_size=batch_size, epochs=epochs)
+class Net_CIFAR10(netcorecv.Net_Core_CV):
+    def __init__(self, l1, l2, lr, batch_size, epochs, k_folds):
+        super(Net_CIFAR10, self).__init__(lr=lr, batch_size=batch_size, epochs=epochs, k_folds=k_folds)
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.fc1 = nn.Linear(16 * 5 * 5, l1)
         self.fc2 = nn.Linear(l1, l2)
         self.fc3 = nn.Linear(l2, 10)
-        #
-        self.lr = lr
-        self.batch_size = batch_size
-        self.epochs = epochs
-        if torch.cuda.device_count() > 1:
-            print("We will use", torch.cuda.device_count(), "GPUs!")
-        self = nn.DataParallel(self)
 
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
