@@ -617,6 +617,8 @@ def get_one_sklearn_model_from_X(X, fun_control=None):
     core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
         model = make_pipeline(fun_control["prep_model"], core_model)
+    else:
+        model = core_model
     return model
 
 
@@ -624,6 +626,8 @@ def get_one_river_model_from_X(X, fun_control=None):
     core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
         model = compose.Pipeline(fun_control["prep_model"], core_model)
+    else:
+        model = core_model
     return model
 
 
@@ -638,7 +642,7 @@ def get_default_hyperparameters_as_array(fun_control, hyper_dict) -> np.array:
 
 def get_default_hyperparameters_for_core_model(fun_control) -> dict:
     values = get_default_values(fun_control)
-    values = convert_keys(values, fun_control["var_type"])
     values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
+    values = convert_keys(values, fun_control["var_type"])
     values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
     return values
