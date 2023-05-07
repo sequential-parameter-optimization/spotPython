@@ -15,10 +15,6 @@ class Net_Core_CV(nn.Module):
         self.epochs = epochs
         self.k_folds = k_folds
         self.results = {}
-        # TODO: move the following to the net initialization:
-        # if torch.cuda.device_count() > 1:
-        #     print("We will use", torch.cuda.device_count(), "GPUs!")
-        # self = nn.DataParallel(self)
 
     # def evaluate_cv_old(self, dataset, shuffle=False):
     #     try:
@@ -206,13 +202,9 @@ class Net_Core_CV(nn.Module):
 
     def evaluate_hold_out(self, dataset, shuffle):
         lr = self.lr
-        # del self.lr
         epochs = self.epochs
-        # del self.epochs
         try:
             device = getDevice()
-            # if torch.cuda.device_count() > 1:
-            #     self = nn.DataParallel(self)
             self.to(device)
             criterion = nn.CrossEntropyLoss()
             optimizer = optim.Adam(self.parameters(), lr=lr)
@@ -221,14 +213,13 @@ class Net_Core_CV(nn.Module):
             for epoch in range(epochs):
                 self.train_hold_out(trainloader, criterion, optimizer, device=device, epoch=epoch)
                 scheduler.step()
-            df_eval = self.validate_hold_out(valloader=valloader, criterion=criterion, device=device)
+            val_accuracy, val_loss = self.validate_hold_out(valloader=valloader, criterion=criterion, device=device)
+            df_eval = val_loss
             df_preds = np.nan
         except Exception as err:
             print(f"Error in Net_Core_CV. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
-        # self.lr = lr
-        # self.epochs = epochs
         return df_eval, df_preds
 
     def create_data_loaders(self, dataset, shuffle):
@@ -283,4 +274,4 @@ class Net_Core_CV(nn.Module):
         loss = val_loss / val_steps
         print(f"Accuracy on hold-out set: {accuracy}")
         print(f"Loss on hold-out set: {loss}")
-        return loss
+        return accuracy, loss
