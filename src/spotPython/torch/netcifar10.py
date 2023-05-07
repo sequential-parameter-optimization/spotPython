@@ -1,9 +1,9 @@
 from torch import nn
 import torch.nn.functional as F
-import spotPython.torch.netcorecv as netcorecv
+import spotPython.torch.netcore as netcore
 
 
-class Net_CIFAR10(netcorecv.Net_Core_CV):
+class Net_CIFAR10(netcore.Net_Core):
     def __init__(self, l1, l2, lr, batch_size, epochs, k_folds):
         super(Net_CIFAR10, self).__init__(lr=lr, batch_size=batch_size, epochs=epochs, k_folds=k_folds)
         self.conv1 = nn.Conv2d(3, 6, 5)

@@ -1,8 +1,8 @@
 from torch import nn
-import spotPython.torch.netcorecv as netcorecv
+import spotPython.torch.netcore as netcore
 
 
-class Net_CV_fashionMNIST(netcorecv.Net_Core_CV):
+class Net_CV_fashionMNIST(netcore.Net_Core):
     def __init__(self, l1, l2, lr, batch_size, epochs, k_folds):
         super(Net_CV_fashionMNIST, self).__init__(lr=lr, batch_size=batch_size, epochs=epochs, k_folds=k_folds)
         self.flatten = nn.Flatten()
