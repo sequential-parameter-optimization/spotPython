@@ -60,6 +60,14 @@ def transform_power_2(x):
     return 2**x
 
 
+def transform_none_to_None(x):
+    """Needed for sklearn.linear_model.LogisticRegression"""
+    if x == "none":
+        return None
+    else:
+        return x
+
+
 def transform_power(base: int, x: int, as_int: bool = False) -> float:
     """
     Raises a given base to the power of x.
@@ -121,7 +129,7 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     hyper_parameter_values = copy.deepcopy(hyper_parameter_values)
     for key, value in hyper_parameter_values.items():
         if (
-            fun_control["core_model_hyper_dict"][key]["type"] in ["int", "float", "num"]
+            fun_control["core_model_hyper_dict"][key]["type"] in ["int", "float", "num", "factor"]
             and fun_control["core_model_hyper_dict"][key]["transform"] != "None"
         ):
             hyper_parameter_values[key] = eval(fun_control["core_model_hyper_dict"][key]["transform"])(value)
