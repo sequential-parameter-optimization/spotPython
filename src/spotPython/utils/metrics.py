@@ -30,26 +30,24 @@ import numpy as np
 def apk(actual, predicted, k=10):
     """
     Computes the average precision at k.
-    This function computes the average precision at k between two arrays of
+    This function computes the average precision at k between two lists of
     items.
     Parameters
     ----------
-    actual : array
-        An array of elements that are to be predicted (order doesn't matter)
-    predicted : array
-        An array of predicted elements (order does matter)
+    actual : list
+             A list of elements that are to be predicted (order doesn't matter)
+    predicted : list
+                A list of predicted elements (order does matter)
     k : int, optional
         The maximum number of predicted elements
     Returns
     -------
     score : double
-        The average precision at k over the input arrays
+            The average precision at k over the input lists
     """
-    print("k:", k)
-    if predicted.shape[0] > k:
+    if len(predicted) > k:
         predicted = predicted[:k]
-    print("predicted:", predicted)
-    print("actual:", actual)
+
     score = 0.0
     num_hits = 0.0
 
@@ -59,38 +57,36 @@ def apk(actual, predicted, k=10):
             score += num_hits / (i + 1.0)
 
     if not actual:
-        print("res:", 0)
-        print("---------------------")
         return 0.0
 
-    res = score / min(len(actual), k)
-    print("res:", res)
-    print("---------------------")
-    return res
+    return score / min(len(actual), k)
 
 
 def mapk(actual, predicted, k=10):
     """
     Computes the mean average precision at k.
-    This function computes the mean average precision at k between two arrays
-    of arrays of items.
+    This function computes the mean average precision at k between two lists
+    of lists of items.
     Parameters
     ----------
-    actual : array
-        An array of arrays of elements that are to be predicted
-        (order doesn't matter in the arrays)
-    predicted : array
-        An array of arrays of predicted elements
-        (order matters in the arrays)
+    actual : list
+             A list of lists of elements that are to be predicted
+             (order doesn't matter in the lists)
+    predicted : list
+                A list of lists of predicted elements
+                (order matters in the lists)
     k : int, optional
         The maximum number of predicted elements
     Returns
     -------
     score : double
-        The mean average precision at k over the input arrays
+            The mean average precision at k over the input lists
     """
-    predicted = np.array(predicted).reshape(-1, 1)
-    actual = np.array(actual).reshape(-1, 1)
-    print("mapk: predicted:", predicted)
-    print("mapk: actual:", actual)
     return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
+
+
+def mapk_score(y_true, y_pred, k=3):
+    sorted_prediction_ids = np.argsort(-y_pred, axis=1)
+    top_k_prediction_ids = sorted_prediction_ids[:, :k]
+    score = mapk(y_true.values.reshape(-1, 1), top_k_prediction_ids, k=k)
+    return score

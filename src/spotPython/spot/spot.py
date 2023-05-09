@@ -25,6 +25,7 @@ from spotPython.budget.ocba import get_ocba_X
 import logging
 import time
 from spotPython.utils.progress import progress_bar
+from spotPython.utils.convert import find_indices
 import plotly.graph_objects as go
 
 
@@ -708,6 +709,24 @@ class Spot:
         if show:
             pylab.show()
 
+    def get_importance(self) -> list:
+        """Get importance of each variable and return the results as a list.
+        Returns:
+            output (list): list of results
+        """
+        if self.surrogate.n_theta > 1 and self.var_name is not None:
+            output = [0] * len(self.all_var_name)
+            theta = np.power(10, self.surrogate.theta)
+            imp = 100 * theta / np.max(theta)
+            ind = find_indices(A=self.var_name, B=self.all_var_name)
+            j = 0
+            for i in ind:
+                output[i] = imp[j]
+                j = j + 1
+            return output
+        else:
+            print("Importance requires more than one theta values (n_theta>1).")
+
     def print_importance(self, threshold=0.1, print_screen=True) -> list:
         """Print importance of each variable and return the results as a list.
         Args:
@@ -735,7 +754,7 @@ class Spot:
                             print(var_name[i] + ": ", imp[i])
                     output.append([var_name[i], imp[i]])
         else:
-            print("Importantance requires more than one theta values (n_theta>1).")
+            print("Importance requires more than one theta values (n_theta>1).")
         return output
 
     def plot_importance(self, threshold=0.1, filename=None, dpi=300) -> None:

@@ -26,6 +26,5 @@ def fun_control_init():
         "k_folds": None,
         "device": None,
         "metric_params": {},
-        "metric_custom": None,
     }
     return fun_control

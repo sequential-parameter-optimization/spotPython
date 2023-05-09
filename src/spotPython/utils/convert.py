@@ -39,3 +39,11 @@ def get_Xy_from_df(df, target_column) -> tuple:
     X = df.drop(columns=[target_column])
     y = df[target_column]
     return X, y
+
+
+def find_indices(A, B):
+    indices = []
+    for element in A:
+        index = B.index(element)
+        indices.append(index)
+    return indices

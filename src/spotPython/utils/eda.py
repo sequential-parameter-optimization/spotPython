@@ -65,8 +65,9 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
     else:
         res = spot.print_results(print_screen=False)
         tuned = [item[1] for item in res]
-        imp = spot.print_importance(threshold=0.0, print_screen=False)
-        importance = [item[1] for item in imp]
+        # imp = spot.print_importance(threshold=0.0, print_screen=False)
+        # importance = [item[1] for item in imp]
+        importance = spot.get_importance()
         stars = get_stars(importance)
         tab = tabulate(
             {
