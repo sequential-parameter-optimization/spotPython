@@ -60,6 +60,10 @@ def transform_power_2(x):
     return 2**x
 
 
+def transform_power_10(x):
+    return 10**x
+
+
 def transform_none_to_None(x):
     """Needed for sklearn.linear_model.LogisticRegression"""
     if x == "none":
