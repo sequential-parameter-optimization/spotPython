@@ -69,7 +69,12 @@ class HyperSklearn:
             X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
             model.fit(X_train, y_train)
             df_preds = model.predict(X_test)
-            df_eval = fun_control["metric_sklearn"](y_test, df_preds)
+            metric = (
+                fun_control["metric_custom"]
+                if fun_control["metric_custom"] is not None
+                else fun_control["metric_sklearn"]
+            )
+            df_eval = metric(y_test, df_preds, **fun_control["metric_params"])
         except Exception as err:
             print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
             df_eval = np.nan
