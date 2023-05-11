@@ -5,6 +5,7 @@ from torch import nn
 import torch.optim as optim
 from spotPython.utils.device import getDevice
 from torch.utils.data import random_split
+from spotPython.utils.classes import get_additional_attributes
 
 
 class Net_Core(nn.Module):
@@ -14,7 +15,11 @@ class Net_Core(nn.Module):
         self.batch_size = batch_size
         self.epochs = epochs
         self.k_folds = k_folds
-        self.results = {}
+
+    def remove_attributes(self, atttributes_to_remove):
+        for attr in atttributes_to_remove:
+            # print(f"Remove attribute {attr} from {self}")
+            delattr(self, attr)
 
     def reset_weights(self):
         for layer in self.children():
@@ -22,8 +27,8 @@ class Net_Core(nn.Module):
                 print(f"Reset trainable parameters of layer = {layer}")
                 layer.reset_parameters()
 
-    def train_fold(self, trainloader, criterion, optimizer, device):
-        for epoch in range(self.epochs):
+    def train_fold(self, trainloader, epochs, criterion, optimizer, device):
+        for epoch in range(epochs):
             for i, data in enumerate(trainloader, 0):
                 inputs, labels = data
                 inputs, labels = inputs.to(device), labels.to(device)
@@ -53,49 +58,74 @@ class Net_Core(nn.Module):
         return 100.0 * (correct / total)
 
     def evaluate_cv(self, dataset, shuffle=False, num_workers=0, device=None):
+        lr = self.lr
+        epochs = self.epochs
+        batch_size = self.batch_size
+        k_folds = self.k_folds
+        results = {}
+        removed_attributes = get_additional_attributes(self)
+        # print(f"Removed attributes: {removed_attributes}")
+        self.remove_attributes(removed_attributes)
         try:
             device = getDevice(device=device)
-            # if torch.cuda.device_count() > 1:
-            #     self = nn.DataParallel(self)
+            if torch.cuda.is_available():
+                device = "cuda:0"
+                if torch.cuda.device_count() > 1:
+                    self = nn.DataParallel(self)
             self.to(device)
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(self.parameters(), lr=self.lr)
-            kfold = KFold(n_splits=self.k_folds, shuffle=shuffle)
+            optimizer = optim.Adam(self.parameters(), lr=lr)
+            kfold = KFold(n_splits=k_folds, shuffle=shuffle)
             for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
                 train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
                 val_subsampler = torch.utils.data.SubsetRandomSampler(val_ids)
                 trainloader = torch.utils.data.DataLoader(
-                    dataset, batch_size=self.batch_size, sampler=train_subsampler, num_workers=num_workers
+                    dataset, batch_size=batch_size, sampler=train_subsampler, num_workers=num_workers
                 )
                 valloader = torch.utils.data.DataLoader(
-                    dataset, batch_size=self.batch_size, sampler=val_subsampler, num_workers=num_workers
+                    dataset, batch_size=batch_size, sampler=val_subsampler, num_workers=num_workers
                 )
                 self.reset_weights()
                 # Train fold for several epochs:
-                self.train_fold(trainloader, criterion, optimizer, device)
+                self.train_fold(trainloader, epochs, criterion, optimizer, device)
                 # Validate fold:
-                self.results[fold] = self.validate_fold(valloader, criterion, device)
-            df_eval = sum(self.results.values()) / len(self.results.values())
+                results[fold] = self.validate_fold(valloader, criterion, device)
+            df_eval = sum(results.values()) / len(results.values())
             df_preds = np.nan
         except Exception as err:
             print(f"Error in Net_Core. Call to evaluate_cv() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
+        self.lr = lr
+        self.epochs = epochs
+        self.batch_size = batch_size
         return df_eval, df_preds
 
     def evaluate_hold_out(self, dataset, shuffle, test_dataset=None, device=None):
         lr = self.lr
         epochs = self.epochs
+        batch_size = self.batch_size
+        removed_attributes = get_additional_attributes(self)
+        # print(f"Removed attributes: {removed_attributes}")
+        self.remove_attributes(removed_attributes)
         try:
             device = getDevice(device=device)
+            if torch.cuda.is_available():
+                device = "cuda:0"
+                if torch.cuda.device_count() > 1:
+                    self = nn.DataParallel(self)
             self.to(device)
             criterion = nn.CrossEntropyLoss()
             # TODO: optimizer = optim.Adam(self.parameters(), lr=lr)
             optimizer = optim.SGD(self.parameters(), lr=lr, momentum=0.9)
             if test_dataset is None:
-                trainloader, valloader = self.create_train_val_data_loaders(dataset, shuffle)
+                trainloader, valloader = self.create_train_val_data_loaders(
+                    dataset=dataset, batch_size=batch_size, shuffle=shuffle
+                )
             else:
-                trainloader, valloader = self.create_train_test_data_loaders(dataset, shuffle, test_dataset)
+                trainloader, valloader = self.create_train_test_data_loaders(
+                    dataset=dataset, batch_size=batch_size, shuffle=shuffle, test_dataset=test_dataset
+                )
             # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
             # Early stopping parameters
             patience = 5
@@ -106,7 +136,7 @@ class Net_Core(nn.Module):
             for epoch in range(epochs):
                 print(f"Epoch: {epoch + 1}")
                 # training loss from one epoch:
-                _ = self.train_hold_out(trainloader, criterion, optimizer, device=device)
+                _ = self.train_hold_out(trainloader, batch_size, criterion, optimizer, device=device)
                 # TODO: scheduler.step()
                 # Early stopping check. Calculate validation loss from one epoch:
                 val_accuracy, val_loss = self.validate_hold_out(valloader=valloader, criterion=criterion, device=device)
@@ -124,31 +154,34 @@ class Net_Core(nn.Module):
             print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
             df_eval = np.nan
             df_preds = np.nan
+        self.lr = lr
+        self.epochs = epochs
+        self.batch_size = batch_size
         print(f"Returned to Spot: Validation loss: {df_eval}")
         print("----------------------------------------------")
         return df_eval, df_preds
 
-    def create_train_val_data_loaders(self, dataset, shuffle, num_workers=0):
+    def create_train_val_data_loaders(self, dataset, batch_size, shuffle, num_workers=0):
         test_abs = int(len(dataset) * 0.6)
         train_subset, val_subset = random_split(dataset, [test_abs, len(dataset) - test_abs])
         trainloader = torch.utils.data.DataLoader(
-            train_subset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=num_workers
+            train_subset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
         )
         valloader = torch.utils.data.DataLoader(
-            val_subset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=num_workers
+            val_subset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
         )
         return trainloader, valloader
 
-    def create_train_test_data_loaders(self, dataset, shuffle, test_dataset, num_workers=0):
+    def create_train_test_data_loaders(self, dataset, batch_size, shuffle, test_dataset, num_workers=0):
         trainloader = torch.utils.data.DataLoader(
-            dataset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=num_workers
+            dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
         )
         testloader = torch.utils.data.DataLoader(
-            test_dataset, batch_size=int(self.batch_size), shuffle=shuffle, num_workers=num_workers
+            test_dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
         )
         return trainloader, testloader
 
-    def train_hold_out(self, trainloader, criterion, optimizer, device):
+    def train_hold_out(self, trainloader, batch_size, criterion, optimizer, device):
         running_loss = 0.0
         epoch_steps = 0
         for i, data in enumerate(trainloader, 0):
@@ -166,7 +199,7 @@ class Net_Core(nn.Module):
             if i % 1000 == 999:  # print every 1000 mini-batches
                 print(
                     "Batch: %5d. Batch Size: %d. Training Loss (running): %.3f"
-                    % (i + 1, int(self.batch_size), running_loss / epoch_steps)
+                    % (i + 1, int(batch_size), running_loss / epoch_steps)
                 )
                 running_loss = 0.0
         return loss.item()
