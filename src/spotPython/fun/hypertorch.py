@@ -2,6 +2,7 @@ from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
+from spotPython.torch.traintest import evaluate_cv, evaluate_hold_out
 
 
 from spotPython.hyperparameters.values import (
@@ -73,20 +74,23 @@ class HyperTorch:
                 model = self.fun_control["core_model"](**config)
             try:
                 if self.fun_control["eval"] == "train_cv":
-                    df_eval, _ = model.evaluate_cv(
+                    df_eval, _ = evaluate_cv(
+                        model,
                         dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
                     )
                 elif self.fun_control["eval"] == "test_hold_out":
-                    df_eval, _ = model.evaluate_hold_out(
+                    df_eval, _ = evaluate_hold_out(
+                        model,
                         dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         test_dataset=fun_control["test"],
                         device=self.fun_control["device"],
                     )
                 else:  # eval == "train_hold_out"
-                    df_eval, _ = model.evaluate_hold_out(
+                    df_eval, _ = evaluate_hold_out(
+                        model,
                         dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
