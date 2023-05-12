@@ -3,8 +3,10 @@ import spotPython.torch.netcore as netcore
 
 
 class Net_fashionMNIST(netcore.Net_Core):
-    def __init__(self, l1, l2, lr, batch_size, epochs, k_folds):
-        super(Net_fashionMNIST, self).__init__(lr=lr, batch_size=batch_size, epochs=epochs, k_folds=k_folds)
+    def __init__(self, l1, l2, lr, batch_size, epochs, k_folds, patience):
+        super(Net_fashionMNIST, self).__init__(
+            lr=lr, batch_size=batch_size, epochs=epochs, k_folds=k_folds, patience=patience
+        )
         self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(28 * 28, l1), nn.ReLU(), nn.Linear(l1, l2), nn.ReLU(), nn.Linear(l2, 10)

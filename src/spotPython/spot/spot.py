@@ -43,7 +43,7 @@ class Spot:
     """
     Spot base class to handle the following tasks in a uniform manner:
 
-    * Getting and setting parameters. This is done via the `Spot` initilaization.
+    * Getting and setting parameters. This is done via the `Spot` initialization.
     * Running surrogate based hyperparameter optimization. After the class is initialized, hyperparameter tuning
     runs can be performed via the `run` method.
     * Displaying information. The `plot` method can be used for visualizing results. The `print` methods summarizes

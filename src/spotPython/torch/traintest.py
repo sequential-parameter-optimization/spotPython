@@ -10,7 +10,6 @@ from spotPython.utils.classes import get_additional_attributes
 
 def remove_attributes(net, atttributes_to_remove):
     for attr in atttributes_to_remove:
-        # print(f"Remove attribute {attr} from {net}")
         delattr(net, attr)
     return net
 
@@ -18,13 +17,14 @@ def remove_attributes(net, atttributes_to_remove):
 def reset_weights(net):
     for layer in net.children():
         if hasattr(layer, "reset_parameters"):
-            print(f"Reset trainable parameters of layer = {layer}")
             layer.reset_parameters()
 
 
-def train_fold(net, trainloader, epochs, criterion, optimizer, device):
+def train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batch_interval=10_000):
     for epoch in range(epochs):
         print(f"Epoch: {epoch + 1}")
+        running_loss = 0.0
+        epoch_steps = 0
         for i, data in enumerate(trainloader, 0):
             inputs, labels = data
             inputs, labels = inputs.to(device), labels.to(device)
@@ -34,6 +34,12 @@ def train_fold(net, trainloader, epochs, criterion, optimizer, device):
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=1.0)
             optimizer.step()
+            # print statistics
+            running_loss += loss.item()
+            epoch_steps += 1
+            if i % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
+                print("Batch: %5d. Training Loss (running): %.3f" % (i + 1, running_loss / epoch_steps))
+                running_loss = 0.0
 
 
 def validate_fold(net, valloader, criterion, device):
@@ -56,14 +62,22 @@ def validate_fold(net, valloader, criterion, device):
 
 
 def evaluate_cv(
-    net, dataset, shuffle=False, num_workers=0, device=None, lr=None, epochs=None, batch_size=None, k_folds=None
+    net,
+    dataset,
+    shuffle=False,
+    num_workers=0,
+    device=None,
+    lr=None,
+    epochs=None,
+    batch_size=None,
+    k_folds=None,
+    show_batch_interval=10_000,
 ):
     lr = net.lr
     epochs = net.epochs
     batch_size = net.batch_size
     k_folds = net.k_folds
     removed_attributes = get_additional_attributes(net)
-    print(f"Removed attributes: {removed_attributes}")
     net = remove_attributes(net, removed_attributes)
     results = {}
     try:
@@ -71,7 +85,7 @@ def evaluate_cv(
         if torch.cuda.is_available():
             device = "cuda:0"
             if torch.cuda.device_count() > 1:
-                print("Let's use", torch.cuda.device_count(), "GPUs!")
+                print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
         criterion = nn.CrossEntropyLoss()
@@ -89,7 +103,7 @@ def evaluate_cv(
             )
             reset_weights(net)
             # Train fold for several epochs:
-            train_fold(net, trainloader, epochs, criterion, optimizer, device)
+            train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batch_interval=show_batch_interval)
             # Validate fold:
             results[fold] = validate_fold(net, valloader, criterion, device)
         df_eval = sum(results.values()) / len(results.values())
@@ -105,19 +119,19 @@ def evaluate_cv(
     return df_eval, df_preds
 
 
-def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None):
+def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None, show_batch_interval=10_000):
     lr = net.lr
     epochs = net.epochs
     batch_size = net.batch_size
+    patience = net.patience
     removed_attributes = get_additional_attributes(net)
-    print(f"Removed attributes: {removed_attributes}")
     net = remove_attributes(net, removed_attributes)
     try:
         device = getDevice(device=device)
         if torch.cuda.is_available():
             device = "cuda:0"
             if torch.cuda.device_count() > 1:
-                print("Let's use", torch.cuda.device_count(), "GPUs!")
+                print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
         criterion = nn.CrossEntropyLoss()
@@ -133,7 +147,7 @@ def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None):
             )
         # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         # Early stopping parameters
-        patience = 5
+        patience = patience
         best_val_loss = float("inf")
         counter = 0
         # We only have "one fold" which is trained for several epochs
@@ -148,6 +162,7 @@ def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None):
                 criterion=criterion,
                 optimizer=optimizer,
                 device=device,
+                show_batch_interval=show_batch_interval,
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
@@ -169,6 +184,7 @@ def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None):
     net.lr = lr
     net.epochs = epochs
     net.batch_size = batch_size
+    net.patience = patience
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
@@ -196,7 +212,7 @@ def create_train_test_data_loaders(dataset, batch_size, shuffle, test_dataset, n
     return trainloader, testloader
 
 
-def train_hold_out(net, trainloader, batch_size, criterion, optimizer, device):
+def train_hold_out(net, trainloader, batch_size, criterion, optimizer, device, show_batch_interval=10_000):
     running_loss = 0.0
     epoch_steps = 0
     for i, data in enumerate(trainloader, 0):
@@ -211,7 +227,7 @@ def train_hold_out(net, trainloader, batch_size, criterion, optimizer, device):
         # print statistics
         running_loss += loss.item()
         epoch_steps += 1
-        if i % 1000 == 999:  # print every 1000 mini-batches
+        if i % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
             print(
                 "Batch: %5d. Batch Size: %d. Training Loss (running): %.3f"
                 % (i + 1, int(batch_size), running_loss / epoch_steps)

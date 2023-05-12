@@ -26,5 +26,6 @@ def fun_control_init():
         "k_folds": None,
         "device": None,
         "metric_params": {},
+        "show_batch_interval": 1_000_000,
     }
     return fun_control

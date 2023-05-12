@@ -79,6 +79,7 @@ class HyperTorch:
                         dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
+                        show_batch_interval=self.fun_control["show_batch_interval"],
                     )
                 elif self.fun_control["eval"] == "test_hold_out":
                     df_eval, _ = evaluate_hold_out(
@@ -87,6 +88,7 @@ class HyperTorch:
                         shuffle=self.fun_control["shuffle"],
                         test_dataset=fun_control["test"],
                         device=self.fun_control["device"],
+                        show_batch_interval=self.fun_control["show_batch_interval"],
                     )
                 else:  # eval == "train_hold_out"
                     df_eval, _ = evaluate_hold_out(
@@ -94,6 +96,7 @@ class HyperTorch:
                         dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
+                        show_batch_interval=self.fun_control["show_batch_interval"],
                     )
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
