@@ -149,7 +149,6 @@ def evaluate_hold_out(
             )
         # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         # Early stopping parameters
-        patience = patience
         best_val_loss = float("inf")
         counter = 0
         # We only have "one fold" which is trained for several epochs
