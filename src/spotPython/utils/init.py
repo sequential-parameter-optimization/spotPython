@@ -27,5 +27,7 @@ def fun_control_init():
         "device": None,
         "metric_params": {},
         "show_batch_interval": 1_000_000,
+        "path": None,
+        "save_model": False,
     }
     return fun_control

@@ -119,7 +119,9 @@ def evaluate_cv(
     return df_eval, df_preds
 
 
-def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None, show_batch_interval=10_000):
+def evaluate_hold_out(
+    net, train_dataset, shuffle, test_dataset=None, device=None, show_batch_interval=10_000, path=None, save_model=False
+):
     lr = net.lr
     epochs = net.epochs
     batch_size = net.batch_size
@@ -139,11 +141,11 @@ def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None, sho
         optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
         if test_dataset is None:
             trainloader, valloader = create_train_val_data_loaders(
-                dataset=dataset, batch_size=batch_size, shuffle=shuffle
+                dataset=train_dataset, batch_size=batch_size, shuffle=shuffle
             )
         else:
             trainloader, valloader = create_train_test_data_loaders(
-                dataset=dataset, batch_size=batch_size, shuffle=shuffle, test_dataset=test_dataset
+                dataset=train_dataset, batch_size=batch_size, shuffle=shuffle, test_dataset=test_dataset
             )
         # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         # Early stopping parameters
@@ -170,6 +172,9 @@ def evaluate_hold_out(net, dataset, shuffle, test_dataset=None, device=None, sho
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 counter = 0
+                # save model:
+                if save_model:
+                    torch.save({"model_state_dict": net.state_dict()}, path)
             else:
                 counter += 1
                 if counter >= patience:
@@ -259,3 +264,107 @@ def validate_hold_out(net, valloader, criterion, device):
     print(f"Loss on hold-out set: {loss}")
     print(f"Accuracy on hold-out set: {accuracy}")
     return accuracy, loss
+
+
+def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_000, path=None, save_model=False):
+    lr = net.lr
+    epochs = net.epochs
+    batch_size = net.batch_size
+    patience = net.patience
+    removed_attributes = get_additional_attributes(net)
+    net = remove_attributes(net, removed_attributes)
+    try:
+        device = getDevice(device=device)
+        if torch.cuda.is_available():
+            device = "cuda:0"
+            if torch.cuda.device_count() > 1:
+                print("We will use", torch.cuda.device_count(), "GPUs!")
+                net = nn.DataParallel(net)
+        net.to(device)
+        criterion = nn.CrossEntropyLoss()
+        # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
+        optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+        trainloader, valloader = create_train_val_data_loaders(
+            dataset=train_dataset, batch_size=batch_size, shuffle=shuffle
+        )
+        # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+        # Early stopping parameters
+        patience = patience
+        best_val_loss = float("inf")
+        counter = 0
+        # We only have "one fold" which is trained for several epochs
+        # (we do not have to reset the weights for each fold):
+        for epoch in range(epochs):
+            print(f"Epoch: {epoch + 1}")
+            # training loss from one epoch:
+            _ = train_hold_out(
+                net=net,
+                trainloader=trainloader,
+                batch_size=batch_size,
+                criterion=criterion,
+                optimizer=optimizer,
+                device=device,
+                show_batch_interval=show_batch_interval,
+            )
+            # TODO: scheduler.step()
+            # Early stopping check. Calculate validation loss from one epoch:
+            val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, criterion=criterion, device=device)
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
+                counter = 0
+                # save model:
+                if save_model:
+                    torch.save({"model_state_dict": net.state_dict()}, path)
+            else:
+                counter += 1
+                if counter >= patience:
+                    print(f"Early stopping at epoch {epoch}")
+                    break
+        df_eval = val_loss
+        df_preds = np.nan
+    except Exception as err:
+        print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
+        df_eval = np.nan
+        df_preds = np.nan
+    net.lr = lr
+    net.epochs = epochs
+    net.batch_size = batch_size
+    net.patience = patience
+    print(f"Returned to Spot: Validation loss: {df_eval}")
+    print("----------------------------------------------")
+    return df_eval, df_preds
+
+
+def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval=10_000, path=None):
+    lr = net.lr
+    epochs = net.epochs
+    batch_size = net.batch_size
+    patience = net.patience
+    removed_attributes = get_additional_attributes(net)
+    net = remove_attributes(net, removed_attributes)
+    try:
+        device = getDevice(device=device)
+        if torch.cuda.is_available():
+            device = "cuda:0"
+            if torch.cuda.device_count() > 1:
+                print("We will use", torch.cuda.device_count(), "GPUs!")
+                net = nn.DataParallel(net)
+        net.to(device)
+        criterion = nn.CrossEntropyLoss()
+        valloader = torch.utils.data.DataLoader(
+            test_dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=0
+        )
+        val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, criterion=criterion, device=device)
+        df_eval = val_loss
+        df_preds = np.nan
+    except Exception as err:
+        print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
+        df_eval = np.nan
+        df_preds = np.nan
+    net.lr = lr
+    net.epochs = epochs
+    net.batch_size = batch_size
+    net.patience = patience
+    print(f"Returned to Spot: Validation loss: {df_eval}")
+    print("----------------------------------------------")
+    return df_eval, df_preds

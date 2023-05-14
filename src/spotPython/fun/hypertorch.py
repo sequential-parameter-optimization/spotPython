@@ -11,7 +11,6 @@ from spotPython.hyperparameters.values import (
 )
 
 import logging
-from sklearn.metrics import mean_absolute_error
 
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -40,14 +39,12 @@ class HyperTorch:
             "horizon": None,
             "grace_period": None,
             "metric": None,
-            "metric_sklearn": mean_absolute_error,
+            "metric_sklearn": None,
             "weights": array([1, 0, 0]),
             "weight_coeff": 0.0,
             "log_level": log_level,
             "var_name": [],
             "var_type": [],
-            "prep_model": None,
-            "shuffle": True,
         }
         self.log_level = self.fun_control["log_level"]
         logger.setLevel(self.log_level)
@@ -64,6 +61,7 @@ class HyperTorch:
     def fun_torch(self, X, fun_control=None):
         z_res = np.array([], dtype=float)
         self.fun_control.update(fun_control)
+        # print(self.fun_control)
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
         # type information and transformations are considered in generate_one_config_from_var_dict:
@@ -81,22 +79,34 @@ class HyperTorch:
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                     )
+                elif self.fun_control["eval"] == "test_cv":
+                    df_eval, _ = evaluate_cv(
+                        model,
+                        dataset=fun_control["test"],
+                        shuffle=self.fun_control["shuffle"],
+                        device=self.fun_control["device"],
+                        show_batch_interval=self.fun_control["show_batch_interval"],
+                    )
                 elif self.fun_control["eval"] == "test_hold_out":
                     df_eval, _ = evaluate_hold_out(
                         model,
-                        dataset=fun_control["train"],
+                        train_dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         test_dataset=fun_control["test"],
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
+                        path=self.fun_control["path"],
+                        save_model=self.fun_control["save_model"],
                     )
                 else:  # eval == "train_hold_out"
                     df_eval, _ = evaluate_hold_out(
                         model,
-                        dataset=fun_control["train"],
+                        train_dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
+                        path=self.fun_control["path"],
+                        save_model=self.fun_control["save_model"],
                     )
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
