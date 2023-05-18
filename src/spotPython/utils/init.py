@@ -16,6 +16,7 @@ def fun_control_init():
                 'device': None}
     """
     fun_control = {
+        "criterion": None,
         "data": None,
         "train": None,
         "test": None,
@@ -24,6 +25,7 @@ def fun_control_init():
         "shuffle": None,
         "eval": None,
         "k_folds": None,
+        "optimizer": None,
         "device": None,
         "metric_params": {},
         "show_batch_interval": 1_000_000,

@@ -1,8 +1,7 @@
 import numpy as np
 from sklearn.model_selection import KFold
 import torch
-from torch import nn
-import torch.optim as optim
+from torch import nn as nn
 from spotPython.utils.device import getDevice
 from torch.utils.data import random_split
 from spotPython.utils.classes import get_additional_attributes
@@ -77,6 +76,8 @@ def evaluate_cv(
     epochs = net.epochs
     batch_size = net.batch_size
     k_folds = net.k_folds
+    criterion_instance = net.criterion
+    optimizer_instance = net.optimizer
     removed_attributes = get_additional_attributes(net)
     net = remove_attributes(net, removed_attributes)
     results = {}
@@ -88,8 +89,10 @@ def evaluate_cv(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(net.parameters(), lr=lr)
+        # criterion = nn.CrossEntropyLoss()
+        # optimizer = optim.Adam(net.parameters(), lr=lr)
+        optimizer = optimizer_instance(net.parameters(), lr=lr)
+        criterion = criterion_instance
         kfold = KFold(n_splits=k_folds, shuffle=shuffle)
         for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
             print(f"Fold: {fold + 1}")
@@ -116,6 +119,8 @@ def evaluate_cv(
     net.epochs = epochs
     net.batch_size = batch_size
     net.k_folds = k_folds
+    net.criterion = criterion_instance
+    net.optimizer = optimizer_instance
     return df_eval, df_preds
 
 
@@ -126,6 +131,8 @@ def evaluate_hold_out(
     epochs = net.epochs
     batch_size = net.batch_size
     patience = net.patience
+    criterion_instance = net.criterion
+    optimizer_instance = net.optimizer
     removed_attributes = get_additional_attributes(net)
     net = remove_attributes(net, removed_attributes)
     try:
@@ -136,9 +143,11 @@ def evaluate_hold_out(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        criterion = nn.CrossEntropyLoss()
+        # criterion = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
-        optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+        # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+        optimizer = optimizer_instance(net.parameters(), lr=lr)
+        criterion = criterion_instance
         if test_dataset is None:
             trainloader, valloader = create_train_val_data_loaders(
                 dataset=train_dataset, batch_size=batch_size, shuffle=shuffle
@@ -189,6 +198,8 @@ def evaluate_hold_out(
     net.epochs = epochs
     net.batch_size = batch_size
     net.patience = patience
+    net.criterion = criterion_instance
+    net.optimizer = optimizer_instance
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
@@ -270,6 +281,8 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
     epochs = net.epochs
     batch_size = net.batch_size
     patience = net.patience
+    criterion_instance = net.criterion
+    optimizer_instance = net.optimizer
     removed_attributes = get_additional_attributes(net)
     net = remove_attributes(net, removed_attributes)
     try:
@@ -280,9 +293,11 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        criterion = nn.CrossEntropyLoss()
+        # criterion = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
-        optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+        # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
+        optimizer = optimizer_instance(net.parameters(), lr=lr)
+        criterion = criterion_instance
         trainloader, valloader = create_train_val_data_loaders(
             dataset=train_dataset, batch_size=batch_size, shuffle=shuffle
         )
@@ -329,6 +344,8 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
     net.epochs = epochs
     net.batch_size = batch_size
     net.patience = patience
+    net.criterion = criterion_instance
+    net.optimizer = optimizer_instance
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
@@ -339,6 +356,8 @@ def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval
     epochs = net.epochs
     batch_size = net.batch_size
     patience = net.patience
+    criterion_instance = net.criterion
+    optimizer_instance = net.optimizer
     removed_attributes = get_additional_attributes(net)
     net = remove_attributes(net, removed_attributes)
     try:
@@ -349,7 +368,8 @@ def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        criterion = nn.CrossEntropyLoss()
+        # criterion = nn.CrossEntropyLoss()
+        criterion = criterion_instance
         valloader = torch.utils.data.DataLoader(
             test_dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=0
         )
@@ -364,6 +384,8 @@ def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval
     net.epochs = epochs
     net.batch_size = batch_size
     net.patience = patience
+    net.criterion = criterion_instance
+    net.optimizer = optimizer_instance
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
