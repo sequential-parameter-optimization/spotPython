@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Thomas Bartz-Beielstein">
+<meta name="keywords" content="hyperparameter tuning, hyperparameter optimization, spotPython, PyTorch, CIFAR10, optimization, deep learning, machine learning">
+
+<title>PyTorch Hyperparameter Tuning — A Tutorial for spotPython</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="bart23e.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">PyTorch Hyperparameter Tuning — A Tutorial for spotPython</h1>
+<p class="subtitle lead">Version 0.1.1</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliations</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author"><a href="https://www.spotseven.de">Thomas Bartz-Beielstein</a> <a href="https://orcid.org/0000-0002-5938-5158" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            SpotSeven Lab
+          </p>
+        <p class="affiliation">
+            
+          </p>
+      </div>
+    </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="abstract-title">Abstract</div>
+    <p>The goal of hyperparameter tuning (or hyperparameter optimization) is to optimize the hyperparameters to improve the performance of the machine or deep learning model. spotPython (“Sequential Parameter Optimization Toolbox in Python”) is the Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade. PyTorch is an optimized tensor library for deep learning using GPUs and CPUs. This document shows how to integrate the spotPython hyperparameter tuner into the PyTorch training workflow. As an example, the results of the CIFAR10 image classifier are used. In addition to an introduction to spotPython, this tutorial also includes a brief comparison with Ray Tune, a Python library for running experiments and tuning hyperparameters. This comparison is based on the PyTorch hyperparameter tuning tutorial. The advantages and disadvantages of both approaches are discussed. We show that spotPython achieves similar or even better results while being more flexible and transparent than Ray Tune.</p>
+  </div>
+</div>
+
+</header>
+
+<section id="sec-hyperparameter-tuning" class="level1">
+<h1>Hyperparameter Tuning</h1>
+<p>Hyperparameter tuning is an important, but often difficult and computationally intensive task. Changing the architecture of a neural network or the learning rate of an optimizer can have a significant impact on the performance .</p>
+<p>The goal of hyperparameter tuning is to optimize the hyperparameters in a way that improves the performance of the machine learning or deep learning model. The simplest, but also most computationally expensive, approach uses manual search (or trial-and-error <span class="citation" data-cites="Meignan:2015vp">(<a href="#ref-Meignan:2015vp" role="doc-biblioref">Meignan et al. 2015</a>)</span>). Commonly encountered is simple random search, i.e., random and repeated selection of hyperparameters for evaluation, and lattice search (“grid search”). In addition, methods that perform directed search and other model-free algorithms, i.e., algorithms that do not explicitly rely on a model, e.g., evolution strategies <span class="citation" data-cites="Bart13j">(<a href="#ref-Bart13j" role="doc-biblioref">Bartz-Beielstein et al. 2014</a>)</span> or pattern search <span class="citation" data-cites="Torczon00">(<a href="#ref-Torczon00" role="doc-biblioref">Lewis, Torczon, and Trosset 2000</a>)</span> play an important role. Also, “hyperband”, i.e., a multi-armed bandit strategy that dynamically allocates resources to a set of random configurations and uses successive bisections to stop configurations with poor performance <span class="citation" data-cites="Li16a">(<a href="#ref-Li16a" role="doc-biblioref">Li et al. 2016</a>)</span>, is very common in hyperparameter tuning. The most sophisticated and efficient approaches are the Bayesian optimization and surrogate model based optimization methods, which are based on the optimization of cost functions determined by simulations or experiments.</p>
+<p>We consider below a surrogate model based optimization-based hyperparameter tuning approach based on the Python version of the SPOT (“Sequential Parameter Optimization Toolbox”) <span class="citation" data-cites="BLP05">(<a href="#ref-BLP05" role="doc-biblioref">Bartz-Beielstein, Lasarczyk, and Preuss 2005</a>)</span>, which is suitable for situations where only limited resources are available. This may be due to limited availability and cost of hardware, or due to the fact that confidential data may only be processed locally, e.g., due to legal requirements. Furthermore, in our approach, the understanding of algorithms is seen as a key tool for enabling transparency and explainability. This can be enabled, for example, by quantifying the contribution of machine learning and deep learning components (nodes, layers, split decisions, activation functions, etc.). Understanding the importance of hyperparameters and the interactions between multiple hyperparameters plays a major role in the interpretability and explainability of machine learning models. SPOT provides statistical tools for understanding hyperparameters and their interactions. Last but not least, it should be noted that the SPOT software code is available in the open source <code>spotPython</code> package on github<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, allowing replicability of the results. This tutorial descries the Python variant of SPOT, which is called <code>spotPython</code>. The R implementation is described in <span class="citation" data-cites="bart21i">Bartz et al. (<a href="#ref-bart21i" role="doc-biblioref">2022</a>)</span>. SPOT is an established open source software that has been maintained for more than 15 years <span class="citation" data-cites="BLP05">(<a href="#ref-BLP05" role="doc-biblioref">Bartz-Beielstein, Lasarczyk, and Preuss 2005</a>)</span> <span class="citation" data-cites="bart21i">(<a href="#ref-bart21i" role="doc-biblioref">Bartz et al. 2022</a>)</span>.</p>
+<p>This tutorial is structured as follows. The concept of the hyperparameter tuning software <code>spotPython</code> is described in <a href="#sec-spot">Section&nbsp;2</a>. <a href="#sec-hyperparameter-tuning-for-pytorch">Section&nbsp;3</a> describes the integration of <code>spotPython</code> into the <code>PyTorch</code> training workflow and presents the results. Finally, <a href="#sec-summary">Section&nbsp;5</a> presents a summary and an outlook.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The corresponding <code>.ipynb</code> notebook <span class="citation" data-cites="bart23e">(<a href="#ref-bart23e" role="doc-biblioref">Bartz-Beielstein 2023</a>)</span> is updated regularly and reflects updates and changes in the <code>spotPython</code> package. It can be downloaded from <a href="https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb">https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb</a>.</p>
+</div>
+</div>
+</section>
+<section id="sec-spot" class="level1">
+<h1>The Hyperparameter Tuning Software SPOT</h1>
+<p>Surrogate model based optimization methods are common approaches in simulation and optimization. SPOT was developed because there is a great need for sound statistical analysis of simulation and optimization algorithms. SPOT includes methods for tuning based on classical regression and analysis of variance techniques. It presents tree-based models such as classification and regression trees and random forests as well as Bayesian optimization (Gaussian process models, also known as Kriging). Combinations of different meta-modeling approaches are possible. SPOT comes with a sophisticated surrogate model based optimization method, that can handle discrete and continuous inputs. Furthermore, any model implemented in <code>scikit-learn</code> can be used out-of-the-box as a surrogate in <code>spotPython</code>.</p>
+<p>SPOT implements key techniques such as exploratory fitness landscape analysis and sensitivity analysis. It can be used to understand the performance of various algorithms, while simultaneously giving insights into their algorithmic behavior. In addition, SPOT can be used as an optimizer and for automatic and interactive tuning. Details on SPOT and its use in practice are given by <span class="citation" data-cites="bart21i">Bartz et al. (<a href="#ref-bart21i" role="doc-biblioref">2022</a>)</span>.</p>
+<p>A typical hyperparameter tuning process with <code>spotPython</code> consists of the following steps:</p>
+<ol type="1">
+<li>Loading the data (training and test datasets), see <a href="#sec-data-loading">Section&nbsp;4.2</a>.</li>
+<li>Specification of the preprocessing model, see <a href="#sec-specification-of-preprocessing-model">Section&nbsp;4.3</a>. This model is called <code>prep_model</code> (“preparation” or pre-processing). The information required for the hyperparameter tuning is stored in the dictionary <code>fun_control</code>. Thus, the information needed for the execution of the hyperparameter tuning is available in a readable form.</li>
+<li>Selection of the machine learning or deep learning model to be tuned, see <a href="#sec-selection-of-the-algorithm">Section&nbsp;4.4</a>. This is called the <code>core_model</code>. Once the <code>core_model</code> is defined, then the associated hyperparameters are stored in the <code>fun_control</code> dictionary. First, the hyperparameters of the <code>core_model</code> are initialized with the default values of the <code>core_model</code>. As default values we use the default values contained in the <code>spotPython</code> package for the algorithms of the <code>torch</code> package.</li>
+<li>Modification of the default values for the hyperparameters used in <code>core_model</code>, see <a href="#sec-modification-of-default-values">Section&nbsp;4.6.1</a>. This step is optional.
+<ol type="1">
+<li>numeric parameters are modified by changing the bounds.</li>
+<li>categorical parameters are modified by changing the categories (“levels”).</li>
+</ol></li>
+<li>Selection of target function (loss function) for the optimizer, see <a href="#sec-selection-of-target-function">Section&nbsp;4.7</a>.</li>
+<li>Calling SPOT with the corresponding parameters, see <a href="#sec-call-the-hyperparameter-tuner">Section&nbsp;4.8</a>. The results are stored in a dictionary and are available for further analysis.</li>
+<li>Presentation, visualization and interpretation of the results, see <a href="#sec-results-tuning">Section&nbsp;4.9</a>.</li>
+</ol>
+</section>
+<section id="sec-hyperparameter-tuning-for-pytorch" class="level1">
+<h1>Hyperparameter Tuning for PyTorch With <code>spotPython</code></h1>
+<p>In this tutorial, we will show how <code>spotPython</code> can be integrated into the <code>PyTorch</code> training workflow. It is based on the tutorial “Hyperparameter Tuning with Ray Tune” from the <code>PyTorch</code> documentation <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>, which is an extension of the tutorial “Training a Classifier” <span class="citation" data-cites="pyto23b">(<a href="#ref-pyto23b" role="doc-biblioref">PyTorch 2023b</a>)</span> for training a CIFAR10 image classifier.</p>
+<p>This document refers to the following software versions:</p>
+<ul>
+<li><code>python</code>: 3.10.10</li>
+<li><code>torch</code>: 2.0.1</li>
+<li><code>torchvision</code>: 0.15.0</li>
+<li><code>spotPython</code>: 0.1.1</li>
+</ul>
+<p><code>spotPython</code> can be installed via pip<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip install spotPython</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Results that refer to the <code>Ray Tune</code> package are taken from <a href="https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html">https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html</a><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+</section>
+<section id="sec-setup" class="level1">
+<h1>Setup</h1>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> <span class="st">"cpu"</span> <span class="co"># "cuda:0"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The notebook is updated regularly and reflects updates and changes in the <code>spotPython</code> package.</p>
+<section id="initialization-of-the-fun_control-dictionary" class="level2">
+<h2 class="anchored" data-anchor-id="initialization-of-the-fun_control-dictionary">Initialization of the <code>fun_control</code> Dictionary</h2>
+<p><code>spotPython</code> uses a dictionary for storing the information required for the hyperparameter tuning process. This dictionary is called <code>fun_control</code> and is initialized with the function <code>fun_control_init</code>. The function <code>fun_control_init</code> returns a skeleton dictionary. The dictionary is filled with the required information for the hyperparameter tuning process. It stores the hyperparameter tuning settings, e.g., the deep learning network architecture that should be tuned, the classification (or regression) problem, and the data that is used for the tuning. The dictionary is used as an input for the SPOT function.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sec-data-loading" class="level2">
+<h2 class="anchored" data-anchor-id="sec-data-loading">Data Loading</h2>
+<p>The data loading process is implemented in the same manner as described in the Section “Data loaders” in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>. The data loaders are wrapped into the function <code>load_data</code>. A global data directory is used, which allows sharing the data directory between different trials.</p>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data(data_dir<span class="op">=</span><span class="st">"./data"</span>):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    transform <span class="op">=</span> transforms.Compose([</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        transforms.ToTensor(),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        transforms.Normalize((<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>), (<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">0.5</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    ])</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    trainset <span class="op">=</span> torchvision.datasets.CIFAR10(</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        root<span class="op">=</span>data_dir, train<span class="op">=</span><span class="va">True</span>, download<span class="op">=</span><span class="va">True</span>, transform<span class="op">=</span>transform)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    testset <span class="op">=</span> torchvision.datasets.CIFAR10(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        root<span class="op">=</span>data_dir, train<span class="op">=</span><span class="va">False</span>, download<span class="op">=</span><span class="va">True</span>, transform<span class="op">=</span>transform)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> trainset, testset</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The test and train data are added to the dictionary <code>fun_control</code>.</p>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> load_data()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="bu">len</span>(train)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># add the dataset to the fun_control</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"train"</span>: train,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"test"</span>: test,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_samples"</span>: n_samples})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sec-specification-of-preprocessing-model" class="level2">
+<h2 class="anchored" data-anchor-id="sec-specification-of-preprocessing-model">Specification of the Preprocessing Model</h2>
+<p>After the training and test data are specified and added to the <code>fun_control</code> dictionary, <code>spotPython</code> allows the specification of a data preprocessing pipeline, e.g., for the scaling of the data or for the one-hot encoding of categorical variables. The preprocessing model is called <code>prep_model</code> (“preparation” or pre-processing) and includes steps that are not subject to the hyperparameter tuning process. The preprocessing model is specified in the <code>fun_control</code> dictionary. The preprocessing model can be implemented as a <code>sklearn</code> pipeline. The following code shows a typical preprocessing pipeline:</p>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>categorical_columns <span class="op">=</span> [<span class="st">"cities"</span>, <span class="st">"colors"</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>one_hot_encoder <span class="op">=</span> OneHotEncoder(handle_unknown<span class="op">=</span><span class="st">"ignore"</span>, sparse_output<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> ColumnTransformer(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        transformers<span class="op">=</span>[</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>             (<span class="st">"categorical"</span>, one_hot_encoder, categorical_columns),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>         ],</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>         remainder<span class="op">=</span>StandardScaler(),</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>     )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Because the Ray Tune (<code>ray[tune]</code>) hyperparameter tuning as described in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> does not use a preprocessing model, the preprocessing model is set to <code>None</code> here.</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sec-selection-of-the-algorithm" class="level2">
+<h2 class="anchored" data-anchor-id="sec-selection-of-the-algorithm">Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
+<p>The same neural network model as implemented in the section “Configurable neural network” of the <code>PyTorch</code> tutorial <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span> is used here. We will show the implementation from <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> in <a href="#sec-implementation-with-raytune">Section&nbsp;4.4.1</a> first, before the extended implementation with <code>spotPython</code> is shown in <a href="#sec-implementation-with-spotpython">Section&nbsp;4.4.2</a>.</p>
+<section id="sec-implementation-with-raytune" class="level3">
+<h3 class="anchored" data-anchor-id="sec-implementation-with-raytune">Implementing a Configurable Neural Network With Ray Tune</h3>
+<p>We used the same hyperparameters that are implemented as configurable in the <code>PyTorch</code> tutorial. We specify the layer sizes, namely <code>l1</code> and <code>l2</code>, of the fully connected layers:</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Net(nn.Module):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, l1<span class="op">=</span><span class="dv">120</span>, l2<span class="op">=</span><span class="dv">84</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>(Net, <span class="va">self</span>).<span class="fu">__init__</span>()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv1 <span class="op">=</span> nn.Conv2d(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">5</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pool <span class="op">=</span> nn.MaxPool2d(<span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv2 <span class="op">=</span> nn.Conv2d(<span class="dv">6</span>, <span class="dv">16</span>, <span class="dv">5</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc1 <span class="op">=</span> nn.Linear(<span class="dv">16</span> <span class="op">*</span> <span class="dv">5</span> <span class="op">*</span> <span class="dv">5</span>, l1)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc2 <span class="op">=</span> nn.Linear(l1, l2)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc3 <span class="op">=</span> nn.Linear(l2, <span class="dv">10</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(F.relu(<span class="va">self</span>.conv1(x)))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(F.relu(<span class="va">self</span>.conv2(x)))</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.view(<span class="op">-</span><span class="dv">1</span>, <span class="dv">16</span> <span class="op">*</span> <span class="dv">5</span> <span class="op">*</span> <span class="dv">5</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.relu(<span class="va">self</span>.fc1(x))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.relu(<span class="va">self</span>.fc2(x))</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.fc3(x)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The learning rate, i.e., <code>lr</code>, of the optimizer is made configurable, too:</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> optim.SGD(net.parameters(), lr<span class="op">=</span>config[<span class="st">"lr"</span>], momentum<span class="op">=</span><span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sec-implementation-with-spotpython" class="level3">
+<h3 class="anchored" data-anchor-id="sec-implementation-with-spotpython">Implementing a Configurable Neural Network With spotPython</h3>
+<p><code>spotPython</code> implements a class which is similar to the class described in the <code>PyTorch</code> tutorial. The class is called <code>Net_CIFAR10</code> and is implemented in the file <code>netcifar10.py</code>.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> spotPython.torch.netcore <span class="im">as</span> netcore</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Net_CIFAR10(netcore.Net_Core):</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, l1, l2, lr, batch_size, epochs, k_folds, patience):</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>(Net_CIFAR10, <span class="va">self</span>).<span class="fu">__init__</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>            lr<span class="op">=</span>lr, batch_size<span class="op">=</span>batch_size, epochs<span class="op">=</span>epochs, k_folds<span class="op">=</span>k_folds,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            patience<span class="op">=</span>patience</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv1 <span class="op">=</span> nn.Conv2d(<span class="dv">3</span>, <span class="dv">6</span>, <span class="dv">5</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pool <span class="op">=</span> nn.MaxPool2d(<span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.conv2 <span class="op">=</span> nn.Conv2d(<span class="dv">6</span>, <span class="dv">16</span>, <span class="dv">5</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc1 <span class="op">=</span> nn.Linear(<span class="dv">16</span> <span class="op">*</span> <span class="dv">5</span> <span class="op">*</span> <span class="dv">5</span>, l1)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc2 <span class="op">=</span> nn.Linear(l1, l2)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.fc3 <span class="op">=</span> nn.Linear(l2, <span class="dv">10</span>)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(F.relu(<span class="va">self</span>.conv1(x)))</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.pool(F.relu(<span class="va">self</span>.conv2(x)))</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> x.view(<span class="op">-</span><span class="dv">1</span>, <span class="dv">16</span> <span class="op">*</span> <span class="dv">5</span> <span class="op">*</span> <span class="dv">5</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.relu(<span class="va">self</span>.fc1(x))</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> F.relu(<span class="va">self</span>.fc2(x))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> <span class="va">self</span>.fc3(x)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>Net_CIFAR10</code> inherits from the class <code>Net_Core</code> which is implemented in the file <code>netcore.py</code>. It implements the additional attributes that are common to all neural network models. The attributes are the learning rate <code>lr</code>, the batch size <code>batch_size</code>, the number of epochs <code>epochs</code>, the number of folds <code>k_folds</code> for the cross validation, and the patience <code>patience</code> for the early stopping. The class <code>Net_Core</code> is shown below.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Net_Core(nn.Module):</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, lr, batch_size, epochs, k_folds, patience):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>(Net_Core, <span class="va">self</span>).<span class="fu">__init__</span>()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lr <span class="op">=</span> lr</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.batch_size <span class="op">=</span> batch_size</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.epochs <span class="op">=</span> epochs</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.k_folds <span class="op">=</span> k_folds</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.patience <span class="op">=</span> patience</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="sec-comparison" class="level3">
+<h3 class="anchored" data-anchor-id="sec-comparison">Comparison of the Approach Described in the PyTorch Tutorial With spotPython</h3>
+<p>Comparing the class <code>Net</code> from the <code>PyTorch</code> tutorial and the class <code>Net_CIFAR10</code> from <code>spotPython</code>, we see that the class <code>Net_CIFAR10</code> has additional attributes and does not inherit from <code>nn</code> directly. It adds an additional class, <code>Net_core</code>, that takes care of additional attributes that are common to all neural network models, e.g., the learning rate <code>lr</code> or the batch size <code>batch_size</code>.</p>
+<p><code>spotPython</code>’s <code>core_model</code> implements an instance of the <code>Net_CIFAR10</code> class. In addition to the basic neural network model, the <code>core_model</code> can use these additional attributes. <code>spotPython</code> provides methods for handling these additional attributes to guarantee 100% compatibility with the <code>PyTorch</code> classes. The method <code>add_core_model_to_fun_control</code> adds the hyperparameters and additional attributes to the <code>fun_control</code> dictionary. The method is shown below.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>core_model <span class="op">=</span> Net_CIFAR10</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>TorchHyperDict,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In addition to the class Net from the <code>PyTorch</code> tutorial, the class Net_CIFAR10 has additional attributes, e.g.:</p>
+<ul>
+<li>learning rate (<code>lr</code>),</li>
+<li>batch size (<code>batch_size</code>),</li>
+<li>epochs (<code>epochs</code>),</li>
+<li>k_folds (<code>k_folds</code>), and</li>
+<li>early stopping criterion “patience” (<code>patience</code>)</li>
+</ul>
+<p>Further attributes can be easily added to the class, e.g., <code>optimizer</code> or <code>loss_function</code>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="sec-search-space" class="level2">
+<h2 class="anchored" data-anchor-id="sec-search-space">The Search Space</h2>
+<p>In <a href="#sec-configuring-the-search-space-with-ray-tune">Section&nbsp;4.5.1</a>, we first describe how to configure the search space with <code>ray[tune]</code> (as shown in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>) and then how to configure the search space with <code>spotPython</code> in <a href="#sec-configuring-the-search-space-with-spotpython">Section&nbsp;4.5.2</a>.</p>
+<section id="sec-configuring-the-search-space-with-ray-tune" class="level3">
+<h3 class="anchored" data-anchor-id="sec-configuring-the-search-space-with-ray-tune">Configuring the Search Space With Ray Tune</h3>
+<p>Ray Tune’s search space can be configured as follows <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>:</p>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"l1"</span>: tune.sample_from(<span class="kw">lambda</span> _: <span class="dv">2</span><span class="op">**</span>np.random.randint(<span class="dv">2</span>, <span class="dv">9</span>)),</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"l2"</span>: tune.sample_from(<span class="kw">lambda</span> _: <span class="dv">2</span><span class="op">**</span>np.random.randint(<span class="dv">2</span>, <span class="dv">9</span>)),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lr"</span>: tune.loguniform(<span class="fl">1e-4</span>, <span class="fl">1e-1</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>: tune.choice([<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">16</span>])</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>tune.sample_from()</code> function enables the user to define sample methods to obtain hyperparameters. In this example, the <code>l1</code> and <code>l2</code> parameters should be powers of 2 between 4 and 256, so either 4, 8, 16, 32, 64, 128, or 256. The <code>lr</code> (learning rate) should be uniformly sampled between 0.0001 and 0.1. Lastly, the batch size is a choice between 2, 4, 8, and 16.</p>
+<p>At each trial, <code>ray[tune]</code> will randomly sample a combination of parameters from these search spaces. It will then train a number of models in parallel and find the best performing one among these. <code>ray[tune]</code> uses the <code>ASHAScheduler</code> which will terminate bad performing trials early.</p>
+</section>
+<section id="sec-configuring-the-search-space-with-spotpython" class="level3">
+<h3 class="anchored" data-anchor-id="sec-configuring-the-search-space-with-spotpython">Configuring the Search Space With spotPython</h3>
+<section id="the-hyper_dict-hyperparameters-for-the-selected-algorithm" class="level4">
+<h4 class="anchored" data-anchor-id="the-hyper_dict-hyperparameters-for-the-selected-algorithm">The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</h4>
+<p><code>spotPython</code> uses simple <code>JSON</code> files for the specification of the hyperparameters. Users can specify their individual <code>JSON</code> files, or they can use the <code>JSON</code> files provided by <code>spotPython</code>. The <code>JSON</code> file for the <code>core_model</code> is called <code>torch_hyper_dict.json</code>.</p>
+<p>Each entry in the <code>JSON</code> file represents one hyperparameter with the following structure: <code>type</code>, <code>default</code>, <code>transform</code>, <code>lower</code>, and <code>upper</code>. The corresponding entries for the <code>Net_CIFAR10</code> class are shown below.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">"Net_CIFAR10"</span><span class="fu">:</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"l1"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">5</span><span class="fu">,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"transform_power_2_int"</span><span class="fu">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">9</span><span class="fu">},</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"l2"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">5</span><span class="fu">,</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"transform_power_2_int"</span><span class="fu">,</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">9</span><span class="fu">},</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"lr"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"float"</span><span class="fu">,</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">1e-03</span><span class="fu">,</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">1e-05</span><span class="fu">,</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1e-02</span><span class="fu">},</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"batch_size"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"transform_power_2_int"</span><span class="fu">,</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">},</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"epochs"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"transform_power_2_int"</span><span class="fu">,</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">},</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"k_folds"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">},</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"patience"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">5</span><span class="fu">,</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">10</span><span class="fu">}</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="categorical-hyperparameters" class="level4">
+<h4 class="anchored" data-anchor-id="categorical-hyperparameters">Categorical Hyperparameters</h4>
+<p>In contrast to <code>ray[tune]</code>, <code>spotPython</code> can handle numerical, boolean, and categorical hyperparameters. Since <code>ray[tune]</code> does not tune categorical hyperparameters, they are not used here. However, they can be specified in the <code>JSON</code> file in a similar way as the numerical hyperparameters as shown below:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="er">"factor_hyperparameter":</span> <span class="fu">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"A"</span><span class="ot">,</span> <span class="st">"B"</span><span class="ot">,</span> <span class="st">"C"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"B"</span><span class="fu">,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"str"</span><span class="fu">,</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span><span class="er">,</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+</section>
+<section id="sec-modification-of-hyperparameters" class="level2">
+<h2 class="anchored" data-anchor-id="sec-modification-of-hyperparameters">Modifying the Hyperparameters</h2>
+<p>Ray tune <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span> does not provide a way to change the specified hyperparameters without re-compilation. However, <code>spotPython</code> provides functions for modifying the hyperparameters, their bounds and factors as well as for activating and de-activating hyperparameters without re-compilation of the Python source code. These functions are described in the following.</p>
+<section id="sec-modification-of-default-values" class="level3">
+<h3 class="anchored" data-anchor-id="sec-modification-of-default-values">Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h3>
+<p>After specifying the model, the corresponding hyperparameters, their types and bounds are loaded from the <code>JSON</code> file <code>torch_hyper_dict.json</code>. After loading, the user can modify the hyperparameters, e.g., the bounds. <code>spotPython</code> provides a simple rule for de-activating hyperparameters: If the lower and the upper bound are set to identical values, the hyperparameter is de-activated. This is useful for the hyperparameter tuning, because it allows to specify a hyperparameter in the <code>JSON</code> file, but to de-activate it in the <code>fun_control</code> dictionary. This is done in the next step.</p>
+</section>
+<section id="modify-hyperparameters-of-type-numeric-and-integer-boolean" class="level3">
+<h3 class="anchored" data-anchor-id="modify-hyperparameters-of-type-numeric-and-integer-boolean">Modify Hyperparameters of Type numeric and integer (boolean)</h3>
+<p>Since the hyperparameter <code>k_folds</code> is not used in the <code>PyTorch</code> tutorial, it is de-activated here by setting the lower and upper bound to the same value. Note, <code>k_folds</code> is of type “integer”.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"batch_size"</span>, bounds<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">5</span>])</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"k_folds"</span>, bounds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"patience"</span>, bounds<span class="op">=</span>[<span class="dv">5</span>, <span class="dv">5</span>])</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">"core_model_hyper_dict"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modify-hyperparameter-of-type-factor" class="level3">
+<h3 class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor">Modify Hyperparameter of Type factor</h3>
+<p>In a similar manner as for the numerical hyperparameters, the categorical hyperparameters can be modified. For example, the hyperparameter <code>optimizer</code> is de-activated here by choosing only one value, here: <code>"SGD"</code>.</p>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>New configurations can be chosen by adding or deleting levels. For example, the hyperparameter <code>optimizer</code> can be re-configured as follows:</p>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>, <span class="st">"Adam"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this case, two optimizers (<code>"SGD"</code> and <code>"Adam"</code>) are compared during the <code>spotPython</code> hyperparameter tuning. Now, the hyperparameter <code>optimizer</code> is active again.</p>
+</section>
+</section>
+<section id="sec-selection-of-target-function" class="level2">
+<h2 class="anchored" data-anchor-id="sec-selection-of-target-function">Evaluation</h2>
+<p>The evaluation procedure requires the specification of two elements:</p>
+<ol type="1">
+<li>the way how the data is split into a train and a test set and</li>
+<li>the loss function (and a metric).</li>
+</ol>
+<section id="hold-out-data-split-and-cross-validation" class="level3">
+<h3 class="anchored" data-anchor-id="hold-out-data-split-and-cross-validation">Hold-out Data Split and Cross-Validation</h3>
+<p>As a default, <code>spotPython</code> provides a standard hold-out data split and cross validation.</p>
+<section id="hold-out-data-split" class="level4">
+<h4 class="anchored" data-anchor-id="hold-out-data-split">Hold-out Data Split</h4>
+<p>If a hold-out data split is used, the data will be partitioned into a training, a validation, and a test data set. The split depends on the setting of the <code>eval</code> parameter. If <code>eval</code> is set to <code>train_hold_out</code>, one data set, usually the original training data set, is split into a new training and a validation data set. The training data set is used for training the model. The validation data set is used for the evaluation of the hyperparameter configuration and early stopping to prevent overfitting. In this case, the original test data set is not used. The following splits are performed in the hold-out setting: <span class="math inline">\(\{\text{train}_0, \text{test}\} \rightarrow \{\text{train}_1, \text{validation}_1, \text{test}\}\)</span>, where <span class="math inline">\(\text{train}_1 \cup \text{validation}_1 = \text{train}_0\)</span>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>spotPython</code> returns the hyperparameters of the machine learning and deep learning models, e.g., number of layers, learning rate, or optimizer, but not the model weights. Therefore, after the SPOT run is finished, the corresponding model has to be trained again with the best hyperparameter configuration. The training is performed on the training data set. The test data set is used for the final evaluation of the model.</p>
+<p>Summarizing, the following splits are performed in the hold-out setting:</p>
+<ol type="1">
+<li>Run <code>spotPython</code> with <code>eval</code> set to <code>train_hold_out</code> to determine the best hyperparameter configuration.</li>
+<li>Train the model with the best hyperparameter configuration on the training data set:
+<ul>
+<li><code>train_save(model_spot, train, "model_spot.pt")</code>.</li>
+</ul></li>
+<li>Test the model on the test data:
+<ul>
+<li><code>test_saved(model_spot, test, "model_spot.pt")</code></li>
+</ul></li>
+</ol>
+<p>These steps will be exemplified in the following sections.</p>
+</div>
+</div>
+<p>In addition to this <code>hold-out</code> setting, <code>spotPython</code> provides another hold-out setting, where an explicit test data is specified by the user that will be used as the validation set. To choose this option, the <code>eval</code> parameter is set to <code>test_hold_out</code>. In this case, the training data set is used for the model training. Then, the explicitly defined test data set is used for the evaluation of the hyperparameter configuration (the validation).</p>
+</section>
+<section id="cross-validation" class="level4">
+<h4 class="anchored" data-anchor-id="cross-validation">Cross-Validation</h4>
+<p>The cross validation setting is used by setting the <code>eval</code> parameter to <code>train_cv</code> or <code>test_cv</code>. In both cases, the data set is split into <span class="math inline">\(k\)</span> folds. The model is trained on <span class="math inline">\(k-1\)</span> folds and evaluated on the remaining fold. This is repeated <span class="math inline">\(k\)</span> times, so that each fold is used exactly once for evaluation. The final evaluation is performed on the test data set. The cross validation setting is useful for small data sets, because it allows to use all data for training and evaluation. However, it is computationally expensive, because the model has to be trained <span class="math inline">\(k\)</span> times.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Combinations of the above settings are possible, e.g., cross validation can be used for training and hold-out for evaluation or . Also, cross validation can be used for training and testing. Because cross validation is not used in the <code>PyTorch</code> tutorial <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>, it is not considered further here.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="loss-functions-and-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="loss-functions-and-metrics">Loss Functions and Metrics</h3>
+<p>The key <code>"criterion"</code> specifies the loss function which is used during the optimization. There are several different loss functions under <code>PyTorch</code>’s nn package. For example, a simple loss is <code>MSELoss</code>, which computes the mean-squared error between the output and the target. In this tutorial we will use <code>CrossEntropyLoss</code>, because it is also used in the <code>PyTorch</code> tutorial.</p>
+<p>In addition to the loss function, <code>spotPython</code> provides access to a large number of metrics. The key <code>"metric_sklearn"</code> is used for metrics that follow the <code>scikit-learn</code> conventions<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>. Because the <code>PyTorch</code> tutorial uses the accuracy as metric, we use the same metric here. Currently, accuracy is computed in the tutorial’s example code. Therefore, we will use the same implementation here and set the key <code>"metric_sklearn"</code> to <code>None</code>.</p>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>criterion <span class="op">=</span> CrossEntropyLoss</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>shuffle <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span> <span class="op">=</span> <span class="st">"train_hold_out"</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> DEVICE</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>show_batch_interval <span class="op">=</span> <span class="dv">100_000</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>save_model <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>path<span class="op">=</span><span class="st">"torch_model.pt"</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"data_dir"</span>: <span class="va">None</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"checkpoint_dir"</span>: <span class="va">None</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizon"</span>: <span class="va">None</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"oml_grace_period"</span>: <span class="va">None</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weights"</span>: weights,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"step"</span>: <span class="va">None</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"log_level"</span>: <span class="dv">50</span>,</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weight_coeff"</span>: <span class="va">None</span>,</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric"</span>: <span class="va">None</span>,</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_sklearn"</span>: <span class="va">None</span>,</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"criterion"</span>: criterion,</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"shuffle"</span>: shuffle,</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>               <span class="st">"eval"</span>: <span class="bu">eval</span>,</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>               <span class="st">"device"</span>: device,</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>               <span class="st">"show_batch_interval"</span>: show_batch_interval,</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a>               <span class="st">"save_model"</span>: save_model,</span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>               <span class="st">"path"</span>: path,</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="sec-call-the-hyperparameter-tuner" class="level2">
+<h2 class="anchored" data-anchor-id="sec-call-the-hyperparameter-tuner">Calling the SPOT Function</h2>
+<p>Now, the dictionary <code>fun_control</code> contains all information needed for the hyperparameter tuning. Before the hyperparameter tuning is started, it is recommended to take a look at the experimental design. The method <code>gen_design_table</code> generates a design table as follows:</p>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This allows to check if all information is available and if the information is correct. <a href="#tbl-design">Table&nbsp;1</a> shows the experimental design for the hyperparameter tuning. Hyperparameter transformations are shown in the column “transform”, e.g., the <code>l1</code> default is <code>5</code>, which results in the value <span class="math inline">\(2^5 = 32\)</span> for the network, because the transformation <code>transform_power_2_int</code> was selected in the <code>JSON</code> file. The default value of the <code>batch_size</code> is set to <code>4</code>, which results in a batch size of <span class="math inline">\(2^4 = 16\)</span>.</p>
+<div id="tbl-design" class="anchored">
+<table class="table">
+<caption>Table&nbsp;1: Experimental design for the hyperparameter tuning. The table shows the hyperparameters, their types, default values, lower and upper bounds, and the transformation function. The transformation function is used to transform the hyperparameter values from the unit hypercube to the original domain. The transformation function is applied to the hyperparameter values before the evaluation of the objective function.</caption>
+<colgroup>
+<col style="width: 16%">
+<col style="width: 11%">
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 31%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>name</th>
+<th>type</th>
+<th>default</th>
+<th>lower</th>
+<th>upper</th>
+<th>transform</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>l1</td>
+<td>int</td>
+<td>5</td>
+<td>2</td>
+<td>9</td>
+<td>transform_power_2_int</td>
+</tr>
+<tr class="even">
+<td>l2</td>
+<td>int</td>
+<td>5</td>
+<td>2</td>
+<td>9</td>
+<td>transform_power_2_int</td>
+</tr>
+<tr class="odd">
+<td>lr</td>
+<td>float</td>
+<td>0.001</td>
+<td>1e-05</td>
+<td>0.01</td>
+<td>None</td>
+</tr>
+<tr class="even">
+<td>batch_size</td>
+<td>int</td>
+<td>4</td>
+<td>1</td>
+<td>4</td>
+<td>transform_power_2_int</td>
+</tr>
+<tr class="odd">
+<td>epochs</td>
+<td>int</td>
+<td>3</td>
+<td>3</td>
+<td>4</td>
+<td>transform_power_2_int</td>
+</tr>
+<tr class="even">
+<td>k_folds</td>
+<td>int</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The objective function <code>fun_torch</code> is selected next. It implements an interface from <code>PyTorch</code>’s training, validation, and testing methods to <code>spotPython</code>.</p>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperTorch().fun_torch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>spotPython</code> hyperparameter tuning is started by calling the <code>Spot</code> function. Here, we will run the tuner for approx. 30 minutes (<code>max_time</code>). Note: the initial design is always evaluated in the <code>spotPython</code> run. As a consequence, the run may take longer than specified by <code>max_time</code>, because the evaluation time of initial design (here: <code>init_size</code>, 10 points) is performed independently of <code>max_time</code>.</p>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                   fun_repeats <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                   noise <span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                   infill_criterion <span class="op">=</span> <span class="st">"y"</span>,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                   n_points <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>                   log_level <span class="op">=</span> <span class="dv">50</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_optimizer"</span>: differential_evolution,</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span>,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"log_level"</span>: <span class="dv">50</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>                                      })</span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>During the run, the following output is shown:</p>
+<pre class="{raw}"><code>Epoch: 9
+Batch:  1000. Batch Size: 4. Training Loss (running): 2.308
+Batch:  2000. Batch Size: 4. Training Loss (running): 1.153
+Batch:  3000. Batch Size: 4. Training Loss (running): 0.769
+Batch:  4000. Batch Size: 4. Training Loss (running): 0.576
+Batch:  5000. Batch Size: 4. Training Loss (running): 0.461
+Batch:  6000. Batch Size: 4. Training Loss (running): 0.384
+Batch:  7000. Batch Size: 4. Training Loss (running): 0.330
+Loss on hold-out set: 2.306006399059296
+Accuracy on hold-out set: 0.1007
+Early stopping at epoch 8
+Returned to Spot: Validation loss: 2.306006399059296</code></pre>
+</section>
+<section id="sec-results-tuning" class="level2">
+<h2 class="anchored" data-anchor-id="sec-results-tuning">Results</h2>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_ch10-friedman-hpt-0_maans03_60min_20init_1K_2023-04-14_10-11-19.pkl"</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>After the hyperparameter tuning run is finished, the progress of the hyperparameter tuning can be visualized. The following code generates the progress plot from <a href="#fig-progress">Figure&nbsp;2</a>.</p>
+<div id="fig-progress" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, filename<span class="op">=</span><span class="st">"./figures"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<figcaption class="figure-caption">Figure&nbsp;1: <strong>?(caption)</strong></figcaption>
+</figure>
+</div>
+<div id="fig-progress" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="./figures/14-torch_bartz09_30min_10init_2023-05-14_14-45-25_progress.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;2: Progress plot. <code>Black</code> dots denote results from the initial design. <code>Red</code> dots illustrate the improvement found by the surrogate model based optimization (surrogate model based optimization).</figcaption>
+</figure>
+</div>
+<p><a href="#fig-progress">Figure&nbsp;2</a> shows a typical behaviour that can be observed in many hyperparameter studies <span class="citation" data-cites="bart21i">(<a href="#ref-bart21i" role="doc-biblioref">Bartz et al. 2022</a>)</span>: the largest improvement is obtained during the evaluation of the initial design. The surrogate model based optimization-optimization with the surrogate refines the results. <a href="#fig-progress">Figure&nbsp;2</a> also illustrates one major difference between <code>ray[tune]</code> as used in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> and <code>spotPython</code>: the <code>ray[tune]</code> uses a random search and will generate results similar to the <em>black</em> dots, whereas <code>spotPython</code> uses a surrogate model based optimization and presents results represented by <em>red</em> dots in <a href="#fig-progress">Figure&nbsp;2</a>. The surrogate model based optimization is considered to be more efficient than a random search, because the surrogate model guides the search towards promising regions in the hyperparameter space.</p>
+<p>In addition to the improved (“optimized”) hyperparameter values, <code>spotPython</code> allows a statistical analysis, e.g., a sensitivity analysis, of the results. We can print the results of the hyperparameter tuning, see <a href="#tbl-results">Table&nbsp;2</a>.</p>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tbl-results" class="anchored">
+<table class="table">
+<caption>Table&nbsp;2: Results of the hyperparameter tuning. The table shows the hyperparameters, their types, default values, lower and upper bounds, and the transformation function. The column “tuned” shows the tuned values. The column “importance” shows the importance of the hyperparameters. The column “stars” shows the importance of the hyperparameters in stars. The importance is computed by the SPOT software.</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 7%">
+<col style="width: 10%">
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 5%">
+<col style="width: 22%">
+<col style="width: 13%">
+<col style="width: 8%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>name</th>
+<th>type</th>
+<th>default</th>
+<th>lower</th>
+<th>upper</th>
+<th>tuned</th>
+<th>transform</th>
+<th>importance</th>
+<th>stars</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>l1</td>
+<td>int</td>
+<td>5.0</td>
+<td>2.0</td>
+<td>9.0</td>
+<td>6.0</td>
+<td>power_2_int</td>
+<td>74.93</td>
+<td>**</td>
+</tr>
+<tr class="even">
+<td>l2</td>
+<td>int</td>
+<td>5.0</td>
+<td>2.0</td>
+<td>9.0</td>
+<td>5.0</td>
+<td>power_2_int</td>
+<td>0.00</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>lr</td>
+<td>float</td>
+<td>0.001</td>
+<td>1e-05</td>
+<td>0.01</td>
+<td>0.0038</td>
+<td>None</td>
+<td>100.00</td>
+<td>***</td>
+</tr>
+<tr class="even">
+<td>batch_size</td>
+<td>int</td>
+<td>4.0</td>
+<td>1.0</td>
+<td>5.0</td>
+<td>4.0</td>
+<td>power_2_int</td>
+<td>75.39</td>
+<td>**</td>
+</tr>
+<tr class="odd">
+<td>epochs</td>
+<td>int</td>
+<td>3.0</td>
+<td>3.0</td>
+<td>4.0</td>
+<td>4.0</td>
+<td>power_2_int</td>
+<td>0.00</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>k_folds</td>
+<td>int</td>
+<td>2.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>None</td>
+<td>0.00</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>patience</td>
+<td>int</td>
+<td>5.0</td>
+<td>5.0</td>
+<td>5.0</td>
+<td>5.0</td>
+<td>None</td>
+<td>0.00</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To visualize the most important hyperparameters, <code>spotPython</code> provides the function <code>plot_importance</code>. The following code generates the importance plot from <a href="#fig-importance">Figure&nbsp;3</a>.</p>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>, filename<span class="op">=</span><span class="st">"./figures"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="fig-importance" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="./figures/14-torch_bartz09_30min_10init_2023-05-14_14-45-25_importance.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;3: Variable importance</figcaption>
+</figure>
+</div>
+</section>
+<section id="sec-get-spot-results" class="level2">
+<h2 class="anchored" data-anchor-id="sec-get-spot-results">Get SPOT Results</h2>
+<p>The architecture of the <code>spotPython</code> model can be obtained by the following code:</p>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First, the numerical representation of the hyperparameters are obtained, i.e., the numpy array <code>X</code> is generated. This array is then used to generate the model <code>model_spot</code> by the function <code>get_one_core_model_from_X</code>. The model <code>model_spot</code> has the following architecture:</p>
+<pre class="{raw}"><code>Net_CIFAR10(
+  (conv1): Conv2d(3, 6, kernel_size=(5, 5), stride=(1, 1))
+  (pool): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (conv2): Conv2d(6, 16, kernel_size=(5, 5), stride=(1, 1))
+  (fc1): Linear(in_features=400, out_features=64, bias=True)
+  (fc2): Linear(in_features=64, out_features=32, bias=True)
+  (fc3): Linear(in_features=32, out_features=10, bias=True)
+)</code></pre>
+</section>
+<section id="get-default-hyperparameters" class="level2">
+<h2 class="anchored" data-anchor-id="get-default-hyperparameters">Get Default Hyperparameters</h2>
+<p>In a similar manner as in <a href="#sec-get-spot-results">Section&nbsp;4.10</a>, the default hyperparameters can be obtained.</p>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> get_default_values(fun_control)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> transform_hyper_parameter_values(fun_control<span class="op">=</span>fun_control, hyper_parameter_values<span class="op">=</span>values_default)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(values_default)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> fun_control[<span class="st">"core_model"</span>](<span class="op">**</span>values_default)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(model_default)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The corresponding default model has the following architecture:</p>
+<pre class="{raw}"><code>Net_CIFAR10(
+  (conv1): Conv2d(3, 6, kernel_size=(5, 5), stride=(1, 1))
+  (pool): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (conv2): Conv2d(6, 16, kernel_size=(5, 5), stride=(1, 1))
+  (fc1): Linear(in_features=400, out_features=32, bias=True)
+  (fc2): Linear(in_features=32, out_features=32, bias=True)
+  (fc3): Linear(in_features=32, out_features=10, bias=True)
+)</code></pre>
+</section>
+<section id="evaluation-of-the-tuned-architecture" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-of-the-tuned-architecture">Evaluation of the Tuned Architecture</h2>
+<p>The method <code>train_save</code> takes a model architecture without trained weights and trains this model with the train data. The train data is split into train and validation data. The validation data is used for early stopping. The trained model weights are saved as a dictionary.</p>
+<p>This evaluation is similar to the final evaluation in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>.</p>
+<p>::: {.cell execution_count=32} <code>{.python .cell-code}  train_save(net=model_default,train_dataset=train, shuffle=True, device = "cpu", show_batch_interval=1_000, path="model_default_trained.pt", save_model=True)  test_saved(net=model_default,test_dataset=test, shuffle=False, device = "cpu", path="model_default_trained.pt")</code> :::</p>
+<p>The following code trains the model <code>model_spot</code> and saves the weights of the trained model to the file <code>model_spot_trained.pt</code>.</p>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>train_save(net<span class="op">=</span>model_spot, train_dataset<span class="op">=</span>train,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                shuffle<span class="op">=</span><span class="va">True</span>, path<span class="op">=</span><span class="st">"model_spot_trained.pt"</span>, save_model<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre class="{raw}"><code>Loss on hold-out set: 1.1649643966913223
+Accuracy on hold-out set: 0.5948</code></pre>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>test_saved(net<span class="op">=</span>model_spot, test_dataset<span class="op">=</span>test,</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>            shuffle<span class="op">=</span><span class="va">False</span>, path<span class="op">=</span><span class="st">"model_spot_trained.pt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre class="{raw}"><code>Loss on hold-out set: 1.1034918918132781
+Accuracy on hold-out set: 0.6184</code></pre>
+</section>
+<section id="comparison-with-default-hyperparameters-and-ray-tune" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-with-default-hyperparameters-and-ray-tune">Comparison with Default Hyperparameters and Ray Tune</h2>
+<p><a href="#tbl-comparison">Table&nbsp;3</a> shows the loss and accuracy of the default model, the model with the hyperparameters from SPOT, and the model with the hyperparameters from <code>ray[tune]</code>.</p>
+<div id="tbl-comparison" class="anchored">
+<table class="table">
+<caption>Table&nbsp;3: Comparison of the loss and accuracy of the default model, the model with the hyperparameters from SPOT, and the model with the hyperparameters from <code>ray[tune]</code>. <code>ray[tune]</code> only shows the validation loss, because training loss is not reported by <code>ray[tune]</code>.</caption>
+<colgroup>
+<col style="width: 16%">
+<col style="width: 25%">
+<col style="width: 30%">
+<col style="width: 13%">
+<col style="width: 14%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model</th>
+<th style="text-align: right;">Validation Loss</th>
+<th style="text-align: right;">Validation Accuracy</th>
+<th style="text-align: right;">Loss</th>
+<th style="text-align: right;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Default</td>
+<td style="text-align: right;">1.3152</td>
+<td style="text-align: right;">0.5316</td>
+<td style="text-align: right;">1.1561</td>
+<td style="text-align: right;">0.5934</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>spotPython</code></td>
+<td style="text-align: right;">1.0686</td>
+<td style="text-align: right;">0.6291</td>
+<td style="text-align: right;">1.1035</td>
+<td style="text-align: right;">0.6184</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>ray[tune]</code></td>
+<td style="text-align: right;">1.1815</td>
+<td style="text-align: right;">0.5836</td>
+<td style="text-align: right;">-</td>
+<td style="text-align: right;">0.5806</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="detailed-hyperparameter-plots" class="level2">
+<h2 class="anchored" data-anchor-id="detailed-hyperparameter-plots">Detailed Hyperparameter Plots</h2>
+<p>The contour plots in this section visualize the interactions of the three most important hyperparameters, <code>lr</code>, <code>batch_size</code>, and <code>l1</code> of the surrogate model used to optimize the hyperparameters. Since these hyperparameters take integer values, a step-like fitness landcape (or response surface) is generated. SPOT draws the interactions of the main hyperparameters by default. It is also possible to visualize all interactions. For this, again refer to the notebook <span class="citation" data-cites="bart23e">(<a href="#ref-bart23e" role="doc-biblioref">Bartz-Beielstein 2023</a>)</span>.</p>
+<div id="fig-contour" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>threshold <span class="op">=</span> <span class="fl">0.025</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>impo <span class="op">=</span> spot_tuner.print_importance(threshold<span class="op">=</span>threshold, print_screen<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>var_plots <span class="op">=</span> [i <span class="cf">for</span> i, x <span class="kw">in</span> <span class="bu">enumerate</span>(impo) <span class="cf">if</span> x[<span class="dv">1</span>] <span class="op">&gt;</span> threshold]</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>min_z <span class="op">=</span> <span class="bu">min</span>(spot_tuner.y)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>max_z <span class="op">=</span> <span class="bu">max</span>(spot_tuner.y)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> spot_tuner.k</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> var_plots:</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> var_plots:</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">&gt;</span> i:</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>            filename <span class="op">=</span> <span class="st">"./figures"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_contour_"</span><span class="op">+</span><span class="bu">str</span>(i)<span class="op">+</span><span class="st">"_"</span><span class="op">+</span><span class="bu">str</span>(j)<span class="op">+</span><span class="st">".pdf"</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z, filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<figcaption class="figure-caption">Figure&nbsp;4: <strong>?(caption)</strong></figcaption>
+</figure>
+</div>
+<div id="fig-contour-0-2" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="./figures/14-torch_bartz09_30min_10init_2023-05-14_14-45-25_contour_0_2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;5: Contour plot. Learning rate versus number of neurons in layer <code>l1</code>.</figcaption>
+</figure>
+</div>
+<div id="fig-contour-0-3" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="./figures/14-torch_bartz09_30min_10init_2023-05-14_14-45-25_contour_0_3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;6: Contour plot. Batch size versus number of neurons in layer <code>l1</code>.</figcaption>
+</figure>
+</div>
+<div id="fig-contour-2-3" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="./figures/14-torch_bartz09_30min_10init_2023-05-14_14-45-25_contour_2_3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;7: Contour plot. Batch size versus learning rate.</figcaption>
+</figure>
+</div>
+<p><a href="#fig-contour-0-2">Figure&nbsp;5</a> shows the contour plot of the loss as a function of the learning rate and the number of neurons in layer <code>l1</code>. The contour plot shows that the learning rate has a strong influence on the performance of the model. Too large values of the learning rate decrease the performance of the neural network. <a href="#fig-contour-0-3">Figure&nbsp;6</a> and <a href="#fig-contour-2-3">Figure&nbsp;7</a> indicate that the batch size should be increased. The batch size has a strong influence on the performance of the model. Too small values of the batch size decrease the performance of the neural network.</p>
+<p><code>spotPython</code> provides additional tools for a visual inspection of the results and give valuable insights into the hyperparameter tuning process. This is especially useful for model explainability, transparency, and trustworthiness. In addition to the contour plots, <a href="#fig-parallel">Figure&nbsp;9</a> shows the parallel plot of the hyperparameters.</p>
+<div id="fig-parallel" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<figcaption class="figure-caption">Figure&nbsp;8: <strong>?(caption)</strong></figcaption>
+</figure>
+</div>
+<div id="fig-parallel" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="./figures/parallel.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;9: Parallel plot</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-summary" class="level1">
+<h1>Summary and Outlook</h1>
+<p>This tutorial presents the hyperparameter tuning open source software <code>spotPython</code> for <code>PyTorch</code>. To show its basic features, a comparison with the “official” <code>PyTorch</code> hyperparameter tuning tutorial <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span> is presented. Some of the advantages of <code>spotPython</code> are:</p>
+<ul>
+<li>Numerical and categorical hyperparameters.</li>
+<li>Powerful surrogate models.</li>
+<li>Flexible approach and easy to use.</li>
+<li>Simple JSON files for the specification of the hyperparameters.</li>
+<li>Extension of default and user specified network classes.</li>
+<li>Noise handling techniques.</li>
+</ul>
+<p>Currently, only rudimentary parallel and distributed neural network training is possible, but these capabilities will be extended in the future. The next version of <code>spotPython</code> will also include a more detailed documentation and more examples.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Important: This tutorial does not present a complete benchmarking study <span class="citation" data-cites="bart20gArxiv">(<a href="#ref-bart20gArxiv" role="doc-biblioref">Bartz-Beielstein et al. 2020</a>)</span>. The results are only preliminary and highly dependent on the local configuration (hard- and software). Our goal is to provide a first impression of the performance of the hyperparameter tuning package <code>spotPython</code>. To demonstrate its capabilities, a quick comparison with <code>ray[tune]</code> was performed. <code>ray[tune]</code> was chosen, because it is presented as “an industry standard tool for distributed hyperparameter tuning.” The results should be interpreted with care.</p>
+</div>
+</div>
+</section>
+<section id="sec-appendix" class="level1">
+<h1>Appendix</h1>
+<section id="sample-output-from-ray-tunes-run" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="sample-output-from-ray-tunes-run">Sample Output From Ray Tune’s Run</h2>
+<p>The output from <code>ray[tune]</code> could look like this <span class="citation" data-cites="pyto23b">(<a href="#ref-pyto23b" role="doc-biblioref">PyTorch 2023b</a>)</span>:</p>
+<pre class="{raw}"><code>Number of trials: 10 (10 TERMINATED)
+------+------+-------------+--------------+---------+------------+--------------------+
+|   l1 |   l2 |          lr |   batch_size |    loss |   accuracy | training_iteration |
++------+------+-------------+--------------+---------+------------+--------------------|
+|   64 |    4 | 0.00011629  |            2 | 1.87273 |     0.244  |                  2 |
+|   32 |   64 | 0.000339763 |            8 | 1.23603 |     0.567  |                  8 |
+|    8 |   16 | 0.00276249  |           16 | 1.1815  |     0.5836 |                 10 |
+|    4 |   64 | 0.000648721 |            4 | 1.31131 |     0.5224 |                  8 |
+|   32 |   16 | 0.000340753 |            8 | 1.26454 |     0.5444 |                  8 |
+|    8 |    4 | 0.000699775 |            8 | 1.99594 |     0.1983 |                  2 |
+|  256 |    8 | 0.0839654   |           16 | 2.3119  |     0.0993 |                  1 |
+|   16 |  128 | 0.0758154   |           16 | 2.33575 |     0.1327 |                  1 |
+|   16 |    8 | 0.0763312   |           16 | 2.31129 |     0.1042 |                  4 |
+|  128 |   16 | 0.000124903 |            4 | 2.26917 |     0.1945 |                  1 |
++-----+------+------+-------------+--------------+---------+------------+--------------------+
+Best trial config: {'l1': 8, 'l2': 16, 'lr': 0.00276249, 'batch_size': 16, 'data_dir': '...'}
+Best trial final validation loss: 1.181501
+Best trial final validation accuracy: 0.5836
+Best trial test set accuracy: 0.5806</code></pre>
+<div style="page-break-after: always;"></div>
+</section>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bart21i" class="csl-entry" role="listitem">
+Bartz, Eva, Thomas Bartz-Beielstein, Martin Zaefferer, and Olaf Mersmann, eds. 2022. <em><span class="nocase">Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide</span></em>. Springer.
+</div>
+<div id="ref-bart23e" class="csl-entry" role="listitem">
+Bartz-Beielstein, Thomas. 2023. <span>“<span>PyTorch</span> Hyperparameter Tuning with <span>SPOT</span>: Comparison with <span>Ray Tuner</span> and Default Hyperparameters on <span>CIFAR10</span>.”</span> <a href="https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb">https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb</a>.
+</div>
+<div id="ref-Bart13j" class="csl-entry" role="listitem">
+Bartz-Beielstein, Thomas, Jürgen Branke, Jörn Mehnen, and Olaf Mersmann. 2014. <span>“Evolutionary Algorithms.”</span> <em>Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery</em> 4 (3): 178–95.
+</div>
+<div id="ref-bart20gArxiv" class="csl-entry" role="listitem">
+Bartz-Beielstein, Thomas, Carola Doerr, Jakob Bossek, Sowmya Chandrasekaran, Tome Eftimov, Andreas Fischbach, Pascal Kerschke, et al. 2020. <span>“Benchmarking in Optimization: Best Practice and Open Issues.”</span> arXiv. <a href="https://arxiv.org/abs/2007.03488">https://arxiv.org/abs/2007.03488</a>.
+</div>
+<div id="ref-BLP05" class="csl-entry" role="listitem">
+Bartz-Beielstein, Thomas, Christian Lasarczyk, and Mike Preuss. 2005. <span>“<span>Sequential Parameter Optimization</span>.”</span> In <em><span class="nocase">Proceedings 2005 Congress on Evolutionary Computation (CEC’05), Edinburgh, Scotland</span></em>, edited by B McKay et al., 773–80. Piscataway NJ: <span>IEEE Press</span>.
+</div>
+<div id="ref-Torczon00" class="csl-entry" role="listitem">
+Lewis, R M, V Torczon, and M W Trosset. 2000. <span>“<span class="nocase">Direct search methods: Then and now</span>.”</span> <em>Journal of Computational and Applied Mathematics</em> 124 (1–2): 191–207.
+</div>
+<div id="ref-Li16a" class="csl-entry" role="listitem">
+Li, Lisha, Kevin Jamieson, Giulia DeSalvo, Afshin Rostamizadeh, and Ameet Talwalkar. 2016. <span>“<span class="nocase">Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization</span>.”</span> <em>arXiv e-Prints</em>, March, arXiv:1603.06560.
+</div>
+<div id="ref-Meignan:2015vp" class="csl-entry" role="listitem">
+Meignan, David, Sigrid Knust, Jean-Marc Frayet, Gilles Pesant, and Nicolas Gaud. 2015. <span>“<span class="nocase">A Review and Taxonomy of Interactive Optimization Methods in Operations Research</span>.”</span> <em>ACM Transactions on Interactive Intelligent Systems</em>, September.
+</div>
+<div id="ref-mont20a" class="csl-entry" role="listitem">
+Montiel, Jacob, Max Halford, Saulo Martiello Mastelini, Geoffrey Bolmier, Raphael Sourty, Robin Vaysse, Adil Zouitine, et al. 2021. <span>“River: Machine Learning for Streaming Data in Python.”</span>
+</div>
+<div id="ref-pyto23a" class="csl-entry" role="listitem">
+PyTorch. 2023a. <span>“Hyperparameter Tuning with Ray Tune.”</span> <a href="https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html">https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html</a>.
+</div>
+<div id="ref-pyto23b" class="csl-entry" role="listitem">
+———. 2023b. <span>“Training a Classifier.”</span> <a href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html">https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html</a>.
+</div>
+</div>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p><a href="https://github.com/sequential-parameter-optimization">https://github.com/sequential-parameter-optimization</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Alternatively, the source code can be downloaded from gitHub: <a href="https://github.com/sequential-parameter-optimization/spotPython">https://github.com/sequential-parameter-optimization/spotPython</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>We were not able to install <code>Ray Tune</code> on our system. Therefore, we used the results from the <code>PyTorch</code> tutorial.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>The key <code>"metric"</code> is used for the river based evaluation <span class="citation" data-cites="mont20a">(<a href="#ref-mont20a" role="doc-biblioref">Montiel et al. 2021</a>)</span> via <code>eval_oml_iter_progressive</code>.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
