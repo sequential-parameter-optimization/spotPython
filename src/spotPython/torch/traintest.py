@@ -5,6 +5,7 @@ from torch import nn as nn
 from spotPython.utils.device import getDevice
 from torch.utils.data import random_split
 from spotPython.utils.classes import get_additional_attributes
+from spotPython.hyperparameters.optimizer import optimizer_handler
 
 
 def remove_attributes(net, atttributes_to_remove):
@@ -17,6 +18,24 @@ def reset_weights(net):
     for layer in net.children():
         if hasattr(layer, "reset_parameters"):
             layer.reset_parameters()
+
+
+def add_attributes(net, attributes):
+    # directly modifies the net object (no return value)
+    for key, value in attributes.items():
+        setattr(net, key, value)
+
+
+def get_removed_attributes_and_base_net(net):
+    # 1. Determine the additional attributes:
+    removed_attributes = get_additional_attributes(net)
+    # 2. Save the attributes:
+    attributes = {}
+    for attr in removed_attributes:
+        attributes[attr] = getattr(net, attr)
+    # 3. Remove the attributes:
+    net = remove_attributes(net, removed_attributes)
+    return attributes, net
 
 
 def train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batch_interval=10_000):
@@ -72,14 +91,12 @@ def evaluate_cv(
     k_folds=None,
     show_batch_interval=10_000,
 ):
-    lr = net.lr
-    epochs = net.epochs
-    batch_size = net.batch_size
-    k_folds = net.k_folds
+    lr_instance = net.lr
+    epochs_instance = net.epochs
+    batch_size_instance = net.batch_size
     criterion_instance = net.criterion
     optimizer_instance = net.optimizer
-    removed_attributes = get_additional_attributes(net)
-    net = remove_attributes(net, removed_attributes)
+    removed_attributes, net = get_removed_attributes_and_base_net(net)
     results = {}
     try:
         device = getDevice(device=device)
@@ -91,7 +108,7 @@ def evaluate_cv(
         net.to(device)
         # criterion = nn.CrossEntropyLoss()
         # optimizer = optim.Adam(net.parameters(), lr=lr)
-        optimizer = optimizer_instance(net.parameters(), lr=lr)
+        optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
         criterion = criterion_instance
         kfold = KFold(n_splits=k_folds, shuffle=shuffle)
         for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
@@ -102,11 +119,13 @@ def evaluate_cv(
                 dataset, batch_size=batch_size, sampler=train_subsampler, num_workers=num_workers
             )
             valloader = torch.utils.data.DataLoader(
-                dataset, batch_size=batch_size, sampler=val_subsampler, num_workers=num_workers
+                dataset, batch_size=batch_size_instance, sampler=val_subsampler, num_workers=num_workers
             )
             reset_weights(net)
             # Train fold for several epochs:
-            train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batch_interval=show_batch_interval)
+            train_fold(
+                net, trainloader, epochs_instance, criterion, optimizer, device, show_batch_interval=show_batch_interval
+            )
             # Validate fold:
             results[fold] = validate_fold(net, valloader, criterion, device)
         df_eval = sum(results.values()) / len(results.values())
@@ -115,26 +134,22 @@ def evaluate_cv(
         print(f"Error in Net_Core. Call to evaluate_cv() failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_preds = np.nan
-    net.lr = lr
-    net.epochs = epochs
-    net.batch_size = batch_size
-    net.k_folds = k_folds
-    net.criterion = criterion_instance
-    net.optimizer = optimizer_instance
+    add_attributes(net, removed_attributes)
     return df_eval, df_preds
 
 
 def evaluate_hold_out(
     net, train_dataset, shuffle, test_dataset=None, device=None, show_batch_interval=10_000, path=None, save_model=False
 ):
-    lr = net.lr
-    epochs = net.epochs
-    batch_size = net.batch_size
-    patience = net.patience
+    lr_instance = net.lr
+    epochs_instance = net.epochs
+    batch_size_instance = net.batch_size
     criterion_instance = net.criterion
     optimizer_instance = net.optimizer
-    removed_attributes = get_additional_attributes(net)
-    net = remove_attributes(net, removed_attributes)
+    patience_instance = net.patience
+    removed_attributes, net = get_removed_attributes_and_base_net(net)
+    print(f"Removed attributes: {removed_attributes}")
+    print(f"Optimizer_instatance: {optimizer_instance}")
     try:
         device = getDevice(device=device)
         if torch.cuda.is_available():
@@ -146,15 +161,15 @@ def evaluate_hold_out(
         # criterion = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
         # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
-        optimizer = optimizer_instance(net.parameters(), lr=lr)
+        optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
         criterion = criterion_instance
         if test_dataset is None:
             trainloader, valloader = create_train_val_data_loaders(
-                dataset=train_dataset, batch_size=batch_size, shuffle=shuffle
+                dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle
             )
         else:
             trainloader, valloader = create_train_test_data_loaders(
-                dataset=train_dataset, batch_size=batch_size, shuffle=shuffle, test_dataset=test_dataset
+                dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle, test_dataset=test_dataset
             )
         # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         # Early stopping parameters
@@ -162,13 +177,13 @@ def evaluate_hold_out(
         counter = 0
         # We only have "one fold" which is trained for several epochs
         # (we do not have to reset the weights for each fold):
-        for epoch in range(epochs):
+        for epoch in range(epochs_instance):
             print(f"Epoch: {epoch + 1}")
             # training loss from one epoch:
             _ = train_hold_out(
                 net=net,
                 trainloader=trainloader,
-                batch_size=batch_size,
+                batch_size=batch_size_instance,
                 criterion=criterion,
                 optimizer=optimizer,
                 device=device,
@@ -185,7 +200,7 @@ def evaluate_hold_out(
                     torch.save({"model_state_dict": net.state_dict()}, path)
             else:
                 counter += 1
-                if counter >= patience:
+                if counter >= patience_instance:
                     print(f"Early stopping at epoch {epoch}")
                     break
         df_eval = val_loss
@@ -194,12 +209,7 @@ def evaluate_hold_out(
         print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_preds = np.nan
-    net.lr = lr
-    net.epochs = epochs
-    net.batch_size = batch_size
-    net.patience = patience
-    net.criterion = criterion_instance
-    net.optimizer = optimizer_instance
+    add_attributes(net, removed_attributes)
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
@@ -277,14 +287,13 @@ def validate_hold_out(net, valloader, criterion, device):
 
 
 def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_000, path=None, save_model=False):
-    lr = net.lr
-    epochs = net.epochs
-    batch_size = net.batch_size
-    patience = net.patience
+    lr_instance = net.lr
+    epochs_instance = net.epochs
+    batch_size_instance = net.batch_size
     criterion_instance = net.criterion
     optimizer_instance = net.optimizer
-    removed_attributes = get_additional_attributes(net)
-    net = remove_attributes(net, removed_attributes)
+    patience_instance = net.patience
+    removed_attributes, net = get_removed_attributes_and_base_net(net)
     try:
         device = getDevice(device=device)
         if torch.cuda.is_available():
@@ -296,25 +305,25 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
         # criterion = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
         # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
-        optimizer = optimizer_instance(net.parameters(), lr=lr)
+        optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
         criterion = criterion_instance
         trainloader, valloader = create_train_val_data_loaders(
-            dataset=train_dataset, batch_size=batch_size, shuffle=shuffle
+            dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle
         )
         # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         # Early stopping parameters
-        patience = patience
+        patience = patience_instance
         best_val_loss = float("inf")
         counter = 0
         # We only have "one fold" which is trained for several epochs
         # (we do not have to reset the weights for each fold):
-        for epoch in range(epochs):
+        for epoch in range(epochs_instance):
             print(f"Epoch: {epoch + 1}")
             # training loss from one epoch:
             _ = train_hold_out(
                 net=net,
                 trainloader=trainloader,
-                batch_size=batch_size,
+                batch_size=batch_size_instance,
                 criterion=criterion,
                 optimizer=optimizer,
                 device=device,
@@ -340,26 +349,16 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
         print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_preds = np.nan
-    net.lr = lr
-    net.epochs = epochs
-    net.batch_size = batch_size
-    net.patience = patience
-    net.criterion = criterion_instance
-    net.optimizer = optimizer_instance
+    add_attributes(net, removed_attributes)
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
 
 
 def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval=10_000, path=None):
-    lr = net.lr
-    epochs = net.epochs
-    batch_size = net.batch_size
-    patience = net.patience
+    batch_size_instance = net.batch_size
     criterion_instance = net.criterion
-    optimizer_instance = net.optimizer
-    removed_attributes = get_additional_attributes(net)
-    net = remove_attributes(net, removed_attributes)
+    removed_attributes, net = get_removed_attributes_and_base_net(net)
     try:
         device = getDevice(device=device)
         if torch.cuda.is_available():
@@ -371,7 +370,7 @@ def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval
         # criterion = nn.CrossEntropyLoss()
         criterion = criterion_instance
         valloader = torch.utils.data.DataLoader(
-            test_dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=0
+            test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0
         )
         val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, criterion=criterion, device=device)
         df_eval = val_loss
@@ -380,12 +379,7 @@ def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval
         print(f"Error in Net_Core. Call to evaluate_hold_out() failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_preds = np.nan
-    net.lr = lr
-    net.epochs = epochs
-    net.batch_size = batch_size
-    net.patience = patience
-    net.criterion = criterion_instance
-    net.optimizer = optimizer_instance
+    add_attributes(net, removed_attributes)
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds

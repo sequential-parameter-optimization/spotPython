@@ -66,6 +66,7 @@ class HyperTorch:
         var_dict = assign_values(X, self.fun_control["var_name"])
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
+            print(f"config: {config}")
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:
