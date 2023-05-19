@@ -1,34 +1,87 @@
+<p align="left">
+  <img height="200" src="docs/img/spotLogo.png" alt="spot_logo">
+</p>
+
 # spotPython
 
 Sequential Parameter Optimization in Python
 
-# Development
+* spotPython is a Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade [bart21i].
+* spotPython is a sequential model-based optimization (SMBO) method [BLP05].
 
+
+# Installation
+
+* Installation can be done with `pip`:
+
+`pip install spotPython`
+
+# spotPython Documentation
+
+* [Bartz-Beielstein (2023). PyTorch Hyperparameter Tuning --- A Tutorial for spotPython (Working Paper)](https://sequential-parameter-optimization.github.io/spotPython/).
+
+    > **Abstract**: The goal of hyperparameter tuning (or hyperparameter optimization) is to optimize the hyperparameters to improve the performance of the machine or deep learning model. spotPython ("Sequential Parameter Optimization Toolbox in Python") is the Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade. PyTorch is an optimized tensor library for deep learning using GPUs and CPUs. This document shows how to integrate the spotPython hyperparameter tuner into the PyTorch training workflow.  As an example, the results of the CIFAR10 image classifier are used. In addition to an introduction to spotPython, this tutorial also includes a brief comparison with Ray Tune, a Python library for running experiments and tuning hyperparameters. This comparison is based on the PyTorch hyperparameter tuning tutorial. The advantages and disadvantages of both approaches are discussed. We show that spotPython achieves similar or even better results while being more flexible and transparent than Ray Tune.
+
+
+# spotPython Features
+
+* Some of the advantages of `spotPython` are:
+
+  - Numerical and categorical hyperparameters.
+  - Powerful surrogate models.
+  - Flexible approach and easy to use.
+  - Simple JSON files for the specification of the hyperparameters.
+  - Extension of default and user specified network classes.
+  - Noise handling techniques.
+
+# Citation
+
+```bibtex
+@techreport{bart23e,
+	author = {Bartz-Beielstein, Thomas},
+	title = {PyTorch Hyperparameter Tuning --- A Tutorial for spotPython},
+	year = {2023}}
+
+
+@book{bart21i,
+	editor = {Bartz,Eva and Bartz-Beielstein, Thomas and Zaefferer, Martin and Mersmann, Olaf},
+	isbn = {ISBN 978-981-19-5169-5},
+	keywords = {bartzPublic},
+	note = {in print},
+	publisher = {Springer},
+	title = {{Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide}},
+	year = {2022}
+  url = {https://link.springer.com/book/10.1007/978-981-19-5170-1}
+}
+
+
+@inproceedings{BLP05,
+	author = {Bartz-Beielstein, Thomas and Lasarczyk, Christian and Preuss, Mike},
+	title = {{Sequential Parameter Optimization}},
+	booktitle = {{Proceedings 2005 Congress on Evolutionary Computation (CEC'05), Edinburgh, Scotland}},
+	date-added = {2016-10-30 11:44:52 +0000},
+	date-modified = {2021-07-22 12:12:43 +0200},
+	doi = {10.1109/CEC.2005.1554761},
+	editor = {McKay, B and others},
+	isbn = {0-7803-9363-5},
+	issn = {1089-778X},
+	pages = {773--780},
+	publisher = {{IEEE Press}},
+  address = {Piscataway NJ},
+	year = {2005},
+	url= {http://dx.doi.org/10.1109/CEC.2005.1554761}
+  }
+
+```
+
+# Appendix
+
+* This appendix contains some information on how to setup the development environment for spotPython.
+Information provided here is not required for the installation of spotPython.
 
 ## Styleguide
 
 Follow the Google Python Style Guide from [https://google.github.io/styleguide/pyguide.html]([https://google.github.io/styleguide/pyguide.html).
-
-## Pre commit checks
-
-Before you commit your code, please check that it is "clean". 
-To do so, first run [`black`](https://github.com/psf/black) from the projects root directory:
-
-```
-$ black .
-```
-
-Next, check if [`flake8`](https://flake8.pycqa.org/en/latest/) shows any errors:
-
-```
-$ flake8
-```
-
-Fix any shown errors before you commit.
-
-# Installation
-
-`pip install spotPython`
 
 
 ## Python
@@ -52,17 +105,15 @@ Fix any shown errors before you commit.
 
 * [scipy lecture notes: optimizing code](https://scipy-lectures.org/advanced/optimizing/index.html)
 
-https://scipy-lectures.org/advanced/optimizing/index.html
-
 ## Editor/IDE
 
 * Optional: Install [visualstudio](https://code.visualstudio.com)
 * Optional: Install [quarto](https://quarto.org)
 
 
-## Package Installation
+## Package Building
 
-### Configuration Files
+### Local Setup
 
 * This information is based on [https://packaging.python.org/en/latest/tutorials/packaging-projects/](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
 * Information is stored in `pyproject.toml` (`setup.py` is not used anymore.)
@@ -74,7 +125,7 @@ https://scipy-lectures.org/advanced/optimizing/index.html
        * `include src/spotPython/data/*.rst`
     * `LICENSE`: see [LICENSE](./LICENSE)
 
-### Installation
+### Local Installation
 
 * Perform the following steps to install the package:
   * Make sure you have the latest version of PyPA’s build installed:
