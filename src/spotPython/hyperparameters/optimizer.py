@@ -47,7 +47,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
             fused=None,
         )
     elif optimizer_name == "SparseAdam":
-        return torch.optim.SparseAdam(params, lr=0.001, betas=(0.9, 0.999), eps=1e-08, foreach=None, maximize=False)
+        return torch.optim.SparseAdam(params, lr=0.001, betas=(0.9, 0.999), eps=1e-08, maximize=False)
     elif optimizer_name == "Adamax":
         return torch.optim.Adamax(
             params,
