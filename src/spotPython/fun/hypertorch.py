@@ -1,16 +1,14 @@
+import logging
 from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
 from spotPython.torch.traintest import evaluate_cv, evaluate_hold_out
-
-
 from spotPython.hyperparameters.values import (
     assign_values,
     generate_one_config_from_var_dict,
 )
 
-import logging
 
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -38,7 +36,7 @@ class HyperTorch:
             "step": 10_000,
             "horizon": None,
             "grace_period": None,
-            "metric": None,
+            "metric_river": None,
             "metric_sklearn": None,
             "weights": array([1, 0, 0]),
             "weight_coeff": 0.0,
@@ -61,12 +59,11 @@ class HyperTorch:
     def fun_torch(self, X, fun_control=None):
         z_res = np.array([], dtype=float)
         self.fun_control.update(fun_control)
-        # print(self.fun_control)
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
-            print(f"config: {config}")
+            print(f"\nconfig: {config}")
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:

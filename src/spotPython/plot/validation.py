@@ -1,9 +1,9 @@
 from sklearn.model_selection import cross_val_predict
 import matplotlib.pyplot as plt
 from sklearn.metrics import PredictionErrorDisplay
-from spotPython.utils.convert import get_Xy_from_df
 from sklearn.metrics import RocCurveDisplay
 from sklearn.metrics import ConfusionMatrixDisplay
+from spotPython.utils.convert import get_Xy_from_df
 
 
 def plot_cv_predictions(model, fun_control):

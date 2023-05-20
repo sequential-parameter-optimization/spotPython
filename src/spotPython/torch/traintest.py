@@ -38,7 +38,7 @@ def get_removed_attributes_and_base_net(net):
     return attributes, net
 
 
-def train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batch_interval=10_000):
+def train_fold(net, trainloader, epochs, loss_function, optimizer, device, show_batch_interval=10_000):
     for epoch in range(epochs):
         print(f"Epoch: {epoch + 1}")
         running_loss = 0.0
@@ -48,7 +48,7 @@ def train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batc
             inputs, labels = inputs.to(device), labels.to(device)
             optimizer.zero_grad()
             outputs = net(inputs)
-            loss = criterion(outputs, labels)
+            loss = loss_function(outputs, labels)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=1.0)
             optimizer.step()
@@ -60,7 +60,7 @@ def train_fold(net, trainloader, epochs, criterion, optimizer, device, show_batc
                 running_loss = 0.0
 
 
-def validate_fold(net, valloader, criterion, device):
+def validate_fold(net, valloader, loss_function, device):
     val_loss = 0.0
     val_steps = 0
     total = 0
@@ -73,7 +73,7 @@ def validate_fold(net, valloader, criterion, device):
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            loss = criterion(outputs, labels)
+            loss = loss_function(outputs, labels)
             val_loss += loss.cpu().numpy()
             val_steps += 1
     return 100.0 * (correct / total)
@@ -94,7 +94,7 @@ def evaluate_cv(
     lr_instance = net.lr
     epochs_instance = net.epochs
     batch_size_instance = net.batch_size
-    criterion_instance = net.criterion
+    loss_function_instance = net.loss_function
     optimizer_instance = net.optimizer
     removed_attributes, net = get_removed_attributes_and_base_net(net)
     results = {}
@@ -106,10 +106,10 @@ def evaluate_cv(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        # criterion = nn.CrossEntropyLoss()
+        # loss_function = nn.CrossEntropyLoss()
         # optimizer = optim.Adam(net.parameters(), lr=lr)
         optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
-        criterion = criterion_instance
+        loss_function = loss_function_instance
         kfold = KFold(n_splits=k_folds, shuffle=shuffle)
         for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
             print(f"Fold: {fold + 1}")
@@ -124,10 +124,16 @@ def evaluate_cv(
             reset_weights(net)
             # Train fold for several epochs:
             train_fold(
-                net, trainloader, epochs_instance, criterion, optimizer, device, show_batch_interval=show_batch_interval
+                net,
+                trainloader,
+                epochs_instance,
+                loss_function,
+                optimizer,
+                device,
+                show_batch_interval=show_batch_interval,
             )
             # Validate fold:
-            results[fold] = validate_fold(net, valloader, criterion, device)
+            results[fold] = validate_fold(net, valloader, loss_function, device)
         df_eval = sum(results.values()) / len(results.values())
         df_preds = np.nan
     except Exception as err:
@@ -144,7 +150,7 @@ def evaluate_hold_out(
     lr_instance = net.lr
     epochs_instance = net.epochs
     batch_size_instance = net.batch_size
-    criterion_instance = net.criterion
+    loss_function_instance = net.loss_function
     optimizer_instance = net.optimizer
     patience_instance = net.patience
     removed_attributes, net = get_removed_attributes_and_base_net(net)
@@ -158,11 +164,11 @@ def evaluate_hold_out(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        # criterion = nn.CrossEntropyLoss()
+        # loss_function = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
         # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
         optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
-        criterion = criterion_instance
+        loss_function = loss_function_instance
         if test_dataset is None:
             trainloader, valloader = create_train_val_data_loaders(
                 dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle
@@ -184,14 +190,16 @@ def evaluate_hold_out(
                 net=net,
                 trainloader=trainloader,
                 batch_size=batch_size_instance,
-                criterion=criterion,
+                loss_function=loss_function,
                 optimizer=optimizer,
                 device=device,
                 show_batch_interval=show_batch_interval,
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
-            val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, criterion=criterion, device=device)
+            val_accuracy, val_loss = validate_hold_out(
+                net, valloader=valloader, loss_function=loss_function, device=device
+            )
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 counter = 0
@@ -237,7 +245,7 @@ def create_train_test_data_loaders(dataset, batch_size, shuffle, test_dataset, n
     return trainloader, testloader
 
 
-def train_hold_out(net, trainloader, batch_size, criterion, optimizer, device, show_batch_interval=10_000):
+def train_hold_out(net, trainloader, batch_size, loss_function, optimizer, device, show_batch_interval=10_000):
     running_loss = 0.0
     epoch_steps = 0
     for i, data in enumerate(trainloader, 0):
@@ -245,7 +253,7 @@ def train_hold_out(net, trainloader, batch_size, criterion, optimizer, device, s
         inputs, labels = inputs.to(device), labels.to(device)
         optimizer.zero_grad()
         outputs = net(inputs)
-        loss = criterion(outputs, labels)
+        loss = loss_function(outputs, labels)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=1.0)
         optimizer.step()
@@ -261,7 +269,7 @@ def train_hold_out(net, trainloader, batch_size, criterion, optimizer, device, s
     return loss.item()
 
 
-def validate_hold_out(net, valloader, criterion, device):
+def validate_hold_out(net, valloader, loss_function, device):
     val_loss = 0.0
     val_steps = 0
     total = 0
@@ -276,7 +284,7 @@ def validate_hold_out(net, valloader, criterion, device):
             pred_list.append(predicted)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            loss = criterion(outputs, labels)
+            loss = loss_function(outputs, labels)
             val_loss += loss.cpu().numpy()
             val_steps += 1
     accuracy = correct / total
@@ -290,7 +298,7 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
     lr_instance = net.lr
     epochs_instance = net.epochs
     batch_size_instance = net.batch_size
-    criterion_instance = net.criterion
+    loss_function_instance = net.loss_function
     optimizer_instance = net.optimizer
     patience_instance = net.patience
     removed_attributes, net = get_removed_attributes_and_base_net(net)
@@ -302,11 +310,11 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        # criterion = nn.CrossEntropyLoss()
+        # loss_function = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
         # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
         optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
-        criterion = criterion_instance
+        loss_function = loss_function_instance
         trainloader, valloader = create_train_val_data_loaders(
             dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle
         )
@@ -324,14 +332,16 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
                 net=net,
                 trainloader=trainloader,
                 batch_size=batch_size_instance,
-                criterion=criterion,
+                loss_function=loss_function,
                 optimizer=optimizer,
                 device=device,
                 show_batch_interval=show_batch_interval,
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
-            val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, criterion=criterion, device=device)
+            val_accuracy, val_loss = validate_hold_out(
+                net, valloader=valloader, loss_function=loss_function, device=device
+            )
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 counter = 0
@@ -357,7 +367,7 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
 
 def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval=10_000, path=None):
     batch_size_instance = net.batch_size
-    criterion_instance = net.criterion
+    loss_function_instance = net.loss_function
     removed_attributes, net = get_removed_attributes_and_base_net(net)
     try:
         device = getDevice(device=device)
@@ -367,12 +377,12 @@ def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        # criterion = nn.CrossEntropyLoss()
-        criterion = criterion_instance
+        # loss_function = nn.CrossEntropyLoss()
+        loss_function = loss_function_instance
         valloader = torch.utils.data.DataLoader(
             test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0
         )
-        val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, criterion=criterion, device=device)
+        val_accuracy, val_loss = validate_hold_out(net, valloader=valloader, loss_function=loss_function, device=device)
         df_eval = val_loss
         df_preds = np.nan
     except Exception as err:

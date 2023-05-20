@@ -42,7 +42,7 @@ class HyperSklearn:
             "step": 10_000,
             "horizon": None,
             "grace_period": None,
-            "metric": None,
+            "metric_river": None,
             "metric_sklearn": mean_absolute_error,
             "weights": array([1, 0, 0]),
             "weight_coeff": 0.0,

@@ -4,14 +4,14 @@ import spotPython.torch.netcore as netcore
 
 
 class Net_CIFAR10(netcore.Net_Core):
-    def __init__(self, l1, l2, lr, batch_size, epochs, k_folds, patience, criterion, optimizer):
+    def __init__(self, l1, l2, lr, batch_size, epochs, k_folds, patience, loss_function, optimizer):
         super(Net_CIFAR10, self).__init__(
             lr=lr,
             batch_size=batch_size,
             epochs=epochs,
             k_folds=k_folds,
             patience=patience,
-            criterion=criterion,
+            loss_function=loss_function,
             optimizer=optimizer,
         )
         self.conv1 = nn.Conv2d(3, 6, 5)
