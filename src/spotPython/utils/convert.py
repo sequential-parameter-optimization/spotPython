@@ -1,4 +1,6 @@
 import importlib
+import pandas as pd
+import numpy as np
 
 
 def class_for_name(module_name, class_name) -> object:
@@ -47,3 +49,22 @@ def find_indices(A, B):
         index = B.index(element)
         indices.append(index)
     return indices
+
+
+def series_to_array(series):
+    """Converts a pandas series to a numpy array.
+        Args:
+            series (pandas.Series): The input series.
+        Returns:
+            numpy.ndarray: The output array.
+        Example:
+            >>> from spotPython.utils.convert import series_to_array
+            >>> import pandas as pd
+            >>> series = pd.Series([1, 2, 3])
+            >>> series_to_array(series)
+            array([1, 2, 3])
+        """
+    if isinstance(series, np.ndarray):
+        return series
+    else:
+        return series.to_numpy()

@@ -17,6 +17,10 @@ def fun_control_init():
     """
     fun_control = {
         "criterion": None,
+        "metric_sklearn": None,
+        "metric_river": None,
+        "metric_params": {},
+        "prep_model": None,
         "data": None,
         "train": None,
         "test": None,
@@ -27,7 +31,6 @@ def fun_control_init():
         "k_folds": None,
         "optimizer": None,
         "device": None,
-        "metric_params": {},
         "show_batch_interval": 1_000_000,
         "path": None,
         "save_model": False,

@@ -25,6 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
+from spotPython.utils.convert import series_to_array
 
 
 def apk(actual, predicted, k=10):
@@ -86,7 +87,30 @@ def mapk(actual, predicted, k=10):
 
 
 def mapk_score(y_true, y_pred, k=3):
+    """Wrapper for mapk func using numpy arrays
+     Args:
+            y_true (np.array): array of true values
+            y_pred (np.array): array of predicted values
+            k (int): number of predictions
+    Returns:
+            score (float): mean average precision at k
+    Examples:
+            >>> y_true = np.array([0, 1, 2, 2])
+            >>> y_pred = np.array([[0.5, 0.2, 0.2],  # 0 is in top 2
+                     [0.3, 0.4, 0.2],  # 1 is in top 2
+                     [0.2, 0.4, 0.3],  # 2 is in top 2
+                     [0.7, 0.2, 0.1]]) # 2 isn't in top 2
+            >>> mapk_score(y_true, y_pred, k=1)
+            0.25
+            >>> mapk_score(y_true, y_pred, k=2)
+            0.375
+            >>> mapk_score(y_true, y_pred, k=3)
+            0.4583333333333333
+            >>> mapk_score(y_true, y_pred, k=4)
+            0.4583333333333333
+    """
+    y_true = series_to_array(y_true)
     sorted_prediction_ids = np.argsort(-y_pred, axis=1)
     top_k_prediction_ids = sorted_prediction_ids[:, :k]
-    score = mapk(y_true.values.reshape(-1, 1), top_k_prediction_ids, k=k)
+    score = mapk(y_true.reshape(-1, 1), top_k_prediction_ids, k=k)
     return score
