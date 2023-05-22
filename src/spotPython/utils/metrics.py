@@ -114,3 +114,26 @@ def mapk_score(y_true, y_pred, k=3):
     top_k_prediction_ids = sorted_prediction_ids[:, :k]
     score = mapk(y_true.reshape(-1, 1), top_k_prediction_ids, k=k)
     return score
+
+
+def mapk_scorer(estimator, X, y):
+    """
+    Scorer for mean average precision at k.
+    This function computes the mean average precision at k between two lists
+    of lists of items.
+    Parameters
+    ----------
+    estimator : sklearn estimator
+                The estimator to be used for prediction.
+    X : array-like of shape (n_samples, n_features)
+        The input samples.
+    y : array-like of shape (n_samples,)
+        The target values.
+    Returns
+    -------
+    score : double
+            The mean average precision at k over the input lists
+    """
+    y_pred = estimator.predict_proba(X)
+    score = mapk_score(y, y_pred, k=3)
+    return score
