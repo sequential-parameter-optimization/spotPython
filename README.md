@@ -53,10 +53,10 @@ archivePrefix = {arXiv},
        adsurl = {https://ui.adsabs.harvard.edu/abs/2023arXiv230511930B},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
+```
 
 
-
-
+```bibtex
 @book{bart21i,
 	editor = {Bartz,Eva and Bartz-Beielstein, Thomas and Zaefferer, Martin and Mersmann, Olaf},
 	isbn = {ISBN 978-981-19-5169-5},
@@ -67,8 +67,9 @@ archivePrefix = {arXiv},
 	year = {2022}
   url = {https://link.springer.com/book/10.1007/978-981-19-5170-1}
 }
+```
 
-
+```bibtex
 @inproceedings{BLP05,
 	author = {Bartz-Beielstein, Thomas and Lasarczyk, Christian and Preuss, Mike},
 	title = {{Sequential Parameter Optimization}},
