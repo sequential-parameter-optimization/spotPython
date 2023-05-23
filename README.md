@@ -37,10 +37,24 @@ Sequential Parameter Optimization in Python
 # Citation
 
 ```bibtex
-@techreport{bart23e,
-	author = {Bartz-Beielstein, Thomas},
-	title = {PyTorch Hyperparameter Tuning --- A Tutorial for spotPython},
-	year = {2023}}
+@ARTICLE{bart23earxiv,
+       author = {{Bartz-Beielstein}, Thomas},
+        title = "{PyTorch Hyperparameter Tuning -- A Tutorial for spotPython}",
+      journal = {arXiv e-prints},
+     keywords = {Computer Science - Machine Learning, Computer Science - Artificial Intelligence, Mathematics - Numerical Analysis, 68T07, A.1, B.8.0, G.1.6, G.4, I.2.8},
+         year = 2023,
+        month = may,
+          eid = {arXiv:2305.11930},
+        pages = {arXiv:2305.11930},
+          doi = {10.48550/arXiv.2305.11930},
+archivePrefix = {arXiv},
+       eprint = {2305.11930},
+ primaryClass = {cs.LG},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2023arXiv230511930B},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+
 
 
 @book{bart21i,
