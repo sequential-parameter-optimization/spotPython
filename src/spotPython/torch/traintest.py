@@ -76,7 +76,12 @@ def validate_fold(net, valloader, loss_function, device):
             loss = loss_function(outputs, labels)
             val_loss += loss.cpu().numpy()
             val_steps += 1
-    return 100.0 * (correct / total)
+    # return 100.0 * (correct / total)
+    accuracy = correct / total
+    loss = val_loss / val_steps
+    print(f"Loss on hold-out set: {loss}")
+    print(f"Accuracy on hold-out set: {accuracy}")
+    return accuracy, loss
 
 
 def evaluate_cv(
@@ -85,15 +90,12 @@ def evaluate_cv(
     shuffle=False,
     num_workers=0,
     device=None,
-    lr=None,
-    epochs=None,
-    batch_size=None,
-    k_folds=None,
     show_batch_interval=10_000,
 ):
     lr_instance = net.lr
     epochs_instance = net.epochs
     batch_size_instance = net.batch_size
+    k_folds_instance = net.k_folds
     loss_function_instance = net.loss_function
     optimizer_instance = net.optimizer
     removed_attributes, net = get_removed_attributes_and_base_net(net)
@@ -106,17 +108,15 @@ def evaluate_cv(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        # loss_function = nn.CrossEntropyLoss()
-        # optimizer = optim.Adam(net.parameters(), lr=lr)
         optimizer = optimizer_handler(optimizer_name=optimizer_instance, params=net.parameters(), sgd_lr=lr_instance)
         loss_function = loss_function_instance
-        kfold = KFold(n_splits=k_folds, shuffle=shuffle)
+        kfold = KFold(n_splits=k_folds_instance, shuffle=shuffle)
         for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
             print(f"Fold: {fold + 1}")
             train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
             val_subsampler = torch.utils.data.SubsetRandomSampler(val_ids)
             trainloader = torch.utils.data.DataLoader(
-                dataset, batch_size=batch_size, sampler=train_subsampler, num_workers=num_workers
+                dataset, batch_size=batch_size_instance, sampler=train_subsampler, num_workers=num_workers
             )
             valloader = torch.utils.data.DataLoader(
                 dataset, batch_size=batch_size_instance, sampler=val_subsampler, num_workers=num_workers
@@ -132,8 +132,8 @@ def evaluate_cv(
                 device,
                 show_batch_interval=show_batch_interval,
             )
-            # Validate fold:
-            results[fold] = validate_fold(net, valloader, loss_function, device)
+            # Validate fold: use only accuracy for now, loss is not used
+            results[fold], _ = validate_fold(net, valloader, loss_function, device)
         df_eval = sum(results.values()) / len(results.values())
         df_preds = np.nan
     except Exception as err:
@@ -365,7 +365,7 @@ def train_save(net, train_dataset, shuffle, device=None, show_batch_interval=10_
     return df_eval, df_preds
 
 
-def test_saved(net, shuffle, test_dataset=None, device=None, show_batch_interval=10_000, path=None):
+def test_saved(net, shuffle, test_dataset=None, device=None):
     batch_size_instance = net.batch_size
     loss_function_instance = net.loss_function
     removed_attributes, net = get_removed_attributes_and_base_net(net)

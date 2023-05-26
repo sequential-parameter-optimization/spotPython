@@ -134,7 +134,7 @@ class HyperSklearn:
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:
-                model = self.fun_control["core_model"](**config ,random_state=self.seed)
+                model = self.fun_control["core_model"](**config, random_state=self.seed)
             try:
                 if fun_control["eval"] == "eval_oob_score":
                     df_eval, _ = self.evaluate_model_oob(model, self.fun_control)
