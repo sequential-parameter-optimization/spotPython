@@ -90,21 +90,23 @@ class HyperTorch:
                         model,
                         train_dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
+                        loss_function=self.fun_control["loss_function"],
+                        metric=self.fun_control["metric_torch"],
                         test_dataset=fun_control["test"],
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         path=self.fun_control["path"],
-                        save_model=self.fun_control["save_model"],
                     )
                 else:  # eval == "train_hold_out"
                     df_eval, _ = evaluate_hold_out(
                         model,
                         train_dataset=fun_control["train"],
                         shuffle=self.fun_control["shuffle"],
+                        loss_function=self.fun_control["loss_function"],
+                        metric=self.fun_control["metric_torch"],
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         path=self.fun_control["path"],
-                        save_model=self.fun_control["save_model"],
                     )
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")

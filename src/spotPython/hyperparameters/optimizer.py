@@ -1,15 +1,22 @@
 import torch.optim
 
 
-def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
+def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
     if optimizer_name == "Adadelta":
         return torch.optim.Adadelta(
-            params, lr=1.0, rho=0.9, eps=1e-06, weight_decay=0, foreach=None, maximize=False, differentiable=False
+            params,
+            lr=lr_mult * 1.0,
+            rho=0.9,
+            eps=1e-06,
+            weight_decay=0,
+            foreach=None,
+            maximize=False,
+            differentiable=False,
         )
     elif optimizer_name == "Adagrad":
         return torch.optim.Adagrad(
             params,
-            lr=0.01,
+            lr=lr_mult * 0.01,
             lr_decay=0,
             weight_decay=0,
             initial_accumulator_value=0,
@@ -21,7 +28,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "Adam":
         return torch.optim.Adam(
             params,
-            lr=0.001,
+            lr=lr_mult * 0.001,
             betas=(0.9, 0.999),
             eps=1e-08,
             weight_decay=0,
@@ -35,7 +42,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "AdamW":
         return torch.optim.AdamW(
             params,
-            lr=0.001,
+            lr=lr_mult * 0.001,
             betas=(0.9, 0.999),
             eps=1e-08,
             weight_decay=0.01,
@@ -51,7 +58,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "Adamax":
         return torch.optim.Adamax(
             params,
-            lr=0.002,
+            lr=lr_mult * 0.002,
             betas=(0.9, 0.999),
             eps=1e-08,
             weight_decay=0,
@@ -62,7 +69,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "ASGD":
         return torch.optim.ASGD(
             params,
-            lr=0.01,
+            lr=lr_mult * 0.01,
             lambd=0.0001,
             alpha=0.75,
             t0=1000000.0,
@@ -74,7 +81,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "LBFGS":
         return torch.optim.LBFGS(
             params,
-            lr=1,
+            lr=lr_mult * 1,
             max_iter=20,
             max_eval=None,
             tolerance_grad=1e-07,
@@ -85,7 +92,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "NAdam":
         return torch.optim.NAdam(
             params,
-            lr=0.002,
+            lr=lr_mult * 0.002,
             betas=(0.9, 0.999),
             eps=1e-08,
             weight_decay=0,
@@ -100,7 +107,7 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
     elif optimizer_name == "RMSprop":
         return torch.optim.RMSprop(
             params,
-            lr=0.01,
+            lr=lr_mult * 0.01,
             alpha=0.99,
             eps=1e-08,
             weight_decay=0,
@@ -112,13 +119,19 @@ def optimizer_handler(optimizer_name: str, params, sgd_lr=0.9, **kwargs):
         )
     elif optimizer_name == "Rprop":
         return torch.optim.Rprop(
-            params, lr=0.01, etas=(0.5, 1.2), step_sizes=(1e-06, 50), foreach=None, maximize=False, differentiable=False
+            params,
+            lr=lr_mult * 0.01,
+            etas=(0.5, 1.2),
+            step_sizes=(1e-06, 50),
+            foreach=None,
+            maximize=False,
+            differentiable=False,
         )
     elif optimizer_name == "SGD":
         return torch.optim.SGD(
             params,
-            lr=sgd_lr,
-            momentum=0,
+            lr=lr_mult * 1e-3,
+            momentum=kwargs["sgd_momentum"],
             dampening=0,
             weight_decay=0,
             nesterov=False,
