@@ -2,16 +2,13 @@ from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
-from sklearn.model_selection import cross_val_score
-
-from spotPython.utils.convert import get_Xy_from_df
-from sklearn.metrics import make_scorer
 
 from spotPython.hyperparameters.values import assign_values
 from spotPython.hyperparameters.values import (
     generate_one_config_from_var_dict,
 )
-from spotPython.utils.metrics import mapk_scorer
+
+from spotPython.sklearn.traintest import evaluate_cv, evaluate_model_oob, evaluate_hold_out
 
 import logging
 from sklearn.metrics import mean_absolute_error
@@ -66,55 +63,6 @@ class HyperSklearn:
         if X.shape[1] != len(self.fun_control["var_name"]):
             raise Exception
 
-    def evaluate_model(self, model, fun_control):
-        try:
-            X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
-            X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
-            model.fit(X_train, y_train)
-            if fun_control["predict_proba"]:
-                df_preds = model.predict_proba(X_test)
-            else:
-                df_preds = model.predict(X_test)
-            df_eval = fun_control["metric_sklearn"](y_test, df_preds, **fun_control["metric_params"])
-        except Exception as err:
-            print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
-            df_eval = np.nan
-            df_eval = np.nan
-        return df_eval, df_preds
-
-    def evaluate_model_cv(self, model, fun_control):
-        X, y = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
-        k = fun_control["k_folds"]
-        try:
-            if fun_control["predict_proba"]:
-                # TODO: add more scorers
-                # proba_scorer = make_scorer(fun_control["metric_sklearn"], **fun_control["metric_params"])
-                proba_scorer = mapk_scorer
-                scores = cross_val_score(model, X, y, cv=k, scoring=proba_scorer, verbose=0)
-            else:
-                sklearn_scorer = make_scorer(fun_control["metric_sklearn"], **fun_control["metric_params"])
-                scores = cross_val_score(model, X, y, cv=k, scoring=sklearn_scorer)
-            df_eval = scores.mean()
-        except Exception as err:
-            print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
-            df_eval = np.nan
-        return df_eval, None
-
-    def evaluate_model_oob(self, model, fun_control):
-        """Out-of-bag evaluation (Only for RandomForestClassifier).
-        If fun_control["eval"] == "eval_oob_score".
-        """
-        try:
-            X, y = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
-            model.fit(X, y)
-            df_preds = model.oob_decision_function_
-            df_eval = fun_control["metric_sklearn"](y, df_preds, **fun_control["metric_params"])
-        except Exception as err:
-            print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
-            df_eval = np.nan
-            df_eval = np.nan
-        return df_eval, df_preds
-
     def get_sklearn_df_eval_preds(self, model):
         try:
             df_eval, df_preds = self.evaluate_model(model, self.fun_control)
@@ -136,12 +84,13 @@ class HyperSklearn:
             else:
                 model = self.fun_control["core_model"](**config, random_state=self.seed)
             try:
-                if fun_control["eval"] == "eval_oob_score":
-                    df_eval, _ = self.evaluate_model_oob(model, self.fun_control)
-                elif fun_control["eval"] == "train_cv":
-                    df_eval, _ = self.evaluate_model_cv(model, self.fun_control)
-                else:
-                    df_eval, _ = self.evaluate_model(model, self.fun_control)
+                eval_type = fun_control["eval"]
+                if eval_type == "eval_oob_score":
+                    df_eval, _ = evaluate_model_oob(model, self.fun_control)
+                elif eval_type == "train_cv":
+                    df_eval, _ = evaluate_cv(model, self.fun_control)
+                else:  # eval_type == "train_hold_out":
+                    df_eval, _ = evaluate_hold_out(model, self.fun_control)
             except Exception as err:
                 print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")
