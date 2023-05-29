@@ -48,5 +48,6 @@ def fun_control_init():
         "show_batch_interval": 1_000_000,
         "path": None,
         "save_model": False,
+        "weights": 1.0,
     }
     return fun_control

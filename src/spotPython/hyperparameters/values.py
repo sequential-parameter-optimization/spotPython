@@ -576,7 +576,7 @@ def get_values_from_dict(dictionary) -> np.array:
     return np.array(list(dictionary.values()))
 
 
-def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename) -> dict:
+def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=None) -> dict:
     """Add the core model to the function control dictionary.
     Args:
         core_model (class): The core model.

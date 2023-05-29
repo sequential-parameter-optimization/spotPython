@@ -709,6 +709,18 @@ class Spot:
         if show:
             pylab.show()
 
+    def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None):
+        impo = self.print_importance(threshold=threshold, print_screen=True)
+        var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
+        min_z = min(self.y)
+        max_z = max(self.y)
+        for i in var_plots:
+            for j in var_plots:
+                if j > i:
+                    if filename is not None:
+                        filename = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
+                    self.plot_contour(i=i, j=j, min_z=min_z, max_z=max_z, filename=filename)
+
     def get_importance(self) -> list:
         """Get importance of each variable and return the results as a list.
         Returns:
