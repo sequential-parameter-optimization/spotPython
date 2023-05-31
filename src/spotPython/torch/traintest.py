@@ -73,6 +73,7 @@ def validate_fold_or_hold_out(net, valloader, loss_function, metric, device):
             outputs = net(inputs)
             # print(f"outputs: {outputs}")
             # print(f"labels: {labels}")
+            metric_value = metric.update(outputs, labels)
             _, predicted = torch.max(outputs.data, 1)
             # print(f"predicted: {predicted}")
             total += labels.size(0)
@@ -80,7 +81,9 @@ def validate_fold_or_hold_out(net, valloader, loss_function, metric, device):
             correct += (predicted == labels).sum().item()
             # print(f"correct: {correct}")
             #
-            metric_value = metric(predicted, labels).to(device)
+            # print(f"predicted: {predicted}")
+            # print(f"labels: {labels}")
+            # metric_value = metric.update(predicted, labels).to(device)
             # print(f"Accuracy on batch {i}: {acc}")
             #
             loss = loss_function(outputs, labels)
