@@ -20,7 +20,8 @@ class Net_vbdp(netcore.Net_Core):
         l2 = l1 // 2
         l3 = l2 // 2
         l4 = l3 // 2
-        self.fc1 = nn.Linear(6112, l1)
+        # self.fc1 = nn.Linear(6112, l1)
+        self.fc1 = nn.Linear(69, l1)
         self.fc2 = nn.Linear(l1, l2)
         self.fc3 = nn.Linear(l2, l3)
         self.fc4 = nn.Linear(l3, l4)
