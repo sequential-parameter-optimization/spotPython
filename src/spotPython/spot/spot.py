@@ -389,9 +389,9 @@ class Spot:
         if not self.show_progress:
             return
         if isfinite(self.fun_evals):
-            progress_bar(progress=self.counter / self.fun_evals)
+            progress_bar(progress=self.counter / self.fun_evals, y=self.min_y)
         else:
-            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60))
+            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y)
 
     def generate_design(self, size, repeats, lower, upper):
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)

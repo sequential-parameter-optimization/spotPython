@@ -2,9 +2,9 @@ from torch import nn
 import spotPython.torch.netcore as netcore
 
 
-class Net_vbdp(netcore.Net_Core):
+class Net_lin_reg(netcore.Net_Core):
     def __init__(self, _L0, l1, dropout_prob, lr_mult, batch_size, epochs, k_folds, patience, optimizer, sgd_momentum):
-        super(Net_vbdp, self).__init__(
+        super(Net_lin_reg, self).__init__(
             lr_mult=lr_mult,
             batch_size=batch_size,
             epochs=epochs,
@@ -17,16 +17,16 @@ class Net_vbdp(netcore.Net_Core):
         # min 80 (= 2*2*2*10) neurons in second layer
         # min 40 (= 2*2*2*5) neurons in third layer
         # min 20 (= 2*2*2*2*2) neurons in fourth layer
-        l2 = l1 // 2
-        l3 = l2 // 2
-        l4 = l3 // 2
+        l2 = max(l1 // 2, 4)
+        l3 = max(l2 // 2, 4)
+        l4 = max(l3 // 2, 4)
         # self.fc1 = nn.Linear(6112, l1)
         # self.fc1 = nn.Linear(196, l1)
         self.fc1 = nn.Linear(_L0, l1)
         self.fc2 = nn.Linear(l1, l2)
         self.fc3 = nn.Linear(l2, l3)
         self.fc4 = nn.Linear(l3, l4)
-        self.fc5 = nn.Linear(l4, 11)
+        self.fc5 = nn.Linear(l4, 1)
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)
         self.dropout1 = nn.Dropout(p=dropout_prob)
@@ -44,5 +44,4 @@ class Net_vbdp(netcore.Net_Core):
         x = self.fc4(x)
         x = self.relu(x)
         x = self.fc5(x)
-        x = self.softmax(x)
         return x

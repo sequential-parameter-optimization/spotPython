@@ -38,17 +38,17 @@ def get_removed_attributes_and_base_net(net):
     return attributes, net
 
 
-def train_fold(net, trainloader, epochs, loss_function, optimizer, device, show_batch_interval=10_000):
+def train_fold(net, trainloader, epochs, loss_function, optimizer, device, show_batch_interval=10_000, writer=None):
     for epoch in range(epochs):
         print(f"Epoch: {epoch + 1}")
         running_loss = 0.0
         epoch_steps = 0
         for i, data in enumerate(trainloader, 0):
-            inputs, labels = data
-            inputs, labels = inputs.to(device), labels.to(device)
+            input, target = data
+            input, target = input.to(device), target.to(device)
             optimizer.zero_grad()
-            outputs = net(inputs)
-            loss = loss_function(outputs, labels)
+            output = net(input)
+            loss = loss_function(output, target)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=1.0)
             optimizer.step()
@@ -57,10 +57,15 @@ def train_fold(net, trainloader, epochs, loss_function, optimizer, device, show_
             epoch_steps += 1
             if i % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
                 print("Batch: %5d. Training Loss (running): %.3f" % (i + 1, running_loss / epoch_steps))
+                # Log the running loss averaged per batch
+                if writer is not None:
+                    writer.add_scalars(
+                        "Validation Loss", {"Validation": running_loss / epoch_steps}, epoch * len(trainloader) + i
+                    )
                 running_loss = 0.0
 
 
-def validate_fold_or_hold_out(net, valloader, loss_function, metric, device):
+def validate_fold_or_hold_out(net, valloader, loss_function, metric, device, task):
     val_loss = 0.0
     val_steps = 0
     total = 0
@@ -68,44 +73,42 @@ def validate_fold_or_hold_out(net, valloader, loss_function, metric, device):
     metric.reset()
     for i, data in enumerate(valloader, 0):
         with torch.no_grad():
-            inputs, labels = data
-            inputs, labels = inputs.to(device), labels.to(device)
-            outputs = net(inputs)
-            # print(f"outputs: {outputs}")
-            # print(f"labels: {labels}")
-            metric_value = metric.update(outputs, labels)
-            _, predicted = torch.max(outputs.data, 1)
-            # print(f"predicted: {predicted}")
-            total += labels.size(0)
-            # print(f"total: {total}")
-            correct += (predicted == labels).sum().item()
-            # print(f"correct: {correct}")
-            #
-            # print(f"predicted: {predicted}")
-            # print(f"labels: {labels}")
-            # metric_value = metric.update(predicted, labels).to(device)
-            # print(f"Accuracy on batch {i}: {acc}")
-            #
-            loss = loss_function(outputs, labels)
+            input, target = data
+            input, target = input.to(device), target.to(device)
+            output = net(input)
+            # print(f"target: {target}")
+            # print(f"output: {output}")
+            if task == "regression":
+                target = target.unsqueeze(1)
+                if target.shape == output.shape:
+                    loss = loss_function(output, target)
+                else:
+                    raise ValueError(f"Shapes of target and output do not match: {target.shape} vs {output.shape}")
+                metric_value = metric.update(output, target)
+            elif task == "classification":
+                loss = loss_function(output, target)
+                metric_value = metric.update(output, target)
+                _, predicted = torch.max(output.data, 1)
+                total += target.size(0)
+                correct += (predicted == target).sum().item()
+            else:
+                raise ValueError(f"Unknown task: {task}")
             val_loss += loss.cpu().numpy()
             val_steps += 1
-    accuracy = correct / total
     loss = val_loss / val_steps
     print(f"Loss on hold-out set: {loss}")
-    print(f"Accuracy on hold-out set: {accuracy}")
+    if task == "classification":
+        accuracy = correct / total
+        print(f"Accuracy on hold-out set: {accuracy}")
     # metric on all batches using custom accumulation
     metric_value = metric.compute()
-    print(f"Metric value on hold-out data: {metric_value}")
+    metric_name = type(metric).__name__
+    print(f"{metric_name} value on hold-out data: {metric_value}")
     return metric_value, loss
 
 
 def evaluate_cv(
-    net,
-    dataset,
-    shuffle=False,
-    num_workers=0,
-    device=None,
-    show_batch_interval=10_000,
+    net, dataset, shuffle=False, num_workers=0, device=None, show_batch_interval=10_000, task=None, writer=None
 ):
     lr_mult_instance = net.lr_mult
     epochs_instance = net.epochs
@@ -153,9 +156,12 @@ def evaluate_cv(
                 optimizer,
                 device,
                 show_batch_interval=show_batch_interval,
+                writer=writer,
             )
             # Validate fold: use only loss for tuning
-            metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(net, valloader, loss_function, device)
+            metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
+                net, valloader, loss_function, device, task
+            )
         df_eval = sum(loss_values.values()) / len(loss_values.values())
         df_preds = np.nan
     except Exception as err:
@@ -163,6 +169,8 @@ def evaluate_cv(
         df_eval = np.nan
         df_preds = np.nan
     add_attributes(net, removed_attributes)
+    if writer is not None:
+        writer.flush()
     return df_eval, df_preds
 
 
@@ -176,6 +184,8 @@ def evaluate_hold_out(
     device=None,
     show_batch_interval=10_000,
     path=None,
+    task=None,
+    writer=None,
 ):
     lr_mult_instance = net.lr_mult
     epochs_instance = net.epochs
@@ -226,12 +236,22 @@ def evaluate_hold_out(
                 optimizer=optimizer,
                 device=device,
                 show_batch_interval=show_batch_interval,
+                task=task,
+                writer=writer,
+                epoch=epoch,
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
-            val_accuracy, val_loss = validate_fold_or_hold_out(
-                net, valloader=valloader, loss_function=loss_function, metric=metric, device=device
+            metric_val, val_loss = validate_fold_or_hold_out(
+                net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
             )
+            # Log the running loss averaged per batch
+            if writer is not None:
+                writer.add_scalars(
+                    "Validation Loss",
+                    {"Validation loss": val_loss, "Validation metric": metric_val},
+                    epoch + 1,
+                )
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 counter = 0
@@ -250,6 +270,8 @@ def evaluate_hold_out(
         df_eval = np.nan
         df_preds = np.nan
     add_attributes(net, removed_attributes)
+    if writer is not None:
+        writer.flush()
     print(f"Returned to Spot: Validation loss: {df_eval}")
     print("----------------------------------------------")
     return df_eval, df_preds
@@ -277,15 +299,35 @@ def create_train_test_data_loaders(dataset, batch_size, shuffle, test_dataset, n
     return trainloader, testloader
 
 
-def train_hold_out(net, trainloader, batch_size, loss_function, optimizer, device, show_batch_interval=10_000):
+def train_hold_out(
+    net,
+    trainloader,
+    batch_size,
+    loss_function,
+    optimizer,
+    device,
+    epoch,
+    show_batch_interval=10_000,
+    task=None,
+    writer=None,
+):
     running_loss = 0.0
     epoch_steps = 0
     for i, data in enumerate(trainloader, 0):
-        inputs, labels = data
-        inputs, labels = inputs.to(device), labels.to(device)
+        input, target = data
+        input, target = input.to(device), target.to(device)
         optimizer.zero_grad()
-        outputs = net(inputs)
-        loss = loss_function(outputs, labels)
+        output = net(input)
+        if task == "regression":
+            target = target.unsqueeze(1)
+            if target.shape == output.shape:
+                loss = loss_function(output, target)
+            else:
+                raise ValueError(f"Shapes of target and output do not match: {target.shape} vs {output.shape}")
+        elif task == "classification":
+            loss = loss_function(output, target)
+        else:
+            raise ValueError(f"Unknown task: {task}")
         loss.backward()
         torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=1.0)
         optimizer.step()
@@ -296,11 +338,27 @@ def train_hold_out(net, trainloader, batch_size, loss_function, optimizer, devic
                 "Batch: %5d. Batch Size: %d. Training Loss (running): %.3f"
                 % (i + 1, int(batch_size), running_loss / epoch_steps)
             )
+            # Log the running loss averaged per batch
+            if writer is not None:
+                writer.add_scalars(
+                    "Validation Loss", {"Validation": running_loss / epoch_steps}, epoch * len(trainloader) + i
+                )
             running_loss = 0.0
     return loss.item()
 
 
-def train_tuned(net, train_dataset, shuffle, loss_function, metric, device=None, show_batch_interval=10_000, path=None):
+def train_tuned(
+    net,
+    train_dataset,
+    shuffle,
+    loss_function,
+    metric,
+    device=None,
+    show_batch_interval=10_000,
+    path=None,
+    task=None,
+    writer=None,
+):
     evaluate_hold_out(
         net=net,
         train_dataset=train_dataset,
@@ -311,10 +369,12 @@ def train_tuned(net, train_dataset, shuffle, loss_function, metric, device=None,
         device=device,
         show_batch_interval=show_batch_interval,
         path=path,
+        task=task,
+        writer=writer,
     )
 
 
-def test_tuned(net, shuffle, test_dataset=None, loss_function=None, metric=None, device=None, path=None):
+def test_tuned(net, shuffle, test_dataset=None, loss_function=None, metric=None, device=None, path=None, task=None):
     batch_size_instance = net.batch_size
     removed_attributes, net = get_removed_attributes_and_base_net(net)
     if path is not None:
@@ -332,7 +392,7 @@ def test_tuned(net, shuffle, test_dataset=None, loss_function=None, metric=None,
             test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0
         )
         metric_value, loss = validate_fold_or_hold_out(
-            net, valloader=valloader, loss_function=loss_function, metric=metric, device=device
+            net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
         )
         df_eval = loss
         df_metric = metric_value

@@ -76,6 +76,8 @@ class HyperTorch:
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
+                        task=self.fun_control["task"],
+                        writer=self.fun_control["writer"],
                     )
                 elif self.fun_control["eval"] == "test_cv":
                     df_eval, _ = evaluate_cv(
@@ -84,6 +86,8 @@ class HyperTorch:
                         shuffle=self.fun_control["shuffle"],
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
+                        task=self.fun_control["task"],
+                        writer=self.fun_control["writer"],
                     )
                 elif self.fun_control["eval"] == "test_hold_out":
                     df_eval, _ = evaluate_hold_out(
@@ -96,6 +100,8 @@ class HyperTorch:
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         path=self.fun_control["path"],
+                        task=self.fun_control["task"],
+                        writer=self.fun_control["writer"],
                     )
                 else:  # eval == "train_hold_out"
                     df_eval, _ = evaluate_hold_out(
@@ -107,6 +113,8 @@ class HyperTorch:
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         path=self.fun_control["path"],
+                        task=self.fun_control["task"],
+                        writer=self.fun_control["writer"],
                     )
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")

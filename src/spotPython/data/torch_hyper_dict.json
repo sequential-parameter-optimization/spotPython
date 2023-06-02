@@ -1,12 +1,85 @@
 {
+    "Net_lin_reg":
+    {
+        "_L0": {
+            "type": "int",
+            "default": 10,
+            "transform": "None",
+            "lower": 10,
+            "upper": 10},
+        "l1": {
+            "type": "int",
+            "default": 3,
+            "transform": "transform_power_2_int",
+            "lower": 3,
+            "upper": 8},
+        "dropout_prob": {
+            "type": "float",
+            "default": 0.01,
+            "transform": "None",
+            "lower": 0.0,
+            "upper": 0.9},
+        "lr_mult": {
+            "type": "float",
+            "default": 1.0,
+            "transform": "None",
+            "lower": 0.1,
+            "upper": 10.0},
+        "batch_size": {
+            "type": "int",
+            "default": 4,
+            "transform": "transform_power_2_int",
+            "lower": 1,
+            "upper": 4},
+        "epochs": {
+            "type": "int",
+            "default": 4,
+            "transform": "transform_power_2_int",
+            "lower": 4,
+            "upper": 9},
+        "k_folds": {
+            "type": "int",
+            "default": 1,
+            "transform": "None",
+            "lower": 1,
+            "upper": 1},
+        "patience": {
+            "type": "int",
+            "default": 2,
+            "transform": "transform_power_2_int",
+            "lower": 1,
+            "upper": 5
+        },
+        "optimizer": {
+            "levels": ["Adadelta", "Adagrad", "Adam", "AdamW", "SparseAdam", "Adamax", "ASGD", "NAdam", "RAdam", "RMSprop", "Rprop", "SGD"],
+            "type": "factor",
+            "default": "SGD",
+            "transform": "None",
+            "class_name": "torch.optim",
+            "core_model_parameter_type": "str",
+            "lower": 0,
+            "upper": 12},
+        "sgd_momentum": {
+            "type": "float",
+            "default": 0.0,
+            "transform": "None",
+            "lower": 0.0,
+            "upper": 1.0}
+    },
     "Net_vbdp":
     {
+        "_L0": {
+            "type": "int",
+            "default": 64,
+            "transform": "None",
+            "lower": 64,
+            "upper": 64},
         "l1": {
             "type": "int",
             "default": 8,
             "transform": "transform_power_2_int",
             "lower": 8,
-            "upper": 13},
+            "upper": 16},
         "dropout_prob": {
             "type": "float",
             "default": 0.01,
