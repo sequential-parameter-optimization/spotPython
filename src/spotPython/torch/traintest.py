@@ -72,6 +72,7 @@ def validate_fold_or_hold_out(net, valloader, loss_function, metric, device, tas
     correct = 0
     metric.reset()
     for i, data in enumerate(valloader, 0):
+        # get batches
         with torch.no_grad():
             input, target = data
             input, target = input.to(device), target.to(device)
@@ -186,6 +187,7 @@ def evaluate_hold_out(
     path=None,
     task=None,
     writer=None,
+    writerId=None,
 ):
     lr_mult_instance = net.lr_mult
     epochs_instance = net.epochs
@@ -228,7 +230,7 @@ def evaluate_hold_out(
         for epoch in range(epochs_instance):
             print(f"Epoch: {epoch + 1}")
             # training loss from one epoch:
-            _ = train_hold_out(
+            training_loss = train_hold_out(
                 net=net,
                 trainloader=trainloader,
                 batch_size=batch_size_instance,
@@ -238,7 +240,6 @@ def evaluate_hold_out(
                 show_batch_interval=show_batch_interval,
                 task=task,
                 writer=writer,
-                epoch=epoch,
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
@@ -246,12 +247,17 @@ def evaluate_hold_out(
                 net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
             )
             # Log the running loss averaged per batch
+            metric_name = "Metric"
+            if metric is None:
+                metric_name = type(metric).__name__
+                print(f"{metric_name} value on hold-out data: {metric_val}")
             if writer is not None:
                 writer.add_scalars(
-                    "Validation Loss",
-                    {"Validation loss": val_loss, "Validation metric": metric_val},
+                    "evaluate_hold_out: Train & Val Loss and Val Metric" + writerId,
+                    {"Train loss": training_loss, "Val loss": val_loss, metric_name: metric_val},
                     epoch + 1,
                 )
+                writer.flush()
             if val_loss < best_val_loss:
                 best_val_loss = val_loss
                 counter = 0
@@ -306,14 +312,13 @@ def train_hold_out(
     loss_function,
     optimizer,
     device,
-    epoch,
     show_batch_interval=10_000,
     task=None,
     writer=None,
 ):
     running_loss = 0.0
     epoch_steps = 0
-    for i, data in enumerate(trainloader, 0):
+    for batch_nr, data in enumerate(trainloader, 0):
         input, target = data
         input, target = input.to(device), target.to(device)
         optimizer.zero_grad()
@@ -333,17 +338,19 @@ def train_hold_out(
         optimizer.step()
         running_loss += loss.item()
         epoch_steps += 1
-        if i % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
+        if batch_nr % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
             print(
                 "Batch: %5d. Batch Size: %d. Training Loss (running): %.3f"
-                % (i + 1, int(batch_size), running_loss / epoch_steps)
+                % (batch_nr + 1, int(batch_size), running_loss / epoch_steps)
             )
             # Log the running loss averaged per batch
             if writer is not None:
                 writer.add_scalars(
-                    "Validation Loss", {"Validation": running_loss / epoch_steps}, epoch * len(trainloader) + i
+                    "Training Loss (running)", {"Training Loss (running)": running_loss / epoch_steps}, batch_nr + 1
                 )
             running_loss = 0.0
+    # if writer is not None:
+    #     writer.flush()
     return loss.item()
 
 

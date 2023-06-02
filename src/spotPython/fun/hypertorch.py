@@ -64,6 +64,10 @@ class HyperTorch:
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
             print(f"\nconfig: {config}")
+            config_id = ''
+            for key in config:
+                config_id += str(config[key]) + "_"
+            config_id = config_id[:-1]
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:
@@ -102,6 +106,7 @@ class HyperTorch:
                         path=self.fun_control["path"],
                         task=self.fun_control["task"],
                         writer=self.fun_control["writer"],
+                        writerId=config_id,
                     )
                 else:  # eval == "train_hold_out"
                     df_eval, _ = evaluate_hold_out(
@@ -115,10 +120,16 @@ class HyperTorch:
                         path=self.fun_control["path"],
                         task=self.fun_control["task"],
                         writer=self.fun_control["writer"],
+                        writerId=config_id,
                     )
             except Exception as err:
                 print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")
                 df_eval = np.nan
-            z_res = np.append(z_res, fun_control["weights"] * df_eval)
+            z_val = fun_control["weights"] * df_eval
+            if self.fun_control["writer"] is not None:
+                writer = self.fun_control["writer"]
+                writer.add_hparams(config, {"fun_torch: loss": z_val})
+                writer.flush()
+            z_res = np.append(z_res, z_val)
         return z_res
