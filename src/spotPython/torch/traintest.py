@@ -109,7 +109,7 @@ def validate_fold_or_hold_out(net, valloader, loss_function, metric, device, tas
 
 
 def evaluate_cv(
-    net, dataset, shuffle=False, num_workers=0, device=None, show_batch_interval=10_000, task=None, writer=None
+    net, dataset, shuffle=False, num_workers=0, device=None, show_batch_interval=10_000, metric=None, task=None, writer=None
 ):
     lr_mult_instance = net.lr_mult
     epochs_instance = net.epochs
@@ -161,8 +161,9 @@ def evaluate_cv(
             )
             # Validate fold: use only loss for tuning
             metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
-                net, valloader, loss_function, device, task
+                net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
             )
+        # TODO: Compute Metric on all folds
         df_eval = sum(loss_values.values()) / len(loss_values.values())
         df_preds = np.nan
     except Exception as err:
