@@ -64,7 +64,7 @@ class HyperTorch:
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
             print(f"\nconfig: {config}")
-            config_id = ''
+            config_id = ""
             for key in config:
                 config_id += str(config[key]) + "_"
             config_id = config_id[:-1]

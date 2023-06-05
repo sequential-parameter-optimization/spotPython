@@ -38,33 +38,6 @@ def get_removed_attributes_and_base_net(net):
     return attributes, net
 
 
-def train_fold(net, trainloader, epochs, loss_function, optimizer, device, show_batch_interval=10_000, writer=None):
-    for epoch in range(epochs):
-        print(f"Epoch: {epoch + 1}")
-        running_loss = 0.0
-        epoch_steps = 0
-        for i, data in enumerate(trainloader, 0):
-            input, target = data
-            input, target = input.to(device), target.to(device)
-            optimizer.zero_grad()
-            output = net(input)
-            loss = loss_function(output, target)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(net.parameters(), max_norm=1.0)
-            optimizer.step()
-            # print statistics
-            running_loss += loss.item()
-            epoch_steps += 1
-            if i % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
-                print("Batch: %5d. Training Loss (running): %.3f" % (i + 1, running_loss / epoch_steps))
-                # Log the running loss averaged per batch
-                if writer is not None:
-                    writer.add_scalars(
-                        "Validation Loss", {"Validation": running_loss / epoch_steps}, epoch * len(trainloader) + i
-                    )
-                running_loss = 0.0
-
-
 def validate_fold_or_hold_out(net, valloader, loss_function, metric, device, task):
     val_loss = 0.0
     val_steps = 0
@@ -109,14 +82,25 @@ def validate_fold_or_hold_out(net, valloader, loss_function, metric, device, tas
 
 
 def evaluate_cv(
-    net, dataset, shuffle=False, num_workers=0, device=None, show_batch_interval=10_000, metric=None, task=None, writer=None
+    net,
+    dataset,
+    shuffle=False,
+    loss_function=None,
+    num_workers=0,
+    device=None,
+    show_batch_interval=10_000,
+    metric=None,
+    path=None,
+    task=None,
+    writer=None,
+    writerId=None,
 ):
     lr_mult_instance = net.lr_mult
     epochs_instance = net.epochs
     batch_size_instance = net.batch_size
     k_folds_instance = net.k_folds
-    loss_function_instance = net.loss_function
     optimizer_instance = net.optimizer
+    patience_instance = net.patience
     sgd_momentum_instance = net.sgd_momentum
     removed_attributes, net = get_removed_attributes_and_base_net(net)
     metric_values = {}
@@ -135,7 +119,6 @@ def evaluate_cv(
             lr_mult=lr_mult_instance,
             sgd_momentum=sgd_momentum_instance,
         )
-        loss_function = loss_function_instance
         kfold = KFold(n_splits=k_folds_instance, shuffle=shuffle)
         for fold, (train_ids, val_ids) in enumerate(kfold.split(dataset)):
             print(f"Fold: {fold + 1}")
@@ -149,22 +132,71 @@ def evaluate_cv(
             )
             reset_weights(net)
             # Train fold for several epochs:
-            train_fold(
-                net,
-                trainloader,
-                epochs_instance,
-                loss_function,
-                optimizer,
-                device,
-                show_batch_interval=show_batch_interval,
-                writer=writer,
-            )
-            # Validate fold: use only loss for tuning
-            metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
-                net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
-            )
+            # train_fold(
+            #     net,
+            #     trainloader,
+            #     epochs_instance,
+            #     loss_function,
+            #     optimizer,
+            #     device,
+            #     show_batch_interval=show_batch_interval,
+            #     writer=writer,
+            # )
+            # # Validate fold: use only loss for tuning
+            # metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
+            #     net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
+            # )
+            # Early stopping parameters
+            best_val_loss = float("inf")
+            counter = 0
+            # We only have "one fold" which is trained for several epochs
+            # (we do not have to reset the weights for each fold):
+            for epoch in range(epochs_instance):
+                print(f"Epoch: {epoch + 1}")
+                # training loss from one epoch:
+                training_loss = train_hold_out(
+                    net=net,
+                    trainloader=trainloader,
+                    batch_size=batch_size_instance,
+                    loss_function=loss_function,
+                    optimizer=optimizer,
+                    device=device,
+                    show_batch_interval=show_batch_interval,
+                    task=task,
+                    writer=writer,
+                )
+                # TODO: scheduler.step()
+                # Early stopping check. Calculate validation loss from one epoch:
+                metric_val, val_loss = validate_fold_or_hold_out(
+                    net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
+                )
+                metric_values[fold], loss_values[fold] = metric_val, val_loss
+                # Log the running loss averaged per batch
+                metric_name = "Metric"
+                if metric is None:
+                    metric_name = type(metric).__name__
+                    print(f"{metric_name} value on hold-out data: {metric_val}")
+                if writer is not None:
+                    writer.add_scalars(
+                        "evaluate_hold_out: Train & Val Loss and Val Metric" + writerId,
+                        {"Train loss": training_loss, "Val loss": val_loss, metric_name: metric_val},
+                        epoch + 1,
+                    )
+                    writer.flush()
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    counter = 0
+                    # save model:
+                    if path is not None:
+                        torch.save(net.state_dict(), path)
+                else:
+                    counter += 1
+                    if counter >= patience_instance:
+                        print(f"Early stopping at epoch {epoch}")
+                        break
         # TODO: Compute Metric on all folds
         df_eval = sum(loss_values.values()) / len(loss_values.values())
+        df_metrics = sum(metric_values.values()) / len(metric_values.values())
         df_preds = np.nan
     except Exception as err:
         print(f"Error in Net_Core. Call to evaluate_cv() failed. {err=}, {type(err)=}")
@@ -173,7 +205,7 @@ def evaluate_cv(
     add_attributes(net, removed_attributes)
     if writer is not None:
         writer.flush()
-    return df_eval, df_preds
+    return df_eval, df_preds, df_metrics
 
 
 def evaluate_hold_out(
