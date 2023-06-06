@@ -130,27 +130,11 @@ def evaluate_cv(
             valloader = torch.utils.data.DataLoader(
                 dataset, batch_size=batch_size_instance, sampler=val_subsampler, num_workers=num_workers
             )
+            # each fold starts with new weights:
             reset_weights(net)
-            # Train fold for several epochs:
-            # train_fold(
-            #     net,
-            #     trainloader,
-            #     epochs_instance,
-            #     loss_function,
-            #     optimizer,
-            #     device,
-            #     show_batch_interval=show_batch_interval,
-            #     writer=writer,
-            # )
-            # # Validate fold: use only loss for tuning
-            # metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
-            #     net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
-            # )
             # Early stopping parameters
             best_val_loss = float("inf")
             counter = 0
-            # We only have "one fold" which is trained for several epochs
-            # (we do not have to reset the weights for each fold):
             for epoch in range(epochs_instance):
                 print(f"Epoch: {epoch + 1}")
                 # training loss from one epoch:
@@ -167,24 +151,23 @@ def evaluate_cv(
                 )
                 # TODO: scheduler.step()
                 # Early stopping check. Calculate validation loss from one epoch:
-                metric_val, val_loss = validate_fold_or_hold_out(
+                metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
                     net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
                 )
-                metric_values[fold], loss_values[fold] = metric_val, val_loss
                 # Log the running loss averaged per batch
                 metric_name = "Metric"
                 if metric is None:
                     metric_name = type(metric).__name__
-                    print(f"{metric_name} value on hold-out data: {metric_val}")
+                    print(f"{metric_name} value on hold-out data: {metric_values[fold]}")
                 if writer is not None:
                     writer.add_scalars(
-                        "evaluate_hold_out: Train & Val Loss and Val Metric" + writerId,
-                        {"Train loss": training_loss, "Val loss": val_loss, metric_name: metric_val},
+                        "evaluate_cv fold:" + str(fold + 1) + ". Train & Val Loss and Val Metric" + writerId,
+                        {"Train loss": training_loss, "Val loss": loss_values[fold], metric_name: metric_values[fold]},
                         epoch + 1,
                     )
                     writer.flush()
-                if val_loss < best_val_loss:
-                    best_val_loss = val_loss
+                if loss_values[fold] < best_val_loss:
+                    best_val_loss = loss_values[fold]
                     counter = 0
                     # save model:
                     if path is not None:
@@ -194,7 +177,7 @@ def evaluate_cv(
                     if counter >= patience_instance:
                         print(f"Early stopping at epoch {epoch}")
                         break
-        # TODO: Compute Metric on all folds
+        # TODO: Compute Metric on all folds and return average to spotPython
         df_eval = sum(loss_values.values()) / len(loss_values.values())
         df_metrics = sum(metric_values.values()) / len(metric_values.values())
         df_preds = np.nan
@@ -204,6 +187,14 @@ def evaluate_cv(
         df_preds = np.nan
     add_attributes(net, removed_attributes)
     if writer is not None:
+        metric_name = "Metric"
+        if metric is None:
+            metric_name = type(metric).__name__
+        writer.add_scalars(
+            "CV: Val Loss and Val Metric" + writerId,
+            {"CV-loss": df_eval, metric_name: df_metrics},
+            epoch + 1,
+        )
         writer.flush()
     return df_eval, df_preds, df_metrics
 

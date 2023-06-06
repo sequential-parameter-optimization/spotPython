@@ -82,6 +82,7 @@ class HyperTorch:
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         task=self.fun_control["task"],
                         writer=self.fun_control["writer"],
+                        writerId=config_id,
                     )
                 elif self.fun_control["eval"] == "test_cv":
                     df_eval, _ = evaluate_cv(
@@ -92,6 +93,7 @@ class HyperTorch:
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         task=self.fun_control["task"],
                         writer=self.fun_control["writer"],
+                        writerId=config_id,
                     )
                 elif self.fun_control["eval"] == "test_hold_out":
                     df_eval, _ = evaluate_hold_out(
