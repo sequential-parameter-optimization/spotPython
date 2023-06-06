@@ -44,6 +44,8 @@ def fun_control_init(task, tensorboard_path=None):
         if not os.path.exists(tensorboard_path):
             os.makedirs(tensorboard_path)
         writer = SummaryWriter(tensorboard_path)
+    else:
+        writer = None
 
     fun_control = {
         "data": None,
