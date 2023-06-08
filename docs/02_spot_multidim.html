@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hyperparameter-tuning Cookbook - 3&nbsp; Introduction to Sequential Parameter Optimization</title>
+<title>Hyperparameter-tuning Cookbook - 2&nbsp; Multi-dimensional Functions</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -99,7 +99,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 3&nbsp; Introduction to Sequential Parameter Optimization">
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 2&nbsp; Multi-dimensional Functions">
+<meta name="twitter:description" content="">
 <meta name="twitter:image" content="02_spot_multidim_files/figure-html/cell-6-output-1.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -113,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02_spot_multidim.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02_spot_multidim.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -167,104 +168,92 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Using <code>sklearn</code> Surrogates in <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Using <code>scipy</code> Optimizers</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Gaussian Process Models</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expected Improvement</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning and Noise</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch wth cifar10 Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -283,23 +272,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#multi-dimensional-functions" id="toc-multi-dimensional-functions" class="nav-link active" data-scroll-target="#multi-dimensional-functions"><span class="header-section-number">3.1</span> Multi-dimensional Functions</a></li>
-  <li><a href="#example-spot-and-the-3-dim-sphere-function" id="toc-example-spot-and-the-3-dim-sphere-function" class="nav-link" data-scroll-target="#example-spot-and-the-3-dim-sphere-function"><span class="header-section-number">3.2</span> 1 Example: <code>Spot</code> and the 3-dim Sphere Function</a>
+  <li><a href="#example-spot-and-the-3-dim-sphere-function" id="toc-example-spot-and-the-3-dim-sphere-function" class="nav-link active" data-scroll-target="#example-spot-and-the-3-dim-sphere-function"><span class="header-section-number">2.1</span> Example: <code>Spot</code> and the 3-dim Sphere Function</a>
   <ul class="collapse">
-  <li><a href="#the-objective-function-3-dim-sphere" id="toc-the-objective-function-3-dim-sphere" class="nav-link" data-scroll-target="#the-objective-function-3-dim-sphere"><span class="header-section-number">3.2.1</span> The Objective Function: 3-dim Sphere</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">3.2.2</span> Results</a></li>
-  <li><a href="#a-contour-plot" id="toc-a-contour-plot" class="nav-link" data-scroll-target="#a-contour-plot"><span class="header-section-number">3.2.3</span> A Contour Plot</a></li>
+  <li><a href="#the-objective-function-3-dim-sphere" id="toc-the-objective-function-3-dim-sphere" class="nav-link" data-scroll-target="#the-objective-function-3-dim-sphere"><span class="header-section-number">2.1.1</span> The Objective Function: 3-dim Sphere</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">2.1.2</span> Results</a></li>
+  <li><a href="#a-contour-plot" id="toc-a-contour-plot" class="nav-link" data-scroll-target="#a-contour-plot"><span class="header-section-number">2.1.3</span> A Contour Plot</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">3.3</span> Conclusion:</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">4</span> Exercises</a>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">2.2</span> Conclusion</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">2.3</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">4.1</span> Exercise 1</a>
-  <ul class="collapse">
-  <li><a href="#the-three-dimensional-fun_cubed" id="toc-the-three-dimensional-fun_cubed" class="nav-link" data-scroll-target="#the-three-dimensional-fun_cubed"><span class="header-section-number">4.1.1</span> 1. The Three Dimensional <code>fun_cubed</code></a></li>
-  <li><a href="#the-ten-dimensional-fun_wing_wt" id="toc-the-ten-dimensional-fun_wing_wt" class="nav-link" data-scroll-target="#the-ten-dimensional-fun_wing_wt"><span class="header-section-number">4.1.2</span> 2. The Ten Dimensional <code>fun_wing_wt</code></a></li>
-  <li><a href="#the-three-dimensional-fun_runge" id="toc-the-three-dimensional-fun_runge" class="nav-link" data-scroll-target="#the-three-dimensional-fun_runge"><span class="header-section-number">4.1.3</span> 3. The Three Dimensional <code>fun_runge</code></a></li>
-  <li><a href="#the-three-dimensional-fun_linear" id="toc-the-three-dimensional-fun_linear" class="nav-link" data-scroll-target="#the-three-dimensional-fun_linear"><span class="header-section-number">4.1.4</span> 4. The Three Dimensional <code>fun_linear</code></a></li>
-  </ul></li>
+  <li><a href="#the-three-dimensional-fun_cubed" id="toc-the-three-dimensional-fun_cubed" class="nav-link" data-scroll-target="#the-three-dimensional-fun_cubed"><span class="header-section-number">2.3.1</span> The Three Dimensional <code>fun_cubed</code></a></li>
+  <li><a href="#the-ten-dimensional-fun_wing_wt" id="toc-the-ten-dimensional-fun_wing_wt" class="nav-link" data-scroll-target="#the-ten-dimensional-fun_wing_wt"><span class="header-section-number">2.3.2</span> The Ten Dimensional <code>fun_wing_wt</code></a></li>
+  <li><a href="#the-three-dimensional-fun_runge" id="toc-the-three-dimensional-fun_runge" class="nav-link" data-scroll-target="#the-three-dimensional-fun_runge"><span class="header-section-number">2.3.3</span> The Three Dimensional <code>fun_runge</code></a></li>
+  <li><a href="#the-three-dimensional-fun_linear" id="toc-the-three-dimensional-fun_linear" class="nav-link" data-scroll-target="#the-three-dimensional-fun_linear"><span class="header-section-number">2.3.4</span> The Three Dimensional <code>fun_linear</code></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -309,7 +294,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></h1>
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></h1>
 </div>
 
 
@@ -324,14 +309,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="multi-dimensional-functions" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="multi-dimensional-functions"><span class="header-section-number">3.1</span> Multi-dimensional Functions</h2>
-<ul>
-<li>This notebook illustrates how high-dimensional functions can be analyzed.</li>
-</ul>
-</section>
-<section id="example-spot-and-the-3-dim-sphere-function" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="example-spot-and-the-3-dim-sphere-function"><span class="header-section-number">3.2</span> 1 Example: <code>Spot</code> and the 3-dim Sphere Function</h2>
+<p>This notebook illustrates how high-dimensional functions can be analyzed.</p>
+<section id="example-spot-and-the-3-dim-sphere-function" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="example-spot-and-the-3-dim-sphere-function"><span class="header-section-number">2.1</span> Example: <code>Spot</code> and the 3-dim Sphere Function</h2>
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
@@ -345,8 +325,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> append, ndarray, multiply, isinf, linspace, meshgrid, ravel</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> numpy <span class="im">import</span> array</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="the-objective-function-3-dim-sphere" class="level3" data-number="3.2.1">
-<h3 data-number="3.2.1" class="anchored" data-anchor-id="the-objective-function-3-dim-sphere"><span class="header-section-number">3.2.1</span> The Objective Function: 3-dim Sphere</h3>
+<section id="the-objective-function-3-dim-sphere" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="the-objective-function-3-dim-sphere"><span class="header-section-number">2.1.1</span> The Objective Function: 3-dim Sphere</h3>
 <ul>
 <li><p>The <code>spotPython</code> package provides several classes of objective functions.</p></li>
 <li><p>We will use an analytical objective function, i.e., a function that can be described by a (closed) formula: <span class="math display">\[f(x) = \sum_i^n x_i^2 \]</span></p></li>
@@ -387,12 +367,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x1073a10c0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x10415c040&gt;</code></pre>
 </div>
 </div>
 </section>
-<section id="results" class="level3" data-number="3.2.2">
-<h3 data-number="3.2.2" class="anchored" data-anchor-id="results"><span class="header-section-number">3.2.2</span> Results</h3>
+<section id="results" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="results"><span class="header-section-number">2.1.2</span> Results</h3>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>spot_3.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -414,8 +394,8 @@ Lambda: 0.005621713639718905</code></pre>
 </div>
 </div>
 </section>
-<section id="a-contour-plot" class="level3" data-number="3.2.3">
-<h3 data-number="3.2.3" class="anchored" data-anchor-id="a-contour-plot"><span class="header-section-number">3.2.3</span> A Contour Plot</h3>
+<section id="a-contour-plot" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="a-contour-plot"><span class="header-section-number">2.1.3</span> A Contour Plot</h3>
 <ul>
 <li>We can select two dimensions, say <span class="math inline">\(i=0\)</span> and <span class="math inline">\(j=1\)</span>, and generate a contour plot as follows.
 <ul>
@@ -465,14 +445,12 @@ Lambda:  94.31627052007231</code></pre>
 </div>
 </section>
 </section>
-<section id="conclusion" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">3.3</span> Conclusion:</h2>
-<ul>
-<li>Based on this quick analysis, we can conclude that all three dimensions are equally important (as expected, because the analytical function is known).</li>
-</ul>
+<section id="conclusion" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">2.2</span> Conclusion</h2>
+<p>Based on this quick analysis, we can conclude that all three dimensions are equally important (as expected, because the analytical function is known).</p>
 </section>
-<section id="exercises" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Exercises</h1>
+<section id="exercises" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="exercises"><span class="header-section-number">2.3</span> Exercises</h2>
 <ul>
 <li>Important:
 <ul>
@@ -480,17 +458,11 @@ Lambda:  94.31627052007231</code></pre>
 <li>Please combine your results using this notebook.</li>
 <li>Only one notebook from each group!</li>
 <li>Presentation is based on this notebook. No addtional slides are required!</li>
-<li>spotPython version <code>0.16.11</code> (or greater) is required (see http://www.gm.fh-koeln.de/~bartz/site/download/)</li>
+<li>spotPython version <code>0.16.11</code> (or greater) is required</li>
 </ul></li>
 </ul>
-<section id="exercise-1" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">4.1</span> Exercise 1</h2>
-<ul>
-<li>Each team member should choose one of the following objective functions.</li>
-<li>Please add your name to the section title!</li>
-</ul>
-<section id="the-three-dimensional-fun_cubed" class="level3" data-number="4.1.1">
-<h3 data-number="4.1.1" class="anchored" data-anchor-id="the-three-dimensional-fun_cubed"><span class="header-section-number">4.1.1</span> 1. The Three Dimensional <code>fun_cubed</code></h3>
+<section id="the-three-dimensional-fun_cubed" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="the-three-dimensional-fun_cubed"><span class="header-section-number">2.3.1</span> The Three Dimensional <code>fun_cubed</code></h3>
 <ul>
 <li>The input dimension is <code>3</code>. The search range is <span class="math inline">\(-1 \leq x \leq 1\)</span> for all dimensions.</li>
 <li>Generate contour plots</li>
@@ -506,8 +478,8 @@ Lambda:  94.31627052007231</code></pre>
 </ul></li>
 </ul>
 </section>
-<section id="the-ten-dimensional-fun_wing_wt" class="level3" data-number="4.1.2">
-<h3 data-number="4.1.2" class="anchored" data-anchor-id="the-ten-dimensional-fun_wing_wt"><span class="header-section-number">4.1.2</span> 2. The Ten Dimensional <code>fun_wing_wt</code></h3>
+<section id="the-ten-dimensional-fun_wing_wt" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="the-ten-dimensional-fun_wing_wt"><span class="header-section-number">2.3.2</span> The Ten Dimensional <code>fun_wing_wt</code></h3>
 <ul>
 <li>The input dimension is <code>10</code>. The search range is <span class="math inline">\(0 \leq x \leq 1\)</span> for all dimensions.</li>
 <li>Calculate the variable importance.</li>
@@ -523,8 +495,8 @@ Lambda:  94.31627052007231</code></pre>
 </ul></li>
 </ul>
 </section>
-<section id="the-three-dimensional-fun_runge" class="level3" data-number="4.1.3">
-<h3 data-number="4.1.3" class="anchored" data-anchor-id="the-three-dimensional-fun_runge"><span class="header-section-number">4.1.3</span> 3. The Three Dimensional <code>fun_runge</code></h3>
+<section id="the-three-dimensional-fun_runge" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="the-three-dimensional-fun_runge"><span class="header-section-number">2.3.3</span> The Three Dimensional <code>fun_runge</code></h3>
 <ul>
 <li>The input dimension is <code>3</code>. The search range is <span class="math inline">\(-5 \leq x \leq 5\)</span> for all dimensions.</li>
 <li>Generate contour plots</li>
@@ -540,8 +512,8 @@ Lambda:  94.31627052007231</code></pre>
 </ul></li>
 </ul>
 </section>
-<section id="the-three-dimensional-fun_linear" class="level3" data-number="4.1.4">
-<h3 data-number="4.1.4" class="anchored" data-anchor-id="the-three-dimensional-fun_linear"><span class="header-section-number">4.1.4</span> 4. The Three Dimensional <code>fun_linear</code></h3>
+<section id="the-three-dimensional-fun_linear" class="level3" data-number="2.3.4">
+<h3 data-number="2.3.4" class="anchored" data-anchor-id="the-three-dimensional-fun_linear"><span class="header-section-number">2.3.4</span> The Three Dimensional <code>fun_linear</code></h3>
 <ul>
 <li>The input dimension is <code>3</code>. The search range is <span class="math inline">\(-5 \leq x \leq 5\)</span> for all dimensions.</li>
 <li>Generate contour plots</li>
@@ -558,7 +530,6 @@ Lambda:  94.31627052007231</code></pre>
 </ul>
 
 
-</section>
 </section>
 </section>
 
@@ -799,12 +770,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./01_spot_intro.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./03_spot_anisotropic.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

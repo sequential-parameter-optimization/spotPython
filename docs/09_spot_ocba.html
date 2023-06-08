@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hyperparameter-tuning Cookbook - 10&nbsp; Introduction to Sequential Parameter Optimization</title>
+<title>Hyperparameter-tuning Cookbook - 9&nbsp; Handling Noise: Optimal Computational Budget Allocation in Spot</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -99,7 +99,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 10&nbsp; Introduction to Sequential Parameter Optimization">
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 9&nbsp; Handling Noise: Optimal Computational Budget Allocation in Spot">
+<meta name="twitter:description" content="">
 <meta name="twitter:image" content="09_spot_ocba_files/figure-html/cell-4-output-1.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -113,7 +114,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09_spot_ocba.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./09_spot_ocba.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in `Spot`</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -167,104 +168,92 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Using <code>sklearn</code> Surrogates in <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Using <code>scipy</code> Optimizers</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Gaussian Process Models</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expected Improvement</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning and Noise</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch wth cifar10 Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -283,28 +272,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#noise" id="toc-noise" class="nav-link active" data-scroll-target="#noise"><span class="header-section-number">10.1</span> Noise</a></li>
-  <li><a href="#example-spot-ocba-and-the-noisy-sphere-function" id="toc-example-spot-ocba-and-the-noisy-sphere-function" class="nav-link" data-scroll-target="#example-spot-ocba-and-the-noisy-sphere-function"><span class="header-section-number">10.2</span> 1 Example: <code>Spot</code>, OCBA, and the Noisy Sphere Function</a>
+  <li><a href="#example-spot-ocba-and-the-noisy-sphere-function" id="toc-example-spot-ocba-and-the-noisy-sphere-function" class="nav-link active" data-scroll-target="#example-spot-ocba-and-the-noisy-sphere-function"><span class="header-section-number">9.1</span> Example: <code>Spot</code>, OCBA, and the Noisy Sphere Function</a>
   <ul class="collapse">
-  <li><a href="#the-objective-function-noisy-sphere" id="toc-the-objective-function-noisy-sphere" class="nav-link" data-scroll-target="#the-objective-function-noisy-sphere"><span class="header-section-number">10.2.1</span> The Objective Function: Noisy Sphere</a></li>
+  <li><a href="#the-objective-function-noisy-sphere" id="toc-the-objective-function-noisy-sphere" class="nav-link" data-scroll-target="#the-objective-function-noisy-sphere"><span class="header-section-number">9.1.1</span> The Objective Function: Noisy Sphere</a></li>
   </ul></li>
-  <li><a href="#print-the-results" id="toc-print-the-results" class="nav-link" data-scroll-target="#print-the-results"><span class="header-section-number">10.3</span> Print the Results</a></li>
-  <li><a href="#noise-and-surrogates-the-nugget-effect" id="toc-noise-and-surrogates-the-nugget-effect" class="nav-link" data-scroll-target="#noise-and-surrogates-the-nugget-effect"><span class="header-section-number">11</span> 2 Noise and Surrogates: The Nugget Effect</a>
+  <li><a href="#print-the-results" id="toc-print-the-results" class="nav-link" data-scroll-target="#print-the-results"><span class="header-section-number">9.2</span> Print the Results</a></li>
+  <li><a href="#noise-and-surrogates-the-nugget-effect" id="toc-noise-and-surrogates-the-nugget-effect" class="nav-link" data-scroll-target="#noise-and-surrogates-the-nugget-effect"><span class="header-section-number">9.3</span> Noise and Surrogates: The Nugget Effect</a>
   <ul class="collapse">
-  <li><a href="#the-noisy-sphere" id="toc-the-noisy-sphere" class="nav-link" data-scroll-target="#the-noisy-sphere"><span class="header-section-number">11.1</span> 2.1 The Noisy Sphere</a>
-  <ul class="collapse">
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">11.1.1</span> The Data</a></li>
+  <li><a href="#the-noisy-sphere" id="toc-the-noisy-sphere" class="nav-link" data-scroll-target="#the-noisy-sphere"><span class="header-section-number">9.3.1</span> The Noisy Sphere</a></li>
   </ul></li>
-  </ul></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">12</span> Exercises</a>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">9.4</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">12.1</span> Exercise 1</a>
-  <ul class="collapse">
-  <li><a href="#noisy-fun_cubed" id="toc-noisy-fun_cubed" class="nav-link" data-scroll-target="#noisy-fun_cubed"><span class="header-section-number">12.1.1</span> 1. Noisy <code>fun_cubed</code></a></li>
-  <li><a href="#fun_runge" id="toc-fun_runge" class="nav-link" data-scroll-target="#fun_runge"><span class="header-section-number">12.1.2</span> 2. <code>fun_runge</code></a></li>
-  <li><a href="#fun_forrester" id="toc-fun_forrester" class="nav-link" data-scroll-target="#fun_forrester"><span class="header-section-number">12.1.3</span> 3. <code>fun_forrester</code></a></li>
-  <li><a href="#fun_xsin" id="toc-fun_xsin" class="nav-link" data-scroll-target="#fun_xsin"><span class="header-section-number">12.1.4</span> 4. <code>fun_xsin</code></a></li>
-  </ul></li>
+  <li><a href="#noisy-fun_cubed" id="toc-noisy-fun_cubed" class="nav-link" data-scroll-target="#noisy-fun_cubed"><span class="header-section-number">9.4.1</span> Noisy <code>fun_cubed</code></a></li>
+  <li><a href="#fun_runge" id="toc-fun_runge" class="nav-link" data-scroll-target="#fun_runge"><span class="header-section-number">9.4.2</span> <code>fun_runge</code></a></li>
+  <li><a href="#fun_forrester" id="toc-fun_forrester" class="nav-link" data-scroll-target="#fun_forrester"><span class="header-section-number">9.4.3</span> <code>fun_forrester</code></a></li>
+  <li><a href="#fun_xsin" id="toc-fun_xsin" class="nav-link" data-scroll-target="#fun_xsin"><span class="header-section-number">9.4.4</span> <code>fun_xsin</code></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -314,7 +296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></h1>
+<h1 class="title"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></h1>
 </div>
 
 
@@ -329,14 +311,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="noise" class="level2" data-number="10.1">
-<h2 data-number="10.1" class="anchored" data-anchor-id="noise"><span class="header-section-number">10.1</span> Noise</h2>
-<ul>
-<li>This notebook demonstrates how noisy functions can be handled with OCBA by <code>Spot</code>.</li>
-</ul>
-</section>
-<section id="example-spot-ocba-and-the-noisy-sphere-function" class="level2" data-number="10.2">
-<h2 data-number="10.2" class="anchored" data-anchor-id="example-spot-ocba-and-the-noisy-sphere-function"><span class="header-section-number">10.2</span> 1 Example: <code>Spot</code>, OCBA, and the Noisy Sphere Function</h2>
+<p>This notebook demonstrates how noisy functions can be handled with OCBA by <code>Spot</code>.</p>
+<section id="example-spot-ocba-and-the-noisy-sphere-function" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="example-spot-ocba-and-the-noisy-sphere-function"><span class="header-section-number">9.1</span> Example: <code>Spot</code>, OCBA, and the Noisy Sphere Function</h2>
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
@@ -347,21 +324,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> differential_evolution</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="the-objective-function-noisy-sphere" class="level3" data-number="10.2.1">
-<h3 data-number="10.2.1" class="anchored" data-anchor-id="the-objective-function-noisy-sphere"><span class="header-section-number">10.2.1</span> The Objective Function: Noisy Sphere</h3>
-<ul>
-<li><p>The <code>spotPython</code> package provides several classes of objective functions.</p></li>
-<li><p>We will use an analytical objective function with noise, i.e., a function that can be described by a (closed) formula: <span class="math display">\[f(x) = x^2 + \epsilon\]</span></p></li>
-<li><p>Since <code>sigma</code> is set to <code>0.1</code>, noise is added to the function:</p></li>
-</ul>
+<section id="the-objective-function-noisy-sphere" class="level3" data-number="9.1.1">
+<h3 data-number="9.1.1" class="anchored" data-anchor-id="the-objective-function-noisy-sphere"><span class="header-section-number">9.1.1</span> The Objective Function: Noisy Sphere</h3>
+<p>The <code>spotPython</code> package provides several classes of objective functions. We will use an analytical objective function with noise, i.e., a function that can be described by a (closed) formula: <span class="math display">\[f(x) = x^2 + \epsilon\]</span></p>
+<p>Since <code>sigma</code> is set to <code>0.1</code>, noise is added to the function:</p>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> analytical().fun_sphere</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> {<span class="st">"sigma"</span>: <span class="fl">0.1</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>               <span class="st">"seed"</span>: <span class="dv">123</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<ul>
-<li>A plot illustrates the noise:</li>
-</ul>
+<p>A plot illustrates the noise:</p>
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> fun(x, fun_control<span class="op">=</span>fun_control)</span>
@@ -446,13 +418,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><img src="09_spot_ocba_files/figure-html/cell-6-output-16.png" width="604" height="449"></p>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x29c8e99c0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x29cc62530&gt;</code></pre>
 </div>
 </div>
 </section>
 </section>
-<section id="print-the-results" class="level2" data-number="10.3">
-<h2 data-number="10.3" class="anchored" data-anchor-id="print-the-results"><span class="header-section-number">10.3</span> Print the Results</h2>
+<section id="print-the-results" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="print-the-results"><span class="header-section-number">9.2</span> Print the Results</h2>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>spot_1_noisy.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -472,15 +444,13 @@ x0: 0.1335999447536301</code></pre>
 </div>
 </div>
 </section>
-<section id="noise-and-surrogates-the-nugget-effect" class="level1" data-number="11">
-<h1 data-number="11"><span class="header-section-number">11</span> 2 Noise and Surrogates: The Nugget Effect</h1>
-<section id="the-noisy-sphere" class="level2" data-number="11.1">
-<h2 data-number="11.1" class="anchored" data-anchor-id="the-noisy-sphere"><span class="header-section-number">11.1</span> 2.1 The Noisy Sphere</h2>
-<section id="the-data" class="level3" data-number="11.1.1">
-<h3 data-number="11.1.1" class="anchored" data-anchor-id="the-data"><span class="header-section-number">11.1.1</span> The Data</h3>
-<ul>
-<li>We prepare some data first:</li>
-</ul>
+<section id="noise-and-surrogates-the-nugget-effect" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="noise-and-surrogates-the-nugget-effect"><span class="header-section-number">9.3</span> Noise and Surrogates: The Nugget Effect</h2>
+<section id="the-noisy-sphere" class="level3" data-number="9.3.1">
+<h3 data-number="9.3.1" class="anchored" data-anchor-id="the-noisy-sphere"><span class="header-section-number">9.3.1</span> The Noisy Sphere</h3>
+<section id="the-data" class="level4" data-number="9.3.1.1">
+<h4 data-number="9.3.1.1" class="anchored" data-anchor-id="the-data"><span class="header-section-number">9.3.1.1</span> The Data</h4>
+<p>We prepare some data first:</p>
 <div class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> spotPython</span>
@@ -502,9 +472,7 @@ x0: 0.1335999447536301</code></pre>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> X.reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)</span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>y_train <span class="op">=</span> y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<ul>
-<li>A surrogate without nugget is fitted to these data:</li>
-</ul>
+<p>A surrogate without nugget is fitted to these data:</p>
 <div class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>S <span class="op">=</span> Kriging(name<span class="op">=</span><span class="st">'kriging'</span>,</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>            seed<span class="op">=</span><span class="dv">123</span>,</span>
@@ -526,9 +494,7 @@ x0: 0.1335999447536301</code></pre>
 <p><img src="09_spot_ocba_files/figure-html/cell-10-output-1.png" width="594" height="449"></p>
 </div>
 </div>
-<ul>
-<li>In comparison to the surrogate without nugget, we fit a surrogate with nugget to the data:</li>
-</ul>
+<p>In comparison to the surrogate without nugget, we fit a surrogate with nugget to the data:</p>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>S_nug <span class="op">=</span> Kriging(name<span class="op">=</span><span class="st">'kriging'</span>,</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>            seed<span class="op">=</span><span class="dv">123</span>,</span>
@@ -548,9 +514,7 @@ x0: 0.1335999447536301</code></pre>
 <p><img src="09_spot_ocba_files/figure-html/cell-11-output-1.png" width="600" height="449"></p>
 </div>
 </div>
-<ul>
-<li>The value of the nugget term can be extracted from the model as follows:</li>
-</ul>
+<p>The value of the nugget term can be extracted from the model as follows:</p>
 <div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>S.Lambda</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -560,39 +524,19 @@ x0: 0.1335999447536301</code></pre>
 <pre><code>9.088150066416743e-05</code></pre>
 </div>
 </div>
-<ul>
-<li>We see:
+<p>We see:</p>
 <ul>
 <li>the first model <code>S</code> has no nugget,</li>
 <li>whereas the second model has a nugget value (<code>Lambda</code>) larger than zero.</li>
-</ul></li>
 </ul>
 </section>
 </section>
 </section>
-<section id="exercises" class="level1" data-number="12">
-<h1 data-number="12"><span class="header-section-number">12</span> Exercises</h1>
-<ul>
-<li>Important:
-<ul>
-<li>Results from these exercises should be added to this document, i.e., you should submit an updated version of this notebook.</li>
-<li>Please combine your results using this notebook.</li>
-<li>Only one notebook from each group!</li>
-<li>Presentation is based on this notebook. No addtional slides are required!</li>
-<li>spotPython version <code>0.16.11</code> (or greater) is required (see http://www.gm.fh-koeln.de/~bartz/site/download/)</li>
-</ul></li>
-</ul>
-<section id="exercise-1" class="level2" data-number="12.1">
-<h2 data-number="12.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">12.1</span> Exercise 1</h2>
-<ul>
-<li>Each team member should choose one of the following optimization algorithms.</li>
-<li>Please add your name to the section title!</li>
-</ul>
-<section id="noisy-fun_cubed" class="level3" data-number="12.1.1">
-<h3 data-number="12.1.1" class="anchored" data-anchor-id="noisy-fun_cubed"><span class="header-section-number">12.1.1</span> 1. Noisy <code>fun_cubed</code></h3>
-<ul>
-<li>Analyse the effect of noise on the <code>fun_cubed</code> function with the following settings:</li>
-</ul>
+<section id="exercises" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="exercises"><span class="header-section-number">9.4</span> Exercises</h2>
+<section id="noisy-fun_cubed" class="level3" data-number="9.4.1">
+<h3 data-number="9.4.1" class="anchored" data-anchor-id="noisy-fun_cubed"><span class="header-section-number">9.4.1</span> Noisy <code>fun_cubed</code></h3>
+<p>Analyse the effect of noise on the <code>fun_cubed</code> function with the following settings:</p>
 <div class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> analytical().fun_cubed</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> {<span class="st">"sigma"</span>: <span class="dv">10</span>,</span>
@@ -601,11 +545,9 @@ x0: 0.1335999447536301</code></pre>
 <span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> np.array([<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fun_runge" class="level3" data-number="12.1.2">
-<h3 data-number="12.1.2" class="anchored" data-anchor-id="fun_runge"><span class="header-section-number">12.1.2</span> 2. <code>fun_runge</code></h3>
-<ul>
-<li>Analyse the effect of noise on the <code>fun_runge</code> function with the following settings:</li>
-</ul>
+<section id="fun_runge" class="level3" data-number="9.4.2">
+<h3 data-number="9.4.2" class="anchored" data-anchor-id="fun_runge"><span class="header-section-number">9.4.2</span> <code>fun_runge</code></h3>
+<p>Analyse the effect of noise on the <code>fun_runge</code> function with the following settings:</p>
 <div class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">10</span>])</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> np.array([<span class="dv">10</span>])</span>
@@ -614,11 +556,9 @@ x0: 0.1335999447536301</code></pre>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"seed"</span>: <span class="dv">123</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fun_forrester" class="level3" data-number="12.1.3">
-<h3 data-number="12.1.3" class="anchored" data-anchor-id="fun_forrester"><span class="header-section-number">12.1.3</span> 3. <code>fun_forrester</code></h3>
-<ul>
-<li>Analyse the effect of noise on the <code>fun_forrester</code> function with the following settings:</li>
-</ul>
+<section id="fun_forrester" class="level3" data-number="9.4.3">
+<h3 data-number="9.4.3" class="anchored" data-anchor-id="fun_forrester"><span class="header-section-number">9.4.3</span> <code>fun_forrester</code></h3>
+<p>Analyse the effect of noise on the <code>fun_forrester</code> function with the following settings:</p>
 <div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> np.array([<span class="dv">0</span>])</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> np.array([<span class="dv">1</span>])</span>
@@ -627,11 +567,9 @@ x0: 0.1335999447536301</code></pre>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"seed"</span>: <span class="dv">123</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fun_xsin" class="level3" data-number="12.1.4">
-<h3 data-number="12.1.4" class="anchored" data-anchor-id="fun_xsin"><span class="header-section-number">12.1.4</span> 4. <code>fun_xsin</code></h3>
-<ul>
-<li>Analyse the effect of noise on the <code>fun_xsin</code> function with the following settings:</li>
-</ul>
+<section id="fun_xsin" class="level3" data-number="9.4.4">
+<h3 data-number="9.4.4" class="anchored" data-anchor-id="fun_xsin"><span class="header-section-number">9.4.4</span> <code>fun_xsin</code></h3>
+<p>Analyse the effect of noise on the <code>fun_xsin</code> function with the following settings:</p>
 <div class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.</span>])</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> np.array([<span class="fl">1.</span>])</span>
@@ -647,7 +585,6 @@ x0: 0.1335999447536301</code></pre>
 </div>
 
 
-</section>
 </section>
 </section>
 
@@ -888,12 +825,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./08_spot_noisy.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning and Noise</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./10_spot_hpt_sklearn_classification.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

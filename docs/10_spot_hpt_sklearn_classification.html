@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hyperparameter-tuning Cookbook - 11&nbsp; Chapter 10: Sequential Parameter Optimization</title>
+<title>Hyperparameter-tuning Cookbook - 10&nbsp; Hyperparameter Tuning: sklearn</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -97,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 11&nbsp; Chapter 10: Sequential Parameter Optimization">
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 10&nbsp; Hyperparameter Tuning: sklearn">
 <meta name="twitter:description" content="">
 <meta name="twitter:card" content="summary">
 </head>
@@ -111,7 +111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10_spot_hpt_sklearn_classification.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10_spot_hpt_sklearn_classification.html"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -165,104 +165,92 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Using <code>sklearn</code> Surrogates in <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Using <code>scipy</code> Optimizers</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Gaussian Process Models</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expected Improvement</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning and Noise</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch wth cifar10 Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -281,33 +269,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#hyperparameter-tuning-sklearn" id="toc-hyperparameter-tuning-sklearn" class="nav-link active" data-scroll-target="#hyperparameter-tuning-sklearn"><span class="header-section-number">11.1</span> Hyperparameter Tuning: sklearn</a></li>
-  <li><a href="#initialization-of-the-empty-fun_control-dictionary" id="toc-initialization-of-the-empty-fun_control-dictionary" class="nav-link" data-scroll-target="#initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">11.2</span> 0. Initialization of the Empty <code>fun_control</code> Dictionary</a></li>
-  <li><a href="#load-data-classification" id="toc-load-data-classification" class="nav-link" data-scroll-target="#load-data-classification"><span class="header-section-number">11.3</span> 1. Load Data: Classification</a></li>
-  <li><a href="#specification-of-the-preprocessing-model" id="toc-specification-of-the-preprocessing-model" class="nav-link" data-scroll-target="#specification-of-the-preprocessing-model"><span class="header-section-number">11.4</span> 2. Specification of the Preprocessing Model</a></li>
-  <li><a href="#select-algorithm-and-core_model_hyper_dict" id="toc-select-algorithm-and-core_model_hyper_dict" class="nav-link" data-scroll-target="#select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">11.5</span> 3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></a></li>
-  <li><a href="#modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" id="toc-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="nav-link" data-scroll-target="#modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">11.6</span> 4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></a>
+  <li><a href="#step-1-initialization-of-the-empty-fun_control-dictionary" id="toc-step-1-initialization-of-the-empty-fun_control-dictionary" class="nav-link active" data-scroll-target="#step-1-initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">10.1</span> Step 1: Initialization of the Empty <code>fun_control</code> Dictionary</a></li>
+  <li><a href="#step-2-load-data-classification" id="toc-step-2-load-data-classification" class="nav-link" data-scroll-target="#step-2-load-data-classification"><span class="header-section-number">10.2</span> Step 2: Load Data (Classification)</a></li>
+  <li><a href="#step-3-specification-of-the-preprocessing-model" id="toc-step-3-specification-of-the-preprocessing-model" class="nav-link" data-scroll-target="#step-3-specification-of-the-preprocessing-model"><span class="header-section-number">10.3</span> Step 3: Specification of the Preprocessing Model</a></li>
+  <li><a href="#step-4-select-algorithm-and-core_model_hyper_dict" id="toc-step-4-select-algorithm-and-core_model_hyper_dict" class="nav-link" data-scroll-target="#step-4-select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">10.4</span> Step 4: Select <code>algorithm</code> and <code>core_model_hyper_dict</code></a></li>
+  <li><a href="#step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" id="toc-step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="nav-link" data-scroll-target="#step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">10.5</span> Step 5: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></a>
   <ul class="collapse">
-  <li><a href="#modify-hyperparameter-of-type-factor" id="toc-modify-hyperparameter-of-type-factor" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-factor"><span class="header-section-number">11.6.1</span> Modify hyperparameter of type factor</a></li>
-  <li><a href="#modify-hyperparameter-of-type-numeric-and-integer-boolean" id="toc-modify-hyperparameter-of-type-numeric-and-integer-boolean" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">11.6.2</span> Modify hyperparameter of type numeric and integer (boolean)</a></li>
+  <li><a href="#modify-hyperparameter-of-type-factor" id="toc-modify-hyperparameter-of-type-factor" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-factor"><span class="header-section-number">10.5.1</span> Modify hyperparameter of type factor</a></li>
+  <li><a href="#modify-hyperparameter-of-type-numeric-and-integer-boolean" id="toc-modify-hyperparameter-of-type-numeric-and-integer-boolean" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">10.5.2</span> Modify hyperparameter of type numeric and integer (boolean)</a></li>
   </ul></li>
-  <li><a href="#selection-of-the-objective-loss-function" id="toc-selection-of-the-objective-loss-function" class="nav-link" data-scroll-target="#selection-of-the-objective-loss-function"><span class="header-section-number">11.7</span> 5. Selection of the Objective (Loss) Function</a>
+  <li><a href="#step-6-selection-of-the-objective-loss-function" id="toc-step-6-selection-of-the-objective-loss-function" class="nav-link" data-scroll-target="#step-6-selection-of-the-objective-loss-function"><span class="header-section-number">10.6</span> Step 6: Selection of the Objective (Loss) Function</a>
   <ul class="collapse">
-  <li><a href="#predict-classes-or-class-probabilities" id="toc-predict-classes-or-class-probabilities" class="nav-link" data-scroll-target="#predict-classes-or-class-probabilities"><span class="header-section-number">11.7.1</span> Predict Classes or Class Probabilities</a></li>
+  <li><a href="#predict-classes-or-class-probabilities" id="toc-predict-classes-or-class-probabilities" class="nav-link" data-scroll-target="#predict-classes-or-class-probabilities"><span class="header-section-number">10.6.1</span> Predict Classes or Class Probabilities</a></li>
   </ul></li>
-  <li><a href="#calling-the-spot-function" id="toc-calling-the-spot-function" class="nav-link" data-scroll-target="#calling-the-spot-function"><span class="header-section-number">11.8</span> 6. Calling the SPOT Function</a>
+  <li><a href="#step-7-calling-the-spot-function" id="toc-step-7-calling-the-spot-function" class="nav-link" data-scroll-target="#step-7-calling-the-spot-function"><span class="header-section-number">10.7</span> Step 7: Calling the SPOT Function</a>
   <ul class="collapse">
-  <li><a href="#prepare-the-spot-parameters" id="toc-prepare-the-spot-parameters" class="nav-link" data-scroll-target="#prepare-the-spot-parameters"><span class="header-section-number">11.8.1</span> Prepare the SPOT Parameters</a></li>
-  <li><a href="#run-the-spot-optimizer" id="toc-run-the-spot-optimizer" class="nav-link" data-scroll-target="#run-the-spot-optimizer"><span class="header-section-number">11.8.2</span> Run the <code>Spot</code> Optimizer</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">11.8.3</span> 4 Results</a></li>
+  <li><a href="#prepare-the-spot-parameters" id="toc-prepare-the-spot-parameters" class="nav-link" data-scroll-target="#prepare-the-spot-parameters"><span class="header-section-number">10.7.1</span> Prepare the SPOT Parameters</a></li>
+  <li><a href="#run-the-spot-optimizer" id="toc-run-the-spot-optimizer" class="nav-link" data-scroll-target="#run-the-spot-optimizer"><span class="header-section-number">10.7.2</span> Run the <code>Spot</code> Optimizer</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">10.7.3</span> Results</a></li>
   </ul></li>
-  <li><a href="#show-variable-importance" id="toc-show-variable-importance" class="nav-link" data-scroll-target="#show-variable-importance"><span class="header-section-number">11.9</span> Show variable importance</a></li>
-  <li><a href="#get-default-hyperparameters" id="toc-get-default-hyperparameters" class="nav-link" data-scroll-target="#get-default-hyperparameters"><span class="header-section-number">11.10</span> Get Default Hyperparameters</a></li>
-  <li><a href="#get-spot-results" id="toc-get-spot-results" class="nav-link" data-scroll-target="#get-spot-results"><span class="header-section-number">11.11</span> Get SPOT Results</a></li>
-  <li><a href="#plot-compare-predictions" id="toc-plot-compare-predictions" class="nav-link" data-scroll-target="#plot-compare-predictions"><span class="header-section-number">11.12</span> Plot: Compare Predictions</a></li>
-  <li><a href="#detailed-hyperparameter-plots" id="toc-detailed-hyperparameter-plots" class="nav-link" data-scroll-target="#detailed-hyperparameter-plots"><span class="header-section-number">11.13</span> Detailed Hyperparameter Plots</a></li>
-  <li><a href="#parallel-coordinates-plot" id="toc-parallel-coordinates-plot" class="nav-link" data-scroll-target="#parallel-coordinates-plot"><span class="header-section-number">11.14</span> Parallel Coordinates Plot</a></li>
-  <li><a href="#plot-all-combinations-of-hyperparameters" id="toc-plot-all-combinations-of-hyperparameters" class="nav-link" data-scroll-target="#plot-all-combinations-of-hyperparameters"><span class="header-section-number">11.15</span> Plot all Combinations of Hyperparameters</a></li>
+  <li><a href="#show-variable-importance" id="toc-show-variable-importance" class="nav-link" data-scroll-target="#show-variable-importance"><span class="header-section-number">10.8</span> Show variable importance</a></li>
+  <li><a href="#get-default-hyperparameters" id="toc-get-default-hyperparameters" class="nav-link" data-scroll-target="#get-default-hyperparameters"><span class="header-section-number">10.9</span> Get Default Hyperparameters</a></li>
+  <li><a href="#get-spot-results" id="toc-get-spot-results" class="nav-link" data-scroll-target="#get-spot-results"><span class="header-section-number">10.10</span> Get SPOT Results</a></li>
+  <li><a href="#plot-compare-predictions" id="toc-plot-compare-predictions" class="nav-link" data-scroll-target="#plot-compare-predictions"><span class="header-section-number">10.11</span> Plot: Compare Predictions</a></li>
+  <li><a href="#detailed-hyperparameter-plots" id="toc-detailed-hyperparameter-plots" class="nav-link" data-scroll-target="#detailed-hyperparameter-plots"><span class="header-section-number">10.12</span> Detailed Hyperparameter Plots</a></li>
+  <li><a href="#parallel-coordinates-plot" id="toc-parallel-coordinates-plot" class="nav-link" data-scroll-target="#parallel-coordinates-plot"><span class="header-section-number">10.13</span> Parallel Coordinates Plot</a></li>
+  <li><a href="#plot-all-combinations-of-hyperparameters" id="toc-plot-all-combinations-of-hyperparameters" class="nav-link" data-scroll-target="#plot-all-combinations-of-hyperparameters"><span class="header-section-number">10.14</span> Plot all Combinations of Hyperparameters</a></li>
   </ul>
 </nav>
     </div>
@@ -316,7 +303,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></h1>
+<h1 class="title"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></h1>
 </div>
 
 
@@ -346,12 +333,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> experiment_name.replace(<span class="st">':'</span>, <span class="st">'-'</span>)</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>experiment_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="hyperparameter-tuning-sklearn" class="level2" data-number="11.1">
-<h2 data-number="11.1" class="anchored" data-anchor-id="hyperparameter-tuning-sklearn"><span class="header-section-number">11.1</span> Hyperparameter Tuning: sklearn</h2>
-<ul>
-<li>This notebook exemplifies hyperparameter tuning with SPOT (spotPython).</li>
-<li>The hyperparameter software SPOT was developed in R (statistical programming language), see Open Access book “Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide”, available here: <a href="https://link.springer.com/book/10.1007/978-981-19-5170-1">https://link.springer.com/book/10.1007/978-981-19-5170-1</a>.</li>
-</ul>
+<p>This notebook exemplifies hyperparameter tuning with SPOT (spotPython). The hyperparameter software SPOT was developed in R (statistical programming language), see Open Access book “Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide”, available here: <a href="https://link.springer.com/book/10.1007/978-981-19-5170-1">https://link.springer.com/book/10.1007/978-981-19-5170-1</a>.</p>
 <div class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -436,19 +418,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.hypersklearn <span class="im">import</span> HyperSklearn</span>
 <span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.metrics <span class="im">import</span> mapk, apk</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="initialization-of-the-empty-fun_control-dictionary" class="level2" data-number="11.2">
-<h2 data-number="11.2" class="anchored" data-anchor-id="initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">11.2</span> 0. Initialization of the Empty <code>fun_control</code> Dictionary</h2>
+<section id="step-1-initialization-of-the-empty-fun_control-dictionary" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="step-1-initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">10.1</span> Step 1: Initialization of the Empty <code>fun_control</code> Dictionary</h2>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    tensorboard_path<span class="op">=</span><span class="st">"runs/10_spot_hpt_sklearn_classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="load-data-classification" class="level2" data-number="11.3">
-<h2 data-number="11.3" class="anchored" data-anchor-id="load-data-classification"><span class="header-section-number">11.3</span> 1. Load Data: Classification</h2>
-<ul>
-<li>Randomly generate classification data.</li>
-</ul>
+<section id="step-2-load-data-classification" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="step-2-load-data-classification"><span class="header-section-number">10.2</span> Step 2: Load Data (Classification)</h2>
+<p>Randomly generate classification data.</p>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_features <span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="dv">250</span></span>
@@ -498,8 +477,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: target_column})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="specification-of-the-preprocessing-model" class="level2" data-number="11.4">
-<h2 data-number="11.4" class="anchored" data-anchor-id="specification-of-the-preprocessing-model"><span class="header-section-number">11.4</span> 2. Specification of the Preprocessing Model</h2>
+<section id="step-3-specification-of-the-preprocessing-model" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="step-3-specification-of-the-preprocessing-model"><span class="header-section-number">10.3</span> Step 3: Specification of the Preprocessing Model</h2>
 <p>Data preprocesssing can be very simple, e.g., you can ignore it. Then you would choose the <code>prep_model</code> “None”:</p>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
@@ -522,8 +501,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="select-algorithm-and-core_model_hyper_dict" class="level2" data-number="11.5">
-<h2 data-number="11.5" class="anchored" data-anchor-id="select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">11.5</span> 3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
+<section id="step-4-select-algorithm-and-core_model_hyper_dict" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="step-4-select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">10.4</span> Step 4: Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
 <p>The selection of the algorithm (ML model) that should be tuned is done by specifying the its name from the <code>sklearn</code> implementation. For example, the <code>SVC</code> support vector machine classifier is selected as follows:</p>
 <div class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model  = RidgeCV</span></span>
@@ -614,18 +593,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">}</span></span>
 <span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2" data-number="11.6">
-<h2 data-number="11.6" class="anchored" data-anchor-id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">11.6</span> 4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
-<section id="modify-hyperparameter-of-type-factor" class="level3" data-number="11.6.1">
-<h3 data-number="11.6.1" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">11.6.1</span> Modify hyperparameter of type factor</h3>
+<section id="step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2" data-number="10.5">
+<h2 data-number="10.5" class="anchored" data-anchor-id="step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">10.5</span> Step 5: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
+<section id="modify-hyperparameter-of-type-factor" class="level3" data-number="10.5.1">
+<h3 data-number="10.5.1" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">10.5.1</span> Modify hyperparameter of type factor</h3>
 <p>Factors can be modified with the <code>modify_hyper_parameter_levels</code> function. For example, to exclude the <code>sigmoid</code> kernel from the tuning, the <code>kernel</code> hyperparameter of the <code>SVC</code> model can be modified as follows:</p>
 <div class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_levels(fun_control, <span class="st">"kernel"</span>, [<span class="st">"linear"</span>, <span class="st">"poly"</span>, <span class="st">"rbf"</span>])</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">"core_model_hyper_dict"</span>][<span class="st">"kernel"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3" data-number="11.6.2">
-<h3 data-number="11.6.2" class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">11.6.2</span> Modify hyperparameter of type numeric and integer (boolean)</h3>
+<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3" data-number="10.5.2">
+<h3 data-number="10.5.2" class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">10.5.2</span> Modify hyperparameter of type numeric and integer (boolean)</h3>
 <p>Numeric and boolean values can be modified using the <code>modify_hyper_parameter_bounds</code> method. For example, to change the <code>tol</code> hyperparameter of the <code>SVC</code> model to the interval [1e-3, 1e-2], the following code can be used:</p>
 <div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"tol"</span>, bounds<span class="op">=</span>[<span class="fl">1e-3</span>, <span class="fl">1e-2</span>])</span>
@@ -635,8 +614,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="selection-of-the-objective-loss-function" class="level2" data-number="11.7">
-<h2 data-number="11.7" class="anchored" data-anchor-id="selection-of-the-objective-loss-function"><span class="header-section-number">11.7</span> 5. Selection of the Objective (Loss) Function</h2>
+<section id="step-6-selection-of-the-objective-loss-function" class="level2" data-number="10.6">
+<h2 data-number="10.6" class="anchored" data-anchor-id="step-6-selection-of-the-objective-loss-function"><span class="header-section-number">10.6</span> Step 6: Selection of the Objective (Loss) Function</h2>
 <p>There are two metrics:</p>
 <pre><code>1. `metric_river` is used for the river based evaluation via `eval_oml_iter_progressive`.
 2. `metric_sklearn` is used for the sklearn based evaluation.</code></pre>
@@ -661,8 +640,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>               <span class="co"># "metric_params": {"k": k},</span></span>
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="predict-classes-or-class-probabilities" class="level3" data-number="11.7.1">
-<h3 data-number="11.7.1" class="anchored" data-anchor-id="predict-classes-or-class-probabilities"><span class="header-section-number">11.7.1</span> Predict Classes or Class Probabilities</h3>
+<section id="predict-classes-or-class-probabilities" class="level3" data-number="10.6.1">
+<h3 data-number="10.6.1" class="anchored" data-anchor-id="predict-classes-or-class-probabilities"><span class="header-section-number">10.6.1</span> Predict Classes or Class Probabilities</h3>
 <p>If the key <code>"predict_proba"</code> is set to <code>True</code>, the class probabilities are predicted. <code>False</code> is the default, i.e., the classes are predicted.</p>
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
@@ -671,10 +650,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="calling-the-spot-function" class="level2" data-number="11.8">
-<h2 data-number="11.8" class="anchored" data-anchor-id="calling-the-spot-function"><span class="header-section-number">11.8</span> 6. Calling the SPOT Function</h2>
-<section id="prepare-the-spot-parameters" class="level3" data-number="11.8.1">
-<h3 data-number="11.8.1" class="anchored" data-anchor-id="prepare-the-spot-parameters"><span class="header-section-number">11.8.1</span> Prepare the SPOT Parameters</h3>
+<section id="step-7-calling-the-spot-function" class="level2" data-number="10.7">
+<h2 data-number="10.7" class="anchored" data-anchor-id="step-7-calling-the-spot-function"><span class="header-section-number">10.7</span> Step 7: Calling the SPOT Function</h2>
+<section id="prepare-the-spot-parameters" class="level3" data-number="10.7.1">
+<h3 data-number="10.7.1" class="anchored" data-anchor-id="prepare-the-spot-parameters"><span class="header-section-number">10.7.1</span> Prepare the SPOT Parameters</h3>
 <ul>
 <li>Get types and variable names as well as lower and upper bounds for the hyperparameters.</li>
 </ul>
@@ -691,8 +670,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="run-the-spot-optimizer" class="level3" data-number="11.8.2">
-<h3 data-number="11.8.2" class="anchored" data-anchor-id="run-the-spot-optimizer"><span class="header-section-number">11.8.2</span> Run the <code>Spot</code> Optimizer</h3>
+<section id="run-the-spot-optimizer" class="level3" data-number="10.7.2">
+<h3 data-number="10.7.2" class="anchored" data-anchor-id="run-the-spot-optimizer"><span class="header-section-number">10.7.2</span> Run the <code>Spot</code> Optimizer</h3>
 <ul>
 <li>Run SPOT for approx. x mins (<code>max_time</code>).</li>
 <li>Note: the run takes longer, because the evaluation time of initial design (here: <code>initi_size</code>, 20 points) is not considered.</li>
@@ -735,8 +714,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="results" class="level3" data-number="11.8.3">
-<h3 data-number="11.8.3" class="anchored" data-anchor-id="results"><span class="header-section-number">11.8.3</span> 4 Results</h3>
+<section id="results" class="level3" data-number="10.7.3">
+<h3 data-number="10.7.3" class="anchored" data-anchor-id="results"><span class="header-section-number">10.7.3</span> Results</h3>
 <div class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
@@ -757,22 +736,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<ul>
-<li>Print the Results</li>
-</ul>
+<p>Print the results.</p>
 <div class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-<section id="show-variable-importance" class="level2" data-number="11.9">
-<h2 data-number="11.9" class="anchored" data-anchor-id="show-variable-importance"><span class="header-section-number">11.9</span> Show variable importance</h2>
+<section id="show-variable-importance" class="level2" data-number="10.8">
+<h2 data-number="10.8" class="anchored" data-anchor-id="show-variable-importance"><span class="header-section-number">10.8</span> Show variable importance</h2>
 <div class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="get-default-hyperparameters" class="level2" data-number="11.10">
-<h2 data-number="11.10" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">11.10</span> Get Default Hyperparameters</h2>
+<section id="get-default-hyperparameters" class="level2" data-number="10.9">
+<h2 data-number="10.9" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">10.9</span> Get Default Hyperparameters</h2>
 <div class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> get_default_values(fun_control)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> transform_hyper_parameter_values(fun_control<span class="op">=</span>fun_control, hyper_parameter_values<span class="op">=</span>values_default)</span>
@@ -783,8 +760,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="get-spot-results" class="level2" data-number="11.11">
-<h2 data-number="11.11" class="anchored" data-anchor-id="get-spot-results"><span class="header-section-number">11.11</span> Get SPOT Results</h2>
+<section id="get-spot-results" class="level2" data-number="10.10">
+<h2 data-number="10.10" class="anchored" data-anchor-id="get-spot-results"><span class="header-section-number">10.10</span> Get SPOT Results</h2>
 <div class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -798,8 +775,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plot-compare-predictions" class="level2" data-number="11.12">
-<h2 data-number="11.12" class="anchored" data-anchor-id="plot-compare-predictions"><span class="header-section-number">11.12</span> Plot: Compare Predictions</h2>
+<section id="plot-compare-predictions" class="level2" data-number="10.11">
+<h2 data-number="10.11" class="anchored" data-anchor-id="plot-compare-predictions"><span class="header-section-number">10.11</span> Plot: Compare Predictions</h2>
 <div class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>plot_roc([model_default, model_spot], fun_control, model_names<span class="op">=</span>[<span class="st">"Default"</span>, <span class="st">"Spot"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -813,38 +790,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="bu">min</span>(spot_tuner.y), <span class="bu">max</span>(spot_tuner.y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="detailed-hyperparameter-plots" class="level2" data-number="11.13">
-<h2 data-number="11.13" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">11.13</span> Detailed Hyperparameter Plots</h2>
-<ul>
-<li>For productive use, you might want to select:
-<ul>
-<li><code>min_z=min(spot_tuner.y)</code> and</li>
-<li><code>max_z = max(spot_tuner.y)</code></li>
-</ul></li>
-<li>These settings are not so colorful as visualizations that use <code>None</code> for the ranges, but give better insights.</li>
-</ul>
+<section id="detailed-hyperparameter-plots" class="level2" data-number="10.12">
+<h2 data-number="10.12" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">10.12</span> Detailed Hyperparameter Plots</h2>
 <div class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>threshold <span class="op">=</span> <span class="fl">0.025</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>impo <span class="op">=</span> spot_tuner.print_importance(threshold<span class="op">=</span>threshold, print_screen<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>var_plots <span class="op">=</span> [i <span class="cf">for</span> i, x <span class="kw">in</span> <span class="bu">enumerate</span>(impo) <span class="cf">if</span> x[<span class="dv">1</span>] <span class="op">&gt;</span> threshold]</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>min_z <span class="op">=</span> <span class="bu">min</span>(spot_tuner.y)</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>max_z <span class="op">=</span> <span class="bu">max</span>(spot_tuner.y)</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> spot_tuner.k</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> var_plots:</span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> var_plots:</span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">&gt;</span> i:</span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>            filename <span class="op">=</span> <span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_contour_"</span><span class="op">+</span><span class="bu">str</span>(i)<span class="op">+</span><span class="st">"_"</span><span class="op">+</span><span class="bu">str</span>(j)<span class="op">+</span><span class="st">".pdf"</span></span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z, filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="parallel-coordinates-plot" class="level2" data-number="11.14">
-<h2 data-number="11.14" class="anchored" data-anchor-id="parallel-coordinates-plot"><span class="header-section-number">11.14</span> Parallel Coordinates Plot</h2>
+<section id="parallel-coordinates-plot" class="level2" data-number="10.13">
+<h2 data-number="10.13" class="anchored" data-anchor-id="parallel-coordinates-plot"><span class="header-section-number">10.13</span> Parallel Coordinates Plot</h2>
 <div class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plot-all-combinations-of-hyperparameters" class="level2" data-number="11.15">
-<h2 data-number="11.15" class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters"><span class="header-section-number">11.15</span> Plot all Combinations of Hyperparameters</h2>
+<section id="plot-all-combinations-of-hyperparameters" class="level2" data-number="10.14">
+<h2 data-number="10.14" class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters"><span class="header-section-number">10.14</span> Plot all Combinations of Hyperparameters</h2>
 <ul>
 <li>Warning: this may take a while.</li>
 </ul>
@@ -1097,12 +1057,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./09_spot_ocba.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./11_spot_hpt_torch_fashion_mnist.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

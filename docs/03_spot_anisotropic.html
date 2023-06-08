@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hyperparameter-tuning Cookbook - 4&nbsp; Introduction to Sequential Parameter Optimization</title>
+<title>Hyperparameter-tuning Cookbook - 3&nbsp; Isotropic and Anisotropic Kriging</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -99,7 +99,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
-<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 4&nbsp; Introduction to Sequential Parameter Optimization">
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 3&nbsp; Isotropic and Anisotropic Kriging">
 <meta name="twitter:image" content="03_spot_anisotropic_files/figure-html/cell-6-output-1.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -113,7 +113,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03_spot_anisotropic.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./03_spot_anisotropic.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -167,104 +167,92 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Using <code>sklearn</code> Surrogates in <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Using <code>scipy</code> Optimizers</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Gaussian Process Models</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expected Improvement</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning and Noise</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch wth cifar10 Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -283,32 +271,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#isotropic-and-anisotropic-kriging" id="toc-isotropic-and-anisotropic-kriging" class="nav-link active" data-scroll-target="#isotropic-and-anisotropic-kriging"><span class="header-section-number">4.1</span> Isotropic and Anisotropic Kriging</a></li>
-  <li><a href="#example-isotropic-spot-surrogate-and-the-2-dim-sphere-function" id="toc-example-isotropic-spot-surrogate-and-the-2-dim-sphere-function" class="nav-link" data-scroll-target="#example-isotropic-spot-surrogate-and-the-2-dim-sphere-function"><span class="header-section-number">4.2</span> 1 Example: Isotropic <code>Spot</code> Surrogate and the 2-dim Sphere Function</a>
+  <li><a href="#example-isotropic-spot-surrogate-and-the-2-dim-sphere-function" id="toc-example-isotropic-spot-surrogate-and-the-2-dim-sphere-function" class="nav-link active" data-scroll-target="#example-isotropic-spot-surrogate-and-the-2-dim-sphere-function"><span class="header-section-number">3.1</span> Example: Isotropic <code>Spot</code> Surrogate and the 2-dim Sphere Function</a>
   <ul class="collapse">
-  <li><a href="#the-objective-function-2-dim-sphere" id="toc-the-objective-function-2-dim-sphere" class="nav-link" data-scroll-target="#the-objective-function-2-dim-sphere"><span class="header-section-number">4.2.1</span> The Objective Function: 2-dim Sphere</a></li>
-  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">4.2.2</span> Results</a></li>
+  <li><a href="#the-objective-function-2-dim-sphere" id="toc-the-objective-function-2-dim-sphere" class="nav-link" data-scroll-target="#the-objective-function-2-dim-sphere"><span class="header-section-number">3.1.1</span> The Objective Function: 2-dim Sphere</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">3.1.2</span> Results</a></li>
   </ul></li>
-  <li><a href="#same-but-with-anisotropic-kriging" id="toc-same-but-with-anisotropic-kriging" class="nav-link" data-scroll-target="#same-but-with-anisotropic-kriging"><span class="header-section-number">4.3</span> 2 Same, but with anisotropic Kriging</a>
+  <li><a href="#example-with-anisotropic-kriging" id="toc-example-with-anisotropic-kriging" class="nav-link" data-scroll-target="#example-with-anisotropic-kriging"><span class="header-section-number">3.2</span> Example With Anisotropic Kriging</a>
   <ul class="collapse">
-  <li><a href="#taking-a-look-at-the-theta-values" id="toc-taking-a-look-at-the-theta-values" class="nav-link" data-scroll-target="#taking-a-look-at-the-theta-values"><span class="header-section-number">4.3.1</span> Taking a Look at the <code>theta</code> Values</a></li>
+  <li><a href="#taking-a-look-at-the-theta-values" id="toc-taking-a-look-at-the-theta-values" class="nav-link" data-scroll-target="#taking-a-look-at-the-theta-values"><span class="header-section-number">3.2.1</span> Taking a Look at the <code>theta</code> Values</a></li>
   </ul></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5</span> Exercises</a>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">4</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">5.1</span> Exercise 1</a>
-  <ul class="collapse">
-  <li><a href="#fun_branin" id="toc-fun_branin" class="nav-link" data-scroll-target="#fun_branin"><span class="header-section-number">5.1.1</span> 1. <code>fun_branin</code></a></li>
-  <li><a href="#fun_sin_cos" id="toc-fun_sin_cos" class="nav-link" data-scroll-target="#fun_sin_cos"><span class="header-section-number">5.1.2</span> 2. <code>fun_sin_cos</code></a></li>
-  <li><a href="#fun_runge" id="toc-fun_runge" class="nav-link" data-scroll-target="#fun_runge"><span class="header-section-number">5.1.3</span> 3. <code>fun_runge</code></a></li>
-  <li><a href="#fun_wingwt" id="toc-fun_wingwt" class="nav-link" data-scroll-target="#fun_wingwt"><span class="header-section-number">5.1.4</span> 4. <code>fun_wingwt</code></a></li>
-  </ul></li>
-  </ul></li>
-  <li><a href="#solutions" id="toc-solutions" class="nav-link" data-scroll-target="#solutions"><span class="header-section-number">6</span> Solutions</a>
-  <ul class="collapse">
-  <li><a href="#fun_branin-1" id="toc-fun_branin-1" class="nav-link" data-scroll-target="#fun_branin-1"><span class="header-section-number">6.0.1</span> 1. <code>fun_branin</code></a></li>
-  <li><a href="#fun_sin_cos-1" id="toc-fun_sin_cos-1" class="nav-link" data-scroll-target="#fun_sin_cos-1"><span class="header-section-number">6.0.2</span> 2. <code>fun_sin_cos</code></a></li>
-  <li><a href="#fun_runge-1" id="toc-fun_runge-1" class="nav-link" data-scroll-target="#fun_runge-1"><span class="header-section-number">6.0.3</span> 3. <code>fun_runge</code></a></li>
-  <li><a href="#fun_wingwt-1" id="toc-fun_wingwt-1" class="nav-link" data-scroll-target="#fun_wingwt-1"><span class="header-section-number">6.0.4</span> 4. <code>fun_wingwt</code></a></li>
+  <li><a href="#fun_branin" id="toc-fun_branin" class="nav-link" data-scroll-target="#fun_branin"><span class="header-section-number">4.1</span> <code>fun_branin</code></a></li>
+  <li><a href="#fun_sin_cos" id="toc-fun_sin_cos" class="nav-link" data-scroll-target="#fun_sin_cos"><span class="header-section-number">4.2</span> <code>fun_sin_cos</code></a></li>
+  <li><a href="#fun_runge" id="toc-fun_runge" class="nav-link" data-scroll-target="#fun_runge"><span class="header-section-number">4.3</span> <code>fun_runge</code></a></li>
+  <li><a href="#fun_wingwt" id="toc-fun_wingwt" class="nav-link" data-scroll-target="#fun_wingwt"><span class="header-section-number">4.4</span> <code>fun_wingwt</code></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -318,7 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></h1>
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></h1>
 </div>
 
 
@@ -333,11 +310,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="isotropic-and-anisotropic-kriging" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="isotropic-and-anisotropic-kriging"><span class="header-section-number">4.1</span> Isotropic and Anisotropic Kriging</h2>
-</section>
-<section id="example-isotropic-spot-surrogate-and-the-2-dim-sphere-function" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="example-isotropic-spot-surrogate-and-the-2-dim-sphere-function"><span class="header-section-number">4.2</span> 1 Example: Isotropic <code>Spot</code> Surrogate and the 2-dim Sphere Function</h2>
+<section id="example-isotropic-spot-surrogate-and-the-2-dim-sphere-function" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="example-isotropic-spot-surrogate-and-the-2-dim-sphere-function"><span class="header-section-number">3.1</span> Example: Isotropic <code>Spot</code> Surrogate and the 2-dim Sphere Function</h2>
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
@@ -348,8 +322,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> differential_evolution</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="the-objective-function-2-dim-sphere" class="level3" data-number="4.2.1">
-<h3 data-number="4.2.1" class="anchored" data-anchor-id="the-objective-function-2-dim-sphere"><span class="header-section-number">4.2.1</span> The Objective Function: 2-dim Sphere</h3>
+<section id="the-objective-function-2-dim-sphere" class="level3" data-number="3.1.1">
+<h3 data-number="3.1.1" class="anchored" data-anchor-id="the-objective-function-2-dim-sphere"><span class="header-section-number">3.1.1</span> The Objective Function: 2-dim Sphere</h3>
 <ul>
 <li>The <code>spotPython</code> package provides several classes of objective functions.</li>
 <li>We will use an analytical objective function, i.e., a function that can be described by a (closed) formula: <span class="math display">\[f(x, y) = x^2 + y^2\]</span></li>
@@ -370,12 +344,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>spot_2.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x28c49b940&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x17f85f880&gt;</code></pre>
 </div>
 </div>
 </section>
-<section id="results" class="level3" data-number="4.2.2">
-<h3 data-number="4.2.2" class="anchored" data-anchor-id="results"><span class="header-section-number">4.2.2</span> Results</h3>
+<section id="results" class="level3" data-number="3.1.2">
+<h3 data-number="3.1.2" class="anchored" data-anchor-id="results"><span class="header-section-number">3.1.2</span> Results</h3>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spot_2.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -395,8 +369,8 @@ x1: 0.00428428640184529</code></pre>
 </div>
 </section>
 </section>
-<section id="same-but-with-anisotropic-kriging" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="same-but-with-anisotropic-kriging"><span class="header-section-number">4.3</span> 2 Same, but with anisotropic Kriging</h2>
+<section id="example-with-anisotropic-kriging" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="example-with-anisotropic-kriging"><span class="header-section-number">3.2</span> Example With Anisotropic Kriging</h2>
 <ul>
 <li>The default parameter setting of <code>spotPython</code>’s Kriging surrogate uses the same <code>theta</code> value for every dimension.</li>
 <li>This is referred to as “using an isotropic kernel”.</li>
@@ -411,11 +385,11 @@ x1: 0.00428428640184529</code></pre>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"n_theta"</span>: <span class="dv">2</span>})</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>spot_2_anisotropic.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x28e79fb80&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x17fca8bb0&gt;</code></pre>
 </div>
 </div>
-<section id="taking-a-look-at-the-theta-values" class="level3" data-number="4.3.1">
-<h3 data-number="4.3.1" class="anchored" data-anchor-id="taking-a-look-at-the-theta-values"><span class="header-section-number">4.3.1</span> Taking a Look at the <code>theta</code> Values</h3>
+<section id="taking-a-look-at-the-theta-values" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="taking-a-look-at-the-theta-values"><span class="header-section-number">3.2.1</span> Taking a Look at the <code>theta</code> Values</h3>
 <ul>
 <li>We can check, whether one or several <code>theta</code> values were used.</li>
 <li>The <code>theta</code> values from the surrogate can be printed as follows:</li>
@@ -463,26 +437,10 @@ x1: -0.0013318658594137815</code></pre>
 </div>
 </section>
 </section>
-<section id="exercises" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Exercises</h1>
-<ul>
-<li>Important:
-<ul>
-<li>Results from these exercises should be added to this document, i.e., you should submit an updated version of this notebook.</li>
-<li>Please combine your results using this notebook.</li>
-<li>Only one notebook from each group!</li>
-<li>Presentation is based on this notebook. No addtional slides are required!</li>
-<li>spotPython version <code>0.16.11</code> (or greater) is required (see http://www.gm.fh-koeln.de/~bartz/site/download/)</li>
-</ul></li>
-</ul>
-<section id="exercise-1" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">5.1</span> Exercise 1</h2>
-<ul>
-<li>Each team member should choose one of the following objective functions.</li>
-<li>Please add your name to the section title!</li>
-</ul>
-<section id="fun_branin" class="level3" data-number="5.1.1">
-<h3 data-number="5.1.1" class="anchored" data-anchor-id="fun_branin"><span class="header-section-number">5.1.1</span> 1. <code>fun_branin</code></h3>
+<section id="exercises" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Exercises</h1>
+<section id="fun_branin" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="fun_branin"><span class="header-section-number">4.1</span> <code>fun_branin</code></h2>
 <ul>
 <li>Describe the function.
 <ul>
@@ -496,8 +454,8 @@ x1: -0.0013318658594137815</code></pre>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>max_time<span class="op">=</span><span class="dv">1</span>,</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fun_sin_cos" class="level3" data-number="5.1.2">
-<h3 data-number="5.1.2" class="anchored" data-anchor-id="fun_sin_cos"><span class="header-section-number">5.1.2</span> 2. <code>fun_sin_cos</code></h3>
+<section id="fun_sin_cos" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="fun_sin_cos"><span class="header-section-number">4.2</span> <code>fun_sin_cos</code></h2>
 <ul>
 <li>Describe the function.
 <ul>
@@ -507,8 +465,8 @@ x1: -0.0013318658594137815</code></pre>
 <li>Modify the termination criterion (<code>max_time</code> instead of <code>fun_evals</code>) as described for <code>fun_branin</code>.</li>
 </ul>
 </section>
-<section id="fun_runge" class="level3" data-number="5.1.3">
-<h3 data-number="5.1.3" class="anchored" data-anchor-id="fun_runge"><span class="header-section-number">5.1.3</span> 3. <code>fun_runge</code></h3>
+<section id="fun_runge" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="fun_runge"><span class="header-section-number">4.3</span> <code>fun_runge</code></h2>
 <ul>
 <li>Describe the function.
 <ul>
@@ -518,8 +476,8 @@ x1: -0.0013318658594137815</code></pre>
 <li>Modify the termination criterion (<code>max_time</code> instead of <code>fun_evals</code>) as described for <code>fun_branin</code>.</li>
 </ul>
 </section>
-<section id="fun_wingwt" class="level3" data-number="5.1.4">
-<h3 data-number="5.1.4" class="anchored" data-anchor-id="fun_wingwt"><span class="header-section-number">5.1.4</span> 4. <code>fun_wingwt</code></h3>
+<section id="fun_wingwt" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="fun_wingwt"><span class="header-section-number">4.4</span> <code>fun_wingwt</code></h2>
 <ul>
 <li>Describe the function.
 <ul>
@@ -528,22 +486,6 @@ x1: -0.0013318658594137815</code></pre>
 <li>Compare the results from <code>spotPython</code> run a) with isotropic and b) anisotropic surrogate models.</li>
 <li>Modify the termination criterion (<code>max_time</code> instead of <code>fun_evals</code>) as described for <code>fun_branin</code>.</li>
 </ul>
-</section>
-</section>
-</section>
-<section id="solutions" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Solutions</h1>
-<section id="fun_branin-1" class="level3" data-number="6.0.1">
-<h3 data-number="6.0.1" class="anchored" data-anchor-id="fun_branin-1"><span class="header-section-number">6.0.1</span> 1. <code>fun_branin</code></h3>
-</section>
-<section id="fun_sin_cos-1" class="level3" data-number="6.0.2">
-<h3 data-number="6.0.2" class="anchored" data-anchor-id="fun_sin_cos-1"><span class="header-section-number">6.0.2</span> 2. <code>fun_sin_cos</code></h3>
-</section>
-<section id="fun_runge-1" class="level3" data-number="6.0.3">
-<h3 data-number="6.0.3" class="anchored" data-anchor-id="fun_runge-1"><span class="header-section-number">6.0.3</span> 3. <code>fun_runge</code></h3>
-</section>
-<section id="fun_wingwt-1" class="level3" data-number="6.0.4">
-<h3 data-number="6.0.4" class="anchored" data-anchor-id="fun_wingwt-1"><span class="header-section-number">6.0.4</span> 4. <code>fun_wingwt</code></h3>
 
 
 </section>
@@ -786,12 +728,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./02_spot_multidim.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./04_spot_sklearn_surrogate.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Using <code>sklearn</code> Surrogates in <code>spotPython</code></span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

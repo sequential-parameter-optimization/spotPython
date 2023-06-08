@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hyperparameter-tuning Cookbook - 7&nbsp; Sequential Parameter Optimization</title>
+<title>Hyperparameter-tuning Cookbook - 6&nbsp; Sequential Parameter Optimization: Gaussian Process Models</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -97,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 7&nbsp; Sequential Parameter Optimization">
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 6&nbsp; Sequential Parameter Optimization: Gaussian Process Models">
 <meta name="twitter:image" content="06_spot_gaussian_files/figure-html/cell-5-output-1.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -111,7 +111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06_spot_gaussian.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06_spot_gaussian.html"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization:  Gaussian Process Models</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -165,104 +165,92 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
   <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Multi-dimensional Functions</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Isotropic and Anisotropic Kriging</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Using <code>sklearn</code> Surrogates in <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Using <code>scipy</code> Optimizers</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Gaussian Process Models</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expected Improvement</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning and Noise</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Handling Noise: Optimal Computational Budget Allocation in <code>Spot</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch wth cifar10 Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./summary.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -281,32 +269,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#gaussian-process-models" id="toc-gaussian-process-models" class="nav-link active" data-scroll-target="#gaussian-process-models"><span class="header-section-number">7.1</span> Gaussian Process Models</a></li>
-  <li><a href="#gaussian-processes-regression-basic-introductory-scikit-learn-example" id="toc-gaussian-processes-regression-basic-introductory-scikit-learn-example" class="nav-link" data-scroll-target="#gaussian-processes-regression-basic-introductory-scikit-learn-example"><span class="header-section-number">7.2</span> 1 Gaussian Processes Regression: Basic Introductory <code>scikit-learn</code> Example</a>
+  <li><a href="#gaussian-processes-regression-basic-introductory-scikit-learn-example" id="toc-gaussian-processes-regression-basic-introductory-scikit-learn-example" class="nav-link active" data-scroll-target="#gaussian-processes-regression-basic-introductory-scikit-learn-example"><span class="header-section-number">6.1</span> Gaussian Processes Regression: Basic Introductory <code>scikit-learn</code> Example</a>
   <ul class="collapse">
-  <li><a href="#train-and-test-data" id="toc-train-and-test-data" class="nav-link" data-scroll-target="#train-and-test-data"><span class="header-section-number">7.2.1</span> Train and Test Data</a></li>
-  <li><a href="#building-the-surrogate-with-sklearn" id="toc-building-the-surrogate-with-sklearn" class="nav-link" data-scroll-target="#building-the-surrogate-with-sklearn"><span class="header-section-number">7.2.2</span> Building the Surrogate With <code>Sklearn</code></a></li>
-  <li><a href="#plotting-the-sklearnmodel" id="toc-plotting-the-sklearnmodel" class="nav-link" data-scroll-target="#plotting-the-sklearnmodel"><span class="header-section-number">7.2.3</span> Plotting the <code>Sklearn</code>Model</a></li>
-  <li><a href="#the-spotpython-version" id="toc-the-spotpython-version" class="nav-link" data-scroll-target="#the-spotpython-version"><span class="header-section-number">7.2.4</span> The <code>spotPython</code> Version</a></li>
-  <li><a href="#visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits" id="toc-visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits" class="nav-link" data-scroll-target="#visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits"><span class="header-section-number">7.2.5</span> Visualizing the Differences Between the <code>spotPython</code> and the <code>sklearn</code> Model Fits</a></li>
+  <li><a href="#train-and-test-data" id="toc-train-and-test-data" class="nav-link" data-scroll-target="#train-and-test-data"><span class="header-section-number">6.1.1</span> Train and Test Data</a></li>
+  <li><a href="#building-the-surrogate-with-sklearn" id="toc-building-the-surrogate-with-sklearn" class="nav-link" data-scroll-target="#building-the-surrogate-with-sklearn"><span class="header-section-number">6.1.2</span> Building the Surrogate With <code>Sklearn</code></a></li>
+  <li><a href="#plotting-the-sklearnmodel" id="toc-plotting-the-sklearnmodel" class="nav-link" data-scroll-target="#plotting-the-sklearnmodel"><span class="header-section-number">6.1.3</span> Plotting the <code>Sklearn</code>Model</a></li>
+  <li><a href="#the-spotpython-version" id="toc-the-spotpython-version" class="nav-link" data-scroll-target="#the-spotpython-version"><span class="header-section-number">6.1.4</span> The <code>spotPython</code> Version</a></li>
+  <li><a href="#visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits" id="toc-visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits" class="nav-link" data-scroll-target="#visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits"><span class="header-section-number">6.1.5</span> Visualizing the Differences Between the <code>spotPython</code> and the <code>sklearn</code> Model Fits</a></li>
   </ul></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">8</span> Exercises</a>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">8.1</span> Exercise 1</a>
-  <ul class="collapse">
-  <li><a href="#schonlau-example-function" id="toc-schonlau-example-function" class="nav-link" data-scroll-target="#schonlau-example-function"><span class="header-section-number">8.1.1</span> 1. <code>Schonlau Example Function</code></a></li>
-  <li><a href="#forrester-example-function" id="toc-forrester-example-function" class="nav-link" data-scroll-target="#forrester-example-function"><span class="header-section-number">8.1.2</span> 2. <code>Forrester Example Function</code></a></li>
-  <li><a href="#fun_runge-function-1-dim" id="toc-fun_runge-function-1-dim" class="nav-link" data-scroll-target="#fun_runge-function-1-dim"><span class="header-section-number">8.1.3</span> 3.<code>fun_runge Function (1-dim)</code></a></li>
-  <li><a href="#fun_cubed-1-dim" id="toc-fun_cubed-1-dim" class="nav-link" data-scroll-target="#fun_cubed-1-dim"><span class="header-section-number">8.1.4</span> 4. <code>fun_cubed (1-dim)</code></a></li>
-  </ul></li>
-  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2"><span class="header-section-number">8.2</span> Exercise 2</a></li>
-  </ul></li>
-  <li><a href="#solutions" id="toc-solutions" class="nav-link" data-scroll-target="#solutions"><span class="header-section-number">9</span> Solutions</a>
-  <ul class="collapse">
-  <li><a href="#schonlau-example-function-1" id="toc-schonlau-example-function-1" class="nav-link" data-scroll-target="#schonlau-example-function-1"><span class="header-section-number">9.0.1</span> 1. <code>Schonlau Example Function</code></a></li>
-  <li><a href="#forrester-example-function-1" id="toc-forrester-example-function-1" class="nav-link" data-scroll-target="#forrester-example-function-1"><span class="header-section-number">9.0.2</span> 2. <code>Forrester Example Function</code></a></li>
-  <li><a href="#fun_runge-function-1-dim-1" id="toc-fun_runge-function-1-dim-1" class="nav-link" data-scroll-target="#fun_runge-function-1-dim-1"><span class="header-section-number">9.0.3</span> 3.<code>fun_runge Function (1-dim)</code></a></li>
-  <li><a href="#fun_cubed-1-dim-1" id="toc-fun_cubed-1-dim-1" class="nav-link" data-scroll-target="#fun_cubed-1-dim-1"><span class="header-section-number">9.0.4</span> 4. <code>fun_cubed (1-dim)</code></a></li>
+  <li><a href="#schonlau-example-function" id="toc-schonlau-example-function" class="nav-link" data-scroll-target="#schonlau-example-function"><span class="header-section-number">7.1</span> <code>Schonlau Example Function</code></a></li>
+  <li><a href="#forrester-example-function" id="toc-forrester-example-function" class="nav-link" data-scroll-target="#forrester-example-function"><span class="header-section-number">7.2</span> <code>Forrester Example Function</code></a></li>
+  <li><a href="#fun_runge-function-1-dim" id="toc-fun_runge-function-1-dim" class="nav-link" data-scroll-target="#fun_runge-function-1-dim"><span class="header-section-number">7.3</span> <code>fun_runge Function (1-dim)</code></a></li>
+  <li><a href="#fun_cubed-1-dim" id="toc-fun_cubed-1-dim" class="nav-link" data-scroll-target="#fun_cubed-1-dim"><span class="header-section-number">7.4</span> <code>fun_cubed (1-dim)</code></a></li>
+  <li><a href="#the-effect-of-noise" id="toc-the-effect-of-noise" class="nav-link" data-scroll-target="#the-effect-of-noise"><span class="header-section-number">7.5</span> The Effect of Noise</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -316,7 +293,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></h1>
+<h1 class="title"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Gaussian Process Models</span></h1>
 </div>
 
 
@@ -331,8 +308,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="gaussian-process-models" class="level2" data-number="7.1">
-<h2 data-number="7.1" class="anchored" data-anchor-id="gaussian-process-models"><span class="header-section-number">7.1</span> Gaussian Process Models</h2>
 <ul>
 <li>This notebook analyzes differences between
 <ul>
@@ -355,16 +330,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.gaussian_process <span class="im">import</span> GaussianProcessRegressor</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.gaussian_process.kernels <span class="im">import</span> RBF</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="gaussian-processes-regression-basic-introductory-scikit-learn-example" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="gaussian-processes-regression-basic-introductory-scikit-learn-example"><span class="header-section-number">7.2</span> 1 Gaussian Processes Regression: Basic Introductory <code>scikit-learn</code> Example</h2>
+<section id="gaussian-processes-regression-basic-introductory-scikit-learn-example" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="gaussian-processes-regression-basic-introductory-scikit-learn-example"><span class="header-section-number">6.1</span> Gaussian Processes Regression: Basic Introductory <code>scikit-learn</code> Example</h2>
 <ul>
 <li><p>This is the example from <a href="https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html">scikit-learn: https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html</a></p></li>
 <li><p>After fitting our model, we see that the hyperparameters of the kernel have been optimized.</p></li>
 <li><p>Now, we will use our kernel to compute the mean prediction of the full dataset and plot the 95% confidence interval.</p></li>
 </ul>
-<section id="train-and-test-data" class="level3" data-number="7.2.1">
-<h3 data-number="7.2.1" class="anchored" data-anchor-id="train-and-test-data"><span class="header-section-number">7.2.1</span> Train and Test Data</h3>
+<section id="train-and-test-data" class="level3" data-number="6.1.1">
+<h3 data-number="6.1.1" class="anchored" data-anchor-id="train-and-test-data"><span class="header-section-number">6.1.1</span> Train and Test Data</h3>
 <div class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.linspace(start<span class="op">=</span><span class="dv">0</span>, stop<span class="op">=</span><span class="dv">10</span>, num<span class="op">=</span><span class="dv">1_000</span>).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.squeeze(X <span class="op">*</span> np.sin(X))</span>
@@ -373,8 +347,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X_train, y_train <span class="op">=</span> X[training_indices], y[training_indices]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="building-the-surrogate-with-sklearn" class="level3" data-number="7.2.2">
-<h3 data-number="7.2.2" class="anchored" data-anchor-id="building-the-surrogate-with-sklearn"><span class="header-section-number">7.2.2</span> Building the Surrogate With <code>Sklearn</code></h3>
+<section id="building-the-surrogate-with-sklearn" class="level3" data-number="6.1.2">
+<h3 data-number="6.1.2" class="anchored" data-anchor-id="building-the-surrogate-with-sklearn"><span class="header-section-number">6.1.2</span> Building the Surrogate With <code>Sklearn</code></h3>
 <ul>
 <li>The model building with <code>sklearn</code> consisits of three steps:
 <ol type="1">
@@ -390,8 +364,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>mean_prediction, std_prediction <span class="op">=</span> gaussian_process.predict(X, return_std<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plotting-the-sklearnmodel" class="level3" data-number="7.2.3">
-<h3 data-number="7.2.3" class="anchored" data-anchor-id="plotting-the-sklearnmodel"><span class="header-section-number">7.2.3</span> Plotting the <code>Sklearn</code>Model</h3>
+<section id="plotting-the-sklearnmodel" class="level3" data-number="6.1.3">
+<h3 data-number="6.1.3" class="anchored" data-anchor-id="plotting-the-sklearnmodel"><span class="header-section-number">6.1.3</span> Plotting the <code>Sklearn</code>Model</h3>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>plt.plot(X, y, label<span class="op">=</span><span class="vs">r"$f(x) = x \sin(x)$"</span>, linestyle<span class="op">=</span><span class="st">"dotted"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(X_train, y_train, label<span class="op">=</span><span class="st">"Observations"</span>)</span>
@@ -412,8 +386,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="the-spotpython-version" class="level3" data-number="7.2.4">
-<h3 data-number="7.2.4" class="anchored" data-anchor-id="the-spotpython-version"><span class="header-section-number">7.2.4</span> The <code>spotPython</code> Version</h3>
+<section id="the-spotpython-version" class="level3" data-number="6.1.4">
+<h3 data-number="6.1.4" class="anchored" data-anchor-id="the-spotpython-version"><span class="header-section-number">6.1.4</span> The <code>spotPython</code> Version</h3>
 <ul>
 <li>The <code>spotPython</code> version is very similar:
 <ol type="1">
@@ -447,8 +421,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits" class="level3" data-number="7.2.5">
-<h3 data-number="7.2.5" class="anchored" data-anchor-id="visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits"><span class="header-section-number">7.2.5</span> Visualizing the Differences Between the <code>spotPython</code> and the <code>sklearn</code> Model Fits</h3>
+<section id="visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits" class="level3" data-number="6.1.5">
+<h3 data-number="6.1.5" class="anchored" data-anchor-id="visualizing-the-differences-between-the-spotpython-and-the-sklearn-model-fits"><span class="header-section-number">6.1.5</span> Visualizing the Differences Between the <code>spotPython</code> and the <code>sklearn</code> Model Fits</h3>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plt.plot(X, y, label<span class="op">=</span><span class="vs">r"$f(x) = x \sin(x)$"</span>, linestyle<span class="op">=</span><span class="st">"dotted"</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(X_train, y_train, label<span class="op">=</span><span class="st">"Observations"</span>)</span>
@@ -464,26 +438,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="exercises" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Exercises</h1>
-<ul>
-<li>Important:
-<ul>
-<li>Results from these exercises should be added to this document, i.e., you should submit an updated version of this notebook.</li>
-<li>Please combine your results using this notebook.</li>
-<li>Only one notebook from each group!</li>
-<li>Presentation is based on this notebook. No addtional slides are required!</li>
-<li>spotPython version <code>0.16.11</code> (or greater) is required (see http://www.gm.fh-koeln.de/~bartz/site/download/)</li>
-</ul></li>
-</ul>
-<section id="exercise-1" class="level2" data-number="8.1">
-<h2 data-number="8.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">8.1</span> Exercise 1</h2>
-<ul>
-<li>Each team member should choose one of the following functions and repeat the experiments from above.</li>
-<li>Please add your name to the section title!</li>
-</ul>
-<section id="schonlau-example-function" class="level3" data-number="8.1.1">
-<h3 data-number="8.1.1" class="anchored" data-anchor-id="schonlau-example-function"><span class="header-section-number">8.1.1</span> 1. <code>Schonlau Example Function</code></h3>
+<section id="exercises" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Exercises</h1>
+<section id="schonlau-example-function" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="schonlau-example-function"><span class="header-section-number">7.1</span> <code>Schonlau Example Function</code></h2>
 <ul>
 <li>The Schonlau Example Function is based on sample points only (there is no analytical function description available):</li>
 </ul>
@@ -498,8 +456,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Note: Since there is no analytical function available, you might be interested in adding some points and describe the effects.</li>
 </ul>
 </section>
-<section id="forrester-example-function" class="level3" data-number="8.1.2">
-<h3 data-number="8.1.2" class="anchored" data-anchor-id="forrester-example-function"><span class="header-section-number">8.1.2</span> 2. <code>Forrester Example Function</code></h3>
+<section id="forrester-example-function" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="forrester-example-function"><span class="header-section-number">7.2</span> <code>Forrester Example Function</code></h2>
 <ul>
 <li><p>The Forrester Example Function is defined as follows:</p>
 <p><code>f(x) = (6x- 2)^2 sin(12x-4) for x in [0,1].</code></p></li>
@@ -523,8 +481,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> {<span class="st">"sigma"</span>: <span class="fl">0.2</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fun_runge-function-1-dim" class="level3" data-number="8.1.3">
-<h3 data-number="8.1.3" class="anchored" data-anchor-id="fun_runge-function-1-dim"><span class="header-section-number">8.1.3</span> 3.<code>fun_runge Function (1-dim)</code></h3>
+<section id="fun_runge-function-1-dim" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="fun_runge-function-1-dim"><span class="header-section-number">7.3</span> <code>fun_runge Function (1-dim)</code></h2>
 <ul>
 <li><p>The Runge function is defined as follows:</p>
 <p><code>f(x) = 1/ (1 + sum(x_i))^2</code></p></li>
@@ -552,8 +510,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> {<span class="st">"sigma"</span>: <span class="fl">0.5</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="fun_cubed-1-dim" class="level3" data-number="8.1.4">
-<h3 data-number="8.1.4" class="anchored" data-anchor-id="fun_cubed-1-dim"><span class="header-section-number">8.1.4</span> 4. <code>fun_cubed (1-dim)</code></h3>
+<section id="fun_cubed-1-dim" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="fun_cubed-1-dim"><span class="header-section-number">7.4</span> <code>fun_cubed (1-dim)</code></h2>
 <ul>
 <li><p>The Cubed function is defined as follows:</p>
 <p><code>np.sum(X[i]** 3)</code></p></li>
@@ -581,29 +539,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> {<span class="st">"sigma"</span>: <span class="fl">0.05</span>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="exercise-2" class="level2" data-number="8.2">
-<h2 data-number="8.2" class="anchored" data-anchor-id="exercise-2"><span class="header-section-number">8.2</span> Exercise 2</h2>
-<ul>
-<li><p>How does the behavior of the <code>spotPython</code> fit changes when the argument <code>noise</code> is set to <code>True</code>, i.e.,</p>
-<p><code>S = Kriging(name='kriging',  seed=123, n_theta=1, noise=True)</code></p></li>
-</ul>
+<section id="the-effect-of-noise" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="the-effect-of-noise"><span class="header-section-number">7.5</span> The Effect of Noise</h2>
+<p>How does the behavior of the <code>spotPython</code> fit changes when the argument <code>noise</code> is set to <code>True</code>, i.e.,</p>
+<p><code>S = Kriging(name='kriging',  seed=123, n_theta=1, noise=True)</code></p>
 <p>is used?</p>
-</section>
-</section>
-<section id="solutions" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> Solutions</h1>
-<section id="schonlau-example-function-1" class="level3" data-number="9.0.1">
-<h3 data-number="9.0.1" class="anchored" data-anchor-id="schonlau-example-function-1"><span class="header-section-number">9.0.1</span> 1. <code>Schonlau Example Function</code></h3>
-</section>
-<section id="forrester-example-function-1" class="level3" data-number="9.0.2">
-<h3 data-number="9.0.2" class="anchored" data-anchor-id="forrester-example-function-1"><span class="header-section-number">9.0.2</span> 2. <code>Forrester Example Function</code></h3>
-</section>
-<section id="fun_runge-function-1-dim-1" class="level3" data-number="9.0.3">
-<h3 data-number="9.0.3" class="anchored" data-anchor-id="fun_runge-function-1-dim-1"><span class="header-section-number">9.0.3</span> 3.<code>fun_runge Function (1-dim)</code></h3>
-</section>
-<section id="fun_cubed-1-dim-1" class="level3" data-number="9.0.4">
-<h3 data-number="9.0.4" class="anchored" data-anchor-id="fun_cubed-1-dim-1"><span class="header-section-number">9.0.4</span> 4. <code>fun_cubed (1-dim)</code></h3>
 
 
 </section>
@@ -846,12 +786,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./05_spot_sklearn_optimization.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization: Using <code>scipy</code> Optimizers</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./07_spot_ei.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Expected Improvement</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
