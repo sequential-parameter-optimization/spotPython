@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Thomas Bartz-Beielstein">
-<meta name="keywords" content="hyperparameter tuning, hyperparameter optimization, spotPython, PyTorch, CIFAR10, optimization, deep learning, machine learning">
 
-<title>PyTorch Hyperparameter Tuning — A Tutorial for spotPython</title>
+<title>spot_ray_hpt_torch_cifar10</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -127,178 +125,28 @@ div.csl-indent {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#sec-hyperparameter-tuning" id="toc-sec-hyperparameter-tuning" class="nav-link active" data-scroll-target="#sec-hyperparameter-tuning">Hyperparameter Tuning</a></li>
-  <li><a href="#sec-spot" id="toc-sec-spot" class="nav-link" data-scroll-target="#sec-spot">The Hyperparameter Tuning Software SPOT</a></li>
-  <li><a href="#sec-hyperparameter-tuning-for-pytorch" id="toc-sec-hyperparameter-tuning-for-pytorch" class="nav-link" data-scroll-target="#sec-hyperparameter-tuning-for-pytorch">Hyperparameter Tuning for PyTorch With <code>spotPython</code></a></li>
-  <li><a href="#sec-setup" id="toc-sec-setup" class="nav-link" data-scroll-target="#sec-setup">Setup</a>
-  <ul class="collapse">
-  <li><a href="#initialization-of-the-fun_control-dictionary" id="toc-initialization-of-the-fun_control-dictionary" class="nav-link" data-scroll-target="#initialization-of-the-fun_control-dictionary">Initialization of the <code>fun_control</code> Dictionary</a></li>
-  </ul></li>
-  <li><a href="#sec-data-loading" id="toc-sec-data-loading" class="nav-link" data-scroll-target="#sec-data-loading">Data Loading</a></li>
-  <li><a href="#sec-the-model-to-be-tuned" id="toc-sec-the-model-to-be-tuned" class="nav-link" data-scroll-target="#sec-the-model-to-be-tuned">The Model (Algorithm) to be Tuned</a>
-  <ul class="collapse">
-  <li><a href="#sec-specification-of-preprocessing-model" id="toc-sec-specification-of-preprocessing-model" class="nav-link" data-scroll-target="#sec-specification-of-preprocessing-model">Specification of the Preprocessing Model</a></li>
-  <li><a href="#sec-selection-of-the-algorithm" id="toc-sec-selection-of-the-algorithm" class="nav-link" data-scroll-target="#sec-selection-of-the-algorithm">Select <code>algorithm</code> and <code>core_model_hyper_dict</code></a>
-  <ul class="collapse">
-  <li><a href="#sec-implementation-with-raytune" id="toc-sec-implementation-with-raytune" class="nav-link" data-scroll-target="#sec-implementation-with-raytune">Implementing a Configurable Neural Network With Ray Tune</a></li>
-  <li><a href="#sec-implementation-with-spotpython" id="toc-sec-implementation-with-spotpython" class="nav-link" data-scroll-target="#sec-implementation-with-spotpython">Implementing a Configurable Neural Network With spotPython</a></li>
-  </ul></li>
-  <li><a href="#the-net_core-class" id="toc-the-net_core-class" class="nav-link" data-scroll-target="#the-net_core-class">The <code>Net_Core</code> class</a></li>
-  <li><a href="#sec-comparison" id="toc-sec-comparison" class="nav-link" data-scroll-target="#sec-comparison">Comparison of the Approach Described in the PyTorch Tutorial With spotPython</a></li>
-  </ul></li>
-  <li><a href="#sec-search-space" id="toc-sec-search-space" class="nav-link" data-scroll-target="#sec-search-space">The Search Space: Hyperparameters</a>
-  <ul class="collapse">
-  <li><a href="#sec-configuring-the-search-space-with-ray-tune" id="toc-sec-configuring-the-search-space-with-ray-tune" class="nav-link" data-scroll-target="#sec-configuring-the-search-space-with-ray-tune">Configuring the Search Space With Ray Tune</a></li>
-  <li><a href="#sec-configuring-the-search-space-with-spotpython" id="toc-sec-configuring-the-search-space-with-spotpython" class="nav-link" data-scroll-target="#sec-configuring-the-search-space-with-spotpython">Configuring the Search Space With spotPython</a>
-  <ul class="collapse">
-  <li><a href="#the-hyper_dict-hyperparameters-for-the-selected-algorithm" id="toc-the-hyper_dict-hyperparameters-for-the-selected-algorithm" class="nav-link" data-scroll-target="#the-hyper_dict-hyperparameters-for-the-selected-algorithm">The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</a></li>
-  </ul></li>
-  <li><a href="#sec-modification-of-hyperparameters" id="toc-sec-modification-of-hyperparameters" class="nav-link" data-scroll-target="#sec-modification-of-hyperparameters">Modifying the Hyperparameters</a>
-  <ul class="collapse">
-  <li><a href="#sec-modification-of-default-values" id="toc-sec-modification-of-default-values" class="nav-link" data-scroll-target="#sec-modification-of-default-values">Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></a></li>
-  <li><a href="#modify-hyperparameters-of-type-numeric-and-integer-boolean" id="toc-modify-hyperparameters-of-type-numeric-and-integer-boolean" class="nav-link" data-scroll-target="#modify-hyperparameters-of-type-numeric-and-integer-boolean">Modify Hyperparameters of Type numeric and integer (boolean)</a></li>
-  <li><a href="#modify-hyperparameter-of-type-factor" id="toc-modify-hyperparameter-of-type-factor" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-factor">Modify Hyperparameter of Type factor</a></li>
-  </ul></li>
-  </ul></li>
-  <li><a href="#sec-optimizers" id="toc-sec-optimizers" class="nav-link" data-scroll-target="#sec-optimizers">Optimizers</a>
-  <ul class="collapse">
-  <li><a href="#a-note-on-lbfgs" id="toc-a-note-on-lbfgs" class="nav-link" data-scroll-target="#a-note-on-lbfgs">A note on LBFGS</a></li>
-  <li><a href="#a-note-on-the-learning-rate" id="toc-a-note-on-the-learning-rate" class="nav-link" data-scroll-target="#a-note-on-the-learning-rate">A note on the learning rate</a></li>
-  </ul></li>
-  <li><a href="#sec-data-splitting" id="toc-sec-data-splitting" class="nav-link" data-scroll-target="#sec-data-splitting">Evaluation: Data Splitting</a>
-  <ul class="collapse">
-  <li><a href="#hold-out-data-split" id="toc-hold-out-data-split" class="nav-link" data-scroll-target="#hold-out-data-split">Hold-out Data Split</a></li>
-  <li><a href="#cross-validation" id="toc-cross-validation" class="nav-link" data-scroll-target="#cross-validation">Cross-Validation</a></li>
-  <li><a href="#overview-of-the-evaluation-settings" id="toc-overview-of-the-evaluation-settings" class="nav-link" data-scroll-target="#overview-of-the-evaluation-settings">Overview of the Evaluation Settings</a>
-  <ul class="collapse">
-  <li><a href="#settings-for-the-hyperparameter-tuning" id="toc-settings-for-the-hyperparameter-tuning" class="nav-link" data-scroll-target="#settings-for-the-hyperparameter-tuning">Settings for the Hyperparameter Tuning</a></li>
-  <li><a href="#settings-for-the-final-evaluation-of-the-tuned-architecture" id="toc-settings-for-the-final-evaluation-of-the-tuned-architecture" class="nav-link" data-scroll-target="#settings-for-the-final-evaluation-of-the-tuned-architecture">Settings for the Final Evaluation of the Tuned Architecture</a></li>
-  </ul></li>
-  </ul></li>
-  <li><a href="#sec-loss-functions" id="toc-sec-loss-functions" class="nav-link" data-scroll-target="#sec-loss-functions">Evaluation: Loss Functions and Metrics</a></li>
-  <li><a href="#sec-prepare-spot-call" id="toc-sec-prepare-spot-call" class="nav-link" data-scroll-target="#sec-prepare-spot-call">Preparing the SPOT Call</a></li>
-  <li><a href="#sec-the-objective-function" id="toc-sec-the-objective-function" class="nav-link" data-scroll-target="#sec-the-objective-function">The Objective Function <code>fun_torch</code></a></li>
-  <li><a href="#sec-default-hyperparameters" id="toc-sec-default-hyperparameters" class="nav-link" data-scroll-target="#sec-default-hyperparameters">Using Default Hyperparameters or Results from Previous Runs</a></li>
-  <li><a href="#sec-call-the-hyperparameter-tuner" id="toc-sec-call-the-hyperparameter-tuner" class="nav-link" data-scroll-target="#sec-call-the-hyperparameter-tuner">Starting the Hyperparameter Tuning</a></li>
-  <li><a href="#sec-tensorboard" id="toc-sec-tensorboard" class="nav-link" data-scroll-target="#sec-tensorboard">Tensorboard</a>
-  <ul class="collapse">
-  <li><a href="#tensorboard-start-tensorboard" id="toc-tensorboard-start-tensorboard" class="nav-link" data-scroll-target="#tensorboard-start-tensorboard">Tensorboard: Start Tensorboard</a></li>
-  <li><a href="#sec-saving-the-state-of-the-notebook" id="toc-sec-saving-the-state-of-the-notebook" class="nav-link" data-scroll-target="#sec-saving-the-state-of-the-notebook">Saving the State of the Notebook</a></li>
-  </ul></li>
-  <li><a href="#sec-results" id="toc-sec-results" class="nav-link" data-scroll-target="#sec-results">Results</a>
-  <ul class="collapse">
-  <li><a href="#sec-get-spot-results" id="toc-sec-get-spot-results" class="nav-link" data-scroll-target="#sec-get-spot-results">Get SPOT Results</a></li>
-  <li><a href="#get-default-hyperparameters" id="toc-get-default-hyperparameters" class="nav-link" data-scroll-target="#get-default-hyperparameters">Get Default Hyperparameters</a></li>
-  <li><a href="#evaluation-of-the-default-architecture" id="toc-evaluation-of-the-default-architecture" class="nav-link" data-scroll-target="#evaluation-of-the-default-architecture">Evaluation of the Default Architecture</a></li>
-  <li><a href="#evaluation-of-the-tuned-architecture" id="toc-evaluation-of-the-tuned-architecture" class="nav-link" data-scroll-target="#evaluation-of-the-tuned-architecture">Evaluation of the Tuned Architecture</a></li>
-  <li><a href="#comparison-with-default-hyperparameters-and-ray-tune" id="toc-comparison-with-default-hyperparameters-and-ray-tune" class="nav-link" data-scroll-target="#comparison-with-default-hyperparameters-and-ray-tune">Comparison with Default Hyperparameters and Ray Tune</a></li>
-  <li><a href="#detailed-hyperparameter-plots" id="toc-detailed-hyperparameter-plots" class="nav-link" data-scroll-target="#detailed-hyperparameter-plots">Detailed Hyperparameter Plots</a></li>
-  </ul></li>
-  <li><a href="#sec-summary" id="toc-sec-summary" class="nav-link" data-scroll-target="#sec-summary">Summary and Outlook</a></li>
-  <li><a href="#sec-appendix" id="toc-sec-appendix" class="nav-link" data-scroll-target="#sec-appendix">Appendix</a>
-  <ul class="collapse">
-  <li><a href="#sample-output-from-ray-tunes-run" id="toc-sample-output-from-ray-tunes-run" class="nav-link" data-scroll-target="#sample-output-from-ray-tunes-run">Sample Output From Ray Tune’s Run</a></li>
-  <li><a href="#sec-detailed-data-splitting" id="toc-sec-detailed-data-splitting" class="nav-link" data-scroll-target="#sec-detailed-data-splitting">Detailed Description of the Data Splitting</a>
-  <ul class="collapse">
-  <li><a href="#description-of-the-train_hold_out-setting" id="toc-description-of-the-train_hold_out-setting" class="nav-link" data-scroll-target="#description-of-the-train_hold_out-setting">Description of the <code>"train_hold_out"</code> Setting</a></li>
-  <li><a href="#description-of-the-test_hold_out-setting" id="toc-description-of-the-test_hold_out-setting" class="nav-link" data-scroll-target="#description-of-the-test_hold_out-setting">Description of the <code>"test_hold_out"</code> Setting</a></li>
-  <li><a href="#detailed-description-of-the-train_cv-setting" id="toc-detailed-description-of-the-train_cv-setting" class="nav-link" data-scroll-target="#detailed-description-of-the-train_cv-setting">Detailed Description of the <code>"train_cv"</code> Setting</a></li>
-  <li><a href="#detailed-description-of-the-test_cv-setting" id="toc-detailed-description-of-the-test_cv-setting" class="nav-link" data-scroll-target="#detailed-description-of-the-test_cv-setting">Detailed Description of the <code>"test_cv"</code> Setting</a></li>
-  <li><a href="#sec-final-model-evaluation" id="toc-sec-final-model-evaluation" class="nav-link" data-scroll-target="#sec-final-model-evaluation">Detailed Description of the Final Model Training and Evaluation</a></li>
-  </ul></li>
-  </ul></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="14_spot_ray_hpt_torch_cifar10.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
-    </div>
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="14_spot_ray_hpt_torch_cifar10.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">PyTorch Hyperparameter Tuning — A Tutorial for spotPython</h1>
-<p class="subtitle lead">Version 0.2.16</p>
+<h1 class="title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></h1>
 </div>
 
 
-<div class="quarto-title-meta-author">
-  <div class="quarto-title-meta-heading">Author</div>
-  <div class="quarto-title-meta-heading">Affiliations</div>
-  
-    <div class="quarto-title-meta-contents">
-    <p class="author"><a href="https://www.spotseven.de">Thomas Bartz-Beielstein</a> <a href="https://orcid.org/0000-0002-5938-5158" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
-  </div>
-    <div class="quarto-title-meta-contents">
-        <p class="affiliation">
-            SpotSeven Lab
-          </p>
-        <p class="affiliation">
-            
-          </p>
-      </div>
-    </div>
 
 <div class="quarto-title-meta">
 
-      
+    
   
     
   </div>
   
-<div>
-  <div class="abstract">
-    <div class="abstract-title">Abstract</div>
-    <p>The goal of hyperparameter tuning (or hyperparameter optimization) is to optimize the hyperparameters to improve the performance of the machine or deep learning model. spotPython (“Sequential Parameter Optimization Toolbox in Python”) is the Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade. PyTorch is an optimized tensor library for deep learning using GPUs and CPUs. This document shows how to integrate the spotPython hyperparameter tuner into the PyTorch training workflow. As an example, the results of the CIFAR10 image classifier are used. In addition to an introduction to spotPython, this tutorial also includes a brief comparison with Ray Tune, a Python library for running experiments and tuning hyperparameters. This comparison is based on the PyTorch hyperparameter tuning tutorial. The advantages and disadvantages of both approaches are discussed. We show that spotPython achieves similar or even better results while being more flexible and transparent than Ray Tune.</p>
-  </div>
-</div>
 
 </header>
 
-<section id="sec-hyperparameter-tuning" class="level1">
-<h1>Hyperparameter Tuning</h1>
-<p>Hyperparameter tuning is an important, but often difficult and computationally intensive task. Changing the architecture of a neural network or the learning rate of an optimizer can have a significant impact on the performance.</p>
-<p>The goal of hyperparameter tuning is to optimize the hyperparameters in a way that improves the performance of the machine learning or deep learning model. The simplest, but also most computationally expensive, approach uses manual search (or trial-and-error <span class="citation" data-cites="Meignan:2015vp">(<a href="#ref-Meignan:2015vp" role="doc-biblioref">Meignan et al. 2015</a>)</span>). Commonly encountered is simple random search, i.e., random and repeated selection of hyperparameters for evaluation, and lattice search (“grid search”). In addition, methods that perform directed search and other model-free algorithms, i.e., algorithms that do not explicitly rely on a model, e.g., evolution strategies <span class="citation" data-cites="Bart13j">(<a href="#ref-Bart13j" role="doc-biblioref">Bartz-Beielstein et al. 2014</a>)</span> or pattern search <span class="citation" data-cites="Torczon00">(<a href="#ref-Torczon00" role="doc-biblioref">Lewis, Torczon, and Trosset 2000</a>)</span> play an important role. Also, “hyperband”, i.e., a multi-armed bandit strategy that dynamically allocates resources to a set of random configurations and uses successive bisections to stop configurations with poor performance <span class="citation" data-cites="Li16a">(<a href="#ref-Li16a" role="doc-biblioref">Li et al. 2016</a>)</span>, is very common in hyperparameter tuning. The most sophisticated and efficient approaches are the Bayesian optimization and surrogate model based optimization methods, which are based on the optimization of cost functions determined by simulations or experiments.</p>
-<p>We consider below a surrogate model based optimization-based hyperparameter tuning approach based on the Python version of the SPOT (“Sequential Parameter Optimization Toolbox”) <span class="citation" data-cites="BLP05">(<a href="#ref-BLP05" role="doc-biblioref">Bartz-Beielstein, Lasarczyk, and Preuss 2005</a>)</span>, which is suitable for situations where only limited resources are available. This may be due to limited availability and cost of hardware, or due to the fact that confidential data may only be processed locally, e.g., due to legal requirements. Furthermore, in our approach, the understanding of algorithms is seen as a key tool for enabling transparency and explainability. This can be enabled, for example, by quantifying the contribution of machine learning and deep learning components (nodes, layers, split decisions, activation functions, etc.). Understanding the importance of hyperparameters and the interactions between multiple hyperparameters plays a major role in the interpretability and explainability of machine learning models. SPOT provides statistical tools for understanding hyperparameters and their interactions. Last but not least, it should be noted that the SPOT software code is available in the open source <code>spotPython</code> package on github<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, allowing replicability of the results. This tutorial descries the Python variant of SPOT, which is called <code>spotPython</code>. The R implementation is described in <span class="citation" data-cites="bart21i">Bartz et al. (<a href="#ref-bart21i" role="doc-biblioref">2022</a>)</span>. SPOT is an established open source software that has been maintained for more than 15 years <span class="citation" data-cites="BLP05">(<a href="#ref-BLP05" role="doc-biblioref">Bartz-Beielstein, Lasarczyk, and Preuss 2005</a>)</span> <span class="citation" data-cites="bart21i">(<a href="#ref-bart21i" role="doc-biblioref">Bartz et al. 2022</a>)</span>.</p>
-<p>This tutorial is structured as follows. The concept of the hyperparameter tuning software <code>spotPython</code> is described in <a href="#sec-spot">Section&nbsp;2</a>. <a href="#sec-hyperparameter-tuning-for-pytorch">Section&nbsp;3</a> describes the execution of the example from the tutorial “Hyperparameter Tuning with Ray Tune” <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>. The integration of <code>spotPython</code> into the <code>PyTorch</code> training workflow is described in detail in the following sections. <a href="#sec-setup">Section&nbsp;4</a> describes the setup of the tuners. <a href="#sec-data-loading">Section&nbsp;5</a> describes the data loading. <a href="#sec-the-model-to-be-tuned">Section&nbsp;6</a> describes the model to be tuned. The search space is introduced in <a href="#sec-search-space">Section&nbsp;7</a>. Optimizers are presented in <a href="#sec-optimizers">Section&nbsp;8</a>. How to split the data in train, validation, and test sets is described in <a href="#sec-data-splitting">Section&nbsp;9</a>. The selection of the loss function and metrics is described in <a href="#sec-loss-functions">Section&nbsp;10</a>. @#sec-prepare-spot-call describes the preparation of the <code>spotPython</code> call. The objective function is described in <a href="#sec-the-objective-function">Section&nbsp;12</a>. How to use results from previous runs and default hyperparameter configurations is described in <a href="#sec-default-hyperparameters">Section&nbsp;13</a>. Starting the tuner is shown in <a href="#sec-call-the-hyperparameter-tuner">Section&nbsp;14</a>. TensorBoard can be used to visualize the results as shown in <a href="#sec-tensorboard">Section&nbsp;15</a>. Results are discussed and explained in <a href="#sec-results">Section&nbsp;16</a> Finally, <a href="#sec-summary">Section&nbsp;17</a> presents a summary and an outlook.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>The corresponding <code>.ipynb</code> notebook <span class="citation" data-cites="bart23e">(<a href="#ref-bart23e" role="doc-biblioref">Bartz-Beielstein 2023</a>)</span> is updated regularly and reflects updates and changes in the <code>spotPython</code> package. It can be downloaded from <a href="https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb">https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb</a>.</p>
-</div>
-</div>
-</section>
-<section id="sec-spot" class="level1">
-<h1>The Hyperparameter Tuning Software SPOT</h1>
-<p>Surrogate model based optimization methods are common approaches in simulation and optimization. SPOT was developed because there is a great need for sound statistical analysis of simulation and optimization algorithms. SPOT includes methods for tuning based on classical regression and analysis of variance techniques. It presents tree-based models such as classification and regression trees and random forests as well as Bayesian optimization (Gaussian process models, also known as Kriging). Combinations of different meta-modeling approaches are possible. SPOT comes with a sophisticated surrogate model based optimization method, that can handle discrete and continuous inputs. Furthermore, any model implemented in <code>scikit-learn</code> can be used out-of-the-box as a surrogate in <code>spotPython</code>.</p>
-<p>SPOT implements key techniques such as exploratory fitness landscape analysis and sensitivity analysis. It can be used to understand the performance of various algorithms, while simultaneously giving insights into their algorithmic behavior. In addition, SPOT can be used as an optimizer and for automatic and interactive tuning. Details on SPOT and its use in practice are given by <span class="citation" data-cites="bart21i">Bartz et al. (<a href="#ref-bart21i" role="doc-biblioref">2022</a>)</span>.</p>
-<p>A typical hyperparameter tuning process with <code>spotPython</code> consists of the following steps:</p>
-<ol type="1">
-<li>Loading the data (training and test datasets), see <a href="#sec-data-loading">Section&nbsp;5</a>.</li>
-<li>Specification of the preprocessing model, see <a href="#sec-specification-of-preprocessing-model">Section&nbsp;6.1</a>. This model is called <code>prep_model</code> (“preparation” or pre-processing). The information required for the hyperparameter tuning is stored in the dictionary <code>fun_control</code>. Thus, the information needed for the execution of the hyperparameter tuning is available in a readable form.</li>
-<li>Selection of the machine learning or deep learning model to be tuned, see <a href="#sec-selection-of-the-algorithm">Section&nbsp;6.2</a>. This is called the <code>core_model</code>. Once the <code>core_model</code> is defined, then the associated hyperparameters are stored in the <code>fun_control</code> dictionary. First, the hyperparameters of the <code>core_model</code> are initialized with the default values of the <code>core_model</code>. As default values we use the default values contained in the <code>spotPython</code> package for the algorithms of the <code>torch</code> package.</li>
-<li>Modification of the default values for the hyperparameters used in <code>core_model</code>, see <a href="#sec-modification-of-default-values">Section&nbsp;7.3.1</a>. This step is optional.
-<ol type="1">
-<li>numeric parameters are modified by changing the bounds.</li>
-<li>categorical parameters are modified by changing the categories (“levels”).</li>
-</ol></li>
-<li>Selection of target function (loss function) for the optimizer, see <a href="#sec-loss-functions">Section&nbsp;10</a>.</li>
-<li>Calling SPOT with the corresponding parameters, see <a href="#sec-call-the-hyperparameter-tuner">Section&nbsp;14</a>. The results are stored in a dictionary and are available for further analysis.</li>
-<li>Presentation, visualization and interpretation of the results, see <a href="#sec-results">Section&nbsp;16</a>.</li>
-</ol>
-</section>
-<section id="sec-hyperparameter-tuning-for-pytorch" class="level1">
-<h1>Hyperparameter Tuning for PyTorch With <code>spotPython</code></h1>
 <p>In this tutorial, we will show how <code>spotPython</code> can be integrated into the <code>PyTorch</code> training workflow. It is based on the tutorial “Hyperparameter Tuning with Ray Tune” from the <code>PyTorch</code> documentation <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>, which is an extension of the tutorial “Training a Classifier” <span class="citation" data-cites="pyto23b">(<a href="#ref-pyto23b" role="doc-biblioref">PyTorch 2023b</a>)</span> for training a CIFAR10 image classifier.</p>
 <p>This document refers to the following software versions:</p>
 <ul>
@@ -307,10 +155,9 @@ Note
 <li><code>torchvision</code>: 0.15.0</li>
 <li><code>spotPython</code>: 0.2.15</li>
 </ul>
-<p><code>spotPython</code> can be installed via pip<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
+<p><code>spotPython</code> can be installed via pip<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <pre class="{raw}"><code>!pip install spotPython</code></pre>
-<p>Results that refer to the <code>Ray Tune</code> package are taken from <a href="https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html">https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html</a><a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
-</section>
+<p>Results that refer to the <code>Ray Tune</code> package are taken from <a href="https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html">https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html</a><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
 <section id="sec-setup" class="level1">
 <h1>Setup</h1>
 <p>Before we consider the detailed experimental setup, we select the parameters that affect run time, initial design size and the device that is used.</p>
@@ -366,7 +213,7 @@ prep_model = ColumnTransformer(
 </section>
 <section id="sec-selection-of-the-algorithm" class="level2">
 <h2 class="anchored" data-anchor-id="sec-selection-of-the-algorithm">Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
-<p>The same neural network model as implemented in the section “Configurable neural network” of the <code>PyTorch</code> tutorial <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span> is used here. We will show the implementation from <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> in <a href="#sec-implementation-with-raytune">Section&nbsp;6.2.1</a> first, before the extended implementation with <code>spotPython</code> is shown in <a href="#sec-implementation-with-spotpython">Section&nbsp;6.2.2</a>.</p>
+<p>The same neural network model as implemented in the section “Configurable neural network” of the <code>PyTorch</code> tutorial <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span> is used here. We will show the implementation from <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> in <a href="#sec-implementation-with-raytune">Section&nbsp;3.2.1</a> first, before the extended implementation with <code>spotPython</code> is shown in <a href="#sec-implementation-with-spotpython">Section&nbsp;3.2.2</a>.</p>
 <section id="sec-implementation-with-raytune" class="level3">
 <h3 class="anchored" data-anchor-id="sec-implementation-with-raytune">Implementing a Configurable Neural Network With Ray Tune</h3>
 <p>We used the same hyperparameters that are implemented as configurable in the <code>PyTorch</code> tutorial. We specify the layer sizes, namely <code>l1</code> and <code>l2</code>, of the fully connected layers:</p>
@@ -474,7 +321,7 @@ class Net_Core(nn.Module):
 </section>
 <section id="sec-search-space" class="level1">
 <h1>The Search Space: Hyperparameters</h1>
-<p>In <a href="#sec-configuring-the-search-space-with-ray-tune">Section&nbsp;7.1</a>, we first describe how to configure the search space with <code>ray[tune]</code> (as shown in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>) and then how to configure the search space with <code>spotPython</code> in <a href="#sec-configuring-the-search-space-with-spotpython">Section&nbsp;7.2</a>.</p>
+<p>In <a href="#sec-configuring-the-search-space-with-ray-tune">Section&nbsp;4.1</a>, we first describe how to configure the search space with <code>ray[tune]</code> (as shown in <span class="citation" data-cites="pyto23a">PyTorch (<a href="#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>) and then how to configure the search space with <code>spotPython</code> in <a href="#sec-configuring-the-search-space-with-spotpython">Section&nbsp;4.2</a>.</p>
 <section id="sec-configuring-the-search-space-with-ray-tune" class="level2">
 <h2 class="anchored" data-anchor-id="sec-configuring-the-search-space-with-ray-tune">Configuring the Search Space With Ray Tune</h2>
 <p>Ray Tune’s search space can be configured as follows <span class="citation" data-cites="pyto23a">(<a href="#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>:</p>
@@ -610,7 +457,7 @@ class Net_Core(nn.Module):
 <div class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>As discussed in <a href="#sec-optimizers">Section&nbsp;8</a>, there are some issues with the LBFGS optimizer. Therefore, the usage of the LBFGS optimizer is not deactivated in <code>spotPython</code> by default. However, the LBFGS optimizer can be activated by adding it to the list of optimizers. <code>Rprop</code> was removed, because it does perform very poorly (as some pre-tests have shown). However, it can also be activated by adding it to the list of optimizers. Since <code>SparseAdam</code> does not support dense gradients, <code>Adam</code> was used instead. Therefore, there are 10 default optimizers:</p>
+<p>As discussed in <a href="#sec-optimizers">Section&nbsp;5</a>, there are some issues with the LBFGS optimizer. Therefore, the usage of the LBFGS optimizer is not deactivated in <code>spotPython</code> by default. However, the LBFGS optimizer can be activated by adding it to the list of optimizers. <code>Rprop</code> was removed, because it does perform very poorly (as some pre-tests have shown). However, it can also be activated by adding it to the list of optimizers. Since <code>SparseAdam</code> does not support dense gradients, <code>Adam</code> was used instead. Therefore, there are 10 default optimizers:</p>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>,</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Adadelta"</span>, <span class="st">"Adagrad"</span>, <span class="st">"Adam"</span>, <span class="st">"AdamW"</span>, <span class="st">"Adamax"</span>, <span class="st">"ASGD"</span>, </span>
@@ -932,7 +779,7 @@ class Net_Core(nn.Module):
 <h2 class="anchored" data-anchor-id="overview-of-the-evaluation-settings">Overview of the Evaluation Settings</h2>
 <section id="settings-for-the-hyperparameter-tuning" class="level3">
 <h3 class="anchored" data-anchor-id="settings-for-the-hyperparameter-tuning">Settings for the Hyperparameter Tuning</h3>
-<p>An overview of the training evaluations is shown in <a href="#tbl-eval-settings">Table&nbsp;2</a>. <code>"train_cv"</code> and <code>"test_cv"</code> use <code>sklearn.model_selection.KFold()</code> internally. More details on the data splitting are provided in <a href="#sec-detailed-data-splitting">Section&nbsp;18.2</a> (in the Appendix).</p>
+<p>An overview of the training evaluations is shown in <a href="#tbl-eval-settings">Table&nbsp;2</a>. <code>"train_cv"</code> and <code>"test_cv"</code> use <code>sklearn.model_selection.KFold()</code> internally. More details on the data splitting are provided in <a href="#sec-detailed-data-splitting">Section&nbsp;15.2</a> (in the Appendix).</p>
 <div id="tbl-eval-settings" class="anchored">
 <table class="table">
 <caption>Table&nbsp;2: Overview of the evaluation settings.</caption>
@@ -994,7 +841,7 @@ class Net_Core(nn.Module):
 <section id="testing-of-the-tuned-architecture" class="level4">
 <h4 class="anchored" data-anchor-id="testing-of-the-tuned-architecture">Testing of the Tuned Architecture</h4>
 <p><code>test_tuned(model, test)</code>: test the model on the test data set. No data splitting is performed. The (trained) model is evaluated using the <code>validate_fold_or_hold_out()</code> function. Note: During training, <code>shuffle</code> is set to <code>True</code>, whereas during testing, <code>shuffle</code> is set to <code>False</code>.</p>
-<p><a href="#sec-final-model-evaluation">Section&nbsp;18.2.5</a> describes the final evaluation of the tuned architecture.</p>
+<p><a href="#sec-final-model-evaluation">Section&nbsp;15.2.5</a> describes the final evaluation of the tuned architecture.</p>
 </section>
 </section>
 </section>
@@ -1447,7 +1294,7 @@ Returned to Spot: Validation loss: 1.2061678514480592
 </section>
 <section id="get-default-hyperparameters" class="level2">
 <h2 class="anchored" data-anchor-id="get-default-hyperparameters">Get Default Hyperparameters</h2>
-<p>In a similar manner as in <a href="#sec-get-spot-results">Section&nbsp;16.1</a>, the default hyperparameters can be obtained.</p>
+<p>In a similar manner as in <a href="#sec-get-spot-results">Section&nbsp;13.1</a>, the default hyperparameters can be obtained.</p>
 <div class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control was modified, we generate a new one with the original </span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># default hyperparameters</span></span>
@@ -2071,13 +1918,8 @@ optimizer = optimizer_handler(optimizer_name=optimizer_instance,
     print(f"Final evaluation: Validation metric: {df_metric}")
     print("----------------------------------------------")
     return df_eval, df_preds, df_metric</code></pre>
-<div style="page-break-after: always;"></div>
-</section>
-</section>
-</section>
-</section>
-<section id="references" class="level1 unnumbered">
-<h1 class="unnumbered">References</h1>
+
+
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-bart21i" class="csl-entry" role="listitem">
 Bartz, Eva, Thomas Bartz-Beielstein, Martin Zaefferer, and Olaf Mersmann, eds. 2022. <em><span class="nocase">Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide</span></em>. Springer.
@@ -2085,23 +1927,8 @@ Bartz, Eva, Thomas Bartz-Beielstein, Martin Zaefferer, and Olaf Mersmann, eds. 2
 <div id="ref-bart23e" class="csl-entry" role="listitem">
 Bartz-Beielstein, Thomas. 2023. <span>“<span>PyTorch</span> Hyperparameter Tuning with <span>SPOT</span>: Comparison with <span>Ray Tuner</span> and Default Hyperparameters on <span>CIFAR10</span>.”</span> <a href="https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb">https://github.com/sequential-parameter-optimization/spotPython/blob/main/notebooks/14_spot_ray_hpt_torch_cifar10.ipynb</a>.
 </div>
-<div id="ref-Bart13j" class="csl-entry" role="listitem">
-Bartz-Beielstein, Thomas, Jürgen Branke, Jörn Mehnen, and Olaf Mersmann. 2014. <span>“Evolutionary Algorithms.”</span> <em>Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery</em> 4 (3): 178–95.
-</div>
 <div id="ref-bart20gArxiv" class="csl-entry" role="listitem">
 Bartz-Beielstein, Thomas, Carola Doerr, Jakob Bossek, Sowmya Chandrasekaran, Tome Eftimov, Andreas Fischbach, Pascal Kerschke, et al. 2020. <span>“Benchmarking in Optimization: Best Practice and Open Issues.”</span> arXiv. <a href="https://arxiv.org/abs/2007.03488">https://arxiv.org/abs/2007.03488</a>.
-</div>
-<div id="ref-BLP05" class="csl-entry" role="listitem">
-Bartz-Beielstein, Thomas, Christian Lasarczyk, and Mike Preuss. 2005. <span>“<span>Sequential Parameter Optimization</span>.”</span> In <em><span class="nocase">Proceedings 2005 Congress on Evolutionary Computation (CEC’05), Edinburgh, Scotland</span></em>, edited by B McKay et al., 773–80. Piscataway NJ: <span>IEEE Press</span>.
-</div>
-<div id="ref-Torczon00" class="csl-entry" role="listitem">
-Lewis, R M, V Torczon, and M W Trosset. 2000. <span>“<span class="nocase">Direct search methods: Then and now</span>.”</span> <em>Journal of Computational and Applied Mathematics</em> 124 (1–2): 191–207.
-</div>
-<div id="ref-Li16a" class="csl-entry" role="listitem">
-Li, Lisha, Kevin Jamieson, Giulia DeSalvo, Afshin Rostamizadeh, and Ameet Talwalkar. 2016. <span>“<span class="nocase">Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization</span>.”</span> <em>arXiv e-Prints</em>, March, arXiv:1603.06560.
-</div>
-<div id="ref-Meignan:2015vp" class="csl-entry" role="listitem">
-Meignan, David, Sigrid Knust, Jean-Marc Frayet, Gilles Pesant, and Nicolas Gaud. 2015. <span>“<span class="nocase">A Review and Taxonomy of Interactive Optimization Methods in Operations Research</span>.”</span> <em>ACM Transactions on Interactive Intelligent Systems</em>, September.
 </div>
 <div id="ref-mont20a" class="csl-entry" role="listitem">
 Montiel, Jacob, Max Halford, Saulo Martiello Mastelini, Geoffrey Bolmier, Raphael Sourty, Robin Vaysse, Adil Zouitine, et al. 2021. <span>“River: Machine Learning for Streaming Data in Python.”</span>
@@ -2113,19 +1940,19 @@ PyTorch. 2023a. <span>“Hyperparameter Tuning with Ray Tune.”</span> <a href=
 ———. 2023b. <span>“Training a Classifier.”</span> <a href="https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html">https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html</a>.
 </div>
 </div>
-
-
+</section>
+</section>
+</section>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Alternatively, the source code can be downloaded from gitHub: <a href="https://github.com/sequential-parameter-optimization/spotPython">https://github.com/sequential-parameter-optimization/spotPython</a>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>We were not able to install <code>Ray Tune</code> on our system. Therefore, we used the results from the <code>PyTorch</code> tutorial.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p><a href="https://github.com/sequential-parameter-optimization">https://github.com/sequential-parameter-optimization</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Alternatively, the source code can be downloaded from gitHub: <a href="https://github.com/sequential-parameter-optimization/spotPython">https://github.com/sequential-parameter-optimization/spotPython</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>We were not able to install <code>Ray Tune</code> on our system. Therefore, we used the results from the <code>PyTorch</code> tutorial.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

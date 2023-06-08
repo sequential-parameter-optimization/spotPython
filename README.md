@@ -1,5 +1,5 @@
 <p align="left">
-  <img height="200" src="docs/img/spotLogo.png" alt="spot_logo">
+  <img height="200" src="img/spotLogo.png" alt="spot_logo">
 </p>
 
 # spotPython

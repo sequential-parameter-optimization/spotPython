@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>spot_hpt_torch_fashion_mnist</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="11_spot_hpt_torch_fashion_mnist.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Chapter 10: Sequential Parameter Optimization</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">5</span> <span class="co"># Time in minutes. Counter starts, after the initial design is evaluated. So, runtime can be larger.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">20</span> <span class="co"># Initial number of designs to evaluate, before the surrogate is build.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dateutil.tz <span class="im">import</span> tzlocal</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> datetime.now(tzlocal())</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>HOSTNAME <span class="op">=</span> socket.gethostname().split(<span class="st">"."</span>)[<span class="dv">0</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> <span class="st">'10-sklearn'</span> <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> HOSTNAME <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> <span class="bu">str</span>(MAX_TIME) <span class="op">+</span> <span class="st">"min_"</span> <span class="op">+</span> <span class="bu">str</span>(INIT_SIZE) <span class="op">+</span> <span class="st">"init_"</span> <span class="op">+</span> <span class="bu">str</span>(start_time).split(<span class="st">"."</span>, <span class="dv">1</span>)[<span class="dv">0</span>].replace(<span class="st">' '</span>, <span class="st">'_'</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> experiment_name.replace(<span class="st">':'</span>, <span class="st">'-'</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>experiment_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="hyperparameter-tuning-sklearn" class="level2">
+<h2 class="anchored" data-anchor-id="hyperparameter-tuning-sklearn">Hyperparameter Tuning: sklearn</h2>
+<ul>
+<li>This notebook exemplifies hyperparameter tuning with SPOT (spotPython).</li>
+<li>The hyperparameter software SPOT was developed in R (statistical programming language), see Open Access book “Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide”, available here: <a href="https://link.springer.com/book/10.1007/978-981-19-5170-1">https://link.springer.com/book/10.1007/978-981-19-5170-1</a>.</li>
+</ul>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import sys</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade build</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade --force-reinstall spotPython</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> differential_evolution</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder , MinMaxScaler, StandardScaler</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OrdinalEncoder</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RidgeCV</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> make_pipeline , Pipeline</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> HistGradientBoostingRegressor</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_validate</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> fetch_openml</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error, accuracy_score, roc_curve, roc_auc_score, log_loss, mean_squared_error</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeRegressor</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_regression</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MinMaxScaler</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_classification</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_moons, make_circles, make_classification</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> RidgeCV</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsClassifier</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> GradientBoostingClassifier</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> GradientBoostingRegressor</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> ElasticNet</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    add_core_model_to_fun_control,</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    assign_values,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    convert_keys,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    get_bound_values,</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    get_default_hyperparameters_for_core_model,</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    get_default_values,</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    get_dict_with_levels_and_types,</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    get_values_from_dict,</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    iterate_dict_values,</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    modify_hyper_parameter_levels,</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    modify_hyper_parameter_bounds,</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    replace_levels_with_positions,</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    return_conf_list_from_var_dict,</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    get_one_core_model_from_X,</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    transform_hyper_parameter_values,</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    get_dict_with_levels_and_types,</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    convert_keys,</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    iterate_dict_values,</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    get_one_sklearn_model_from_X</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.convert <span class="im">import</span> class_for_name</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> (</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>    get_stars,</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>    gen_design_table)</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.transform <span class="im">import</span> transform_hyper_parameter_values</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.convert <span class="im">import</span> get_Xy_from_df</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.plot.validation <span class="im">import</span> plot_cv_predictions, plot_roc, plot_confusion_matrix</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.sklearn_hyper_dict <span class="im">import</span> SklearnHyperDict</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.hypersklearn <span class="im">import</span> HyperSklearn</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.metrics <span class="im">import</span> mapk, apk</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="initialization-of-the-empty-fun_control-dictionary" class="level2">
+<h2 class="anchored" data-anchor-id="initialization-of-the-empty-fun_control-dictionary">0. Initialization of the Empty <code>fun_control</code> Dictionary</h2>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    tensorboard_path<span class="op">=</span><span class="st">"runs/10_spot_hpt_sklearn_classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="load-data-classification" class="level2">
+<h2 class="anchored" data-anchor-id="load-data-classification">1. Load Data: Classification</h2>
+<ul>
+<li>Randomly generate classification data.</li>
+</ul>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>n_features <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="dv">250</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>target_column <span class="op">=</span> <span class="st">"y"</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span>  make_moons(n_samples, noise<span class="op">=</span><span class="fl">0.5</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>X, y <span class="op">=</span> ds</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    X, y, test_size<span class="op">=</span><span class="fl">0.4</span>, random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> pd.DataFrame(np.hstack((X_train, y_train.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> pd.DataFrame(np.hstack((X_test, y_test.reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>train.columns <span class="op">=</span> [<span class="ss">f"x</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_features<span class="op">+</span><span class="dv">1</span>)] <span class="op">+</span> [target_column]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>test.columns <span class="op">=</span> [<span class="ss">f"x</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_features<span class="op">+</span><span class="dv">1</span>)] <span class="op">+</span> [target_column]</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>train.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> ListedColormap</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>x_min, x_max <span class="op">=</span> X[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, X[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>y_min, y_max <span class="op">=</span> X[:, <span class="dv">1</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, X[:, <span class="dv">1</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># just plot the dataset first</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>cm <span class="op">=</span> plt.cm.RdBu</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>cm_bright <span class="op">=</span> ListedColormap([<span class="st">"#FF0000"</span>, <span class="st">"#0000FF"</span>])</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> plt.subplot(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Input data"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the training points</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>ax.scatter(X_train[:, <span class="dv">0</span>], X_train[:, <span class="dv">1</span>], c<span class="op">=</span>y_train, cmap<span class="op">=</span>cm_bright, edgecolors<span class="op">=</span><span class="st">"k"</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the testing points</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>ax.scatter(</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    X_test[:, <span class="dv">0</span>], X_test[:, <span class="dv">1</span>], c<span class="op">=</span>y_test, cmap<span class="op">=</span>cm_bright, alpha<span class="op">=</span><span class="fl">0.6</span>, edgecolors<span class="op">=</span><span class="st">"k"</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(x_min, x_max)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(y_min, y_max)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(())</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(())</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="bu">len</span>(train)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># add the dataset to the fun_control</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>, <span class="co"># dataset,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: target_column})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="specification-of-the-preprocessing-model" class="level2">
+<h2 class="anchored" data-anchor-id="specification-of-the-preprocessing-model">2. Specification of the Preprocessing Model</h2>
+<p>Data preprocesssing can be very simple, e.g., you can ignore it. Then you would choose the <code>prep_model</code> “None”:</p>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A default approach for numerical data is the <code>StandardScaler</code> (mean 0, variance 1). This can be selected as follows:</p>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> StandardScaler()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Even more complicated pre-processing steps are possible, e.g., the follwing pipeline:</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># categorical_columns = []</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># one_hot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># prep_model = ColumnTransformer(</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#         transformers=[</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#             ("categorical", one_hot_encoder, categorical_columns),</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         ],</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         remainder=StandardScaler(),</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="select-algorithm-and-core_model_hyper_dict" class="level2">
+<h2 class="anchored" data-anchor-id="select-algorithm-and-core_model_hyper_dict">3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
+<p>The selection of the algorithm (ML model) that should be tuned is done by specifying the its name from the <code>sklearn</code> implementation. For example, the <code>SVC</code> support vector machine classifier is selected as follows:</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model  = RidgeCV</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model = GradientBoostingRegressor</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model = ElasticNet</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model = RandomForestClassifier</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>core_model <span class="op">=</span> SVC</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model = LogisticRegression</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model = KNeighborsClassifier</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># core_model = GradientBoostingClassifier</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>SklearnHyperDict,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now <code>fun_control</code> has the information from the JSON file:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>    <span class="er">"SVC":</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"C"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"float"</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="fl">1.0</span><span class="fu">,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="fl">0.1</span><span class="fu">,</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="fl">10.0</span><span class="fu">},</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"kernel"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"linear"</span><span class="ot">,</span> <span class="st">"poly"</span><span class="ot">,</span> <span class="st">"rbf"</span><span class="ot">,</span> <span class="st">"sigmoid"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"rbf"</span><span class="fu">,</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"str"</span><span class="fu">,</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">},</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"degree"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"int"</span><span class="fu">,</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">},</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"gamma"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"scale"</span><span class="ot">,</span> <span class="st">"auto"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"scale"</span><span class="fu">,</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"str"</span><span class="fu">,</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">},</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"coef0"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"float"</span><span class="fu">,</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="fl">0.0</span><span class="fu">,</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="fl">0.0</span><span class="fu">,</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="fl">0.0</span><span class="fu">},</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"shrinking"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"bool"</span><span class="fu">,</span></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">},</span></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"probability"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"bool"</span><span class="fu">,</span></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">},</span></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"tol"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"float"</span><span class="fu">,</span></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">1e-3</span><span class="fu">,</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">1e-4</span><span class="fu">,</span></span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1e-2</span><span class="fu">},</span></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"cache_size"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"float"</span><span class="fu">,</span></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">200</span><span class="fu">,</span></span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">100</span><span class="fu">,</span></span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">400</span><span class="fu">},</span></span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"break_ties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">,</span> <span class="dv">1</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"default"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"bool"</span><span class="fu">,</span></span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a>            <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">}</span></span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2">
+<h2 class="anchored" data-anchor-id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model">4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
+<section id="modify-hyperparameter-of-type-factor" class="level3">
+<h3 class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor">Modify hyperparameter of type factor</h3>
+<p>Factors can be modified with the <code>modify_hyper_parameter_levels</code> function. For example, to exclude the <code>sigmoid</code> kernel from the tuning, the <code>kernel</code> hyperparameter of the <code>SVC</code> model can be modified as follows:</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_levels(fun_control, <span class="st">"kernel"</span>, [<span class="st">"linear"</span>, <span class="st">"poly"</span>, <span class="st">"rbf"</span>])</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">"core_model_hyper_dict"</span>][<span class="st">"kernel"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3">
+<h3 class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean">Modify hyperparameter of type numeric and integer (boolean)</h3>
+<p>Numeric and boolean values can be modified using the <code>modify_hyper_parameter_bounds</code> method. For example, to change the <code>tol</code> hyperparameter of the <code>SVC</code> model to the interval [1e-3, 1e-2], the following code can be used:</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"tol"</span>, bounds<span class="op">=</span>[<span class="fl">1e-3</span>, <span class="fl">1e-2</span>])</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_bounds(fun_control, "min_samples_split", bounds=[3, 20])</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co">#fun_control = modify_hyper_parameter_bounds(fun_control, "merit_preprune", bounds=[0, 0])</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">"core_model_hyper_dict"</span>][<span class="st">"tol"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="selection-of-the-objective-loss-function" class="level2">
+<h2 class="anchored" data-anchor-id="selection-of-the-objective-loss-function">5. Selection of the Objective (Loss) Function</h2>
+<p>There are two metrics:</p>
+<pre><code>1. `metric_river` is used for the river based evaluation via `eval_oml_iter_progressive`.
+2. `metric_sklearn` is used for the sklearn based evaluation.</code></pre>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperSklearn(seed<span class="op">=</span><span class="dv">123</span>, log_level<span class="op">=</span><span class="dv">50</span>).fun_sklearn</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># metric_sklearn = roc_auc_score</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># weights = -1.0</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>metric_sklearn <span class="op">=</span> log_loss</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># k = None</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># custom_metric = mapk</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizon"</span>: <span class="va">None</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"oml_grace_period"</span>: <span class="va">None</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weights"</span>: weights,</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"step"</span>: <span class="va">None</span>,</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"log_level"</span>: <span class="dv">50</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weight_coeff"</span>: <span class="va">None</span>,</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_river"</span>: <span class="va">None</span>,</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_sklearn"</span>: metric_sklearn,</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>               <span class="co"># "metric_params": {"k": k},</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="predict-classes-or-class-probabilities" class="level3">
+<h3 class="anchored" data-anchor-id="predict-classes-or-class-probabilities">Predict Classes or Class Probabilities</h3>
+<p>If the key <code>"predict_proba"</code> is set to <code>True</code>, the class probabilities are predicted. <code>False</code> is the default, i.e., the classes are predicted.</p>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"predict_proba"</span>: <span class="va">False</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="calling-the-spot-function" class="level2">
+<h2 class="anchored" data-anchor-id="calling-the-spot-function">6. Calling the SPOT Function</h2>
+<section id="prepare-the-spot-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="prepare-the-spot-parameters">Prepare the SPOT Parameters</h3>
+<ul>
+<li>Get types and variable names as well as lower and upper bounds for the hyperparameters.</li>
+</ul>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"var_type"</span>: var_type,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"var_name"</span>: var_name})</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="run-the-spot-optimizer" class="level3">
+<h3 class="anchored" data-anchor-id="run-the-spot-optimizer">Run the <code>Spot</code> Optimizer</h3>
+<ul>
+<li>Run SPOT for approx. x mins (<code>max_time</code>).</li>
+<li>Note: the run takes longer, because the evaluation time of initial design (here: <code>initi_size</code>, 20 points) is not considered.</li>
+</ul>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>hyper_dict<span class="op">=</span>SklearnHyperDict().load()</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control, hyper_dict)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                   fun_repeats <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                   noise <span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                   infill_criterion <span class="op">=</span> <span class="st">"y"</span>,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                   n_points <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>                   log_level <span class="op">=</span> <span class="dv">50</span>,</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE,</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_optimizer"</span>: differential_evolution,</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span>,</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"log_level"</span>: <span class="dv">50</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>                                      })</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">4 Results</h3>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_ch10-friedman-hpt-0_maans03_60min_20init_1K_2023-04-14_10-11-19.pkl"</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Show the Progress of the hyperparameter tuning:</li>
+</ul>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Print the Results</li>
+</ul>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="show-variable-importance" class="level2">
+<h2 class="anchored" data-anchor-id="show-variable-importance">Show variable importance</h2>
+<div class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="get-default-hyperparameters" class="level2">
+<h2 class="anchored" data-anchor-id="get-default-hyperparameters">Get Default Hyperparameters</h2>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> get_default_values(fun_control)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> transform_hyper_parameter_values(fun_control<span class="op">=</span>fun_control, hyper_parameter_values<span class="op">=</span>values_default)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>values_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> make_pipeline(fun_control[<span class="st">"prep_model"</span>], fun_control[<span class="st">"core_model"</span>](<span class="op">**</span>values_default))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="get-spot-results" class="level2">
+<h2 class="anchored" data-anchor-id="get-spot-results">Get SPOT Results</h2>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>v_dict <span class="op">=</span> assign_values(X, fun_control[<span class="st">"var_name"</span>])</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>return_conf_list_from_var_dict(var_dict<span class="op">=</span>v_dict, fun_control<span class="op">=</span>fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_sklearn_model_from_X(X, fun_control)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot-compare-predictions" class="level2">
+<h2 class="anchored" data-anchor-id="plot-compare-predictions">Plot: Compare Predictions</h2>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>plot_roc([model_default, model_spot], fun_control, model_names<span class="op">=</span>[<span class="st">"Default"</span>, <span class="st">"Spot"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>plot_confusion_matrix(model_default, fun_control, title <span class="op">=</span> <span class="st">"Default"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>plot_confusion_matrix(model_spot, fun_control, title<span class="op">=</span><span class="st">"SPOT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="bu">min</span>(spot_tuner.y), <span class="bu">max</span>(spot_tuner.y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="detailed-hyperparameter-plots" class="level2">
+<h2 class="anchored" data-anchor-id="detailed-hyperparameter-plots">Detailed Hyperparameter Plots</h2>
+<ul>
+<li>For productive use, you might want to select:
+<ul>
+<li><code>min_z=min(spot_tuner.y)</code> and</li>
+<li><code>max_z = max(spot_tuner.y)</code></li>
+</ul></li>
+<li>These settings are not so colorful as visualizations that use <code>None</code> for the ranges, but give better insights.</li>
+</ul>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>threshold <span class="op">=</span> <span class="fl">0.025</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>impo <span class="op">=</span> spot_tuner.print_importance(threshold<span class="op">=</span>threshold, print_screen<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>var_plots <span class="op">=</span> [i <span class="cf">for</span> i, x <span class="kw">in</span> <span class="bu">enumerate</span>(impo) <span class="cf">if</span> x[<span class="dv">1</span>] <span class="op">&gt;</span> threshold]</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>min_z <span class="op">=</span> <span class="bu">min</span>(spot_tuner.y)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>max_z <span class="op">=</span> <span class="bu">max</span>(spot_tuner.y)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> spot_tuner.k</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> var_plots:</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> var_plots:</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> j <span class="op">&gt;</span> i:</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>            filename <span class="op">=</span> <span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_contour_"</span><span class="op">+</span><span class="bu">str</span>(i)<span class="op">+</span><span class="st">"_"</span><span class="op">+</span><span class="bu">str</span>(j)<span class="op">+</span><span class="st">".pdf"</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z, filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="parallel-coordinates-plot" class="level2">
+<h2 class="anchored" data-anchor-id="parallel-coordinates-plot">Parallel Coordinates Plot</h2>
+<div class="cell" data-execution_count="36">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot-all-combinations-of-hyperparameters" class="level2">
+<h2 class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters">Plot all Combinations of Hyperparameters</h2>
+<ul>
+<li>Warning: this may take a while.</li>
+</ul>
+<div class="cell" data-execution_count="37">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
