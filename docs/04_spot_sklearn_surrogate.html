@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>spot_sklearn_surrogate</title>
+<title>Hyperparameter-tuning Cookbook - 5&nbsp; Sequential Parameter Optimization</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -58,11 +58,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./05_spot_sklearn_optimization.html" rel="next">
+<link href="./03_spot_anisotropic.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -94,24 +97,234 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 5&nbsp; Sequential Parameter Optimization">
+<meta name="twitter:image" content="04_spot_sklearn_surrogate_files/figure-html/cell-8-output-1.png">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body>
+<body class="nav-sidebar docked">
 
 <div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04_spot_sklearn_surrogate.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Hyperparameter-tuning Cookbook</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sequential-parameter-optimization/spotPython" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Hyperparameter-tuning-Cookbook.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="04_spot_sklearn_surrogate.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#using-sklearn-surrogates" id="toc-using-sklearn-surrogates" class="nav-link active" data-scroll-target="#using-sklearn-surrogates"><span class="header-section-number">5.1</span> Using <code>sklearn</code> Surrogates</a></li>
+  <li><a href="#example-branin-function-with-spotpythons-internal-kriging-surrogate" id="toc-example-branin-function-with-spotpythons-internal-kriging-surrogate" class="nav-link" data-scroll-target="#example-branin-function-with-spotpythons-internal-kriging-surrogate"><span class="header-section-number">5.2</span> 1 Example: Branin Function with <code>spotPython</code>’s Internal Kriging Surrogate</a>
+  <ul class="collapse">
+  <li><a href="#the-objective-function-branin" id="toc-the-objective-function-branin" class="nav-link" data-scroll-target="#the-objective-function-branin"><span class="header-section-number">5.2.1</span> The Objective Function Branin</a></li>
+  <li><a href="#running-the-surrogate-model-based-optimizer-spot" id="toc-running-the-surrogate-model-based-optimizer-spot" class="nav-link" data-scroll-target="#running-the-surrogate-model-based-optimizer-spot"><span class="header-section-number">5.2.2</span> Running the surrogate model based optimizer <code>Spot</code>:</a></li>
+  <li><a href="#print-the-results" id="toc-print-the-results" class="nav-link" data-scroll-target="#print-the-results"><span class="header-section-number">5.2.3</span> Print the Results</a></li>
+  <li><a href="#show-the-progress-and-the-surrogate" id="toc-show-the-progress-and-the-surrogate" class="nav-link" data-scroll-target="#show-the-progress-and-the-surrogate"><span class="header-section-number">5.2.4</span> Show the Progress and the Surrogate</a></li>
+  </ul></li>
+  <li><a href="#example-using-surrogates-from-scikit-learn" id="toc-example-using-surrogates-from-scikit-learn" class="nav-link" data-scroll-target="#example-using-surrogates-from-scikit-learn"><span class="header-section-number">5.3</span> 2 Example: Using Surrogates From scikit-learn</a>
+  <ul class="collapse">
+  <li><a href="#gaussianprocessregressor-as-a-surrogate" id="toc-gaussianprocessregressor-as-a-surrogate" class="nav-link" data-scroll-target="#gaussianprocessregressor-as-a-surrogate"><span class="header-section-number">5.3.1</span> GaussianProcessRegressor as a Surrogate</a></li>
+  </ul></li>
+  <li><a href="#example-one-dimensional-sphere-function-with-spotpythons-kriging" id="toc-example-one-dimensional-sphere-function-with-spotpythons-kriging" class="nav-link" data-scroll-target="#example-one-dimensional-sphere-function-with-spotpythons-kriging"><span class="header-section-number">6</span> 3 Example: One-dimensional Sphere Function With <code>spotPython</code>’s Kriging</a>
+  <ul class="collapse">
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">6.0.1</span> Results</a></li>
+  <li><a href="#example-sklearn-model-gaussianprocess" id="toc-example-sklearn-model-gaussianprocess" class="nav-link" data-scroll-target="#example-sklearn-model-gaussianprocess"><span class="header-section-number">6.1</span> 4 Example: <code>Sklearn</code> Model GaussianProcess</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1"><span class="header-section-number">7.1</span> Exercise 1</a>
+  <ul class="collapse">
+  <li><a href="#decisiontreeregressor" id="toc-decisiontreeregressor" class="nav-link" data-scroll-target="#decisiontreeregressor"><span class="header-section-number">7.1.1</span> 1. <code>DecisionTreeRegressor</code></a></li>
+  <li><a href="#randomforestregressor" id="toc-randomforestregressor" class="nav-link" data-scroll-target="#randomforestregressor"><span class="header-section-number">7.1.2</span> 2. <code>RandomForestRegressor</code></a></li>
+  <li><a href="#linear_model.linearregression" id="toc-linear_model.linearregression" class="nav-link" data-scroll-target="#linear_model.linearregression"><span class="header-section-number">7.1.3</span> 3.<code>linear_model.LinearRegression</code></a></li>
+  <li><a href="#linear_model.ridge" id="toc-linear_model.ridge" class="nav-link" data-scroll-target="#linear_model.ridge"><span class="header-section-number">7.1.4</span> 4. <code>linear_model.Ridge</code></a></li>
+  </ul></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2"><span class="header-section-number">7.2</span> Exercise 2</a></li>
+  <li><a href="#solutions" id="toc-solutions" class="nav-link" data-scroll-target="#solutions"><span class="header-section-number">7.3</span> Solutions</a>
+  <ul class="collapse">
+  <li><a href="#decisiontreeregressor-1" id="toc-decisiontreeregressor-1" class="nav-link" data-scroll-target="#decisiontreeregressor-1"><span class="header-section-number">7.3.1</span> 1. <code>DecisionTreeRegressor</code></a></li>
+  <li><a href="#randomforestregressor-1" id="toc-randomforestregressor-1" class="nav-link" data-scroll-target="#randomforestregressor-1"><span class="header-section-number">7.3.2</span> 2. <code>RandomForestRegressor</code></a></li>
+  <li><a href="#linear_model.linearregression-1" id="toc-linear_model.linearregression-1" class="nav-link" data-scroll-target="#linear_model.linearregression-1"><span class="header-section-number">7.3.3</span> 3. <code>linear_model.LinearRegression</code></a></li>
+  <li><a href="#linear_model.ridge-1" id="toc-linear_model.ridge-1" class="nav-link" data-scroll-target="#linear_model.ridge-1"><span class="header-section-number">7.3.4</span> 4. <code>linear_model.Ridge</code></a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Sequential Parameter Optimization</h1>
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></h1>
 </div>
 
 
@@ -126,8 +339,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="using-sklearn-surrogates" class="level2">
-<h2 class="anchored" data-anchor-id="using-sklearn-surrogates">Using <code>sklearn</code> Surrogates</h2>
+<section id="using-sklearn-surrogates" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="using-sklearn-surrogates"><span class="header-section-number">5.1</span> Using <code>sklearn</code> Surrogates</h2>
 <ul>
 <li>This notebook explains how different surrogate models from <code>scikit-learn</code> can be used as surrogates in <code>spotPython</code> optimization runs.</li>
 </ul>
@@ -142,10 +355,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="example-branin-function-with-spotpythons-internal-kriging-surrogate" class="level2">
-<h2 class="anchored" data-anchor-id="example-branin-function-with-spotpythons-internal-kriging-surrogate">1 Example: Branin Function with <code>spotPython</code>’s Internal Kriging Surrogate</h2>
-<section id="the-objective-function-branin" class="level3">
-<h3 class="anchored" data-anchor-id="the-objective-function-branin">The Objective Function Branin</h3>
+<section id="example-branin-function-with-spotpythons-internal-kriging-surrogate" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="example-branin-function-with-spotpythons-internal-kriging-surrogate"><span class="header-section-number">5.2</span> 1 Example: Branin Function with <code>spotPython</code>’s Internal Kriging Surrogate</h2>
+<section id="the-objective-function-branin" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="the-objective-function-branin"><span class="header-section-number">5.2.1</span> The Objective Function Branin</h3>
 <ul>
 <li><p>The <code>spotPython</code> package provides several classes of objective functions.</p></li>
 <li><p>We will use an analytical objective function, i.e., a function that can be described by a (closed) formula.</p></li>
@@ -165,8 +378,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> analytical().fun_branin</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="running-the-surrogate-model-based-optimizer-spot" class="level3">
-<h3 class="anchored" data-anchor-id="running-the-surrogate-model-based-optimizer-spot">Running the surrogate model based optimizer <code>Spot</code>:</h3>
+<section id="running-the-surrogate-model-based-optimizer-spot" class="level3" data-number="5.2.2">
+<h3 data-number="5.2.2" class="anchored" data-anchor-id="running-the-surrogate-model-based-optimizer-spot"><span class="header-section-number">5.2.2</span> Running the surrogate model based optimizer <code>Spot</code>:</h3>
 <div class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>spot_2 <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
@@ -179,12 +392,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>spot_2.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x10735c250&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x10605d000&gt;</code></pre>
 </div>
 </div>
 </section>
-<section id="print-the-results" class="level3">
-<h3 class="anchored" data-anchor-id="print-the-results">Print the Results</h3>
+<section id="print-the-results" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="print-the-results"><span class="header-section-number">5.2.3</span> Print the Results</h3>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>spot_2.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -197,8 +410,8 @@ x1: 2.2926027772585886</code></pre>
 </div>
 </div>
 </section>
-<section id="show-the-progress-and-the-surrogate" class="level3">
-<h3 class="anchored" data-anchor-id="show-the-progress-and-the-surrogate">Show the Progress and the Surrogate</h3>
+<section id="show-the-progress-and-the-surrogate" class="level3" data-number="5.2.4">
+<h3 data-number="5.2.4" class="anchored" data-anchor-id="show-the-progress-and-the-surrogate"><span class="header-section-number">5.2.4</span> Show the Progress and the Surrogate</h3>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>spot_2.plot_progress(log_y<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -213,8 +426,8 @@ x1: 2.2926027772585886</code></pre>
 </div>
 </section>
 </section>
-<section id="example-using-surrogates-from-scikit-learn" class="level2">
-<h2 class="anchored" data-anchor-id="example-using-surrogates-from-scikit-learn">2 Example: Using Surrogates From scikit-learn</h2>
+<section id="example-using-surrogates-from-scikit-learn" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="example-using-surrogates-from-scikit-learn"><span class="header-section-number">5.3</span> 2 Example: Using Surrogates From scikit-learn</h2>
 <ul>
 <li>Default is the <code>spotPython</code> (i.e., the internal) <code>kriging</code> surrogate.</li>
 <li>It can be called explicitely and passed to <code>Spot</code>.</li>
@@ -245,8 +458,8 @@ x1: 2.2926027772585886</code></pre>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>S_Ridge <span class="op">=</span> linear_model.Ridge()</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>S_RF <span class="op">=</span> RandomForestRegressor(max_depth<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="gaussianprocessregressor-as-a-surrogate" class="level3">
-<h3 class="anchored" data-anchor-id="gaussianprocessregressor-as-a-surrogate">GaussianProcessRegressor as a Surrogate</h3>
+<section id="gaussianprocessregressor-as-a-surrogate" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="gaussianprocessregressor-as-a-surrogate"><span class="header-section-number">5.3.1</span> GaussianProcessRegressor as a Surrogate</h3>
 <ul>
 <li>To use a Gaussian Process model from <code>sklearn</code>, that is similar to <code>spotPython</code>’s <code>Kriging</code>, we can proceed as follows:</li>
 </ul>
@@ -285,7 +498,7 @@ x1: 2.2926027772585886</code></pre>
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                   surrogate <span class="op">=</span> S_GP)</span>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>spot_2_GP.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x2963a4c70&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x28df9cac0&gt;</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="16">
@@ -297,18 +510,18 @@ x1: 2.2926027772585886</code></pre>
 <div class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>spot_2_GP.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>min y: 0.3979464195375453
-x0: 3.145047074035537
-x1: 2.2736382792584244</code></pre>
+<pre><code>min y: 0.39818416017212854
+x0: 3.1492489685308644
+x1: 2.2729571758527487</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="17">
-<pre><code>[['x0', 3.145047074035537], ['x1', 2.2736382792584244]]</code></pre>
+<pre><code>[['x0', 3.1492489685308644], ['x1', 2.2729571758527487]]</code></pre>
 </div>
 </div>
 </section>
 </section>
-<section id="example-one-dimensional-sphere-function-with-spotpythons-kriging" class="level1">
-<h1>3 Example: One-dimensional Sphere Function With <code>spotPython</code>’s Kriging</h1>
+<section id="example-one-dimensional-sphere-function-with-spotpythons-kriging" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> 3 Example: One-dimensional Sphere Function With <code>spotPython</code>’s Kriging</h1>
 <ul>
 <li>In this example, we will use an one-dimensional function, which allows us to visualize the optimization process.
 <ul>
@@ -357,11 +570,11 @@ x1: 2.2736382792584244</code></pre>
 <p><img src="04_spot_sklearn_surrogate_files/figure-html/cell-20-output-8.png" width="604" height="449"></p>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="19">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x2963a4c40&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x28dfc5150&gt;</code></pre>
 </div>
 </div>
-<section id="results" class="level3">
-<h3 class="anchored" data-anchor-id="results">Results</h3>
+<section id="results" class="level3" data-number="6.0.1">
+<h3 data-number="6.0.1" class="anchored" data-anchor-id="results"><span class="header-section-number">6.0.1</span> Results</h3>
 <div class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>spot_1.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -388,8 +601,8 @@ x0: -0.00021022017702259125</code></pre>
 </div>
 </div>
 </section>
-<section id="example-sklearn-model-gaussianprocess" class="level2">
-<h2 class="anchored" data-anchor-id="example-sklearn-model-gaussianprocess">4 Example: <code>Sklearn</code> Model GaussianProcess</h2>
+<section id="example-sklearn-model-gaussianprocess" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="example-sklearn-model-gaussianprocess"><span class="header-section-number">6.1</span> 4 Example: <code>Sklearn</code> Model GaussianProcess</h2>
 <ul>
 <li>This example visualizes the search process on the <code>GaussianProcessRegression</code> surrogate from <code>sklearn</code>.</li>
 <li>Therefore <code>surrogate = S_GP</code> is added to the argument list.</li>
@@ -431,17 +644,17 @@ x0: -0.00021022017702259125</code></pre>
 <p><img src="04_spot_sklearn_surrogate_files/figure-html/cell-24-output-8.png" width="604" height="449"></p>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="23">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x295e0cc70&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x17ff44250&gt;</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>spot_1_GP.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>min y: 3.0134876506351976e-09
-x0: 5.489524251367506e-05</code></pre>
+<pre><code>min y: 3.4820096247785327e-09
+x0: -5.900855552187778e-05</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="24">
-<pre><code>[['x0', 5.489524251367506e-05]]</code></pre>
+<pre><code>[['x0', -5.900855552187778e-05]]</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="25">
@@ -458,8 +671,8 @@ x0: 5.489524251367506e-05</code></pre>
 </div>
 </section>
 </section>
-<section id="exercises" class="level1">
-<h1>Exercises</h1>
+<section id="exercises" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Exercises</h1>
 <ul>
 <li>Important:
 <ul>
@@ -470,43 +683,43 @@ x0: 5.489524251367506e-05</code></pre>
 <li>spotPython version <code>0.16.11</code> (or greater) is required (see http://www.gm.fh-koeln.de/~bartz/site/download/)</li>
 </ul></li>
 </ul>
-<section id="exercise-1" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
+<section id="exercise-1" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="exercise-1"><span class="header-section-number">7.1</span> Exercise 1</h2>
 <ul>
 <li>Each team member should choose one of the following surrogates and repeat the experiments from Example 2 and Example 4.</li>
 <li>Please add your name to the section title!</li>
 </ul>
-<section id="decisiontreeregressor" class="level3">
-<h3 class="anchored" data-anchor-id="decisiontreeregressor">1. <code>DecisionTreeRegressor</code></h3>
+<section id="decisiontreeregressor" class="level3" data-number="7.1.1">
+<h3 data-number="7.1.1" class="anchored" data-anchor-id="decisiontreeregressor"><span class="header-section-number">7.1.1</span> 1. <code>DecisionTreeRegressor</code></h3>
 <ul>
 <li>Describe the surrogate model.</li>
 <li>Use the surrogate as the model for optimization.</li>
 </ul>
 </section>
-<section id="randomforestregressor" class="level3">
-<h3 class="anchored" data-anchor-id="randomforestregressor">2. <code>RandomForestRegressor</code></h3>
+<section id="randomforestregressor" class="level3" data-number="7.1.2">
+<h3 data-number="7.1.2" class="anchored" data-anchor-id="randomforestregressor"><span class="header-section-number">7.1.2</span> 2. <code>RandomForestRegressor</code></h3>
 <ul>
 <li>Describe the surrogate model.</li>
 <li>Use the surrogate as the model for optimization.</li>
 </ul>
 </section>
-<section id="linear_model.linearregression" class="level3">
-<h3 class="anchored" data-anchor-id="linear_model.linearregression">3.<code>linear_model.LinearRegression</code></h3>
+<section id="linear_model.linearregression" class="level3" data-number="7.1.3">
+<h3 data-number="7.1.3" class="anchored" data-anchor-id="linear_model.linearregression"><span class="header-section-number">7.1.3</span> 3.<code>linear_model.LinearRegression</code></h3>
 <ul>
 <li>Describe the surrogate model.</li>
 <li>Use the surrogate as the model for optimization.</li>
 </ul>
 </section>
-<section id="linear_model.ridge" class="level3">
-<h3 class="anchored" data-anchor-id="linear_model.ridge">4. <code>linear_model.Ridge</code></h3>
+<section id="linear_model.ridge" class="level3" data-number="7.1.4">
+<h3 data-number="7.1.4" class="anchored" data-anchor-id="linear_model.ridge"><span class="header-section-number">7.1.4</span> 4. <code>linear_model.Ridge</code></h3>
 <ul>
 <li>Describe the surrogate model.</li>
 <li>Use the surrogate as the model for optimization.</li>
 </ul>
 </section>
 </section>
-<section id="exercise-2" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
+<section id="exercise-2" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="exercise-2"><span class="header-section-number">7.2</span> Exercise 2</h2>
 <ul>
 <li>(All group members): Compare the performance of the 5 different surrogates on both objective functions:
 <ul>
@@ -518,42 +731,42 @@ x0: 5.489524251367506e-05</code></pre>
 </ul></li>
 </ul>
 </section>
-<section id="solutions" class="level2">
-<h2 class="anchored" data-anchor-id="solutions">Solutions</h2>
-<section id="decisiontreeregressor-1" class="level3">
-<h3 class="anchored" data-anchor-id="decisiontreeregressor-1">1. <code>DecisionTreeRegressor</code></h3>
-<section id="branin" class="level4">
-<h4 class="anchored" data-anchor-id="branin">1.1. Branin</h4>
+<section id="solutions" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="solutions"><span class="header-section-number">7.3</span> Solutions</h2>
+<section id="decisiontreeregressor-1" class="level3" data-number="7.3.1">
+<h3 data-number="7.3.1" class="anchored" data-anchor-id="decisiontreeregressor-1"><span class="header-section-number">7.3.1</span> 1. <code>DecisionTreeRegressor</code></h3>
+<section id="branin" class="level4" data-number="7.3.1.1">
+<h4 data-number="7.3.1.1" class="anchored" data-anchor-id="branin"><span class="header-section-number">7.3.1.1</span> 1.1. Branin</h4>
 </section>
-<section id="sphere" class="level4">
-<h4 class="anchored" data-anchor-id="sphere">1.2. Sphere</h4>
-</section>
-</section>
-<section id="randomforestregressor-1" class="level3">
-<h3 class="anchored" data-anchor-id="randomforestregressor-1">2. <code>RandomForestRegressor</code></h3>
-<section id="branin-1" class="level4">
-<h4 class="anchored" data-anchor-id="branin-1">2.1 Branin</h4>
-</section>
-<section id="sphere-1" class="level4">
-<h4 class="anchored" data-anchor-id="sphere-1">2.2 Sphere</h4>
+<section id="sphere" class="level4" data-number="7.3.1.2">
+<h4 data-number="7.3.1.2" class="anchored" data-anchor-id="sphere"><span class="header-section-number">7.3.1.2</span> 1.2. Sphere</h4>
 </section>
 </section>
-<section id="linear_model.linearregression-1" class="level3">
-<h3 class="anchored" data-anchor-id="linear_model.linearregression-1">3. <code>linear_model.LinearRegression</code></h3>
-<section id="branin-2" class="level4">
-<h4 class="anchored" data-anchor-id="branin-2">3.1 Branin</h4>
+<section id="randomforestregressor-1" class="level3" data-number="7.3.2">
+<h3 data-number="7.3.2" class="anchored" data-anchor-id="randomforestregressor-1"><span class="header-section-number">7.3.2</span> 2. <code>RandomForestRegressor</code></h3>
+<section id="branin-1" class="level4" data-number="7.3.2.1">
+<h4 data-number="7.3.2.1" class="anchored" data-anchor-id="branin-1"><span class="header-section-number">7.3.2.1</span> 2.1 Branin</h4>
 </section>
-<section id="sphere-2" class="level4">
-<h4 class="anchored" data-anchor-id="sphere-2">3.2 Sphere</h4>
+<section id="sphere-1" class="level4" data-number="7.3.2.2">
+<h4 data-number="7.3.2.2" class="anchored" data-anchor-id="sphere-1"><span class="header-section-number">7.3.2.2</span> 2.2 Sphere</h4>
 </section>
 </section>
-<section id="linear_model.ridge-1" class="level3">
-<h3 class="anchored" data-anchor-id="linear_model.ridge-1">4. <code>linear_model.Ridge</code></h3>
-<section id="branin-3" class="level4">
-<h4 class="anchored" data-anchor-id="branin-3">4.1 Branin</h4>
+<section id="linear_model.linearregression-1" class="level3" data-number="7.3.3">
+<h3 data-number="7.3.3" class="anchored" data-anchor-id="linear_model.linearregression-1"><span class="header-section-number">7.3.3</span> 3. <code>linear_model.LinearRegression</code></h3>
+<section id="branin-2" class="level4" data-number="7.3.3.1">
+<h4 data-number="7.3.3.1" class="anchored" data-anchor-id="branin-2"><span class="header-section-number">7.3.3.1</span> 3.1 Branin</h4>
 </section>
-<section id="sphere-3" class="level4">
-<h4 class="anchored" data-anchor-id="sphere-3">4.2 Sphere</h4>
+<section id="sphere-2" class="level4" data-number="7.3.3.2">
+<h4 data-number="7.3.3.2" class="anchored" data-anchor-id="sphere-2"><span class="header-section-number">7.3.3.2</span> 3.2 Sphere</h4>
+</section>
+</section>
+<section id="linear_model.ridge-1" class="level3" data-number="7.3.4">
+<h3 data-number="7.3.4" class="anchored" data-anchor-id="linear_model.ridge-1"><span class="header-section-number">7.3.4</span> 4. <code>linear_model.Ridge</code></h3>
+<section id="branin-3" class="level4" data-number="7.3.4.1">
+<h4 data-number="7.3.4.1" class="anchored" data-anchor-id="branin-3"><span class="header-section-number">7.3.4.1</span> 4.1 Branin</h4>
+</section>
+<section id="sphere-3" class="level4" data-number="7.3.4.2">
+<h4 data-number="7.3.4.2" class="anchored" data-anchor-id="sphere-3"><span class="header-section-number">7.3.4.2</span> 4.2 Sphere</h4>
 
 
 </section>
@@ -795,6 +1008,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./03_spot_anisotropic.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./05_spot_sklearn_optimization.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

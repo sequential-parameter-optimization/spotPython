@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>spot_hpt_torch_cifar10</title>
+<title>Hyperparameter-tuning Cookbook - 13&nbsp; Chapter 12: Sequential Parameter Optimization</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -77,11 +77,14 @@ div.csl-indent {
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
 <script src="site_libs/clipboard/clipboard.min.js"></script>
 <script src="site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./14_spot_ray_hpt_torch_cifar10.html" rel="next">
+<link href="./11_spot_hpt_torch_fashion_mnist.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -113,24 +116,227 @@ div.csl-indent {
 }</script>
 
 
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 13&nbsp; Chapter 12: Sequential Parameter Optimization">
+<meta name="twitter:description" content="">
+<meta name="twitter:card" content="summary">
 </head>
 
-<body>
+<body class="nav-sidebar docked">
 
 <div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./12_spot_hpt_torch_cifar10.html"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Hyperparameter-tuning Cookbook</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sequential-parameter-optimization/spotPython" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Hyperparameter-tuning-Cookbook.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="12_spot_hpt_torch_cifar10.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#hyperparameter-tuning-pytorch-wth-cifar10-data" id="toc-hyperparameter-tuning-pytorch-wth-cifar10-data" class="nav-link active" data-scroll-target="#hyperparameter-tuning-pytorch-wth-cifar10-data"><span class="header-section-number">13.1</span> Hyperparameter Tuning: pytorch wth cifar10 Data</a></li>
+  <li><a href="#initialization-of-the-empty-fun_control-dictionary" id="toc-initialization-of-the-empty-fun_control-dictionary" class="nav-link" data-scroll-target="#initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">13.2</span> 0. Initialization of the Empty <code>fun_control</code> Dictionary</a></li>
+  <li><a href="#load-data-cifar10-data" id="toc-load-data-cifar10-data" class="nav-link" data-scroll-target="#load-data-cifar10-data"><span class="header-section-number">13.3</span> 1. Load Data Cifar10 Data</a></li>
+  <li><a href="#specification-of-the-preprocessing-model" id="toc-specification-of-the-preprocessing-model" class="nav-link" data-scroll-target="#specification-of-the-preprocessing-model"><span class="header-section-number">13.4</span> 2. Specification of the Preprocessing Model</a></li>
+  <li><a href="#select-algorithm-and-core_model_hyper_dict" id="toc-select-algorithm-and-core_model_hyper_dict" class="nav-link" data-scroll-target="#select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">13.5</span> 3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></a>
+  <ul class="collapse">
+  <li><a href="#the-hyper_dict-hyperparameters-for-the-selected-algorithm" id="toc-the-hyper_dict-hyperparameters-for-the-selected-algorithm" class="nav-link" data-scroll-target="#the-hyper_dict-hyperparameters-for-the-selected-algorithm"><span class="header-section-number">13.5.1</span> The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</a></li>
+  <li><a href="#categorical-hyperparameters" id="toc-categorical-hyperparameters" class="nav-link" data-scroll-target="#categorical-hyperparameters"><span class="header-section-number">13.5.2</span> Categorical Hyperparameters</a></li>
+  </ul></li>
+  <li><a href="#modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" id="toc-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="nav-link" data-scroll-target="#modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">13.6</span> 4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></a>
+  <ul class="collapse">
+  <li><a href="#modify-hyperparameter-of-type-numeric-and-integer-boolean" id="toc-modify-hyperparameter-of-type-numeric-and-integer-boolean" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">13.6.1</span> Modify hyperparameter of type numeric and integer (boolean)</a></li>
+  <li><a href="#modify-hyperparameter-of-type-factor" id="toc-modify-hyperparameter-of-type-factor" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-factor"><span class="header-section-number">13.6.2</span> Modify hyperparameter of type factor</a></li>
+  </ul></li>
+  <li><a href="#selection-of-the-objective-loss-function" id="toc-selection-of-the-objective-loss-function" class="nav-link" data-scroll-target="#selection-of-the-objective-loss-function"><span class="header-section-number">13.7</span> 5. Selection of the Objective (Loss) Function</a></li>
+  <li><a href="#calling-the-spot-function" id="toc-calling-the-spot-function" class="nav-link" data-scroll-target="#calling-the-spot-function"><span class="header-section-number">13.8</span> 6. Calling the SPOT Function</a>
+  <ul class="collapse">
+  <li><a href="#prepare-the-spot-parameters" id="toc-prepare-the-spot-parameters" class="nav-link" data-scroll-target="#prepare-the-spot-parameters"><span class="header-section-number">13.8.1</span> Prepare the SPOT Parameters</a></li>
+  <li><a href="#run-the-spot-optimizer" id="toc-run-the-spot-optimizer" class="nav-link" data-scroll-target="#run-the-spot-optimizer"><span class="header-section-number">13.8.2</span> Run the <code>Spot</code> Optimizer</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">13.8.3</span> 4 Results</a></li>
+  </ul></li>
+  <li><a href="#show-variable-importance" id="toc-show-variable-importance" class="nav-link" data-scroll-target="#show-variable-importance"><span class="header-section-number">13.9</span> Show variable importance</a></li>
+  <li><a href="#get-default-hyperparameters" id="toc-get-default-hyperparameters" class="nav-link" data-scroll-target="#get-default-hyperparameters"><span class="header-section-number">13.10</span> Get Default Hyperparameters</a></li>
+  <li><a href="#sec-get-spot-results" id="toc-sec-get-spot-results" class="nav-link" data-scroll-target="#sec-get-spot-results"><span class="header-section-number">13.11</span> Get SPOT Results</a></li>
+  <li><a href="#evaluation-of-the-tuned-architecture" id="toc-evaluation-of-the-tuned-architecture" class="nav-link" data-scroll-target="#evaluation-of-the-tuned-architecture"><span class="header-section-number">13.12</span> Evaluation of the Tuned Architecture</a></li>
+  <li><a href="#detailed-hyperparameter-plots" id="toc-detailed-hyperparameter-plots" class="nav-link" data-scroll-target="#detailed-hyperparameter-plots"><span class="header-section-number">13.13</span> Detailed Hyperparameter Plots</a></li>
+  <li><a href="#parallel-coordinates-plot" id="toc-parallel-coordinates-plot" class="nav-link" data-scroll-target="#parallel-coordinates-plot"><span class="header-section-number">13.14</span> Parallel Coordinates Plot</a></li>
+  <li><a href="#plot-all-combinations-of-hyperparameters" id="toc-plot-all-combinations-of-hyperparameters" class="nav-link" data-scroll-target="#plot-all-combinations-of-hyperparameters"><span class="header-section-number">13.15</span> Plot all Combinations of Hyperparameters</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Chapter 12: Sequential Parameter Optimization</h1>
+<h1 class="title"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></h1>
 </div>
 
 
@@ -161,8 +367,8 @@ div.csl-indent {
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> experiment_name.replace(<span class="st">':'</span>, <span class="st">'-'</span>)</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>experiment_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="hyperparameter-tuning-pytorch-wth-cifar10-data" class="level2">
-<h2 class="anchored" data-anchor-id="hyperparameter-tuning-pytorch-wth-cifar10-data">Hyperparameter Tuning: pytorch wth cifar10 Data</h2>
+<section id="hyperparameter-tuning-pytorch-wth-cifar10-data" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="hyperparameter-tuning-pytorch-wth-cifar10-data"><span class="header-section-number">13.1</span> Hyperparameter Tuning: pytorch wth cifar10 Data</h2>
 <ul>
 <li>This notebook exemplifies hyperparameter tuning with SPOT (spotPython).</li>
 <li>The hyperparameter software SPOT was developed in R (statistical programming language), see Open Access book “Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide”, available here: <a href="https://link.springer.com/book/10.1007/978-981-19-5170-1">https://link.springer.com/book/10.1007/978-981-19-5170-1</a>.</li>
@@ -262,14 +468,14 @@ div.csl-indent {
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"MPS device: "</span>, mps_device)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="initialization-of-the-empty-fun_control-dictionary" class="level2">
-<h2 class="anchored" data-anchor-id="initialization-of-the-empty-fun_control-dictionary">0. Initialization of the Empty <code>fun_control</code> Dictionary</h2>
+<section id="initialization-of-the-empty-fun_control-dictionary" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">13.2</span> 0. Initialization of the Empty <code>fun_control</code> Dictionary</h2>
 <div class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="load-data-cifar10-data" class="level2">
-<h2 class="anchored" data-anchor-id="load-data-cifar10-data">1. Load Data Cifar10 Data</h2>
+<section id="load-data-cifar10-data" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="load-data-cifar10-data"><span class="header-section-number">13.3</span> 1. Load Data Cifar10 Data</h2>
 <div class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data(data_dir<span class="op">=</span><span class="st">"./data"</span>):</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    transform <span class="op">=</span> transforms.Compose([</span>
@@ -299,8 +505,8 @@ div.csl-indent {
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: <span class="va">None</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="specification-of-the-preprocessing-model" class="level2">
-<h2 class="anchored" data-anchor-id="specification-of-the-preprocessing-model">2. Specification of the Preprocessing Model</h2>
+<section id="specification-of-the-preprocessing-model" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="specification-of-the-preprocessing-model"><span class="header-section-number">13.4</span> 2. Specification of the Preprocessing Model</h2>
 <div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># categorical_columns = []</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># one_hot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)</span></span>
@@ -314,8 +520,8 @@ div.csl-indent {
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="select-algorithm-and-core_model_hyper_dict" class="level2">
-<h2 class="anchored" data-anchor-id="select-algorithm-and-core_model_hyper_dict">3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
+<section id="select-algorithm-and-core_model_hyper_dict" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">13.5</span> 3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
 <p>Our implementation is based on the Section “Configurable neural network” in the PyTorch tutorial <a href="https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html">Hyperparameter Tuning with Ray Tune</a> is used here. <code>spotPython</code> implements a class which is similar to the class described in the PyTorch tutorial. The class is called <code>Net_CIFAR10</code> and is implemented in the file <code>netcifar10.py</code>. The class is imported here.</p>
 <p>Note: In addition to the class Net from the PyTorch tutorial, the class Net_CIFAR10 has additional attributes, namely:</p>
 <ul>
@@ -332,8 +538,8 @@ div.csl-indent {
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>TorchHyperDict,</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="the-hyper_dict-hyperparameters-for-the-selected-algorithm" class="level3">
-<h3 class="anchored" data-anchor-id="the-hyper_dict-hyperparameters-for-the-selected-algorithm">The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</h3>
+<section id="the-hyper_dict-hyperparameters-for-the-selected-algorithm" class="level3" data-number="13.5.1">
+<h3 data-number="13.5.1" class="anchored" data-anchor-id="the-hyper_dict-hyperparameters-for-the-selected-algorithm"><span class="header-section-number">13.5.1</span> The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</h3>
 <p><code>spotPython</code> uses simple <code>JSON</code> files for the specification of the hyperparameters. The <code>JSON</code> file for the <code>core_model</code> is called <code>torch_hyper_dict.json</code>. The corresponding entries for the <code>Net_CIFAR10</code> class are shown below.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span><span class="dt">"Net_CIFAR10"</span><span class="fu">:</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
@@ -377,8 +583,8 @@ div.csl-indent {
 <span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Each entry in the <code>JSON</code> file represents one hyperparameter with the following structure: <code>type</code>, <code>default</code>, <code>transform</code>, <code>lower</code>, and <code>upper</code>.</p>
 </section>
-<section id="categorical-hyperparameters" class="level3">
-<h3 class="anchored" data-anchor-id="categorical-hyperparameters">Categorical Hyperparameters</h3>
+<section id="categorical-hyperparameters" class="level3" data-number="13.5.2">
+<h3 data-number="13.5.2" class="anchored" data-anchor-id="categorical-hyperparameters"><span class="header-section-number">13.5.2</span> Categorical Hyperparameters</h3>
 <p>In contrast to Ray Tune, <code>spotPython</code> can handle numerical, boolean, and categorical hyperparameters. Since <code>Ray Tune</code> does not tune categorical hyperparameters, they are not used here. However, they can be specified in the <code>JSON</code> file in a similar way as the numerical hyperparameters as shown below:</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="er">"factor_hyperparameter":</span> <span class="fu">{</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"A"</span><span class="ot">,</span> <span class="st">"B"</span><span class="ot">,</span> <span class="st">"C"</span><span class="ot">]</span><span class="fu">,</span></span>
@@ -390,11 +596,11 @@ div.csl-indent {
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span><span class="er">,</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2">
-<h2 class="anchored" data-anchor-id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model">4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
+<section id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">13.6</span> 4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
 <p>After specifying the model, the corresponding hyperparameters, their types and bounds are loaded from the <code>JSON</code> file <code>torch_hyper_dict.json</code>. After loading, the user can modify the hyperparameters, e.g., the bounds. <code>spotPython</code> provides a clever rule for de-activating hyperparameters. If the lower and the upper bound are set to identical values, the hyperparameter is de-activated. This is useful for the hyperparameter tuning, because it allows to specify a hyperparameter in the <code>JSON</code> file, but to de-activate it in the <code>fun_control</code> dictionary. This is done in the next step.</p>
-<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3">
-<h3 class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean">Modify hyperparameter of type numeric and integer (boolean)</h3>
+<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3" data-number="13.6.1">
+<h3 data-number="13.6.1" class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">13.6.1</span> Modify hyperparameter of type numeric and integer (boolean)</h3>
 <p>Since the hyperparameter <code>k_folds</code> is not used in the PyTorch tutorial, it is de-activated here by setting the lower and upper bound to the same value.</p>
 <div class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_bounds(fun_control, "delta", bounds=[1e-10, 1e-6])</span></span>
@@ -404,8 +610,8 @@ div.csl-indent {
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"k_folds"</span>, bounds<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="modify-hyperparameter-of-type-factor" class="level3">
-<h3 class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor">Modify hyperparameter of type factor</h3>
+<section id="modify-hyperparameter-of-type-factor" class="level3" data-number="13.6.2">
+<h3 data-number="13.6.2" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">13.6.2</span> Modify hyperparameter of type factor</h3>
 <p>In a similar manner as for the numerical hyperparameters, the categorical hyperparameters can be modified. For example, the hyperparameter <code>leaf_model</code> is de-activated here by choosing only one value <code>"LinearRegression"</code>.</p>
 <div class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_levels(fun_control, "leaf_model", ["LinearRegression"])</span></span>
@@ -413,8 +619,8 @@ div.csl-indent {
 </div>
 </section>
 </section>
-<section id="selection-of-the-objective-loss-function" class="level2">
-<h2 class="anchored" data-anchor-id="selection-of-the-objective-loss-function">5. Selection of the Objective (Loss) Function</h2>
+<section id="selection-of-the-objective-loss-function" class="level2" data-number="13.7">
+<h2 data-number="13.7" class="anchored" data-anchor-id="selection-of-the-objective-loss-function"><span class="header-section-number">13.7</span> 5. Selection of the Objective (Loss) Function</h2>
 <div class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> CrossEntropyLoss</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
@@ -423,7 +629,7 @@ div.csl-indent {
 <p>In addition to the loss functions, <code>spotPython</code> provides access to a large number of metrics.</p>
 <ul>
 <li>The key <code>"metric_sklearn"</code> is used for metrics that follow the <code>scikit-learn</code> conventions.</li>
-<li>The key <code>"river_metric"</code> is used for the river based evaluation <span class="citation" data-cites="mont20a">(<a href="#ref-mont20a" role="doc-biblioref">Montiel et al. 2021</a>)</span> via <code>eval_oml_iter_progressive</code>, and</li>
+<li>The key <code>"river_metric"</code> is used for the river based evaluation <span class="citation" data-cites="mont20a">(<a href="references.html#ref-mont20a" role="doc-biblioref">Montiel et al. 2021</a>)</span> via <code>eval_oml_iter_progressive</code>, and</li>
 <li>the key <code>"metric_torch"</code> is used for the metrics from <code>TorchMetrics</code>.</li>
 </ul>
 <p><code>TorchMetrics</code> is a collection of more than 90 PyTorch metrics<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
@@ -477,10 +683,10 @@ div.csl-indent {
 <span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="calling-the-spot-function" class="level2">
-<h2 class="anchored" data-anchor-id="calling-the-spot-function">6. Calling the SPOT Function</h2>
-<section id="prepare-the-spot-parameters" class="level3">
-<h3 class="anchored" data-anchor-id="prepare-the-spot-parameters">Prepare the SPOT Parameters</h3>
+<section id="calling-the-spot-function" class="level2" data-number="13.8">
+<h2 data-number="13.8" class="anchored" data-anchor-id="calling-the-spot-function"><span class="header-section-number">13.8</span> 6. Calling the SPOT Function</h2>
+<section id="prepare-the-spot-parameters" class="level3" data-number="13.8.1">
+<h3 data-number="13.8.1" class="anchored" data-anchor-id="prepare-the-spot-parameters"><span class="header-section-number">13.8.1</span> Prepare the SPOT Parameters</h3>
 <ul>
 <li>Get types and variable names as well as lower and upper bounds for the hyperparameters.</li>
 </ul>
@@ -502,8 +708,8 @@ div.csl-indent {
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperTorch().fun_torch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="run-the-spot-optimizer" class="level3">
-<h3 class="anchored" data-anchor-id="run-the-spot-optimizer">Run the <code>Spot</code> Optimizer</h3>
+<section id="run-the-spot-optimizer" class="level3" data-number="13.8.2">
+<h3 data-number="13.8.2" class="anchored" data-anchor-id="run-the-spot-optimizer"><span class="header-section-number">13.8.2</span> Run the <code>Spot</code> Optimizer</h3>
 <ul>
 <li>Run SPOT for approx. x mins (<code>max_time</code>).</li>
 <li>Note: the run takes longer, because the evaluation time of initial design (here: <code>initi_size</code>, 20 points) is not considered.</li>
@@ -546,8 +752,8 @@ div.csl-indent {
 <span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="results" class="level3">
-<h3 class="anchored" data-anchor-id="results">4 Results</h3>
+<section id="results" class="level3" data-number="13.8.3">
+<h3 data-number="13.8.3" class="anchored" data-anchor-id="results"><span class="header-section-number">13.8.3</span> 4 Results</h3>
 <div class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
@@ -579,14 +785,14 @@ div.csl-indent {
 </div>
 </section>
 </section>
-<section id="show-variable-importance" class="level2">
-<h2 class="anchored" data-anchor-id="show-variable-importance">Show variable importance</h2>
+<section id="show-variable-importance" class="level2" data-number="13.9">
+<h2 data-number="13.9" class="anchored" data-anchor-id="show-variable-importance"><span class="header-section-number">13.9</span> Show variable importance</h2>
 <div class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="get-default-hyperparameters" class="level2">
-<h2 class="anchored" data-anchor-id="get-default-hyperparameters">Get Default Hyperparameters</h2>
+<section id="get-default-hyperparameters" class="level2" data-number="13.10">
+<h2 data-number="13.10" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">13.10</span> Get Default Hyperparameters</h2>
 <div class="cell" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> get_default_values(fun_control)</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>values_default <span class="op">=</span> transform_hyper_parameter_values(fun_control<span class="op">=</span>fun_control, hyper_parameter_values<span class="op">=</span>values_default)</span>
@@ -597,8 +803,8 @@ div.csl-indent {
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="sec-get-spot-results" class="level2">
-<h2 class="anchored" data-anchor-id="sec-get-spot-results">Get SPOT Results</h2>
+<section id="sec-get-spot-results" class="level2" data-number="13.11">
+<h2 data-number="13.11" class="anchored" data-anchor-id="sec-get-spot-results"><span class="header-section-number">13.11</span> Get SPOT Results</h2>
 <p>The architecture of the <code>spotPython</code> model can be obtained by the following code:</p>
 <div class="cell" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
@@ -607,8 +813,8 @@ div.csl-indent {
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="evaluation-of-the-tuned-architecture" class="level2">
-<h2 class="anchored" data-anchor-id="evaluation-of-the-tuned-architecture">Evaluation of the Tuned Architecture</h2>
+<section id="evaluation-of-the-tuned-architecture" class="level2" data-number="13.12">
+<h2 data-number="13.12" class="anchored" data-anchor-id="evaluation-of-the-tuned-architecture"><span class="header-section-number">13.12</span> Evaluation of the Tuned Architecture</h2>
 <p>The method <code>train_tuned</code> takes a model architecture without trained weights and trains this model with the train data. The train data is split into train and validation data. The validation data is used for early stopping. The trained model weights are saved as a dictionary.</p>
 <div class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> (</span>
@@ -647,21 +853,21 @@ div.csl-indent {
 <span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>            task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="detailed-hyperparameter-plots" class="level2">
-<h2 class="anchored" data-anchor-id="detailed-hyperparameter-plots">Detailed Hyperparameter Plots</h2>
+<section id="detailed-hyperparameter-plots" class="level2" data-number="13.13">
+<h2 data-number="13.13" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">13.13</span> Detailed Hyperparameter Plots</h2>
 <div class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="parallel-coordinates-plot" class="level2">
-<h2 class="anchored" data-anchor-id="parallel-coordinates-plot">Parallel Coordinates Plot</h2>
+<section id="parallel-coordinates-plot" class="level2" data-number="13.14">
+<h2 data-number="13.14" class="anchored" data-anchor-id="parallel-coordinates-plot"><span class="header-section-number">13.14</span> Parallel Coordinates Plot</h2>
 <div class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plot-all-combinations-of-hyperparameters" class="level2">
-<h2 class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters">Plot all Combinations of Hyperparameters</h2>
+<section id="plot-all-combinations-of-hyperparameters" class="level2" data-number="13.15">
+<h2 data-number="13.15" class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters"><span class="header-section-number">13.15</span> Plot all Combinations of Hyperparameters</h2>
 <ul>
 <li>Warning: this may take a while.</li>
 </ul>
@@ -675,7 +881,7 @@ div.csl-indent {
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
 <div id="ref-mont20a" class="csl-entry" role="listitem">
 Montiel, Jacob, Max Halford, Saulo Martiello Mastelini, Geoffrey Bolmier, Raphael Sourty, Robin Vaysse, Adil Zouitine, et al. 2021. <span>“River: Machine Learning for Streaming Data in Python.”</span>
 </div>
@@ -922,6 +1128,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./11_spot_hpt_torch_fashion_mnist.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./14_spot_ray_hpt_torch_cifar10.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

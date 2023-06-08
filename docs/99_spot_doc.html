@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Hyperparameter-tuning Cookbook - 17&nbsp; Documentation of the Sequential Parameter Optimization</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./references.html" rel="next">
+<link href="./summary.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 17&nbsp; Documentation of the Sequential Parameter Optimization">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./99_spot_doc.html"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Hyperparameter-tuning Cookbook</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="https://github.com/sequential-parameter-optimization/spotPython" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+    <a href="./Hyperparameter-tuning-Cookbook.pdf" title="Download PDF" class="quarto-navigation-tool px-1" aria-label="Download PDF"><i class="bi bi-file-pdf"></i></a>
+    <div class="dropdown">
+      <a href="" title="Share" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Share"><i class="bi bi-share"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://twitter.com/intent/tweet?url=|url|">
+              <i class="bi bi-bi-twitter pe-1"></i>
+            Twitter
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://www.linkedin.com/sharing/share-offsite/?url=|url|">
+              <i class="bi bi-bi-linkedin pe-1"></i>
+            LinkedIn
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction: Hyperparameter Tuning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_spot_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_spot_multidim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_spot_anisotropic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_spot_sklearn_surrogate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_spot_sklearn_optimization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_spot_gaussian.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_spot_ei.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./08_spot_noisy.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09_spot_ocba.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Introduction to Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Chapter 10: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12_spot_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Chapter 12: Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14_spot_ray_hpt_torch_cifar10.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code></span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./summary.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#example-spot" id="toc-example-spot" class="nav-link active" data-scroll-target="#example-spot"><span class="header-section-number">17.1</span> Example: spot</a>
+  <ul class="collapse">
+  <li><a href="#the-objective-function" id="toc-the-objective-function" class="nav-link" data-scroll-target="#the-objective-function"><span class="header-section-number">17.1.1</span> The Objective Function</a></li>
+  <li><a href="#external-parameters" id="toc-external-parameters" class="nav-link" data-scroll-target="#external-parameters"><span class="header-section-number">17.1.2</span> External Parameters</a></li>
+  </ul></li>
+  <li><a href="#the-fun_control-dictionary" id="toc-the-fun_control-dictionary" class="nav-link" data-scroll-target="#the-fun_control-dictionary"><span class="header-section-number">17.2</span> The <code>fun_control</code> Dictionary</a></li>
+  <li><a href="#the-design_control-dictionary" id="toc-the-design_control-dictionary" class="nav-link" data-scroll-target="#the-design_control-dictionary"><span class="header-section-number">17.3</span> The <code>design_control</code> Dictionary</a></li>
+  <li><a href="#the-surrogate_control-dictionary" id="toc-the-surrogate_control-dictionary" class="nav-link" data-scroll-target="#the-surrogate_control-dictionary"><span class="header-section-number">17.4</span> The <code>surrogate_control</code> Dictionary</a></li>
+  <li><a href="#the-optimizer_control-dictionary" id="toc-the-optimizer_control-dictionary" class="nav-link" data-scroll-target="#the-optimizer_control-dictionary"><span class="header-section-number">17.5</span> The <code>optimizer_control</code> Dictionary</a></li>
+  <li><a href="#run" id="toc-run" class="nav-link" data-scroll-target="#run"><span class="header-section-number">17.6</span> Run</a></li>
+  <li><a href="#print-the-results" id="toc-print-the-results" class="nav-link" data-scroll-target="#print-the-results"><span class="header-section-number">17.7</span> Print the Results</a></li>
+  <li><a href="#show-the-progress" id="toc-show-the-progress" class="nav-link" data-scroll-target="#show-the-progress"><span class="header-section-number">17.8</span> Show the Progress</a></li>
+  <li><a href="#visualize-the-surrogate" id="toc-visualize-the-surrogate" class="nav-link" data-scroll-target="#visualize-the-surrogate"><span class="header-section-number">17.9</span> Visualize the Surrogate</a></li>
+  <li><a href="#init-build-initial-design" id="toc-init-build-initial-design" class="nav-link" data-scroll-target="#init-build-initial-design"><span class="header-section-number">17.10</span> 1. Init: Build Initial Design</a></li>
+  <li><a href="#replicability" id="toc-replicability" class="nav-link" data-scroll-target="#replicability"><span class="header-section-number">17.11</span> Replicability</a></li>
+  <li><a href="#surrogates" id="toc-surrogates" class="nav-link" data-scroll-target="#surrogates"><span class="header-section-number">17.12</span> Surrogates</a>
+  <ul class="collapse">
+  <li><a href="#a-simple-predictor" id="toc-a-simple-predictor" class="nav-link" data-scroll-target="#a-simple-predictor"><span class="header-section-number">17.12.1</span> A Simple Predictor</a></li>
+  </ul></li>
+  <li><a href="#demotest-objective-function-fails" id="toc-demotest-objective-function-fails" class="nav-link" data-scroll-target="#demotest-objective-function-fails"><span class="header-section-number">17.13</span> Demo/Test: Objective Function Fails</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<ul>
+<li>This document describes the <code>Spot</code> features.</li>
+</ul>
+<section id="example-spot" class="level2" data-number="17.1">
+<h2 data-number="17.1" class="anchored" data-anchor-id="example-spot"><span class="header-section-number">17.1</span> Example: spot</h2>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.objectivefunctions <span class="im">import</span> analytical</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> shgo</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> direct</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> differential_evolution</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="the-objective-function" class="level3" data-number="17.1.1">
+<h3 data-number="17.1.1" class="anchored" data-anchor-id="the-objective-function"><span class="header-section-number">17.1.1</span> The Objective Function</h3>
+<ul>
+<li>The <code>spotPython</code> package provides several classes of objective functions.</li>
+<li>We will use an analytical objective function, i.e., a function that can be described by a (closed) formula: <span class="math display">\[f(x) = x^2\]</span></li>
+</ul>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> analytical().fun_sphere</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">100</span>).reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> fun(x)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.plot(x,y, <span class="st">"k"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>spot_1 <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">10</span>]),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> np.array([<span class="dv">100</span>]),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> <span class="dv">7</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                   fun_repeats <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> inf,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                   noise <span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                   var_type<span class="op">=</span>[<span class="st">"num"</span>],</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                   infill_criterion <span class="op">=</span> <span class="st">"y"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                   n_points <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>                   log_level <span class="op">=</span> <span class="dv">50</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> {},</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: <span class="dv">5</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">False</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="dv">1</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_optimizer"</span>: differential_evolution,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">1000</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>                                      })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><code>spot</code>’s <code>__init__</code> method sets the control parameters. There are two parameter groups:</li>
+</ul>
+<ol type="1">
+<li>external parameters can be specified by the user</li>
+<li>internal parameters, which are handled by <code>spot</code>.</li>
+</ol>
+</section>
+<section id="external-parameters" class="level3" data-number="17.1.2">
+<h3 data-number="17.1.2" class="anchored" data-anchor-id="external-parameters"><span class="header-section-number">17.1.2</span> External Parameters</h3>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>external parameter</th>
+<th>type</th>
+<th>description</th>
+<th>default</th>
+<th>mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>fun</code></td>
+<td>object</td>
+<td>objective function</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td><code>lower</code></td>
+<td>array</td>
+<td>lower bound</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr class="odd">
+<td><code>upper</code></td>
+<td>array</td>
+<td>upper bound</td>
+<td></td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td><code>fun_evals</code></td>
+<td>int</td>
+<td>number of function evaluations</td>
+<td>15</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>fun_evals</code></td>
+<td>int</td>
+<td>number of function evaluations</td>
+<td>15</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>fun_control</code></td>
+<td>dict</td>
+<td>noise etc.</td>
+<td>{}</td>
+<td>n</td>
+</tr>
+<tr class="odd">
+<td><code>max_time</code></td>
+<td>int</td>
+<td>max run time budget</td>
+<td><code>inf</code></td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>noise</code></td>
+<td>bool</td>
+<td>if repeated evaluations of <code>fun</code> results in different values, then <code>noise</code> should be set to <code>True</code>.</td>
+<td><code>False</code></td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>tolerance_x</code></td>
+<td>float</td>
+<td>tolerance for new x solutions. Minimum distance of new solutions, generated by <code>suggest_new_X</code>, to already existing solutions. If zero (which is the default), every new solution is accepted.</td>
+<td><code>0</code></td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>var_type</code></td>
+<td>list</td>
+<td>list of type information, can be either <code>"num"</code> or <code>"factor"</code></td>
+<td><code>["num"]</code></td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>infill_criterion</code></td>
+<td>string</td>
+<td>Can be <code>"y"</code>, <code>"s"</code>, <code>"ei"</code> (negative expected improvement), or <code>"all"</code></td>
+<td><code>"y"</code></td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>n_points</code></td>
+<td>int</td>
+<td>number of infill points</td>
+<td>1</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>seed</code></td>
+<td>int</td>
+<td>initial seed. If <code>Spot.run()</code> is called twice, different results will be generated. To reproduce results, the <code>seed</code> can be used.</td>
+<td><code>123</code></td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>log_level</code></td>
+<td>int</td>
+<td>log level with the following settings: <code>NOTSET</code> (<code>0</code>), <code>DEBUG</code> (<code>10</code>: Detailed information, typically of interest only when diagnosing problems.), <code>INFO</code> (<code>20</code>: Confirmation that things are working as expected.), <code>WARNING</code> (<code>30</code>: An indication that something unexpected happened, or indicative of some problem in the near future (e.g.&nbsp;‘disk space low’). The software is still working as expected.), <code>ERROR</code> (<code>40</code>: Due to a more serious problem, the software has not been able to perform some function.), and <code>CRITICAL</code> (<code>50</code>: A serious error, indicating that the program itself may be unable to continue running.)</td>
+<td><code>50</code></td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>show_models</code></td>
+<td>bool</td>
+<td>Plot model. Currently only 1-dim functions are supported</td>
+<td><code>False</code></td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>design</code></td>
+<td>object</td>
+<td>experimental design</td>
+<td><code>None</code></td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>design_control</code></td>
+<td>dict</td>
+<td>control parameters</td>
+<td>see below</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>surrogate</code></td>
+<td></td>
+<td>surrogate model</td>
+<td><code>kriging</code></td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>surrogate_control</code></td>
+<td>dict</td>
+<td>control parameters</td>
+<td>see below</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td><code>optimizer</code></td>
+<td>object</td>
+<td>optimizer</td>
+<td>see below</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>optimizer_control</code></td>
+<td>dict</td>
+<td>control parameters</td>
+<td>see below</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Besides these single parameters, the following parameter dictionaries can be specified by the user:
+<ul>
+<li><code>fun_control</code></li>
+<li><code>design_control</code></li>
+<li><code>surrogate_control</code></li>
+<li><code>optimizer_control</code></li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="the-fun_control-dictionary" class="level2" data-number="17.2">
+<h2 data-number="17.2" class="anchored" data-anchor-id="the-fun_control-dictionary"><span class="header-section-number">17.2</span> The <code>fun_control</code> Dictionary</h2>
+<table class="table">
+<thead>
+<tr class="header">
+<th>external parameter</th>
+<th>type</th>
+<th>description</th>
+<th>default</th>
+<th>mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sigma</code></td>
+<td>float</td>
+<td>noise: standard deviation</td>
+<td><code>0</code></td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td><code>seed</code></td>
+<td>int</td>
+<td>seed for rng</td>
+<td><code>124</code></td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-design_control-dictionary" class="level2" data-number="17.3">
+<h2 data-number="17.3" class="anchored" data-anchor-id="the-design_control-dictionary"><span class="header-section-number">17.3</span> The <code>design_control</code> Dictionary</h2>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>external parameter</th>
+<th>type</th>
+<th>description</th>
+<th>default</th>
+<th>mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>init_size</code></td>
+<td>int</td>
+<td>initial sample size</td>
+<td><code>10</code></td>
+<td>yes</td>
+</tr>
+<tr class="even">
+<td><code>repeats</code></td>
+<td>int</td>
+<td>number of repeats of the initial sammples</td>
+<td><code>1</code></td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-surrogate_control-dictionary" class="level2" data-number="17.4">
+<h2 data-number="17.4" class="anchored" data-anchor-id="the-surrogate_control-dictionary"><span class="header-section-number">17.4</span> The <code>surrogate_control</code> Dictionary</h2>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>external parameter</th>
+<th>type</th>
+<th>description</th>
+<th>default</th>
+<th>mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>noise</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>model_optimizer</code></td>
+<td>object</td>
+<td>optimizer</td>
+<td><code>differential_evolution</code></td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td><code>model_fun_evals</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>min_theta</code></td>
+<td></td>
+<td></td>
+<td><code>-3.</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>max_theta</code></td>
+<td></td>
+<td></td>
+<td><code>3.</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>n_theta</code></td>
+<td></td>
+<td></td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>n_p</code></td>
+<td></td>
+<td></td>
+<td><code>1</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>optim_p</code></td>
+<td></td>
+<td></td>
+<td><code>False</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>cod_type</code></td>
+<td></td>
+<td></td>
+<td><code>"norm"</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><code>var_type</code></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><code>use_cod_y</code></td>
+<td>bool</td>
+<td></td>
+<td><code>False</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="the-optimizer_control-dictionary" class="level2" data-number="17.5">
+<h2 data-number="17.5" class="anchored" data-anchor-id="the-optimizer_control-dictionary"><span class="header-section-number">17.5</span> The <code>optimizer_control</code> Dictionary</h2>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>external parameter</th>
+<th>type</th>
+<th>description</th>
+<th>default</th>
+<th>mandatory</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>max_iter</code></td>
+<td>int</td>
+<td>max number of iterations. Note: these are the cheap evaluations on the surrogate.</td>
+<td><code>1000</code></td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="run" class="level2" data-number="17.6">
+<h2 data-number="17.6" class="anchored" data-anchor-id="run"><span class="header-section-number">17.6</span> Run</h2>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spot_1.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="print-the-results" class="level2" data-number="17.7">
+<h2 data-number="17.7" class="anchored" data-anchor-id="print-the-results"><span class="header-section-number">17.7</span> Print the Results</h2>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>spot_1.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="show-the-progress" class="level2" data-number="17.8">
+<h2 data-number="17.8" class="anchored" data-anchor-id="show-the-progress"><span class="header-section-number">17.8</span> Show the Progress</h2>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>spot_1.plot_progress()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualize-the-surrogate" class="level2" data-number="17.9">
+<h2 data-number="17.9" class="anchored" data-anchor-id="visualize-the-surrogate"><span class="header-section-number">17.9</span> Visualize the Surrogate</h2>
+<ul>
+<li>The plot method of the <code>kriging</code> surrogate is used.</li>
+<li>Note: the plot uses the interval defined by the ranges of the natural variables.</li>
+</ul>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>spot_1.surrogate.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="init-build-initial-design" class="level2" data-number="17.10">
+<h2 data-number="17.10" class="anchored" data-anchor-id="init-build-initial-design"><span class="header-section-number">17.10</span> 1. Init: Build Initial Design</h2>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.design.spacefilling <span class="im">import</span> spacefilling</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.build.kriging <span class="im">import</span> Kriging</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.objectivefunctions <span class="im">import</span> analytical</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>gen <span class="op">=</span> spacefilling(<span class="dv">2</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.RandomState(<span class="dv">1</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">5</span>,<span class="op">-</span><span class="dv">0</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> np.array([<span class="dv">10</span>,<span class="dv">15</span>])</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> analytical().fun_branin</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> {<span class="st">"sigma"</span>: <span class="dv">0</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">"seed"</span>: <span class="dv">123</span>}</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> gen.scipy_lhd(<span class="dv">10</span>, lower<span class="op">=</span>lower, upper <span class="op">=</span> upper)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(X)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> fun(X, fun_control<span class="op">=</span>fun_control)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="replicability" class="level2" data-number="17.11">
+<h2 data-number="17.11" class="anchored" data-anchor-id="replicability"><span class="header-section-number">17.11</span> Replicability</h2>
+<ul>
+<li>Seed</li>
+</ul>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>gen <span class="op">=</span> spacefilling(<span class="dv">2</span>, seed<span class="op">=</span><span class="dv">123</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>X0 <span class="op">=</span> gen.scipy_lhd(<span class="dv">3</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>gen <span class="op">=</span> spacefilling(<span class="dv">2</span>, seed<span class="op">=</span><span class="dv">345</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>X1 <span class="op">=</span> gen.scipy_lhd(<span class="dv">3</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>X2 <span class="op">=</span> gen.scipy_lhd(<span class="dv">3</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>gen <span class="op">=</span> spacefilling(<span class="dv">2</span>, seed<span class="op">=</span><span class="dv">123</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>X3 <span class="op">=</span> gen.scipy_lhd(<span class="dv">3</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>X0, X1, X2, X3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="surrogates" class="level2" data-number="17.12">
+<h2 data-number="17.12" class="anchored" data-anchor-id="surrogates"><span class="header-section-number">17.12</span> Surrogates</h2>
+<section id="a-simple-predictor" class="level3" data-number="17.12.1">
+<h3 data-number="17.12.1" class="anchored" data-anchor-id="a-simple-predictor"><span class="header-section-number">17.12.1</span> A Simple Predictor</h3>
+<p>The code below shows how to use a simple model for prediction.</p>
+<ul>
+<li><p>Assume that only two (very costly) measurements are available:</p>
+<ol type="1">
+<li>f(0) = 0.5</li>
+<li>f(2) = 2.5</li>
+</ol></li>
+<li><p>We are interested in the value at <span class="math inline">\(x_0 = 1\)</span>, i.e., <span class="math inline">\(f(x_0 = 1)\)</span>, but cannot run an additional, third experiment.</p></li>
+</ul>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> linear_model</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.array([[<span class="dv">0</span>], [<span class="dv">2</span>]])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.array([<span class="fl">0.5</span>, <span class="fl">2.5</span>])</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>S_lm <span class="op">=</span> linear_model.LinearRegression()</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>S_lm <span class="op">=</span> S_lm.fit(X, y)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>X0 <span class="op">=</span> np.array([[<span class="dv">1</span>]])</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>y0 <span class="op">=</span> S_lm.predict(X0)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(y0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Central Idea:
+<ul>
+<li>Evaluation of the surrogate model <code>S_lm</code> is much cheaper (or / and much faster) than running the real-world experiment <span class="math inline">\(f\)</span>.</li>
+</ul></li>
+</ul>
+</section>
+</section>
+<section id="demotest-objective-function-fails" class="level2" data-number="17.13">
+<h2 data-number="17.13" class="anchored" data-anchor-id="demotest-objective-function-fails"><span class="header-section-number">17.13</span> Demo/Test: Objective Function Fails</h2>
+<ul>
+<li>SPOT expects <code>np.nan</code> values from failed objective function values.</li>
+<li>These are handled.</li>
+<li>Note: SPOT’s counter considers only successful executions of the objective function.</li>
+</ul>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.objectivefunctions <span class="im">import</span> analytical</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># number of initial points:</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>ni <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co"># number of points</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">30</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> analytical().fun_random_error</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> np.array([<span class="dv">1</span>])</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>design_control<span class="op">=</span>{<span class="st">"init_size"</span>: ni}</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>spot_1 <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>            lower <span class="op">=</span> lower,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            upper<span class="op">=</span> upper,</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>            fun_evals <span class="op">=</span> n,</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>            show_progress<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>            design_control<span class="op">=</span>design_control,)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>spot_1.run()</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co"># To check whether the run was successfully completed,</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co"># we compare the number of evaluated points to the specified</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="co"># number of points.</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> spot_1.y.shape[<span class="dv">0</span>] <span class="op">==</span> n</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./summary.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Summary</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./references.html" class="pagination-link">
+        <span class="nav-page-text">References</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
