@@ -90,9 +90,9 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
 
 
 def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Spot"]):
-    keys = model1[1].summary.keys()
-    values1 = model1[1].summary.values()
-    values2 = model2[1].summary.values()
+    keys = model1.summary.keys()
+    values1 = model1.summary.values()
+    values2 = model2.summary.values()
     tbl = []
     for key, value1, value2 in zip(keys, values1, values2):
         tbl.append([key, value1, value2])

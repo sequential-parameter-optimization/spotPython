@@ -718,8 +718,10 @@ class Spot:
             for j in var_plots:
                 if j > i:
                     if filename is not None:
-                        filename = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
-                    self.plot_contour(i=i, j=j, min_z=min_z, max_z=max_z, filename=filename)
+                        filename_full = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
+                    else:
+                        filename_full = None
+                    self.plot_contour(i=i, j=j, min_z=min_z, max_z=max_z, filename=filename_full)
 
     def get_importance(self) -> list:
         """Get importance of each variable and return the results as a list.

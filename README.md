@@ -1,5 +1,5 @@
 <p align="left">
-  <img height="200" src="docs/img/spotLogo.png" alt="spot_logo">
+  <img height="200" src="img/spotLogo.png" alt="spot_logo">
 </p>
 
 # spotPython
@@ -18,7 +18,9 @@ Sequential Parameter Optimization in Python
 
 # spotPython Documentation
 
-* [Bartz-Beielstein (2023). PyTorch Hyperparameter Tuning --- A Tutorial for spotPython (Working Paper)](https://sequential-parameter-optimization.github.io/spotPython/).
+* Hyperparameter-tuning Cookbook: A guide for scikit-learn, PyTorch, river, and spotPython. Available at [https://sequential-parameter-optimization.github.io/spotPython/](https://sequential-parameter-optimization.github.io/spotPython/).
+
+* [Bartz-Beielstein (2023). PyTorch Hyperparameter Tuning --- A Tutorial for spotPython (Working Paper)](https://arxiv.org/abs/2305.11930).
 
     > **Abstract**: The goal of hyperparameter tuning (or hyperparameter optimization) is to optimize the hyperparameters to improve the performance of the machine or deep learning model. spotPython ("Sequential Parameter Optimization Toolbox in Python") is the Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade. PyTorch is an optimized tensor library for deep learning using GPUs and CPUs. This document shows how to integrate the spotPython hyperparameter tuner into the PyTorch training workflow.  As an example, the results of the CIFAR10 image classifier are used. In addition to an introduction to spotPython, this tutorial also includes a brief comparison with Ray Tune, a Python library for running experiments and tuning hyperparameters. This comparison is based on the PyTorch hyperparameter tuning tutorial. The advantages and disadvantages of both approaches are discussed. We show that spotPython achieves similar or even better results while being more flexible and transparent than Ray Tune.
 
@@ -33,6 +35,7 @@ Sequential Parameter Optimization in Python
   - Simple JSON files for the specification of the hyperparameters.
   - Extension of default and user specified network classes.
   - Noise handling techniques.
+  - Tensorboard interaction.
 
 # Citation
 

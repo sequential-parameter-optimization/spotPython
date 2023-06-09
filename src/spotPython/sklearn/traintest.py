@@ -41,7 +41,7 @@ def evaluate_hold_out(model, fun_control):
             df_preds = model.predict(X_test)
         df_eval = fun_control["metric_sklearn"](y_test, df_preds, **fun_control["metric_params"])
     except Exception as err:
-        print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+        print(f"Error in fun_sklearn(). Call to evaluate_hold_out failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_eval = np.nan
     return df_eval, df_preds
@@ -66,7 +66,7 @@ def evaluate_cv(model, fun_control, verbose=0):
             scores = cross_val_score(model, X, y, cv=k, scoring=sklearn_scorer)
         df_eval = scores.mean()
     except Exception as err:
-        print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+        print(f"Error in fun_sklearn(). Call to evaluate_cv failed. {err=}, {type(err)=}")
         df_eval = np.nan
     return df_eval, None
 
@@ -81,7 +81,7 @@ def evaluate_model_oob(model, fun_control):
         df_preds = model.oob_decision_function_
         df_eval = fun_control["metric_sklearn"](y, df_preds, **fun_control["metric_params"])
     except Exception as err:
-        print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")
+        print(f"Error in fun_sklearn(). Call to evaluate_model_oob failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_eval = np.nan
     return df_eval, df_preds

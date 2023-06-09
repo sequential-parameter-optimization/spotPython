@@ -50,6 +50,7 @@ class HyperSklearn:
             "var_name": [],
             "var_type": [],
             "prep_model": None,
+            "predict_proba": False,
         }
         self.log_level = self.fun_control["log_level"]
         logger.setLevel(self.log_level)
