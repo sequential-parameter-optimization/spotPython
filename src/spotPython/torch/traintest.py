@@ -38,7 +38,7 @@ def get_removed_attributes_and_base_net(net):
     return attributes, net
 
 
-def validate_fold_or_hold_out(net, valloader, loss_function, metric, device, task):
+def validate_one_epoch(net, valloader, loss_function, metric, device, task):
     val_loss = 0.0
     val_steps = 0
     total = 0
@@ -138,7 +138,7 @@ def evaluate_cv(
             for epoch in range(epochs_instance):
                 print(f"Epoch: {epoch + 1}")
                 # training loss from one epoch:
-                training_loss = train_hold_out(
+                training_loss = train_one_epoch(
                     net=net,
                     trainloader=trainloader,
                     batch_size=batch_size_instance,
@@ -147,11 +147,10 @@ def evaluate_cv(
                     device=device,
                     show_batch_interval=show_batch_interval,
                     task=task,
-                    writer=writer,
                 )
                 # TODO: scheduler.step()
                 # Early stopping check. Calculate validation loss from one epoch:
-                metric_values[fold], loss_values[fold] = validate_fold_or_hold_out(
+                metric_values[fold], loss_values[fold] = validate_one_epoch(
                     net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
                 )
                 # Log the running loss averaged per batch
@@ -177,7 +176,6 @@ def evaluate_cv(
                     if counter >= patience_instance:
                         print(f"Early stopping at epoch {epoch}")
                         break
-        # TODO: Compute Metric on all folds and return average to spotPython
         df_eval = sum(loss_values.values()) / len(loss_values.values())
         df_metrics = sum(metric_values.values()) / len(metric_values.values())
         df_preds = np.nan
@@ -254,7 +252,7 @@ def evaluate_hold_out(
         for epoch in range(epochs_instance):
             print(f"Epoch: {epoch + 1}")
             # training loss from one epoch:
-            training_loss = train_hold_out(
+            training_loss = train_one_epoch(
                 net=net,
                 trainloader=trainloader,
                 batch_size=batch_size_instance,
@@ -263,11 +261,10 @@ def evaluate_hold_out(
                 device=device,
                 show_batch_interval=show_batch_interval,
                 task=task,
-                writer=writer,
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
-            metric_val, val_loss = validate_fold_or_hold_out(
+            metric_val, val_loss = validate_one_epoch(
                 net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
             )
             # Log the running loss averaged per batch
@@ -329,7 +326,7 @@ def create_train_test_data_loaders(dataset, batch_size, shuffle, test_dataset, n
     return trainloader, testloader
 
 
-def train_hold_out(
+def train_one_epoch(
     net,
     trainloader,
     batch_size,
@@ -338,7 +335,6 @@ def train_hold_out(
     device,
     show_batch_interval=10_000,
     task=None,
-    writer=None,
 ):
     running_loss = 0.0
     epoch_steps = 0
@@ -367,14 +363,7 @@ def train_hold_out(
                 "Batch: %5d. Batch Size: %d. Training Loss (running): %.3f"
                 % (batch_nr + 1, int(batch_size), running_loss / epoch_steps)
             )
-            # Log the running loss averaged per batch
-            if writer is not None:
-                writer.add_scalars(
-                    "Training Loss (running)", {"Training Loss (running)": running_loss / epoch_steps}, batch_nr + 1
-                )
             running_loss = 0.0
-    # if writer is not None:
-    #     writer.flush()
     return loss.item()
 
 
@@ -422,7 +411,7 @@ def test_tuned(net, shuffle, test_dataset=None, loss_function=None, metric=None,
         valloader = torch.utils.data.DataLoader(
             test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0
         )
-        metric_value, loss = validate_fold_or_hold_out(
+        metric_value, loss = validate_one_epoch(
             net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
         )
         df_eval = loss

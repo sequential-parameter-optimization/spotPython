@@ -3,7 +3,9 @@ import spotPython.torch.netcore as netcore
 
 
 class Net_lin_reg(netcore.Net_Core):
-    def __init__(self, _L0, l1, dropout_prob, lr_mult, batch_size, epochs, k_folds, patience, optimizer, sgd_momentum):
+    def __init__(
+        self, _L_in, _L_out, l1, dropout_prob, lr_mult, batch_size, epochs, k_folds, patience, optimizer, sgd_momentum
+    ):
         super(Net_lin_reg, self).__init__(
             lr_mult=lr_mult,
             batch_size=batch_size,
@@ -13,20 +15,10 @@ class Net_lin_reg(netcore.Net_Core):
             optimizer=optimizer,
             sgd_momentum=sgd_momentum,
         )
-        # min 160 (= 2*2*2*20) neurons in first layer
-        # min 80 (= 2*2*2*10) neurons in second layer
-        # min 40 (= 2*2*2*5) neurons in third layer
-        # min 20 (= 2*2*2*2*2) neurons in fourth layer
         l2 = max(l1 // 2, 4)
-        l3 = max(l2 // 2, 4)
-        l4 = max(l3 // 2, 4)
-        # self.fc1 = nn.Linear(6112, l1)
-        # self.fc1 = nn.Linear(196, l1)
-        self.fc1 = nn.Linear(_L0, l1)
+        self.fc1 = nn.Linear(_L_in, l1)
         self.fc2 = nn.Linear(l1, l2)
-        self.fc3 = nn.Linear(l2, l3)
-        self.fc4 = nn.Linear(l3, l4)
-        self.fc5 = nn.Linear(l4, 1)
+        self.fc3 = nn.Linear(l2, _L_out)
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=1)
         self.dropout1 = nn.Dropout(p=dropout_prob)
@@ -40,8 +32,4 @@ class Net_lin_reg(netcore.Net_Core):
         x = self.relu(x)
         x = self.dropout2(x)
         x = self.fc3(x)
-        x = self.relu(x)
-        x = self.fc4(x)
-        x = self.relu(x)
-        x = self.fc5(x)
         return x
