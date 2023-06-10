@@ -9,6 +9,7 @@ from spotPython.hyperparameters.values import (
 )
 
 from spotPython.sklearn.traintest import evaluate_cv, evaluate_model_oob, evaluate_hold_out
+from spotPython.utils.eda import generate_config_id
 
 import logging
 from sklearn.metrics import mean_absolute_error
@@ -80,6 +81,7 @@ class HyperSklearn:
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
+            config_id = generate_config_id(config)
             if self.fun_control["prep_model"] is not None:
                 model = make_pipeline(self.fun_control["prep_model"], self.fun_control["core_model"](**config))
             else:

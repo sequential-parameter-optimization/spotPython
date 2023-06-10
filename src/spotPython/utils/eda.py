@@ -97,3 +97,16 @@ def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Sp
     for key, value1, value2 in zip(keys, values1, values2):
         tbl.append([key, value1, value2])
     return tabulate(tbl, headers=headers, numalign="right", tablefmt="github")
+
+
+def generate_config_id(config):
+    """Generates a unique id for a configuration.
+    Args:
+        config (dict): A dictionary with the configuration.
+    Returns:
+        str: A unique id for the configuration.
+    """
+    config_id = ""
+    for key in config:
+        config_id += str(config[key]) + "_"
+    return config_id[:-1]
