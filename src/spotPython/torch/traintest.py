@@ -113,6 +113,7 @@ def evaluate_cv(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
+        metric.to(device)
         optimizer = optimizer_handler(
             optimizer_name=optimizer_instance,
             params=net.parameters(),
@@ -226,6 +227,7 @@ def evaluate_hold_out(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
+        metric.to(device)
         # loss_function = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
         # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
