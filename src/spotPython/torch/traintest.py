@@ -156,7 +156,7 @@ def evaluate_cv(
                 )
                 # Log the running loss averaged per batch
                 metric_name = "Metric"
-                if metric is None:
+                if metric is not None:
                     metric_name = type(metric).__name__
                     print(f"{metric_name} value on hold-out data: {metric_values[fold]}")
                 if writer is not None:
@@ -183,17 +183,10 @@ def evaluate_cv(
     except Exception as err:
         print(f"Error in Net_Core. Call to evaluate_cv() failed. {err=}, {type(err)=}")
         df_eval = np.nan
+        df_metrics = np.nan
         df_preds = np.nan
     add_attributes(net, removed_attributes)
     if writer is not None:
-        metric_name = "Metric"
-        if metric is None:
-            metric_name = type(metric).__name__
-        writer.add_scalars(
-            "CV: Val Loss and Val Metric" + writerId,
-            {"CV-loss": df_eval, metric_name: df_metrics},
-            epoch + 1,
-        )
         writer.flush()
     return df_eval, df_preds, df_metrics
 
@@ -271,7 +264,7 @@ def evaluate_hold_out(
             )
             # Log the running loss averaged per batch
             metric_name = "Metric"
-            if metric is None:
+            if metric is not None:
                 metric_name = type(metric).__name__
                 print(f"{metric_name} value on hold-out data: {metric_val}")
             if writer is not None:
