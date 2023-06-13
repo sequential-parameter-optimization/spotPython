@@ -8,6 +8,7 @@ class MAPK(Metric):
     Args:
         k: Number of predictions to consider
         dist_sync_on_step: Whether to sync the output across all GPUs
+        device: Device to use for the computation
     Example:
         >>> from torchmetrics import MAPK
         >>> target = torch.tensor([0, 1, 2, 3])
@@ -30,8 +31,8 @@ class MAPK(Metric):
         >>> print(result) # tensor(0.37500)
     """
 
-    def __init__(self, k=3, dist_sync_on_step=False):
-        super().__init__(dist_sync_on_step=dist_sync_on_step)
+    def __init__(self, k=3, dist_sync_on_step=False, device=None):
+        super().__init__(dist_sync_on_step=dist_sync_on_step, device=device)
         self.k = k
         self.add_state("actual", default=[], dist_reduce_fx="cat")
         self.add_state("predicted", default=[], dist_reduce_fx="cat")

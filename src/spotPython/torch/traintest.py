@@ -113,7 +113,6 @@ def evaluate_cv(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        metric.to(device)
         optimizer = optimizer_handler(
             optimizer_name=optimizer_instance,
             params=net.parameters(),
@@ -220,7 +219,6 @@ def evaluate_hold_out(
                 print("We will use", torch.cuda.device_count(), "GPUs!")
                 net = nn.DataParallel(net)
         net.to(device)
-        metric.to(device)
         # loss_function = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
         # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
@@ -266,7 +264,6 @@ def evaluate_hold_out(
             metric_name = "Metric"
             if metric is not None:
                 metric_name = type(metric).__name__
-                print(f"{metric_name} value on hold-out data: {metric_val}")
             if writer is not None:
                 writer.add_scalars(
                     "evaluate_hold_out: Train & Val Loss and Val Metric" + writerId,
