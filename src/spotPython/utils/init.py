@@ -4,7 +4,7 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 
 
-def fun_control_init(task, tensorboard_path=None):
+def fun_control_init(task, tensorboard_path=None, device=None):
     """Initialize fun_control dictionary.
     Args:
         None
@@ -63,7 +63,7 @@ def fun_control_init(task, tensorboard_path=None):
         "eval": None,
         "k_folds": None,
         "optimizer": None,
-        "device": None,
+        "device": device,
         "show_batch_interval": 1_000_000,
         "path": None,
         "task": task,
