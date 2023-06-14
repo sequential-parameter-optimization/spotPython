@@ -157,7 +157,7 @@ def evaluate_cv(
                 metric_name = "Metric"
                 if metric is not None:
                     metric_name = type(metric).__name__
-                    print(f"{metric_name} value on hold-out data: {metric_values[fold]}")
+                    # print(f"{metric_name} value on hold-out data: {metric_values[fold]}")
                 if writer is not None:
                     writer.add_scalars(
                         "evaluate_cv fold:" + str(fold + 1) + ". Train & Val Loss and Val Metric" + writerId,
