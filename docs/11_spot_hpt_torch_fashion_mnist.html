@@ -114,11 +114,31 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script type="text/javascript">
+window.PlotlyConfig = {MathJaxConfig: 'local'};
+if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}
+if (typeof require !== 'undefined') {
+require.undef("plotly");
+requirejs.config({
+    paths: {
+        'plotly': ['https://cdn.plot.ly/plotly-2.20.0.min']
+    }
+});
+require(['plotly'], function(Plotly) {
+    window._Plotly = Plotly;
+});
+}
+</script>
+
 
 
 <meta name="twitter:title" content="Hyperparameter-tuning Cookbook - 11&nbsp; Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets">
 <meta name="twitter:description" content="">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-27-output-1.png">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-sidebar docked">
@@ -268,8 +288,14 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./25_spot_torch_vbdp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: VBDP</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -335,171 +361,197 @@ div.csl-indent {
 </header>
 
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">60</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">10</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> <span class="st">"cpu"</span> <span class="co"># "cuda:0"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> <span class="va">None</span> <span class="co"># "cpu" # "cuda:0"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dateutil.tz <span class="im">import</span> tzlocal</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> datetime.now(tzlocal())</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>HOSTNAME <span class="op">=</span> socket.gethostname().split(<span class="st">"."</span>)[<span class="dv">0</span>]</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> <span class="st">'11-torch'</span> <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> HOSTNAME <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> <span class="bu">str</span>(MAX_TIME) <span class="op">+</span> <span class="st">"min_"</span> <span class="op">+</span> <span class="bu">str</span>(INIT_SIZE) <span class="op">+</span> <span class="st">"init_"</span> <span class="op">+</span> <span class="bu">str</span>(start_time).split(<span class="st">"."</span>, <span class="dv">1</span>)[<span class="dv">0</span>].replace(<span class="st">' '</span>, <span class="st">'_'</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> experiment_name.replace(<span class="st">':'</span>, <span class="st">'-'</span>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>experiment_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.device <span class="im">import</span> getDevice</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> getDevice(DEVICE)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(DEVICE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>mps</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dateutil.tz <span class="im">import</span> tzlocal</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> datetime.now(tzlocal())</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>HOSTNAME <span class="op">=</span> socket.gethostname().split(<span class="st">"."</span>)[<span class="dv">0</span>]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> <span class="st">'11-torch'</span> <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> HOSTNAME <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> <span class="bu">str</span>(MAX_TIME) <span class="op">+</span> <span class="st">"min_"</span> <span class="op">+</span> <span class="bu">str</span>(INIT_SIZE) <span class="op">+</span> <span class="st">"init_"</span> <span class="op">+</span> <span class="bu">str</span>(start_time).split(<span class="st">"."</span>, <span class="dv">1</span>)[<span class="dv">0</span>].replace(<span class="st">' '</span>, <span class="st">'_'</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> experiment_name.replace(<span class="st">':'</span>, <span class="st">'-'</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>experiment_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>'11-torch_bartz09_1min_5init_2023-06-14_23-39-41'</code></pre>
+</div>
 </div>
 <p>This notebook exemplifies hyperparameter tuning with SPOT (spotPython). The hyperparameter software SPOT was developed in R (statistical programming language), see Open Access book “Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide”, available here: <a href="https://link.springer.com/book/10.1007/978-981-19-5170-1">https://link.springer.com/book/10.1007/978-981-19-5170-1</a>.</p>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import sys</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade build</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade --force-reinstall spotPython</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spotPython                 0.2.29
+spotRiver                  0.0.93</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Note: you may need to restart the kernel to use updated packages.</code></pre>
+</div>
 </div>
 <div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numbers</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> calendar</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime <span class="im">as</span> dt</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> differential_evolution</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> DataLoader</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision <span class="im">import</span> datasets</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision.transforms <span class="im">import</span> ToTensor</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> partial</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="im">as</span> F</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.optim <span class="im">as</span> optim</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> random_split</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchvision</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchvision.transforms <span class="im">as</span> transforms</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    add_core_model_to_fun_control,</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    assign_values,</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    convert_keys,</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    get_bound_values,</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    get_default_hyperparameters_for_core_model,</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    get_default_values,</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    get_dict_with_levels_and_types,</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    get_values_from_dict,</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    iterate_dict_values,</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    modify_hyper_parameter_levels,</span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    modify_hyper_parameter_bounds,</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    replace_levels_with_positions,</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    return_conf_list_from_var_dict,</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    get_one_core_model_from_X,</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    transform_hyper_parameter_values,</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    get_dict_with_levels_and_types,</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    convert_keys,</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    iterate_dict_values,</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> evaluate_cv, evaluate_hold_out</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.convert <span class="im">import</span> class_for_name</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> (</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    get_stars,</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    gen_design_table)</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.transform <span class="im">import</span> transform_hyper_parameter_values</span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.convert <span class="im">import</span> get_Xy_from_df</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.plot.validation <span class="im">import</span> plot_cv_predictions, plot_roc, plot_confusion_matrix</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torch_hyper_dict <span class="im">import</span> TorchHyperDict</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.hypertorch <span class="im">import</span> HyperTorch</span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Neural Net specific imports:</span></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.netfashionMNIST <span class="im">import</span> Net_fashionMNIST</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import sys</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade build</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade --force-reinstall spotPython</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(torch.__version__)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that MPS is available</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> torch.backends.mps.is_available():</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> torch.backends.mps.is_built():</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"MPS not available because the current PyTorch install was not "</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"built with MPS enabled."</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"MPS not available because the current MacOS version is not 12.3+ "</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>              <span class="st">"and/or you do not have an MPS-enabled device on this machine."</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    mps_device <span class="op">=</span> torch.device(<span class="st">"mps"</span>)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"MPS device: "</span>, mps_device)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numbers</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> calendar</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> datetime <span class="im">as</span> dt</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> differential_evolution</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch <span class="im">import</span> nn</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> DataLoader</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision <span class="im">import</span> datasets</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torchvision.transforms <span class="im">import</span> ToTensor</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> functools <span class="im">import</span> partial</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.nn.functional <span class="im">as</span> F</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torch.optim <span class="im">as</span> optim</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.utils.data <span class="im">import</span> random_split</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchvision</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchvision.transforms <span class="im">as</span> transforms</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    add_core_model_to_fun_control,</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    assign_values,</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    convert_keys,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    get_bound_values,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    get_default_hyperparameters_for_core_model,</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    get_default_values,</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    get_dict_with_levels_and_types,</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    get_values_from_dict,</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    iterate_dict_values,</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    modify_hyper_parameter_levels,</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    modify_hyper_parameter_bounds,</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    replace_levels_with_positions,</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    return_conf_list_from_var_dict,</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>    get_one_core_model_from_X,</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    transform_hyper_parameter_values,</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    get_dict_with_levels_and_types,</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>    convert_keys,</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>    iterate_dict_values,</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> evaluate_cv, evaluate_hold_out</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.convert <span class="im">import</span> class_for_name</span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> (</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a>    get_stars,</span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>    gen_design_table)</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.transform <span class="im">import</span> transform_hyper_parameter_values</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.convert <span class="im">import</span> get_Xy_from_df</span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.plot.validation <span class="im">import</span> plot_cv_predictions, plot_roc, plot_confusion_matrix</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torch_hyper_dict <span class="im">import</span> TorchHyperDict</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.hypertorch <span class="im">import</span> HyperTorch</span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Neural Net specific imports:</span></span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.netfashionMNIST <span class="im">import</span> Net_fashionMNIST</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(torch.__version__)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Check that MPS is available</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> torch.backends.mps.is_available():</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> torch.backends.mps.is_built():</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"MPS not available because the current PyTorch install was not "</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"built with MPS enabled."</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"MPS not available because the current MacOS version is not 12.3+ "</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>              <span class="st">"and/or you do not have an MPS-enabled device on this machine."</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    mps_device <span class="op">=</span> torch.device(<span class="st">"mps"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"MPS device: "</span>, mps_device)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>2.0.1
+MPS device:  mps</code></pre>
+</div>
 </div>
 <section id="step-1-initialization-of-the-empty-fun_control-dictionary" class="level2" data-number="11.1">
 <h2 data-number="11.1" class="anchored" data-anchor-id="step-1-initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">11.1</span> Step 1: Initialization of the Empty <code>fun_control</code> Dictionary</h2>
-<div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    tensorboard_path<span class="op">=</span><span class="st">"runs/10_spot_hpt_sklearn_classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    tensorboard_path<span class="op">=</span><span class="st">"runs/11_spot_hpt_torch_fashion_mnist"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    device<span class="op">=</span>DEVICE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-2-load-fashionmnist-data" class="level2" data-number="11.2">
 <h2 data-number="11.2" class="anchored" data-anchor-id="step-2-load-fashionmnist-data"><span class="header-section-number">11.2</span> Step 2: Load fashionMNIST Data</h2>
-<div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data(data_dir<span class="op">=</span><span class="st">"./data"</span>):</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Download training data from open datasets.</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    training_data <span class="op">=</span> datasets.FashionMNIST(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        root<span class="op">=</span>data_dir,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        train<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        download<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        transform<span class="op">=</span>ToTensor(),</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Download test data from open datasets.</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    test_data <span class="op">=</span> datasets.FashionMNIST(</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        root<span class="op">=</span>data_dir,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        train<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        download<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        transform<span class="op">=</span>ToTensor(),</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> training_data, test_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> load_data()</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>train.data.shape, test.data.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_data(data_dir<span class="op">=</span><span class="st">"./data"</span>):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Download training data from open datasets.</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    training_data <span class="op">=</span> datasets.FashionMNIST(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        root<span class="op">=</span>data_dir,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        train<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        download<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        transform<span class="op">=</span>ToTensor(),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Download test data from open datasets.</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    test_data <span class="op">=</span> datasets.FashionMNIST(</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>        root<span class="op">=</span>data_dir,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        train<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        download<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>        transform<span class="op">=</span>ToTensor(),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> training_data, test_data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="bu">len</span>(train)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># add the dataset to the fun_control</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: <span class="va">None</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> load_data()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>train.data.shape, test.data.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>(torch.Size([60000, 28, 28]), torch.Size([10000, 28, 28]))</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="bu">len</span>(train)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># add the dataset to the fun_control</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: <span class="va">None</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-3-specification-of-the-preprocessing-model" class="level2" data-number="11.3">
 <h2 data-number="11.3" class="anchored" data-anchor-id="step-3-specification-of-the-preprocessing-model"><span class="header-section-number">11.3</span> Step 3: Specification of the Preprocessing Model</h2>
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># categorical_columns = []</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># one_hot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># prep_model = ColumnTransformer(</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#         transformers=[</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#             ("categorical", one_hot_encoder, categorical_columns),</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         ],</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         remainder=StandardScaler(),</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># categorical_columns = []</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># one_hot_encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># prep_model = ColumnTransformer(</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">#         transformers=[</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#             ("categorical", one_hot_encoder, categorical_columns),</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         ],</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#         remainder=StandardScaler(),</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     )</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-4-select-algorithm-and-core_model_hyper_dict" class="level2" data-number="11.4">
@@ -513,41 +565,42 @@ div.csl-indent {
 <li>k_folds (<code>k_folds</code>).</li>
 </ul>
 <p>Further attributes can be easily added to the class, e.g., <code>optimizer</code> or <code>loss_function</code>.</p>
-<div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>core_model <span class="op">=</span> Net_fashionMNIST</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>TorchHyperDict,</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>core_model <span class="op">=</span> Net_fashionMNIST</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>TorchHyperDict,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2" data-number="11.5">
 <h2 data-number="11.5" class="anchored" data-anchor-id="step-5-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">11.5</span> Step 5: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
 <section id="modify-hyperparameter-of-type-factor" class="level3" data-number="11.5.1">
 <h3 data-number="11.5.1" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">11.5.1</span> Modify hyperparameter of type factor</h3>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_levels(fun_control, "leaf_model", ["LinearRegression"])</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control["core_model_hyper_dict"]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_levels(fun_control, "leaf_model", ["LinearRegression"])</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control["core_model_hyper_dict"]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3" data-number="11.5.2">
 <h3 data-number="11.5.2" class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">11.5.2</span> Modify hyperparameter of type numeric and integer (boolean)</h3>
-<div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_bounds(fun_control, "delta", bounds=[1e-10, 1e-6])</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_bounds(fun_control, "min_samples_split", bounds=[3, 20])</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#fun_control = modify_hyper_parameter_bounds(fun_control, "merit_preprune", bounds=[0, 0])</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control["core_model_hyper_dict"]</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"k_folds"</span>, bounds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>])</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"patience"</span>, bounds<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_bounds(fun_control, "delta", bounds=[1e-10, 1e-6])</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control = modify_hyper_parameter_bounds(fun_control, "min_samples_split", bounds=[3, 20])</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#fun_control = modify_hyper_parameter_bounds(fun_control, "merit_preprune", bounds=[0, 0])</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control["core_model_hyper_dict"]</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"k_folds"</span>, bounds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"patience"</span>, bounds<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">2</span>])</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"epochs"</span>, bounds<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="step-6-selection-of-the-objective-loss-function" class="level2" data-number="11.6">
 <h2 data-number="11.6" class="anchored" data-anchor-id="step-6-selection-of-the-objective-loss-function"><span class="header-section-number">11.6</span> Step 6: Selection of the Objective (Loss) Function</h2>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> CrossEntropyLoss</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"loss_function"</span>: loss_function})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> CrossEntropyLoss</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"loss_function"</span>: loss_function})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In addition to the loss functions, <code>spotPython</code> provides access to a large number of metrics.</p>
 <ul>
@@ -566,9 +619,10 @@ div.csl-indent {
 <li>Automatic synchronization between multiple devices</li>
 </ul>
 <p>Therefore, we set</p>
-<div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchmetrics</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>metric_torch <span class="op">=</span> torchmetrics.Accuracy(task<span class="op">=</span><span class="st">"multiclass"</span>, num_classes<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchmetrics</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>metric_torch <span class="op">=</span> torchmetrics.Accuracy(task<span class="op">=</span><span class="st">"multiclass"</span>, num_classes<span class="op">=</span><span class="dv">10</span>).to(fun_control[<span class="st">"device"</span>])</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"metric_torch"</span>: metric_torch})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -583,39 +637,135 @@ Minimization and maximization:
 <p><code>spotPython</code> performs minimization by default. If accuracy should be maximized, then the objective function has to be multiplied by -1. Therefore, <code>weights</code> is set to -1 in this case.</p>
 </div>
 </div>
-<div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperTorch(seed<span class="op">=</span><span class="dv">123</span>, log_level<span class="op">=</span><span class="dv">50</span>).fun_torch</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>metric_torch <span class="op">=</span> torchmetrics.Accuracy(task<span class="op">=</span><span class="st">"multiclass"</span>, num_classes<span class="op">=</span><span class="dv">10</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>shuffle <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span> <span class="op">=</span> <span class="st">"train_hold_out"</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>device <span class="op">=</span> DEVICE</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>show_batch_interval <span class="op">=</span> <span class="dv">100_000</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>path<span class="op">=</span><span class="st">"torch_model.pt"</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"data_dir"</span>: <span class="va">None</span>,</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"checkpoint_dir"</span>: <span class="va">None</span>,</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizon"</span>: <span class="va">None</span>,</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"oml_grace_period"</span>: <span class="va">None</span>,</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weights"</span>: weights,</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"step"</span>: <span class="va">None</span>,</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">"log_level"</span>: <span class="dv">50</span>,</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weight_coeff"</span>: <span class="va">None</span>,</span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_torch"</span>: metric_torch,</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_river"</span>: <span class="va">None</span>,</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_sklearn"</span>: <span class="va">None</span>,</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>               <span class="st">"loss_function"</span>: loss_function,</span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>               <span class="st">"shuffle"</span>: shuffle,</span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>               <span class="st">"eval"</span>: <span class="bu">eval</span>,</span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>               <span class="st">"device"</span>: device,</span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>               <span class="st">"show_batch_interval"</span>: show_batch_interval,</span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>               <span class="st">"path"</span>: path,</span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fun_control</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperTorch(seed<span class="op">=</span><span class="dv">123</span>, log_level<span class="op">=</span><span class="dv">50</span>).fun_torch</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>shuffle <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="bu">eval</span> <span class="op">=</span> <span class="st">"train_hold_out"</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>show_batch_interval <span class="op">=</span> <span class="dv">100_000</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>path<span class="op">=</span><span class="st">"torch_model.pt"</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">"data_dir"</span>: <span class="va">None</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"checkpoint_dir"</span>: <span class="va">None</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizon"</span>: <span class="va">None</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"oml_grace_period"</span>: <span class="va">None</span>,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weights"</span>: weights,</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"step"</span>: <span class="va">None</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"log_level"</span>: <span class="dv">50</span>,</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weight_coeff"</span>: <span class="va">None</span>,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_river"</span>: <span class="va">None</span>,</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_sklearn"</span>: <span class="va">None</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"loss_function"</span>: loss_function,</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"shuffle"</span>: shuffle,</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"eval"</span>: <span class="bu">eval</span>,</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>               <span class="st">"show_batch_interval"</span>: show_batch_interval,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>               <span class="st">"path"</span>: path,</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>fun_control</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>{'data': None,
+ 'train': Dataset FashionMNIST
+     Number of datapoints: 60000
+     Root location: ./data
+     Split: Train
+     StandardTransform
+ Transform: ToTensor(),
+ 'test': Dataset FashionMNIST
+     Number of datapoints: 10000
+     Root location: ./data
+     Split: Test
+     StandardTransform
+ Transform: ToTensor(),
+ 'loss_function': CrossEntropyLoss(),
+ 'metric_sklearn': None,
+ 'metric_river': None,
+ 'metric_torch': MulticlassAccuracy(),
+ 'metric_params': {},
+ 'prep_model': None,
+ 'n_samples': 60000,
+ 'target_column': None,
+ 'shuffle': True,
+ 'eval': 'train_hold_out',
+ 'k_folds': None,
+ 'optimizer': None,
+ 'device': 'mps',
+ 'show_batch_interval': 100000,
+ 'path': 'torch_model.pt',
+ 'task': 'classification',
+ 'save_model': False,
+ 'weights': 1.0,
+ 'writer': &lt;torch.utils.tensorboard.writer.SummaryWriter at 0x10905ec20&gt;,
+ 'core_model': spotPython.torch.netfashionMNIST.Net_fashionMNIST,
+ 'core_model_hyper_dict': {'l1': {'type': 'int',
+   'default': 5,
+   'transform': 'transform_power_2_int',
+   'lower': 2,
+   'upper': 9},
+  'l2': {'type': 'int',
+   'default': 5,
+   'transform': 'transform_power_2_int',
+   'lower': 2,
+   'upper': 9},
+  'lr_mult': {'type': 'float',
+   'default': 1.0,
+   'transform': 'None',
+   'lower': 0.1,
+   'upper': 10.0},
+  'batch_size': {'type': 'int',
+   'default': 4,
+   'transform': 'transform_power_2_int',
+   'lower': 1,
+   'upper': 4},
+  'epochs': {'type': 'int',
+   'default': 3,
+   'transform': 'transform_power_2_int',
+   'lower': 2,
+   'upper': 3},
+  'k_folds': {'type': 'int',
+   'default': 1,
+   'transform': 'None',
+   'lower': 0,
+   'upper': 0},
+  'patience': {'type': 'int',
+   'default': 5,
+   'transform': 'None',
+   'lower': 2,
+   'upper': 2},
+  'optimizer': {'levels': ['Adadelta',
+    'Adagrad',
+    'Adam',
+    'AdamW',
+    'SparseAdam',
+    'Adamax',
+    'ASGD',
+    'NAdam',
+    'RAdam',
+    'RMSprop',
+    'Rprop',
+    'SGD'],
+   'type': 'factor',
+   'default': 'SGD',
+   'transform': 'None',
+   'core_model_parameter_type': 'str',
+   'lower': 0,
+   'upper': 12},
+  'sgd_momentum': {'type': 'float',
+   'default': 0.0,
+   'transform': 'None',
+   'lower': 0.0,
+   'upper': 1.0}},
+ 'data_dir': None,
+ 'checkpoint_dir': None,
+ 'horizon': None,
+ 'oml_grace_period': None,
+ 'step': None,
+ 'log_level': 50,
+ 'weight_coeff': None}</code></pre>
+</div>
 </div>
 </section>
 <section id="step-7-calling-the-spot-function" class="level2" data-number="11.7">
@@ -623,17 +773,30 @@ Minimization and maximization:
 <section id="prepare-the-spot-parameters" class="level3" data-number="11.7.1">
 <h3 data-number="11.7.1" class="anchored" data-anchor-id="prepare-the-spot-parameters"><span class="header-section-number">11.7.1</span> Prepare the SPOT Parameters</h3>
 <p>Get types and variable names as well as lower and upper bounds for the hyperparameters.</p>
-<div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"var_type"</span>: var_type,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"var_name"</span>: var_name})</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"var_type"</span>: var_type,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"var_name"</span>: var_name})</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>| name         | type   | default   |   lower |   upper | transform             |
+|--------------|--------|-----------|---------|---------|-----------------------|
+| l1           | int    | 5         |     2   |       9 | transform_power_2_int |
+| l2           | int    | 5         |     2   |       9 | transform_power_2_int |
+| lr_mult      | float  | 1.0       |     0.1 |      10 | None                  |
+| batch_size   | int    | 4         |     1   |       4 | transform_power_2_int |
+| epochs       | int    | 3         |     2   |       3 | transform_power_2_int |
+| k_folds      | int    | 1         |     0   |       0 | None                  |
+| patience     | int    | 5         |     2   |       2 | None                  |
+| optimizer    | factor | SGD       |     0   |      12 | None                  |
+| sgd_momentum | float  | 0.0       |     0   |       1 | None                  |</code></pre>
+</div>
 </div>
 </section>
 <section id="run-the-spot-optimizer" class="level3" data-number="11.7.2">
@@ -642,153 +805,651 @@ Minimization and maximization:
 <li>Run SPOT for approx. x mins (<code>max_time</code>).</li>
 <li>Note: the run takes longer, because the evaluation time of initial design (here: <code>initi_size</code>, 20 points) is not considered.</li>
 </ul>
-<div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>hyper_dict<span class="op">=</span>TorchHyperDict().load()</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control, hyper_dict)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                   fun_repeats <span class="op">=</span> <span class="dv">1</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                   noise <span class="op">=</span> <span class="va">False</span>,</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                   infill_criterion <span class="op">=</span> <span class="st">"y"</span>,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                   n_points <span class="op">=</span> <span class="dv">1</span>,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>                   log_level <span class="op">=</span> <span class="dv">50</span>,</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span> <span class="va">False</span>,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE,</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_optimizer"</span>: differential_evolution,</span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span>,</span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"log_level"</span>: <span class="dv">50</span></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>                                      })</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>hyper_dict<span class="op">=</span>TorchHyperDict().load()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control, hyper_dict)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>array([[ 5.,  5.,  1.,  4.,  3.,  1.,  5., 11.,  0.]])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                   fun_repeats <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                   noise <span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>                   infill_criterion <span class="op">=</span> <span class="st">"y"</span>,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>                   n_points <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>                   log_level <span class="op">=</span> <span class="dv">50</span>,</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span> <span class="va">False</span>,</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE,</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_optimizer"</span>: differential_evolution,</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span>,</span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"log_level"</span>: <span class="dv">50</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>                                      })</span>
+<span id="cb32-29"><a href="#cb32-29" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+config: {'l1': 16, 'l2': 32, 'lr_mult': 9.563687451910228, 'batch_size': 8, 'epochs': 8, 'k_folds': 0, 'patience': 2, 'optimizer': 'AdamW', 'sgd_momentum': 0.41533100039458876}
+Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5919768625410895
+Accuracy on hold-out set: 0.7926666666666666
+MulticlassAccuracy value on hold-out data: 0.7926666736602783
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5422454833596324
+Accuracy on hold-out set: 0.8049166666666666
+MulticlassAccuracy value on hold-out data: 0.8049166798591614
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5306496526372309
+Accuracy on hold-out set: 0.8284583333333333
+MulticlassAccuracy value on hold-out data: 0.828458309173584
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5690700718184235
+Accuracy on hold-out set: 0.82525
+MulticlassAccuracy value on hold-out data: 0.8252500295639038
+Epoch: 5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.601823767261114
+Accuracy on hold-out set: 0.7808333333333334
+MulticlassAccuracy value on hold-out data: 0.7808333039283752
+Early stopping at epoch 4
+Returned to Spot: Validation loss: 0.601823767261114
+----------------------------------------------
+
+config: {'l1': 128, 'l2': 32, 'lr_mult': 6.258012467639852, 'batch_size': 2, 'epochs': 4, 'k_folds': 0, 'patience': 2, 'optimizer': 'RAdam', 'sgd_momentum': 0.9572474073249809}
+Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5694384363164898
+Accuracy on hold-out set: 0.8373333333333334
+MulticlassAccuracy value on hold-out data: 0.8373333215713501
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5111982016891852
+Accuracy on hold-out set: 0.8609583333333334
+MulticlassAccuracy value on hold-out data: 0.8609583377838135
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5325020373088812
+Accuracy on hold-out set: 0.8742083333333334
+MulticlassAccuracy value on hold-out data: 0.8742083311080933
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5583847571162562
+Accuracy on hold-out set: 0.8638333333333333
+MulticlassAccuracy value on hold-out data: 0.8638333082199097
+Early stopping at epoch 3
+Returned to Spot: Validation loss: 0.5583847571162562
+----------------------------------------------
+
+config: {'l1': 256, 'l2': 256, 'lr_mult': 0.2437336281201693, 'batch_size': 16, 'epochs': 8, 'k_folds': 0, 'patience': 2, 'optimizer': 'Adagrad', 'sgd_momentum': 0.15368887503658651}
+Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.5014787770112356
+Accuracy on hold-out set: 0.8265833333333333
+MulticlassAccuracy value on hold-out data: 0.8265833258628845
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.44958208562930424
+Accuracy on hold-out set: 0.8417916666666667
+MulticlassAccuracy value on hold-out data: 0.8417916893959045
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.4320714940639834
+Accuracy on hold-out set: 0.8482083333333333
+MulticlassAccuracy value on hold-out data: 0.8482083082199097
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.4265569516072671
+Accuracy on hold-out set: 0.8494166666666667
+MulticlassAccuracy value on hold-out data: 0.8494166731834412
+Epoch: 5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.42196655583878356
+Accuracy on hold-out set: 0.8513333333333334
+MulticlassAccuracy value on hold-out data: 0.8513333201408386
+Epoch: 6</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.40411193598558504
+Accuracy on hold-out set: 0.8585416666666666
+MulticlassAccuracy value on hold-out data: 0.8585416674613953
+Epoch: 7</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.39835683585455023
+Accuracy on hold-out set: 0.8597916666666666
+MulticlassAccuracy value on hold-out data: 0.8597916960716248
+Epoch: 8</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.3937539686386784
+Accuracy on hold-out set: 0.8613333333333333
+MulticlassAccuracy value on hold-out data: 0.8613333106040955
+Returned to Spot: Validation loss: 0.3937539686386784
+----------------------------------------------
+
+config: {'l1': 64, 'l2': 8, 'lr_mult': 2.906205211581667, 'batch_size': 8, 'epochs': 4, 'k_folds': 0, 'patience': 2, 'optimizer': 'SGD', 'sgd_momentum': 0.25435133436334767}
+Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.953721585482359
+Accuracy on hold-out set: 0.6365833333333333
+MulticlassAccuracy value on hold-out data: 0.6365833282470703
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.7918141765445471
+Accuracy on hold-out set: 0.698125
+MulticlassAccuracy value on hold-out data: 0.6981250047683716
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.7259560302868485
+Accuracy on hold-out set: 0.7350416666666667
+MulticlassAccuracy value on hold-out data: 0.7350416779518127
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.6805050338432193
+Accuracy on hold-out set: 0.7610833333333333
+MulticlassAccuracy value on hold-out data: 0.7610833048820496
+Returned to Spot: Validation loss: 0.6805050338432193
+----------------------------------------------
+
+config: {'l1': 4, 'l2': 128, 'lr_mult': 4.224097306355747, 'batch_size': 4, 'epochs': 8, 'k_folds': 0, 'patience': 2, 'optimizer': 'Adamax', 'sgd_momentum': 0.6538496127257492}
+Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 1.0079037581153742
+Accuracy on hold-out set: 0.5950416666666667
+MulticlassAccuracy value on hold-out data: 0.5950416922569275
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.9708360467644622
+Accuracy on hold-out set: 0.6071666666666666
+MulticlassAccuracy value on hold-out data: 0.6071666479110718
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.9234958228009085
+Accuracy on hold-out set: 0.6239583333333333
+MulticlassAccuracy value on hold-out data: 0.6239583492279053
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.9553061232081882
+Accuracy on hold-out set: 0.6332916666666667
+MulticlassAccuracy value on hold-out data: 0.6332916617393494
+Epoch: 5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.9313747411405621
+Accuracy on hold-out set: 0.6387083333333333
+MulticlassAccuracy value on hold-out data: 0.6387083530426025
+Early stopping at epoch 4
+Returned to Spot: Validation loss: 0.9313747411405621
+----------------------------------------------
+
+config: {'l1': 256, 'l2': 256, 'lr_mult': 0.22681831533642605, 'batch_size': 16, 'epochs': 8, 'k_folds': 0, 'patience': 2, 'optimizer': 'Adagrad', 'sgd_momentum': 0.14870946450909894}
+Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.48470553995668886
+Accuracy on hold-out set: 0.8322916666666667
+MulticlassAccuracy value on hold-out data: 0.8322916626930237
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.4450473321378231
+Accuracy on hold-out set: 0.846
+MulticlassAccuracy value on hold-out data: 0.8460000157356262
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.42815405742575724
+Accuracy on hold-out set: 0.8490833333333333
+MulticlassAccuracy value on hold-out data: 0.8490833044052124
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.41871932974457743
+Accuracy on hold-out set: 0.849625
+MulticlassAccuracy value on hold-out data: 0.8496249914169312
+Epoch: 5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.40385921974480155
+Accuracy on hold-out set: 0.8589166666666667
+MulticlassAccuracy value on hold-out data: 0.8589166402816772
+Epoch: 6</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.3990575960949063
+Accuracy on hold-out set: 0.8619166666666667
+MulticlassAccuracy value on hold-out data: 0.8619166612625122
+Epoch: 7</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.3924024781137705
+Accuracy on hold-out set: 0.86375
+MulticlassAccuracy value on hold-out data: 0.8637499809265137
+Epoch: 8</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.3886936074246963
+Accuracy on hold-out set: 0.8648333333333333
+MulticlassAccuracy value on hold-out data: 0.8648333549499512
+Returned to Spot: Validation loss: 0.3886936074246963
+----------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spotPython tuning: 0.3886936074246963 [##########] 100.00% Done...
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x2864f8160&gt;</code></pre>
+</div>
 </div>
 </section>
 <section id="results" class="level3" data-number="11.7.3">
 <h3 data-number="11.7.3" class="anchored" data-anchor-id="results"><span class="header-section-number">11.7.3</span> Results</h3>
-<div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_ch10-friedman-hpt-0_maans03_60min_20init_1K_2023-04-14_10-11-19.pkl"</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_ch10-friedman-hpt-0_maans03_60min_20init_1K_2023-04-14_10-11-19.pkl"</span></span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Show the Progress of the hyperparameter tuning:</li>
 </ul>
-<div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.y</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>array([0.60182377, 0.55838476, 0.39375397, 0.68050503, 0.93137474,
+       0.38869361])</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-27-output-1.png" width="719" height="243"></p>
+</div>
 </div>
 <p>Print the results</p>
-<div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>| name         | type   | default   |   lower |   upper |               tuned | transform             |   importance | stars   |
+|--------------|--------|-----------|---------|---------|---------------------|-----------------------|--------------|---------|
+| l1           | int    | 5         |     2.0 |     9.0 |                 8.0 | transform_power_2_int |       100.00 | ***     |
+| l2           | int    | 5         |     2.0 |     9.0 |                 8.0 | transform_power_2_int |         0.04 |         |
+| lr_mult      | float  | 1.0       |     0.1 |    10.0 | 0.22681831533642605 | None                  |         0.04 |         |
+| batch_size   | int    | 4         |     1.0 |     4.0 |                 4.0 | transform_power_2_int |         0.00 |         |
+| epochs       | int    | 3         |     2.0 |     3.0 |                 3.0 | transform_power_2_int |         0.16 | .       |
+| k_folds      | int    | 1         |     0.0 |     0.0 |                 0.0 | None                  |         0.00 |         |
+| patience     | int    | 5         |     2.0 |     2.0 |                 2.0 | None                  |         0.00 |         |
+| optimizer    | factor | SGD       |     0.0 |    12.0 |                 1.0 | None                  |        18.26 | *       |
+| sgd_momentum | float  | 0.0       |     0.0 |     1.0 | 0.14870946450909894 | None                  |         0.44 | .       |</code></pre>
+</div>
 </div>
 </section>
 </section>
 <section id="show-variable-importance" class="level2" data-number="11.8">
 <h2 data-number="11.8" class="anchored" data-anchor-id="show-variable-importance"><span class="header-section-number">11.8</span> Show variable importance</h2>
-<div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>, filename<span class="op">=</span><span class="st">"../Figures.d/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-29-output-1.png" width="575" height="411"></p>
+</div>
 </div>
 </section>
 <section id="sec-get-spot-results-11" class="level2" data-number="11.9">
 <h2 data-number="11.9" class="anchored" data-anchor-id="sec-get-spot-results-11"><span class="header-section-number">11.9</span> Get SPOT Results</h2>
 <p>The architecture of the <code>spotPython</code> model can be obtained by the following code:</p>
-<div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>Net_fashionMNIST(
+  (flatten): Flatten(start_dim=1, end_dim=-1)
+  (linear_relu_stack): Sequential(
+    (0): Linear(in_features=784, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=256, out_features=256, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=256, out_features=10, bias=True)
+  )
+)</code></pre>
+</div>
 </div>
 </section>
 <section id="get-default-hyperparameters" class="level2" data-number="11.10">
 <h2 data-number="11.10" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">11.10</span> Get Default Hyperparameters</h2>
-<div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>fc <span class="op">=</span> fun_control</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>fc.update({<span class="st">"core_model_hyper_dict"</span>:</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    hyper_dict[fun_control[<span class="st">"core_model"</span>].<span class="va">__name__</span>]})</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> get_one_core_model_from_X(X_start, fun_control<span class="op">=</span>fc)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>fc <span class="op">=</span> fun_control</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>fc.update({<span class="st">"core_model_hyper_dict"</span>:</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>    hyper_dict[fun_control[<span class="st">"core_model"</span>].<span class="va">__name__</span>]})</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> get_one_core_model_from_X(X_start, fun_control<span class="op">=</span>fc)</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>Net_fashionMNIST(
+  (flatten): Flatten(start_dim=1, end_dim=-1)
+  (linear_relu_stack): Sequential(
+    (0): Linear(in_features=784, out_features=32, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=32, out_features=32, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=32, out_features=10, bias=True)
+  )
+)</code></pre>
+</div>
 </div>
 </section>
 <section id="evaluation-of-the-default-and-the-tuned-architectures" class="level2" data-number="11.11">
 <h2 data-number="11.11" class="anchored" data-anchor-id="evaluation-of-the-default-and-the-tuned-architectures"><span class="header-section-number">11.11</span> Evaluation of the Default and the Tuned Architectures</h2>
 <p>The method <code>train_tuned</code> takes a model architecture without trained weights and trains this model with the train data. The train data is split into train and validation data. The validation data is used for early stopping. The trained model weights are saved as a dictionary.</p>
-<div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> (</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    train_tuned,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    test_tuned,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_default, train_dataset<span class="op">=</span>train, shuffle<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> DEVICE, show_batch_interval<span class="op">=</span><span class="dv">1_000_000</span>,</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_default, test_dataset<span class="op">=</span>test, </span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">False</span>, </span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> DEVICE,</span>
-<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> (</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>    train_tuned,</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>    test_tuned,</span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb81-5"><a href="#cb81-5" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_default, train_dataset<span class="op">=</span>train, shuffle<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb81-8"><a href="#cb81-8" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb81-9"><a href="#cb81-9" aria-hidden="true" tabindex="-1"></a>        show_batch_interval<span class="op">=</span><span class="dv">1_000_000</span>,</span>
+<span id="cb81-10"><a href="#cb81-10" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb81-11"><a href="#cb81-11" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
+<span id="cb81-12"><a href="#cb81-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb81-13"><a href="#cb81-13" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_default, test_dataset<span class="op">=</span>test, </span>
+<span id="cb81-14"><a href="#cb81-14" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb81-15"><a href="#cb81-15" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb81-16"><a href="#cb81-16" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">False</span>, </span>
+<span id="cb81-17"><a href="#cb81-17" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb81-18"><a href="#cb81-18" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 2.002133889834086
+Accuracy on hold-out set: 0.395125
+MulticlassAccuracy value on hold-out data: 0.39512500166893005
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 1.536445673386256
+Accuracy on hold-out set: 0.5830833333333333
+MulticlassAccuracy value on hold-out data: 0.5830833315849304
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 1.2659441814422607
+Accuracy on hold-out set: 0.635625
+MulticlassAccuracy value on hold-out data: 0.6356250047683716
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 1.1083517822821936
+Accuracy on hold-out set: 0.64375
+MulticlassAccuracy value on hold-out data: 0.643750011920929
+Epoch: 5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 1.0063857422669729
+Accuracy on hold-out set: 0.6590833333333334
+MulticlassAccuracy value on hold-out data: 0.6590833067893982
+Epoch: 6</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.9346535342931748
+Accuracy on hold-out set: 0.6680416666666666
+MulticlassAccuracy value on hold-out data: 0.6680416464805603
+Epoch: 7</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.8822947811484337
+Accuracy on hold-out set: 0.6852916666666666
+MulticlassAccuracy value on hold-out data: 0.6852916479110718
+Epoch: 8</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.8434276076555252
+Accuracy on hold-out set: 0.69525
+MulticlassAccuracy value on hold-out data: 0.6952499747276306
+Returned to Spot: Validation loss: 0.8434276076555252
+----------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.8601902204036712
+Accuracy on hold-out set: 0.6849
+MulticlassAccuracy value on hold-out data: 0.6848999857902527
+Final evaluation: Validation loss: 0.8601902204036712
+Final evaluation: Validation metric: 0.6848999857902527
+----------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="31">
+<pre><code>(0.8601902204036712, nan, tensor(0.6849, device='mps:0'))</code></pre>
+</div>
 </div>
 <p>The following code trains the model <code>model_spot</code>. If <code>path</code> is set to a filename, e.g., <code>path = "model_spot_trained.pt"</code>, the weights of the trained model will be saved to this file.</p>
-<div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_spot, train_dataset<span class="op">=</span>train,</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> DEVICE,</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_spot, test_dataset<span class="op">=</span>test,</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>            shuffle<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>            loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>            metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>            device <span class="op">=</span> DEVICE,</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>            task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_spot, train_dataset<span class="op">=</span>train,</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_spot, test_dataset<span class="op">=</span>test,</span>
+<span id="cb93-10"><a href="#cb93-10" aria-hidden="true" tabindex="-1"></a>            shuffle<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb93-11"><a href="#cb93-11" aria-hidden="true" tabindex="-1"></a>            loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb93-12"><a href="#cb93-12" aria-hidden="true" tabindex="-1"></a>            metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb93-13"><a href="#cb93-13" aria-hidden="true" tabindex="-1"></a>            device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb93-14"><a href="#cb93-14" aria-hidden="true" tabindex="-1"></a>            task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Epoch: 1</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.4911266313244899
+Accuracy on hold-out set: 0.8313333333333334
+MulticlassAccuracy value on hold-out data: 0.831333339214325
+Epoch: 2</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.46031840571016075
+Accuracy on hold-out set: 0.8353333333333334
+MulticlassAccuracy value on hold-out data: 0.8353333473205566
+Epoch: 3</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.43224791787813105
+Accuracy on hold-out set: 0.8477916666666667
+MulticlassAccuracy value on hold-out data: 0.8477916717529297
+Epoch: 4</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.42185806428889433
+Accuracy on hold-out set: 0.8517083333333333
+MulticlassAccuracy value on hold-out data: 0.8517083525657654
+Epoch: 5</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.41309068199495474
+Accuracy on hold-out set: 0.85425
+MulticlassAccuracy value on hold-out data: 0.8542500138282776
+Epoch: 6</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.4044274035145839
+Accuracy on hold-out set: 0.8583333333333333
+MulticlassAccuracy value on hold-out data: 0.8583333492279053
+Epoch: 7</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.397600487438341
+Accuracy on hold-out set: 0.8612083333333334
+MulticlassAccuracy value on hold-out data: 0.8612083196640015
+Epoch: 8</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.3943131767263015
+Accuracy on hold-out set: 0.861375
+MulticlassAccuracy value on hold-out data: 0.8613749742507935
+Returned to Spot: Validation loss: 0.3943131767263015
+----------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loss on hold-out set: 0.4229417533516884
+Accuracy on hold-out set: 0.8522
+MulticlassAccuracy value on hold-out data: 0.8521999716758728
+Final evaluation: Validation loss: 0.4229417533516884
+Final evaluation: Validation metric: 0.8521999716758728
+----------------------------------------------</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>(0.4229417533516884, nan, tensor(0.8522, device='mps:0'))</code></pre>
+</div>
 </div>
 </section>
 <section id="detailed-hyperparameter-plots" class="level2" data-number="11.12">
 <h2 data-number="11.12" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">11.12</span> Detailed Hyperparameter Plots</h2>
-<div class="cell" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>l1:  100.0
+l2:  0.040086691763006235
+lr_mult:  0.03531024245898389
+epochs:  0.16440806107512462
+optimizer:  18.263478058594348
+sgd_momentum:  0.44059827453221734</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-2.png" width="703" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-3.png" width="712" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-4.png" width="716" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-5.png" width="708" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-6.png" width="716" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-7.png" width="721" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-8.png" width="729" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-9.png" width="711" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-10.png" width="724" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-11.png" width="725" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-12.png" width="711" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-13.png" width="725" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-14.png" width="711" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-15.png" width="725" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="11_spot_hpt_torch_fashion_mnist_files/figure-html/cell-34-output-16.png" width="717" height="281"></p>
+</div>
 </div>
 </section>
 <section id="parallel-coordinates-plot" class="level2" data-number="11.13">
 <h2 data-number="11.13" class="anchored" data-anchor-id="parallel-coordinates-plot"><span class="header-section-number">11.13</span> Parallel Coordinates Plot</h2>
-<div class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+
+<div>                            <div id="26f68b16-ff90-416f-a48e-47d4a3d6d2ed" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("26f68b16-ff90-416f-a48e-47d4a3d6d2ed")) {                    Plotly.newPlot(                        "26f68b16-ff90-416f-a48e-47d4a3d6d2ed",                        [{"dimensions":[{"label":"l1","range":[2.0,8.0],"values":[4.0,7.0,8.0,6.0,2.0,8.0]},{"label":"l2","range":[3.0,8.0],"values":[5.0,5.0,8.0,3.0,7.0,8.0]},{"label":"lr_mult","range":[0.22681831533642605,9.563687451910228],"values":[9.563687451910228,6.258012467639852,0.2437336281201693,2.906205211581667,4.224097306355747,0.22681831533642605]},{"label":"batch_size","range":[1.0,4.0],"values":[3.0,1.0,4.0,3.0,2.0,4.0]},{"label":"epochs","range":[2.0,3.0],"values":[3.0,2.0,3.0,2.0,3.0,3.0]},{"label":"optimizer","range":[1.0,11.0],"values":[3.0,8.0,1.0,11.0,5.0,1.0]},{"label":"sgd_momentum","range":[0.14870946450909894,0.9572474073249809],"values":[0.41533100039458876,0.9572474073249809,0.15368887503658651,0.25435133436334767,0.6538496127257492,0.14870946450909894]}],"line":{"cmax":0.9313747411405621,"cmin":0.3886936074246963,"color":[0.601823767261114,0.5583847571162562,0.3937539686386784,0.6805050338432193,0.9313747411405621,0.3886936074246963],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+                            
+var gd = document.getElementById('26f68b16-ff90-416f-a48e-47d4a3d6d2ed');
+var x = new MutationObserver(function (mutations, observer) {{
+        var display = window.getComputedStyle(gd).display;
+        if (!display || display === 'none') {{
+            console.log([gd, 'removed!']);
+            Plotly.purge(gd);
+            observer.disconnect();
+        }}
+}});
+
+// Listen for the removal of the full notebook cells
+var notebookContainer = gd.closest('#notebook-container');
+if (notebookContainer) {{
+    x.observe(notebookContainer, {childList: true});
+}}
+
+// Listen for the clearing of the current output cell
+var outputEl = gd.closest('.output');
+if (outputEl) {{
+    x.observe(outputEl, {childList: true});
+}}
+
+                        })                };                });            </script>        </div>
+</div>
 </div>
 </section>
 <section id="plot-all-combinations-of-hyperparameters" class="level2" data-number="11.14">
@@ -796,13 +1457,13 @@ Minimization and maximization:
 <ul>
 <li>Warning: this may take a while.</li>
 </ul>
-<div class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
+<span id="cb108-6"><a href="#cb108-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
