@@ -107,11 +107,6 @@ def evaluate_cv(
     loss_values = {}
     try:
         device = getDevice(device=device)
-        if torch.cuda.is_available():
-            device = "cuda:0"
-            if torch.cuda.device_count() > 1:
-                print("We will use", torch.cuda.device_count(), "GPUs!")
-                net = nn.DataParallel(net)
         net.to(device)
         optimizer = optimizer_handler(
             optimizer_name=optimizer_instance,
@@ -213,11 +208,6 @@ def evaluate_hold_out(
     removed_attributes, net = get_removed_attributes_and_base_net(net)
     try:
         device = getDevice(device=device)
-        if torch.cuda.is_available():
-            device = "cuda:0"
-            if torch.cuda.device_count() > 1:
-                print("We will use", torch.cuda.device_count(), "GPUs!")
-                net = nn.DataParallel(net)
         net.to(device)
         # loss_function = nn.CrossEntropyLoss()
         # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
