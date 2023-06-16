@@ -242,13 +242,13 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./10_spot_hpt_sklearn_classification.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn SVC on Moons Data</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./11_spot_hpt_torch_fashion_mnist.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST Data Using Hold-out Data Sets</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: PyTorch With fashionMNIST</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -265,20 +265,44 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./16_spot_hpt_sklearn_multiclass_classification_randomforest.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn RandomForestClassifier VBDP Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./17_spot_hpt_sklearn_multiclass_classification_xgb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn RandomForestClassifier VBDP Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./18_spot_hpt_sklearn_multiclass_classification_svc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn RandomForestClassifier VBDP Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./19_spot_hpt_sklearn_multiclass_classification_knn.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: sklearn RandomForestClassifier VBDP Data</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./24_spot_torch_regression.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning for PyTorch With <code>spotPython</code>: Regression</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./25_spot_torch_vbdp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: VBDP</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Hyperparameter Tuning: VBDP</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./99_spot_doc.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Documentation of the Sequential Parameter Optimization</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -332,7 +356,7 @@ div.csl-indent {
 <p>Hyperparameter tuning is an important, but often difficult and computationally intensive task. Changing the architecture of a neural network or the learning rate of an optimizer can have a significant impact on the performance.</p>
 <p>The goal of hyperparameter tuning is to optimize the hyperparameters in a way that improves the performance of the machine learning or deep learning model. The simplest, but also most computationally expensive, approach uses manual search (or trial-and-error <span class="citation" data-cites="Meignan:2015vp">(<a href="references.html#ref-Meignan:2015vp" role="doc-biblioref">Meignan et al. 2015</a>)</span>). Commonly encountered is simple random search, i.e., random and repeated selection of hyperparameters for evaluation, and lattice search (“grid search”). In addition, methods that perform directed search and other model-free algorithms, i.e., algorithms that do not explicitly rely on a model, e.g., evolution strategies <span class="citation" data-cites="Bart13j">(<a href="references.html#ref-Bart13j" role="doc-biblioref">Bartz-Beielstein et al. 2014</a>)</span> or pattern search <span class="citation" data-cites="Torczon00">(<a href="references.html#ref-Torczon00" role="doc-biblioref">Lewis, Torczon, and Trosset 2000</a>)</span> play an important role. Also, “hyperband”, i.e., a multi-armed bandit strategy that dynamically allocates resources to a set of random configurations and uses successive bisections to stop configurations with poor performance <span class="citation" data-cites="Li16a">(<a href="references.html#ref-Li16a" role="doc-biblioref">Li et al. 2016</a>)</span>, is very common in hyperparameter tuning. The most sophisticated and efficient approaches are the Bayesian optimization and surrogate model based optimization methods, which are based on the optimization of cost functions determined by simulations or experiments.</p>
 <p>We consider below a surrogate model based optimization-based hyperparameter tuning approach based on the Python version of the SPOT (“Sequential Parameter Optimization Toolbox”) <span class="citation" data-cites="BLP05">(<a href="references.html#ref-BLP05" role="doc-biblioref">Bartz-Beielstein, Lasarczyk, and Preuss 2005</a>)</span>, which is suitable for situations where only limited resources are available. This may be due to limited availability and cost of hardware, or due to the fact that confidential data may only be processed locally, e.g., due to legal requirements. Furthermore, in our approach, the understanding of algorithms is seen as a key tool for enabling transparency and explainability. This can be enabled, for example, by quantifying the contribution of machine learning and deep learning components (nodes, layers, split decisions, activation functions, etc.). Understanding the importance of hyperparameters and the interactions between multiple hyperparameters plays a major role in the interpretability and explainability of machine learning models. SPOT provides statistical tools for understanding hyperparameters and their interactions. Last but not least, it should be noted that the SPOT software code is available in the open source <code>spotPython</code> package on github<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, allowing replicability of the results. This tutorial descries the Python variant of SPOT, which is called <code>spotPython</code>. The R implementation is described in <span class="citation" data-cites="bart21i">Bartz et al. (<a href="references.html#ref-bart21i" role="doc-biblioref">2022</a>)</span>. SPOT is an established open source software that has been maintained for more than 15 years <span class="citation" data-cites="BLP05">(<a href="references.html#ref-BLP05" role="doc-biblioref">Bartz-Beielstein, Lasarczyk, and Preuss 2005</a>)</span> <span class="citation" data-cites="bart21i">(<a href="references.html#ref-bart21i" role="doc-biblioref">Bartz et al. 2022</a>)</span>.</p>
-<p>This tutorial is structured as follows. The concept of the hyperparameter tuning software <code>spotPython</code> is described in <a href="#sec-spot"><span>Section&nbsp;1.1</span></a>. <a href="14_spot_ray_hpt_torch_cifar10.html"><span>Chapter&nbsp;13</span></a> describes the execution of the example from the tutorial “Hyperparameter Tuning with Ray Tune” <span class="citation" data-cites="pyto23a">(<a href="references.html#ref-pyto23a" role="doc-biblioref">PyTorch 2023</a>)</span>. The integration of <code>spotPython</code> into the <code>PyTorch</code> training workflow is described in detail in the following sections. <a href="14_spot_ray_hpt_torch_cifar10.html#sec-setup"><span>Section&nbsp;13.1</span></a> describes the setup of the tuners. <a href="14_spot_ray_hpt_torch_cifar10.html#sec-data-loading"><span>Section&nbsp;13.3</span></a> describes the data loading. <a href="14_spot_ray_hpt_torch_cifar10.html#sec-the-model-to-be-tuned"><span>Section&nbsp;13.4</span></a> describes the model to be tuned. The search space is introduced in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-search-space"><span>Section&nbsp;13.5</span></a>. Optimizers are presented in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-optimizers"><span>Section&nbsp;13.6</span></a>. How to split the data in train, validation, and test sets is described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-data-splitting"><span>Section&nbsp;13.7</span></a>. The selection of the loss function and metrics is described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-loss-functions"><span>Section&nbsp;13.8</span></a>. @#sec-prepare-spot-call describes the preparation of the <code>spotPython</code> call. The objective function is described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-the-objective-function"><span>Section&nbsp;13.10</span></a>. How to use results from previous runs and default hyperparameter configurations is described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-default-hyperparameters"><span>Section&nbsp;13.11</span></a>. Starting the tuner is shown in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-call-the-hyperparameter-tuner"><span>Section&nbsp;13.12</span></a>. TensorBoard can be used to visualize the results as shown in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-tensorboard"><span>Section&nbsp;13.13</span></a>. Results are discussed and explained in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-results"><span>Section&nbsp;13.14</span></a> Finally, <a href="14_spot_ray_hpt_torch_cifar10.html#sec-summary"><span>Section&nbsp;13.15</span></a> presents a summary and an outlook.</p>
+<p>This tutorial is structured as follows. The concept of the hyperparameter tuning software <code>spotPython</code> is described in <a href="#sec-spot"><span>Section&nbsp;1.1</span></a>. <a href="14_spot_ray_hpt_torch_cifar10.html"><span>Chapter&nbsp;13</span></a> describes the execution of the example from the tutorial “Hyperparameter Tuning with Ray Tune” <span class="citation" data-cites="pyto23a">(<a href="references.html#ref-pyto23a" role="doc-biblioref">PyTorch 2023</a>)</span>. The integration of <code>spotPython</code> into the <code>PyTorch</code> training workflow is described in detail in the following sections. <span class="quarto-unresolved-ref">?sec-setup</span> describes the setup of the tuners. <span class="quarto-unresolved-ref">?sec-data-loading</span> describes the data loading. <a href="24_spot_torch_regression.html#sec-the-model-to-be-tuned"><span>Section&nbsp;18.4</span></a> describes the model to be tuned. The search space is introduced in <span class="quarto-unresolved-ref">?sec-search-space</span>. Optimizers are presented in <span class="quarto-unresolved-ref">?sec-optimizers</span>. How to split the data in train, validation, and test sets is described in <span class="quarto-unresolved-ref">?sec-data-splitting</span>. The selection of the loss function and metrics is described in <span class="quarto-unresolved-ref">?sec-loss-functions</span>. <span class="quarto-unresolved-ref">?sec-prepare-spot-call</span> describes the preparation of the <code>spotPython</code> call. The objective function is described in <span class="quarto-unresolved-ref">?sec-the-objective-function</span>. How to use results from previous runs and default hyperparameter configurations is described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-default-hyperparameters"><span>Section&nbsp;13.11</span></a>. Starting the tuner is shown in <span class="quarto-unresolved-ref">?sec-call-the-hyperparameter-tuner</span>. TensorBoard can be used to visualize the results as shown in <a href="12_spot_hpt_torch_cifar10.html"><span>Chapter&nbsp;13</span></a>. Results are discussed and explained in <span class="quarto-unresolved-ref">?sec-results</span> Finally, <a href="14_spot_ray_hpt_torch_cifar10.html#sec-summary"><span>Section&nbsp;13.15</span></a> presents a summary and an outlook.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -352,17 +376,17 @@ Note
 <p>SPOT implements key techniques such as exploratory fitness landscape analysis and sensitivity analysis. It can be used to understand the performance of various algorithms, while simultaneously giving insights into their algorithmic behavior. In addition, SPOT can be used as an optimizer and for automatic and interactive tuning. Details on SPOT and its use in practice are given by <span class="citation" data-cites="bart21i">Bartz et al. (<a href="references.html#ref-bart21i" role="doc-biblioref">2022</a>)</span>.</p>
 <p>A typical hyperparameter tuning process with <code>spotPython</code> consists of the following steps:</p>
 <ol type="1">
-<li>Loading the data (training and test datasets), see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-data-loading"><span>Section&nbsp;13.3</span></a>.</li>
-<li>Specification of the preprocessing model, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-specification-of-preprocessing-model"><span>Section&nbsp;13.4.1</span></a>. This model is called <code>prep_model</code> (“preparation” or pre-processing). The information required for the hyperparameter tuning is stored in the dictionary <code>fun_control</code>. Thus, the information needed for the execution of the hyperparameter tuning is available in a readable form.</li>
+<li>Loading the data (training and test datasets), see <span class="quarto-unresolved-ref">?sec-data-loading</span>.</li>
+<li>Specification of the preprocessing model, see <span class="quarto-unresolved-ref">?sec-specification-of-preprocessing-model</span>. This model is called <code>prep_model</code> (“preparation” or pre-processing). The information required for the hyperparameter tuning is stored in the dictionary <code>fun_control</code>. Thus, the information needed for the execution of the hyperparameter tuning is available in a readable form.</li>
 <li>Selection of the machine learning or deep learning model to be tuned, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-selection-of-the-algorithm"><span>Section&nbsp;13.4.2</span></a>. This is called the <code>core_model</code>. Once the <code>core_model</code> is defined, then the associated hyperparameters are stored in the <code>fun_control</code> dictionary. First, the hyperparameters of the <code>core_model</code> are initialized with the default values of the <code>core_model</code>. As default values we use the default values contained in the <code>spotPython</code> package for the algorithms of the <code>torch</code> package.</li>
 <li>Modification of the default values for the hyperparameters used in <code>core_model</code>, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-modification-of-default-values"><span>Section&nbsp;13.5.3.1</span></a>. This step is optional.
 <ol type="1">
 <li>numeric parameters are modified by changing the bounds.</li>
 <li>categorical parameters are modified by changing the categories (“levels”).</li>
 </ol></li>
-<li>Selection of target function (loss function) for the optimizer, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-loss-functions"><span>Section&nbsp;13.8</span></a>.</li>
-<li>Calling SPOT with the corresponding parameters, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-call-the-hyperparameter-tuner"><span>Section&nbsp;13.12</span></a>. The results are stored in a dictionary and are available for further analysis.</li>
-<li>Presentation, visualization and interpretation of the results, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-results"><span>Section&nbsp;13.14</span></a>.</li>
+<li>Selection of target function (loss function) for the optimizer, see <span class="quarto-unresolved-ref">?sec-loss-functions</span>.</li>
+<li>Calling SPOT with the corresponding parameters, see <span class="quarto-unresolved-ref">?sec-call-the-hyperparameter-tuner</span>. The results are stored in a dictionary and are available for further analysis.</li>
+<li>Presentation, visualization and interpretation of the results, see <span class="quarto-unresolved-ref">?sec-results</span>.</li>
 </ol>
 </section>
 <section id="spot-as-an-optimizer" class="level2" data-number="1.2">
@@ -416,7 +440,7 @@ Note
 <div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spot_0.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x16c96bc10&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x1694639d0&gt;</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="6">
@@ -468,7 +492,7 @@ x0: 1.922728975158508e-05</code></pre>
 <p><img src="01_spot_intro_files/figure-html/cell-10-output-2.png" width="600" height="449"></p>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x16cacfdf0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x16973b9d0&gt;</code></pre>
 </div>
 </div>
 </section>
