@@ -71,47 +71,37 @@ def series_to_array(series):
         return series.to_numpy()
 
 
-def add_logical_columns(df, arity):
-    """Adds logical columns to a DataFrame.
+def add_logical_columns(X, arity=2, operations=["and", "or", "xor"]):
+    """Combines all features in a dataframe with each other using bitwise operations
+
     Args:
-        df (pandas.DataFrame): The input DataFrame.
-        arity (int): The arity of the logical columns.
+        X (pd.DataFrame): dataframe with features
+        arity (int): the number of columns to combine at once
+        operations (list of str): the operations to apply. Possible values are 'and', 'or' and 'xor'
     Returns:
-        pandas.DataFrame: The output DataFrame.
-    Example:
-        >>> from spotPython.utils.convert import add_logical_columns
-        >>> import pandas as pd
-        >>> df = pd.DataFrame({'A': [True, False, True], 'B': [False, True, True], 'C': [True, True, False]})
-        >>> result = add_logical_columns(df, 2)
-        >>> print(result)
-            A      B      C  and_A_B  or_A_B  xor_A_B  and_A_C  or_A_C  xor_A_C  and_B_C  or_B_C  xor_B_C
-        0   True  False   True    False    True     True     True    True    False   False    True     True
-        1  False   True   True    False    True     True    False    True     True   False    True     True
-        2   True   True  False     True    True    False    False    True     True    True    True    False
+        X (pd.DataFrame): dataframe with new features
+    Examples:
+        >>> X = pd.DataFrame({"a": [True, False, True], "b": [True, True, False], "c": [False, False, True]})
+        >>> add_logical_columns(X)
+            a      b      c  a_and_b  a_and_c  b_and_c  a_or_b  a_or_c  b_or_c  a_xor_b  a_xor_c  b_xor_c
+        0  True   True  False     True    False    False    True    True    True    False     True     True
+        1 False   True  False    False    False    False    True   False    True     True     True    False
+        2  True  False   True    False     True    False    True    True    True     True    False     True
+
     """
-    # Create a copy of the input DataFrame to avoid modifying it
-    result = df.copy()
-
-    # Create empty DataFrames for the additional columns
-    and_df = pd.DataFrame(index=df.index)
-    or_df = pd.DataFrame(index=df.index)
-    xor_df = pd.DataFrame(index=df.index)
-
-    # Get all combinations of columns with the specified arity
-    column_combinations = list(combinations(df.columns, arity))
-
-    # Apply the logical_and, logical_or and logical_xor functions to all combinations of columns
-    for cols in column_combinations:
-        col_name = "_".join(cols)
-        and_df[f"and_{col_name}"] = result[cols[0]]
-        or_df[f"or_{col_name}"] = result[cols[0]]
-        xor_df[f"xor_{col_name}"] = result[cols[0]]
-        for col in cols[1:]:
-            and_df[f"and_{col_name}"] &= result[col]
-            or_df[f"or_{col_name}"] |= result[col]
-            xor_df[f"xor_{col_name}"] ^= result[col]
-
-    # Concatenate the input DataFrame with the additional columns
-    result = pd.concat([result, and_df, or_df, xor_df], axis=1)
-
-    return result
+    new_cols = []
+    # Iterate over all combinations of columns of the given arity
+    for cols in combinations(X.columns, arity):
+        # Create new columns for the specified operations
+        if "and" in operations:
+            and_col = X[list(cols)].apply(lambda x: x.all(), axis=1)
+            new_cols.append(and_col)
+        if "or" in operations:
+            or_col = X[list(cols)].apply(lambda x: x.any(), axis=1)
+            new_cols.append(or_col)
+        if "xor" in operations:
+            xor_col = X[list(cols)].apply(lambda x: x.sum() % 2 == 1, axis=1)
+            new_cols.append(xor_col)
+    # Join all the new columns at once
+    X = pd.concat([X] + new_cols, axis=1)
+    return X
