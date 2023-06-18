@@ -483,13 +483,13 @@ Note: Device selection
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'./figures'</span>):</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'./figures'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>12-torch_bartz09_1min_5init_2023-06-18_11-30-35</code></pre>
+<pre><code>12-torch_bartz09_1min_5init_2023-06-18_18-37-10</code></pre>
 </div>
 </div>
 </section>
 <section id="step-2-initialization-of-the-empty-fun_control-dictionary" class="level2" data-number="12.2">
 <h2 data-number="12.2" class="anchored" data-anchor-id="step-2-initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">12.2</span> Step 2: Initialization of the Empty <code>fun_control</code> Dictionary</h2>
-<p><code>spotPython</code> uses a Python dictionary for storing the information required for the hyperparameter tuning process, which was described in <a href="#sec-initialization-fun-control-14"><span class="quarto-unresolved-ref">sec-initialization-fun-control-14</span></a>.</p>
+<p><code>spotPython</code> uses a Python dictionary for storing the information required for the hyperparameter tuning process, which was described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-initialization-fun-control-14"><span>Section&nbsp;14.2</span></a>.</p>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
@@ -541,14 +541,14 @@ Note: Device selection
 </section>
 <section id="sec-specification-of-preprocessing-model-12" class="level2" data-number="12.4">
 <h2 data-number="12.4" class="anchored" data-anchor-id="sec-specification-of-preprocessing-model-12"><span class="header-section-number">12.4</span> Step 4: Specification of the Preprocessing Model</h2>
-<p>After the training and test data are specified and added to the <code>fun_control</code> dictionary, <code>spotPython</code> allows the specification of a data preprocessing pipeline, e.g., for the scaling of the data or for the one-hot encoding of categorical variables, see <a href="#sec-specification-of-preprocessing-model-14"><span class="quarto-unresolved-ref">sec-specification-of-preprocessing-model-14</span></a>. This feature is not used here, so we do not change the default value (which is <code>None</code>).</p>
+<p>After the training and test data are specified and added to the <code>fun_control</code> dictionary, <code>spotPython</code> allows the specification of a data preprocessing pipeline, e.g., for the scaling of the data or for the one-hot encoding of categorical variables, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-specification-of-preprocessing-model-14"><span>Section&nbsp;14.4</span></a>. This feature is not used here, so we do not change the default value (which is <code>None</code>).</p>
 </section>
 <section id="sec-selection-of-the-algorithm-12" class="level2" data-number="12.5">
 <h2 data-number="12.5" class="anchored" data-anchor-id="sec-selection-of-the-algorithm-12"><span class="header-section-number">12.5</span> Step 5: Select Model (<code>algorithm</code>) and <code>core_model_hyper_dict</code></h2>
 <section id="sec-implementation-with-spotpython-12" class="level3" data-number="12.5.1">
 <h3 data-number="12.5.1" class="anchored" data-anchor-id="sec-implementation-with-spotpython-12"><span class="header-section-number">12.5.1</span> Implementing a Configurable Neural Network With spotPython</h3>
 <p><code>spotPython</code> includes the <code>Net_CIFAR10</code> class which is implemented in the file <code>netcifar10.py</code>. The class is imported here.</p>
-<p>This class inherits from the class <code>Net_Core</code> which is implemented in the file <code>netcore.py</code>, see <a href="#sec-the-netcore-class-14"><span class="quarto-unresolved-ref">sec-the-netcore-class-14</span></a>.</p>
+<p>This class inherits from the class <code>Net_Core</code> which is implemented in the file <code>netcore.py</code>, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-the-netcore-class-14"><span>Section&nbsp;14.5.1</span></a>.</p>
 <div class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.netcifar10 <span class="im">import</span> Net_CIFAR10</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torch_hyper_dict <span class="im">import</span> TorchHyperDict</span>
@@ -566,7 +566,7 @@ Note: Device selection
 <h3 data-number="12.5.3" class="anchored" data-anchor-id="sec-configuring-the-search-space-with-spotpython-12"><span class="header-section-number">12.5.3</span> Configuring the Search Space With spotPython</h3>
 <section id="the-hyper_dict-hyperparameters-for-the-selected-algorithm" class="level4" data-number="12.5.3.1">
 <h4 data-number="12.5.3.1" class="anchored" data-anchor-id="the-hyper_dict-hyperparameters-for-the-selected-algorithm"><span class="header-section-number">12.5.3.1</span> The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</h4>
-<p><code>spotPython</code> uses <code>JSON</code> files for the specification of the hyperparameters, which were described in <a href="#sec-configuring-search-space-spotpython-14"><span class="quarto-unresolved-ref">sec-configuring-search-space-spotpython-14</span></a>.</p>
+<p><code>spotPython</code> uses <code>JSON</code> files for the specification of the hyperparameters, which were described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-configuring-search-space-spotpython-14"><span>Section&nbsp;14.5.5</span></a>.</p>
 <p>The corresponding entries for the <code>Net_CIFAR10</code> class are shown below.</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>    <span class="er">"Net_CIFAR10":</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
@@ -645,7 +645,7 @@ Note: Device selection
 </section>
 <section id="sec-modification-of-hyperparameters-12" class="level2" data-number="12.6">
 <h2 data-number="12.6" class="anchored" data-anchor-id="sec-modification-of-hyperparameters-12"><span class="header-section-number">12.6</span> Step 6: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
-<p><code>spotPython</code> provides functions for modifying the hyperparameters, their bounds and factors as well as for activating and de-activating hyperparameters without re-compilation of the Python source code. These functions were described in <a href="#sec-modification-of-hyperparameters-14"><span class="quarto-unresolved-ref">sec-modification-of-hyperparameters-14</span></a>.</p>
+<p><code>spotPython</code> provides functions for modifying the hyperparameters, their bounds and factors as well as for activating and de-activating hyperparameters without re-compilation of the Python source code. These functions were described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-modification-of-hyperparameters-14"><span>Section&nbsp;14.6</span></a>.</p>
 <section id="sec-modification-of-default-values-12" class="level3" data-number="12.6.1">
 <h3 data-number="12.6.1" class="anchored" data-anchor-id="sec-modification-of-default-values-12"><span class="header-section-number">12.6.1</span> Step 5: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h3>
 <section id="modify-hyperparameters-of-type-numeric-and-integer-boolean" class="level4" data-number="12.6.1.1">
@@ -691,8 +691,8 @@ Caution: Small net size, number of epochs, and patience for demonstration purpos
 </section>
 <section id="sec-optimizers-12" class="level3" data-number="12.6.3">
 <h3 data-number="12.6.3" class="anchored" data-anchor-id="sec-optimizers-12"><span class="header-section-number">12.6.3</span> Optimizers</h3>
-<p>Optimizers can be selected as described in <a href="#sec-optimizers-24"><span class="quarto-unresolved-ref">sec-optimizers-24</span></a>.</p>
-<p>Optimizers are described in <a href="#sec-optimizers-14"><span class="quarto-unresolved-ref">sec-optimizers-14</span></a>.</p>
+<p>Optimizers can be selected as described in <a href="24_spot_torch_regression.html#sec-optimizers-24"><span>Section&nbsp;19.6.2</span></a>.</p>
+<p>Optimizers are described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-optimizers-14"><span>Section&nbsp;14.6.1</span></a>.</p>
 <div class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control,</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lr_mult"</span>, bounds<span class="op">=</span>[<span class="fl">1e-3</span>, <span class="fl">1e-3</span>])</span>
@@ -710,8 +710,8 @@ Caution: Small net size, number of epochs, and patience for demonstration purpos
 <li>the way how the data is split into a train and a test set and</li>
 <li>the loss function (and a metric).</li>
 </ol>
-<p>These are described in <a href="#sec-selection-of-target-function-24"><span class="quarto-unresolved-ref">sec-selection-of-target-function-24</span></a>.</p>
-<p>The key <code>"loss_function"</code> specifies the loss function which is used during the optimization, see <a href="#sec-loss-functions-14"><span class="quarto-unresolved-ref">sec-loss-functions-14</span></a>.</p>
+<p>These are described in <a href="24_spot_torch_regression.html#sec-selection-of-target-function-24"><span>Section&nbsp;19.7.1</span></a>.</p>
+<p>The key <code>"loss_function"</code> specifies the loss function which is used during the optimization, see <a href="14_spot_ray_hpt_torch_cifar10.html#sec-loss-functions-14"><span>Section&nbsp;14.7.5</span></a>.</p>
 <p>We will use CrossEntropy loss for the multiclass-classification task.</p>
 <div class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> CrossEntropyLoss</span>
@@ -816,144 +816,144 @@ config: {'l1': 16, 'l2': 8, 'lr_mult': 0.001, 'batch_size': 16, 'epochs': 8, 'k_
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3262841812133788 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1005999967455864 | Loss: 2.3320793640136719 | Acc: 0.1006000000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3255353332519531 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1005999967455864 | Loss: 2.3313088960647583 | Acc: 0.1006000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3250493227005005 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1005000025033951 | Loss: 2.3305278373718261 | Acc: 0.1005000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3246419370651243 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1004500016570091 | Loss: 2.3295538171768189 | Acc: 0.1004500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3242410139083862 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1027000024914742 | Loss: 2.3282799844741819 | Acc: 0.1027000000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3237221200942995 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1048500016331673 | Loss: 2.3268387472152710 | Acc: 0.1048500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3229146539688110 | Acc: 0.0996500000000000.
+<pre><code>MulticlassAccuracy: 0.1062000021338463 | Loss: 2.3253345775604246 | Acc: 0.1062000000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0996500030159950 | Loss: 2.3217201877593996 | Acc: 0.0996500000000000.
-Returned to Spot: Validation loss: 2.3217201877593996
+<pre><code>MulticlassAccuracy: 0.1062500029802322 | Loss: 2.3238091669082643 | Acc: 0.1062500000000000.
+Returned to Spot: Validation loss: 2.3238091669082643
 
 config: {'l1': 8, 'l2': 8, 'lr_mult': 0.001, 'batch_size': 8, 'epochs': 4, 'k_folds': 0, 'patience': 2, 'optimizer': 'Adamax', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0965500026941299 | Loss: 2.3241368919372558 | Acc: 0.0965500000000000.
+<pre><code>MulticlassAccuracy: 0.1001999974250793 | Loss: 2.3143725443840029 | Acc: 0.1002000000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0969500020146370 | Loss: 2.3212197051048280 | Acc: 0.0969500000000000.
+<pre><code>MulticlassAccuracy: 0.1001999974250793 | Loss: 2.3127466676712034 | Acc: 0.1002000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0966000035405159 | Loss: 2.3181092567443846 | Acc: 0.0966000000000000.
+<pre><code>MulticlassAccuracy: 0.1001999974250793 | Loss: 2.3108304573059084 | Acc: 0.1002000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0966499969363213 | Loss: 2.3150114579200745 | Acc: 0.0966500000000000.
-Returned to Spot: Validation loss: 2.3150114579200745
+<pre><code>MulticlassAccuracy: 0.1001999974250793 | Loss: 2.3086504985809326 | Acc: 0.1002000000000000.
+Returned to Spot: Validation loss: 2.3086504985809326
 
 config: {'l1': 32, 'l2': 16, 'lr_mult': 0.001, 'batch_size': 2, 'epochs': 8, 'k_folds': 0, 'patience': 2, 'optimizer': 'NAdam', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1389999985694885 | Loss: 2.3026773401975631 | Acc: 0.1390000000000000.
+<pre><code>MulticlassAccuracy: 0.0838499963283539 | Loss: 2.2970648386478425 | Acc: 0.0838500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1725499927997589 | Loss: 2.2689604730606079 | Acc: 0.1725500000000000.
+<pre><code>MulticlassAccuracy: 0.1060499995946884 | Loss: 2.2672528599262236 | Acc: 0.1060500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1799499988555908 | Loss: 2.2155837823748588 | Acc: 0.1799500000000000.
+<pre><code>MulticlassAccuracy: 0.1532000005245209 | Loss: 2.2286043057560923 | Acc: 0.1532000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1905499994754791 | Loss: 2.1627716468691824 | Acc: 0.1905500000000000.
+<pre><code>MulticlassAccuracy: 0.1592999994754791 | Loss: 2.1975404310941697 | Acc: 0.1593000000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2021999955177307 | Loss: 2.1196009296655656 | Acc: 0.2022000000000000.
+<pre><code>MulticlassAccuracy: 0.1621000021696091 | Loss: 2.1720725005507471 | Acc: 0.1621000000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2225500047206879 | Loss: 2.0854218399703504 | Acc: 0.2225500000000000.
+<pre><code>MulticlassAccuracy: 0.1661500036716461 | Loss: 2.1485777876496317 | Acc: 0.1661500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2452500015497208 | Loss: 2.0579921216070654 | Acc: 0.2452500000000000.
+<pre><code>MulticlassAccuracy: 0.1698500066995621 | Loss: 2.1261238770365716 | Acc: 0.1698500000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2570999860763550 | Loss: 2.0353966302931310 | Acc: 0.2571000000000000.
-Returned to Spot: Validation loss: 2.035396630293131
+<pre><code>MulticlassAccuracy: 0.2027000039815903 | Loss: 2.1048670004248620 | Acc: 0.2027000000000000.
+Returned to Spot: Validation loss: 2.104867000424862
 
 config: {'l1': 4, 'l2': 8, 'lr_mult': 0.001, 'batch_size': 4, 'epochs': 4, 'k_folds': 0, 'patience': 2, 'optimizer': 'AdamW', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1015499979257584 | Loss: 2.3264963497638704 | Acc: 0.1015500000000000.
+<pre><code>MulticlassAccuracy: 0.1021500006318092 | Loss: 2.3173159094333649 | Acc: 0.1021500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1015499979257584 | Loss: 2.3255454828023909 | Acc: 0.1015500000000000.
+<pre><code>MulticlassAccuracy: 0.1021500006318092 | Loss: 2.3166419280052186 | Acc: 0.1021500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1015499979257584 | Loss: 2.3244904157161712 | Acc: 0.1015500000000000.
+<pre><code>MulticlassAccuracy: 0.1021500006318092 | Loss: 2.3159096458911894 | Acc: 0.1021500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1015499979257584 | Loss: 2.3234288920640944 | Acc: 0.1015500000000000.
-Returned to Spot: Validation loss: 2.3234288920640944
+<pre><code>MulticlassAccuracy: 0.1021500006318092 | Loss: 2.3151150074481963 | Acc: 0.1021500000000000.
+Returned to Spot: Validation loss: 2.3151150074481963
 
 config: {'l1': 16, 'l2': 32, 'lr_mult': 0.001, 'batch_size': 8, 'epochs': 8, 'k_folds': 0, 'patience': 2, 'optimizer': 'Adam', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1001000031828880 | Loss: 2.3056060587882996 | Acc: 0.1001000000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3072158798217774 | Acc: 0.0977500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1002499982714653 | Loss: 2.3039238615989683 | Acc: 0.1002500000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3066844908714295 | Acc: 0.0977500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1024999991059303 | Loss: 2.3020663659095764 | Acc: 0.1025000000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3061227139472962 | Acc: 0.0977500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1123500019311905 | Loss: 2.2996805529594422 | Acc: 0.1123500000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3054926554679871 | Acc: 0.0977500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1213499978184700 | Loss: 2.2965774685859679 | Acc: 0.1213500000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3047465593338012 | Acc: 0.0977500000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1386000066995621 | Loss: 2.2928578038215637 | Acc: 0.1386000000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3037577246665957 | Acc: 0.0977500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1522500067949295 | Loss: 2.2892151821136473 | Acc: 0.1522500000000000.
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3023899147033693 | Acc: 0.0977500000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1571500003337860 | Loss: 2.2855352701187135 | Acc: 0.1571500000000000.
-Returned to Spot: Validation loss: 2.2855352701187135</code></pre>
+<pre><code>MulticlassAccuracy: 0.0977500006556511 | Loss: 2.3005272761344910 | Acc: 0.0977500000000000.
+Returned to Spot: Validation loss: 2.300527276134491</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -961,52 +961,52 @@ config: {'l1': 8, 'l2': 16, 'lr_mult': 0.001, 'batch_size': 8, 'epochs': 8, 'k_f
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1009500026702881 | Loss: 2.3156700240135191 | Acc: 0.1009500000000000.
+<pre><code>MulticlassAccuracy: 0.0992000028491020 | Loss: 2.3124587755203247 | Acc: 0.0992000000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1009500026702881 | Loss: 2.3136162655830383 | Acc: 0.1009500000000000.
+<pre><code>MulticlassAccuracy: 0.0992000028491020 | Loss: 2.3107175286293029 | Acc: 0.0992000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1009500026702881 | Loss: 2.3115685421943666 | Acc: 0.1009500000000000.
+<pre><code>MulticlassAccuracy: 0.0992000028491020 | Loss: 2.3079713578224181 | Acc: 0.0992000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1009500026702881 | Loss: 2.3092090119361877 | Acc: 0.1009500000000000.
+<pre><code>MulticlassAccuracy: 0.0992000028491020 | Loss: 2.3040227384567262 | Acc: 0.0992000000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1009500026702881 | Loss: 2.3066311806678770 | Acc: 0.1009500000000000.
+<pre><code>MulticlassAccuracy: 0.0998999997973442 | Loss: 2.2972345275878907 | Acc: 0.0999000000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1010000035166740 | Loss: 2.3039203453063966 | Acc: 0.1010000000000000.
+<pre><code>MulticlassAccuracy: 0.1196999996900558 | Loss: 2.2885291831970216 | Acc: 0.1197000000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1010999977588654 | Loss: 2.3010090321540830 | Acc: 0.1011000000000000.
+<pre><code>MulticlassAccuracy: 0.1536000072956085 | Loss: 2.2788153867721559 | Acc: 0.1536000000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1019999980926514 | Loss: 2.2977037984848021 | Acc: 0.1020000000000000.
-Returned to Spot: Validation loss: 2.297703798484802
-spotPython tuning: 2.035396630293131 [##########] 100.00% Done...
+<pre><code>MulticlassAccuracy: 0.1726000010967255 | Loss: 2.2669863924026488 | Acc: 0.1726000000000000.
+Returned to Spot: Validation loss: 2.2669863924026488
+spotPython tuning: 2.104867000424862 [##########] 100.00% Done...
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="19">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x2a52a2da0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x2acc26aa0&gt;</code></pre>
 </div>
 </div>
 </section>
 </section>
 <section id="sec-tensorboard-10" class="level2" data-number="12.9">
 <h2 data-number="12.9" class="anchored" data-anchor-id="sec-tensorboard-10"><span class="header-section-number">12.9</span> Step 9: Tensorboard</h2>
-<p>The textual output shown in the console (or code cell) can be visualized with Tensorboard as described in <a href="#sec-tensorboard-14"><span class="quarto-unresolved-ref">sec-tensorboard-14</span></a>, see also the description in the documentation: <a href="https://sequential-parameter-optimization.github.io/spotPython/14_spot_ray_hpt_torch_cifar10.html#sec-tensorboard-14">Tensorboard.</a></p>
+<p>The textual output shown in the console (or code cell) can be visualized with Tensorboard as described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-tensorboard-14"><span>Section&nbsp;14.9</span></a>, see also the description in the documentation: <a href="https://sequential-parameter-optimization.github.io/spotPython/14_spot_ray_hpt_torch_cifar10.html#sec-tensorboard-14">Tensorboard.</a></p>
 </section>
 <section id="sec-results-tuning-12" class="level2" data-number="12.10">
 <h2 data-number="12.10" class="anchored" data-anchor-id="sec-results-tuning-12"><span class="header-section-number">12.10</span> Step 10: Results</h2>
-<p>After the hyperparameter tuning run is finished, the results can be analyzed as described in <a href="#sec-results-14"><span class="quarto-unresolved-ref">sec-results-14</span></a>.</p>
+<p>After the hyperparameter tuning run is finished, the results can be analyzed as described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-results-14"><span>Section&nbsp;14.10</span></a>.</p>
 <div class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
@@ -1021,7 +1021,7 @@ spotPython tuning: 2.035396630293131 [##########] 100.00% Done...
 <span id="cb71-11"><a href="#cb71-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
 <span id="cb71-12"><a href="#cb71-12" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>After the hyperparameter tuning run is finished, the progress of the hyperparameter tuning can be visualized. The following code generates the progress plot from <a href="#fig-progress">Figure&nbsp;<span class="quarto-unresolved-ref">fig-progress</span></a>.</p>
+<p>After the hyperparameter tuning run is finished, the progress of the hyperparameter tuning can be visualized. The following code generates the progress plot from <span class="quarto-unresolved-ref">?fig-progress</span>.</p>
 <div class="cell" data-fig-label="fig-progress" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1043,14 +1043,14 @@ spotPython tuning: 2.035396630293131 [##########] 100.00% Done...
 <div class="cell-output cell-output-stdout">
 <pre><code>| name         | type   | default   |   lower |   upper |   tuned | transform             |   importance | stars   |
 |--------------|--------|-----------|---------|---------|---------|-----------------------|--------------|---------|
-| l1           | int    | 5         |     2.0 |     5.0 |     5.0 | transform_power_2_int |        71.37 | **      |
+| l1           | int    | 5         |     2.0 |     5.0 |     5.0 | transform_power_2_int |         0.15 | .       |
 | l2           | int    | 5         |     2.0 |     5.0 |     4.0 | transform_power_2_int |         0.00 |         |
 | lr_mult      | float  | 1.0       |   0.001 |   0.001 |   0.001 | None                  |         0.00 |         |
-| batch_size   | int    | 4         |     1.0 |     4.0 |     1.0 | transform_power_2_int |       100.00 | ***     |
+| batch_size   | int    | 4         |     1.0 |     4.0 |     1.0 | transform_power_2_int |         0.26 | .       |
 | epochs       | int    | 3         |     2.0 |     3.0 |     3.0 | transform_power_2_int |         0.00 |         |
 | k_folds      | int    | 1         |     0.0 |     0.0 |     0.0 | None                  |         0.00 |         |
 | patience     | int    | 5         |     2.0 |     2.0 |     2.0 | None                  |         0.00 |         |
-| optimizer    | factor | SGD       |     0.0 |     3.0 |     3.0 | None                  |         1.74 | *       |
+| optimizer    | factor | SGD       |     0.0 |     3.0 |     3.0 | None                  |       100.00 | ***     |
 | sgd_momentum | float  | 0.0       |     0.9 |     0.9 |     0.9 | None                  |         0.00 |         |</code></pre>
 </div>
 </div>
@@ -1108,60 +1108,60 @@ spotPython tuning: 2.035396630293131 [##########] 100.00% Done...
 <pre><code>Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.311</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.315</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1085499972105026 | Loss: 2.2988964053630827 | Acc: 0.1085500000000000.
+<pre><code>MulticlassAccuracy: 0.0996999964118004 | Loss: 2.3080700983047486 | Acc: 0.0997000000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.288</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.302</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1310500055551529 | Loss: 2.2661914694905283 | Acc: 0.1310500000000000.
+<pre><code>MulticlassAccuracy: 0.1472000032663345 | Loss: 2.2859390279293059 | Acc: 0.1472000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.251</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.275</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1612499952316284 | Loss: 2.2249807449221612 | Acc: 0.1612500000000000.
+<pre><code>MulticlassAccuracy: 0.1883500069379807 | Loss: 2.2514116731166838 | Acc: 0.1883500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.207</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.239</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1763499975204468 | Loss: 2.1825934031009675 | Acc: 0.1763500000000000.
+<pre><code>MulticlassAccuracy: 0.1889500021934509 | Loss: 2.2111890979766846 | Acc: 0.1889500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.160</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.195</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2117500007152557 | Loss: 2.1341749504685401 | Acc: 0.2117500000000000.
+<pre><code>MulticlassAccuracy: 0.1897000074386597 | Loss: 2.1724009061694147 | Acc: 0.1897000000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.114</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.158</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2229000031948090 | Loss: 2.0886091987133026 | Acc: 0.2229000000000000.
+<pre><code>MulticlassAccuracy: 0.1960500031709671 | Loss: 2.1386834780216217 | Acc: 0.1960500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.071</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.126</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2317000031471252 | Loss: 2.0470410999178887 | Acc: 0.2317000000000000.
+<pre><code>MulticlassAccuracy: 0.2005500048398972 | Loss: 2.1079546381115914 | Acc: 0.2005500000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.029</code></pre>
+<pre><code>Batch: 10000. Batch Size: 2. Training Loss (running): 2.093</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2423499971628189 | Loss: 2.0133926375210285 | Acc: 0.2423500000000000.
-Returned to Spot: Validation loss: 2.0133926375210285</code></pre>
+<pre><code>MulticlassAccuracy: 0.2078000009059906 | Loss: 2.0786065553188324 | Acc: 0.2078000000000000.
+Returned to Spot: Validation loss: 2.0786065553188324</code></pre>
 </div>
 </div>
 <p>If <code>path</code> is set to a filename, e.g., <code>path = "model_spot_trained.pt"</code>, the weights of the trained model will be loaded from this file.</p>
@@ -1173,13 +1173,13 @@ Returned to Spot: Validation loss: 2.0133926375210285</code></pre>
 <span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>            device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
 <span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>            task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2504999935626984 | Loss: 2.0021943577408789 | Acc: 0.2505000000000000.
-Final evaluation: Validation loss: 2.002194357740879
-Final evaluation: Validation metric: 0.25049999356269836
+<pre><code>MulticlassAccuracy: 0.2084999978542328 | Loss: 2.0775342788815498 | Acc: 0.2085000000000000.
+Final evaluation: Validation loss: 2.07753427888155
+Final evaluation: Validation metric: 0.2084999978542328
 ----------------------------------------------</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="27">
-<pre><code>(2.002194357740879, nan, tensor(0.2505))</code></pre>
+<pre><code>(2.07753427888155, nan, tensor(0.2085))</code></pre>
 </div>
 </div>
 </section>
@@ -1234,9 +1234,9 @@ Caution: Cross-validated Evaluations
 <div class="sourceCode cell-code" id="cb104"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
 <span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>l1:  71.37333851619576
-batch_size:  100.0
-optimizer:  1.741273893320973</code></pre>
+<pre><code>l1:  0.1505907656064017
+batch_size:  0.2628721485249123
+optimizer:  100.0</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -1260,9 +1260,9 @@ optimizer:  1.741273893320973</code></pre>
 <div class="sourceCode cell-code" id="cb106"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-<div>                            <div id="3aa7bcf9-0875-440c-b265-aa8b16429d6c" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("3aa7bcf9-0875-440c-b265-aa8b16429d6c")) {                    Plotly.newPlot(                        "3aa7bcf9-0875-440c-b265-aa8b16429d6c",                        [{"dimensions":[{"label":"l1","range":[2.0,5.0],"values":[4.0,3.0,5.0,2.0,4.0,3.0]},{"label":"l2","range":[3.0,5.0],"values":[3.0,3.0,4.0,3.0,5.0,4.0]},{"label":"batch_size","range":[1.0,4.0],"values":[4.0,3.0,1.0,2.0,3.0,3.0]},{"label":"epochs","range":[2.0,3.0],"values":[3.0,2.0,3.0,2.0,3.0,3.0]},{"label":"optimizer","range":[0.0,3.0],"values":[1.0,2.0,3.0,1.0,0.0,3.0]}],"line":{"cmax":2.3234288920640944,"cmin":2.035396630293131,"color":[2.3217201877593996,2.3150114579200745,2.035396630293131,2.3234288920640944,2.2855352701187135,2.297703798484802],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+<div>                            <div id="944779d3-0751-4fd2-91db-d9a6dfb807aa" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("944779d3-0751-4fd2-91db-d9a6dfb807aa")) {                    Plotly.newPlot(                        "944779d3-0751-4fd2-91db-d9a6dfb807aa",                        [{"dimensions":[{"label":"l1","range":[2.0,5.0],"values":[4.0,3.0,5.0,2.0,4.0,3.0]},{"label":"l2","range":[3.0,5.0],"values":[3.0,3.0,4.0,3.0,5.0,4.0]},{"label":"batch_size","range":[1.0,4.0],"values":[4.0,3.0,1.0,2.0,3.0,3.0]},{"label":"epochs","range":[2.0,3.0],"values":[3.0,2.0,3.0,2.0,3.0,3.0]},{"label":"optimizer","range":[0.0,3.0],"values":[1.0,2.0,3.0,1.0,0.0,3.0]}],"line":{"cmax":2.3238091669082643,"cmin":2.104867000424862,"color":[2.3238091669082643,2.3086504985809326,2.104867000424862,2.3151150074481963,2.300527276134491,2.2669863924026488],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('3aa7bcf9-0875-440c-b265-aa8b16429d6c');
+var gd = document.getElementById('944779d3-0751-4fd2-91db-d9a6dfb807aa');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{
