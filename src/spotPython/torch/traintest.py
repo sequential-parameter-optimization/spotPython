@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.model_selection import KFold
 import torch
-from torch import nn as nn
 from spotPython.utils.device import getDevice
 from torch.utils.data import random_split
 from spotPython.utils.classes import get_additional_attributes
@@ -70,14 +69,13 @@ def validate_one_epoch(net, valloader, loss_function, metric, device, task):
             val_loss += loss.cpu().numpy()
             val_steps += 1
     loss = val_loss / val_steps
-    print(f"Loss on hold-out set: {loss}")
-    if task == "classification":
-        accuracy = correct / total
-        print(f"Accuracy on hold-out set: {accuracy}")
-    # metric on all batches using custom accumulation
     metric_value = metric.compute()
     metric_name = type(metric).__name__
-    print(f"{metric_name} value on hold-out data: {metric_value}")
+    print(f"{metric_name}: {metric_value:.16f}", end=" | ")
+    print(f"Loss: {loss:.16f}", end=" | ")
+    if task == "classification":
+        accuracy = correct / total
+        print(f"Acc: {accuracy:.16f}.")
     return metric_value, loss
 
 
@@ -131,7 +129,7 @@ def evaluate_cv(
             best_val_loss = float("inf")
             counter = 0
             for epoch in range(epochs_instance):
-                print(f"Epoch: {epoch + 1}")
+                print(f"Epoch: {epoch +1}", end=" | ")
                 # training loss from one epoch:
                 training_loss = train_one_epoch(
                     net=net,
@@ -209,9 +207,6 @@ def evaluate_hold_out(
     try:
         device = getDevice(device=device)
         net.to(device)
-        # loss_function = nn.CrossEntropyLoss()
-        # TODO: optimizer = optim.Adam(net.parameters(), lr=lr)
-        # optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9)
         optimizer = optimizer_handler(
             optimizer_name=optimizer_instance,
             params=net.parameters(),
@@ -233,7 +228,7 @@ def evaluate_hold_out(
         # We only have "one fold" which is trained for several epochs
         # (we do not have to reset the weights for each fold):
         for epoch in range(epochs_instance):
-            print(f"Epoch: {epoch + 1}")
+            print(f"Epoch: {epoch + 1}", end=" | ")
             # training loss from one epoch:
             training_loss = train_one_epoch(
                 net=net,
@@ -282,7 +277,6 @@ def evaluate_hold_out(
     if writer is not None:
         writer.flush()
     print(f"Returned to Spot: Validation loss: {df_eval}")
-    print("----------------------------------------------")
     return df_eval, df_preds
 
 
@@ -384,11 +378,6 @@ def test_tuned(net, shuffle, test_dataset=None, loss_function=None, metric=None,
         net.eval()
     try:
         device = getDevice(device=device)
-        if torch.cuda.is_available():
-            device = "cuda:0"
-            if torch.cuda.device_count() > 1:
-                print("We will use", torch.cuda.device_count(), "GPUs!")
-                net = nn.DataParallel(net)
         net.to(device)
         valloader = torch.utils.data.DataLoader(
             test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0
