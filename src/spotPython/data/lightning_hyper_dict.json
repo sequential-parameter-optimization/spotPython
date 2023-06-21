@@ -1,0 +1,41 @@
+{
+    "BaseNetwork":
+    {
+        "_L_in": {
+            "type": "int",
+            "default": 784,
+            "transform": "None",
+            "lower": 784,
+            "upper": 784},
+        "_L_out": {
+            "type": "int",
+            "default": 10,
+            "transform": "None",
+            "lower": 10,
+            "upper": 10},
+        "l1": {
+            "type": "int",
+            "default": 3,
+            "transform": "transform_power_2_int",
+            "lower": 3,
+            "upper": 8},
+        "act_fn": {
+                "levels": ["ReLU"],
+                "type": "factor",
+                "default": "ReLU",
+                "transform": "None",
+                "class_name": "torch.nn",
+                "core_model_parameter_type": "instance()",
+                "lower": 0,
+                "upper": 0},
+        "optimizer": {
+            "levels": ["Adadelta", "Adagrad", "Adam", "AdamW", "SparseAdam", "Adamax", "ASGD", "NAdam", "RAdam", "RMSprop", "Rprop", "SGD"],
+            "type": "factor",
+            "default": "SGD",
+            "transform": "None",
+            "class_name": "torch.optim",
+            "core_model_parameter_type": "str",
+            "lower": 0,
+            "upper": 12}
+    }
+}

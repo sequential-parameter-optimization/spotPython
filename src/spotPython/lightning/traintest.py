@@ -6,6 +6,9 @@ import torch.utils.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm.notebook import tqdm
+from spotPython.torch.traintest import get_removed_attributes_and_base_net, create_train_val_data_loaders
+from spotPython.hyperparameters.optimizer import optimizer_handler
+from spotPython.utils.device import getDevice
 
 
 def _get_config_file(model_path, model_name):
@@ -52,7 +55,7 @@ def save_model(model, model_path, model_name):
     torch.save(model.state_dict(), model_file)
 
 
-def train_model(net, model_name, optim_func, max_epochs=50, batch_size=256, overwrite=False):
+def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=False):
     """Train a model on the training set of FashionMNIST.
 
     Args:
@@ -64,6 +67,7 @@ def train_model(net, model_name, optim_func, max_epochs=50, batch_size=256, over
         overwrite: Determines how to handle the case when there already exists a checkpoint.
         If True, it will be overwritten. Otherwise, we skip training.
     """
+    CHECKPOINT_PATH = "./checkpoints/"
     file_exists = os.path.isfile(_get_model_file(CHECKPOINT_PATH, model_name))
     if file_exists and not overwrite:
         print(f'Model file of "{model_name}" already exists. Skipping training...')
@@ -73,20 +77,34 @@ def train_model(net, model_name, optim_func, max_epochs=50, batch_size=256, over
         if file_exists:
             print("Model file exists, but will be overwritten...")
 
+        device = getDevice("cpu")
+        optimizer_instance = net.optimizer
+        batch_size_instance = net.batch_size
+        removed_attributes, net = get_removed_attributes_and_base_net(net)
+        print(f"Removed attributes: {removed_attributes}")
         # Defining optimizer, loss and data loader
-        optimizer = optim_func(net.parameters())
-        loss_module = nn.CrossEntropyLoss()
-        train_loader_local = data.DataLoader(
-            train_set, batch_size=batch_size, shuffle=True, drop_last=True, pin_memory=True
+        # optimizer = optimizer_instance(net.parameters())
+        optimizer = optimizer_handler(
+            optimizer_name=optimizer_instance,
+            params=net.parameters(),
+            lr_mult=1.0,  # lr_mult_instance,
+            sgd_momentum=0.9,  # sgd_momentum_instance,
         )
-
+        print(f"Optimizer initialized: {optimizer}")
+        loss_module = nn.CrossEntropyLoss()
+        # train_loader_local = data.DataLoader(
+        #     dataset, batch_size=batch_size, shuffle=True, drop_last=True, pin_memory=True
+        # )
+        train_loader_local, val_loader = create_train_val_data_loaders(
+            dataset=dataset, batch_size=batch_size_instance, shuffle=shuffle
+        )
         results = None
         val_scores = []
         train_losses, train_scores = [], []
         best_val_epoch = -1
         for epoch in range(max_epochs):
             train_acc, val_acc, epoch_losses = epoch_iteration(
-                net, loss_module, optimizer, train_loader_local, val_loader, epoch
+                net, loss_module, optimizer, train_loader_local, val_loader, epoch, device
             )
             train_scores.append(train_acc)
             val_scores.append(val_acc)

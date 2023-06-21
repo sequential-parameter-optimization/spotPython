@@ -71,24 +71,22 @@ class HyperLightning:
                 df_eval, _ = train_model(
                     net=model,
                     model_name=config_id,
-                    optim_func=optim_func,
-                    max_epochs=max_epochs,
-                    batch_size=batch_size,
+                    max_epochs=10,  # max_epochs,
                     dataset=fun_control["train"],
                     shuffle=self.fun_control["shuffle"],
-                    device=self.fun_control["device"],
-                    task=self.fun_control["task"],
-                    writer=self.fun_control["writer"],
-                    writerId=config_id,
+                    # device=self.fun_control["device"],
+                    # task=self.fun_control["task"],
+                    # writer=self.fun_control["writer"],
+                    # writerId=config_id,
                 )
             except Exception as err:
-                print(f"Error in fun_torch(). Call to evaluate_model failed. {err=}, {type(err)=}")
+                print(f"Error in fun_lightning(). Call to evaluate_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")
                 df_eval = np.nan
             z_val = fun_control["weights"] * df_eval
             if self.fun_control["writer"] is not None:
                 writer = self.fun_control["writer"]
-                writer.add_hparams(config, {"fun_torch: loss": z_val})
+                writer.add_hparams(config, {"fun_lightning: loss": z_val})
                 writer.flush()
             z_res = np.append(z_res, z_val)
         return z_res
