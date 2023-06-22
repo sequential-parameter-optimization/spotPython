@@ -71,7 +71,7 @@ class HyperLightning:
                 df_eval, _ = train_model(
                     net=model,
                     model_name=config_id,
-                    max_epochs=10,  # max_epochs,
+                    max_epochs=3,  # max_epochs,
                     dataset=fun_control["train"],
                     shuffle=self.fun_control["shuffle"],
                     # device=self.fun_control["device"],

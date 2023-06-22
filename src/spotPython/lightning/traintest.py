@@ -6,9 +6,14 @@ import torch.utils.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm.notebook import tqdm
-from spotPython.torch.traintest import get_removed_attributes_and_base_net, create_train_val_data_loaders
+from spotPython.torch.traintest import (
+    get_removed_attributes_and_base_net,
+    create_train_val_data_loaders,
+    add_attributes,
+)
 from spotPython.hyperparameters.optimizer import optimizer_handler
 from spotPython.utils.device import getDevice
+import numpy as np
 
 
 def _get_config_file(model_path, model_name):
@@ -68,64 +73,72 @@ def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=Fals
         If True, it will be overwritten. Otherwise, we skip training.
     """
     CHECKPOINT_PATH = "./checkpoints/"
-    file_exists = os.path.isfile(_get_model_file(CHECKPOINT_PATH, model_name))
-    if file_exists and not overwrite:
-        print(f'Model file of "{model_name}" already exists. Skipping training...')
-        with open(_get_result_file(CHECKPOINT_PATH, model_name)) as f:
-            results = json.load(f)
-    else:
-        if file_exists:
-            print("Model file exists, but will be overwritten...")
+    # file_exists = os.path.isfile(_get_model_file(CHECKPOINT_PATH, model_name))
+    # if file_exists and not overwrite:
+    #     print(f'Model file of "{model_name}" already exists. Skipping training...')
+    #     with open(_get_result_file(CHECKPOINT_PATH, model_name)) as f:
+    #         results = json.load(f)
+    # else:
+    #     if file_exists:
+    #         print("Model file exists, but will be overwritten...")
 
-        device = getDevice("cpu")
-        optimizer_instance = net.optimizer
-        batch_size_instance = net.batch_size
-        removed_attributes, net = get_removed_attributes_and_base_net(net)
-        print(f"Removed attributes: {removed_attributes}")
-        # Defining optimizer, loss and data loader
-        # optimizer = optimizer_instance(net.parameters())
-        optimizer = optimizer_handler(
-            optimizer_name=optimizer_instance,
-            params=net.parameters(),
-            lr_mult=1.0,  # lr_mult_instance,
-            sgd_momentum=0.9,  # sgd_momentum_instance,
+    device = getDevice("cpu")
+    optimizer_instance = net.optimizer
+    batch_size_instance = net.batch_size
+    removed_attributes, net = get_removed_attributes_and_base_net(net)
+    print(f"Removed attributes: {removed_attributes}")
+    # Defining optimizer, loss and data loader
+    # optimizer = optimizer_instance(net.parameters())
+    optimizer = optimizer_handler(
+        optimizer_name=optimizer_instance,
+        params=net.parameters(),
+        lr_mult=1.0,  # lr_mult_instance,
+        sgd_momentum=0.9,  # sgd_momentum_instance,
+    )
+    print(f"Optimizer initialized: {optimizer}")
+    loss_module = nn.CrossEntropyLoss()
+    # train_loader_local = data.DataLoader(
+    #     dataset, batch_size=batch_size, shuffle=True, drop_last=True, pin_memory=True
+    # )
+    train_loader_local, val_loader = create_train_val_data_loaders(
+        dataset=dataset, batch_size=batch_size_instance, shuffle=shuffle
+    )
+    results = None
+    val_scores = []
+    train_losses, train_scores = [], []
+    best_val_epoch = -1
+    for epoch in range(max_epochs):
+        train_acc, val_acc, epoch_losses = epoch_iteration(
+            net, loss_module, optimizer, train_loader_local, val_loader, epoch, device
         )
-        print(f"Optimizer initialized: {optimizer}")
-        loss_module = nn.CrossEntropyLoss()
-        # train_loader_local = data.DataLoader(
-        #     dataset, batch_size=batch_size, shuffle=True, drop_last=True, pin_memory=True
-        # )
-        train_loader_local, val_loader = create_train_val_data_loaders(
-            dataset=dataset, batch_size=batch_size_instance, shuffle=shuffle
-        )
-        results = None
-        val_scores = []
-        train_losses, train_scores = [], []
-        best_val_epoch = -1
-        for epoch in range(max_epochs):
-            train_acc, val_acc, epoch_losses = epoch_iteration(
-                net, loss_module, optimizer, train_loader_local, val_loader, epoch, device
-            )
-            train_scores.append(train_acc)
-            val_scores.append(val_acc)
-            train_losses += epoch_losses
+        train_scores.append(train_acc)
+        val_scores.append(val_acc)
+        train_losses += epoch_losses
 
-            if len(val_scores) == 1 or val_acc > val_scores[best_val_epoch]:
-                print("\t   (New best performance, saving model...)")
-                save_model(net, CHECKPOINT_PATH, model_name)
-                best_val_epoch = epoch
+        # if len(val_scores) == 1 or val_acc > val_scores[best_val_epoch]:
+        #     print("\t   (New best performance, saving model...)")
+        #     save_model(net, CHECKPOINT_PATH, model_name)
+        #     best_val_epoch = epoch
 
-    if results is None:
-        load_model(CHECKPOINT_PATH, model_name, net=net)
-        test_acc = test_model(net, test_loader)
-        results = {
-            "test_acc": test_acc,
-            "val_scores": val_scores,
-            "train_losses": train_losses,
-            "train_scores": train_scores,
-        }
-        with open(_get_result_file(CHECKPOINT_PATH, model_name), "w") as f:
-            json.dump(results, f)
+    # TODO: Move this part to the test method
+    # if results is None:
+    #     load_model(CHECKPOINT_PATH, model_name, net=net)
+    #     test_acc = test_model(net, test_loader)
+    #     results = {
+    #         "test_acc": test_acc,
+    #         "val_scores": val_scores,
+    #         "train_losses": train_losses,
+    #         "train_scores": train_scores,
+    #     }
+    #     with open(_get_result_file(CHECKPOINT_PATH, model_name), "w") as f:
+    #         json.dump(results, f)
+
+    results = {
+        # "test_acc": test_acc,
+        "val_scores": val_scores,
+        "train_losses": train_losses,
+        "train_scores": train_scores,
+    }
 
     # Plot a curve of the validation accuracy
     sns.set()
@@ -139,8 +152,12 @@ def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=Fals
     plt.show()
     plt.close()
 
-    print((f" Test accuracy: {results['test_acc']*100.0:4.2f}% ").center(50, "=") + "\n")
-    return results
+    # print((f" Test accuracy: {results['test_acc']*100.0:4.2f}% ").center(50, "=") + "\n")
+    # return results
+
+    # TODO: Return Validation Loss (and not accuracy)
+    print(f"Validation Acc: {val_acc}")
+    return val_acc, np.nan
 
 
 def epoch_iteration(net, loss_module, optimizer, train_loader_local, val_loader, epoch, device):
@@ -164,10 +181,8 @@ def epoch_iteration(net, loss_module, optimizer, train_loader_local, val_loader,
     train_acc = true_preds / count
 
     # Validation
-    val_acc = test_model(net, val_loader)
-    print(
-        f"[Epoch {epoch+1:2i}] Training accuracy: {train_acc*100.0:05.2f}%, Validation accuracy: {val_acc*100.0:05.2f}%"
-    )
+    val_acc = test_model(net, val_loader, device)
+    print(f"[Epoch {epoch+1}] Training accuracy: {train_acc*100.0:05.2f}%, Validation accuracy: {val_acc*100.0:05.2f}%")
     return train_acc, val_acc, epoch_losses
 
 

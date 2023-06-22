@@ -16,7 +16,7 @@ class BaseNetwork(nn.Module):
 
         # Create the network based on the specified hidden sizes
         layers = []
-        hidden_sizes=[512, 256, 256, 128]
+        hidden_sizes = [512, 256, 256, 128]
         layer_sizes = [_L_in] + hidden_sizes
         for layer_index in range(1, len(layer_sizes)):
             layers += [nn.Linear(layer_sizes[layer_index - 1], layer_sizes[layer_index]), act_fn]
@@ -24,13 +24,13 @@ class BaseNetwork(nn.Module):
         # A module list registers a list of modules as submodules (e.g. for parameters)
         self.layers = nn.ModuleList(layers)
 
-        self.config = {
-            "act_fn": act_fn.__class__.__name__,
-            "_L_in": _L_in,
-            "_L_out": _L_out,
-            "l1": l1,
-            "optimizer": optimizer,
-        }
+        # self.config = {
+        #     "act_fn": act_fn.__class__.__name__,
+        #     "_L_in": _L_in,
+        #     "_L_out": _L_out,
+        #     "l1": l1,
+        #     "optimizer": optimizer,
+        # }
 
     def forward(self, x):
         x = x.view(x.size(0), -1)
