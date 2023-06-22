@@ -2,7 +2,7 @@ from torch import nn
 
 
 class BaseNetwork(nn.Module):
-    def __init__(self, act_fn, _L_in=784, _L_out=10, l1=512, optimizer="Adam", batch_size=16):
+    def __init__(self, act_fn, _L_in=784, _L_out=10, l1=512, optimizer="Adam", batch_size=16, epochs=2):
         """
         Args:
             act_fn: Object of the activation function that should be used as non-linearity in the network.
@@ -13,6 +13,7 @@ class BaseNetwork(nn.Module):
         super().__init__()
         self.optimizer = optimizer
         self.batch_size = batch_size
+        self.epochs = epochs
 
         # Create the network based on the specified hidden sizes
         layers = []

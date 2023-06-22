@@ -70,11 +70,10 @@ class HyperLightning:
             try:
                 df_eval, _ = train_model(
                     net=model,
-                    model_name=config_id,
-                    max_epochs=3,  # max_epochs,
+                    model_name=config_id,                   
                     dataset=fun_control["train"],
                     shuffle=self.fun_control["shuffle"],
-                    # device=self.fun_control["device"],
+                    device=self.fun_control["device"],
                     # task=self.fun_control["task"],
                     # writer=self.fun_control["writer"],
                     # writerId=config_id,

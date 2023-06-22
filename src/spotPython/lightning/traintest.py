@@ -60,7 +60,7 @@ def save_model(model, model_path, model_name):
     torch.save(model.state_dict(), model_file)
 
 
-def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=False):
+def train_model(net, model_name, dataset, shuffle, device, overwrite=False):
     """Train a model on the training set of FashionMNIST.
 
     Args:
@@ -81,8 +81,8 @@ def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=Fals
     # else:
     #     if file_exists:
     #         print("Model file exists, but will be overwritten...")
-
-    device = getDevice("cpu")
+    device = getDevice(device=device)
+    epochs_instance = net.epochs
     optimizer_instance = net.optimizer
     batch_size_instance = net.batch_size
     removed_attributes, net = get_removed_attributes_and_base_net(net)
@@ -107,7 +107,7 @@ def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=Fals
     val_scores = []
     train_losses, train_scores = [], []
     best_val_epoch = -1
-    for epoch in range(max_epochs):
+    for epoch in range(epochs_instance):
         train_acc, val_acc, epoch_losses = epoch_iteration(
             net, loss_module, optimizer, train_loader_local, val_loader, epoch, device
         )
@@ -160,7 +160,7 @@ def train_model(net, model_name, dataset, shuffle, max_epochs=50, overwrite=Fals
     return val_acc, np.nan
 
 
-def epoch_iteration(net, loss_module, optimizer, train_loader_local, val_loader, epoch, device):
+def epoch_iteration(net, loss_module, optimizer, train_loader_local, val_loader, epoch, device, TQDM=False):
     # Training
     net.train()
     true_preds, count = 0.0, 0

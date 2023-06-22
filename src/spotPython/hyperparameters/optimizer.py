@@ -50,8 +50,8 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             foreach=None,
             maximize=False,
             capturable=False,
-            differentiable=False,
-            fused=None,
+            # differentiable=False,
+            # fused=None,
         )
     elif optimizer_name == "SparseAdam":
         return torch.optim.SparseAdam(params, lr=0.001, betas=(0.9, 0.999), eps=1e-08, maximize=False)
@@ -64,7 +64,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             weight_decay=0,
             foreach=None,
             maximize=False,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "ASGD":
         return torch.optim.ASGD(
@@ -98,7 +98,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             weight_decay=0,
             momentum_decay=0.004,
             foreach=None,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "RAdam":
         return torch.optim.RAdam(
