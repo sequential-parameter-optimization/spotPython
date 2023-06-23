@@ -17,9 +17,9 @@ py_handler.setFormatter(py_formatter)
 logger.addHandler(py_handler)
 
 
-class HyperLightning:
+class HyperLightning2:
     """
-    Hyperparameter Tuning for Lightning.
+    Hyperparameter Tuning for Lightning 2.
 
     Args:
         seed (int): seed.
