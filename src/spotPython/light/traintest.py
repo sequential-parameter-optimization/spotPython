@@ -2,7 +2,7 @@ import lightning as L
 
 # from spotPython.light.mnistdatamodule import MNISTDataModule
 from spotPython.light.csvdatamodule import CSVDataModule
-from spotPython.light.kfolddatamodule import KFoldDataModule
+from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
 
 # from spotPython.light.litmodel import LitModel
@@ -73,7 +73,7 @@ def cv_model(config, fun_control):
 
     for k in range(num_folds):
         print("k:", k)
-        dm = KFoldDataModule(
+        dm = CrossValidationDataModule(
             k=k,
             num_splits=num_folds,
             split_seed=split_seed,
