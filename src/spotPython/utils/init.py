@@ -70,6 +70,7 @@ def fun_control_init(task, tensorboard_path=None, num_workers=0, device=None):
         "show_batch_interval": 1_000_000,
         "path": None,
         "task": task,
+        "tensorboard_path": tensorboard_path,
         "save_model": False,
         "weights": 1.0,
     }

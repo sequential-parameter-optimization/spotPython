@@ -1,19 +1,11 @@
-import os
-
 import lightning as L
-
-
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms
-
-# Note - you must have torchvision installed for this example
 from torchvision.datasets import MNIST
-
-PATH_DATASETS = os.environ.get("PATH_DATASETS", ".")
 
 
 class MNISTDataModule(L.LightningDataModule):
-    def __init__(self, batch_size, data_dir: str = PATH_DATASETS, num_workers: int = 0):
+    def __init__(self, batch_size, data_dir: str = "./data", num_workers: int = 0):
         super().__init__()
         self.batch_size = batch_size
         self.data_dir = data_dir
