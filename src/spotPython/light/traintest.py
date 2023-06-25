@@ -73,7 +73,13 @@ def cv_model(config, fun_control):
 
     for k in range(num_folds):
         print("k:", k)
-        dm = KFoldDataModule(k=k, num_splits=num_folds, split_seed=split_seed, batch_size=config["batch_size"])
+        dm = KFoldDataModule(
+            k=k,
+            num_splits=num_folds,
+            split_seed=split_seed,
+            batch_size=config["batch_size"],
+            data_dir=fun_control["data_dir"],
+        )
         dm.prepare_data()
         dm.setup()
 
@@ -95,8 +101,8 @@ def cv_model(config, fun_control):
         score = score[0]
         print(f"train_model result: {score}")
 
-        results.append(score)
+        results.append(score["valid_mapk"])
 
-    score = sum(results) / num_folds
-    print(f"cv_model result: {score}")
-    return score
+    mapk_score = sum(results) / num_folds
+    print(f"cv_model mapk result: {mapk_score}")
+    return mapk_score

@@ -1,17 +1,20 @@
 import lightning as L
-from torch.utils.data import DataLoader
+
+from torch.utils.data import DataLoader, Subset
 from typing import Optional
 from spotPython.light.csvdataset import CSVDataset
 from sklearn.model_selection import KFold
 from torch.utils.data import Dataset
 
+# from torch_geometric.data import DataLoader
+
 
 class KFoldDataModule(L.LightningDataModule):
     def __init__(
         self,
-        batch_size,
+        batch_size=64,
         # fold number
-        k: int = 0,
+        k: int = 1,
         # split needs to be always the same for correct cross validation
         split_seed: int = 12345,
         num_splits: int = 10,
@@ -28,14 +31,12 @@ class KFoldDataModule(L.LightningDataModule):
         self.num_splits = num_splits
         self.pin_memory = pin_memory
 
-        # this line allows to access init params with 'self.hparams' attribute
+        # allow to access init params with 'self.hparams' attribute
         self.save_hyperparameters(logger=False)
 
-        # num_splits = 10 means our dataset will be split to 10 parts
-        # so we train on 90% of the data and validate on 10%
         assert 0 <= self.k < self.num_splits, "incorrect fold number"
 
-        # data transformations
+        # no data transformations
         self.transforms = None
 
         self.data_train: Optional[Dataset] = None
@@ -54,8 +55,13 @@ class KFoldDataModule(L.LightningDataModule):
             all_splits = [k for k in kf.split(dataset_full)]
             train_indexes, val_indexes = all_splits[self.hparams.k]
             train_indexes, val_indexes = train_indexes.tolist(), val_indexes.tolist()
+            print(f"train_indexes: {train_indexes}")
+            print(f"val_indexes: {val_indexes}")
 
-            self.data_train, self.data_val = dataset_full[train_indexes], dataset_full[val_indexes]
+            # Create subsets using Subset class
+            self.data_train = Subset(dataset_full, train_indexes)
+            self.data_val = Subset(dataset_full, val_indexes)
+            # self.data_train, self.data_val = dataset_full[train_indexes], dataset_full[val_indexes]
 
     def train_dataloader(self):
         return DataLoader(
