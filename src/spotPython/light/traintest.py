@@ -53,14 +53,7 @@ def test_model(config, fun_control):
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
-    # Test best model on validation and test set
-    # result = trainer.validate(model=model, datamodule=dm, ckpt_path="last")
-    val_result = trainer.validate(model=model, datamodule=dm)
-    # unlist the result (from a list of one dict)
-    val_result = val_result[0]
-    print(f"validation_model result: {val_result}")
-    # test
-    test_result = trainer.test(model=model, datamodule=dm)
+    test_result = trainer.test(datamodule=dm, ckpt_path="last")
     test_result = test_result[0]
     print(f"test_model result: {test_result}")
-    return test_result["test_loss"]
+    return test_result["val_loss"], test_result["val_acc"]
