@@ -2,14 +2,12 @@ import os
 import json
 import torch
 import torch.nn as nn
-import torch.utils.data as data
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm.notebook import tqdm
 from spotPython.torch.traintest import (
     get_removed_attributes_and_base_net,
     create_train_val_data_loaders,
-    add_attributes,
 )
 from spotPython.hyperparameters.optimizer import optimizer_handler
 from spotPython.utils.device import getDevice
@@ -28,26 +26,26 @@ def _get_result_file(model_path, model_name):
     return os.path.join(model_path, model_name + "_results.json")
 
 
-def load_model(model_path, model_name, net=None):
-    config_file = _get_config_file(model_path, model_name)
-    model_file = _get_model_file(model_path, model_name)
-    assert os.path.isfile(
-        config_file
-    ), f'Could not find config file "{config_file}". Is the path correct and you have your model config stored here?'
-    assert os.path.isfile(
-        model_file
-    ), f'Could not find model file "{model_file}". Is the path correct and you have your model stored here?'
-    with open(config_file) as f:
-        config_dict = json.load(f)
-    if net is None:
-        act_fn_name = config_dict["act_fn"].pop("name").lower()
-        assert (
-            act_fn_name in act_fn_by_name
-        ), f'Unknown activation function "{act_fn_name}". Please add it to the "act_fn_by_name" dict.'
-        act_fn = act_fn_by_name[act_fn_name]()
-        net = BaseNetwork(act_fn=act_fn, **config_dict)
-    net.load_state_dict(torch.load(model_file))
-    return net
+# def load_model(model_path, model_name, net=None):
+#     config_file = _get_config_file(model_path, model_name)
+#     model_file = _get_model_file(model_path, model_name)
+#     assert os.path.isfile(
+#         config_file
+#     ), f'Could not find config file "{config_file}". Is the path correct and you have your model config stored here?'
+#     assert os.path.isfile(
+#         model_file
+#     ), f'Could not find model file "{model_file}". Is the path correct and you have your model stored here?'
+#     with open(config_file) as f:
+#         config_dict = json.load(f)
+#     if net is None:
+#         act_fn_name = config_dict["act_fn"].pop("name").lower()
+#         assert (
+#             act_fn_name in act_fn_by_name
+#         ), f'Unknown activation function "{act_fn_name}". Please add it to the "act_fn_by_name" dict.'
+#         act_fn = act_fn_by_name[act_fn_name]()
+#         net = BaseNetwork(act_fn=act_fn, **config_dict)
+#     net.load_state_dict(torch.load(model_file))
+#     return net
 
 
 def save_model(model, model_path, model_name):
@@ -72,7 +70,7 @@ def train_model(net, model_name, dataset, shuffle, device, overwrite=False):
         overwrite: Determines how to handle the case when there already exists a checkpoint.
         If True, it will be overwritten. Otherwise, we skip training.
     """
-    CHECKPOINT_PATH = "./checkpoints/"
+    # CHECKPOINT_PATH = "./checkpoints/"
     # file_exists = os.path.isfile(_get_model_file(CHECKPOINT_PATH, model_name))
     # if file_exists and not overwrite:
     #     print(f'Model file of "{model_name}" already exists. Skipping training...')
@@ -106,7 +104,7 @@ def train_model(net, model_name, dataset, shuffle, device, overwrite=False):
     results = None
     val_scores = []
     train_losses, train_scores = [], []
-    best_val_epoch = -1
+    # best_val_epoch = -1
     for epoch in range(epochs_instance):
         train_acc, val_acc, epoch_losses = epoch_iteration(
             net, loss_module, optimizer, train_loader_local, val_loader, epoch, device

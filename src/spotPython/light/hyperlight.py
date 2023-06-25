@@ -74,9 +74,5 @@ class HyperLight:
                 print("Setting df_eval to np.nan")
                 df_eval = np.nan
             z_val = fun_control["weights"] * df_eval
-            if self.fun_control["writer"] is not None:
-                writer = self.fun_control["writer"]
-                writer.add_hparams(config, {"fun_lightning: loss": z_val})
-                writer.flush()
             z_res = np.append(z_res, z_val)
         return z_res

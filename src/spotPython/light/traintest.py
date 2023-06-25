@@ -1,6 +1,9 @@
 import lightning as L
 from spotPython.light.mnistdatamodule import MNISTDataModule
-from spotPython.light.litmodel import LitModel
+from spotPython.utils.eda import generate_config_id
+
+# from spotPython.light.litmodel import LitModel
+from pytorch_lightning.loggers import TensorBoardLogger
 
 
 def train_model(config, fun_control):
@@ -24,16 +27,21 @@ def train_model(config, fun_control):
     # result = trainer.test(model)
     # print(f"train_model result: {result}")
     # return result
-
+    config_id = generate_config_id(config)
     # Init DataModule
-    dm = MNISTDataModule()
+    dm = MNISTDataModule(
+        batch_size=config["batch_size"], num_workers=fun_control["num_workers"], data_dir=fun_control["data_dir"]
+    )
     # Init model from datamodule's attributes
-    model = LitModel(*dm.dims, dm.num_classes)
+    # model = LitModel(*dm.dims, dm.num_classes)
+    model = fun_control["core_model"](**config, _L_in=1 * 28 * 28, _L_out=10)
     # Init trainer
     trainer = L.Trainer(
-        max_epochs=3,
+        max_epochs=model.epochs,
         accelerator="auto",
         devices=1,
+        # logger=TensorBoardLogger(save_dir="./runs/29/" + config_id, version=1, name="lightning_logs"),
+        logger=TensorBoardLogger(save_dir="./runs/29", version=1, name=config_id),
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)

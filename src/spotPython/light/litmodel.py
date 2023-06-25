@@ -12,26 +12,27 @@ BATCH_SIZE = 256 if torch.cuda.is_available() else 64
 
 
 class LitModel(L.LightningModule):
-    def __init__(self, channels, width, height, num_classes, hidden_size=64, learning_rate=2e-4):
+    def __init__(self, l1, epochs, batch_size, act_fn, optimizer, learning_rate=2e-4, _L_in=28 * 28, _L_out=10):
         super().__init__()
 
         # We take in input dimensions as parameters and use those to dynamically build model.
-        self.channels = channels
-        self.width = width
-        self.height = height
-        self.num_classes = num_classes
-        self.hidden_size = hidden_size
+        self._L_out = _L_out
+        self.l1 = l1
+        self.epochs = epochs
+        self.batch_size = batch_size
+        self.act_fn = act_fn
+        self.optimizer = optimizer
         self.learning_rate = learning_rate
 
         self.model = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(channels * width * height, hidden_size),
+            nn.Linear(_L_in, l1),
             nn.ReLU(),
             nn.Dropout(0.1),
-            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(l1, l1),
             nn.ReLU(),
             nn.Dropout(0.1),
-            nn.Linear(hidden_size, num_classes),
+            nn.Linear(l1, _L_out),
         )
 
     def forward(self, x):
