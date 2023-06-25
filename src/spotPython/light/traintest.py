@@ -72,6 +72,7 @@ def cv_model(config, fun_control):
     print(f"model: {model}")
 
     for k in range(num_folds):
+        print("k:", k)
         dm = KFoldDataModule(k=k, num_splits=num_folds, split_seed=split_seed, batch_size=config["batch_size"])
         dm.prepare_data()
         dm.setup()

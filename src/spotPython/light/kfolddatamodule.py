@@ -11,7 +11,7 @@ class KFoldDataModule(L.LightningDataModule):
         self,
         batch_size,
         # fold number
-        k: int = 1,
+        k: int = 0,
         # split needs to be always the same for correct cross validation
         split_seed: int = 12345,
         num_splits: int = 10,
@@ -33,7 +33,7 @@ class KFoldDataModule(L.LightningDataModule):
 
         # num_splits = 10 means our dataset will be split to 10 parts
         # so we train on 90% of the data and validate on 10%
-        assert 1 <= self.k <= self.num_splits, "incorrect fold number"
+        assert 0 <= self.k < self.num_splits, "incorrect fold number"
 
         # data transformations
         self.transforms = None
