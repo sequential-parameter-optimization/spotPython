@@ -1,4 +1,3 @@
-from typing import Dict
 import torch
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
@@ -6,20 +5,6 @@ from torch.utils.data import Dataset
 
 
 class CSVDataset(Dataset):
-    classes = [
-        "0 - zero",
-        "1 - one",
-        "2 - two",
-        "3 - three",
-        "4 - four",
-        "5 - five",
-        "6 - six",
-        "7 - seven",
-        "8 - eight",
-        "9 - nine",
-        "10 - ten",
-    ]
-
     def __init__(
         self,
         csv_file: str = "./data/VBDP/train.csv",
@@ -32,6 +17,8 @@ class CSVDataset(Dataset):
 
     def _load_data(self):
         data_df = pd.read_csv(self.csv_file)
+        # drop the id column
+        data_df = data_df.drop(columns=["id"])
         target_column = "prognosis"
 
         # Encode prognosis labels as integers
@@ -57,7 +44,3 @@ class CSVDataset(Dataset):
     def extra_repr(self) -> str:
         split = "Train" if self.train else "Test"
         return f"Split: {split}"
-
-    @property
-    def class_to_idx(self) -> Dict[str, int]:
-        return {_class: i for i, _class in enumerate(self.classes)}

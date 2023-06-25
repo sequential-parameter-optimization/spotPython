@@ -1,20 +1,23 @@
 import lightning as L
-from spotPython.light.mnistdatamodule import MNISTDataModule
+
+# from spotPython.light.mnistdatamodule import MNISTDataModule
+from spotPython.light.csvdatamodule import CSVDataModule
 from spotPython.utils.eda import generate_config_id
 
 # from spotPython.light.litmodel import LitModel
+
 from pytorch_lightning.loggers import TensorBoardLogger
 
 
 def train_model(config, fun_control):
     config_id = generate_config_id(config)
     # Init DataModule
-    dm = MNISTDataModule(
+    dm = CSVDataModule(
         batch_size=config["batch_size"], num_workers=fun_control["num_workers"], data_dir=fun_control["data_dir"]
     )
     # Init model from datamodule's attributes
     # model = LitModel(*dm.dims, dm.num_classes)
-    model = fun_control["core_model"](**config, _L_in=1 * 28 * 28, _L_out=10)
+    model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
     print(f"model: {model}")
     # Init trainer
     trainer = L.Trainer(
@@ -37,12 +40,12 @@ def train_model(config, fun_control):
 def test_model(config, fun_control):
     config_id = generate_config_id(config)
     # Init DataModule
-    dm = MNISTDataModule(
+    dm = CSVDataModule(
         batch_size=config["batch_size"], num_workers=fun_control["num_workers"], data_dir=fun_control["data_dir"]
     )
     # Init model from datamodule's attributes
     # model = LitModel(*dm.dims, dm.num_classes)
-    model = fun_control["core_model"](**config, _L_in=1 * 28 * 28, _L_out=10)
+    model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
     print(f"model: {model}")
     # Init trainer
     trainer = L.Trainer(
