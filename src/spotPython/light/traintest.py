@@ -66,13 +66,13 @@ def test_model(config, fun_control):
 def cv_model(config, fun_control):
     # config_id = generate_config_id(config)
     results = []
-    nums_folds = 10
+    num_folds = 10
     split_seed = 12345
     model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
     print(f"model: {model}")
 
-    for k in range(nums_folds):
-        dm = KFoldDataModule(k=k, num_folds=nums_folds, split_seed=split_seed)
+    for k in range(num_folds):
+        dm = KFoldDataModule(k=k, num_splits=num_folds, split_seed=split_seed)
         dm.prepare_data()
         dm.setup()
 
@@ -96,6 +96,6 @@ def cv_model(config, fun_control):
 
         results.append(score)
 
-    score = sum(results) / nums_folds
+    score = sum(results) / num_folds
     print(f"cv_model result: {score}")
     return score

@@ -10,6 +10,7 @@ class KFoldDataModule(L.LightningDataModule):
     def __init__(
         self,
         batch_size,
+        # fold number
         k: int = 1,
         # split needs to be always the same for correct cross validation
         split_seed: int = 12345,
