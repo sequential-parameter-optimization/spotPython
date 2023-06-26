@@ -70,7 +70,7 @@ class HyperLight:
             try:
                 df_eval = train_model(config, self.fun_control)
             except Exception as err:
-                print(f"Error in fun_light(). Call to train_model failed. {err=}, {type(err)=}")
+                print(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                 print("Setting df_eval to np.nan")
                 df_eval = np.nan
             z_val = fun_control["weights"] * df_eval

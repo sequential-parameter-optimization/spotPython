@@ -4,8 +4,7 @@ import torch
 def getDevice(device=None):
     """Get cpu, gpu or mps device for training.
     Args:
-        device (str): Device for training. If None,
-        the device is selected automatically.
+        device (str): Device for training. If None or "auto" the device is selected automatically.
     Returns:
         device (str): Device for training.
         Example:
@@ -13,7 +12,7 @@ def getDevice(device=None):
             >>> getDevice()
             'cuda:0'
     """
-    if device is None:
+    if device is None or device == "auto":
         device = "cpu"
         if torch.cuda.is_available():
             device = "cuda:0"

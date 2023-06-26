@@ -28,17 +28,6 @@ class CSVModel(L.LightningModule):
         self.valid_mapk = MAPK(k=3)
         self.test_mapk = MAPK(k=3)
 
-        # self.model = nn.Sequential(
-        #     nn.Flatten(),
-        #     nn.Linear(_L_in, l1),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.1),
-        #     nn.Linear(l1, l1),
-        #     nn.ReLU(),
-        #     nn.Dropout(0.1),
-        #     nn.Linear(l1, _L_out),
-        # )
-
         # Create the network based on the specified hidden sizes
         layers = []
         layer_sizes = [_L_in] + hidden_sizes
