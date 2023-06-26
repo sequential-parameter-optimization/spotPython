@@ -4,12 +4,11 @@ import torch.nn.functional as F
 from torch import nn
 from torchmetrics.functional import accuracy
 from spotPython.torch.mapk import MAPK
+from spotPython.hyperparameters.optimizer import optimizer_handler
 
 
 class NetLightBase(L.LightningModule):
-    def __init__(
-        self, l1, epochs, batch_size, act_fn, optimizer, dropout_prob, learning_rate=2e-4, _L_in=64, _L_out=11
-    ):
+    def __init__(self, l1, epochs, batch_size, act_fn, optimizer, dropout_prob, lr_mult, _L_in=64, _L_out=11):
         super().__init__()
 
         # We take in input dimensions as parameters and use those to dynamically build model.
@@ -23,7 +22,7 @@ class NetLightBase(L.LightningModule):
         self.act_fn = act_fn
         self.optimizer = optimizer
         self.dropout_prob = dropout_prob
-        self.learning_rate = learning_rate
+        self.lr_mult = lr_mult
         self.train_mapk = MAPK(k=3)
         self.valid_mapk = MAPK(k=3)
         self.test_mapk = MAPK(k=3)
@@ -79,5 +78,6 @@ class NetLightBase(L.LightningModule):
         return loss, acc
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        optimizer = optimizer_handler(optimizer_name=self.optimizer, params=self.parameters(), lr_mult=self.lr_mult)
         return optimizer

@@ -20,14 +20,14 @@
                     "lower": 1,
                     "upper": 4},
         "act_fn": {
-                "levels": ["ReLU"],
+                "levels": ["Sigmoid", "Tanh", "ReLU", "LeakyReLU", "ELU", "Swish"],
                 "type": "factor",
                 "default": "ReLU",
                 "transform": "None",
-                "class_name": "torch.nn",
+                "class_name": "spotPython.torch.activation", 
                 "core_model_parameter_type": "instance()",
                 "lower": 0,
-                "upper": 0},
+                "upper": 2},
         "optimizer": {
             "levels": ["Adadelta", "Adagrad", "Adam", "AdamW", "SparseAdam", "Adamax", "ASGD", "NAdam", "RAdam", "RMSprop", "Rprop", "SGD"],
             "type": "factor",
@@ -36,13 +36,19 @@
             "class_name": "torch.optim",
             "core_model_parameter_type": "str",
             "lower": 0,
-            "upper": 12},
+            "upper": 11},
         "dropout_prob": {
             "type": "float",
             "default": 0.01,
             "transform": "None",
             "lower": 0.0,
-            "upper": 0.1}
+            "upper": 0.1},
+        "lr_mult": {
+            "type": "float",
+            "default": 1.0,
+            "transform": "None",
+            "lower": 0.1,
+            "upper": 10.0}
     },
     "LitModel":
     {
