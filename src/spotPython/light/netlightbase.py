@@ -6,7 +6,7 @@ from torchmetrics.functional import accuracy
 from spotPython.torch.mapk import MAPK
 
 
-class CSVModel(L.LightningModule):
+class NetLightBase(L.LightningModule):
     def __init__(
         self, l1, epochs, batch_size, act_fn, optimizer, dropout_prob, learning_rate=2e-4, _L_in=64, _L_out=11
     ):
