@@ -1,7 +1,7 @@
 import os
 
 # PyTorch TensorBoard support
-# from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 
 def fun_control_init(task, tensorboard_path=None, num_workers=0, device=None):
@@ -43,10 +43,11 @@ def fun_control_init(task, tensorboard_path=None, num_workers=0, device=None):
         # create tensorboard_path if it does not exist
         if not os.path.exists(tensorboard_path):
             os.makedirs(tensorboard_path)
-        # Starting with v0.2.41, Summary Writer is not initialized here but by Lightning
-        # writer = SummaryWriter(tensorboard_path)
-    # else:
-    #     writer = None
+        # Starting with v0.2.41, Summary Writer should be not initialized here but by Lightning
+        # it is only available for compatibility reasons
+        writer = SummaryWriter(tensorboard_path)
+    else:
+        writer = None
 
     fun_control = {
         "data": None,
@@ -73,5 +74,6 @@ def fun_control_init(task, tensorboard_path=None, num_workers=0, device=None):
         "tensorboard_path": tensorboard_path,
         "save_model": False,
         "weights": 1.0,
+        "writer": writer,
     }
     return fun_control
