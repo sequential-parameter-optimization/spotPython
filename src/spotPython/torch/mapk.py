@@ -64,10 +64,11 @@ class MAPK(torchmetrics.Metric):
         # Convert predicted to list of lists of indices sorted by confidence score
         _, predicted = predicted.topk(k=self.k, dim=1)
         predicted = predicted.tolist()
-
+        # Code modified according to: "Inplace update to inference tensor outside InferenceMode
+        # is not allowed. You can make a clone to get a normal tensor before doing inplace update."
         score = np.mean([self.apk(p, a, self.k) for p, a in zip(predicted, actual)])
-        self.total += score
-        self.count += 1
+        self.total = self.total + score
+        self.count = self.count + 1
 
     def compute(self):
         """

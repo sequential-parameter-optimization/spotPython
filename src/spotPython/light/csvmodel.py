@@ -63,7 +63,7 @@ class CSVModel(L.LightningModule):
         # self.log("train_mapk", self.train_mapk, on_step=True, on_epoch=False)
         return loss
 
-    def validation_step(self, batch, batch_idx):
+    def validation_step(self, batch, batch_idx, prog_bar=False):
         x, y = batch
         logits = self(x)
         # compute cross entropy loss from logits and y
@@ -73,10 +73,10 @@ class CSVModel(L.LightningModule):
         acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
         self.valid_mapk(logits, y)
         self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True)
-        self.log("val_loss", loss, prog_bar=True)
-        self.log("val_acc", acc, prog_bar=True)
+        self.log("val_loss", loss, prog_bar=prog_bar)
+        self.log("val_acc", acc, prog_bar=prog_bar)
 
-    def test_step(self, batch, batch_idx):
+    def test_step(self, batch, batch_idx, prog_bar=False):
         x, y = batch
         logits = self(x)
         # compute cross entropy loss from logits and y
@@ -85,8 +85,8 @@ class CSVModel(L.LightningModule):
         acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
         self.test_mapk(logits, y)
         self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True)
-        self.log("val_loss", loss, prog_bar=True)
-        self.log("val_acc", acc, prog_bar=True)
+        self.log("val_loss", loss, prog_bar=prog_bar)
+        self.log("val_acc", acc, prog_bar=prog_bar)
         return loss, acc
 
     def configure_optimizers(self):
