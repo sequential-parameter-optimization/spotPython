@@ -72,7 +72,7 @@ class CSVModel(L.LightningModule):
         preds = torch.argmax(logits, dim=1)
         acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
         self.valid_mapk(logits, y)
-        self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True)
+        self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_acc", acc, prog_bar=prog_bar)
 
@@ -84,7 +84,7 @@ class CSVModel(L.LightningModule):
         preds = torch.argmax(logits, dim=1)
         acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
         self.test_mapk(logits, y)
-        self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True)
+        self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_acc", acc, prog_bar=prog_bar)
         return loss, acc
