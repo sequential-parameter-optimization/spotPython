@@ -4,7 +4,7 @@ import os
 from torch.utils.tensorboard import SummaryWriter
 
 
-def fun_control_init(task, tensorboard_path=None, num_workers=0, device=None):
+def fun_control_init(task, enable_progress_bar=False, tensorboard_path=None, num_workers=0, device=None):
     """Initialize fun_control dictionary.
     Args:
         None
@@ -52,27 +52,28 @@ def fun_control_init(task, tensorboard_path=None, num_workers=0, device=None):
     fun_control = {
         "data": None,
         "data_dir": "./data",
-        "train": None,
-        "test": None,
-        "loss_function": None,
-        "metric_sklearn": None,
-        "metric_river": None,
-        "metric_torch": None,
-        "metric_params": {},
-        "num_workers": num_workers,
-        "prep_model": None,
-        "n_samples": None,
-        "target_column": None,
-        "shuffle": None,
+        "device": device,
+        "enable_progress_bar": enable_progress_bar,
         "eval": None,
         "k_folds": None,
+        "loss_function": None,
+        "metric_river": None,
+        "metric_sklearn": None,
+        "metric_torch": None,
+        "metric_params": {},
+        "n_samples": None,
+        "num_workers": num_workers,
         "optimizer": None,
-        "device": device,
-        "show_batch_interval": 1_000_000,
         "path": None,
+        "prep_model": None,
+        "save_model": False,
+        "show_batch_interval": 1_000_000,
+        "shuffle": None,
+        "target_column": None,
+        "train": None,
+        "test": None,
         "task": task,
         "tensorboard_path": tensorboard_path,
-        "save_model": False,
         "weights": 1.0,
         "writer": writer,
     }

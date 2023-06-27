@@ -8,16 +8,18 @@ from spotPython.hyperparameters.optimizer import optimizer_handler
 
 
 class NetLightBase(L.LightningModule):
-    def __init__(self, l1, epochs, batch_size, act_fn, optimizer, dropout_prob, lr_mult, _L_in=64, _L_out=11):
+    def __init__(
+        self, l1, epochs, batch_size, act_fn, optimizer, dropout_prob, lr_mult, patience=3, _L_in=64, _L_out=11
+    ):
         super().__init__()
-
-        # We take in input dimensions as parameters and use those to dynamically build model.
+        self.save_hyperparameters()
         self._L_out = _L_out
         if l1 < 4:
             raise ValueError("l1 must be at least 4")
         self.l1 = l1
         hidden_sizes = [l1, l1 // 2, l1 // 2, l1 // 4]
         self.epochs = epochs
+        self.patience = patience
         self.batch_size = batch_size
         self.act_fn = act_fn
         self.optimizer = optimizer
@@ -63,6 +65,7 @@ class NetLightBase(L.LightningModule):
         self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_acc", acc, prog_bar=prog_bar)
+        self.log("hp_metric", loss)
 
     def test_step(self, batch, batch_idx, prog_bar=False):
         x, y = batch
@@ -75,6 +78,7 @@ class NetLightBase(L.LightningModule):
         self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_acc", acc, prog_bar=prog_bar)
+        # self.log("hp_metric", loss, prog_bar=prog_bar)
         return loss, acc
 
     def configure_optimizers(self):

@@ -7,6 +7,10 @@ from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 
 
 def train_model(config, fun_control):
+    if fun_control["enable_progress_bar"] is None:
+        enable_progress_bar = False
+    else:
+        enable_progress_bar = fun_control["enable_progress_bar"]
     config_id = generate_config_id(config)
     # Init DataModule
     dm = CSVDataModule(
@@ -21,8 +25,11 @@ def train_model(config, fun_control):
         max_epochs=model.epochs,
         accelerator="auto",
         devices=1,
-        logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id),
-        callbacks=[EarlyStopping(monitor="val_loss", patience=3, mode="min", strict=False, verbose=False)],
+        logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id, default_hp_metric=True),
+        callbacks=[
+            EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
+        ],
+        enable_progress_bar=enable_progress_bar,
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
@@ -36,6 +43,10 @@ def train_model(config, fun_control):
 
 
 def test_model(config, fun_control):
+    if fun_control["enable_progress_bar"] is None:
+        enable_progress_bar = False
+    else:
+        enable_progress_bar = fun_control["enable_progress_bar"]
     config_id = generate_config_id(config)
     # Init DataModule
     dm = CSVDataModule(
@@ -50,7 +61,11 @@ def test_model(config, fun_control):
         max_epochs=model.epochs,
         accelerator="auto",
         devices=1,
-        logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id),
+        logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id, default_hp_metric=True),
+        callbacks=[
+            EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
+        ],
+        enable_progress_bar=enable_progress_bar,
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
@@ -61,7 +76,11 @@ def test_model(config, fun_control):
 
 
 def cv_model(config, fun_control):
-    # config_id = generate_config_id(config)
+    config_id = generate_config_id(config)
+    if fun_control["enable_progress_bar"] is None:
+        enable_progress_bar = False
+    else:
+        enable_progress_bar = fun_control["enable_progress_bar"]
     results = []
     num_folds = 10
     split_seed = 12345
@@ -87,7 +106,13 @@ def cv_model(config, fun_control):
             max_epochs=model.epochs,
             accelerator="auto",
             devices=1,
-            # logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id),
+            logger=TensorBoardLogger(
+                save_dir=fun_control["tensorboard_path"], version=config_id, default_hp_metric=True
+            ),
+            callbacks=[
+                EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
+            ],
+            enable_progress_bar=enable_progress_bar,
         )
         # Pass the datamodule as arg to trainer.fit to override model hooks :)
         trainer.fit(model=model, datamodule=dm)
