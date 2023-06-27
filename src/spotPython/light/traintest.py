@@ -4,6 +4,7 @@ from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
+from spotPython.torch.initialization import kaiming_init, xavier_init
 
 
 def train_model(config, fun_control):
@@ -19,6 +20,13 @@ def train_model(config, fun_control):
     # Init model from datamodule's attributes
     # model = LitModel(*dm.dims, dm.num_classes)
     model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+    initialization = config["initialization"]
+    if initialization == "Xavier":
+        xavier_init(model)
+    elif initialization == "Kaiming":
+        kaiming_init(model)
+    else:
+        pass
     print(f"model: {model}")
     # Init trainer
     trainer = L.Trainer(
@@ -55,6 +63,13 @@ def test_model(config, fun_control):
     # Init model from datamodule's attributes
     # model = LitModel(*dm.dims, dm.num_classes)
     model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+    initialization = config["initialization"]
+    if initialization == "Xavier":
+        xavier_init(model)
+    elif initialization == "Kaiming":
+        kaiming_init(model)
+    else:
+        pass
     print(f"model: {model}")
     # Init trainer
     trainer = L.Trainer(
@@ -85,6 +100,13 @@ def cv_model(config, fun_control):
     num_folds = 10
     split_seed = 12345
     model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+    initialization = config["initialization"]
+    if initialization == "Xavier":
+        xavier_init(model)
+    elif initialization == "Kaiming":
+        kaiming_init(model)
+    else:
+        pass
     print(f"model: {model}")
 
     for k in range(num_folds):

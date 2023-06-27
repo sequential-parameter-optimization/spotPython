@@ -6,6 +6,12 @@ from spotPython.hyperparameters.values import (
     get_var_type,
     get_transform,
 )
+import torch
+from spotPython.light.csvdataset import CSVDataset
+from torch.utils.data import DataLoader
+import matplotlib.pyplot as plt
+import math
+import seaborn as sns
 
 
 def get_stars(input_list) -> list:
@@ -110,3 +116,58 @@ def generate_config_id(config):
     for key in config:
         config_id += str(config[key]) + "_"
     return config_id[:-1]
+
+
+def visualize_activations(net, device="cpu", color="C0"):
+    """Visualizes the activations of a neural network.
+    Code is based on:
+    PyTorch Lightning TUTORIAL 2: ACTIVATION FUNCTIONS,
+    Author: Phillip Lippe,
+    License: CC BY-SA.
+
+    Args:
+        net (object): A neural network.
+        device (str, optional): The device to use. Defaults to "cpu".
+        color (str, optional): The color to use. Defaults to "C0".
+    Example:
+        >>> from spotPython.hyperparameters.values import get_one_config_from_X
+        >>> X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))
+        >>> config = get_one_config_from_X(X, fun_control)
+        >>> model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+        >>> visualize_activations(model, device="cpu", color=f"C{0}")
+    """
+    activations = {}
+    net.eval()
+    # Create an instance of CSVDataset
+    dataset = CSVDataset(csv_file="./data/VBDP/train.csv", train=True)
+    # Set batch size for DataLoader
+    batch_size = 128
+    # Create DataLoader
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    # for batch in dataloader:
+    #     inputs, targets = batch
+    # small_loader = data.DataLoader(train_set, batch_size=1024)
+    inputs, _ = next(iter(dataloader))
+    with torch.no_grad():
+        layer_index = 0
+        inputs = inputs.to(device)
+        inputs = inputs.view(inputs.size(0), -1)
+        # We need to manually loop through the layers to save all activations
+        for layer_index, layer in enumerate(net.layers[:-1]):
+            inputs = layer(inputs)
+            activations[layer_index] = inputs.view(-1).cpu().numpy()
+
+    # Plotting
+    columns = 4
+    rows = math.ceil(len(activations) / columns)
+    fig, ax = plt.subplots(rows, columns, figsize=(columns * 2.7, rows * 2.5))
+    fig_index = 0
+    for key in activations:
+        key_ax = ax[fig_index // columns][fig_index % columns]
+        sns.histplot(data=activations[key], bins=50, ax=key_ax, color=color, kde=True, stat="density")
+        key_ax.set_title(f"Layer {key} - {net.layers[key].__class__.__name__}")
+        fig_index += 1
+    fig.suptitle(f"Activation distribution for activation function {net.act_fn}", fontsize=14)
+    fig.subplots_adjust(hspace=0.4, wspace=0.4)
+    plt.show()
+    plt.close()

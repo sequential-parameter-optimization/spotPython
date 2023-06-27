@@ -9,10 +9,24 @@ from spotPython.hyperparameters.optimizer import optimizer_handler
 
 class NetLightBase(L.LightningModule):
     def __init__(
-        self, l1, epochs, batch_size, act_fn, optimizer, dropout_prob, lr_mult, patience=3, _L_in=64, _L_out=11
+        self,
+        l1,
+        epochs,
+        batch_size,
+        initialization,
+        act_fn,
+        optimizer,
+        dropout_prob,
+        lr_mult,
+        patience=3,
+        _L_in=64,
+        _L_out=11,
     ):
         super().__init__()
-        self.save_hyperparameters()
+
+        # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during checkpointing.
+        # It is recommended to ignore them using `self.save_hyperparameters(ignore=['act_fn'])`
+        self.save_hyperparameters(ignore=["act_fn"])
         self._L_out = _L_out
         if l1 < 4:
             raise ValueError("l1 must be at least 4")
@@ -21,6 +35,7 @@ class NetLightBase(L.LightningModule):
         self.epochs = epochs
         self.patience = patience
         self.batch_size = batch_size
+        self.initialization = initialization
         self.act_fn = act_fn
         self.optimizer = optimizer
         self.dropout_prob = dropout_prob
@@ -38,10 +53,10 @@ class NetLightBase(L.LightningModule):
             layer_size_last = layer_size
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
         # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
-        self.model = nn.Sequential(*layers)
+        self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.model(x)
+        x = self.layers(x)
         return F.softmax(x, dim=1)
 
     def training_step(self, batch):
