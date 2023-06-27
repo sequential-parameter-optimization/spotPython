@@ -1,13 +1,9 @@
 import lightning as L
-
-# from spotPython.light.mnistdatamodule import MNISTDataModule
 from spotPython.light.csvdatamodule import CSVDataModule
 from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
-
-# from spotPython.light.litmodel import LitModel
-
 from pytorch_lightning.loggers import TensorBoardLogger
+from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 
 
 def train_model(config, fun_control):
@@ -26,6 +22,7 @@ def train_model(config, fun_control):
         accelerator="auto",
         devices=1,
         logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id),
+        callbacks=[EarlyStopping(monitor="val_loss", patience=3, mode="min", strict=False, verbose=False)],
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
