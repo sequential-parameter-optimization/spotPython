@@ -105,7 +105,7 @@ if (typeof require !== 'undefined') {
 require.undef("plotly");
 requirejs.config({
     paths: {
-        'plotly': ['https://cdn.plot.ly/plotly-2.16.1.min']
+        'plotly': ['https://cdn.plot.ly/plotly-2.20.0.min']
     }
 });
 require(['plotly'], function(Plotly) {
@@ -414,8 +414,8 @@ Caution: Data must be downloaded manually
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython                        0.2.50
-spotRiver                         0.0.94</code></pre>
+<pre><code>spotPython               0.2.51
+spotRiver                0.0.94</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Note: you may need to restart the kernel to use updated packages.</code></pre>
@@ -587,19 +587,19 @@ Dataset Size: 707</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Batch Size: 3
 ---------------
-Inputs: tensor([[1., 1., 1., 0., 0., 1., 1., 1., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0.,
-         1., 1., 1., 1., 1., 1., 1., 0., 0., 1., 0., 1., 0., 0., 0., 0., 0., 1.,
-         1., 0., 0., 1., 0., 1., 1., 0., 1., 0., 1., 1., 1., 0., 0., 1., 1., 1.,
-         1., 1., 1., 1., 1., 0., 0., 0., 0., 0.],
-        [1., 0., 1., 0., 0., 0., 0., 0., 1., 1., 0., 1., 0., 1., 0., 1., 1., 1.,
-         1., 1., 1., 0., 1., 1., 1., 1., 1., 0., 1., 0., 1., 1., 0., 0., 1., 0.,
-         1., 1., 1., 1., 0., 0., 1., 1., 1., 1., 1., 1., 0., 0., 0., 1., 1., 1.,
-         1., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
-        [1., 0., 0., 0., 1., 0., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-         0., 0., 0., 1., 0., 0., 1., 0., 0., 0., 0., 0., 1., 0., 1., 1., 1., 1.,
-         0., 1., 1., 1., 0., 1., 1., 0., 1., 1., 0., 1., 0., 0., 0., 1., 1., 0.,
+Inputs: tensor([[1., 0., 0., 1., 1., 0., 1., 1., 1., 1., 0., 1., 0., 1., 1., 1., 1., 1.,
+         0., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 0., 0., 1., 1., 1.,
+         1., 1., 1., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],
+        [1., 1., 1., 1., 1., 1., 1., 0., 1., 1., 0., 0., 0., 1., 1., 1., 1., 1.,
+         1., 1., 1., 1., 1., 1., 1., 1., 0., 1., 1., 1., 0., 0., 1., 1., 1., 1.,
+         0., 1., 1., 1., 1., 0., 1., 1., 0., 1., 1., 1., 1., 1., 1., 1., 1., 1.,
+         0., 1., 1., 1., 1., 1., 0., 0., 1., 1.],
+        [0., 1., 1., 0., 1., 1., 1., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+         0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
          0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])
-Targets: tensor([4, 3, 2])</code></pre>
+Targets: tensor([8, 3, 1])</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-caution callout-titled">
@@ -753,9 +753,9 @@ Caution: Small number of epochs for demonstration purposes
 <div class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_bounds</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"l1"</span>, bounds<span class="op">=</span>[<span class="dv">7</span>,<span class="dv">10</span>])</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"epochs"</span>, bounds<span class="op">=</span>[<span class="dv">5</span>,<span class="dv">7</span>])</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"batch_size"</span>, bounds<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">8</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"l1"</span>, bounds<span class="op">=</span>[<span class="dv">6</span>,<span class="dv">13</span>])</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"epochs"</span>, bounds<span class="op">=</span>[<span class="dv">6</span>,<span class="dv">13</span>])</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> modify_hyper_parameter_bounds(fun_control, <span class="st">"batch_size"</span>, bounds<span class="op">=</span>[<span class="dv">2</span>, <span class="dv">8</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_levels</span>
@@ -769,17 +769,17 @@ Caution: Small number of epochs for demonstration purposes
 <pre><code>{'l1': {'type': 'int',
   'default': 3,
   'transform': 'transform_power_2_int',
-  'lower': 7,
-  'upper': 10},
+  'lower': 6,
+  'upper': 13},
  'epochs': {'type': 'int',
   'default': 4,
   'transform': 'transform_power_2_int',
-  'lower': 5,
-  'upper': 7},
+  'lower': 6,
+  'upper': 13},
  'batch_size': {'type': 'int',
   'default': 4,
   'transform': 'transform_power_2_int',
-  'lower': 3,
+  'lower': 2,
   'upper': 8},
  'act_fn': {'levels': ['Sigmoid', 'Tanh', 'ReLU', 'LeakyReLU', 'ELU', 'Swish'],
   'type': 'factor',
@@ -917,9 +917,9 @@ Caution: Loss Function and Metric in Lightning
 <div class="cell-output cell-output-stdout">
 <pre><code>| name           | type   | default   |   lower |   upper | transform             |
 |----------------|--------|-----------|---------|---------|-----------------------|
-| l1             | int    | 3         |     7   |    10   | transform_power_2_int |
-| epochs         | int    | 4         |     5   |     7   | transform_power_2_int |
-| batch_size     | int    | 4         |     3   |     8   | transform_power_2_int |
+| l1             | int    | 3         |     6   |    13   | transform_power_2_int |
+| epochs         | int    | 4         |     6   |    13   | transform_power_2_int |
+| batch_size     | int    | 4         |     2   |     8   | transform_power_2_int |
 | act_fn         | factor | ReLU      |     0   |     5   | None                  |
 | optimizer      | factor | SGD       |     0   |     3   | None                  |
 | dropout_prob   | float  | 0.01      |     0   |     0.1 | None                  |
@@ -975,25 +975,99 @@ Caution: Loss Function and Metric in Lightning
 <span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>spot_tuner.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-config: {'l1': 1024, 'epochs': 128, 'batch_size': 64, 'act_fn': ReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.04375810986688453, 'lr_mult': 4.211776903906428, 'patience': 16, 'initialization': 'Default'}
+config: {'l1': 4096, 'epochs': 4096, 'batch_size': 32, 'act_fn': ReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.04375810986688453, 'lr_mult': 4.211776903906428, 'patience': 16, 'initialization': 'Default'}
 model: NetLightBase(
   (act_fn): ReLU()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=1024, bias=True)
+    (0): Linear(in_features=64, out_features=4096, bias=True)
     (1): ReLU()
     (2): Dropout(p=0.04375810986688453, inplace=False)
-    (3): Linear(in_features=1024, out_features=512, bias=True)
+    (3): Linear(in_features=4096, out_features=2048, bias=True)
     (4): ReLU()
     (5): Dropout(p=0.04375810986688453, inplace=False)
-    (6): Linear(in_features=512, out_features=512, bias=True)
+    (6): Linear(in_features=2048, out_features=2048, bias=True)
     (7): ReLU()
     (8): Dropout(p=0.04375810986688453, inplace=False)
-    (9): Linear(in_features=512, out_features=256, bias=True)
+    (9): Linear(in_features=2048, out_features=1024, bias=True)
     (10): ReLU()
     (11): Dropout(p=0.04375810986688453, inplace=False)
+    (12): Linear(in_features=1024, out_features=11, bias=True)
+  )
+)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.458235025405884     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.08480565249919891    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.458235025405884     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.1751328706741333     </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_model result: {'valid_mapk': 0.1751328706741333, 'val_loss': 2.458235025405884, 'val_acc': 0.08480565249919891, 'hp_metric': 2.458235025405884}
+
+config: {'l1': 64, 'epochs': 128, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.005170658955305807, 'lr_mult': 0.832718394912432, 'patience': 8, 'initialization': 'Kaiming'}
+model: NetLightBase(
+  (act_fn): LeakyReLU()
+  (train_mapk): MAPK()
+  (valid_mapk): MAPK()
+  (test_mapk): MAPK()
+  (layers): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): LeakyReLU()
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
+    (4): LeakyReLU()
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
+    (7): LeakyReLU()
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
+    (10): LeakyReLU()
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
+  )
+)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2329816818237305     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.30035334825515747    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2329816818237305     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4217664897441864     </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_model result: {'valid_mapk': 0.4217664897441864, 'val_loss': 2.2329816818237305, 'val_acc': 0.30035334825515747, 'hp_metric': 2.2329816818237305}
+
+config: {'l1': 1024, 'epochs': 256, 'batch_size': 8, 'act_fn': Swish(), 'optimizer': 'NAdam', 'dropout_prob': 0.08834550718769361, 'lr_mult': 7.65501078489161, 'patience': 64, 'initialization': 'Xavier'}
+model: NetLightBase(
+  (act_fn): Swish()
+  (train_mapk): MAPK()
+  (valid_mapk): MAPK()
+  (test_mapk): MAPK()
+  (layers): Sequential(
+    (0): Linear(in_features=64, out_features=1024, bias=True)
+    (1): Swish()
+    (2): Dropout(p=0.08834550718769361, inplace=False)
+    (3): Linear(in_features=1024, out_features=512, bias=True)
+    (4): Swish()
+    (5): Dropout(p=0.08834550718769361, inplace=False)
+    (6): Linear(in_features=512, out_features=512, bias=True)
+    (7): Swish()
+    (8): Dropout(p=0.08834550718769361, inplace=False)
+    (9): Linear(in_features=512, out_features=256, bias=True)
+    (10): Swish()
+    (11): Dropout(p=0.08834550718769361, inplace=False)
     (12): Linear(in_features=256, out_features=11, bias=True)
   )
 )</code></pre>
@@ -1002,72 +1076,35 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3234684467315674     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.21908126771450043    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3234684467315674     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.28458720445632935    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4547009468078613     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.08833922445774078    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4547009468078613     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.16724537312984467    </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.28458720445632935, 'val_loss': 2.3234684467315674, 'val_acc': 0.21908126771450043, 'hp_metric': 2.3234684467315674}
+<pre><code>train_model result: {'valid_mapk': 0.16724537312984467, 'val_loss': 2.4547009468078613, 'val_acc': 0.08833922445774078, 'hp_metric': 2.4547009468078613}
 
-config: {'l1': 128, 'epochs': 32, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.005170658955305807, 'lr_mult': 0.832718394912432, 'patience': 8, 'initialization': 'Kaiming'}
+config: {'l1': 512, 'epochs': 512, 'batch_size': 16, 'act_fn': Sigmoid(), 'optimizer': 'Adam', 'dropout_prob': 0.07563714253500024, 'lr_mult': 2.3450676871382794, 'patience': 32, 'initialization': 'Kaiming'}
 model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.005170658955305807, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.005170658955305807, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.005170658955305807, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.005170658955305807, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2648348808288574     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.27915194630622864    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2648348808288574     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3821132183074951     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.3821132183074951, 'val_loss': 2.2648348808288574, 'val_acc': 0.27915194630622864, 'hp_metric': 2.2648348808288574}
-
-config: {'l1': 512, 'epochs': 64, 'batch_size': 16, 'act_fn': Swish(), 'optimizer': 'NAdam', 'dropout_prob': 0.08834550718769361, 'lr_mult': 7.65501078489161, 'patience': 64, 'initialization': 'Xavier'}
-model: NetLightBase(
-  (act_fn): Swish()
+  (act_fn): Sigmoid()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
     (0): Linear(in_features=64, out_features=512, bias=True)
-    (1): Swish()
-    (2): Dropout(p=0.08834550718769361, inplace=False)
+    (1): Sigmoid()
+    (2): Dropout(p=0.07563714253500024, inplace=False)
     (3): Linear(in_features=512, out_features=256, bias=True)
-    (4): Swish()
-    (5): Dropout(p=0.08834550718769361, inplace=False)
+    (4): Sigmoid()
+    (5): Dropout(p=0.07563714253500024, inplace=False)
     (6): Linear(in_features=256, out_features=256, bias=True)
-    (7): Swish()
-    (8): Dropout(p=0.08834550718769361, inplace=False)
+    (7): Sigmoid()
+    (8): Dropout(p=0.07563714253500024, inplace=False)
     (9): Linear(in_features=256, out_features=128, bias=True)
-    (10): Swish()
-    (11): Dropout(p=0.08834550718769361, inplace=False)
+    (10): Sigmoid()
+    (11): Dropout(p=0.07563714253500024, inplace=False)
     (12): Linear(in_features=128, out_features=11, bias=True)
   )
 )</code></pre>
@@ -1076,54 +1113,17 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4511682987213135     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.09187278896570206    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4511682987213135     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.1778198629617691     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2733662128448486     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">     0.268551230430603     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2733662128448486     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.33696338534355164    </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.1778198629617691, 'val_loss': 2.4511682987213135, 'val_acc': 0.09187278896570206, 'hp_metric': 2.4511682987213135}
+<pre><code>train_model result: {'valid_mapk': 0.33696338534355164, 'val_loss': 2.2733662128448486, 'val_acc': 0.268551230430603, 'hp_metric': 2.2733662128448486}
 
-config: {'l1': 256, 'epochs': 64, 'batch_size': 16, 'act_fn': Sigmoid(), 'optimizer': 'Adam', 'dropout_prob': 0.07563714253500024, 'lr_mult': 2.3450676871382794, 'patience': 32, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): Sigmoid()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=256, bias=True)
-    (1): Sigmoid()
-    (2): Dropout(p=0.07563714253500024, inplace=False)
-    (3): Linear(in_features=256, out_features=128, bias=True)
-    (4): Sigmoid()
-    (5): Dropout(p=0.07563714253500024, inplace=False)
-    (6): Linear(in_features=128, out_features=128, bias=True)
-    (7): Sigmoid()
-    (8): Dropout(p=0.07563714253500024, inplace=False)
-    (9): Linear(in_features=128, out_features=64, bias=True)
-    (10): Sigmoid()
-    (11): Dropout(p=0.07563714253500024, inplace=False)
-    (12): Linear(in_features=64, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2770135402679443     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2614840865135193     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2770135402679443     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.34932658076286316    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.34932658076286316, 'val_loss': 2.2770135402679443, 'val_acc': 0.2614840865135193, 'hp_metric': 2.2770135402679443}
-
-config: {'l1': 256, 'epochs': 128, 'batch_size': 128, 'act_fn': ReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.02833523179697884, 'lr_mult': 9.528945328733357, 'patience': 4, 'initialization': 'Xavier'}
+config: {'l1': 256, 'epochs': 4096, 'batch_size': 64, 'act_fn': ReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.02833523179697884, 'lr_mult': 9.528945328733357, 'patience': 4, 'initialization': 'Xavier'}
 model: NetLightBase(
   (act_fn): ReLU()
   (train_mapk): MAPK()
@@ -1150,37 +1150,77 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.302140951156616     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3004534244537354     </span>│
 │<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.23674911260604858    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.302140951156616     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3054752051830292     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3004534244537354     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2987654209136963     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.3054752051830292, 'val_loss': 2.302140951156616, 'val_acc': 0.23674911260604858, 'hp_metric': 2.302140951156616}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.2987654209136963, 'val_loss': 2.3004534244537354, 'val_acc': 0.23674911260604858, 'hp_metric': 2.3004534244537354}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-config: {'l1': 128, 'epochs': 32, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.00147908939268937, 'lr_mult': 1.0752266899289973, 'patience': 16, 'initialization': 'Kaiming'}
+config: {'l1': 64, 'epochs': 64, 'batch_size': 256, 'act_fn': ReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.0057308353644435995, 'lr_mult': 0.12746123603776952, 'patience': 8, 'initialization': 'Kaiming'}
 model: NetLightBase(
-  (act_fn): LeakyReLU()
+  (act_fn): ReLU()
+  (train_mapk): MAPK()
+  (valid_mapk): MAPK()
+  (test_mapk): MAPK()
+  (layers): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.0057308353644435995, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
+    (4): ReLU()
+    (5): Dropout(p=0.0057308353644435995, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
+    (7): ReLU()
+    (8): Dropout(p=0.0057308353644435995, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
+    (10): ReLU()
+    (11): Dropout(p=0.0057308353644435995, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
+  )
+)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3844985961914062     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.1236749142408371     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3844985961914062     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.21562740206718445    </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_model result: {'valid_mapk': 0.21562740206718445, 'val_loss': 2.3844985961914062, 'val_acc': 0.1236749142408371, 'hp_metric': 2.3844985961914062}
+spotPython tuning: 2.2329816818237305 [----------] 2.80% </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+config: {'l1': 128, 'epochs': 512, 'batch_size': 16, 'act_fn': ELU(), 'optimizer': 'Adamax', 'dropout_prob': 0.0756380926179772, 'lr_mult': 2.3450649482576313, 'patience': 32, 'initialization': 'Kaiming'}
+model: NetLightBase(
+  (act_fn): ELU()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
     (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.00147908939268937, inplace=False)
+    (1): ELU()
+    (2): Dropout(p=0.0756380926179772, inplace=False)
     (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.00147908939268937, inplace=False)
+    (4): ELU()
+    (5): Dropout(p=0.0756380926179772, inplace=False)
     (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.00147908939268937, inplace=False)
+    (7): ELU()
+    (8): Dropout(p=0.0756380926179772, inplace=False)
     (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.00147908939268937, inplace=False)
+    (10): ELU()
+    (11): Dropout(p=0.0756380926179772, inplace=False)
     (12): Linear(in_features=32, out_features=11, bias=True)
   )
 )</code></pre>
@@ -1189,41 +1229,41 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2760536670684814     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.24381625652313232    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2760536670684814     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">     0.385239839553833     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.263234853744507     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">     0.268551230430603     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.263234853744507     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3856271207332611     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.385239839553833, 'val_loss': 2.2760536670684814, 'val_acc': 0.24381625652313232, 'hp_metric': 2.2760536670684814}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.3856271207332611, 'val_loss': 2.263234853744507, 'val_acc': 0.268551230430603, 'hp_metric': 2.263234853744507}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.2648348808288574 [----------] 4.54% </code></pre>
+<pre><code>spotPython tuning: 2.2329816818237305 [#---------] 11.18% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-config: {'l1': 128, 'epochs': 64, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.0, 'lr_mult': 6.5400267229367035, 'patience': 4, 'initialization': 'Default'}
+config: {'l1': 512, 'epochs': 128, 'batch_size': 8, 'act_fn': Tanh(), 'optimizer': 'NAdam', 'dropout_prob': 0.005170536012710651, 'lr_mult': 0.8327083710883477, 'patience': 8, 'initialization': 'Kaiming'}
 model: NetLightBase(
-  (act_fn): LeakyReLU()
+  (act_fn): Tanh()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.0, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.0, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.0, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.0, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (0): Linear(in_features=64, out_features=512, bias=True)
+    (1): Tanh()
+    (2): Dropout(p=0.005170536012710651, inplace=False)
+    (3): Linear(in_features=512, out_features=256, bias=True)
+    (4): Tanh()
+    (5): Dropout(p=0.005170536012710651, inplace=False)
+    (6): Linear(in_features=256, out_features=256, bias=True)
+    (7): Tanh()
+    (8): Dropout(p=0.005170536012710651, inplace=False)
+    (9): Linear(in_features=256, out_features=128, bias=True)
+    (10): Tanh()
+    (11): Dropout(p=0.005170536012710651, inplace=False)
+    (12): Linear(in_features=128, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -1231,44 +1271,83 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2655727863311768     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2661986351013184     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2720848023891449     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2661986351013184     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.36516207456588745    </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_model result: {'valid_mapk': 0.36516207456588745, 'val_loss': 2.2661986351013184, 'val_acc': 0.2720848023891449, 'hp_metric': 2.2661986351013184}</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spotPython tuning: 2.2329816818237305 [###-------] 26.67% </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+config: {'l1': 256, 'epochs': 4096, 'batch_size': 128, 'act_fn': ReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.02833522259075095, 'lr_mult': 9.5289448927627, 'patience': 8, 'initialization': 'Xavier'}
+model: NetLightBase(
+  (act_fn): ReLU()
+  (train_mapk): MAPK()
+  (valid_mapk): MAPK()
+  (test_mapk): MAPK()
+  (layers): Sequential(
+    (0): Linear(in_features=64, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.02833522259075095, inplace=False)
+    (3): Linear(in_features=256, out_features=128, bias=True)
+    (4): ReLU()
+    (5): Dropout(p=0.02833522259075095, inplace=False)
+    (6): Linear(in_features=128, out_features=128, bias=True)
+    (7): ReLU()
+    (8): Dropout(p=0.02833522259075095, inplace=False)
+    (9): Linear(in_features=128, out_features=64, bias=True)
+    (10): ReLU()
+    (11): Dropout(p=0.02833522259075095, inplace=False)
+    (12): Linear(in_features=64, out_features=11, bias=True)
+  )
+)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2677416801452637     </span>│
 │<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.26501765847206116    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2655727863311768     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3856698274612427     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2677416801452637     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.34780094027519226    </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.3856698274612427, 'val_loss': 2.2655727863311768, 'val_acc': 0.26501765847206116, 'hp_metric': 2.2655727863311768}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.34780094027519226, 'val_loss': 2.2677416801452637, 'val_acc': 0.26501765847206116, 'hp_metric': 2.2677416801452637}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.2648348808288574 [#---------] 10.61% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 128, 'epochs': 32, 'batch_size': 256, 'act_fn': Sigmoid(), 'optimizer': 'Adam', 'dropout_prob': 0.1, 'lr_mult': 0.10000000000000053, 'patience': 8, 'initialization': 'Kaiming'}</code></pre>
+<pre><code>spotPython tuning: 2.2329816818237305 [###-------] 30.19% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
+config: {'l1': 512, 'epochs': 128, 'batch_size': 8, 'act_fn': Tanh(), 'optimizer': 'NAdam', 'dropout_prob': 0.005170926446269222, 'lr_mult': 0.8327400103396447, 'patience': 8, 'initialization': 'Kaiming'}
 model: NetLightBase(
-  (act_fn): Sigmoid()
+  (act_fn): Tanh()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): Sigmoid()
-    (2): Dropout(p=0.1, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): Sigmoid()
-    (5): Dropout(p=0.1, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): Sigmoid()
-    (8): Dropout(p=0.1, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): Sigmoid()
-    (11): Dropout(p=0.1, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (0): Linear(in_features=64, out_features=512, bias=True)
+    (1): Tanh()
+    (2): Dropout(p=0.005170926446269222, inplace=False)
+    (3): Linear(in_features=512, out_features=256, bias=True)
+    (4): Tanh()
+    (5): Dropout(p=0.005170926446269222, inplace=False)
+    (6): Linear(in_features=256, out_features=256, bias=True)
+    (7): Tanh()
+    (8): Dropout(p=0.005170926446269222, inplace=False)
+    (9): Linear(in_features=256, out_features=128, bias=True)
+    (10): Tanh()
+    (11): Dropout(p=0.005170926446269222, inplace=False)
+    (12): Linear(in_features=128, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -1276,251 +1355,41 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3945162296295166     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.11307420581579208    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3945162296295166     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2007981240749359     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.2007981240749359, 'val_loss': 2.3945162296295166, 'val_acc': 0.11307420581579208, 'hp_metric': 2.3945162296295166}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.2648348808288574 [##--------] 16.76% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 128, 'epochs': 32, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.1, 'lr_mult': 0.10000000000000009, 'patience': 32, 'initialization': 'Default'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.1, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.1, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.1, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.1, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3974363803863525     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.15547703206539154    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3974363803863525     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.16636526584625244    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.16636526584625244, 'val_loss': 2.3974363803863525, 'val_acc': 0.15547703206539154, 'hp_metric': 2.3974363803863525}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.2648348808288574 [##--------] 20.96% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 128, 'epochs': 64, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.005410283967863825, 'lr_mult': 6.748234140091307, 'patience': 32, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.235407590866089     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.30035334825515747    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.235407590866089     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4498577117919922     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.4498577117919922, 'val_loss': 2.235407590866089, 'val_acc': 0.30035334825515747, 'hp_metric': 2.235407590866089}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [###-------] 25.23% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 256, 'epochs': 64, 'batch_size': 16, 'act_fn': LeakyReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.01092951864482135, 'lr_mult': 10.0, 'patience': 32, 'initialization': 'Default'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=256, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.01092951864482135, inplace=False)
-    (3): Linear(in_features=256, out_features=128, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.01092951864482135, inplace=False)
-    (6): Linear(in_features=128, out_features=128, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.01092951864482135, inplace=False)
-    (9): Linear(in_features=128, out_features=64, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.01092951864482135, inplace=False)
-    (12): Linear(in_features=64, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.401698350906372     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.14134275913238525    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.401698350906372     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.22632575035095215    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.22632575035095215, 'val_loss': 2.401698350906372, 'val_acc': 0.14134275913238525, 'hp_metric': 2.401698350906372}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [####------] 35.39% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 128, 'epochs': 64, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'NAdam', 'dropout_prob': 0.00899518733143736, 'lr_mult': 10.0, 'patience': 32, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.00899518733143736, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.00899518733143736, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.00899518733143736, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.00899518733143736, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4260430335998535     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.11660777032375336    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4260430335998535     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.20526300370693207    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.20526300370693207, 'val_loss': 2.4260430335998535, 'val_acc': 0.11660777032375336, 'hp_metric': 2.4260430335998535}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [####------] 39.41% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 256, 'epochs': 64, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.010835406635652793, 'lr_mult': 6.906652374057626, 'patience': 64, 'initialization': 'Default'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=256, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.010835406635652793, inplace=False)
-    (3): Linear(in_features=256, out_features=128, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.010835406635652793, inplace=False)
-    (6): Linear(in_features=128, out_features=128, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.010835406635652793, inplace=False)
-    (9): Linear(in_features=128, out_features=64, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.010835406635652793, inplace=False)
-    (12): Linear(in_features=64, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3303024768829346     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.31839656829834      </span>│
 │<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.21201413869857788    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.3303024768829346     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3230452537536621     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.31839656829834      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3350694179534912     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.3230452537536621, 'val_loss': 2.3303024768829346, 'val_acc': 0.21201413869857788, 'hp_metric': 2.3303024768829346}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.3350694179534912, 'val_loss': 2.31839656829834, 'val_acc': 0.21201413869857788, 'hp_metric': 2.31839656829834}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [#####-----] 46.70% </code></pre>
+<pre><code>spotPython tuning: 2.2329816818237305 [####------] 37.67% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-config: {'l1': 256, 'epochs': 32, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.010168422249530674, 'lr_mult': 0.3979310825141637, 'patience': 4, 'initialization': 'Kaiming'}
+config: {'l1': 64, 'epochs': 128, 'batch_size': 16, 'act_fn': Tanh(), 'optimizer': 'NAdam', 'dropout_prob': 0.0051691451807639194, 'lr_mult': 0.8325972770237184, 'patience': 32, 'initialization': 'Kaiming'}
 model: NetLightBase(
-  (act_fn): LeakyReLU()
+  (act_fn): Tanh()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=256, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.010168422249530674, inplace=False)
-    (3): Linear(in_features=256, out_features=128, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.010168422249530674, inplace=False)
-    (6): Linear(in_features=128, out_features=128, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.010168422249530674, inplace=False)
-    (9): Linear(in_features=128, out_features=64, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.010168422249530674, inplace=False)
-    (12): Linear(in_features=64, out_features=11, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): Tanh()
+    (2): Dropout(p=0.0051691451807639194, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
+    (4): Tanh()
+    (5): Dropout(p=0.0051691451807639194, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
+    (7): Tanh()
+    (8): Dropout(p=0.0051691451807639194, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
+    (10): Tanh()
+    (11): Dropout(p=0.0051691451807639194, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -1528,22 +1397,64 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2467353343963623     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.30388692021369934    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2467353343963623     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4136767089366913     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2918200492858887     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.23674911260604858    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2918200492858887     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3379629850387573     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.4136767089366913, 'val_loss': 2.2467353343963623, 'val_acc': 0.30388692021369934, 'hp_metric': 2.2467353343963623}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.3379629850387573, 'val_loss': 2.2918200492858887, 'val_acc': 0.23674911260604858, 'hp_metric': 2.2918200492858887}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [#####-----] 50.64% </code></pre>
+<pre><code>spotPython tuning: 2.2329816818237305 [#####-----] 45.83% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-config: {'l1': 128, 'epochs': 64, 'batch_size': 16, 'act_fn': ReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.0, 'lr_mult': 6.251645303354199, 'patience': 8, 'initialization': 'Kaiming'}
+config: {'l1': 64, 'epochs': 128, 'batch_size': 16, 'act_fn': Tanh(), 'optimizer': 'NAdam', 'dropout_prob': 0.005171440031826116, 'lr_mult': 0.8327818027362548, 'patience': 32, 'initialization': 'Kaiming'}
+model: NetLightBase(
+  (act_fn): Tanh()
+  (train_mapk): MAPK()
+  (valid_mapk): MAPK()
+  (test_mapk): MAPK()
+  (layers): Sequential(
+    (0): Linear(in_features=64, out_features=64, bias=True)
+    (1): Tanh()
+    (2): Dropout(p=0.005171440031826116, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
+    (4): Tanh()
+    (5): Dropout(p=0.005171440031826116, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
+    (7): Tanh()
+    (8): Dropout(p=0.005171440031826116, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
+    (10): Tanh()
+    (11): Dropout(p=0.005171440031826116, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
+  )
+)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.295330047607422     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2473498284816742     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.295330047607422     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.33101850748062134    </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_model result: {'valid_mapk': 0.33101850748062134, 'val_loss': 2.295330047607422, 'val_acc': 0.2473498284816742, 'hp_metric': 2.295330047607422}</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spotPython tuning: 2.2329816818237305 [######----] 59.07% </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+config: {'l1': 128, 'epochs': 128, 'batch_size': 8, 'act_fn': ReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.005168205606205038, 'lr_mult': 0.8325345237459943, 'patience': 8, 'initialization': 'Kaiming'}
 model: NetLightBase(
   (act_fn): ReLU()
   (train_mapk): MAPK()
@@ -1552,16 +1463,16 @@ model: NetLightBase(
   (layers): Sequential(
     (0): Linear(in_features=64, out_features=128, bias=True)
     (1): ReLU()
-    (2): Dropout(p=0.0, inplace=False)
+    (2): Dropout(p=0.005168205606205038, inplace=False)
     (3): Linear(in_features=128, out_features=64, bias=True)
     (4): ReLU()
-    (5): Dropout(p=0.0, inplace=False)
+    (5): Dropout(p=0.005168205606205038, inplace=False)
     (6): Linear(in_features=64, out_features=64, bias=True)
     (7): ReLU()
-    (8): Dropout(p=0.0, inplace=False)
+    (8): Dropout(p=0.005168205606205038, inplace=False)
     (9): Linear(in_features=64, out_features=32, bias=True)
     (10): ReLU()
-    (11): Dropout(p=0.0, inplace=False)
+    (11): Dropout(p=0.005168205606205038, inplace=False)
     (12): Linear(in_features=32, out_features=11, bias=True)
   )
 )</code></pre>
@@ -1570,125 +1481,85 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.317075490951538     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.21554769575595856    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.317075490951538     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3116056025028229     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.3116056025028229, 'val_loss': 2.317075490951538, 'val_acc': 0.21554769575595856, 'hp_metric': 2.317075490951538}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [######----] 55.26% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 256, 'epochs': 32, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.017032402495548216, 'lr_mult': 0.1, 'patience': 4, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=256, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.017032402495548216, inplace=False)
-    (3): Linear(in_features=256, out_features=128, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.017032402495548216, inplace=False)
-    (6): Linear(in_features=128, out_features=128, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.017032402495548216, inplace=False)
-    (9): Linear(in_features=128, out_features=64, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.017032402495548216, inplace=False)
-    (12): Linear(in_features=64, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.329146146774292     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.25088340044021606    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.329146146774292     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.34129050374031067    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.34129050374031067, 'val_loss': 2.329146146774292, 'val_acc': 0.25088340044021606, 'hp_metric': 2.329146146774292}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [######----] 58.92% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 1024, 'epochs': 64, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.008891593286542805, 'lr_mult': 0.4334837589006342, 'patience': 8, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=1024, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.008891593286542805, inplace=False)
-    (3): Linear(in_features=1024, out_features=512, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.008891593286542805, inplace=False)
-    (6): Linear(in_features=512, out_features=512, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.008891593286542805, inplace=False)
-    (9): Linear(in_features=512, out_features=256, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.008891593286542805, inplace=False)
-    (12): Linear(in_features=256, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2644355297088623     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2576189041137695     </span>│
 │<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">     0.268551230430603     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2644355297088623     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.40575167536735535    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2576189041137695     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.36342597007751465    </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.40575167536735535, 'val_loss': 2.2644355297088623, 'val_acc': 0.268551230430603, 'hp_metric': 2.2644355297088623}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.36342597007751465, 'val_loss': 2.2576189041137695, 'val_acc': 0.268551230430603, 'hp_metric': 2.2576189041137695}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [######----] 62.85% </code></pre>
+<pre><code>spotPython tuning: 2.2329816818237305 [#######---] 71.19% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-config: {'l1': 512, 'epochs': 64, 'batch_size': 16, 'act_fn': Sigmoid(), 'optimizer': 'AdamW', 'dropout_prob': 0.003937815969805521, 'lr_mult': 6.755223507633317, 'patience': 32, 'initialization': 'Kaiming'}
+config: {'l1': 512, 'epochs': 128, 'batch_size': 256, 'act_fn': ReLU(), 'optimizer': 'NAdam', 'dropout_prob': 0.005165563024496982, 'lr_mult': 0.8323238173327993, 'patience': 8, 'initialization': 'Kaiming'}
 model: NetLightBase(
+  (act_fn): ReLU()
+  (train_mapk): MAPK()
+  (valid_mapk): MAPK()
+  (test_mapk): MAPK()
+  (layers): Sequential(
+    (0): Linear(in_features=64, out_features=512, bias=True)
+    (1): ReLU()
+    (2): Dropout(p=0.005165563024496982, inplace=False)
+    (3): Linear(in_features=512, out_features=256, bias=True)
+    (4): ReLU()
+    (5): Dropout(p=0.005165563024496982, inplace=False)
+    (6): Linear(in_features=256, out_features=256, bias=True)
+    (7): ReLU()
+    (8): Dropout(p=0.005165563024496982, inplace=False)
+    (9): Linear(in_features=256, out_features=128, bias=True)
+    (10): ReLU()
+    (11): Dropout(p=0.005165563024496982, inplace=False)
+    (12): Linear(in_features=128, out_features=11, bias=True)
+  )
+)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2586112022399902     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2826855182647705     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2586112022399902     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3413628339767456     </span>│
+└───────────────────────────┴───────────────────────────┘
+</pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>train_model result: {'valid_mapk': 0.3413628339767456, 'val_loss': 2.2586112022399902, 'val_acc': 0.2826855182647705, 'hp_metric': 2.2586112022399902}</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spotPython tuning: 2.2329816818237305 [#######---] 73.82% </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+config: {'l1': 4096, 'epochs': 512, 'batch_size': 32, 'act_fn': Sigmoid(), 'optimizer': 'Adamax', 'dropout_prob': 0.07563837577587414, 'lr_mult': 2.345074960681534, 'patience': 16, 'initialization': 'Kaiming'}</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>model: NetLightBase(
   (act_fn): Sigmoid()
   (train_mapk): MAPK()
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=512, bias=True)
+    (0): Linear(in_features=64, out_features=4096, bias=True)
     (1): Sigmoid()
-    (2): Dropout(p=0.003937815969805521, inplace=False)
-    (3): Linear(in_features=512, out_features=256, bias=True)
+    (2): Dropout(p=0.07563837577587414, inplace=False)
+    (3): Linear(in_features=4096, out_features=2048, bias=True)
     (4): Sigmoid()
-    (5): Dropout(p=0.003937815969805521, inplace=False)
-    (6): Linear(in_features=256, out_features=256, bias=True)
+    (5): Dropout(p=0.07563837577587414, inplace=False)
+    (6): Linear(in_features=2048, out_features=2048, bias=True)
     (7): Sigmoid()
-    (8): Dropout(p=0.003937815969805521, inplace=False)
-    (9): Linear(in_features=256, out_features=128, bias=True)
+    (8): Dropout(p=0.07563837577587414, inplace=False)
+    (9): Linear(in_features=2048, out_features=1024, bias=True)
     (10): Sigmoid()
-    (11): Dropout(p=0.003937815969805521, inplace=False)
-    (12): Linear(in_features=128, out_features=11, bias=True)
+    (11): Dropout(p=0.07563837577587414, inplace=False)
+    (12): Linear(in_features=1024, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -1696,232 +1567,22 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.292844295501709     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.21908126771450043    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.292844295501709     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">     0.310079962015152     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.388317346572876     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.12720848619937897    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.388317346572876     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2222650647163391     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.310079962015152, 'val_loss': 2.292844295501709, 'val_acc': 0.21908126771450043, 'hp_metric': 2.292844295501709}</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.2222650647163391, 'val_loss': 2.388317346572876, 'val_acc': 0.12720848619937897, 'hp_metric': 2.388317346572876}</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [########--] 79.67% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 1024, 'epochs': 64, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.00969894222013007, 'lr_mult': 0.4584612086889453, 'patience': 8, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=1024, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.00969894222013007, inplace=False)
-    (3): Linear(in_features=1024, out_features=512, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.00969894222013007, inplace=False)
-    (6): Linear(in_features=512, out_features=512, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.00969894222013007, inplace=False)
-    (9): Linear(in_features=512, out_features=256, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.00969894222013007, inplace=False)
-    (12): Linear(in_features=256, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2968060970306396     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.24028268456459045    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2968060970306396     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3265174925327301     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.3265174925327301, 'val_loss': 2.2968060970306396, 'val_acc': 0.24028268456459045, 'hp_metric': 2.2968060970306396}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [########--] 84.30% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 1024, 'epochs': 64, 'batch_size': 32, 'act_fn': LeakyReLU(), 'optimizer': 'AdamW', 'dropout_prob': 0.0030486518813622513, 'lr_mult': 6.651775910569058, 'patience': 8, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=1024, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.0030486518813622513, inplace=False)
-    (3): Linear(in_features=1024, out_features=512, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.0030486518813622513, inplace=False)
-    (6): Linear(in_features=512, out_features=512, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.0030486518813622513, inplace=False)
-    (9): Linear(in_features=512, out_features=256, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.0030486518813622513, inplace=False)
-    (12): Linear(in_features=256, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4547014236450195     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.08833922445774078    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.4547014236450195     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.17118912935256958    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.17118912935256958, 'val_loss': 2.4547014236450195, 'val_acc': 0.08833922445774078, 'hp_metric': 2.4547014236450195}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [#########-] 88.97% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 512, 'epochs': 128, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'NAdam', 'dropout_prob': 0.0, 'lr_mult': 4.0047452006296504, 'patience': 32, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=512, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.0, inplace=False)
-    (3): Linear(in_features=512, out_features=256, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.0, inplace=False)
-    (6): Linear(in_features=256, out_features=256, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.0, inplace=False)
-    (9): Linear(in_features=256, out_features=128, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.0, inplace=False)
-    (12): Linear(in_features=128, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.321242570877075     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2226148396730423     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.321242570877075     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">     0.298382043838501     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.298382043838501, 'val_loss': 2.321242570877075, 'val_acc': 0.2226148396730423, 'hp_metric': 2.321242570877075}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [#########-] 94.39% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 1024, 'epochs': 64, 'batch_size': 128, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.005473793889002229, 'lr_mult': 0.44915068254485657, 'patience': 8, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=1024, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.005473793889002229, inplace=False)
-    (3): Linear(in_features=1024, out_features=512, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.005473793889002229, inplace=False)
-    (6): Linear(in_features=512, out_features=512, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.005473793889002229, inplace=False)
-    (9): Linear(in_features=512, out_features=256, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.005473793889002229, inplace=False)
-    (12): Linear(in_features=256, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2467963695526123     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.2968197762966156     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2467963695526123     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">     0.377861350774765     </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.377861350774765, 'val_loss': 2.2467963695526123, 'val_acc': 0.2968197762966156, 'hp_metric': 2.2467963695526123}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [##########] 99.95% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 1024, 'epochs': 64, 'batch_size': 256, 'act_fn': LeakyReLU(), 'optimizer': 'Adamax', 'dropout_prob': 0.005739155710200516, 'lr_mult': 6.552194949351319, 'patience': 4, 'initialization': 'Kaiming'}
-model: NetLightBase(
-  (act_fn): LeakyReLU()
-  (train_mapk): MAPK()
-  (valid_mapk): MAPK()
-  (test_mapk): MAPK()
-  (layers): Sequential(
-    (0): Linear(in_features=64, out_features=1024, bias=True)
-    (1): LeakyReLU()
-    (2): Dropout(p=0.005739155710200516, inplace=False)
-    (3): Linear(in_features=1024, out_features=512, bias=True)
-    (4): LeakyReLU()
-    (5): Dropout(p=0.005739155710200516, inplace=False)
-    (6): Linear(in_features=512, out_features=512, bias=True)
-    (7): LeakyReLU()
-    (8): Dropout(p=0.005739155710200516, inplace=False)
-    (9): Linear(in_features=512, out_features=256, bias=True)
-    (10): LeakyReLU()
-    (11): Dropout(p=0.005739155710200516, inplace=False)
-    (12): Linear(in_features=256, out_features=11, bias=True)
-  )
-)</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.444101095199585     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.0989399328827858     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.444101095199585     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.15774497389793396    </span>│
-└───────────────────────────┴───────────────────────────┘
-</pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.15774497389793396, 'val_loss': 2.444101095199585, 'val_acc': 0.0989399328827858, 'hp_metric': 2.444101095199585}</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.235407590866089 [##########] 100.00% Done...
+<pre><code>spotPython tuning: 2.2329816818237305 [##########] 100.00% Done...
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="18">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x18ddddb40&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x16ce50e50&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -1934,8 +1595,8 @@ model: NetLightBase(
 <h2 data-number="21.10" class="anchored" data-anchor-id="sec-results-30"><span class="header-section-number">21.10</span> Step 10: Results</h2>
 <p>After the hyperparameter tuning run is finished, the results can be analyzed as described in <a href="14_spot_ray_hpt_torch_cifar10.html#sec-results-14"><span>Section&nbsp;14.10</span></a>.</p>
 <div class="cell" data-fig-label="fig-progress-30" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1946,25 +1607,25 @@ model: NetLightBase(
 </div>
 </div>
 <div class="cell" data-fig-label="tbl-results-30" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>| name           | type   | default   |   lower |   upper |                tuned | transform             |   importance | stars   |
 |----------------|--------|-----------|---------|---------|----------------------|-----------------------|--------------|---------|
-| l1             | int    | 3         |     7.0 |    10.0 |                  7.0 | transform_power_2_int |         0.22 | .       |
-| epochs         | int    | 4         |     5.0 |     7.0 |                  6.0 | transform_power_2_int |         0.00 |         |
-| batch_size     | int    | 4         |     3.0 |     8.0 |                  8.0 | transform_power_2_int |         0.00 |         |
-| act_fn         | factor | ReLU      |     0.0 |     5.0 |                  3.0 | None                  |       100.00 | ***     |
+| l1             | int    | 3         |     6.0 |    13.0 |                  6.0 | transform_power_2_int |         0.12 | .       |
+| epochs         | int    | 4         |     6.0 |    13.0 |                  7.0 | transform_power_2_int |       100.00 | ***     |
+| batch_size     | int    | 4         |     2.0 |     8.0 |                  8.0 | transform_power_2_int |         0.00 |         |
+| act_fn         | factor | ReLU      |     0.0 |     5.0 |                  3.0 | None                  |         0.00 |         |
 | optimizer      | factor | SGD       |     0.0 |     3.0 |                  2.0 | None                  |         0.00 |         |
-| dropout_prob   | float  | 0.01      |     0.0 |     0.1 | 0.005410283967863825 | None                  |         7.34 | *       |
-| lr_mult        | float  | 1.0       |     0.1 |    10.0 |    6.748234140091307 | None                  |         5.47 | *       |
-| patience       | int    | 2         |     2.0 |     6.0 |                  5.0 | transform_power_2_int |         0.00 |         |
-| initialization | factor | Default   |     0.0 |     2.0 |                  1.0 | None                  |         0.00 |         |</code></pre>
+| dropout_prob   | float  | 0.01      |     0.0 |     0.1 | 0.005170658955305807 | None                  |         0.35 | .       |
+| lr_mult        | float  | 1.0       |     0.1 |    10.0 |    0.832718394912432 | None                  |        98.68 | ***     |
+| patience       | int    | 2         |     2.0 |     6.0 |                  3.0 | transform_power_2_int |         0.07 |         |
+| initialization | factor | Default   |     0.0 |     2.0 |                  1.0 | None                  |       100.00 | ***     |</code></pre>
 </div>
 </div>
 <div class="cell" data-fig-label="fig-importance-30" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>,</span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>,</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -1977,19 +1638,19 @@ model: NetLightBase(
 <section id="sec-get-spot-results-30" class="level3" data-number="21.10.1">
 <h3 data-number="21.10.1" class="anchored" data-anchor-id="sec-get-spot-results-30"><span class="header-section-number">21.10.1</span> Get the Tuned Architecture</h3>
 <div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_config_from_X</span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_one_config_from_X(X, fun_control)</span>
-<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>config</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_config_from_X</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_one_config_from_X(X, fun_control)</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>config</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="22">
-<pre><code>{'l1': 128,
- 'epochs': 64,
+<pre><code>{'l1': 64,
+ 'epochs': 128,
  'batch_size': 256,
  'act_fn': LeakyReLU(),
  'optimizer': 'Adamax',
- 'dropout_prob': 0.005410283967863825,
- 'lr_mult': 6.748234140091307,
- 'patience': 32,
+ 'dropout_prob': 0.005170658955305807,
+ 'lr_mult': 0.832718394912432,
+ 'patience': 8,
  'initialization': 'Kaiming'}</code></pre>
 </div>
 </div>
@@ -1997,8 +1658,8 @@ model: NetLightBase(
 <li>Test on the full data set</li>
 </ul>
 <div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.light.traintest <span class="im">import</span> test_model</span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>test_model(config, fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.light.traintest <span class="im">import</span> test_model</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>test_model(config, fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2006,19 +1667,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2026,17 +1687,18 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">        Test metric        </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">      test_mapk_epoch      </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5770321488380432     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5261669158935547     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.0120155811309814     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.1616928577423096     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">      test_mapk_epoch      </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4196580946445465     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.38048091530799866    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.1616928577423096     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>test_model result: {'test_mapk_epoch': 0.5770321488380432, 'val_loss': 2.0120155811309814, 'val_acc': 0.5261669158935547}</code></pre>
+<pre><code>test_model result: {'test_mapk_epoch': 0.4196580946445465, 'val_loss': 2.1616928577423096, 'val_acc': 0.38048091530799866, 'hp_metric': 2.1616928577423096}</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="23">
-<pre><code>(2.0120155811309814, 0.5261669158935547)</code></pre>
+<pre><code>(2.1616928577423096, 0.38048091530799866)</code></pre>
 </div>
 </div>
 </section>
@@ -2049,8 +1711,8 @@ model: NetLightBase(
 <li>It is called from the <code>cv_model</code> function <a href="https://github.com/sequential-parameter-optimization/spotPython/blob/main/src/spotPython/light/traintest.py">[SOURCE]</a>.</li>
 </ul>
 <div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.light.traintest <span class="im">import</span> cv_model</span>
-<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>cv_model(config, fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.light.traintest <span class="im">import</span> cv_model</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>cv_model(config, fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2058,19 +1720,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )
 k: 0
@@ -2080,19 +1742,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2100,15 +1762,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2361419200897217     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.30985915660858154    </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2361419200897217     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4154929518699646     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2102842330932617     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.3239436745643616     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2102842330932617     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.40140846371650696    </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.4154929518699646, 'val_loss': 2.2361419200897217, 'val_acc': 0.30985915660858154, 'hp_metric': 2.2361419200897217}
+<pre><code>train_model result: {'valid_mapk': 0.40140846371650696, 'val_loss': 2.2102842330932617, 'val_acc': 0.3239436745643616, 'hp_metric': 2.2102842330932617}
 k: 1
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2116,19 +1778,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2136,15 +1798,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.023916244506836     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5352112650871277     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.023916244506836     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.6103286147117615     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.1147525310516357     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4507042169570923     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.1147525310516357     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5023474097251892     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.6103286147117615, 'val_loss': 2.023916244506836, 'val_acc': 0.5352112650871277, 'hp_metric': 2.023916244506836}
+<pre><code>train_model result: {'valid_mapk': 0.5023474097251892, 'val_loss': 2.1147525310516357, 'val_acc': 0.4507042169570923, 'hp_metric': 2.1147525310516357}
 k: 2
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2152,19 +1814,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2172,15 +1834,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.0173938274383545     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5352112650871277     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.0173938274383545     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.6197183132171631     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2411983013153076     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.30985915660858154    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.2411983013153076     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">     0.32863849401474      </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.6197183132171631, 'val_loss': 2.0173938274383545, 'val_acc': 0.5352112650871277, 'hp_metric': 2.0173938274383545}
+<pre><code>train_model result: {'valid_mapk': 0.32863849401474, 'val_loss': 2.2411983013153076, 'val_acc': 0.30985915660858154, 'hp_metric': 2.2411983013153076}
 k: 3
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2188,19 +1850,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2208,15 +1870,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    1.8894219398498535     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.6338028311729431     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    1.8894219398498535     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7159624695777893     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.002826452255249     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5492957830429077     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.002826452255249     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5892018675804138     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.7159624695777893, 'val_loss': 1.8894219398498535, 'val_acc': 0.6338028311729431, 'hp_metric': 1.8894219398498535}
+<pre><code>train_model result: {'valid_mapk': 0.5892018675804138, 'val_loss': 2.002826452255249, 'val_acc': 0.5492957830429077, 'hp_metric': 2.002826452255249}
 k: 4
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2224,19 +1886,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2244,15 +1906,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    1.8175771236419678     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7183098793029785     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    1.8175771236419678     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7652581930160522     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.095752239227295     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">     0.49295774102211      </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.095752239227295     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">     0.51408451795578      </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.7652581930160522, 'val_loss': 1.8175771236419678, 'val_acc': 0.7183098793029785, 'hp_metric': 1.8175771236419678}
+<pre><code>train_model result: {'valid_mapk': 0.51408451795578, 'val_loss': 2.095752239227295, 'val_acc': 0.49295774102211, 'hp_metric': 2.095752239227295}
 k: 5
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2260,19 +1922,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2280,15 +1942,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    1.8304204940795898     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7183098793029785     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    1.8304204940795898     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7558685541152954     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.072810173034668     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5070422291755676     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.072810173034668     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5727699398994446     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.7558685541152954, 'val_loss': 1.8304204940795898, 'val_acc': 0.7183098793029785, 'hp_metric': 1.8304204940795898}
+<pre><code>train_model result: {'valid_mapk': 0.5727699398994446, 'val_loss': 2.072810173034668, 'val_acc': 0.5070422291755676, 'hp_metric': 2.072810173034668}
 k: 6
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2296,19 +1958,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2316,15 +1978,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    1.7933049201965332     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7605633735656738     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    1.7933049201965332     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7981220483779907     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    2.1038923263549805     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.43661972880363464    </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    2.1038923263549805     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.4906103312969208     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.7981220483779907, 'val_loss': 1.7933049201965332, 'val_acc': 0.7605633735656738, 'hp_metric': 1.7933049201965332}
+<pre><code>train_model result: {'valid_mapk': 0.4906103312969208, 'val_loss': 2.1038923263549805, 'val_acc': 0.43661972880363464, 'hp_metric': 2.1038923263549805}
 k: 7
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2332,19 +1994,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2352,15 +2014,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    1.6774734258651733     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.8714285492897034     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    1.6774734258651733     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.8809523582458496     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     1.988251805305481     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5857142806053162     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     1.988251805305481     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.6095238327980042     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.8809523582458496, 'val_loss': 1.6774734258651733, 'val_acc': 0.8714285492897034, 'hp_metric': 1.6774734258651733}
+<pre><code>train_model result: {'valid_mapk': 0.6095238327980042, 'val_loss': 1.988251805305481, 'val_acc': 0.5857142806053162, 'hp_metric': 1.988251805305481}
 k: 8
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2368,19 +2030,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2388,15 +2050,15 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">    1.7264482975006104     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.8142856955528259     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">    1.7264482975006104     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.8428571224212646     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     2.028038263320923     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5428571701049805     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     2.028038263320923     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.5809524059295654     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.8428571224212646, 'val_loss': 1.7264482975006104, 'val_acc': 0.8142856955528259, 'hp_metric': 1.7264482975006104}
+<pre><code>train_model result: {'valid_mapk': 0.5809524059295654, 'val_loss': 2.028038263320923, 'val_acc': 0.5428571701049805, 'hp_metric': 2.028038263320923}
 k: 9
 model: NetLightBase(
   (act_fn): LeakyReLU()
@@ -2404,19 +2066,19 @@ model: NetLightBase(
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
@@ -2424,19 +2086,19 @@ model: NetLightBase(
 <pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃<span style="font-weight: bold">      Validate metric      </span>┃<span style="font-weight: bold">       DataLoader 0        </span>┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     1.755602240562439     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.7857142686843872     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     1.755602240562439     </span>│
-│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.8166666626930237     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         hp_metric         </span>│<span style="color: #800080; text-decoration-color: #800080">     1.971924901008606     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">          val_acc          </span>│<span style="color: #800080; text-decoration-color: #800080">    0.6000000238418579     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">         val_loss          </span>│<span style="color: #800080; text-decoration-color: #800080">     1.971924901008606     </span>│
+│<span style="color: #008080; text-decoration-color: #008080">        valid_mapk         </span>│<span style="color: #800080; text-decoration-color: #800080">    0.6309523582458496     </span>│
 └───────────────────────────┴───────────────────────────┘
 </pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>train_model result: {'valid_mapk': 0.8166666626930237, 'val_loss': 1.755602240562439, 'val_acc': 0.7857142686843872, 'hp_metric': 1.755602240562439}
-cv_model mapk result: 0.7221227288246155</code></pre>
+<pre><code>train_model result: {'valid_mapk': 0.6309523582458496, 'val_loss': 1.971924901008606, 'val_acc': 0.6000000238418579, 'hp_metric': 1.971924901008606}
+cv_model mapk result: 0.5220489621162414</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="24">
-<pre><code>0.7221227288246155</code></pre>
+<pre><code>0.5220489621162414</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -2458,48 +2120,77 @@ Note: Evaluation for the Final Comaprison
 <section id="detailed-hyperparameter-plots" class="level3" data-number="21.10.3">
 <h3 data-number="21.10.3" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">21.10.3</span> Detailed Hyperparameter Plots</h3>
 <div class="cell" data-fig-label="fig-contour-30" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
-<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>l1:  0.21696178534277133
-act_fn:  100.00000000000001
-dropout_prob:  7.338197881872086
-lr_mult:  5.466810662183265</code></pre>
+<pre><code>l1:  0.11841349539420895
+epochs:  100.0
+dropout_prob:  0.35410320559765884
+lr_mult:  98.6792989166949
+patience:  0.07429547243917399
+initialization:  100.0</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-2.png" width="712" height="281" class="figure-img"></p>
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-2.png" width="708" height="281" class="figure-img"></p>
 <figcaption class="figure-caption">Contour plots.</figcaption>
 </figure>
 </div>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-3.png" width="729" height="281"></p>
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-3.png" width="725" height="281"></p>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-4.png" width="716" height="281"></p>
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-4.png" width="706" height="281"></p>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-5.png" width="724" height="281"></p>
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-5.png" width="704" height="281"></p>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-6.png" width="716" height="281"></p>
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-6.png" width="717" height="281"></p>
 </div>
 <div class="cell-output cell-output-display">
-<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-7.png" width="712" height="281"></p>
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-7.png" width="725" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-8.png" width="712" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-9.png" width="704" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-10.png" width="705" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-11.png" width="706" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-12.png" width="704" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-13.png" width="717" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-14.png" width="697" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-15.png" width="710" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="30_spot_lightning_csv_files/figure-html/cell-26-output-16.png" width="717" height="281"></p>
 </div>
 </div>
 </section>
 <section id="parallel-coordinates-plot" class="level3" data-number="21.10.4">
 <h3 data-number="21.10.4" class="anchored" data-anchor-id="parallel-coordinates-plot"><span class="header-section-number">21.10.4</span> Parallel Coordinates Plot</h3>
 <div class="cell" data-fig-label="fig-parallel-30" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-<div>                            <div id="59c34fbb-7026-4dbd-b1a5-c9b87f9899ef" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("59c34fbb-7026-4dbd-b1a5-c9b87f9899ef")) {                    Plotly.newPlot(                        "59c34fbb-7026-4dbd-b1a5-c9b87f9899ef",                        [{"dimensions":[{"label":"l1","range":[7.0,10.0],"values":[10.0,7.0,9.0,8.0,8.0,7.0,7.0,7.0,7.0,7.0,8.0,7.0,8.0,8.0,7.0,8.0,10.0,9.0,10.0,10.0,9.0,10.0,10.0]},{"label":"epochs","range":[5.0,7.0],"values":[7.0,5.0,6.0,6.0,7.0,5.0,6.0,5.0,5.0,6.0,6.0,6.0,6.0,5.0,6.0,5.0,6.0,6.0,6.0,6.0,7.0,6.0,6.0]},{"label":"batch_size","range":[4.0,8.0],"values":[6.0,8.0,4.0,4.0,7.0,7.0,8.0,8.0,8.0,8.0,4.0,7.0,7.0,7.0,4.0,7.0,7.0,4.0,7.0,5.0,8.0,7.0,8.0]},{"label":"act_fn","range":[0.0,5.0],"values":[2.0,3.0,5.0,0.0,2.0,3.0,3.0,0.0,3.0,3.0,3.0,3.0,3.0,3.0,2.0,3.0,3.0,0.0,3.0,3.0,3.0,3.0,3.0]},{"label":"optimizer","range":[0.0,3.0],"values":[1.0,2.0,3.0,0.0,2.0,2.0,1.0,0.0,2.0,2.0,1.0,3.0,1.0,2.0,2.0,2.0,2.0,1.0,2.0,1.0,3.0,2.0,2.0]},{"label":"dropout_prob","range":[0.0,0.1],"values":[0.04375810986688453,0.005170658955305807,0.08834550718769361,0.07563714253500024,0.02833523179697884,0.00147908939268937,0.0,0.1,0.1,0.005410283967863825,0.01092951864482135,0.00899518733143736,0.010835406635652793,0.010168422249530674,0.0,0.017032402495548216,0.008891593286542805,0.003937815969805521,0.00969894222013007,0.0030486518813622513,0.0,0.005473793889002229,0.005739155710200516]},{"label":"lr_mult","range":[0.1,10.0],"values":[4.211776903906428,0.832718394912432,7.65501078489161,2.3450676871382794,9.528945328733357,1.0752266899289973,6.5400267229367035,0.10000000000000053,0.10000000000000009,6.748234140091307,10.0,10.0,6.906652374057626,0.3979310825141637,6.251645303354199,0.1,0.4334837589006342,6.755223507633317,0.4584612086889453,6.651775910569058,4.0047452006296504,0.44915068254485657,6.552194949351319]},{"label":"patience","range":[2.0,6.0],"values":[4.0,3.0,6.0,5.0,2.0,4.0,2.0,3.0,5.0,5.0,5.0,5.0,6.0,2.0,3.0,2.0,3.0,5.0,3.0,3.0,5.0,3.0,2.0]},{"label":"initialization","range":[0.0,2.0],"values":[0.0,1.0,2.0,1.0,2.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]}],"line":{"cmax":2.4547014236450195,"cmin":2.235407590866089,"color":[2.3234684467315674,2.2648348808288574,2.4511682987213135,2.2770135402679443,2.302140951156616,2.2760536670684814,2.2655727863311768,2.3945162296295166,2.3974363803863525,2.235407590866089,2.401698350906372,2.4260430335998535,2.3303024768829346,2.2467353343963623,2.317075490951538,2.329146146774292,2.2644355297088623,2.292844295501709,2.2968060970306396,2.4547014236450195,2.321242570877075,2.2467963695526123,2.444101095199585],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+<div>                            <div id="6b613758-bc2f-4eb8-9e53-8c39dfeb6b45" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("6b613758-bc2f-4eb8-9e53-8c39dfeb6b45")) {                    Plotly.newPlot(                        "6b613758-bc2f-4eb8-9e53-8c39dfeb6b45",                        [{"dimensions":[{"label":"l1","range":[6.0,12.0],"values":[12.0,6.0,10.0,9.0,8.0,6.0,7.0,9.0,8.0,9.0,6.0,6.0,7.0,9.0,12.0]},{"label":"epochs","range":[6.0,12.0],"values":[12.0,7.0,8.0,9.0,12.0,6.0,9.0,7.0,12.0,7.0,7.0,7.0,7.0,7.0,9.0]},{"label":"batch_size","range":[3.0,8.0],"values":[5.0,8.0,3.0,4.0,6.0,8.0,4.0,3.0,7.0,3.0,4.0,4.0,3.0,8.0,5.0]},{"label":"act_fn","range":[0.0,5.0],"values":[2.0,3.0,5.0,0.0,2.0,2.0,4.0,1.0,2.0,1.0,1.0,1.0,2.0,2.0,0.0]},{"label":"optimizer","range":[0.0,3.0],"values":[1.0,2.0,3.0,0.0,2.0,2.0,2.0,3.0,1.0,3.0,3.0,3.0,1.0,3.0,2.0]},{"label":"dropout_prob","range":[0.005165563024496982,0.08834550718769361],"values":[0.04375810986688453,0.005170658955305807,0.08834550718769361,0.07563714253500024,0.02833523179697884,0.0057308353644435995,0.0756380926179772,0.005170536012710651,0.02833522259075095,0.005170926446269222,0.0051691451807639194,0.005171440031826116,0.005168205606205038,0.005165563024496982,0.07563837577587414]},{"label":"lr_mult","range":[0.12746123603776952,9.528945328733357],"values":[4.211776903906428,0.832718394912432,7.65501078489161,2.3450676871382794,9.528945328733357,0.12746123603776952,2.3450649482576313,0.8327083710883477,9.5289448927627,0.8327400103396447,0.8325972770237184,0.8327818027362548,0.8325345237459943,0.8323238173327993,2.345074960681534]},{"label":"patience","range":[2.0,6.0],"values":[4.0,3.0,6.0,5.0,2.0,3.0,5.0,3.0,3.0,3.0,5.0,5.0,3.0,3.0,4.0]},{"label":"initialization","range":[0.0,2.0],"values":[0.0,1.0,2.0,1.0,2.0,1.0,1.0,1.0,2.0,1.0,1.0,1.0,1.0,1.0,1.0]}],"line":{"cmax":2.458235025405884,"cmin":2.2329816818237305,"color":[2.458235025405884,2.2329816818237305,2.4547009468078613,2.2733662128448486,2.3004534244537354,2.3844985961914062,2.263234853744507,2.2661986351013184,2.2677416801452637,2.31839656829834,2.2918200492858887,2.295330047607422,2.2576189041137695,2.2586112022399902,2.388317346572876],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('59c34fbb-7026-4dbd-b1a5-c9b87f9899ef');
+var gd = document.getElementById('6b613758-bc2f-4eb8-9e53-8c39dfeb6b45');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{
@@ -2532,12 +2223,12 @@ if (outputEl) {{
 <li>Warning: this may take a while.</li>
 </ul>
 <div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
-<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
-<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
-<span id="cb117-5"><a href="#cb117-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
-<span id="cb117-6"><a href="#cb117-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualizing-the-activation-distribution" class="level3" data-number="21.10.6">
@@ -2559,15 +2250,15 @@ Reference:
 </div>
 <p>After we have trained the models, we can look at the actual activation values that find inside the model. For instance, how many neurons are set to zero in ReLU? Where do we find most values in Tanh? To answer these questions, we can write a simple function which takes a trained model, applies it to a batch of images, and plots the histogram of the activations inside the network:</p>
 <div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.activation <span class="im">import</span> Sigmoid, Tanh, ReLU, LeakyReLU, ELU, Swish</span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>act_fn_by_name <span class="op">=</span> {<span class="st">"sigmoid"</span>: Sigmoid, <span class="st">"tanh"</span>: Tanh, <span class="st">"relu"</span>: ReLU, <span class="st">"leakyrelu"</span>: LeakyReLU, <span class="st">"elu"</span>: ELU, <span class="st">"swish"</span>: Swish}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.activation <span class="im">import</span> Sigmoid, Tanh, ReLU, LeakyReLU, ELU, Swish</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>act_fn_by_name <span class="op">=</span> {<span class="st">"sigmoid"</span>: Sigmoid, <span class="st">"tanh"</span>: Tanh, <span class="st">"relu"</span>: ReLU, <span class="st">"leakyrelu"</span>: LeakyReLU, <span class="st">"elu"</span>: ELU, <span class="st">"swish"</span>: Swish}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_config_from_X</span>
-<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
-<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_one_config_from_X(X, fun_control)</span>
-<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> fun_control[<span class="st">"core_model"</span>](<span class="op">**</span>config, _L_in<span class="op">=</span><span class="dv">64</span>, _L_out<span class="op">=</span><span class="dv">11</span>)</span>
-<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_config_from_X</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> get_one_config_from_X(X, fun_control)</span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> fun_control[<span class="st">"core_model"</span>](<span class="op">**</span>config, _L_in<span class="op">=</span><span class="dv">64</span>, _L_out<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="29">
 <pre><code>NetLightBase(
   (act_fn): LeakyReLU()
@@ -2575,26 +2266,26 @@ Reference:
   (valid_mapk): MAPK()
   (test_mapk): MAPK()
   (layers): Sequential(
-    (0): Linear(in_features=64, out_features=128, bias=True)
+    (0): Linear(in_features=64, out_features=64, bias=True)
     (1): LeakyReLU()
-    (2): Dropout(p=0.005410283967863825, inplace=False)
-    (3): Linear(in_features=128, out_features=64, bias=True)
+    (2): Dropout(p=0.005170658955305807, inplace=False)
+    (3): Linear(in_features=64, out_features=32, bias=True)
     (4): LeakyReLU()
-    (5): Dropout(p=0.005410283967863825, inplace=False)
-    (6): Linear(in_features=64, out_features=64, bias=True)
+    (5): Dropout(p=0.005170658955305807, inplace=False)
+    (6): Linear(in_features=32, out_features=32, bias=True)
     (7): LeakyReLU()
-    (8): Dropout(p=0.005410283967863825, inplace=False)
-    (9): Linear(in_features=64, out_features=32, bias=True)
+    (8): Dropout(p=0.005170658955305807, inplace=False)
+    (9): Linear(in_features=32, out_features=16, bias=True)
     (10): LeakyReLU()
-    (11): Dropout(p=0.005410283967863825, inplace=False)
-    (12): Linear(in_features=32, out_features=11, bias=True)
+    (11): Dropout(p=0.005170658955305807, inplace=False)
+    (12): Linear(in_features=16, out_features=11, bias=True)
   )
 )</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> visualize_activations</span>
-<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>visualize_activations(model, device<span class="op">=</span><span class="st">"cpu"</span>, color<span class="op">=</span><span class="ss">f"C</span><span class="sc">{</span><span class="dv">0</span><span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> visualize_activations</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>visualize_activations(model, device<span class="op">=</span><span class="st">"cpu"</span>, color<span class="op">=</span><span class="ss">f"C</span><span class="sc">{</span><span class="dv">0</span><span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <p><img src="30_spot_lightning_csv_files/figure-html/cell-31-output-1.png" width="875" height="668"></p>
 </div>
