@@ -80,7 +80,7 @@ class NetLightBase(L.LightningModule):
         self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_acc", acc, prog_bar=prog_bar)
-        self.log("hp_metric", loss)
+        self.log("hp_metric", loss, prog_bar=prog_bar)
 
     def test_step(self, batch, batch_idx, prog_bar=False):
         x, y = batch
@@ -93,7 +93,7 @@ class NetLightBase(L.LightningModule):
         self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_acc", acc, prog_bar=prog_bar)
-        # self.log("hp_metric", loss, prog_bar=prog_bar)
+        self.log("hp_metric", loss, prog_bar=prog_bar)
         return loss, acc
 
     def configure_optimizers(self):
