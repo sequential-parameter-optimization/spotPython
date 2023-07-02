@@ -3,23 +3,23 @@ from spotPython.light.csvdatamodule import CSVDataModule
 from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
+from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from spotPython.torch.initialization import kaiming_init, xavier_init
+import os
 
 
 def train_model(config, fun_control):
+    _L_in = fun_control["_L_in"]
+    _L_out = fun_control["_L_out"]
+    print(f"_L_in: {_L_in}")
+    print(f"_L_out: {_L_out}")
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
         enable_progress_bar = fun_control["enable_progress_bar"]
     config_id = generate_config_id(config)
-    # Init DataModule
-    dm = CSVDataModule(
-        batch_size=config["batch_size"], num_workers=fun_control["num_workers"], data_dir=fun_control["data_dir"]
-    )
-    # Init model from datamodule's attributes
-    # model = LitModel(*dm.dims, dm.num_classes)
-    model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
     initialization = config["initialization"]
     if initialization == "Xavier":
         xavier_init(model)
@@ -28,12 +28,22 @@ def train_model(config, fun_control):
     else:
         pass
     print(f"model: {model}")
+
+    # Init DataModule
+    dm = CSVDataModule(
+        batch_size=config["batch_size"],
+        num_workers=fun_control["num_workers"],
+        DATASET_PATH=fun_control["DATASET_PATH"],
+    )
+
     # Init trainer
     trainer = L.Trainer(
-        max_epochs=model.epochs,
+        # Where to save models
+        default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
+        max_epochs=model.hparams.epochs,
         accelerator="auto",
         devices=1,
-        logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id, default_hp_metric=True),
+        logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True),
         callbacks=[
             EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
         ],
@@ -51,18 +61,22 @@ def train_model(config, fun_control):
 
 
 def test_model(config, fun_control):
+    _L_in = fun_control["_L_in"]
+    _L_out = fun_control["_L_out"]
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
         enable_progress_bar = fun_control["enable_progress_bar"]
-    config_id = generate_config_id(config)
+    # Add "TEST" postfix to config_id
+    config_id = generate_config_id(config) + "_TEST"
     # Init DataModule
     dm = CSVDataModule(
-        batch_size=config["batch_size"], num_workers=fun_control["num_workers"], data_dir=fun_control["data_dir"]
+        batch_size=config["batch_size"],
+        num_workers=fun_control["num_workers"],
+        DATASET_PATH=fun_control["DATASET_PATH"],
     )
     # Init model from datamodule's attributes
-    # model = LitModel(*dm.dims, dm.num_classes)
-    model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
     initialization = config["initialization"]
     if initialization == "Xavier":
         xavier_init(model)
@@ -73,12 +87,15 @@ def test_model(config, fun_control):
     print(f"model: {model}")
     # Init trainer
     trainer = L.Trainer(
-        max_epochs=model.epochs,
+        # Where to save models
+        default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
+        max_epochs=model.hparams.epochs,
         accelerator="auto",
         devices=1,
-        logger=TensorBoardLogger(save_dir=fun_control["tensorboard_path"], version=config_id, default_hp_metric=True),
+        logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True),
         callbacks=[
-            EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
+            EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False),
+            ModelCheckpoint(save_last=True),  # Save the last checkpoint
         ],
         enable_progress_bar=enable_progress_bar,
     )
@@ -91,15 +108,18 @@ def test_model(config, fun_control):
 
 
 def cv_model(config, fun_control):
-    config_id = generate_config_id(config)
+    _L_in = fun_control["_L_in"]
+    _L_out = fun_control["_L_out"]
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
         enable_progress_bar = fun_control["enable_progress_bar"]
+    # Add "CV" postfix to config_id
+    config_id = generate_config_id(config) + "_CV"
     results = []
     num_folds = 10
     split_seed = 12345
-    model = fun_control["core_model"](**config, _L_in=64, _L_out=11)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
     initialization = config["initialization"]
     if initialization == "Xavier":
         xavier_init(model)
@@ -116,7 +136,7 @@ def cv_model(config, fun_control):
             num_splits=num_folds,
             split_seed=split_seed,
             batch_size=config["batch_size"],
-            data_dir=fun_control["data_dir"],
+            DATASET_PATH=fun_control["DATASET_PATH"],
         )
         dm.prepare_data()
         dm.setup()
@@ -125,11 +145,13 @@ def cv_model(config, fun_control):
         print(f"model: {model}")
         # Init trainer
         trainer = L.Trainer(
-            max_epochs=model.epochs,
+            # Where to save models
+            default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
+            max_epochs=model.hparams.epochs,
             accelerator="auto",
             devices=1,
             logger=TensorBoardLogger(
-                save_dir=fun_control["tensorboard_path"], version=config_id, default_hp_metric=True
+                save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True
             ),
             callbacks=[
                 EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
@@ -150,3 +172,16 @@ def cv_model(config, fun_control):
     mapk_score = sum(results) / num_folds
     print(f"cv_model mapk result: {mapk_score}")
     return mapk_score
+
+
+def load_light_from_checkpoint(config, fun_control, postfix="_TEST"):
+    config_id = generate_config_id(config) + postfix
+    default_root_dir = fun_control["TENSORBOARD_PATH"] + "lightning_logs/" + config_id + "/checkpoints/last.ckpt"
+    # default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
+    print(f"Loading model from {default_root_dir}")
+    model = fun_control["core_model"].load_from_checkpoint(
+        default_root_dir, _L_in=fun_control["_L_in"], _L_out=fun_control["_L_out"]
+    )
+    # disable randomness, dropout, etc...
+    model.eval()
+    return model

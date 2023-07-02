@@ -167,7 +167,7 @@ def visualize_activations(net, device="cpu", color="C0"):
         sns.histplot(data=activations[key], bins=50, ax=key_ax, color=color, kde=True, stat="density")
         key_ax.set_title(f"Layer {key} - {net.layers[key].__class__.__name__}")
         fig_index += 1
-    fig.suptitle(f"Activation distribution for activation function {net.act_fn}", fontsize=14)
+    fig.suptitle(f"Activation distribution for activation function {net.hparams.act_fn}", fontsize=14)
     fig.subplots_adjust(hspace=0.4, wspace=0.4)
     plt.show()
     plt.close()

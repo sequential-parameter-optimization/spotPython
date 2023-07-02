@@ -5,10 +5,9 @@ from spotPython.light.csvdataset import CSVDataset
 
 
 class CSVDataModule(L.LightningDataModule):
-    def __init__(self, batch_size, data_dir: str = "./data", num_workers: int = 0):
+    def __init__(self, batch_size, DATASET_PATH: str = "./data", num_workers: int = 0):
         super().__init__()
         self.batch_size = batch_size
-        self.data_dir = data_dir
         self.num_workers = num_workers
 
     def prepare_data(self):

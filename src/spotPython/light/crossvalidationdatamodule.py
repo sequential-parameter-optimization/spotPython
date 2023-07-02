@@ -13,13 +13,13 @@ class CrossValidationDataModule(L.LightningDataModule):
         k: int = 1,
         split_seed: int = 42,
         num_splits: int = 10,
-        data_dir: str = "./data",
+        DATASET_PATH: str = "./data",
         num_workers: int = 0,
         pin_memory: bool = False,
     ):
         super().__init__()
         self.batch_size = batch_size
-        self.data_dir = data_dir
+        self.DATASET_PATH = DATASET_PATH
         self.num_workers = num_workers
         self.k = k
         self.split_seed = split_seed
@@ -35,6 +35,7 @@ class CrossValidationDataModule(L.LightningDataModule):
         self.data_val: Optional[Dataset] = None
 
     def prepare_data(self):
+        # download
         pass
 
     def setup(self, stage=None):

@@ -18,38 +18,38 @@ class NetLightBase(L.LightningModule):
         optimizer,
         dropout_prob,
         lr_mult,
-        patience=3,
-        _L_in=64,
-        _L_out=11,
+        patience,
+        _L_in,
+        _L_out,
     ):
         super().__init__()
-
-        # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during checkpointing.
-        # It is recommended to ignore them using `self.save_hyperparameters(ignore=['act_fn'])`
-        self.save_hyperparameters(ignore=["act_fn"])
+        # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during
+        # checkpointing. It is recommended to ignore them
+        # using `self.save_hyperparameters(ignore=['act_fn'])`
+        # self.save_hyperparameters(ignore=["act_fn"])
+        #
+        self._L_in = _L_in
         self._L_out = _L_out
-        if l1 < 4:
+        # _L_in and _L_out are not hyperparameters, but are needed to create the network
+        self.save_hyperparameters(ignore=["_L_in", "_L_out"])
+        if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
-        self.l1 = l1
-        hidden_sizes = [l1, l1 // 2, l1 // 2, l1 // 4]
-        self.epochs = epochs
-        self.patience = patience
-        self.batch_size = batch_size
-        self.initialization = initialization
-        self.act_fn = act_fn
-        self.optimizer = optimizer
-        self.dropout_prob = dropout_prob
-        self.lr_mult = lr_mult
+
+        hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
         self.train_mapk = MAPK(k=3)
         self.valid_mapk = MAPK(k=3)
         self.test_mapk = MAPK(k=3)
 
         # Create the network based on the specified hidden sizes
         layers = []
-        layer_sizes = [_L_in] + hidden_sizes
+        layer_sizes = [self._L_in] + hidden_sizes
         layer_size_last = layer_sizes[0]
         for layer_size in layer_sizes[1:]:
-            layers += [nn.Linear(layer_size_last, layer_size), act_fn, nn.Dropout(self.dropout_prob)]
+            layers += [
+                nn.Linear(layer_size_last, layer_size),
+                self.hparams.act_fn,
+                nn.Dropout(self.hparams.dropout_prob),
+            ]
             layer_size_last = layer_size
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
         # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
@@ -98,5 +98,7 @@ class NetLightBase(L.LightningModule):
 
     def configure_optimizers(self):
         # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        optimizer = optimizer_handler(optimizer_name=self.optimizer, params=self.parameters(), lr_mult=self.lr_mult)
+        optimizer = optimizer_handler(
+            optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
+        )
         return optimizer
