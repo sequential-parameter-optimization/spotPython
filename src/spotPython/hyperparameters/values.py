@@ -261,7 +261,6 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
     fun_control["core_model_hyper_dict"][hyperparameter].update({"levels": levels})
     fun_control["core_model_hyper_dict"][hyperparameter].update({"lower": 0})
     fun_control["core_model_hyper_dict"][hyperparameter].update({"upper": len(levels) - 1})
-    return fun_control
 
 
 def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
@@ -285,7 +284,6 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
     """
     fun_control["core_model_hyper_dict"][hyperparameter].update({"lower": bounds[0]})
     fun_control["core_model_hyper_dict"][hyperparameter].update({"upper": bounds[1]})
-    return fun_control
 
 
 def get_default_values(fun_control) -> dict:
@@ -606,7 +604,6 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=
     var_type = get_var_type(fun_control)
     var_name = get_var_name(fun_control)
     fun_control.update({"var_type": var_type, "var_name": var_name})
-    return fun_control
 
 
 def get_one_core_model_from_X(X, fun_control=None):

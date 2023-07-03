@@ -46,7 +46,9 @@ class CrossValidationDataModule(L.LightningDataModule):
             train_indexes, val_indexes = all_splits[self.hparams.k]
             train_indexes, val_indexes = train_indexes.tolist(), val_indexes.tolist()
             self.data_train = Subset(dataset_full, train_indexes)
+            print(f"Train Dataset Size: {len(self.data_train)}")
             self.data_val = Subset(dataset_full, val_indexes)
+            print(f"Val Dataset Size: {len(self.data_val)}")
 
     def train_dataloader(self):
         return DataLoader(

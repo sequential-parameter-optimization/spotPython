@@ -117,20 +117,22 @@ def cv_model(config, fun_control):
     # Add "CV" postfix to config_id
     config_id = generate_config_id(config) + "_CV"
     results = []
-    num_folds = 10
+    num_folds = fun_control["k_folds"]
     split_seed = 12345
-    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
-    initialization = config["initialization"]
-    if initialization == "Xavier":
-        xavier_init(model)
-    elif initialization == "Kaiming":
-        kaiming_init(model)
-    else:
-        pass
-    print(f"model: {model}")
 
     for k in range(num_folds):
         print("k:", k)
+
+        model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
+        initialization = config["initialization"]
+        if initialization == "Xavier":
+            xavier_init(model)
+        elif initialization == "Kaiming":
+            kaiming_init(model)
+        else:
+            pass
+        print(f"model: {model}")
+
         dm = CrossValidationDataModule(
             k=k,
             num_splits=num_folds,
@@ -141,8 +143,6 @@ def cv_model(config, fun_control):
         dm.prepare_data()
         dm.setup()
 
-        # here we train the model on given split...
-        print(f"model: {model}")
         # Init trainer
         trainer = L.Trainer(
             # Where to save models
