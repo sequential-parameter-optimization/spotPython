@@ -603,6 +603,9 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=
             new_hyper_dict = json.load(f)
     hyper_dict().load()
     fun_control.update({"core_model_hyper_dict": new_hyper_dict[core_model.__name__]})
+    var_type = get_var_type(fun_control)
+    var_name = get_var_name(fun_control)
+    fun_control.update({"var_type": var_type, "var_name": var_name})
     return fun_control
 
 
