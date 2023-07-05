@@ -637,9 +637,9 @@ def get_one_river_model_from_X(X, fun_control=None):
     return model
 
 
-def get_default_hyperparameters_as_array(fun_control, hyper_dict) -> np.array:
+def get_default_hyperparameters_as_array(fun_control) -> np.array:
     X0 = get_default_values(fun_control)
-    X0 = replace_levels_with_positions(hyper_dict[fun_control["core_model"].__name__], X0)
+    X0 = replace_levels_with_positions(fun_control["core_model_hyper_dict"], X0)
     X0 = get_values_from_dict(X0)
     X0 = np.array([X0])
     X0.shape[1]
