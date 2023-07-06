@@ -225,6 +225,9 @@ class Spot:
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
 
+        # if the key "spot_writer" is not in the dictionary fun_control,
+        # set self.spot_writer to None else to the value of the key "spot_writer"
+        self.spot_writer = fun_control.get("spot_writer", None)
         self.surrogate_control.update(surrogate_control)
         # If no surrogate model is specified, use the internal
         # spotPython kriging surrogate:
@@ -245,7 +248,7 @@ class Spot:
                 cod_type=self.surrogate_control["cod_type"],
                 var_type=self.surrogate_control["var_type"],
                 use_cod_y=self.surrogate_control["use_cod_y"],
-                spot_writer=self.fun_control["spot_writer"],
+                spot_writer=self.spot_writer,
                 counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
             )
         # Optimizer related information:
@@ -337,8 +340,8 @@ class Spot:
             self.fit_surrogate()
             # progress bar:
             self.show_progress_if_needed(timeout_start)
-        if self.fun_control["spot_writer"] is not None:
-            writer = self.fun_control["spot_writer"]
+        if self.spot_writer is not None:
+            writer = self.spot_writer
             writer.close()
         return self
 
@@ -422,8 +425,8 @@ class Spot:
             self.var_y = Z[2]
             self.min_mean_y = min(self.mean_y)
             self.min_mean_X = self.mean_X[argmin(self.mean_y)]
-        if self.fun_control["spot_writer"] is not None:
-            writer = self.fun_control["spot_writer"]
+        if self.spot_writer is not None:
+            writer = self.spot_writer
             y_min = self.min_y.copy()
             y_last = self.last_y.copy()
             X_min = self.min_X.copy()
