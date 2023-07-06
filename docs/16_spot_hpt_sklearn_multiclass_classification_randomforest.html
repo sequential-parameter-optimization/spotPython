@@ -382,7 +382,7 @@ require(['plotly'], function(Plotly) {
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython                 0.3.0
+<pre><code>spotPython                 0.3.4
 spotRiver                  0.0.93</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -421,7 +421,7 @@ spotRiver                  0.0.93</code></pre>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'./figures'</span>):</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'./figures'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>16-rf-sklearn_p040025_1min_5init_2023-07-04_01-48-35</code></pre>
+<pre><code>16-rf-sklearn_p040025_1min_5init_2023-07-06_02-03-00</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="5">
@@ -1099,10 +1099,8 @@ OOB-Score
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    get_var_type,)</span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
 <span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"var_type"</span>: var_type,</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"var_name"</span>: var_name})</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig-label="tbl-design" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
@@ -1140,9 +1138,8 @@ OOB-Score
 </ul>
 <div class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>hyper_dict<span class="op">=</span>SklearnHyperDict().load()</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control, hyper_dict)</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="27">
 <pre><code>array([[ 7.,  0., 10.,  2.,  1.,  0.,  0., 10.,  0.,  1.,  0.]])</code></pre>
 </div>
@@ -1180,104 +1177,104 @@ OOB-Score
 <span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>                                      })</span>
 <span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.34276729559748426 [----------] 1.42% </code></pre>
+<pre><code>spotPython tuning: -0.34276729559748426 [----------] 1.45% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.34276729559748426 [----------] 1.89% </code></pre>
+<pre><code>spotPython tuning: -0.34276729559748426 [----------] 1.94% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.34276729559748426 [----------] 2.47% </code></pre>
+<pre><code>spotPython tuning: -0.34276729559748426 [----------] 2.53% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.34276729559748426 [----------] 3.00% </code></pre>
+<pre><code>spotPython tuning: -0.34276729559748426 [----------] 3.09% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.34276729559748426 [----------] 3.39% </code></pre>
+<pre><code>spotPython tuning: -0.34276729559748426 [----------] 3.50% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [----------] 4.06% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [----------] 4.18% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [----------] 4.83% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [----------] 4.97% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 5.63% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 5.79% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 6.93% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 7.12% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 7.59% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 7.81% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 8.89% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 9.12% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 9.85% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 10.09% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 12.72% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [#---------] 13.08% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [##--------] 17.63% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [##--------] 18.33% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [##--------] 19.90% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [##--------] 20.67% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [##--------] 23.24% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [##--------] 24.03% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35062893081761004 [###-------] 26.55% </code></pre>
+<pre><code>spotPython tuning: -0.35062893081761004 [###-------] 27.34% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35188679245283017 [###-------] 29.94% </code></pre>
+<pre><code>spotPython tuning: -0.35188679245283017 [###-------] 30.78% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35188679245283017 [###-------] 34.01% </code></pre>
+<pre><code>spotPython tuning: -0.35188679245283017 [####------] 35.03% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35188679245283017 [####------] 39.01% </code></pre>
+<pre><code>spotPython tuning: -0.35188679245283017 [####------] 40.44% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35188679245283017 [####------] 43.06% </code></pre>
+<pre><code>spotPython tuning: -0.35188679245283017 [####------] 44.63% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35188679245283017 [#####-----] 47.28% </code></pre>
+<pre><code>spotPython tuning: -0.35188679245283017 [#####-----] 48.85% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [#####-----] 51.26% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [#####-----] 52.86% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [######----] 55.26% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [######----] 57.03% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [######----] 59.51% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [######----] 61.47% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [######----] 63.87% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [#######---] 65.73% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [#######---] 68.70% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [#######---] 70.51% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [########--] 75.57% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [########--] 77.58% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [########--] 82.28% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [########--] 84.51% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.35754716981132073 [#########-] 89.33% </code></pre>
+<pre><code>spotPython tuning: -0.35754716981132073 [#########-] 91.73% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.3591194968553459 [##########] 96.08% </code></pre>
+<pre><code>spotPython tuning: -0.3591194968553459 [##########] 98.74% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>spotPython tuning: -0.3591194968553459 [##########] 100.00% Done...
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="28">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x16d1c7af0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x15f107250&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -1624,9 +1621,9 @@ max_leaf_nodes:  2.1411547457633917</code></pre>
 <div class="sourceCode cell-code" id="cb107"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-<div>                            <div id="280ba1f9-6d99-4784-a65b-64c614b50f29" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("280ba1f9-6d99-4784-a65b-64c614b50f29")) {                    Plotly.newPlot(                        "280ba1f9-6d99-4784-a65b-64c614b50f29",                        [{"dimensions":[{"label":"n_estimators","range":[5.0,10.0],"values":[9.0,5.0,8.0,7.0,6.0,8.0,7.0,7.0,8.0,5.0,8.0,8.0,8.0,9.0,6.0,9.0,8.0,9.0,8.0,6.0,9.0,8.0,8.0,8.0,8.0,8.0,9.0,9.0,9.0,9.0,9.0,10.0,9.0,9.0,9.0,9.0,9.0]},{"label":"criterion","range":[0.0,2.0],"values":[2.0,0.0,1.0,1.0,2.0,1.0,2.0,1.0,1.0,1.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"max_depth","range":[1.0,20.0],"values":[12.0,19.0,4.0,6.0,15.0,19.0,1.0,18.0,9.0,12.0,8.0,12.0,10.0,4.0,13.0,7.0,6.0,7.0,7.0,10.0,3.0,20.0,10.0,11.0,13.0,5.0,13.0,13.0,7.0,19.0,11.0,1.0,10.0,10.0,11.0,12.0,7.0]},{"label":"min_samples_split","range":[3.0,97.0],"values":[38.0,64.0,97.0,4.0,50.0,7.0,6.0,4.0,63.0,8.0,15.0,3.0,54.0,18.0,20.0,86.0,7.0,11.0,23.0,4.0,20.0,19.0,19.0,19.0,21.0,15.0,17.0,16.0,17.0,17.0,18.0,15.0,12.0,15.0,13.0,11.0,7.0]},{"label":"min_samples_leaf","range":[1.0,23.0],"values":[10.0,14.0,23.0,2.0,20.0,1.0,1.0,2.0,16.0,1.0,1.0,1.0,1.0,7.0,9.0,1.0,21.0,17.0,1.0,12.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"min_weight_fraction_leaf","range":[0.0005170658955305807,0.01],"values":[0.004375810986688453,0.0005170658955305807,0.00883455071876936,0.007563714253500024,0.002833523179697884,0.00964370149958853,0.0041963986116812756,0.00920433111159413,0.01,0.007992538074609179,0.006809773398328576,0.009702486461405656,0.0062578842811396775,0.0069378573912289845,0.0070310397700413035,0.005790728598179518,0.008280583758321995,0.006605991177956249,0.006840521151916454,0.006761346078545928,0.007390112050027889,0.00720643984619775,0.007039971225515157,0.00863701465012194,0.006191258173853972,0.008593379075248337,0.009236882699025381,0.008214194759586062,0.007024048523353716,0.007699705320572511,0.00853246130779513,0.006737074283810488,0.007512563987975429,0.007401290374388599,0.007120821025401721,0.0059164181306543325,0.003251990785225482]},{"label":"max_features","range":[0.0,1.0],"values":[0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0]},{"label":"max_leaf_nodes","range":[7.0,12.0],"values":[10.0,8.0,12.0,10.0,7.0,9.0,7.0,9.0,10.0,10.0,10.0,10.0,10.0,10.0,10.0,10.0,8.0,10.0,10.0,10.0,10.0,10.0,10.0,8.0,11.0,10.0,9.0,9.0,9.0,9.0,9.0,10.0,9.0,9.0,9.0,9.0,9.0]},{"label":"min_impurity_decrease","range":[0.0,0.01],"values":[0.00036049087681399585,0.0035361836227871626,0.00905773354221908,0.005444269419402145,0.0076527367276491955,0.01,0.01,0.00855281684262531,0.01,0.007021711204493493,0.004485828999382583,0.008618320647481756,0.004174978732575841,0.004263774110434773,0.004255652561754926,0.0033204433015040307,0.0044914751446857816,0.004578884919126868,0.00391778506359571,0.004003792181631402,0.00464257926682031,0.004982428254652078,0.004547189090028323,0.005357298523110613,0.0016661798998482227,0.0075333690729609435,0.009163034561064435,0.006835844042441903,0.0038503275958936974,0.0055218289920614975,0.007849683148809492,0.004433536174903673,0.004101793499378049,0.003945884051807351,0.002998938751954992,0.0,0.0]}],"line":{"cmax":-0.28962264150943395,"cmin":-0.3591194968553459,"color":[-0.32987421383647797,-0.3251572327044025,-0.3069182389937107,-0.34182389937106916,-0.32075471698113206,-0.34276729559748426,-0.28962264150943395,-0.3273584905660377,-0.3213836477987422,-0.3292452830188679,-0.35062893081761004,-0.30566037735849055,-0.3270440251572327,-0.3430817610062893,-0.3374213836477987,-0.3191823899371069,-0.3150943396226415,-0.3210691823899371,-0.3484276729559748,-0.31886792452830187,-0.34559748427672954,-0.34654088050314463,-0.35188679245283017,-0.3449685534591195,-0.34276729559748426,-0.35,-0.35157232704402513,-0.35754716981132073,-0.35094339622641507,-0.35,-0.3449685534591195,-0.2930817610062893,-0.35062893081761004,-0.35188679245283017,-0.3562893081761006,-0.3591194968553459,-0.3559748427672956],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+<div>                            <div id="8f9bb867-f168-4168-9992-76953f85f708" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("8f9bb867-f168-4168-9992-76953f85f708")) {                    Plotly.newPlot(                        "8f9bb867-f168-4168-9992-76953f85f708",                        [{"dimensions":[{"label":"n_estimators","range":[5.0,10.0],"values":[9.0,5.0,8.0,7.0,6.0,8.0,7.0,7.0,8.0,5.0,8.0,8.0,8.0,9.0,6.0,9.0,8.0,9.0,8.0,6.0,9.0,8.0,8.0,8.0,8.0,8.0,9.0,9.0,9.0,9.0,9.0,10.0,9.0,9.0,9.0,9.0,9.0]},{"label":"criterion","range":[0.0,2.0],"values":[2.0,0.0,1.0,1.0,2.0,1.0,2.0,1.0,1.0,1.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"max_depth","range":[1.0,20.0],"values":[12.0,19.0,4.0,6.0,15.0,19.0,1.0,18.0,9.0,12.0,8.0,12.0,10.0,4.0,13.0,7.0,6.0,7.0,7.0,10.0,3.0,20.0,10.0,11.0,13.0,5.0,13.0,13.0,7.0,19.0,11.0,1.0,10.0,10.0,11.0,12.0,7.0]},{"label":"min_samples_split","range":[3.0,97.0],"values":[38.0,64.0,97.0,4.0,50.0,7.0,6.0,4.0,63.0,8.0,15.0,3.0,54.0,18.0,20.0,86.0,7.0,11.0,23.0,4.0,20.0,19.0,19.0,19.0,21.0,15.0,17.0,16.0,17.0,17.0,18.0,15.0,12.0,15.0,13.0,11.0,7.0]},{"label":"min_samples_leaf","range":[1.0,23.0],"values":[10.0,14.0,23.0,2.0,20.0,1.0,1.0,2.0,16.0,1.0,1.0,1.0,1.0,7.0,9.0,1.0,21.0,17.0,1.0,12.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"min_weight_fraction_leaf","range":[0.0005170658955305807,0.01],"values":[0.004375810986688453,0.0005170658955305807,0.00883455071876936,0.007563714253500024,0.002833523179697884,0.00964370149958853,0.0041963986116812756,0.00920433111159413,0.01,0.007992538074609179,0.006809773398328576,0.009702486461405656,0.0062578842811396775,0.0069378573912289845,0.0070310397700413035,0.005790728598179518,0.008280583758321995,0.006605991177956249,0.006840521151916454,0.006761346078545928,0.007390112050027889,0.00720643984619775,0.007039971225515157,0.00863701465012194,0.006191258173853972,0.008593379075248337,0.009236882699025381,0.008214194759586062,0.007024048523353716,0.007699705320572511,0.00853246130779513,0.006737074283810488,0.007512563987975429,0.007401290374388599,0.007120821025401721,0.0059164181306543325,0.003251990785225482]},{"label":"max_features","range":[0.0,1.0],"values":[0.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0]},{"label":"max_leaf_nodes","range":[7.0,12.0],"values":[10.0,8.0,12.0,10.0,7.0,9.0,7.0,9.0,10.0,10.0,10.0,10.0,10.0,10.0,10.0,10.0,8.0,10.0,10.0,10.0,10.0,10.0,10.0,8.0,11.0,10.0,9.0,9.0,9.0,9.0,9.0,10.0,9.0,9.0,9.0,9.0,9.0]},{"label":"min_impurity_decrease","range":[0.0,0.01],"values":[0.00036049087681399585,0.0035361836227871626,0.00905773354221908,0.005444269419402145,0.0076527367276491955,0.01,0.01,0.00855281684262531,0.01,0.007021711204493493,0.004485828999382583,0.008618320647481756,0.004174978732575841,0.004263774110434773,0.004255652561754926,0.0033204433015040307,0.0044914751446857816,0.004578884919126868,0.00391778506359571,0.004003792181631402,0.00464257926682031,0.004982428254652078,0.004547189090028323,0.005357298523110613,0.0016661798998482227,0.0075333690729609435,0.009163034561064435,0.006835844042441903,0.0038503275958936974,0.0055218289920614975,0.007849683148809492,0.004433536174903673,0.004101793499378049,0.003945884051807351,0.002998938751954992,0.0,0.0]}],"line":{"cmax":-0.28962264150943395,"cmin":-0.3591194968553459,"color":[-0.32987421383647797,-0.3251572327044025,-0.3069182389937107,-0.34182389937106916,-0.32075471698113206,-0.34276729559748426,-0.28962264150943395,-0.3273584905660377,-0.3213836477987422,-0.3292452830188679,-0.35062893081761004,-0.30566037735849055,-0.3270440251572327,-0.3430817610062893,-0.3374213836477987,-0.3191823899371069,-0.3150943396226415,-0.3210691823899371,-0.3484276729559748,-0.31886792452830187,-0.34559748427672954,-0.34654088050314463,-0.35188679245283017,-0.3449685534591195,-0.34276729559748426,-0.35,-0.35157232704402513,-0.35754716981132073,-0.35094339622641507,-0.35,-0.3449685534591195,-0.2930817610062893,-0.35062893081761004,-0.35188679245283017,-0.3562893081761006,-0.3591194968553459,-0.3559748427672956],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('280ba1f9-6d99-4784-a65b-64c614b50f29');
+var gd = document.getElementById('8f9bb867-f168-4168-9992-76953f85f708');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{

@@ -381,7 +381,7 @@ require(['plotly'], function(Plotly) {
 <div class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython                 0.3.0
+<pre><code>spotPython                 0.3.4
 spotRiver                  0.0.93</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -420,7 +420,7 @@ spotRiver                  0.0.93</code></pre>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'./figures'</span>):</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'./figures'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>18-svc-sklearn_p040025_1min_5init_2023-07-04_01-59-23</code></pre>
+<pre><code>18-svc-sklearn_p040025_1min_5init_2023-07-06_02-13-55</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="5">
@@ -1054,10 +1054,8 @@ Weights
 <span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    get_var_type,)</span>
 <span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
 <span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"var_type"</span>: var_type,</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"var_name"</span>: var_name})</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-fig-label="tbl-design" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
@@ -1094,11 +1092,10 @@ Weights
 </ul>
 <div class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>hyper_dict<span class="op">=</span>SklearnHyperDict().load()</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control, hyper_dict)</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>X_start</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="25">
-<pre><code>array([[1.e+00, 2.e+00, 3.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e-03,
+<pre><code>array([[1.e+00, 0.e+00, 3.e+00, 0.e+00, 0.e+00, 0.e+00, 0.e+00, 1.e-03,
         2.e+02, 0.e+00]])</code></pre>
 </div>
 </div>
@@ -1135,203 +1132,203 @@ Weights
 <span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>                                      })</span>
 <span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 0.29% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 0.30% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 0.59% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 0.61% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 0.94% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 0.98% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 1.28% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 1.33% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 1.51% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 1.56% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 1.79% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 1.84% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 2.02% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 2.08% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 2.29% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 2.37% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.38345864661654133 [----------] 2.56% </code></pre>
+<pre><code>spotPython tuning: -0.38345864661654133 [----------] 2.64% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [----------] 2.82% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [----------] 2.91% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [----------] 3.03% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [----------] 3.14% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [----------] 3.26% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [----------] 3.39% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [----------] 3.91% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [----------] 4.00% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [----------] 4.59% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [----------] 4.66% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 5.30% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 5.34% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 6.25% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 6.26% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 7.64% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 7.59% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 8.88% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 8.81% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 9.63% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 9.54% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 10.53% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 10.39% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 11.35% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 11.20% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 12.25% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 12.04% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 13.25% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 12.89% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 14.27% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 13.80% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 15.62% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#---------] 14.90% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 16.56% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 15.75% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 17.21% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 16.42% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 18.32% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 17.28% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 19.64% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 18.47% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 20.64% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 19.44% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 21.78% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 20.52% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 23.34% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 22.02% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 25.24% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 23.52% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 26.85% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [##--------] 24.81% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 28.44% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 26.10% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 30.65% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 27.87% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 32.26% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 29.17% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 33.93% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 30.51% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [####------] 35.68% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 31.96% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [####------] 37.42% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 33.36% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [####------] 39.03% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [###-------] 34.69% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [####------] 40.59% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [####------] 35.99% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [####------] 41.98% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [####------] 37.16% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [####------] 44.34% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [####------] 39.15% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 46.14% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [####------] 40.66% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 47.82% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [####------] 42.02% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 49.51% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [####------] 43.36% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 51.57% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 45.00% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 53.10% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 46.30% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [######----] 55.02% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 47.85% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [######----] 56.90% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 49.33% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [######----] 59.11% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 51.05% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [######----] 61.06% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 52.60% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [######----] 62.85% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#####-----] 54.10% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [######----] 64.61% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [######----] 55.53% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#######---] 66.32% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [######----] 56.97% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#######---] 68.00% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [######----] 58.36% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#######---] 69.79% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [######----] 59.84% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#######---] 74.58% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [######----] 64.75% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [########--] 80.36% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#######---] 72.77% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [########--] 84.87% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [########--] 77.94% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#########-] 89.17% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [########--] 83.48% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [#########-] 93.14% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#########-] 89.59% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: -0.39473684210526316 [##########] 97.80% </code></pre>
+<pre><code>spotPython tuning: -0.39473684210526316 [#########-] 94.81% </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>spotPython tuning: -0.39473684210526316 [##########] 100.00% Done...
 </code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="26">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x1525b3f70&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x2ab363970&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -1662,9 +1659,9 @@ cache_size:  0.9342569567506037</code></pre>
 <div class="sourceCode cell-code" id="cb139"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-<div>                            <div id="d32086a9-7ea5-4d83-af61-0b915888e08b" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("d32086a9-7ea5-4d83-af61-0b915888e08b")) {                    Plotly.newPlot(                        "d32086a9-7ea5-4d83-af61-0b915888e08b",                        [{"dimensions":[{"label":"C","range":[0.4480016397271256,9.970256910422835],"values":[8.648943310768674,4.211776903906428,0.4480016397271256,2.477732245332236,7.65501078489161,9.970256910422835,8.39367359451998,7.643308808248038,7.651745326895939,7.654803030746236,7.6548617093258935,7.654897326530919,7.655542798296076,7.655820460926148,4.211117448021866,4.211116113573456,4.211120004559577,4.211119392541106,3.6306219555840893,4.212053496869853,4.156868674776817,4.191480704825077,4.191616889592204,4.188041113517062,4.193775143904672,4.201524993736512,4.202379821076768,4.202447637914392,4.202371971979097,4.201229744055735,4.196646789843976,4.179046999367034,4.1984501501647955,4.19707636546645,4.178387818365676,7.662443636682849,7.662812467603129,7.667168209365481,7.6726798531983835,4.194934606717021,4.1903692489658795,4.19418327255368,4.194752460169141,4.197215750568262,4.198078215396973,4.197970056723932,4.198327763743813,4.197941346894663,4.197405358900802,4.195816731256624,4.198747639850218,4.198721839723767,4.1987043915538225,4.198632710227926,4.199093667318212,4.199183375382498,4.199297647080672,4.199342265263801,4.199177146346089,4.199218412696783,4.199216890263011,4.19917146000354,4.199054307571538,4.199017404368334,4.199031996750046,4.198988765160131,4.198932607501652,4.199047365932007,4.199007960121331,4.199119103833567]},{"label":"gamma","range":[0.0,1.0],"values":[1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"shrinking","range":[0.0,1.0],"values":[0.0,1.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,1.0,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"tol","range":[0.0017515100933833258,0.008752718394912432],"values":[0.0036949438148166343,0.0042780124676398525,0.008752718394912432,0.0017515100933833258,0.006578078210197142,0.0067510297131851285,0.006401591456913242,0.006574508574980985,0.006604466432696822,0.006576290251258298,0.006579390197535392,0.006577700307644493,0.0065785878431451885,0.006577093815414825,0.004278044656534419,0.004278060890262279,0.004259087414114652,0.004280014678320687,0.004283220732445845,0.00428349942957785,0.004278109607125232,0.0042815014945282994,0.004289946403439402,0.004281297615438655,0.004282348040830751,0.004275844668503835,0.004277321833306969,0.004276758187815867,0.0042768918891342485,0.004513966327575126,0.0042609539020589384,0.004279893689137404,0.00420895114839696,0.004169700483398847,0.004178115506298903,0.0065807663213499155,0.006577706324129918,0.006579701390911777,0.0065798648169694985,0.0040816461014482035,0.004010783905595132,0.0040912832704570945,0.004099397367777487,0.004138280994143819,0.004177586202372404,0.0041802492288090815,0.00419405651406836,0.004174399749681166,0.004156055579712097,0.004145923844373218,0.004173710441242331,0.004194978648070631,0.004187349806174992,0.004185395774574277,0.004209433122673159,0.004210642599881929,0.004215814299981925,0.004221265190613721,0.004214167981003262,0.0042168137320695975,0.004220409869675859,0.0042186464477437366,0.0042157883265175455,0.004211759432308394,0.004202121903700486,0.004201962164020574,0.004203266824837874,0.004199156365738244,0.004203168129296268,0.00420845680365584]},{"label":"cache_size","range":[104.35556448848997,389.44564593489815],"values":[389.44564593489815,309.22177268622806,104.35556448848997,190.13266189013237,224.8839704935874,121.03622688943457,227.12739066690537,238.42902208015622,284.4294906114017,224.85604424539804,224.838277699779,224.80427009320363,239.92357686064867,211.5211407808272,319.49898598118955,319.51064176058986,319.51014002493025,319.4545781549498,316.7078847901395,319.5105476541058,289.968885488701,335.46683029857945,266.71473566397765,288.8330741338434,321.8600393598493,245.10521608992684,339.88581403949064,339.8858514519732,339.88578412536515,296.5433493083065,245.1054432199099,245.1069011863709,317.7483294624309,316.5837058205596,245.1077497142949,170.95244093651715,201.20921312293024,170.95146324681056,170.95100612136915,319.51046971120866,320.1204860090832,319.5801871909525,319.12181184426976,318.8502702537257,319.73797318473635,319.65297855315725,320.1297828355202,319.4860720579227,318.98348792123704,319.61915552480355,319.05115303418165,319.8075047409228,319.38370945060956,319.19854017548926,321.1195016570548,321.0431649559973,320.9538116021524,320.84311260991575,320.89716552614965,320.78363283728356,320.67542485899963,320.5940133909914,320.6918307142206,320.96640900264345,321.2019434201876,321.13332977434237,321.0720065783887,321.1550874115968,321.14565593438743,321.52845132310887]},{"label":"break_ties","range":[0.0,1.0],"values":[0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]}],"line":{"cmax":-0.3370927318295739,"cmin":-0.39473684210526316,"color":[-0.35839598997493727,-0.36215538847117795,-0.3370927318295739,-0.35087719298245607,-0.38345864661654133,-0.3533834586466165,-0.3533834586466165,-0.35839598997493727,-0.3558897243107769,-0.3696741854636591,-0.36591478696741847,-0.3571428571428571,-0.3596491228070175,-0.3521303258145363,-0.39473684210526316,-0.3771929824561403,-0.37468671679197996,-0.3847117794486215,-0.3508771929824561,-0.3822055137844611,-0.38721804511278196,-0.37969924812030076,-0.36842105263157887,-0.37218045112781956,-0.3659147869674186,-0.37092731829573933,-0.38345864661654133,-0.37468671679197996,-0.3634085213032581,-0.3684210526315789,-0.3533834586466165,-0.3596491228070175,-0.38596491228070173,-0.38721804511278196,-0.37092731829573933,-0.3634085213032581,-0.36842105263157887,-0.3746867167919799,-0.38596491228070173,-0.38596491228070173,-0.37218045112781956,-0.3771929824561404,-0.37218045112781956,-0.36967418546365916,-0.37719298245614036,-0.37092731829573933,-0.3922305764411027,-0.38596491228070173,-0.38596491228070173,-0.3671679197994987,-0.3684210526315789,-0.38596491228070173,-0.37969924812030076,-0.3558897243107769,-0.38596491228070173,-0.38596491228070173,-0.3822055137844611,-0.37218045112781956,-0.38345864661654133,-0.3809523809523809,-0.37844611528822053,-0.37218045112781956,-0.3659147869674185,-0.3634085213032581,-0.37719298245614036,-0.3771929824561404,-0.39348370927318294,-0.36967418546365916,-0.35714285714285715,-0.37092731829573933],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+<div>                            <div id="e706242d-842c-4756-a23b-7ae7b2b22a06" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("e706242d-842c-4756-a23b-7ae7b2b22a06")) {                    Plotly.newPlot(                        "e706242d-842c-4756-a23b-7ae7b2b22a06",                        [{"dimensions":[{"label":"C","range":[0.4480016397271256,9.970256910422835],"values":[8.648943310768674,4.211776903906428,0.4480016397271256,2.477732245332236,7.65501078489161,9.970256910422835,8.39367359451998,7.643308808248038,7.651745326895939,7.654803030746236,7.6548617093258935,7.654897326530919,7.655542798296076,7.655820460926148,4.211117448021866,4.211116113573456,4.211120004559577,4.211119392541106,3.6306219555840893,4.212053496869853,4.156868674776817,4.191480704825077,4.191616889592204,4.188041113517062,4.193775143904672,4.201524993736512,4.202379821076768,4.202447637914392,4.202371971979097,4.201229744055735,4.196646789843976,4.179046999367034,4.1984501501647955,4.19707636546645,4.178387818365676,7.662443636682849,7.662812467603129,7.667168209365481,7.6726798531983835,4.194934606717021,4.1903692489658795,4.19418327255368,4.194752460169141,4.197215750568262,4.198078215396973,4.197970056723932,4.198327763743813,4.197941346894663,4.197405358900802,4.195816731256624,4.198747639850218,4.198721839723767,4.1987043915538225,4.198632710227926,4.199093667318212,4.199183375382498,4.199297647080672,4.199342265263801,4.199177146346089,4.199218412696783,4.199216890263011,4.19917146000354,4.199054307571538,4.199017404368334,4.199031996750046,4.198988765160131,4.198932607501652,4.199047365932007,4.199007960121331,4.199119103833567]},{"label":"gamma","range":[0.0,1.0],"values":[1.0,0.0,1.0,0.0,1.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"shrinking","range":[0.0,1.0],"values":[0.0,1.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0,0.0,1.0,1.0,1.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,0.0,1.0,0.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]},{"label":"tol","range":[0.0017515100933833258,0.008752718394912432],"values":[0.0036949438148166343,0.0042780124676398525,0.008752718394912432,0.0017515100933833258,0.006578078210197142,0.0067510297131851285,0.006401591456913242,0.006574508574980985,0.006604466432696822,0.006576290251258298,0.006579390197535392,0.006577700307644493,0.0065785878431451885,0.006577093815414825,0.004278044656534419,0.004278060890262279,0.004259087414114652,0.004280014678320687,0.004283220732445845,0.00428349942957785,0.004278109607125232,0.0042815014945282994,0.004289946403439402,0.004281297615438655,0.004282348040830751,0.004275844668503835,0.004277321833306969,0.004276758187815867,0.0042768918891342485,0.004513966327575126,0.0042609539020589384,0.004279893689137404,0.00420895114839696,0.004169700483398847,0.004178115506298903,0.0065807663213499155,0.006577706324129918,0.006579701390911777,0.0065798648169694985,0.0040816461014482035,0.004010783905595132,0.0040912832704570945,0.004099397367777487,0.004138280994143819,0.004177586202372404,0.0041802492288090815,0.00419405651406836,0.004174399749681166,0.004156055579712097,0.004145923844373218,0.004173710441242331,0.004194978648070631,0.004187349806174992,0.004185395774574277,0.004209433122673159,0.004210642599881929,0.004215814299981925,0.004221265190613721,0.004214167981003262,0.0042168137320695975,0.004220409869675859,0.0042186464477437366,0.0042157883265175455,0.004211759432308394,0.004202121903700486,0.004201962164020574,0.004203266824837874,0.004199156365738244,0.004203168129296268,0.00420845680365584]},{"label":"cache_size","range":[104.35556448848997,389.44564593489815],"values":[389.44564593489815,309.22177268622806,104.35556448848997,190.13266189013237,224.8839704935874,121.03622688943457,227.12739066690537,238.42902208015622,284.4294906114017,224.85604424539804,224.838277699779,224.80427009320363,239.92357686064867,211.5211407808272,319.49898598118955,319.51064176058986,319.51014002493025,319.4545781549498,316.7078847901395,319.5105476541058,289.968885488701,335.46683029857945,266.71473566397765,288.8330741338434,321.8600393598493,245.10521608992684,339.88581403949064,339.8858514519732,339.88578412536515,296.5433493083065,245.1054432199099,245.1069011863709,317.7483294624309,316.5837058205596,245.1077497142949,170.95244093651715,201.20921312293024,170.95146324681056,170.95100612136915,319.51046971120866,320.1204860090832,319.5801871909525,319.12181184426976,318.8502702537257,319.73797318473635,319.65297855315725,320.1297828355202,319.4860720579227,318.98348792123704,319.61915552480355,319.05115303418165,319.8075047409228,319.38370945060956,319.19854017548926,321.1195016570548,321.0431649559973,320.9538116021524,320.84311260991575,320.89716552614965,320.78363283728356,320.67542485899963,320.5940133909914,320.6918307142206,320.96640900264345,321.2019434201876,321.13332977434237,321.0720065783887,321.1550874115968,321.14565593438743,321.52845132310887]},{"label":"break_ties","range":[0.0,1.0],"values":[0.0,0.0,1.0,1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,0.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0]}],"line":{"cmax":-0.3370927318295739,"cmin":-0.39473684210526316,"color":[-0.35839598997493727,-0.36215538847117795,-0.3370927318295739,-0.35087719298245607,-0.38345864661654133,-0.3533834586466165,-0.3533834586466165,-0.35839598997493727,-0.3558897243107769,-0.3696741854636591,-0.36591478696741847,-0.3571428571428571,-0.3596491228070175,-0.3521303258145363,-0.39473684210526316,-0.3771929824561403,-0.37468671679197996,-0.3847117794486215,-0.3508771929824561,-0.3822055137844611,-0.38721804511278196,-0.37969924812030076,-0.36842105263157887,-0.37218045112781956,-0.3659147869674186,-0.37092731829573933,-0.38345864661654133,-0.37468671679197996,-0.3634085213032581,-0.3684210526315789,-0.3533834586466165,-0.3596491228070175,-0.38596491228070173,-0.38721804511278196,-0.37092731829573933,-0.3634085213032581,-0.36842105263157887,-0.3746867167919799,-0.38596491228070173,-0.38596491228070173,-0.37218045112781956,-0.3771929824561404,-0.37218045112781956,-0.36967418546365916,-0.37719298245614036,-0.37092731829573933,-0.3922305764411027,-0.38596491228070173,-0.38596491228070173,-0.3671679197994987,-0.3684210526315789,-0.38596491228070173,-0.37969924812030076,-0.3558897243107769,-0.38596491228070173,-0.38596491228070173,-0.3822055137844611,-0.37218045112781956,-0.38345864661654133,-0.3809523809523809,-0.37844611528822053,-0.37218045112781956,-0.3659147869674185,-0.3634085213032581,-0.37719298245614036,-0.3771929824561404,-0.39348370927318294,-0.36967418546365916,-0.35714285714285715,-0.37092731829573933],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('d32086a9-7ea5-4d83-af61-0b915888e08b');
+var gd = document.getElementById('e706242d-842c-4756-a23b-7ae7b2b22a06');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{

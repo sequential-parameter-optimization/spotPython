@@ -401,31 +401,15 @@ require(['plotly'], function(Plotly) {
 </header>
 
 <p>In this tutorial, we will show how <code>spotPython</code> can be integrated into the <code>PyTorch</code> training workflow. It is based on the tutorial “Hyperparameter Tuning with Ray Tune” from the <code>PyTorch</code> documentation <span class="citation" data-cites="pyto23a">(<a href="references.html#ref-pyto23a" role="doc-biblioref">PyTorch 2023a</a>)</span>, which is an extension of the tutorial “Training a Classifier” <span class="citation" data-cites="pyto23b">(<a href="references.html#ref-pyto23b" role="doc-biblioref">PyTorch 2023b</a>)</span> for training a CIFAR10 image classifier.</p>
-<p>This document refers to the following software versions:</p>
-<ul>
-<li><code>python</code>: 3.10.10</li>
-<li><code>torch</code>: 2.0.1</li>
-<li><code>torchvision</code>: 0.15.0</li>
-</ul>
-<div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython                 0.3.0
-spotRiver                  0.0.93</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Note: you may need to restart the kernel to use updated packages.</code></pre>
-</div>
-</div>
 <p><code>spotPython</code> can be installed via pip<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
 <pre class="{raw}"><code>!pip install spotPython</code></pre>
 <ul>
 <li>Uncomment the following lines if you want to for (re-)installation the latest version of <code>spotPython</code> from gitHub.</li>
 </ul>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import sys</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade build</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade --force-reinstall spotPython</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import sys</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade build</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade --force-reinstall spotPython</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Results that refer to the <code>Ray Tune</code> package are taken from <a href="https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html">https://PyTorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html</a><a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.</p>
 <section id="sec-setup-14" class="level2" data-number="12.1">
@@ -461,43 +445,42 @@ Note: Device selection
 <li>The device can be selected by setting the variable <code>DEVICE</code>.</li>
 <li>Since we are using a simple neural net, the setting <code>"cpu"</code> is preferred (on Mac).</li>
 <li>If you have a GPU, you can use <code>"cuda:0"</code> instead.</li>
-<li>If DEVICE is set to <code>None</code>, <code>spotPython</code> will automatically select the device.
+<li>If DEVICE is set to <code>"auto"</code> or <code>None</code>, <code>spotPython</code> will automatically select the device.
 <ul>
 <li>This might result in <code>"mps"</code> on Macs, which is not the best choice for simple neural nets.</li>
 </ul></li>
 </ul>
 </div>
 </div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> <span class="st">"auto"</span> <span class="co"># "cpu"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>PREFIX <span class="op">=</span> <span class="st">"14-torch"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">10</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> <span class="st">"cpu"</span> <span class="co"># "cuda:0"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.device <span class="im">import</span> getDevice</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> getDevice(DEVICE)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(DEVICE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>mps</code></pre>
+</div>
 </div>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.device <span class="im">import</span> getDevice</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>DEVICE <span class="op">=</span> getDevice(DEVICE)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(DEVICE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dateutil.tz <span class="im">import</span> tzlocal</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.<span class="bu">file</span> <span class="im">import</span> get_experiment_name</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> get_experiment_name(prefix<span class="op">=</span>PREFIX)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(experiment_name)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'./figures'</span>):</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'./figures'</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>cpu</code></pre>
-</div>
-</div>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> copy</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> socket</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> datetime</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dateutil.tz <span class="im">import</span> tzlocal</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> datetime.now(tzlocal())</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>HOSTNAME <span class="op">=</span> socket.gethostname().split(<span class="st">"."</span>)[<span class="dv">0</span>]</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> <span class="st">'14-torch'</span> <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> HOSTNAME <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> <span class="bu">str</span>(MAX_TIME) <span class="op">+</span> <span class="st">"min_"</span> <span class="op">+</span> <span class="bu">str</span>(INIT_SIZE) <span class="op">+</span> <span class="st">"init_"</span> <span class="op">+</span> <span class="bu">str</span>(start_time).split(<span class="st">"."</span>, <span class="dv">1</span>)[<span class="dv">0</span>].replace(<span class="st">' '</span>, <span class="st">'_'</span>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> experiment_name.replace(<span class="st">':'</span>, <span class="st">'-'</span>)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(experiment_name)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> os.path.exists(<span class="st">'./figures'</span>):</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    os.makedirs(<span class="st">'./figures'</span>)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>14-torch_bartz09_10min_5init_2023-07-04_01-03-35</code></pre>
+<pre><code>14-torch_p040025_2023-07-06_00-55-16</code></pre>
 </div>
 </div>
 </section>
@@ -519,26 +502,26 @@ Caution: Tensorboard does not work under Windows
 </ul>
 </div>
 </div>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    tensorboard_path<span class="op">=</span><span class="st">"runs/14_spot_ray_hpt_torch_cifar10"</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    device<span class="op">=</span>DEVICE,)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"classification"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    tensorboard_path<span class="op">=</span><span class="st">"runs/14_spot_ray_hpt_torch_cifar10"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    device<span class="op">=</span>DEVICE,)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-data-loading-14" class="level2" data-number="12.3">
 <h2 data-number="12.3" class="anchored" data-anchor-id="sec-data-loading-14"><span class="header-section-number">12.3</span> Step 3: PyTorch Data Loading</h2>
 <p>The data loading process is implemented in the same manner as described in the Section “Data loaders” in <span class="citation" data-cites="pyto23a">PyTorch (<a href="references.html#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>. The data loaders are wrapped into the function <code>load_data_cifar10</code> which is identical to the function <code>load_data</code> in <span class="citation" data-cites="pyto23a">PyTorch (<a href="references.html#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>. A global data directory is used, which allows sharing the data directory between different trials. The method <code>load_data_cifar10</code> is part of the <code>spotPython</code> package and can be imported from <code>spotPython.data.torchdata</code>.</p>
 <p>In the following step, the test and train data are added to the dictionary <code>fun_control</code>.</p>
-<div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torchdata <span class="im">import</span> load_data_cifar10</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> load_data_cifar10()</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="bu">len</span>(train)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add the dataset to the fun_control</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"train"</span>: train,</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"test"</span>: test,</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_samples"</span>: n_samples})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torchdata <span class="im">import</span> load_data_cifar10</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>train, test <span class="op">=</span> load_data_cifar10()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> <span class="bu">len</span>(train)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add the dataset to the fun_control</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"train"</span>: train,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"test"</span>: test,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"n_samples"</span>: n_samples})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Files already downloaded and verified</code></pre>
 </div>
@@ -560,9 +543,9 @@ prep_model = ColumnTransformer(
          remainder=StandardScaler(),
      )</code></pre>
 <p>Because the Ray Tune (<code>ray[tune]</code>) hyperparameter tuning as described in <span class="citation" data-cites="pyto23a">PyTorch (<a href="references.html#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> does not use a preprocessing model, the preprocessing model is set to <code>None</code> here.</p>
-<div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-selection-of-the-algorithm-14" class="level2" data-number="12.5">
@@ -660,15 +643,15 @@ class Net_Core(nn.Module):
 <h3 data-number="12.5.2" class="anchored" data-anchor-id="sec-comparison"><span class="header-section-number">12.5.2</span> Comparison of the Approach Described in the PyTorch Tutorial With spotPython</h3>
 <p>Comparing the class <code>Net</code> from the <code>PyTorch</code> tutorial and the class <code>Net_CIFAR10</code> from <code>spotPython</code>, we see that the class <code>Net_CIFAR10</code> has additional attributes and does not inherit from <code>nn</code> directly. It adds an additional class, <code>Net_core</code>, that takes care of additional attributes that are common to all neural network models, e.g., the learning rate multiplier <code>lr_mult</code> or the batch size <code>batch_size</code>.</p>
 <p><code>spotPython</code>’s <code>core_model</code> implements an instance of the <code>Net_CIFAR10</code> class. In addition to the basic neural network model, the <code>core_model</code> can use these additional attributes. <code>spotPython</code> provides methods for handling these additional attributes to guarantee 100% compatibility with the <code>PyTorch</code> classes. The method <code>add_core_model_to_fun_control</code> adds the hyperparameters and additional attributes to the <code>fun_control</code> dictionary. The method is shown below.</p>
-<div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.netcifar10 <span class="im">import</span> Net_CIFAR10</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torch_hyper_dict <span class="im">import</span> TorchHyperDict</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> add_core_model_to_fun_control</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>core_model <span class="op">=</span> Net_CIFAR10</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>TorchHyperDict,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.netcifar10 <span class="im">import</span> Net_CIFAR10</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.data.torch_hyper_dict <span class="im">import</span> TorchHyperDict</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> add_core_model_to_fun_control</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>core_model <span class="op">=</span> Net_CIFAR10</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>TorchHyperDict,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-search-space-14" class="level3" data-number="12.5.3">
@@ -693,18 +676,18 @@ class Net_Core(nn.Module):
 <h4 data-number="12.5.5.1" class="anchored" data-anchor-id="the-hyper_dict-hyperparameters-for-the-selected-algorithm"><span class="header-section-number">12.5.5.1</span> The <code>hyper_dict</code> Hyperparameters for the Selected Algorithm</h4>
 <p><code>spotPython</code> uses <code>JSON</code> files for the specification of the hyperparameters. Users can specify their individual <code>JSON</code> files, or they can use the <code>JSON</code> files provided by <code>spotPython</code>. The <code>JSON</code> file for the <code>core_model</code> is called <code>torch_hyper_dict.json</code>.</p>
 <p>In contrast to <code>ray[tune]</code>, <code>spotPython</code> can handle numerical, boolean, and categorical hyperparameters. They can be specified in the <code>JSON</code> file in a similar way as the numerical hyperparameters as shown below. Each entry in the <code>JSON</code> file represents one hyperparameter with the following structure: <code>type</code>, <code>default</code>, <code>transform</code>, <code>lower</code>, and <code>upper</code>.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="er">"factor_hyperparameter":</span> <span class="fu">{</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"A"</span><span class="ot">,</span> <span class="st">"B"</span><span class="ot">,</span> <span class="st">"C"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"B"</span><span class="fu">,</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"str"</span><span class="fu">,</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span><span class="er">,</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="er">"factor_hyperparameter":</span> <span class="fu">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"levels"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"A"</span><span class="ot">,</span> <span class="st">"B"</span><span class="ot">,</span> <span class="st">"C"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"factor"</span><span class="fu">,</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"B"</span><span class="fu">,</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"transform"</span><span class="fu">:</span> <span class="st">"None"</span><span class="fu">,</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"core_model_parameter_type"</span><span class="fu">:</span> <span class="st">"str"</span><span class="fu">,</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"lower"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"upper"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">}</span><span class="er">,</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The corresponding entries for the core_model` class are shown below.</p>
-<div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">'core_model_hyper_dict'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">'core_model_hyper_dict'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>{'l1': {'type': 'int',
   'default': 5,
   'transform': 'transform_power_2_int',
@@ -779,34 +762,34 @@ class Net_Core(nn.Module):
 <section id="modify-hyperparameters-of-type-numeric-and-integer-boolean" class="level4" data-number="12.6.0.2">
 <h4 data-number="12.6.0.2" class="anchored" data-anchor-id="modify-hyperparameters-of-type-numeric-and-integer-boolean"><span class="header-section-number">12.6.0.2</span> Modify Hyperparameters of Type numeric and integer (boolean)</h4>
 <p>Since the hyperparameter <code>k_folds</code> is not used in the <code>PyTorch</code> tutorial, it is de-activated here by setting the lower and upper bound to the same value. Note, <code>k_folds</code> is of type “integer”.</p>
-<div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_bounds</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>, bounds<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">5</span>])</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, </span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"k_folds"</span>, bounds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>])</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, </span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"patience"</span>, bounds<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_bounds</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"batch_size"</span>, bounds<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">5</span>])</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, </span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"k_folds"</span>, bounds<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, </span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"patience"</span>, bounds<span class="op">=</span>[<span class="dv">3</span>, <span class="dv">3</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="modify-hyperparameter-of-type-factor" class="level4" data-number="12.6.0.3">
 <h4 data-number="12.6.0.3" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">12.6.0.3</span> Modify Hyperparameter of Type factor</h4>
 <p>In a similar manner as for the numerical hyperparameters, the categorical hyperparameters can be modified. New configurations can be chosen by adding or deleting levels. For example, the hyperparameter <code>optimizer</code> can be re-configured as follows:</p>
 <p>In the following setting, two optimizers (<code>"SGD"</code> and <code>"Adam"</code>) will be compared during the <code>spotPython</code> hyperparameter tuning. The hyperparameter <code>optimizer</code> is active.</p>
-<div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_levels</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_levels(fun_control,</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>, <span class="st">"Adam"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_levels</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_levels(fun_control,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>     <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>, <span class="st">"Adam"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The hyperparameter <code>optimizer</code> can be de-activated by choosing only one value (level), here: <code>"SGD"</code>.</p>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>, [<span class="st">"SGD"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>As discussed in <a href="#sec-optimizers-14"><span>Section&nbsp;12.6.1</span></a>, there are some issues with the LBFGS optimizer. Therefore, the usage of the LBFGS optimizer is not deactivated in <code>spotPython</code> by default. However, the LBFGS optimizer can be activated by adding it to the list of optimizers. <code>Rprop</code> was removed, because it does perform very poorly (as some pre-tests have shown). However, it can also be activated by adding it to the list of optimizers. Since <code>SparseAdam</code> does not support dense gradients, <code>Adam</code> was used instead. Therefore, there are 10 default optimizers:</p>
-<div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>,</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Adadelta"</span>, <span class="st">"Adagrad"</span>, <span class="st">"Adam"</span>, <span class="st">"AdamW"</span>, <span class="st">"Adamax"</span>, <span class="st">"ASGD"</span>, </span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NAdam"</span>, <span class="st">"RAdam"</span>, <span class="st">"RMSprop"</span>, <span class="st">"SGD"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_levels(fun_control, <span class="st">"optimizer"</span>,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    [<span class="st">"Adadelta"</span>, <span class="st">"Adagrad"</span>, <span class="st">"Adam"</span>, <span class="st">"AdamW"</span>, <span class="st">"Adamax"</span>, <span class="st">"ASGD"</span>, </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"NAdam"</span>, <span class="st">"RAdam"</span>, <span class="st">"RMSprop"</span>, <span class="st">"SGD"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-optimizers-14" class="level3" data-number="12.6.1">
@@ -1110,11 +1093,11 @@ A note on the learning rate
 </div>
 </div>
 <p>For the same reason, we will fix the <code>sgd_momentum</code> to <code>0.9</code>.</p>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lr_mult"</span>, bounds<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sgd_momentum"</span>, bounds<span class="op">=</span>[<span class="fl">0.9</span>, <span class="fl">0.9</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control,</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lr_mult"</span>, bounds<span class="op">=</span>[<span class="fl">1.0</span>, <span class="fl">1.0</span>])</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sgd_momentum"</span>, bounds<span class="op">=</span>[<span class="fl">0.9</span>, <span class="fl">0.9</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -1233,11 +1216,11 @@ Note
 <h5 data-number="12.7.4.2.2" class="anchored" data-anchor-id="testing-of-the-tuned-architecture"><span class="header-section-number">12.7.4.2.2</span> Testing of the Tuned Architecture</h5>
 <p><code>test_tuned(model, test)</code>: test the model on the test data set. No data splitting is performed. The (trained) model is evaluated using the <code>validate_fold_or_hold_out()</code> function. Note: During training, <code>"shuffle"</code> is set to <code>True</code>, whereas during testing, <code>"shuffle"</code> is set to <code>False</code>.</p>
 <p><a href="99_spot_doc.html#sec-final-model-evaluation"><span>Section&nbsp;18.14.1.4</span></a> describes the final evaluation of the tuned architecture.</p>
-<div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"eval"</span>: <span class="st">"train_hold_out"</span>,</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"path"</span>: <span class="st">"torch_model.pt"</span>,</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shuffle"</span>: <span class="va">True</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"eval"</span>: <span class="st">"train_hold_out"</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"path"</span>: <span class="st">"torch_model.pt"</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shuffle"</span>: <span class="va">True</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -1245,10 +1228,10 @@ Note
 <section id="sec-loss-functions-14" class="level3" data-number="12.7.5">
 <h3 data-number="12.7.5" class="anchored" data-anchor-id="sec-loss-functions-14"><span class="header-section-number">12.7.5</span> Evaluation: Loss Functions and Metrics</h3>
 <p>The key <code>"loss_function"</code> specifies the loss function which is used during the optimization. There are several different loss functions under <code>PyTorch</code>’s <code>nn</code> package. For example, a simple loss is <code>MSELoss</code>, which computes the mean-squared error between the output and the target. In this tutorial we will use <code>CrossEntropyLoss</code>, because it is also used in the <code>PyTorch</code> tutorial.</p>
-<div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> CrossEntropyLoss</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"loss_function"</span>: loss_function})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> torch.nn <span class="im">import</span> CrossEntropyLoss</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>loss_function <span class="op">=</span> CrossEntropyLoss()</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"loss_function"</span>: loss_function})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In addition to the loss functions, <code>spotPython</code> provides access to a large number of metrics.</p>
 <ul>
@@ -1264,10 +1247,10 @@ Note
 * Automatic accumulation over batches
 * Automatic synchronization between multiple devices</code></pre>
 <p>Therefore, we set</p>
-<div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchmetrics</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>metric_torch <span class="op">=</span> torchmetrics.Accuracy(task<span class="op">=</span><span class="st">"multiclass"</span>, num_classes<span class="op">=</span><span class="dv">10</span>).to(fun_control[<span class="st">"device"</span>])</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"metric_torch"</span>: metric_torch})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> torchmetrics</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>metric_torch <span class="op">=</span> torchmetrics.Accuracy(task<span class="op">=</span><span class="st">"multiclass"</span>, num_classes<span class="op">=</span><span class="dv">10</span>).to(fun_control[<span class="st">"device"</span>])</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"metric_torch"</span>: metric_torch})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -1276,24 +1259,22 @@ Note
 <section id="sec-prepare-spot-call-14" class="level3" data-number="12.8.1">
 <h3 data-number="12.8.1" class="anchored" data-anchor-id="sec-prepare-spot-call-14"><span class="header-section-number">12.8.1</span> Preparing the SPOT Call</h3>
 <p>The following code passes the information about the parameter ranges and bounds to <code>spot</code>.</p>
-<div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    get_bound_values</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"var_type"</span>: var_type,</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"var_name"</span>: var_name})</span>
-<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
-<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    get_bound_values</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now, the dictionary <code>fun_control</code> contains all information needed for the hyperparameter tuning. Before the hyperparameter tuning is started, it is recommended to take a look at the experimental design. The method <code>gen_design_table</code> generates a design table as follows:</p>
-<div class="cell" data-fig-label="tbl-design" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-fig-label="tbl-design" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>| name         | type   | default   |   lower |   upper | transform             |
 |--------------|--------|-----------|---------|---------|-----------------------|
@@ -1313,203 +1294,196 @@ Note
 <section id="sec-the-objective-function-14" class="level3" data-number="12.8.2">
 <h3 data-number="12.8.2" class="anchored" data-anchor-id="sec-the-objective-function-14"><span class="header-section-number">12.8.2</span> The Objective Function <code>fun_torch</code></h3>
 <p>The objective function <code>fun_torch</code> is selected next. It implements an interface from <code>PyTorch</code>’s training, validation, and testing methods to <code>spotPython</code>.</p>
-<div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.hypertorch <span class="im">import</span> HyperTorch</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperTorch().fun_torch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.fun.hypertorch <span class="im">import</span> HyperTorch</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperTorch().fun_torch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-default-hyperparameters" class="level3" data-number="12.8.3">
 <h3 data-number="12.8.3" class="anchored" data-anchor-id="sec-default-hyperparameters"><span class="header-section-number">12.8.3</span> Using Default Hyperparameters or Results from Previous Runs</h3>
 <p>We add the default setting to the initial design:</p>
-<div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>hyper_dict<span class="op">=</span>TorchHyperDict().load()</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control, hyper_dict)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="sec-call-the-hyperparameter-tuner-14" class="level3" data-number="12.8.4">
 <h3 data-number="12.8.4" class="anchored" data-anchor-id="sec-call-the-hyperparameter-tuner-14"><span class="header-section-number">12.8.4</span> Starting the Hyperparameter Tuning</h3>
 <p>The <code>spotPython</code> hyperparameter tuning is started by calling the <code>Spot</code> function. Here, we will run the tuner for approximately 30 minutes (<code>max_time</code>). Note: the initial design is always evaluated in the <code>spotPython</code> run. As a consequence, the run may take longer than specified by <code>max_time</code>, because the evaluation time of initial design (here: <code>init_size</code>, 10 points) is performed independently of <code>max_time</code>. During the run, results from the training is shown. These results can be visualized with Tensorboard as will be shown in <a href="#sec-tensorboard-14"><span>Section&nbsp;12.9</span></a>.</p>
-<div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>                   fun_repeats <span class="op">=</span> <span class="dv">1</span>,</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>                   noise <span class="op">=</span> <span class="va">False</span>,</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>                   infill_criterion <span class="op">=</span> <span class="st">"y"</span>,</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>                   n_points <span class="op">=</span> <span class="dv">1</span>,</span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
-<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>                   log_level <span class="op">=</span> <span class="dv">50</span>,</span>
-<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span> <span class="va">False</span>,</span>
-<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
-<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
-<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE,</span>
-<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"repeats"</span>: <span class="dv">1</span>},</span>
-<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
-<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
-<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
-<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
-<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
-<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span>,</span>
-<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"log_level"</span>: <span class="dv">50</span></span>
-<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>                                      })</span>
-<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE},</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>                                      })</span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 config: {'l1': 128, 'l2': 8, 'lr_mult': 1.0, 'batch_size': 32, 'epochs': 16, 'k_folds': 0, 'patience': 3, 'optimizer': 'AdamW', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.3822999894618988 | Loss: 1.6569919290542603 | Acc: 0.3823000000000000.
+<pre><code>MulticlassAccuracy: 0.3889499902725220 | Loss: 1.6403590366363525 | Acc: 0.3889500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4539499878883362 | Loss: 1.4899173261642455 | Acc: 0.4539500000000000.
+<pre><code>MulticlassAccuracy: 0.4578999876976013 | Loss: 1.4816969134330749 | Acc: 0.4579000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4918999969959259 | Loss: 1.3893225684165955 | Acc: 0.4919000000000000.
+<pre><code>MulticlassAccuracy: 0.4945999979972839 | Loss: 1.3767625138282775 | Acc: 0.4946000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5101500153541565 | Loss: 1.3411697679519654 | Acc: 0.5101500000000000.
+<pre><code>MulticlassAccuracy: 0.5118499994277954 | Loss: 1.3446329971313478 | Acc: 0.5118500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5455999970436096 | Loss: 1.2716289128303528 | Acc: 0.5456000000000000.
+<pre><code>MulticlassAccuracy: 0.5447499752044678 | Loss: 1.2767737101554870 | Acc: 0.5447500000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5616000294685364 | Loss: 1.2248678792953491 | Acc: 0.5616000000000000.
+<pre><code>MulticlassAccuracy: 0.5664499998092651 | Loss: 1.2234437763214112 | Acc: 0.5664500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5623499751091003 | Loss: 1.2264307149887086 | Acc: 0.5623500000000000.
+<pre><code>MulticlassAccuracy: 0.5648499727249146 | Loss: 1.2325385323524476 | Acc: 0.5648500000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5799000263214111 | Loss: 1.1842727457046509 | Acc: 0.5799000000000000.
+<pre><code>MulticlassAccuracy: 0.5896499752998352 | Loss: 1.1611093239784240 | Acc: 0.5896500000000000.
 Epoch: 9 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5939000248908997 | Loss: 1.1541707914352417 | Acc: 0.5939000000000000.
+<pre><code>MulticlassAccuracy: 0.6015999913215637 | Loss: 1.1370150957107543 | Acc: 0.6016000000000000.
 Epoch: 10 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5910500288009644 | Loss: 1.1763400409698486 | Acc: 0.5910500000000000.
+<pre><code>MulticlassAccuracy: 0.6074000000953674 | Loss: 1.1378371593475343 | Acc: 0.6074000000000001.
 Epoch: 11 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5954499840736389 | Loss: 1.1757343863487244 | Acc: 0.5954500000000000.
+<pre><code>MulticlassAccuracy: 0.6036999821662903 | Loss: 1.1592556796073914 | Acc: 0.6037000000000000.
 Epoch: 12 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5922499895095825 | Loss: 1.1785970301628113 | Acc: 0.5922500000000001.
+<pre><code>MulticlassAccuracy: 0.5997499823570251 | Loss: 1.1987680685997009 | Acc: 0.5997500000000000.
 Early stopping at epoch 11
-Returned to Spot: Validation loss: 1.1785970301628113
+Returned to Spot: Validation loss: 1.1987680685997009
 
 config: {'l1': 16, 'l2': 16, 'lr_mult': 1.0, 'batch_size': 8, 'epochs': 8, 'k_folds': 0, 'patience': 3, 'optimizer': 'NAdam', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4137000143527985 | Loss: 1.5771867493391036 | Acc: 0.4137000000000000.
+<pre><code>MulticlassAccuracy: 0.3920499980449677 | Loss: 1.6102165319681168 | Acc: 0.3920500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4795500040054321 | Loss: 1.4186543140649797 | Acc: 0.4795500000000000.
+<pre><code>MulticlassAccuracy: 0.4390000104904175 | Loss: 1.5077767979741097 | Acc: 0.4390000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4794999957084656 | Loss: 1.4321544742107390 | Acc: 0.4795000000000000.
+<pre><code>MulticlassAccuracy: 0.4700999855995178 | Loss: 1.4581756867766380 | Acc: 0.4701000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4969500005245209 | Loss: 1.4049549581408500 | Acc: 0.4969500000000000.
+<pre><code>MulticlassAccuracy: 0.4981499910354614 | Loss: 1.3969129746913911 | Acc: 0.4981500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4853500127792358 | Loss: 1.4105496326088904 | Acc: 0.4853500000000000.
+<pre><code>MulticlassAccuracy: 0.5059000253677368 | Loss: 1.3693460956692696 | Acc: 0.5059000000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4887500107288361 | Loss: 1.4176285049676896 | Acc: 0.4887500000000000.
+<pre><code>MulticlassAccuracy: 0.5133500099182129 | Loss: 1.3540988440275192 | Acc: 0.5133500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4918999969959259 | Loss: 1.4230854102253914 | Acc: 0.4919000000000000.
-Early stopping at epoch 6
-Returned to Spot: Validation loss: 1.4230854102253914
+<pre><code>MulticlassAccuracy: 0.5081499814987183 | Loss: 1.3817692994177342 | Acc: 0.5081500000000000.
+Epoch: 8 | </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>MulticlassAccuracy: 0.5159500241279602 | Loss: 1.3653468480706215 | Acc: 0.5159500000000000.
+Returned to Spot: Validation loss: 1.3653468480706215
 
 config: {'l1': 256, 'l2': 128, 'lr_mult': 1.0, 'batch_size': 2, 'epochs': 16, 'k_folds': 0, 'patience': 3, 'optimizer': 'RMSprop', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0994499996304512 | Loss: 2.3137239639997484 | Acc: 0.0994500000000000.
+<pre><code>MulticlassAccuracy: 0.0958499982953072 | Loss: 2.3086834851264952 | Acc: 0.0958500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0993499979376793 | Loss: 2.3085385819911957 | Acc: 0.0993500000000000.
+<pre><code>MulticlassAccuracy: 0.0987000018358231 | Loss: 2.3107500833988190 | Acc: 0.0987000000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0988000035285950 | Loss: 2.3045743632316591 | Acc: 0.0988000000000000.
+<pre><code>MulticlassAccuracy: 0.0958499982953072 | Loss: 2.3054559610605239 | Acc: 0.0958500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0966999977827072 | Loss: 2.3057950327873229 | Acc: 0.0967000000000000.
+<pre><code>MulticlassAccuracy: 0.1013000011444092 | Loss: 2.3091404678583145 | Acc: 0.1013000000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0988000035285950 | Loss: 2.3120626847267149 | Acc: 0.0988000000000000.
+<pre><code>MulticlassAccuracy: 0.0958499982953072 | Loss: 2.3109533527135850 | Acc: 0.0958500000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.0966999977827072 | Loss: 2.3112036952495574 | Acc: 0.0967000000000000.
+<pre><code>MulticlassAccuracy: 0.0987000018358231 | Loss: 2.3080133529186249 | Acc: 0.0987000000000000.
 Early stopping at epoch 5
-Returned to Spot: Validation loss: 2.3112036952495574
+Returned to Spot: Validation loss: 2.308013352918625
 
 config: {'l1': 8, 'l2': 32, 'lr_mult': 1.0, 'batch_size': 4, 'epochs': 8, 'k_folds': 0, 'patience': 3, 'optimizer': 'Adamax', 'sgd_momentum': 0.9}
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.3768500089645386 | Loss: 1.6525698980569838 | Acc: 0.3768500000000000.
+<pre><code>MulticlassAccuracy: 0.3910000026226044 | Loss: 1.6194829273104667 | Acc: 0.3910000000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4381000101566315 | Loss: 1.5250679602503776 | Acc: 0.4381000000000000.
+<pre><code>MulticlassAccuracy: 0.4532499909400940 | Loss: 1.5181912495672703 | Acc: 0.4532500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4542500078678131 | Loss: 1.4748067722111939 | Acc: 0.4542500000000000.
+<pre><code>MulticlassAccuracy: 0.5023999810218811 | Loss: 1.3594324642419815 | Acc: 0.5024000000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4587000012397766 | Loss: 1.4901986456006766 | Acc: 0.4587000000000000.
+<pre><code>MulticlassAccuracy: 0.5066999793052673 | Loss: 1.3639220094040037 | Acc: 0.5067000000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4853999912738800 | Loss: 1.3857398863971233 | Acc: 0.4854000000000000.
+<pre><code>MulticlassAccuracy: 0.5313000082969666 | Loss: 1.3084210138827563 | Acc: 0.5313000000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5037500262260437 | Loss: 1.3827529514372350 | Acc: 0.5037500000000000.
+<pre><code>MulticlassAccuracy: 0.5376499891281128 | Loss: 1.3020537653062492 | Acc: 0.5376500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5183500051498413 | Loss: 1.3676455246344208 | Acc: 0.5183500000000000.
+<pre><code>MulticlassAccuracy: 0.5404999852180481 | Loss: 1.2979997927054763 | Acc: 0.5405000000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5340999960899353 | Loss: 1.3272761303044855 | Acc: 0.5341000000000000.
-Returned to Spot: Validation loss: 1.3272761303044855
+<pre><code>MulticlassAccuracy: 0.5505999922752380 | Loss: 1.2794678398683668 | Acc: 0.5506000000000000.
+Returned to Spot: Validation loss: 1.2794678398683668
 
 config: {'l1': 64, 'l2': 512, 'lr_mult': 1.0, 'batch_size': 16, 'epochs': 16, 'k_folds': 0, 'patience': 3, 'optimizer': 'Adagrad', 'sgd_momentum': 0.9}
 Error in Net_Core. Call to evaluate_hold_out() failed. err=TypeError("Adagrad.__init__() got an unexpected keyword argument 'differentiable'"), type(err)=&lt;class 'TypeError'&gt;
@@ -1519,220 +1493,40 @@ config: {'l1': 512, 'l2': 256, 'lr_mult': 1.0, 'batch_size': 16, 'epochs': 8, 'k
 Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5050500035285950 | Loss: 1.3639718857765197 | Acc: 0.5050500000000000.
+<pre><code>MulticlassAccuracy: 0.5067499876022339 | Loss: 1.3663547940254210 | Acc: 0.5067500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5328500270843506 | Loss: 1.3052099388599396 | Acc: 0.5328500000000000.
+<pre><code>MulticlassAccuracy: 0.5563499927520752 | Loss: 1.2667929081201554 | Acc: 0.5563500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5652499794960022 | Loss: 1.2344603229284286 | Acc: 0.5652500000000000.
+<pre><code>MulticlassAccuracy: 0.5666499733924866 | Loss: 1.2227724067926407 | Acc: 0.5666500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5896000266075134 | Loss: 1.1868535377025604 | Acc: 0.5896000000000000.
+<pre><code>MulticlassAccuracy: 0.6025000214576721 | Loss: 1.1719128470897675 | Acc: 0.6025000000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5887500047683716 | Loss: 1.2098212986707688 | Acc: 0.5887500000000000.
+<pre><code>MulticlassAccuracy: 0.5952500104904175 | Loss: 1.2412489697217941 | Acc: 0.5952499999999999.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5702499747276306 | Loss: 1.3166809049129486 | Acc: 0.5702500000000000.
+<pre><code>MulticlassAccuracy: 0.5884500145912170 | Loss: 1.2785740818262101 | Acc: 0.5884500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5974500179290771 | Loss: 1.2765553975105286 | Acc: 0.5974500000000000.
+<pre><code>MulticlassAccuracy: 0.6009500026702881 | Loss: 1.3023499223232269 | Acc: 0.6009500000000000.
 Early stopping at epoch 6
-Returned to Spot: Validation loss: 1.2765553975105286</code></pre>
+Returned to Spot: Validation loss: 1.3023499223232269</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 1.1785970301628113 [##--------] 17.36% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 512, 'l2': 512, 'lr_mult': 1.0, 'batch_size': 32, 'epochs': 8, 'k_folds': 0, 'patience': 3, 'optimizer': 'NAdam', 'sgd_momentum': 0.9}
-Epoch: 1 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4888499975204468 | Loss: 1.3960691669464111 | Acc: 0.4888500000000000.
-Epoch: 2 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5519499778747559 | Loss: 1.2605930910110474 | Acc: 0.5519500000000001.
-Epoch: 3 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5625500082969666 | Loss: 1.2682327481269837 | Acc: 0.5625500000000000.
-Epoch: 4 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5820000171661377 | Loss: 1.2330140625953674 | Acc: 0.5820000000000000.
-Epoch: 5 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.6009500026702881 | Loss: 1.1801210371971131 | Acc: 0.6009500000000000.
-Epoch: 6 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5918499827384949 | Loss: 1.3010232583999635 | Acc: 0.5918500000000000.
-Epoch: 7 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5907499790191650 | Loss: 1.4316253225326538 | Acc: 0.5907500000000000.
-Epoch: 8 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5793499946594238 | Loss: 1.5771554583549499 | Acc: 0.5793500000000000.
-Early stopping at epoch 7
-Returned to Spot: Validation loss: 1.5771554583549499
-spotPython tuning: 1.1785970301628113 [###-------] 34.04% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 64, 'l2': 128, 'lr_mult': 1.0, 'batch_size': 2, 'epochs': 8, 'k_folds': 0, 'patience': 3, 'optimizer': 'Adam', 'sgd_momentum': 0.9}
-Epoch: 1 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4648500084877014 | Loss: 1.5890214798149769 | Acc: 0.4648500000000000.
-Epoch: 2 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5056499838829041 | Loss: 1.4554801068477441 | Acc: 0.5056500000000000.
-Epoch: 3 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5152999758720398 | Loss: 1.4293135994918207 | Acc: 0.5153000000000000.
-Epoch: 4 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5337499976158142 | Loss: 1.5508460156368367 | Acc: 0.5337499999999999.
-Epoch: 5 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5503500103950500 | Loss: 1.4691318791180024 | Acc: 0.5503500000000000.
-Epoch: 6 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5546500086784363 | Loss: 1.4323577481051282 | Acc: 0.5546500000000000.
-Early stopping at epoch 5
-Returned to Spot: Validation loss: 1.4323577481051282
-spotPython tuning: 1.1785970301628113 [######----] 55.97% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 64, 'l2': 256, 'lr_mult': 1.0, 'batch_size': 16, 'epochs': 16, 'k_folds': 0, 'patience': 3, 'optimizer': 'Adam', 'sgd_momentum': 0.9}
-Epoch: 1 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4751999974250793 | Loss: 1.4380010580539704 | Acc: 0.4752000000000000.
-Epoch: 2 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5193499922752380 | Loss: 1.3463098950862884 | Acc: 0.5193500000000000.
-Epoch: 3 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5264999866485596 | Loss: 1.3246383390426635 | Acc: 0.5265000000000000.
-Epoch: 4 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5678499937057495 | Loss: 1.2190419143438340 | Acc: 0.5678500000000000.
-Epoch: 5 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5468999743461609 | Loss: 1.2767102817535401 | Acc: 0.5469000000000001.
-Epoch: 6 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5749999880790710 | Loss: 1.2085392861127853 | Acc: 0.5750000000000000.
-Epoch: 7 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5769000053405762 | Loss: 1.2117780505180360 | Acc: 0.5769000000000000.
-Epoch: 8 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5845500230789185 | Loss: 1.2138463154315948 | Acc: 0.5845500000000000.
-Epoch: 9 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5821999907493591 | Loss: 1.2590672193288803 | Acc: 0.5822000000000001.
-Early stopping at epoch 8
-Returned to Spot: Validation loss: 1.2590672193288803
-spotPython tuning: 1.1785970301628113 [########--] 75.36% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-config: {'l1': 128, 'l2': 16, 'lr_mult': 1.0, 'batch_size': 32, 'epochs': 16, 'k_folds': 0, 'patience': 3, 'optimizer': 'AdamW', 'sgd_momentum': 0.9}
-Epoch: 1 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4110499918460846 | Loss: 1.6076623956680298 | Acc: 0.4110500000000000.
-Epoch: 2 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4602999985218048 | Loss: 1.4779073149681092 | Acc: 0.4603000000000000.
-Epoch: 3 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4859000146389008 | Loss: 1.4199016831398010 | Acc: 0.4859000000000000.
-Epoch: 4 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5196499824523926 | Loss: 1.3301249086380005 | Acc: 0.5196499999999999.
-Epoch: 5 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5414999723434448 | Loss: 1.2763008275985719 | Acc: 0.5415000000000000.
-Epoch: 6 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5590000152587891 | Loss: 1.2436287584304810 | Acc: 0.5590000000000001.
-Epoch: 7 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5619500279426575 | Loss: 1.2420474333763123 | Acc: 0.5619499999999999.
-Epoch: 8 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5763999819755554 | Loss: 1.2015644022941590 | Acc: 0.5764000000000000.
-Epoch: 9 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5801500082015991 | Loss: 1.1826168160438537 | Acc: 0.5801500000000001.
-Epoch: 10 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5890499949455261 | Loss: 1.1751258714675903 | Acc: 0.5890500000000000.
-Epoch: 11 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5797500014305115 | Loss: 1.1968159104347229 | Acc: 0.5797500000000000.
-Epoch: 12 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5964000225067139 | Loss: 1.1581353195190429 | Acc: 0.5964000000000000.
-Epoch: 13 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5958999991416931 | Loss: 1.1588751288414001 | Acc: 0.5959000000000000.
-Epoch: 14 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5921000242233276 | Loss: 1.1875594395637512 | Acc: 0.5921000000000000.
-Epoch: 15 | </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5878000259399414 | Loss: 1.2220218329429626 | Acc: 0.5878000000000000.
-Early stopping at epoch 14
-Returned to Spot: Validation loss: 1.2220218329429626
-spotPython tuning: 1.1785970301628113 [##########] 100.00% Done...
+<pre><code>spotPython tuning: 1.1987680685997009 [##########] 100.00% Done...
 </code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="23">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x296de1630&gt;</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x2be16d4e0&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -1761,33 +1555,33 @@ spotPython tuning: 1.1785970301628113 [##########] 100.00% Done...
 <section id="sec-saving-the-state-of-the-notebook" class="level3" data-number="12.9.2">
 <h3 data-number="12.9.2" class="anchored" data-anchor-id="sec-saving-the-state-of-the-notebook"><span class="header-section-number">12.9.2</span> Saving the State of the Notebook</h3>
 <p>The state of the notebook can be saved and reloaded as follows:</p>
-<div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
-<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-5"><a href="#cb127-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
-<span id="cb127-6"><a href="#cb127-6" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
-<span id="cb127-7"><a href="#cb127-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
-<span id="cb127-8"><a href="#cb127-8" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
-<span id="cb127-9"><a href="#cb127-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-10"><a href="#cb127-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
-<span id="cb127-11"><a href="#cb127-11" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"add_the_name_of_the_result_file_here.pkl"</span></span>
-<span id="cb127-12"><a href="#cb127-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
-<span id="cb127-13"><a href="#cb127-13" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
+<span id="cb83-6"><a href="#cb83-6" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
+<span id="cb83-7"><a href="#cb83-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
+<span id="cb83-8"><a href="#cb83-8" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
+<span id="cb83-9"><a href="#cb83-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb83-10"><a href="#cb83-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
+<span id="cb83-11"><a href="#cb83-11" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"add_the_name_of_the_result_file_here.pkl"</span></span>
+<span id="cb83-12"><a href="#cb83-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
+<span id="cb83-13"><a href="#cb83-13" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="sec-results-14" class="level2" data-number="12.10">
 <h2 data-number="12.10" class="anchored" data-anchor-id="sec-results-14"><span class="header-section-number">12.10</span> Step 10: Results</h2>
 <p>After the hyperparameter tuning run is finished, the progress of the hyperparameter tuning can be visualized. The following code generates the progress plot from <span class="quarto-unresolved-ref">?fig-progress</span>.</p>
-<div class="cell" data-fig-label="fig-progress" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, </span>
-<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-fig-label="fig-progress" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">False</span>, </span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-26-output-1.png" width="719" height="243" class="figure-img"></p>
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-25-output-1.png" width="719" height="243" class="figure-img"></p>
 <figcaption class="figure-caption">Progress plot. <em>Black</em> dots denote results from the initial design. <em>Red</em> dots illustrate the improvement found by the surrogate model based optimization.</figcaption>
 </figure>
 </div>
@@ -1795,31 +1589,31 @@ spotPython tuning: 1.1785970301628113 [##########] 100.00% Done...
 </div>
 <p><span class="quarto-unresolved-ref">?fig-progress</span> shows a typical behaviour that can be observed in many hyperparameter studies <span class="citation" data-cites="bart21i">(<a href="references.html#ref-bart21i" role="doc-biblioref">Bartz et al. 2022</a>)</span>: the largest improvement is obtained during the evaluation of the initial design. The surrogate model based optimization-optimization with the surrogate refines the results. <span class="quarto-unresolved-ref">?fig-progress</span> also illustrates one major difference between <code>ray[tune]</code> as used in <span class="citation" data-cites="pyto23a">PyTorch (<a href="references.html#ref-pyto23a" role="doc-biblioref">2023a</a>)</span> and <code>spotPython</code>: the <code>ray[tune]</code> uses a random search and will generate results similar to the <em>black</em> dots, whereas <code>spotPython</code> uses a surrogate model based optimization and presents results represented by <em>red</em> dots in <span class="quarto-unresolved-ref">?fig-progress</span>. The surrogate model based optimization is considered to be more efficient than a random search, because the surrogate model guides the search towards promising regions in the hyperparameter space.</p>
 <p>In addition to the improved (“optimized”) hyperparameter values, <code>spotPython</code> allows a statistical analysis, e.g., a sensitivity analysis, of the results. We can print the results of the hyperparameter tuning, see <span class="quarto-unresolved-ref">?tbl-results</span>. The table shows the hyperparameters, their types, default values, lower and upper bounds, and the transformation function. The column “tuned” shows the tuned values. The column “importance” shows the importance of the hyperparameters. The column “stars” shows the importance of the hyperparameters in stars. The importance is computed by the SPOT software.</p>
-<div class="cell" data-fig-label="tbl-results" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
-<span id="cb129-2"><a href="#cb129-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-fig-label="tbl-results" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>| name         | type   | default   |   lower |   upper |   tuned | transform             |   importance | stars   |
 |--------------|--------|-----------|---------|---------|---------|-----------------------|--------------|---------|
-| l1           | int    | 5         |     2.0 |     9.0 |     7.0 | transform_power_2_int |         0.00 |         |
-| l2           | int    | 5         |     2.0 |     9.0 |     3.0 | transform_power_2_int |         0.00 |         |
+| l1           | int    | 5         |     2.0 |     9.0 |     7.0 | transform_power_2_int |         0.08 |         |
+| l2           | int    | 5         |     2.0 |     9.0 |     3.0 | transform_power_2_int |         0.08 |         |
 | lr_mult      | float  | 1.0       |     1.0 |     1.0 |     1.0 | None                  |         0.00 |         |
-| batch_size   | int    | 4         |     1.0 |     5.0 |     5.0 | transform_power_2_int |         1.84 | *       |
-| epochs       | int    | 3         |     3.0 |     4.0 |     4.0 | transform_power_2_int |       100.00 | ***     |
+| batch_size   | int    | 4         |     1.0 |     5.0 |     5.0 | transform_power_2_int |       100.00 | ***     |
+| epochs       | int    | 3         |     3.0 |     4.0 |     4.0 | transform_power_2_int |         5.04 | *       |
 | k_folds      | int    | 1         |     0.0 |     0.0 |     0.0 | None                  |         0.00 |         |
 | patience     | int    | 5         |     3.0 |     3.0 |     3.0 | None                  |         0.00 |         |
-| optimizer    | factor | SGD       |     0.0 |     9.0 |     3.0 | None                  |         0.01 |         |
+| optimizer    | factor | SGD       |     0.0 |     9.0 |     3.0 | None                  |         0.21 | .       |
 | sgd_momentum | float  | 0.0       |     0.9 |     0.9 |     0.9 | None                  |         0.00 |         |</code></pre>
 </div>
 </div>
 <p>To visualize the most important hyperparameters, <code>spotPython</code> provides the function <code>plot_importance</code>. The following code generates the importance plot from <span class="quarto-unresolved-ref">?fig-importance</span>.</p>
-<div class="cell" data-fig-label="fig-importance" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>,</span>
-<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-fig-label="fig-importance" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.025</span>,</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>    filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.png"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-28-output-1.png" width="575" height="411" class="figure-img"></p>
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-27-output-1.png" width="575" height="411" class="figure-img"></p>
 <figcaption class="figure-caption">Variable importance plot, threshold 0.025.</figcaption>
 </figure>
 </div>
@@ -1828,12 +1622,12 @@ spotPython tuning: 1.1785970301628113 [##########] 100.00% Done...
 <section id="sec-get-spot-results-14" class="level3" data-number="12.10.1">
 <h3 data-number="12.10.1" class="anchored" data-anchor-id="sec-get-spot-results-14"><span class="header-section-number">12.10.1</span> Get the Tuned Architecture (SPOT Results)</h3>
 <p>The architecture of the <code>spotPython</code> model can be obtained as follows. First, the numerical representation of the hyperparameters are obtained, i.e., the numpy array <code>X</code> is generated. This array is then used to generate the model <code>model_spot</code> by the function <code>get_one_core_model_from_X</code>. The model <code>model_spot</code> has the following architecture:</p>
-<div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
-<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
-<span id="cb132-3"><a href="#cb132-3" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
-<span id="cb132-4"><a href="#cb132-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="28">
+<div class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
 <pre><code>Net_CIFAR10(
   (conv1): Conv2d(3, 6, kernel_size=(5, 5), stride=(1, 1))
   (pool): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
@@ -1848,16 +1642,15 @@ spotPython tuning: 1.1785970301628113 [##########] 100.00% Done...
 <section id="get-default-hyperparameters" class="level3" data-number="12.10.2">
 <h3 data-number="12.10.2" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">12.10.2</span> Get Default Hyperparameters</h3>
 <p>In a similar manner as in <a href="#sec-get-spot-results-14"><span>Section&nbsp;12.10.1</span></a>, the default hyperparameters can be obtained.</p>
-<div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control was modified, we generate a new one with the original </span></span>
-<span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a><span class="co"># default hyperparameters</span></span>
-<span id="cb134-3"><a href="#cb134-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
-<span id="cb134-4"><a href="#cb134-4" aria-hidden="true" tabindex="-1"></a>fc <span class="op">=</span> fun_control</span>
-<span id="cb134-5"><a href="#cb134-5" aria-hidden="true" tabindex="-1"></a>fc.update({<span class="st">"core_model_hyper_dict"</span>:</span>
-<span id="cb134-6"><a href="#cb134-6" aria-hidden="true" tabindex="-1"></a>    hyper_dict[fun_control[<span class="st">"core_model"</span>].<span class="va">__name__</span>]})</span>
-<span id="cb134-7"><a href="#cb134-7" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> get_one_core_model_from_X(X_start, fun_control<span class="op">=</span>fc)</span>
-<span id="cb134-8"><a href="#cb134-8" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="29">
+<div class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control was modified, we generate a new one with the original </span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="co"># default hyperparameters</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> get_one_core_model_from_X(X_start, fun_control)</span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
 <pre><code>Net_CIFAR10(
   (conv1): Conv2d(3, 6, kernel_size=(5, 5), stride=(1, 1))
   (pool): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
@@ -1873,67 +1666,67 @@ spotPython tuning: 1.1785970301628113 [##########] 100.00% Done...
 <h3 data-number="12.10.3" class="anchored" data-anchor-id="evaluation-of-the-default-architecture"><span class="header-section-number">12.10.3</span> Evaluation of the Default Architecture</h3>
 <p>The method <code>train_tuned</code> takes a model architecture without trained weights and trains this model with the train data. The train data is split into train and validation data. The validation data is used for early stopping. The trained model weights are saved as a dictionary.</p>
 <p>This evaluation is similar to the final evaluation in <span class="citation" data-cites="pyto23a">PyTorch (<a href="references.html#ref-pyto23a" role="doc-biblioref">2023a</a>)</span>.</p>
-<div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> (</span>
-<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>    train_tuned,</span>
-<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>    test_tuned,</span>
-<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_default, train_dataset<span class="op">=</span>train, shuffle<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb136-6"><a href="#cb136-6" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb136-7"><a href="#cb136-7" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb136-8"><a href="#cb136-8" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>], show_batch_interval<span class="op">=</span><span class="dv">1_000_000</span>,</span>
-<span id="cb136-9"><a href="#cb136-9" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb136-10"><a href="#cb136-10" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
-<span id="cb136-11"><a href="#cb136-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb136-12"><a href="#cb136-12" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_default, test_dataset<span class="op">=</span>test, </span>
-<span id="cb136-13"><a href="#cb136-13" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb136-14"><a href="#cb136-14" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb136-15"><a href="#cb136-15" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">False</span>, </span>
-<span id="cb136-16"><a href="#cb136-16" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
-<span id="cb136-17"><a href="#cb136-17" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="29">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.torch.traintest <span class="im">import</span> (</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>    train_tuned,</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>    test_tuned,</span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_default, train_dataset<span class="op">=</span>train, shuffle<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>], show_batch_interval<span class="op">=</span><span class="dv">1_000_000</span>,</span>
+<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
+<span id="cb92-11"><a href="#cb92-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb92-12"><a href="#cb92-12" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_default, test_dataset<span class="op">=</span>test, </span>
+<span id="cb92-13"><a href="#cb92-13" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb92-14"><a href="#cb92-14" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">False</span>, </span>
+<span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb92-17"><a href="#cb92-17" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)        </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1020999997854233 | Loss: 2.3032254779815675 | Acc: 0.1021000000000000.
+<pre><code>MulticlassAccuracy: 0.0975499972701073 | Loss: 2.3062030729293825 | Acc: 0.0975500000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1037999987602234 | Loss: 2.3003110511779785 | Acc: 0.1038000000000000.
+<pre><code>MulticlassAccuracy: 0.0975499972701073 | Loss: 2.3040160190582277 | Acc: 0.0975500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1328500062227249 | Loss: 2.2962776536941529 | Acc: 0.1328500000000000.
+<pre><code>MulticlassAccuracy: 0.0987500026822090 | Loss: 2.3020986358642577 | Acc: 0.0987500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1394499987363815 | Loss: 2.2892701484680176 | Acc: 0.1394500000000000.
+<pre><code>MulticlassAccuracy: 0.1266500055789948 | Loss: 2.2995942102432250 | Acc: 0.1266500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1676999926567078 | Loss: 2.2727036296844481 | Acc: 0.1677000000000000.
+<pre><code>MulticlassAccuracy: 0.1498499959707260 | Loss: 2.2961405302047728 | Acc: 0.1498500000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1837500035762787 | Loss: 2.2302733320236205 | Acc: 0.1837500000000000.
+<pre><code>MulticlassAccuracy: 0.1425999999046326 | Loss: 2.2900444021224975 | Acc: 0.1426000000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.1986999958753586 | Loss: 2.1764420920372007 | Acc: 0.1987000000000000.
+<pre><code>MulticlassAccuracy: 0.1688500046730042 | Loss: 2.2748941745758056 | Acc: 0.1688500000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2235500067472458 | Loss: 2.1471230669021608 | Acc: 0.2235500000000000.
-Returned to Spot: Validation loss: 2.147123066902161</code></pre>
+<pre><code>MulticlassAccuracy: 0.1881999969482422 | Loss: 2.2260843358993530 | Acc: 0.1882000000000000.
+Returned to Spot: Validation loss: 2.226084335899353</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.2236000001430511 | Loss: 2.1441712369918822 | Acc: 0.2236000000000000.
-Final evaluation: Validation loss: 2.144171236991882
-Final evaluation: Validation metric: 0.22360000014305115
+<pre><code>MulticlassAccuracy: 0.1918999999761581 | Loss: 2.2214019302368162 | Acc: 0.1919000000000000.
+Final evaluation: Validation loss: 2.221401930236816
+Final evaluation: Validation metric: 0.19189999997615814
 ----------------------------------------------</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="30">
-<pre><code>(2.144171236991882, nan, tensor(0.2236))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="29">
+<pre><code>(2.221401930236816, nan, tensor(0.1919, device='mps:0'))</code></pre>
 </div>
 </div>
 </section>
@@ -1942,126 +1735,156 @@ Final evaluation: Validation metric: 0.22360000014305115
 <p>The following code trains the model <code>model_spot</code>.</p>
 <p>If <code>path</code> is set to a filename, e.g., <code>path = "model_spot_trained.pt"</code>, the weights of the trained model will be saved to this file.</p>
 <p>If <code>path</code> is set to a filename, e.g., <code>path = "model_spot_trained.pt"</code>, the weights of the trained model will be loaded from this file.</p>
-<div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_spot, train_dataset<span class="op">=</span>train,</span>
-<span id="cb148-2"><a href="#cb148-2" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb148-3"><a href="#cb148-3" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb148-4"><a href="#cb148-4" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb148-5"><a href="#cb148-5" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
-<span id="cb148-6"><a href="#cb148-6" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb148-7"><a href="#cb148-7" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
-<span id="cb148-8"><a href="#cb148-8" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_spot, test_dataset<span class="op">=</span>test,</span>
-<span id="cb148-9"><a href="#cb148-9" aria-hidden="true" tabindex="-1"></a>            shuffle<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb148-10"><a href="#cb148-10" aria-hidden="true" tabindex="-1"></a>            loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
-<span id="cb148-11"><a href="#cb148-11" aria-hidden="true" tabindex="-1"></a>            metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
-<span id="cb148-12"><a href="#cb148-12" aria-hidden="true" tabindex="-1"></a>            device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
-<span id="cb148-13"><a href="#cb148-13" aria-hidden="true" tabindex="-1"></a>            task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>train_tuned(net<span class="op">=</span>model_spot, train_dataset<span class="op">=</span>train,</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>        loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>        metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>        shuffle<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>        device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>        path<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>        task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span>
+<span id="cb104-8"><a href="#cb104-8" aria-hidden="true" tabindex="-1"></a>test_tuned(net<span class="op">=</span>model_spot, test_dataset<span class="op">=</span>test,</span>
+<span id="cb104-9"><a href="#cb104-9" aria-hidden="true" tabindex="-1"></a>            shuffle<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb104-10"><a href="#cb104-10" aria-hidden="true" tabindex="-1"></a>            loss_function<span class="op">=</span>fun_control[<span class="st">"loss_function"</span>],</span>
+<span id="cb104-11"><a href="#cb104-11" aria-hidden="true" tabindex="-1"></a>            metric<span class="op">=</span>fun_control[<span class="st">"metric_torch"</span>],</span>
+<span id="cb104-12"><a href="#cb104-12" aria-hidden="true" tabindex="-1"></a>            device <span class="op">=</span> fun_control[<span class="st">"device"</span>],</span>
+<span id="cb104-13"><a href="#cb104-13" aria-hidden="true" tabindex="-1"></a>            task<span class="op">=</span>fun_control[<span class="st">"task"</span>],)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Epoch: 1 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.3473500013351440 | Loss: 1.7150537954330445 | Acc: 0.3473500000000000.
+<pre><code>MulticlassAccuracy: 0.3661000132560730 | Loss: 1.7093173021316528 | Acc: 0.3661000000000000.
 Epoch: 2 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.3957499861717224 | Loss: 1.6454636848449706 | Acc: 0.3957500000000000.
+<pre><code>MulticlassAccuracy: 0.4627499878406525 | Loss: 1.4642572961807252 | Acc: 0.4627500000000000.
 Epoch: 3 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4472500085830688 | Loss: 1.5022996424674988 | Acc: 0.4472500000000000.
+<pre><code>MulticlassAccuracy: 0.4796499907970428 | Loss: 1.4531756073951720 | Acc: 0.4796500000000000.
 Epoch: 4 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4896500110626221 | Loss: 1.4034859374046327 | Acc: 0.4896500000000000.
+<pre><code>MulticlassAccuracy: 0.5193499922752380 | Loss: 1.3521972542762757 | Acc: 0.5193500000000000.
 Epoch: 5 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.4974499940872192 | Loss: 1.4032018181800843 | Acc: 0.4974500000000000.
+<pre><code>MulticlassAccuracy: 0.5456500053405762 | Loss: 1.2886844976425171 | Acc: 0.5456500000000000.
 Epoch: 6 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5215499997138977 | Loss: 1.3365078643798829 | Acc: 0.5215500000000000.
+<pre><code>MulticlassAccuracy: 0.5571500062942505 | Loss: 1.2521571839332581 | Acc: 0.5571500000000000.
 Epoch: 7 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5320000052452087 | Loss: 1.3101746562004088 | Acc: 0.5320000000000000.
+<pre><code>MulticlassAccuracy: 0.5662500262260437 | Loss: 1.2315309381484985 | Acc: 0.5662500000000000.
 Epoch: 8 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5446500182151794 | Loss: 1.2812147528648377 | Acc: 0.5446500000000000.
+<pre><code>MulticlassAccuracy: 0.5618000030517578 | Loss: 1.2532640023231507 | Acc: 0.5618000000000000.
 Epoch: 9 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5465999841690063 | Loss: 1.2808432787895203 | Acc: 0.5466000000000000.
+<pre><code>MulticlassAccuracy: 0.5825999975204468 | Loss: 1.1913747765541076 | Acc: 0.5826000000000000.
 Epoch: 10 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5641000270843506 | Loss: 1.2373182715415953 | Acc: 0.5641000000000000.
+<pre><code>MulticlassAccuracy: 0.5830000042915344 | Loss: 1.1833122503280640 | Acc: 0.5830000000000000.
 Epoch: 11 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5662500262260437 | Loss: 1.2444315943717956 | Acc: 0.5662500000000000.
+<pre><code>MulticlassAccuracy: 0.5910000205039978 | Loss: 1.1831278825759888 | Acc: 0.5910000000000000.
 Epoch: 12 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5701000094413757 | Loss: 1.2425961187362671 | Acc: 0.5701000000000001.
+<pre><code>MulticlassAccuracy: 0.5956000089645386 | Loss: 1.1784049792289735 | Acc: 0.5956000000000000.
 Epoch: 13 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5824000239372253 | Loss: 1.2197082972526549 | Acc: 0.5824000000000000.
+<pre><code>MulticlassAccuracy: 0.5949500203132629 | Loss: 1.1580024556159974 | Acc: 0.5949500000000000.
 Epoch: 14 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5792999863624573 | Loss: 1.2425022669792176 | Acc: 0.5793000000000000.
+<pre><code>MulticlassAccuracy: 0.5827500224113464 | Loss: 1.2288481868743897 | Acc: 0.5827500000000000.
 Epoch: 15 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5849000215530396 | Loss: 1.2452355551719665 | Acc: 0.5849000000000000.
+<pre><code>MulticlassAccuracy: 0.5848000049591064 | Loss: 1.2282373707771301 | Acc: 0.5848000000000000.
 Epoch: 16 | </code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5925999879837036 | Loss: 1.2358321579933167 | Acc: 0.5926000000000000.
+<pre><code>MulticlassAccuracy: 0.5872499942779541 | Loss: 1.2612915629386903 | Acc: 0.5872500000000000.
 Early stopping at epoch 15
-Returned to Spot: Validation loss: 1.2358321579933167</code></pre>
+Returned to Spot: Validation loss: 1.2612915629386903</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MulticlassAccuracy: 0.5950000286102295 | Loss: 1.2175832162269007 | Acc: 0.5950000000000000.
-Final evaluation: Validation loss: 1.2175832162269007
-Final evaluation: Validation metric: 0.5950000286102295
+<pre><code>MulticlassAccuracy: 0.5918999910354614 | Loss: 1.2511131338798962 | Acc: 0.5919000000000000.
+Final evaluation: Validation loss: 1.2511131338798962
+Final evaluation: Validation metric: 0.5918999910354614
 ----------------------------------------------</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="31">
-<pre><code>(1.2175832162269007, nan, tensor(0.5950))</code></pre>
+<div class="cell-output cell-output-display" data-execution_count="30">
+<pre><code>(1.2511131338798962, nan, tensor(0.5919, device='mps:0'))</code></pre>
 </div>
 </div>
 </section>
 <section id="detailed-hyperparameter-plots" class="level3" data-number="12.10.5">
 <h3 data-number="12.10.5" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">12.10.5</span> Detailed Hyperparameter Plots</h3>
 <p>The contour plots in this section visualize the interactions of the three most important hyperparameters. Since some of these hyperparameters take fatorial or integer values, sometimes step-like fitness landcapes (or response surfaces) are generated. SPOT draws the interactions of the main hyperparameters by default. It is also possible to visualize all interactions.</p>
-<div class="cell" data-fig-label="fig-contour" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
-<span id="cb168-2"><a href="#cb168-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-fig-label="fig-contour" data-execution_count="31">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>batch_size:  1.8353888605258115
-epochs:  100.0</code></pre>
+<pre><code>l1:  0.08257501318668711
+l2:  0.08257501318668711
+batch_size:  100.0
+epochs:  5.036050457287037
+optimizer:  0.2060782987482385</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-33-output-2.png" width="713" height="281" class="figure-img"></p>
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-2.png" width="712" height="281" class="figure-img"></p>
 <figcaption class="figure-caption">Contour plots.</figcaption>
 </figure>
 </div>
 </div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-3.png" width="708" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-4.png" width="721" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-5.png" width="700" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-6.png" width="708" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-7.png" width="721" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-8.png" width="700" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-9.png" width="721" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-10.png" width="704" height="281"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="14_spot_ray_hpt_torch_cifar10_files/figure-html/cell-32-output-11.png" width="700" height="281"></p>
+</div>
 </div>
 <p>The figures (<span class="quarto-unresolved-ref">?fig-contour</span>) show the contour plots of the loss as a function of the hyperparameters. These plots are very helpful for benchmark studies and for understanding neural networks. <code>spotPython</code> provides additional tools for a visual inspection of the results and give valuable insights into the hyperparameter tuning process. This is especially useful for model explainability, transparency, and trustworthiness. In addition to the contour plots, <span class="quarto-unresolved-ref">?fig-parallel</span> shows the parallel plot of the hyperparameters.</p>
-<div class="cell" data-fig-label="fig-parallel" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-fig-label="fig-parallel" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 
-<div>                            <div id="e5e58fd1-51fb-48a5-b23a-d45628dda355" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("e5e58fd1-51fb-48a5-b23a-d45628dda355")) {                    Plotly.newPlot(                        "e5e58fd1-51fb-48a5-b23a-d45628dda355",                        [{"dimensions":[{"label":"l1","range":[3.0,9.0],"values":[7.0,4.0,8.0,3.0,9.0,9.0,6.0,6.0,7.0]},{"label":"l2","range":[3.0,9.0],"values":[3.0,4.0,7.0,5.0,8.0,9.0,7.0,8.0,4.0]},{"label":"batch_size","range":[1.0,5.0],"values":[5.0,3.0,1.0,2.0,4.0,5.0,1.0,4.0,5.0]},{"label":"epochs","range":[3.0,4.0],"values":[4.0,3.0,4.0,3.0,3.0,3.0,3.0,4.0,4.0]},{"label":"optimizer","range":[2.0,8.0],"values":[3.0,6.0,8.0,4.0,6.0,6.0,2.0,2.0,3.0]}],"line":{"cmax":2.3112036952495574,"cmin":1.1785970301628113,"color":[1.1785970301628113,1.4230854102253914,2.3112036952495574,1.3272761303044855,1.2765553975105286,1.5771554583549499,1.4323577481051282,1.2590672193288803,1.2220218329429626],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
+<div>                            <div id="86543324-c9d2-4e7f-b7c8-7633c1436aaf" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("86543324-c9d2-4e7f-b7c8-7633c1436aaf")) {                    Plotly.newPlot(                        "86543324-c9d2-4e7f-b7c8-7633c1436aaf",                        [{"dimensions":[{"label":"l1","range":[3.0,9.0],"values":[7.0,4.0,8.0,3.0,9.0]},{"label":"l2","range":[3.0,8.0],"values":[3.0,4.0,7.0,5.0,8.0]},{"label":"batch_size","range":[1.0,5.0],"values":[5.0,3.0,1.0,2.0,4.0]},{"label":"epochs","range":[3.0,4.0],"values":[4.0,3.0,4.0,3.0,3.0]},{"label":"optimizer","range":[3.0,8.0],"values":[3.0,6.0,8.0,4.0,6.0]}],"line":{"cmax":2.308013352918625,"cmin":1.1987680685997009,"color":[1.1987680685997009,1.3653468480706215,2.308013352918625,1.2794678398683668,1.3023499223232269],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
                             
-var gd = document.getElementById('e5e58fd1-51fb-48a5-b23a-d45628dda355');
+var gd = document.getElementById('86543324-c9d2-4e7f-b7c8-7633c1436aaf');
 var x = new MutationObserver(function (mutations, observer) {{
         var display = window.getComputedStyle(gd).display;
         if (!display || display === 'none') {{
