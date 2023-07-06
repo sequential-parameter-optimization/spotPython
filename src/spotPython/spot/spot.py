@@ -213,6 +213,18 @@ class Spot:
             "seed": 124,
             "use_cod_y": False,
         }
+        # Logging information:
+        self.counter = 0
+        self.min_y = None
+        self.min_X = None
+        self.min_mean_X = None
+        self.min_mean_y = None
+        self.mean_X = None
+        self.mean_y = None
+        self.var_y = None
+        logger.setLevel(self.log_level)
+        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
+
         self.surrogate_control.update(surrogate_control)
         # If no surrogate model is specified, use the internal
         # spotPython kriging surrogate:
@@ -233,6 +245,8 @@ class Spot:
                 cod_type=self.surrogate_control["cod_type"],
                 var_type=self.surrogate_control["var_type"],
                 use_cod_y=self.surrogate_control["use_cod_y"],
+                spot_writer=self.fun_control["spot_writer"],
+                counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
             )
         # Optimizer related information:
         self.optimizer = optimizer
@@ -240,17 +254,6 @@ class Spot:
         self.optimizer_control.update(optimizer_control)
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
-        # Logging information:
-        self.counter = 0
-        self.min_y = None
-        self.min_X = None
-        self.min_mean_X = None
-        self.min_mean_y = None
-        self.mean_X = None
-        self.mean_y = None
-        self.var_y = None
-        logger.setLevel(self.log_level)
-        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
 
     def to_red_dim(self):
         self.all_lower = self.lower
@@ -334,6 +337,9 @@ class Spot:
             self.fit_surrogate()
             # progress bar:
             self.show_progress_if_needed(timeout_start)
+        if self.fun_control["spot_writer"] is not None:
+            writer = self.fun_control["spot_writer"]
+            writer.close()
         return self
 
     def initialize_design(self, X_start=None):
@@ -404,6 +410,8 @@ class Spot:
 
         """
         self.min_y = min(self.y)
+        # get the last y value:
+        self.last_y = self.y[-1]
         self.min_X = self.X[argmin(self.y)]
         self.counter = self.y.size
         # Update aggregated x and y values (if noise):
@@ -414,6 +422,14 @@ class Spot:
             self.var_y = Z[2]
             self.min_mean_y = min(self.mean_y)
             self.min_mean_X = self.mean_X[argmin(self.mean_y)]
+        if self.fun_control["spot_writer"] is not None:
+            writer = self.fun_control["spot_writer"]
+            y_min = self.min_y.copy()
+            y_last = self.last_y.copy()
+            X_min = self.min_X.copy()
+            writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
+            writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
+            writer.flush()
 
     def suggest_new_X_old(self):
         """

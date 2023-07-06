@@ -71,9 +71,9 @@ def fun_control_init(
         # Starting with v0.2.41, Summary Writer should be not initialized here but by Lightning
         # it is only available for compatibility reasons.
         # So, set this to None and let Lightning manage the logging.
-        writer = SummaryWriter(tensorboard_path)
+        spot_writer = SummaryWriter(tensorboard_path)
     else:
-        writer = None
+        spot_writer = None
 
     # Path to the folder where the pretrained models are saved
     CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "saved_models/")
@@ -121,7 +121,7 @@ def fun_control_init(
         "task": task,
         "tensorboard_path": tensorboard_path,
         "weights": 1.0,
-        "writer": writer,
+        "spot_writer": spot_writer,
     }
     return fun_control
 

@@ -79,7 +79,7 @@ class HyperTorch:
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         task=self.fun_control["task"],
-                        writer=self.fun_control["writer"],
+                        writer=self.fun_control["spot_writer"],
                         writerId=config_id,
                     )
                 elif self.fun_control["eval"] == "test_cv":
@@ -90,7 +90,7 @@ class HyperTorch:
                         device=self.fun_control["device"],
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         task=self.fun_control["task"],
-                        writer=self.fun_control["writer"],
+                        writer=self.fun_control["spot_writer"],
                         writerId=config_id,
                     )
                 elif self.fun_control["eval"] == "test_hold_out":
@@ -105,7 +105,7 @@ class HyperTorch:
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         path=self.fun_control["path"],
                         task=self.fun_control["task"],
-                        writer=self.fun_control["writer"],
+                        writer=self.fun_control["spot_writer"],
                         writerId=config_id,
                     )
                 else:  # eval == "train_hold_out"
@@ -119,7 +119,7 @@ class HyperTorch:
                         show_batch_interval=self.fun_control["show_batch_interval"],
                         path=self.fun_control["path"],
                         task=self.fun_control["task"],
-                        writer=self.fun_control["writer"],
+                        writer=self.fun_control["spot_writer"],
                         writerId=config_id,
                     )
             except Exception as err:
@@ -127,8 +127,8 @@ class HyperTorch:
                 print("Setting df_eval to np.nan")
                 df_eval = np.nan
             z_val = fun_control["weights"] * df_eval
-            if self.fun_control["writer"] is not None:
-                writer = self.fun_control["writer"]
+            if self.fun_control["spot_writer"] is not None:
+                writer = self.fun_control["spot_writer"]
                 writer.add_hparams(config, {"fun_torch: loss": z_val})
                 writer.flush()
             z_res = np.append(z_res, z_val)

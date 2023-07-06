@@ -58,6 +58,8 @@ class Kriging(surrogates):
             n_p=1,
             optim_p=False,
             log_level=50,
+            spot_writer=None,
+            counter=None,
             **kwargs
     ):
         """
@@ -172,6 +174,8 @@ class Kriging(surrogates):
         self.name = name
         self.seed = seed
         self.log_level = log_level
+        self.spot_writer = spot_writer
+        self.counter = counter
 
         self.sigma = 0
         self.eps = sqrt(spacing(1))
@@ -299,6 +303,21 @@ class Kriging(surrogates):
         self.log["theta"] = append(self.log["theta"], self.theta)
         self.log["p"] = append(self.log["p"], self.p)
         self.log["Lambda"] = append(self.log["Lambda"], self.Lambda)
+        # get the length of the log
+        self.log_length = len(self.log["negLnLike"])
+        if self.spot_writer is not None:
+            writer = self.spot_writer
+            negLnLike = self.negLnLike.copy()
+            theta = self.theta.copy()
+            p = self.p.copy()
+            Lambda = self.Lambda.copy()
+            writer.add_scalar("negLnLike", negLnLike, self.counter+self.log_length)
+            writer.add_scalar("Lambda", Lambda, self.counter+self.log_length)
+            # add the self.n_theta theta values to the writer with one key "theta", i.e, the same key for all theta values
+            writer.add_scalars("theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)}, self.counter+self.log_length)
+            # add the self.n_p p values to the writer with one key "p", i.e, the same key for all p values
+            writer.add_scalars("p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
+            writer.flush()
 
     def fit_old(self, nat_X, nat_y):
         """
