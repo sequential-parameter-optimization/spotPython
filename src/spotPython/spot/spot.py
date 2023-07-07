@@ -424,6 +424,11 @@ class Spot:
             X_min = self.min_X.copy()
             writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
             writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
+            # get last value of self.X and convert to dict. take the values from self.var_name as keys:
+            X_last = self.X[-1].copy()
+            config = {self.var_name[i]: X_last[i] for i in range(self.k)}
+            y_val = self.y[-1].copy()
+            writer.add_hparams(config, {"fun_torch: loss": y_val})
             writer.flush()
         # Update aggregated x and y values (if noise):
         if self.noise:
