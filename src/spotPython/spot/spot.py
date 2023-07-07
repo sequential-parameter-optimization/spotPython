@@ -417,14 +417,6 @@ class Spot:
         self.last_y = self.y[-1]
         self.min_X = self.X[argmin(self.y)]
         self.counter = self.y.size
-        # Update aggregated x and y values (if noise):
-        if self.noise:
-            Z = aggregate_mean_var(X=self.X, y=self.y)
-            self.mean_X = Z[0]
-            self.mean_y = Z[1]
-            self.var_y = Z[2]
-            self.min_mean_y = min(self.mean_y)
-            self.min_mean_X = self.mean_X[argmin(self.mean_y)]
         if self.spot_writer is not None:
             writer = self.spot_writer
             y_min = self.min_y.copy()
@@ -433,6 +425,25 @@ class Spot:
             writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
             writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
             writer.flush()
+        # Update aggregated x and y values (if noise):
+        if self.noise:
+            Z = aggregate_mean_var(X=self.X, y=self.y)
+            self.mean_X = Z[0]
+            self.mean_y = Z[1]
+            self.var_y = Z[2]
+            self.min_mean_y = min(self.mean_y)
+            self.min_mean_X = self.mean_X[argmin(self.mean_y)]
+            if self.spot_writer is not None:
+                writer = self.spot_writer
+                y_min_mean = self.min_mean_y.copy()
+                X_min_mean = self.min_mean_X.copy()
+                y_var = self.var_y.copy()
+                writer.add_scalars("spot_y_noise", {"min_mean_y": y_min_mean, "last": y_last}, self.counter)
+                writer.add_scalar("spot_y_var", y_var, self.counter)
+                writer.add_scalars(
+                    "spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter
+                )
+                writer.flush()
 
     def suggest_new_X_old(self):
         """

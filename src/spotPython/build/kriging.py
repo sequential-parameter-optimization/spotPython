@@ -309,13 +309,18 @@ class Kriging(surrogates):
             writer = self.spot_writer
             negLnLike = self.negLnLike.copy()
             theta = self.theta.copy()
-            p = self.p.copy()
-            Lambda = self.Lambda.copy()
-            writer.add_scalar("negLnLike", negLnLike, self.counter+self.log_length)
+            if self.noise:
+                Lambda = self.Lambda.copy()
             writer.add_scalar("Lambda", Lambda, self.counter+self.log_length)
-            # add the self.n_theta theta values to the writer with one key "theta", i.e, the same key for all theta values
-            writer.add_scalars("theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)}, self.counter+self.log_length)
-            # add the self.n_p p values to the writer with one key "p", i.e, the same key for all p values
+            writer.add_scalar("negLnLike", negLnLike, self.counter+self.log_length)
+            # add the self.n_theta theta values to the writer with one key "theta",
+            # i.e, the same key for all theta values
+            writer.add_scalars("theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)},
+                               self.counter+self.log_length)
+            if self.optim_p:
+                p = self.p.copy()
+            # add the self.n_p p values to the writer with one key "p", i.e,
+            # the same key for all p values
             writer.add_scalars("p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
             writer.flush()
 

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Hyperparameter Tuning Cookbook - 11&nbsp; HPT: River</title>
+<title>Hyperparameter Tuning Cookbook - 11&nbsp; River Hyperparameter Tuning with SPOT HATR</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -54,26 +54,7 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -114,31 +95,11 @@ div.csl-indent {
     "search-label": "Search"
   }
 }</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
-<script type="text/javascript">
-window.PlotlyConfig = {MathJaxConfig: 'local'};
-if (window.MathJax && window.MathJax.Hub && window.MathJax.Hub.Config) {window.MathJax.Hub.Config({SVG: {font: "STIX-Web"}});}
-if (typeof require !== 'undefined') {
-require.undef("plotly");
-requirejs.config({
-    paths: {
-        'plotly': ['https://cdn.plot.ly/plotly-2.20.0.min']
-    }
-});
-require(['plotly'], function(Plotly) {
-    window._Plotly = Plotly;
-});
-}
-</script>
 
 
-
-<meta name="twitter:title" content="Hyperparameter Tuning Cookbook - 11&nbsp; HPT: River">
+<meta name="twitter:title" content="Hyperparameter Tuning Cookbook - 11&nbsp; River Hyperparameter Tuning with SPOT HATR">
 <meta name="twitter:description" content="">
-<meta name="twitter:image" content="13_spot_hpt_river_files/figure-html/cell-20-output-1.png">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-sidebar docked">
@@ -150,7 +111,7 @@ require(['plotly'], function(Plotly) {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./13_spot_hpt_river.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">HPT: River</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./13_spot_hpt_river.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">River Hyperparameter Tuning with SPOT HATR</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -265,7 +226,7 @@ require(['plotly'], function(Plotly) {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./13_spot_hpt_river.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">HPT: River</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">River Hyperparameter Tuning with SPOT HATR</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -326,37 +287,41 @@ require(['plotly'], function(Plotly) {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#sec-setup-24" id="toc-sec-setup-24" class="nav-link active" data-scroll-target="#sec-setup-24"><span class="header-section-number">11.1</span> Step 1: Setup</a>
+  <li><a href="#sec-setup-10" id="toc-sec-setup-10" class="nav-link active" data-scroll-target="#sec-setup-10"><span class="header-section-number">11.1</span> Step 1: Setup</a></li>
+  <li><a href="#chapter-10-sequential-parameter-optimization" id="toc-chapter-10-sequential-parameter-optimization" class="nav-link" data-scroll-target="#chapter-10-sequential-parameter-optimization"><span class="header-section-number">12</span> Chapter 10: Sequential Parameter Optimization</a>
   <ul class="collapse">
-  <li><a href="#river-hyperparameter-tuning-hatr-with-friedman-drift-data" id="toc-river-hyperparameter-tuning-hatr-with-friedman-drift-data" class="nav-link" data-scroll-target="#river-hyperparameter-tuning-hatr-with-friedman-drift-data"><span class="header-section-number">11.1.1</span> <code>river</code> Hyperparameter Tuning: HATR with Friedman Drift Data</a></li>
+  <li><a href="#river-hyperparameter-tuning-hatr-with-friedman-drift-data" id="toc-river-hyperparameter-tuning-hatr-with-friedman-drift-data" class="nav-link" data-scroll-target="#river-hyperparameter-tuning-hatr-with-friedman-drift-data"><span class="header-section-number">12.1</span> <code>river</code> Hyperparameter Tuning: HATR with Friedman Drift Data</a></li>
+  <li><a href="#example-1-hatr-hyperparameter" id="toc-example-1-hatr-hyperparameter" class="nav-link" data-scroll-target="#example-1-hatr-hyperparameter"><span class="header-section-number">12.2</span> Example 1: HATR Hyperparameter</a></li>
+  <li><a href="#initialization-of-the-empty-fun_control-dictionary" id="toc-initialization-of-the-empty-fun_control-dictionary" class="nav-link" data-scroll-target="#initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">12.3</span> 0. Initialization of the Empty <code>fun_control</code> Dictionary</a></li>
+  <li><a href="#load-data-the-friedman-drift-data" id="toc-load-data-the-friedman-drift-data" class="nav-link" data-scroll-target="#load-data-the-friedman-drift-data"><span class="header-section-number">12.4</span> 1. Load Data: The Friedman Drift Data</a></li>
+  <li><a href="#specification-of-the-preprocessing-model" id="toc-specification-of-the-preprocessing-model" class="nav-link" data-scroll-target="#specification-of-the-preprocessing-model"><span class="header-section-number">12.5</span> 2. Specification of the Preprocessing Model</a></li>
+  <li><a href="#select-algorithm-and-core_model_hyper_dict" id="toc-select-algorithm-and-core_model_hyper_dict" class="nav-link" data-scroll-target="#select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">12.6</span> 3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></a></li>
+  <li><a href="#modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" id="toc-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="nav-link" data-scroll-target="#modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">12.7</span> 4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></a>
+  <ul class="collapse">
+  <li><a href="#modify-hyperparameter-of-type-factor" id="toc-modify-hyperparameter-of-type-factor" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-factor"><span class="header-section-number">12.7.1</span> Modify hyperparameter of type factor</a></li>
+  <li><a href="#modify-hyperparameter-of-type-numeric-and-integer-boolean" id="toc-modify-hyperparameter-of-type-numeric-and-integer-boolean" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">12.7.2</span> Modify hyperparameter of type numeric and integer (boolean)</a></li>
   </ul></li>
-  <li><a href="#step-2-initialization-of-the-fun_control-dictionary" id="toc-step-2-initialization-of-the-fun_control-dictionary" class="nav-link" data-scroll-target="#step-2-initialization-of-the-fun_control-dictionary"><span class="header-section-number">11.2</span> Step 2: Initialization of the <code>fun_control</code> Dictionary</a></li>
-  <li><a href="#step-3-load-the-friedman-drift-data" id="toc-step-3-load-the-friedman-drift-data" class="nav-link" data-scroll-target="#step-3-load-the-friedman-drift-data"><span class="header-section-number">11.3</span> Step 3: Load the Friedman Drift Data</a></li>
-  <li><a href="#step-4-specification-of-the-preprocessing-model" id="toc-step-4-specification-of-the-preprocessing-model" class="nav-link" data-scroll-target="#step-4-specification-of-the-preprocessing-model"><span class="header-section-number">11.4</span> Step 4: Specification of the Preprocessing Model</a></li>
-  <li><a href="#step-5-select-algorithm-and-core_model_hyper_dict" id="toc-step-5-select-algorithm-and-core_model_hyper_dict" class="nav-link" data-scroll-target="#step-5-select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">11.5</span> Step 5: Select <code>algorithm</code> and <code>core_model_hyper_dict</code></a></li>
-  <li><a href="#step-6-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" id="toc-step-6-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="nav-link" data-scroll-target="#step-6-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">11.6</span> Step 6: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></a>
+  <li><a href="#selection-of-the-objective-loss-function" id="toc-selection-of-the-objective-loss-function" class="nav-link" data-scroll-target="#selection-of-the-objective-loss-function"><span class="header-section-number">12.8</span> 5. Selection of the Objective (Loss) Function</a></li>
+  <li><a href="#calling-the-spot-function" id="toc-calling-the-spot-function" class="nav-link" data-scroll-target="#calling-the-spot-function"><span class="header-section-number">12.9</span> 6. Calling the SPOT Function</a>
   <ul class="collapse">
-  <li><a href="#modify-hyperparameter-of-type-factor" id="toc-modify-hyperparameter-of-type-factor" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-factor"><span class="header-section-number">11.6.1</span> Modify hyperparameter of type factor</a></li>
-  <li><a href="#modify-hyperparameter-of-type-numeric-and-integer-boolean" id="toc-modify-hyperparameter-of-type-numeric-and-integer-boolean" class="nav-link" data-scroll-target="#modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">11.6.2</span> Modify hyperparameter of type numeric and integer (boolean)</a></li>
+  <li><a href="#prepare-the-spot-parameters" id="toc-prepare-the-spot-parameters" class="nav-link" data-scroll-target="#prepare-the-spot-parameters"><span class="header-section-number">12.9.1</span> Prepare the SPOT Parameters</a></li>
+  <li><a href="#run-the-spot-optimizer" id="toc-run-the-spot-optimizer" class="nav-link" data-scroll-target="#run-the-spot-optimizer"><span class="header-section-number">12.9.2</span> Run the <code>Spot</code> Optimizer</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results"><span class="header-section-number">12.9.3</span> 4 Results</a></li>
   </ul></li>
-  <li><a href="#step-7-selection-of-the-objective-loss-function" id="toc-step-7-selection-of-the-objective-loss-function" class="nav-link" data-scroll-target="#step-7-selection-of-the-objective-loss-function"><span class="header-section-number">11.7</span> Step 7: Selection of the Objective (Loss) Function</a></li>
-  <li><a href="#step-8-calling-the-spot-function" id="toc-step-8-calling-the-spot-function" class="nav-link" data-scroll-target="#step-8-calling-the-spot-function"><span class="header-section-number">11.8</span> Step 8: Calling the SPOT Function</a>
-  <ul class="collapse">
-  <li><a href="#prepare-the-spot-parameters" id="toc-prepare-the-spot-parameters" class="nav-link" data-scroll-target="#prepare-the-spot-parameters"><span class="header-section-number">11.8.1</span> Prepare the SPOT Parameters</a></li>
-  <li><a href="#run-the-spot-optimizer" id="toc-run-the-spot-optimizer" class="nav-link" data-scroll-target="#run-the-spot-optimizer"><span class="header-section-number">11.8.2</span> Run the <code>Spot</code> Optimizer</a></li>
+  <li><a href="#show-variable-importance" id="toc-show-variable-importance" class="nav-link" data-scroll-target="#show-variable-importance"><span class="header-section-number">12.10</span> Show variable importance</a></li>
+  <li><a href="#build-and-evaluate-htr-model-with-tuned-hyperparameters" id="toc-build-and-evaluate-htr-model-with-tuned-hyperparameters" class="nav-link" data-scroll-target="#build-and-evaluate-htr-model-with-tuned-hyperparameters"><span class="header-section-number">12.11</span> Build and Evaluate HTR Model with Tuned Hyperparameters</a></li>
   </ul></li>
-  <li><a href="#step-9-results" id="toc-step-9-results" class="nav-link" data-scroll-target="#step-9-results"><span class="header-section-number">11.9</span> Step 9: Results</a>
+  <li><a href="#der-große-datensatz" id="toc-der-große-datensatz" class="nav-link" data-scroll-target="#der-große-datensatz"><span class="header-section-number">13</span> Der große Datensatz</a>
   <ul class="collapse">
-  <li><a href="#show-variable-importance" id="toc-show-variable-importance" class="nav-link" data-scroll-target="#show-variable-importance"><span class="header-section-number">11.9.1</span> Show variable importance</a></li>
-  <li><a href="#build-and-evaluate-htr-model-with-tuned-hyperparameters" id="toc-build-and-evaluate-htr-model-with-tuned-hyperparameters" class="nav-link" data-scroll-target="#build-and-evaluate-htr-model-with-tuned-hyperparameters"><span class="header-section-number">11.9.2</span> Build and Evaluate HTR Model with Tuned Hyperparameters</a></li>
-  <li><a href="#the-large-data-set-k0.2" id="toc-the-large-data-set-k0.2" class="nav-link" data-scroll-target="#the-large-data-set-k0.2"><span class="header-section-number">11.9.3</span> The Large Data Set (k=0.2)</a></li>
-  <li><a href="#get-default-hyperparameters" id="toc-get-default-hyperparameters" class="nav-link" data-scroll-target="#get-default-hyperparameters"><span class="header-section-number">11.9.4</span> Get Default Hyperparameters</a></li>
-  <li><a href="#get-spot-results" id="toc-get-spot-results" class="nav-link" data-scroll-target="#get-spot-results"><span class="header-section-number">11.9.5</span> Get SPOT Results</a></li>
-  <li><a href="#visualize-regression-trees" id="toc-visualize-regression-trees" class="nav-link" data-scroll-target="#visualize-regression-trees"><span class="header-section-number">11.9.6</span> Visualize Regression Trees</a></li>
-  <li><a href="#spot-model" id="toc-spot-model" class="nav-link" data-scroll-target="#spot-model"><span class="header-section-number">11.9.7</span> Spot Model</a></li>
-  <li><a href="#detailed-hyperparameter-plots" id="toc-detailed-hyperparameter-plots" class="nav-link" data-scroll-target="#detailed-hyperparameter-plots"><span class="header-section-number">11.9.8</span> Detailed Hyperparameter Plots</a></li>
-  <li><a href="#parallel-coordinates-plots" id="toc-parallel-coordinates-plots" class="nav-link" data-scroll-target="#parallel-coordinates-plots"><span class="header-section-number">11.9.9</span> Parallel Coordinates Plots</a></li>
-  <li><a href="#plot-all-combinations-of-hyperparameters" id="toc-plot-all-combinations-of-hyperparameters" class="nav-link" data-scroll-target="#plot-all-combinations-of-hyperparameters"><span class="header-section-number">11.9.10</span> Plot all Combinations of Hyperparameters</a></li>
+  <li><a href="#get-default-hyperparameters" id="toc-get-default-hyperparameters" class="nav-link" data-scroll-target="#get-default-hyperparameters"><span class="header-section-number">13.1</span> Get Default Hyperparameters</a></li>
+  <li><a href="#get-spot-results" id="toc-get-spot-results" class="nav-link" data-scroll-target="#get-spot-results"><span class="header-section-number">13.2</span> Get SPOT Results</a></li>
+  <li><a href="#visualize-regression-trees" id="toc-visualize-regression-trees" class="nav-link" data-scroll-target="#visualize-regression-trees"><span class="header-section-number">13.3</span> Visualize Regression Trees</a>
+  <ul class="collapse">
+  <li><a href="#spot-model" id="toc-spot-model" class="nav-link" data-scroll-target="#spot-model"><span class="header-section-number">13.3.1</span> Spot Model</a></li>
+  </ul></li>
+  <li><a href="#detailed-hyperparameter-plots" id="toc-detailed-hyperparameter-plots" class="nav-link" data-scroll-target="#detailed-hyperparameter-plots"><span class="header-section-number">13.4</span> Detailed Hyperparameter Plots</a></li>
+  <li><a href="#parallel-coordinates-plots" id="toc-parallel-coordinates-plots" class="nav-link" data-scroll-target="#parallel-coordinates-plots"><span class="header-section-number">13.5</span> Parallel Coordinates Plots</a></li>
+  <li><a href="#plot-all-combinations-of-hyperparameters" id="toc-plot-all-combinations-of-hyperparameters" class="nav-link" data-scroll-target="#plot-all-combinations-of-hyperparameters"><span class="header-section-number">13.6</span> Plot all Combinations of Hyperparameters</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -366,7 +331,7 @@ require(['plotly'], function(Plotly) {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">HPT: River</span></h1>
+<h1 class="title"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">River Hyperparameter Tuning with SPOT HATR</span></h1>
 </div>
 
 
@@ -381,9 +346,8 @@ require(['plotly'], function(Plotly) {
 
 </header>
 
-<p>River is a Python library for online machine learning <span class="citation" data-cites="mont20a">(<a href="references.html#ref-mont20a" role="doc-biblioref">Montiel et al. 2021</a>)</span>. It aims to be the most user-friendly library for doing machine learning on streaming data. River is the result of a merger between creme and scikit-multiflow.</p>
-<section id="sec-setup-24" class="level2" data-number="11.1">
-<h2 data-number="11.1" class="anchored" data-anchor-id="sec-setup-24"><span class="header-section-number">11.1</span> Step 1: Setup</h2>
+<section id="sec-setup-10" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="sec-setup-10"><span class="header-section-number">11.1</span> Step 1: Setup</h2>
 <p>Before we consider the detailed experimental setup, we select the parameters that affect run time, initial design size and the device that is used.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -403,104 +367,88 @@ Caution: Run time and initial design size should be increased for real experimen
 </div>
 </div>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="fl">.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>MAX_TIME <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>INIT_SIZE <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>PREFIX<span class="op">=</span><span class="st">"10-river"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="fl">.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-execution_count="2">
-<div class="cell-output cell-output-stdout">
-<pre><code>10-river_p040025_1min_5init_2023-07-06_00-49-50</code></pre>
-</div>
-</div>
-<section id="river-hyperparameter-tuning-hatr-with-friedman-drift-data" class="level3" data-number="11.1.1">
-<h3 data-number="11.1.1" class="anchored" data-anchor-id="river-hyperparameter-tuning-hatr-with-friedman-drift-data"><span class="header-section-number">11.1.1</span> <code>river</code> Hyperparameter Tuning: HATR with Friedman Drift Data</h3>
+</section>
+<section id="chapter-10-sequential-parameter-optimization" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> Chapter 10: Sequential Parameter Optimization</h1>
+<section id="river-hyperparameter-tuning-hatr-with-friedman-drift-data" class="level2" data-number="12.1">
+<h2 data-number="12.1" class="anchored" data-anchor-id="river-hyperparameter-tuning-hatr-with-friedman-drift-data"><span class="header-section-number">12.1</span> <code>river</code> Hyperparameter Tuning: HATR with Friedman Drift Data</h2>
 <ul>
 <li>This notebook exemplifies hyperparameter tuning with SPOT (spotPython and spotRiver).</li>
 <li>The hyperparameter software SPOT was developed in R (statistical programming language), see Open Access book “Hyperparameter Tuning for Machine and Deep Learning with R - A Practical Guide”, available here: <a href="https://link.springer.com/book/10.1007/978-981-19-5170-1">https://link.springer.com/book/10.1007/978-981-19-5170-1</a>.</li>
 <li>This notebook demonstrates hyperparameter tuning for <code>river</code>. It is based on the notebook “Incremental decision trees in river: the Hoeffding Tree case”, see: <a href="https://riverml.xyz/0.15.0/recipes/on-hoeffding-trees/#42-regression-tree-splitters">https://riverml.xyz/0.15.0/recipes/on-hoeffding-trees/#42-regression-tree-splitters</a>.</li>
 <li>Here we will use the river <code>HTR</code> and <code>HATR</code> functions as in “Incremental decision trees in river: the Hoeffding Tree case”, see: <a href="https://riverml.xyz/0.15.0/recipes/on-hoeffding-trees/#42-regression-tree-splitters">https://riverml.xyz/0.15.0/recipes/on-hoeffding-trees/#42-regression-tree-splitters</a>.</li>
 </ul>
+</section>
+<section id="example-1-hatr-hyperparameter" class="level2" data-number="12.2">
+<h2 data-number="12.2" class="anchored" data-anchor-id="example-1-hatr-hyperparameter"><span class="header-section-number">12.2</span> Example 1: HATR Hyperparameter</h2>
+</section>
+<section id="initialization-of-the-empty-fun_control-dictionary" class="level2" data-number="12.3">
+<h2 data-number="12.3" class="anchored" data-anchor-id="initialization-of-the-empty-fun_control-dictionary"><span class="header-section-number">12.3</span> 0. Initialization of the Empty <code>fun_control</code> Dictionary</h2>
 <div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pip <span class="bu">list</span> <span class="op">|</span> grep  <span class="st">"spot[RiverPython]"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython                 0.3.4
-spotRiver                  0.0.93</code></pre>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(tensorboard_path<span class="op">=</span><span class="ss">f"./runs/</span><span class="sc">{</span>experiment_name<span class="sc">}</span><span class="ss">/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Note: you may need to restart the kernel to use updated packages.</code></pre>
-</div>
-</div>
+</section>
+<section id="load-data-the-friedman-drift-data" class="level2" data-number="12.4">
+<h2 data-number="12.4" class="anchored" data-anchor-id="load-data-the-friedman-drift-data"><span class="header-section-number">12.4</span> 1. Load Data: The Friedman Drift Data</h2>
 <div class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># import sys</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade build</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># !{sys.executable} -m pip install --upgrade --force-reinstall spotPython</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-</section>
-<section id="step-2-initialization-of-the-fun_control-dictionary" class="level2" data-number="11.2">
-<h2 data-number="11.2" class="anchored" data-anchor-id="step-2-initialization-of-the-fun_control-dictionary"><span class="header-section-number">11.2</span> Step 2: Initialization of the <code>fun_control</code> Dictionary</h2>
-<div class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(task<span class="op">=</span><span class="st">"regression"</span>,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a> tensorboard_path<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="step-3-load-the-friedman-drift-data" class="level2" data-number="11.3">
-<h2 data-number="11.3" class="anchored" data-anchor-id="step-3-load-the-friedman-drift-data"><span class="header-section-number">11.3</span> Step 3: Load the Friedman Drift Data</h2>
-<div class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>horizon <span class="op">=</span> <span class="dv">7</span><span class="op">*</span><span class="dv">24</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> K</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">100_000</span>)</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> n_total</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>p_1 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">25_000</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>p_2 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">50_000</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>position<span class="op">=</span>(p_1, p_2)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>n_train <span class="op">=</span> <span class="dv">1_000</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> n_train <span class="op">+</span> p_1 <span class="op">-</span> <span class="dv">12</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> <span class="dv">12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>horizon <span class="op">=</span> <span class="dv">7</span><span class="op">*</span><span class="dv">24</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> K</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">100_000</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> n_total</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>p_1 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">25_000</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>p_2 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">50_000</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>position<span class="op">=</span>(p_1, p_2)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>n_train <span class="op">=</span> <span class="dv">1_000</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> n_train <span class="op">+</span> p_1 <span class="op">-</span> <span class="dv">12</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> <span class="dv">12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Since we also need a <code>river</code> version of the data below for plotting the model, the corresponding data set is generated here. Note: <code>spotRiver</code> uses the <code>train</code> and <code>test</code> data sets, while <code>river</code> uses the <code>X</code> and <code>y</code> data sets</li>
 </ul>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river.datasets <span class="im">import</span> synth</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> synth.FriedmanDrift(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>   drift_type<span class="op">=</span><span class="st">'gra'</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>   position<span class="op">=</span>position,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>     seed<span class="op">=</span><span class="dv">123</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.utils.data_conversion <span class="im">import</span> convert_to_df</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>target_column <span class="op">=</span> <span class="st">"y"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> convert_to_df(dataset, target_column<span class="op">=</span>target_column, n_total<span class="op">=</span>n_total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river.datasets <span class="im">import</span> synth</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> synth.FriedmanDrift(</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>   drift_type<span class="op">=</span><span class="st">'gra'</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>   position<span class="op">=</span>position,</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>     seed<span class="op">=</span><span class="dv">123</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>data_dict <span class="op">=</span> {key: [] <span class="cf">for</span> key <span class="kw">in</span> <span class="bu">list</span>(dataset.take(<span class="dv">1</span>))[<span class="dv">0</span>][<span class="dv">0</span>].keys()}</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>data_dict[<span class="st">"y"</span>] <span class="op">=</span> []</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, y <span class="kw">in</span> dataset.take(n_total):</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> key, value <span class="kw">in</span> x.items():</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>        data_dict[key].append(value)</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    data_dict[<span class="st">"y"</span>].append(y)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data_dict)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Add column names x1 until x10 to the first 10 columns of the dataframe and the column name y to the last column</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="ss">f"x</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>)] <span class="op">+</span> [<span class="st">"y"</span>]</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> df[:n_train]</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> df[n_train:]</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>target_column <span class="op">=</span> <span class="st">"y"</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>, <span class="co"># dataset,</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: target_column})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add column names x1 until x10 to the first 10 columns of the dataframe and the column name y to the last column</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="ss">f"x</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>)] <span class="op">+</span> [<span class="st">"y"</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> df[:n_train]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> df[n_train:]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>, <span class="co"># dataset,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: target_column})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="step-4-specification-of-the-preprocessing-model" class="level2" data-number="11.4">
-<h2 data-number="11.4" class="anchored" data-anchor-id="step-4-specification-of-the-preprocessing-model"><span class="header-section-number">11.4</span> Step 4: Specification of the Preprocessing Model</h2>
+<section id="specification-of-the-preprocessing-model" class="level2" data-number="12.5">
+<h2 data-number="12.5" class="anchored" data-anchor-id="specification-of-the-preprocessing-model"><span class="header-section-number">12.5</span> 2. Specification of the Preprocessing Model</h2>
 <div class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river <span class="im">import</span> preprocessing</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> preprocessing.StandardScaler()</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river <span class="im">import</span> preprocessing</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>prep_model <span class="op">=</span> preprocessing.StandardScaler()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"prep_model"</span>: prep_model})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="step-5-select-algorithm-and-core_model_hyper_dict" class="level2" data-number="11.5">
-<h2 data-number="11.5" class="anchored" data-anchor-id="step-5-select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">11.5</span> Step 5: Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
+<section id="select-algorithm-and-core_model_hyper_dict" class="level2" data-number="12.6">
+<h2 data-number="12.6" class="anchored" data-anchor-id="select-algorithm-and-core_model_hyper_dict"><span class="header-section-number">12.6</span> 3. Select <code>algorithm</code> and <code>core_model_hyper_dict</code></h2>
 <ul>
 <li>The <code>river</code> model (<code>HATR</code>) is selected.</li>
 <li>Furthermore, the corresponding hyperparameters, see: <a href="https://riverml.xyz/0.15.0/api/tree/HoeffdingTreeRegressor/">https://riverml.xyz/0.15.0/api/tree/HoeffdingTreeRegressor/</a> are selected (incl.&nbsp;type information, names, and bounds).</li>
@@ -508,357 +456,165 @@ spotRiver                  0.0.93</code></pre>
 <li>Alternatively, you can load a local hyper_dict. Simply set <code>river_hyper_dict.json</code> as the filename. If <code>filename</code>is set to <code>None</code>, the hyper_dict is loaded from the <code>spotRiver</code> package.</li>
 </ul>
 <div class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river.tree <span class="im">import</span> HoeffdingAdaptiveTreeRegressor</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.data.river_hyper_dict <span class="im">import</span> RiverHyperDict</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> add_core_model_to_fun_control</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>core_model  <span class="op">=</span> HoeffdingAdaptiveTreeRegressor</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>RiverHyperDict,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river.tree <span class="im">import</span> HoeffdingAdaptiveTreeRegressor</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.data.river_hyper_dict <span class="im">import</span> RiverHyperDict</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> add_core_model_to_fun_control</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>core_model  <span class="op">=</span> HoeffdingAdaptiveTreeRegressor</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>add_core_model_to_fun_control(core_model<span class="op">=</span>core_model,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                              fun_control<span class="op">=</span>fun_control,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                              hyper_dict<span class="op">=</span>RiverHyperDict,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                              filename<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>The corresponding entries for the <code>core_model</code> class are shown below.</p>
+</section>
+<section id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2" data-number="12.7">
+<h2 data-number="12.7" class="anchored" data-anchor-id="modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">12.7</span> 4. Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
+<section id="modify-hyperparameter-of-type-factor" class="level3" data-number="12.7.1">
+<h3 data-number="12.7.1" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">12.7.1</span> Modify hyperparameter of type factor</h3>
 <div class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fun_control[<span class="st">'core_model_hyper_dict'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="10">
-<pre><code>{'grace_period': {'type': 'int',
-  'default': 200,
-  'transform': 'None',
-  'lower': 10,
-  'upper': 1000},
- 'max_depth': {'type': 'int',
-  'default': 20,
-  'transform': 'transform_power_2_int',
-  'lower': 2,
-  'upper': 20},
- 'delta': {'type': 'float',
-  'default': 1e-07,
-  'transform': 'None',
-  'lower': 1e-08,
-  'upper': 1e-06},
- 'tau': {'type': 'float',
-  'default': 0.05,
-  'transform': 'None',
-  'lower': 0.01,
-  'upper': 0.1},
- 'leaf_prediction': {'levels': ['mean', 'model', 'adaptive'],
-  'type': 'factor',
-  'default': 'mean',
-  'transform': 'None',
-  'core_model_parameter_type': 'str',
-  'lower': 0,
-  'upper': 2},
- 'leaf_model': {'levels': ['LinearRegression', 'PARegressor', 'Perceptron'],
-  'type': 'factor',
-  'default': 'LinearRegression',
-  'transform': 'None',
-  'class_name': 'river.linear_model',
-  'core_model_parameter_type': 'instance()',
-  'lower': 0,
-  'upper': 2},
- 'model_selector_decay': {'type': 'float',
-  'default': 0.95,
-  'transform': 'None',
-  'lower': 0.9,
-  'upper': 0.99},
- 'splitter': {'levels': ['EBSTSplitter', 'TEBSTSplitter', 'QOSplitter'],
-  'type': 'factor',
-  'default': 'EBSTSplitter',
-  'transform': 'None',
-  'class_name': 'river.tree.splitter',
-  'core_model_parameter_type': 'instance()',
-  'lower': 0,
-  'upper': 2},
- 'min_samples_split': {'type': 'int',
-  'default': 5,
-  'transform': 'None',
-  'lower': 2,
-  'upper': 10},
- 'bootstrap_sampling': {'levels': [0, 1],
-  'type': 'factor',
-  'default': 0,
-  'transform': 'None',
-  'core_model_parameter_type': 'bool',
-  'lower': 0,
-  'upper': 1},
- 'drift_window_threshold': {'type': 'int',
-  'default': 300,
-  'transform': 'None',
-  'lower': 100,
-  'upper': 500},
- 'switch_significance': {'type': 'float',
-  'default': 0.05,
-  'transform': 'None',
-  'lower': 0.01,
-  'upper': 0.1},
- 'binary_split': {'levels': [0, 1],
-  'type': 'factor',
-  'default': 0,
-  'transform': 'None',
-  'core_model_parameter_type': 'bool',
-  'lower': 0,
-  'upper': 1},
- 'max_size': {'type': 'float',
-  'default': 500.0,
-  'transform': 'None',
-  'lower': 100.0,
-  'upper': 1000.0},
- 'memory_estimate_period': {'type': 'int',
-  'default': 1000000,
-  'transform': 'None',
-  'lower': 100000,
-  'upper': 1000000},
- 'stop_mem_management': {'levels': [0, 1],
-  'type': 'factor',
-  'default': 0,
-  'transform': 'None',
-  'core_model_parameter_type': 'bool',
-  'lower': 0,
-  'upper': 1},
- 'remove_poor_attrs': {'levels': [0, 1],
-  'type': 'factor',
-  'default': 0,
-  'transform': 'None',
-  'core_model_parameter_type': 'bool',
-  'lower': 0,
-  'upper': 1},
- 'merit_preprune': {'levels': [0, 1],
-  'type': 'factor',
-  'default': 0,
-  'transform': 'None',
-  'core_model_parameter_type': 'bool',
-  'lower': 0,
-  'upper': 1}}</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modify_hyper_parameter_levels(fun_control, "leaf_model", ["LinearRegression"])</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control["core_model_hyper_dict"]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="step-6-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model" class="level2" data-number="11.6">
-<h2 data-number="11.6" class="anchored" data-anchor-id="step-6-modify-hyper_dict-hyperparameters-for-the-selected-algorithm-aka-core_model"><span class="header-section-number">11.6</span> Step 6: Modify <code>hyper_dict</code> Hyperparameters for the Selected Algorithm aka <code>core_model</code></h2>
-<section id="modify-hyperparameter-of-type-factor" class="level3" data-number="11.6.1">
-<h3 data-number="11.6.1" class="anchored" data-anchor-id="modify-hyperparameter-of-type-factor"><span class="header-section-number">11.6.1</span> Modify hyperparameter of type factor</h3>
+<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3" data-number="12.7.2">
+<h3 data-number="12.7.2" class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">12.7.2</span> Modify hyperparameter of type numeric and integer (boolean)</h3>
 <div class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># modify_hyper_parameter_levels(fun_control, "leaf_model", ["LinearRegression"])</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control["core_model_hyper_dict"]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_bounds</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, <span class="st">"delta"</span>, bounds<span class="op">=</span>[<span class="fl">1e-10</span>, <span class="fl">1e-6</span>])</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># modify_hyper_parameter_bounds(fun_control, "min_samples_split", bounds=[3, 20])</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, <span class="st">"merit_preprune"</span>, [<span class="dv">0</span>, <span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="modify-hyperparameter-of-type-numeric-and-integer-boolean" class="level3" data-number="11.6.2">
-<h3 data-number="11.6.2" class="anchored" data-anchor-id="modify-hyperparameter-of-type-numeric-and-integer-boolean"><span class="header-section-number">11.6.2</span> Modify hyperparameter of type numeric and integer (boolean)</h3>
+</section>
+<section id="selection-of-the-objective-loss-function" class="level2" data-number="12.8">
+<h2 data-number="12.8" class="anchored" data-anchor-id="selection-of-the-objective-loss-function"><span class="header-section-number">12.8</span> 5. Selection of the Objective (Loss) Function</h2>
+<p>There are two metrics:</p>
+<pre><code>1. `metric` is used for the river based evaluation via `eval_oml_iter_progressive`.
+2. `metric_sklearn` is used for the sklearn based evaluation via `eval_oml_horizon`.</code></pre>
 <div class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> modify_hyper_parameter_bounds</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, <span class="st">"delta"</span>, bounds<span class="op">=</span>[<span class="fl">1e-10</span>, <span class="fl">1e-6</span>])</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># modify_hyper_parameter_bounds(fun_control, "min_samples_split", bounds=[3, 20])</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>modify_hyper_parameter_bounds(fun_control, <span class="st">"merit_preprune"</span>, [<span class="dv">0</span>, <span class="dv">0</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river <span class="im">import</span> metrics</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">1000</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">1000</span>])<span class="op">*</span><span class="fl">10_000.0</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>horizon <span class="op">=</span> <span class="dv">7</span><span class="op">*</span><span class="dv">24</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>oml_grace_period <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>weight_coeff <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizon"</span>: horizon,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"oml_grace_period"</span>: oml_grace_period,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weights"</span>: weights,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"step"</span>: step,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"log_level"</span>: <span class="dv">50</span>,</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weight_coeff"</span>: weight_coeff,</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric"</span>: metrics.MAE(),</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_sklearn"</span>: mean_absolute_error</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="step-7-selection-of-the-objective-loss-function" class="level2" data-number="11.7">
-<h2 data-number="11.7" class="anchored" data-anchor-id="step-7-selection-of-the-objective-loss-function"><span class="header-section-number">11.7</span> Step 7: Selection of the Objective (Loss) Function</h2>
-<p>There are three metrics:</p>
-<pre><code>1. `metric_river` is used for the river based evaluation via `eval_oml_iter_progressive`.
-2. `metric_sklearn` is used for the sklearn based evaluation via `eval_oml_horizon`.
-3. `metric_torch` is used for the pytorch based evaluation.</code></pre>
-<div class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river <span class="im">import</span> metrics</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.fun.hyperriver <span class="im">import</span> HyperRiver</span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperRiver(seed<span class="op">=</span><span class="dv">123</span>, log_level<span class="op">=</span><span class="dv">50</span>).fun_oml_horizon</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>weights <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">1000</span>, <span class="dv">1</span><span class="op">/</span><span class="dv">1000</span>])<span class="op">*</span><span class="fl">10_000.0</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>horizon <span class="op">=</span> <span class="dv">7</span><span class="op">*</span><span class="dv">24</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>oml_grace_period <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>step <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>weight_coeff <span class="op">=</span> <span class="fl">1.0</span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>fun_control.update({</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>               <span class="st">"horizon"</span>: horizon,</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>               <span class="st">"oml_grace_period"</span>: oml_grace_period,</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weights"</span>: weights,</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">"step"</span>: step,</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">"log_level"</span>: <span class="dv">50</span>,</span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>               <span class="st">"weight_coeff"</span>: weight_coeff,</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_river"</span>: metrics.MAE(),</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>               <span class="st">"metric_sklearn"</span>: mean_absolute_error</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="step-8-calling-the-spot-function" class="level2" data-number="11.8">
-<h2 data-number="11.8" class="anchored" data-anchor-id="step-8-calling-the-spot-function"><span class="header-section-number">11.8</span> Step 8: Calling the SPOT Function</h2>
-<section id="prepare-the-spot-parameters" class="level3" data-number="11.8.1">
-<h3 data-number="11.8.1" class="anchored" data-anchor-id="prepare-the-spot-parameters"><span class="header-section-number">11.8.1</span> Prepare the SPOT Parameters</h3>
+<section id="calling-the-spot-function" class="level2" data-number="12.9">
+<h2 data-number="12.9" class="anchored" data-anchor-id="calling-the-spot-function"><span class="header-section-number">12.9</span> 6. Calling the SPOT Function</h2>
+<section id="prepare-the-spot-parameters" class="level3" data-number="12.9.1">
+<h3 data-number="12.9.1" class="anchored" data-anchor-id="prepare-the-spot-parameters"><span class="header-section-number">12.9.1</span> Prepare the SPOT Parameters</h3>
 <ul>
 <li>Get types and variable names as well as lower and upper bounds for the hyperparameters.</li>
 </ul>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    get_bound_values    </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> (</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    get_var_type,</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    get_var_name,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    get_bound_values</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>var_type <span class="op">=</span> get_var_type(fun_control)</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>var_name <span class="op">=</span> get_var_name(fun_control)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>lower <span class="op">=</span> get_bound_values(fun_control, <span class="st">"lower"</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>upper <span class="op">=</span> get_bound_values(fun_control, <span class="st">"upper"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>| name                   | type   | default          |      lower |    upper | transform             |
-|------------------------|--------|------------------|------------|----------|-----------------------|
-| grace_period           | int    | 200              |     10     | 1000     | None                  |
-| max_depth              | int    | 20               |      2     |   20     | transform_power_2_int |
-| delta                  | float  | 1e-07            |      1e-10 |    1e-06 | None                  |
-| tau                    | float  | 0.05             |      0.01  |    0.1   | None                  |
-| leaf_prediction        | factor | mean             |      0     |    2     | None                  |
-| leaf_model             | factor | LinearRegression |      0     |    2     | None                  |
-| model_selector_decay   | float  | 0.95             |      0.9   |    0.99  | None                  |
-| splitter               | factor | EBSTSplitter     |      0     |    2     | None                  |
-| min_samples_split      | int    | 5                |      2     |   10     | None                  |
-| bootstrap_sampling     | factor | 0                |      0     |    1     | None                  |
-| drift_window_threshold | int    | 300              |    100     |  500     | None                  |
-| switch_significance    | float  | 0.05             |      0.01  |    0.1   | None                  |
-| binary_split           | factor | 0                |      0     |    1     | None                  |
-| max_size               | float  | 500.0            |    100     | 1000     | None                  |
-| memory_estimate_period | int    | 1000000          | 100000     |    1e+06 | None                  |
-| stop_mem_management    | factor | 0                |      0     |    1     | None                  |
-| remove_poor_attrs      | factor | 0                |      0     |    1     | None                  |
-| merit_preprune         | factor | 0                |      0     |    0     | None                  |</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> gen_design_table</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="run-the-spot-optimizer" class="level3" data-number="11.8.2">
-<h3 data-number="11.8.2" class="anchored" data-anchor-id="run-the-spot-optimizer"><span class="header-section-number">11.8.2</span> Run the <code>Spot</code> Optimizer</h3>
+<section id="run-the-spot-optimizer" class="level3" data-number="12.9.2">
+<h3 data-number="12.9.2" class="anchored" data-anchor-id="run-the-spot-optimizer"><span class="header-section-number">12.9.2</span> Run the <code>Spot</code> Optimizer</h3>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.fun.hyperriver <span class="im">import</span> HyperRiver</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fun <span class="op">=</span> HyperRiver().fun_oml_horizon</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <ul>
 <li>Run SPOT for approx. x mins (<code>max_time</code>).</li>
-<li>Note: the run takes longer, because the evaluation time of initial design (here: <code>initi_size</code>, 20 points) is not considered.</li>
+<li>Note: the run takes longer, because the evaluation time of initial design (here: <code>init_size</code> = INIT_SIZE as specified above) is not considered.</li>
 </ul>
-<div class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE},</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>                                      })</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.1775404231225908 [##--------] 21.73% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.15276536807347 [####------] 41.29% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.15276536807347 [######----] 57.36% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.15276536807347 [#######---] 72.24% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.15276536807347 [#########-] 86.03% </code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>spotPython tuning: 2.15276536807347 [##########] 100.00% Done...
-</code></pre>
-</div>
-<div class="cell-output cell-output-display" data-execution_count="17">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x2c049f3a0&gt;</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.spot <span class="im">import</span> spot</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> inf</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> lower,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> upper,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                   fun_evals <span class="op">=</span> inf,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                   max_time <span class="op">=</span> MAX_TIME,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                   tolerance_x <span class="op">=</span> np.sqrt(np.spacing(<span class="dv">1</span>)),</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                   var_type <span class="op">=</span> var_type,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                   var_name <span class="op">=</span> var_name,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                   show_progress<span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                   fun_control <span class="op">=</span> fun_control,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: INIT_SIZE},</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                   surrogate_control<span class="op">=</span>{<span class="st">"noise"</span>: <span class="va">True</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"cod_type"</span>: <span class="st">"norm"</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"min_theta"</span>: <span class="op">-</span><span class="dv">4</span>,</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"max_theta"</span>: <span class="dv">3</span>,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"n_theta"</span>: <span class="bu">len</span>(var_name),</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"model_fun_evals"</span>: <span class="dv">10_000</span>})</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>spot_tuner.run(X_start<span class="op">=</span>X_start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="step-9-results" class="level2" data-number="11.9">
-<h2 data-number="11.9" class="anchored" data-anchor-id="step-9-results"><span class="header-section-number">11.9</span> Step 9: Results</h2>
+<section id="results" class="level3" data-number="12.9.3">
+<h3 data-number="12.9.3" class="anchored" data-anchor-id="results"><span class="header-section-number">12.9.3</span> 4 Results</h3>
 <div class="cell" data-execution_count="18">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pickle</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>SAVE <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>LOAD <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> SAVE:</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_"</span> <span class="op">+</span> experiment_name <span class="op">+</span> <span class="st">".pkl"</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'wb'</span>) <span class="im">as</span> f:</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        pickle.dump(spot_tuner, f)</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> LOAD:</span>
-<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    result_file_name <span class="op">=</span> <span class="st">"res_ch10-friedman-hpt-0_maans03_60min_20init_1K_2023-04-14_10-11-19.pkl"</span></span>
-<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(result_file_name, <span class="st">'rb'</span>) <span class="im">as</span> f:</span>
-<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        spot_tuner <span class="op">=</span>  pickle.load(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.<span class="bu">file</span> <span class="im">import</span> save_pickle</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>save_pickle(spot_tuner, experiment_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.<span class="bu">file</span> <span class="im">import</span> load_pickle</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> load_pickle(experiment_name)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Show the Progress of the hyperparameter tuning:</li>
 </ul>
-<div class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">True</span>, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-20-output-1.png" width="744" height="243"></p>
-</div>
+<div class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_progress(log_y<span class="op">=</span><span class="va">True</span>, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_progress.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>Print the Results</li>
 </ul>
-<div class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>| name                   | type   | default          |    lower |     upper |                 tuned | transform             |   importance | stars   |
-|------------------------|--------|------------------|----------|-----------|-----------------------|-----------------------|--------------|---------|
-| grace_period           | int    | 200              |     10.0 |    1000.0 |                 964.0 | None                  |         0.00 |         |
-| max_depth              | int    | 20               |      2.0 |      20.0 |                   7.0 | transform_power_2_int |         0.00 |         |
-| delta                  | float  | 1e-07            |    1e-10 |     1e-06 | 5.202034561654338e-07 | None                  |         0.00 |         |
-| tau                    | float  | 0.05             |     0.01 |       0.1 |                  0.01 | None                  |         0.00 |         |
-| leaf_prediction        | factor | mean             |      0.0 |       2.0 |                   1.0 | None                  |         0.00 |         |
-| leaf_model             | factor | LinearRegression |      0.0 |       2.0 |                   0.0 | None                  |         2.22 | *       |
-| model_selector_decay   | float  | 0.95             |      0.9 |      0.99 |                  0.99 | None                  |         0.00 |         |
-| splitter               | factor | EBSTSplitter     |      0.0 |       2.0 |                   2.0 | None                  |       100.00 | ***     |
-| min_samples_split      | int    | 5                |      2.0 |      10.0 |                  10.0 | None                  |         0.00 |         |
-| bootstrap_sampling     | factor | 0                |      0.0 |       1.0 |                   0.0 | None                  |         0.00 |         |
-| drift_window_threshold | int    | 300              |    100.0 |     500.0 |                 110.0 | None                  |         0.00 |         |
-| switch_significance    | float  | 0.05             |     0.01 |       0.1 |   0.06349319024555065 | None                  |         0.00 |         |
-| binary_split           | factor | 0                |      0.0 |       1.0 |                   0.0 | None                  |         0.00 |         |
-| max_size               | float  | 500.0            |    100.0 |    1000.0 |     822.6675141209015 | None                  |         0.00 |         |
-| memory_estimate_period | int    | 1000000          | 100000.0 | 1000000.0 |              992558.0 | None                  |         0.00 |         |
-| stop_mem_management    | factor | 0                |      0.0 |       1.0 |                   0.0 | None                  |         0.00 |         |
-| remove_poor_attrs      | factor | 0                |      0.0 |       1.0 |                   1.0 | None                  |         0.00 |         |
-| merit_preprune         | factor | 0                |      0.0 |       0.0 |                   0.0 | None                  |         0.00 |         |</code></pre>
-</div>
-</div>
-<section id="show-variable-importance" class="level3" data-number="11.9.1">
-<h3 data-number="11.9.1" class="anchored" data-anchor-id="show-variable-importance"><span class="header-section-number">11.9.1</span> Show variable importance</h3>
 <div class="cell" data-execution_count="21">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.0025</span>, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-22-output-1.png" width="575" height="411"></p>
-</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(gen_design_table(fun_control<span class="op">=</span>fun_control, spot<span class="op">=</span>spot_tuner))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="build-and-evaluate-htr-model-with-tuned-hyperparameters" class="level3" data-number="11.9.2">
-<h3 data-number="11.9.2" class="anchored" data-anchor-id="build-and-evaluate-htr-model-with-tuned-hyperparameters"><span class="header-section-number">11.9.2</span> Build and Evaluate HTR Model with Tuned Hyperparameters</h3>
+</section>
+<section id="show-variable-importance" class="level2" data-number="12.10">
+<h2 data-number="12.10" class="anchored" data-anchor-id="show-variable-importance"><span class="header-section-number">12.10</span> Show variable importance</h2>
 <div class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> test.shape[<span class="dv">0</span>]</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">50</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_importance(threshold<span class="op">=</span><span class="fl">0.0025</span>, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_importance.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="the-large-data-set-k0.2" class="level3" data-number="11.9.3">
-<h3 data-number="11.9.3" class="anchored" data-anchor-id="the-large-data-set-k0.2"><span class="header-section-number">11.9.3</span> The Large Data Set (k=0.2)</h3>
+<section id="build-and-evaluate-htr-model-with-tuned-hyperparameters" class="level2" data-number="12.11">
+<h2 data-number="12.11" class="anchored" data-anchor-id="build-and-evaluate-htr-model-with-tuned-hyperparameters"><span class="header-section-number">12.11</span> Build and Evaluate HTR Model with Tuned Hyperparameters</h2>
+<div class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> test.shape[<span class="dv">0</span>]</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)<span class="op">-</span><span class="dv">50</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="der-große-datensatz" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> Der große Datensatz</h1>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -875,467 +631,113 @@ Caution: Increased Friedman-Drift Data Set
 </ul>
 </div>
 </div>
-<div class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>horizon <span class="op">=</span> <span class="dv">7</span><span class="op">*</span><span class="dv">24</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="fl">.2</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">100_000</span>)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> n_total</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>p_1 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">25_000</span>)</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>p_2 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">50_000</span>)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>position<span class="op">=</span>(p_1, p_2)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>n_train <span class="op">=</span> <span class="dv">1_000</span></span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> n_train <span class="op">+</span> p_1 <span class="op">-</span> <span class="dv">12</span></span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> <span class="dv">12</span></span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> synth.FriedmanDrift(</span>
-<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>   drift_type<span class="op">=</span><span class="st">'gra'</span>,</span>
-<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>   position<span class="op">=</span>position,</span>
-<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>     seed<span class="op">=</span><span class="dv">123</span></span>
-<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>data_dict <span class="op">=</span> {key: [] <span class="cf">for</span> key <span class="kw">in</span> <span class="bu">list</span>(dataset.take(<span class="dv">1</span>))[<span class="dv">0</span>][<span class="dv">0</span>].keys()}</span>
-<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>data_dict[<span class="st">"y"</span>] <span class="op">=</span> []</span>
-<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, y <span class="kw">in</span> dataset.take(n_total):</span>
-<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> key, value <span class="kw">in</span> x.items():</span>
-<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>        data_dict[key].append(value)</span>
-<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>    data_dict[<span class="st">"y"</span>].append(y)</span>
-<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data_dict)</span>
-<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Add column names x1 until x10 to the first 10 columns of the dataframe and the column name y to the last column</span></span>
-<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="ss">f"x</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>)] <span class="op">+</span> [<span class="st">"y"</span>]</span>
-<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> df[:n_train]</span>
-<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> df[n_train:]</span>
-<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>target_column <span class="op">=</span> <span class="st">"y"</span></span>
-<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>, <span class="co"># dataset,</span></span>
-<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
-<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
-<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
-<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: target_column})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="get-default-hyperparameters" class="level3" data-number="11.9.4">
-<h3 data-number="11.9.4" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">11.9.4</span> Get Default Hyperparameters</h3>
 <div class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control was modified, we generate a new one with the original </span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># default hyperparameters</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> get_one_core_model_from_X(X_start, fun_control)</span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="24">
-<div><details class="river-component river-estimator"><summary class="river-summary"><pre class="river-estimator-name">HoeffdingAdaptiveTreeRegressor</pre></summary><code class="river-estimator-params">HoeffdingAdaptiveTreeRegressor (
-  grace_period=200
-  max_depth=1048576
-  delta=1e-07
-  tau=0.05
-  leaf_prediction="mean"
-  leaf_model=LinearRegression (
-    optimizer=SGD (
-      lr=Constant (
-        learning_rate=0.01
-      )
-    )
-    loss=Squared ()
-    l2=0.
-    l1=0.
-    intercept_init=0.
-    intercept_lr=Constant (
-      learning_rate=0.01
-    )
-    clip_gradient=1e+12
-    initializer=Zeros ()
-  )
-  model_selector_decay=0.95
-  nominal_attributes=None
-  splitter=EBSTSplitter ()
-  min_samples_split=5
-  bootstrap_sampling=0
-  drift_window_threshold=300
-  drift_detector=ADWIN (
-    delta=0.002
-    clock=32
-    max_buckets=5
-    min_window_length=5
-    grace_period=10
-  )
-  switch_significance=0.05
-  binary_split=0
-  max_size=500.
-  memory_estimate_period=1000000
-  stop_mem_management=0
-  remove_poor_attrs=0
-  merit_preprune=0
-  seed=None
-)
-</code></details><style scoped="">
-.river-estimator {
-    padding: 1em;
-    border-style: solid;
-    background: white;
-    max-width: max-content;
-}
-
-.river-pipeline {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: linear-gradient(#000, #000) no-repeat center / 1.5px 100%;
-}
-
-.river-union {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    padding: 1em;
-    border-style: solid;
-    background: white;
-}
-
-.river-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1em;
-    border-style: solid;
-    background: white;
-}
-
-.river-wrapper > .river-estimator {
-    margin-top: 1em;
-}
-
-/* Vertical spacing between steps */
-
-.river-component + .river-component {
-    margin-top: 2em;
-}
-
-.river-union > .river-estimator {
-    margin-top: 0;
-}
-
-.river-union > .river-component {
-    margin-top: 0;
-}
-
-.river-union > .pipeline {
-    margin-top: 0;
-}
-
-/* Spacing within a union of estimators */
-
-.river-union > .river-component + .river-component {
-    margin-left: 1em;
-}
-
-/* Typography */
-
-.river-estimator-params {
-    display: block;
-    white-space: pre-wrap;
-    font-size: 110%;
-    margin-top: 1em;
-}
-
-.river-estimator > .river-estimator-params,
-.river-wrapper > .river-details > river-estimator-params {
-    background-color: white !important;
-}
-
-.river-wrapper > .river-details {
-    margin-bottom: 1em;
-}
-
-.river-estimator-name {
-    display: inline;
-    margin: 0;
-    font-size: 110%;
-}
-
-/* Toggle */
-
-.river-summary {
-    display: flex;
-    align-items:center;
-    cursor: pointer;
-}
-
-.river-summary > div {
-    width: 100%;
-}
-</style></div>
-</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>horizon <span class="op">=</span> <span class="dv">7</span><span class="op">*</span><span class="dv">24</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>k <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>n_total <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">100_000</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>n_samples <span class="op">=</span> n_total</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>p_1 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">25_000</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>p_2 <span class="op">=</span> <span class="bu">int</span>(k<span class="op">*</span><span class="dv">50_000</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>position<span class="op">=</span>(p_1, p_2)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>n_train <span class="op">=</span> <span class="dv">1_000</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> n_train <span class="op">+</span> p_1 <span class="op">-</span> <span class="dv">12</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> a <span class="op">+</span> <span class="dv">12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="25">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.evaluation.eval_bml <span class="im">import</span> eval_oml_horizon</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>df_eval_default, df_true_default <span class="op">=</span> eval_oml_horizon(</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                    model<span class="op">=</span>model_default,</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                    train<span class="op">=</span>fun_control[<span class="st">"train"</span>],</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                    test<span class="op">=</span>fun_control[<span class="st">"test"</span>],</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>                    target_column<span class="op">=</span>fun_control[<span class="st">"target_column"</span>],</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>                    horizon<span class="op">=</span>fun_control[<span class="st">"horizon"</span>],</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>                    oml_grace_period<span class="op">=</span>fun_control[<span class="st">"oml_grace_period"</span>],</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>                    metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>],</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> river.datasets <span class="im">import</span> synth</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> synth.FriedmanDrift(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>   drift_type<span class="op">=</span><span class="st">'gra'</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>   position<span class="op">=</span>position,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>     seed<span class="op">=</span><span class="dv">123</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.evaluation.eval_bml <span class="im">import</span> plot_bml_oml_horizon_metrics, plot_bml_oml_horizon_predictions</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>df_labels<span class="op">=</span>[<span class="st">"default"</span>]</span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_metrics(df_eval <span class="op">=</span> [df_eval_default], log_y<span class="op">=</span><span class="va">False</span>, df_labels<span class="op">=</span>df_labels, metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>])</span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_predictions(df_true <span class="op">=</span> [df_true_default[a:b]], target_column<span class="op">=</span>target_column,  df_labels<span class="op">=</span>df_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-27-output-1.png" width="971" height="491"></p>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.utils.data_conversion <span class="im">import</span> convert_to_df</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>target_column <span class="op">=</span> <span class="st">"y"</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> convert_to_df(dataset, target_column<span class="op">=</span>target_column, n_total<span class="op">=</span>n_total)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Add column names x1 until x10 to the first 10 columns of the dataframe and the column name y to the last column</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>df.columns <span class="op">=</span> [<span class="ss">f"x</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>)] <span class="op">+</span> [<span class="st">"y"</span>]</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>train <span class="op">=</span> df[:n_train]</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>test <span class="op">=</span> df[n_train:]</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>target_column <span class="op">=</span> <span class="st">"y"</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>fun_control.update({<span class="st">"data"</span>: <span class="va">None</span>, <span class="co"># dataset,</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train"</span>: train,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>               <span class="st">"test"</span>: test,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>               <span class="st">"n_samples"</span>: n_samples,</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>               <span class="st">"target_column"</span>: target_column})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-27-output-2.png" width="802" height="431"></p>
-</div>
-</div>
-</section>
-<section id="get-spot-results" class="level3" data-number="11.9.5">
-<h3 data-number="11.9.5" class="anchored" data-anchor-id="get-spot-results"><span class="header-section-number">11.9.5</span> Get SPOT Results</h3>
+<section id="get-default-hyperparameters" class="level2" data-number="13.1">
+<h2 data-number="13.1" class="anchored" data-anchor-id="get-default-hyperparameters"><span class="header-section-number">13.1</span> Get Default Hyperparameters</h2>
 <div class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="27">
-<div><details class="river-component river-estimator"><summary class="river-summary"><pre class="river-estimator-name">HoeffdingAdaptiveTreeRegressor</pre></summary><code class="river-estimator-params">HoeffdingAdaptiveTreeRegressor (
-  grace_period=964
-  max_depth=128
-  delta=5e-07
-  tau=0.01
-  leaf_prediction="model"
-  leaf_model=LinearRegression (
-    optimizer=SGD (
-      lr=Constant (
-        learning_rate=0.01
-      )
-    )
-    loss=Squared ()
-    l2=0.
-    l1=0.
-    intercept_init=0.
-    intercept_lr=Constant (
-      learning_rate=0.01
-    )
-    clip_gradient=1e+12
-    initializer=Zeros ()
-  )
-  model_selector_decay=0.99
-  nominal_attributes=None
-  splitter=QOSplitter (
-    radius=0.25
-    allow_multiway_splits=False
-  )
-  min_samples_split=10
-  bootstrap_sampling=0
-  drift_window_threshold=110
-  drift_detector=ADWIN (
-    delta=0.002
-    clock=32
-    max_buckets=5
-    min_window_length=5
-    grace_period=10
-  )
-  switch_significance=0.063493
-  binary_split=0
-  max_size=822.667514
-  memory_estimate_period=992558
-  stop_mem_management=0
-  remove_poor_attrs=1
-  merit_preprune=0
-  seed=None
-)
-</code></details><style scoped="">
-.river-estimator {
-    padding: 1em;
-    border-style: solid;
-    background: white;
-    max-width: max-content;
-}
-
-.river-pipeline {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: linear-gradient(#000, #000) no-repeat center / 1.5px 100%;
-}
-
-.river-union {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    padding: 1em;
-    border-style: solid;
-    background: white;
-}
-
-.river-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1em;
-    border-style: solid;
-    background: white;
-}
-
-.river-wrapper > .river-estimator {
-    margin-top: 1em;
-}
-
-/* Vertical spacing between steps */
-
-.river-component + .river-component {
-    margin-top: 2em;
-}
-
-.river-union > .river-estimator {
-    margin-top: 0;
-}
-
-.river-union > .river-component {
-    margin-top: 0;
-}
-
-.river-union > .pipeline {
-    margin-top: 0;
-}
-
-/* Spacing within a union of estimators */
-
-.river-union > .river-component + .river-component {
-    margin-left: 1em;
-}
-
-/* Typography */
-
-.river-estimator-params {
-    display: block;
-    white-space: pre-wrap;
-    font-size: 110%;
-    margin-top: 1em;
-}
-
-.river-estimator > .river-estimator-params,
-.river-wrapper > .river-details > river-estimator-params {
-    background-color: white !important;
-}
-
-.river-wrapper > .river-details {
-    margin-bottom: 1em;
-}
-
-.river-estimator-name {
-    display: inline;
-    margin: 0;
-    font-size: 110%;
-}
-
-/* Toggle */
-
-.river-summary {
-    display: flex;
-    align-items:center;
-    cursor: pointer;
-}
-
-.river-summary > div {
-    width: 100%;
-}
-</style></div>
-</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># fun_control was modified, we generate a new one with the original </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># default hyperparameters</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_default_hyperparameters_as_array</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>X_start <span class="op">=</span> get_default_hyperparameters_as_array(fun_control)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>model_default <span class="op">=</span> get_one_core_model_from_X(X_start, fun_control)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>model_default</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>df_eval_spot, df_true_spot <span class="op">=</span> eval_oml_horizon(</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                    model<span class="op">=</span>model_spot,</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                    train<span class="op">=</span>fun_control[<span class="st">"train"</span>],</span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                    test<span class="op">=</span>fun_control[<span class="st">"test"</span>],</span>
-<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                    target_column<span class="op">=</span>fun_control[<span class="st">"target_column"</span>],</span>
-<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>                    horizon<span class="op">=</span>fun_control[<span class="st">"horizon"</span>],</span>
-<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>                    oml_grace_period<span class="op">=</span>fun_control[<span class="st">"oml_grace_period"</span>],</span>
-<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>                    metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>],</span>
-<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.evaluation.eval_bml <span class="im">import</span> eval_oml_horizon</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>df_eval_default, df_true_default <span class="op">=</span> eval_oml_horizon(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                    model<span class="op">=</span>model_default,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                    train<span class="op">=</span>fun_control[<span class="st">"train"</span>],</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>                    test<span class="op">=</span>fun_control[<span class="st">"test"</span>],</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                    target_column<span class="op">=</span>fun_control[<span class="st">"target_column"</span>],</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                    horizon<span class="op">=</span>fun_control[<span class="st">"horizon"</span>],</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>                    oml_grace_period<span class="op">=</span>fun_control[<span class="st">"oml_grace_period"</span>],</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>                    metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>],</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="29">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>df_labels<span class="op">=</span>[<span class="st">"default"</span>, <span class="st">"spot"</span>]</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_metrics(df_eval <span class="op">=</span> [df_eval_default, df_eval_spot], log_y<span class="op">=</span><span class="va">False</span>, df_labels<span class="op">=</span>df_labels, metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>], filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_metrics.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-30-output-1.png" width="971" height="491"></p>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotRiver.evaluation.eval_bml <span class="im">import</span> plot_bml_oml_horizon_metrics, plot_bml_oml_horizon_predictions</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>df_labels<span class="op">=</span>[<span class="st">"default"</span>]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_metrics(df_eval <span class="op">=</span> [df_eval_default], log_y<span class="op">=</span><span class="va">False</span>, df_labels<span class="op">=</span>df_labels, metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>])</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_predictions(df_true <span class="op">=</span> [df_true_default[a:b]], target_column<span class="op">=</span>target_column,  df_labels<span class="op">=</span>df_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
+</section>
+<section id="get-spot-results" class="level2" data-number="13.2">
+<h2 data-number="13.2" class="anchored" data-anchor-id="get-spot-results"><span class="header-section-number">13.2</span> Get SPOT Results</h2>
 <div class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)<span class="op">+</span><span class="dv">20</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)<span class="op">+</span><span class="dv">50</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_predictions(df_true <span class="op">=</span> [df_true_default[a:b], df_true_spot[a:b]], target_column<span class="op">=</span>target_column,  df_labels<span class="op">=</span>df_labels, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_predictions.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-31-output-1.png" width="809" height="431"></p>
-</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.hyperparameters.values <span class="im">import</span> get_one_core_model_from_X</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> spot_tuner.to_all_dim(spot_tuner.min_X.reshape(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>model_spot <span class="op">=</span> get_one_core_model_from_X(X, fun_control)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>model_spot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="31">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.plot.validation <span class="im">import</span> plot_actual_vs_predicted</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>plot_actual_vs_predicted(y_test<span class="op">=</span>df_true_default[<span class="st">"y"</span>], y_pred<span class="op">=</span>df_true_default[<span class="st">"Prediction"</span>], title<span class="op">=</span><span class="st">"Default"</span>)</span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>plot_actual_vs_predicted(y_test<span class="op">=</span>df_true_spot[<span class="st">"y"</span>], y_pred<span class="op">=</span>df_true_spot[<span class="st">"Prediction"</span>], title<span class="op">=</span><span class="st">"SPOT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-32-output-1.png" width="757" height="381"></p>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>df_eval_spot, df_true_spot <span class="op">=</span> eval_oml_horizon(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>                    model<span class="op">=</span>model_spot,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                    train<span class="op">=</span>fun_control[<span class="st">"train"</span>],</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>                    test<span class="op">=</span>fun_control[<span class="st">"test"</span>],</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>                    target_column<span class="op">=</span>fun_control[<span class="st">"target_column"</span>],</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>                    horizon<span class="op">=</span>fun_control[<span class="st">"horizon"</span>],</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>                    oml_grace_period<span class="op">=</span>fun_control[<span class="st">"oml_grace_period"</span>],</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>                    metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>],</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>                )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-32-output-2.png" width="758" height="381"></p>
-</div>
-</div>
-</section>
-<section id="visualize-regression-trees" class="level3" data-number="11.9.6">
-<h3 data-number="11.9.6" class="anchored" data-anchor-id="visualize-regression-trees"><span class="header-section-number">11.9.6</span> Visualize Regression Trees</h3>
 <div class="cell" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>dataset_f <span class="op">=</span> dataset.take(n_total)</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, y <span class="kw">in</span> dataset_f:</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    model_default.learn_one(x, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="callout callout-style-default callout-caution callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Caution: Large Trees
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<ul>
-<li>Since the trees are large, the visualization is suppressed by default.</li>
-<li>To visualize the trees, uncomment the following line.</li>
-</ul>
-</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df_labels<span class="op">=</span>[<span class="st">"default"</span>, <span class="st">"spot"</span>]</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_metrics(df_eval <span class="op">=</span> [df_eval_default, df_eval_spot], log_y<span class="op">=</span><span class="va">False</span>, df_labels<span class="op">=</span>df_labels, metric<span class="op">=</span>fun_control[<span class="st">"metric_sklearn"</span>], filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_metrics.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="33">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># model_default.draw()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)<span class="op">+</span><span class="dv">20</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> <span class="bu">int</span>(m<span class="op">/</span><span class="dv">2</span>)<span class="op">+</span><span class="dv">50</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>plot_bml_oml_horizon_predictions(df_true <span class="op">=</span> [df_true_default[a:b], df_true_spot[a:b]], target_column<span class="op">=</span>target_column,  df_labels<span class="op">=</span>df_labels, filename<span class="op">=</span><span class="st">"./figures/"</span> <span class="op">+</span> experiment_name<span class="op">+</span><span class="st">"_predictions.pdf"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>model_default.summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="34">
-<pre><code>{'n_nodes': 35,
- 'n_branches': 17,
- 'n_leaves': 18,
- 'n_active_leaves': 96,
- 'n_inactive_leaves': 0,
- 'height': 6,
- 'total_observed_weight': 39002.0,
- 'n_alternate_trees': 21,
- 'n_pruned_alternate_trees': 6,
- 'n_switch_alternate_trees': 2}</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.plot.validation <span class="im">import</span> plot_actual_vs_predicted</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>plot_actual_vs_predicted(y_test<span class="op">=</span>df_true_default[<span class="st">"y"</span>], y_pred<span class="op">=</span>df_true_default[<span class="st">"Prediction"</span>], title<span class="op">=</span><span class="st">"Default"</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>plot_actual_vs_predicted(y_test<span class="op">=</span>df_true_spot[<span class="st">"y"</span>], y_pred<span class="op">=</span>df_true_spot[<span class="st">"Prediction"</span>], title<span class="op">=</span><span class="st">"SPOT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="spot-model" class="level3" data-number="11.9.7">
-<h3 data-number="11.9.7" class="anchored" data-anchor-id="spot-model"><span class="header-section-number">11.9.7</span> Spot Model</h3>
+<section id="visualize-regression-trees" class="level2" data-number="13.3">
+<h2 data-number="13.3" class="anchored" data-anchor-id="visualize-regression-trees"><span class="header-section-number">13.3</span> Visualize Regression Trees</h2>
 <div class="cell" data-execution_count="35">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>dataset_f <span class="op">=</span> dataset.take(n_total)</span>
-<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, y <span class="kw">in</span> dataset_f:</span>
-<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    model_spot.learn_one(x, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dataset_f <span class="op">=</span> dataset.take(n_total)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, y <span class="kw">in</span> dataset_f:</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    model_default.learn_one(x, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1354,116 +756,74 @@ Caution: Large Trees
 </div>
 </div>
 <div class="cell" data-execution_count="36">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># model_spot.draw()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># model_default.draw()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-execution_count="37">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>model_spot.summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="37">
-<pre><code>{'n_nodes': 11,
- 'n_branches': 5,
- 'n_leaves': 6,
- 'n_active_leaves': -9,
- 'n_inactive_leaves': 0,
- 'height': 5,
- 'total_observed_weight': 39002.0,
- 'n_alternate_trees': 18,
- 'n_pruned_alternate_trees': 11,
- 'n_switch_alternate_trees': 5}</code></pre>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>model_default.summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
+<section id="spot-model" class="level3" data-number="13.3.1">
+<h3 data-number="13.3.1" class="anchored" data-anchor-id="spot-model"><span class="header-section-number">13.3.1</span> Spot Model</h3>
 <div class="cell" data-execution_count="38">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> compare_two_tree_models</span>
-<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(compare_two_tree_models(model_default, model_spot))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>| Parameter                |   Default |   Spot |
-|--------------------------|-----------|--------|
-| n_nodes                  |        35 |     11 |
-| n_branches               |        17 |      5 |
-| n_leaves                 |        18 |      6 |
-| n_active_leaves          |        96 |     -9 |
-| n_inactive_leaves        |         0 |      0 |
-| height                   |         6 |      5 |
-| total_observed_weight    |     39002 |  39002 |
-| n_alternate_trees        |        21 |     18 |
-| n_pruned_alternate_trees |         6 |     11 |
-| n_switch_alternate_trees |         2 |      5 |</code></pre>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>dataset_f <span class="op">=</span> dataset.take(n_total)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, y <span class="kw">in</span> dataset_f:</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    model_spot.learn_one(x, y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution: Large Trees
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Since the trees are large, the visualization is suppressed by default.</li>
+<li>To visualize the trees, uncomment the following line.</li>
+</ul>
 </div>
 </div>
 <div class="cell" data-execution_count="39">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="bu">min</span>(spot_tuner.y), <span class="bu">max</span>(spot_tuner.y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="39">
-<pre><code>(2.15276536807347, 13.363910080861835)</code></pre>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># model_spot.draw()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</section>
-<section id="detailed-hyperparameter-plots" class="level3" data-number="11.9.8">
-<h3 data-number="11.9.8" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">11.9.8</span> Detailed Hyperparameter Plots</h3>
 <div class="cell" data-execution_count="40">
-<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>leaf_model:  2.221456179679611
-splitter:  100.0</code></pre>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>model_spot.summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output cell-output-display">
-<p><img src="13_spot_hpt_river_files/figure-html/cell-41-output-2.png" width="717" height="281"></p>
-</div>
-</div>
-</section>
-<section id="parallel-coordinates-plots" class="level3" data-number="11.9.9">
-<h3 data-number="11.9.9" class="anchored" data-anchor-id="parallel-coordinates-plots"><span class="header-section-number">11.9.9</span> Parallel Coordinates Plots</h3>
 <div class="cell" data-execution_count="41">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-
-<div>                            <div id="ea86b609-e814-414b-8e48-372511664793" class="plotly-graph-div" style="height:525px; width:100%;"></div>            <script type="text/javascript">                require(["plotly"], function(Plotly) {                    window.PLOTLYENV=window.PLOTLYENV || {};                                    if (document.getElementById("ea86b609-e814-414b-8e48-372511664793")) {                    Plotly.newPlot(                        "ea86b609-e814-414b-8e48-372511664793",                        [{"dimensions":[{"label":"grace_period","range":[20.0,998.0],"values":[469.0,360.0,657.0,949.0,21.0,20.0,964.0,988.0,994.0,998.0,825.0]},{"label":"max_depth","range":[4.0,20.0],"values":[20.0,10.0,8.0,6.0,15.0,11.0,7.0,10.0,4.0,6.0,16.0]},{"label":"delta","range":[1e-10,9.55932432642933e-07],"values":[9.55932432642933e-07,2.964373559301942e-07,4.068723023437076e-08,5.238340717917925e-07,7.029014322120622e-07,1e-10,5.202034561654338e-07,1e-10,1e-10,1e-10,1e-10]},{"label":"tau","range":[0.01,0.1],"values":[0.02468130740742395,0.07783199875329279,0.04842600916881275,0.035634284487334605,0.0906559274083691,0.1,0.01,0.01,0.01,0.01,0.01]},{"label":"leaf_prediction","range":[0.0,2.0],"values":[1.0,0.0,2.0,1.0,1.0,2.0,1.0,2.0,0.0,1.0,2.0]},{"label":"leaf_model","range":[0.0,2.0],"values":[2.0,1.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0,2.0]},{"label":"model_selector_decay","range":[0.9,0.99],"values":[0.937379790035513,0.9075109564689242,0.9707132374807789,0.9249031574746166,0.9887336878810369,0.99,0.99,0.9,0.99,0.9,0.9]},{"label":"splitter","range":[0.0,2.0],"values":[0.0,2.0,2.0,1.0,1.0,2.0,2.0,2.0,2.0,2.0,2.0]},{"label":"min_samples_split","range":[2.0,10.0],"values":[9.0,4.0,5.0,7.0,6.0,3.0,10.0,9.0,2.0,6.0,7.0]},{"label":"bootstrap_sampling","range":[0.0,1.0],"values":[1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0,1.0,0.0,1.0]},{"label":"drift_window_threshold","range":[100.0,459.0],"values":[459.0,282.0,166.0,359.0,226.0,182.0,110.0,122.0,446.0,100.0,100.0]},{"label":"switch_significance","range":[0.01,0.1],"values":[0.07759063718076166,0.04746519114807623,0.0403706393874862,0.08981039644611907,0.022549561610997082,0.01,0.06349319024555065,0.1,0.01,0.1,0.1]},{"label":"binary_split","range":[0.0,1.0],"values":[1.0,1.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0]},{"label":"max_size","range":[241.5226665924828,928.6922000048638],"values":[241.5226665924828,474.9179369414316,454.1406541108139,928.6922000048638,683.8337853737277,332.6883690148818,822.6675141209015,692.6847710070815,317.61535089778357,790.2974616807148,373.8495025620069]},{"label":"memory_estimate_period","range":[124356.0,996333.0],"values":[506536.0,124356.0,910594.0,455998.0,806036.0,996333.0,992558.0,744197.0,735633.0,576197.0,995796.0]},{"label":"stop_mem_management","range":[0.0,1.0],"values":[0.0,1.0,1.0,1.0,0.0,1.0,0.0,0.0,1.0,0.0,0.0]},{"label":"remove_poor_attrs","range":[0.0,1.0],"values":[1.0,0.0,1.0,0.0,0.0,1.0,1.0,0.0,1.0,0.0,0.0]}],"line":{"cmax":13.363910080861835,"cmin":2.15276536807347,"color":[13.363910080861835,3.38647508445015,2.1775404231225908,5.918405002911132,5.816280737583969,2.497205626303229,2.15276536807347,2.167669472479421,3.409899205898735,2.156125585211151,3.420713009527376],"colorscale":[[0.0,"rgb(0,0,131)"],[0.2,"rgb(0,60,170)"],[0.4,"rgb(5,255,255)"],[0.6,"rgb(255,255,0)"],[0.8,"rgb(250,0,0)"],[1.0,"rgb(128,0,0)"]],"showscale":true},"type":"parcoords"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmapgl":[{"type":"heatmapgl","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}}},                        {"responsive": true}                    ).then(function(){
-                            
-var gd = document.getElementById('ea86b609-e814-414b-8e48-372511664793');
-var x = new MutationObserver(function (mutations, observer) {{
-        var display = window.getComputedStyle(gd).display;
-        if (!display || display === 'none') {{
-            console.log([gd, 'removed!']);
-            Plotly.purge(gd);
-            observer.disconnect();
-        }}
-}});
-
-// Listen for the removal of the full notebook cells
-var notebookContainer = gd.closest('#notebook-container');
-if (notebookContainer) {{
-    x.observe(notebookContainer, {childList: true});
-}}
-
-// Listen for the clearing of the current output cell
-var outputEl = gd.closest('.output');
-if (outputEl) {{
-    x.observe(outputEl, {childList: true});
-}}
-
-                        })                };                });            </script>        </div>
-</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.eda <span class="im">import</span> compare_two_tree_models</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(compare_two_tree_models(model_default, model_spot))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="plot-all-combinations-of-hyperparameters" class="level3" data-number="11.9.10">
-<h3 data-number="11.9.10" class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters"><span class="header-section-number">11.9.10</span> Plot all Combinations of Hyperparameters</h3>
+</section>
+<section id="detailed-hyperparameter-plots" class="level2" data-number="13.4">
+<h2 data-number="13.4" class="anchored" data-anchor-id="detailed-hyperparameter-plots"><span class="header-section-number">13.4</span> Detailed Hyperparameter Plots</h2>
+<div class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">"./figures/"</span> <span class="op">+</span> experiment_name</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>spot_tuner.plot_important_hyperparameter_contour(filename<span class="op">=</span>filename)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="parallel-coordinates-plots" class="level2" data-number="13.5">
+<h2 data-number="13.5" class="anchored" data-anchor-id="parallel-coordinates-plots"><span class="header-section-number">13.5</span> Parallel Coordinates Plots</h2>
+<div class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>spot_tuner.parallel_plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plot-all-combinations-of-hyperparameters" class="level2" data-number="13.6">
+<h2 data-number="13.6" class="anchored" data-anchor-id="plot-all-combinations-of-hyperparameters"><span class="header-section-number">13.6</span> Plot all Combinations of Hyperparameters</h2>
 <ul>
 <li>Warning: this may take a while.</li>
 </ul>
-<div class="cell" data-execution_count="42">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
-<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
-<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
-<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
-<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>PLOT_ALL <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> PLOT_ALL:</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> spot_tuner.k</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n<span class="op">-</span><span class="dv">1</span>):</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">1</span>, n):</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>            spot_tuner.plot_contour(i<span class="op">=</span>i, j<span class="op">=</span>j, min_z<span class="op">=</span>min_z, max_z <span class="op">=</span> max_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
-<div id="ref-mont20a" class="csl-entry" role="listitem">
-Montiel, Jacob, Max Halford, Saulo Martiello Mastelini, Geoffrey Bolmier, Raphael Sourty, Robin Vaysse, Adil Zouitine, et al. 2021. <span>“River: Machine Learning for Streaming Data in Python.”</span>
-</div>
-</div>
 </section>
 </section>
 
