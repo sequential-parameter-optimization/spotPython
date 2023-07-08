@@ -327,7 +327,7 @@ class Spot:
     def run(self, X_start=None):
         self.initialize_design(X_start)
         # New: self.update_stats() moved here:
-        self.update_stats()
+        # self.update_stats()
         # (S-5) Calling the spotLoop Function
         # and
         # (S-9) Termination Criteria, Conditions:
@@ -373,7 +373,8 @@ class Spot:
             writer = self.spot_writer
             # range goes to init_size -1 because the last value is added by update_stats(),
             # which always adds the last value.
-            for j in range(len(self.y) - 1):
+            # Changed in 0.5.9:
+            for j in range(len(self.y)):
                 X_j = self.X[j].copy()
                 y_j = self.y[j].copy()
                 config = {self.var_name[i]: X_j[i] for i in range(self.k)}
