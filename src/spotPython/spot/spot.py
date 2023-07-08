@@ -150,6 +150,9 @@ class Spot:
         optimizer=None,
         optimizer_control={},
     ):
+        # use x0, x1, ... as default variable names:
+        if var_name is None:
+            var_name = ["x" + str(i) for i in range(len(lower))]
         # small value:
         self.eps = sqrt(spacing(1))
         self.fun = fun
