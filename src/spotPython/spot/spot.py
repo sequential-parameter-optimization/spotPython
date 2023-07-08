@@ -338,6 +338,8 @@ class Spot:
             # Not implemented yet.
             # Update stats
             self.update_stats()
+            # Update writer:
+            self.update_writer()
             # (S-11) Surrogate Fit:
             self.fit_surrogate()
             # progress bar:
@@ -383,7 +385,8 @@ class Spot:
         #
         self.X, self.y = remove_nan(self.X, self.y)
         # self.update_stats() moved to run()!
-        # self.update_stats()
+        # changed in 0.5.9:
+        self.update_stats()
         # (S-4): Imputation:
         # Not implemented yet.
         # (S-11) Surrogate Fit:
@@ -434,6 +437,16 @@ class Spot:
         self.last_y = self.y[-1]
         self.min_X = self.X[argmin(self.y)]
         self.counter = self.y.size
+        # Update aggregated x and y values (if noise):
+        if self.noise:
+            Z = aggregate_mean_var(X=self.X, y=self.y)
+            self.mean_X = Z[0]
+            self.mean_y = Z[1]
+            self.var_y = Z[2]
+            self.min_mean_y = min(self.mean_y)
+            self.min_mean_X = self.mean_X[argmin(self.mean_y)]
+
+    def update_writer(self):
         if self.spot_writer is not None:
             writer = self.spot_writer
             y_min = self.min_y.copy()
@@ -450,15 +463,7 @@ class Spot:
             # hyperparameters X and value y of the last configuration:
             writer.add_hparams(config, {"spot_y": y_last})
             writer.flush()
-        # Update aggregated x and y values (if noise):
-        if self.noise:
-            Z = aggregate_mean_var(X=self.X, y=self.y)
-            self.mean_X = Z[0]
-            self.mean_y = Z[1]
-            self.var_y = Z[2]
-            self.min_mean_y = min(self.mean_y)
-            self.min_mean_X = self.mean_X[argmin(self.mean_y)]
-            if self.spot_writer is not None:
+            if self.noise:
                 writer = self.spot_writer
                 # y_min_mean: best mean y value so far
                 y_min_mean = self.min_mean_y.copy()
