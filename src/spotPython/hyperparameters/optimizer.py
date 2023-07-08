@@ -11,7 +11,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             weight_decay=0,
             foreach=None,
             maximize=False,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "Adagrad":
         return torch.optim.Adagrad(
@@ -23,7 +23,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             eps=1e-10,
             foreach=None,
             maximize=False,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "Adam":
         return torch.optim.Adam(
@@ -36,7 +36,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             foreach=None,
             maximize=False,
             capturable=False,
-            differentiable=False,
+            # differentiable=False,
             fused=None,
         )
     elif optimizer_name == "AdamW":
@@ -76,7 +76,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             weight_decay=0,
             foreach=None,
             maximize=False,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "LBFGS":
         return torch.optim.LBFGS(
@@ -102,7 +102,13 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
         )
     elif optimizer_name == "RAdam":
         return torch.optim.RAdam(
-            params, lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, foreach=None, differentiable=False
+            params,
+            lr=0.001,
+            betas=(0.9, 0.999),
+            eps=1e-08,
+            weight_decay=0,
+            foreach=None,
+            # differentiable=False
         )
     elif optimizer_name == "RMSprop":
         return torch.optim.RMSprop(
@@ -115,7 +121,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             centered=False,
             foreach=None,
             maximize=False,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "Rprop":
         return torch.optim.Rprop(
@@ -125,7 +131,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             step_sizes=(1e-06, 50),
             foreach=None,
             maximize=False,
-            differentiable=False,
+            # differentiable=False,
         )
     elif optimizer_name == "SGD":
         return torch.optim.SGD(
@@ -137,7 +143,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
             nesterov=False,
             maximize=False,
             foreach=None,
-            differentiable=False,
+            # differentiable=False,
         )
     else:
         raise ValueError(f"Optimizer {optimizer_name} not supported")
