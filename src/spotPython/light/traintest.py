@@ -12,8 +12,8 @@ import os
 def train_model(config, fun_control):
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
-    print(f"_L_in: {_L_in}")
-    print(f"_L_out: {_L_out}")
+    # print(f"_L_in: {_L_in}")
+    # print(f"_L_out: {_L_out}")
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
@@ -27,7 +27,7 @@ def train_model(config, fun_control):
         kaiming_init(model)
     else:
         pass
-    print(f"model: {model}")
+    # print(f"model: {model}")
 
     # Init DataModule
     dm = CSVDataModule(
@@ -56,7 +56,7 @@ def train_model(config, fun_control):
     result = trainer.validate(model=model, datamodule=dm)
     # unlist the result (from a list of one dict)
     result = result[0]
-    print(f"train_model result: {result}")
+    # print(f"train_model result: {result}")
     return result["val_loss"]
 
 
@@ -84,7 +84,7 @@ def test_model(config, fun_control):
         kaiming_init(model)
     else:
         pass
-    print(f"model: {model}")
+    # print(f"model: {model}")
     # Init trainer
     trainer = L.Trainer(
         # Where to save models
@@ -103,7 +103,7 @@ def test_model(config, fun_control):
     trainer.fit(model=model, datamodule=dm)
     test_result = trainer.test(datamodule=dm, ckpt_path="last")
     test_result = test_result[0]
-    print(f"test_model result: {test_result}")
+    # print(f"test_model result: {test_result}")
     return test_result["val_loss"], test_result["val_acc"]
 
 
@@ -131,7 +131,7 @@ def cv_model(config, fun_control):
             kaiming_init(model)
         else:
             pass
-        print(f"model: {model}")
+        # print(f"model: {model}")
 
         dm = CrossValidationDataModule(
             k=k,
@@ -170,7 +170,7 @@ def cv_model(config, fun_control):
         results.append(score["valid_mapk"])
 
     mapk_score = sum(results) / num_folds
-    print(f"cv_model mapk result: {mapk_score}")
+    # print(f"cv_model mapk result: {mapk_score}")
     return mapk_score
 
 

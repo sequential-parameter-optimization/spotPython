@@ -10,7 +10,7 @@ def fun_control_init(
     _L_in=None,
     _L_out=None,
     enable_progress_bar=False,
-    tensorboard_path=None,
+    spot_tensorboard_path="runs_spot/",
     num_workers=0,
     device=None,
 ):
@@ -20,7 +20,8 @@ def fun_control_init(
         _L_in (int): The number of input features.
         _L_out (int): The number of output features.
         enable_progress_bar (bool): Whether to enable the progress bar or not.
-        tensorboard_path (str): The path to the folder where the tensorboard files are saved.
+        spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
+        If None, no spot tensorboard files are saved.
         num_workers (int): The number of workers to use for the data loading.
         device (str): The device to use for the training. It can be either "cpu", "mps", or "cuda".
     Returns:
@@ -66,15 +67,6 @@ def fun_control_init(
     # Setting the seed
     L.seed_everything(42)
 
-    if tensorboard_path is not None:
-        check_and_create_dir(tensorboard_path)
-        # Starting with v0.2.41, Summary Writer should be not initialized here but by Lightning
-        # it is only available for compatibility reasons.
-        # So, set this to None and let Lightning manage the logging.
-        spot_writer = SummaryWriter(tensorboard_path)
-    else:
-        spot_writer = None
-
     # Path to the folder where the pretrained models are saved
     CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "saved_models/")
     os.makedirs(CHECKPOINT_PATH, exist_ok=True)
@@ -87,6 +79,12 @@ def fun_control_init(
     # Path to the folder where the tensorboard files are saved
     TENSORBOARD_PATH = os.environ.get("PATH_TENSORBOARD", "runs/")
     os.makedirs(TENSORBOARD_PATH, exist_ok=True)
+    if spot_tensorboard_path is not None:
+        os.makedirs(spot_tensorboard_path, exist_ok=True)
+        spot_writer = SummaryWriter(spot_tensorboard_path)
+
+    if not os.path.exists("./figures"):
+        os.makedirs("./figures")
 
     fun_control = {
         "CHECKPOINT_PATH": CHECKPOINT_PATH,
@@ -119,7 +117,7 @@ def fun_control_init(
         "train": None,
         "test": None,
         "task": task,
-        "tensorboard_path": tensorboard_path,
+        "spot_tensorboard_path": spot_tensorboard_path,
         "weights": 1.0,
         "spot_writer": spot_writer,
     }

@@ -310,18 +310,18 @@ class Kriging(surrogates):
         if self.spot_writer is not None:
             writer = self.spot_writer
             negLnLike = self.negLnLike.copy()
-            writer.add_scalar("negLnLike", negLnLike, self.counter+self.log_length)
+            writer.add_scalar("spot_negLnLike", negLnLike, self.counter+self.log_length)
             # add the self.n_theta theta values to the writer with one key "theta",
             # i.e, the same key for all theta values
             theta = self.theta.copy()
-            writer.add_scalars("theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)},
+            writer.add_scalars("spot_theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)},
                                self.counter+self.log_length)
             if self.noise:
                 Lambda = self.Lambda.copy()
-                writer.add_scalar("Lambda", Lambda, self.counter+self.log_length)
+                writer.add_scalar("spot_Lambda", Lambda, self.counter+self.log_length)
             if self.optim_p:
                 p = self.p.copy()
-                writer.add_scalars("p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
+                writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
             writer.flush()
 
     def fit_old(self, nat_X, nat_y):

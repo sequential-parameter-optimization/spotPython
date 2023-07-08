@@ -4,6 +4,7 @@ import socket
 from datetime import datetime
 from dateutil.tz import tzlocal
 import pickle
+import os
 
 
 def load_data(data_dir="./data"):
@@ -74,3 +75,15 @@ def load_pickle(filename: str):
     with open(filename, "rb") as f:
         obj = pickle.load(f)
     return obj
+
+
+def get_spot_tensorboard_path(experiment_name):
+    """Get the path to the spot tensorboard files.
+    Args:
+        experiment_name (str): The name of the experiment.
+    Returns:
+        spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
+    """
+    spot_tensorboard_path = os.environ.get("PATH_TENSORBOARD", "runs/spot_logs/")
+    spot_tensorboard_path = os.path.join(spot_tensorboard_path, experiment_name)
+    return spot_tensorboard_path

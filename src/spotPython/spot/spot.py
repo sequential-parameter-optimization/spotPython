@@ -326,6 +326,8 @@ class Spot:
 
     def run(self, X_start=None):
         self.initialize_design(X_start)
+        # New: self.update_stats() moved here:
+        self.update_stats()
         # (S-5) Calling the spotLoop Function
         # and
         # (S-9) Termination Criteria, Conditions:
@@ -365,8 +367,22 @@ class Spot:
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
         # TODO: Error if only nan values are returned
         logger.debug("New y value: %s", self.y)
+        #
+        self.counter = self.y.size
+        if self.spot_writer is not None:
+            writer = self.spot_writer
+            # range goes to init_size -1 because the last value is added by update_stats(),
+            # which always adds the last value.
+            for j in range(len(self.y) - 1):
+                X_j = self.X[j].copy()
+                y_j = self.y[j].copy()
+                config = {self.var_name[i]: X_j[i] for i in range(self.k)}
+                writer.add_hparams(config, {"spot_y": y_j})
+                writer.flush()
+        #
         self.X, self.y = remove_nan(self.X, self.y)
-        self.update_stats()
+        # self.update_stats() moved to run()!
+        # self.update_stats()
         # (S-4): Imputation:
         # Not implemented yet.
         # (S-11) Surrogate Fit:
@@ -422,13 +438,16 @@ class Spot:
             y_min = self.min_y.copy()
             y_last = self.last_y.copy()
             X_min = self.min_X.copy()
+            # y_min: best y value so far
+            # y_last: last y value, can he worse than y_min
             writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
+            # X_min: X value of the best y value so far
             writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
             # get last value of self.X and convert to dict. take the values from self.var_name as keys:
             X_last = self.X[-1].copy()
             config = {self.var_name[i]: X_last[i] for i in range(self.k)}
-            y_val = self.y[-1].copy()
-            writer.add_hparams(config, {"fun_torch: loss": y_val})
+            # hyperparameters X and value y of the last configuration:
+            writer.add_hparams(config, {"spot_y": y_last})
             writer.flush()
         # Update aggregated x and y values (if noise):
         if self.noise:
@@ -440,11 +459,17 @@ class Spot:
             self.min_mean_X = self.mean_X[argmin(self.mean_y)]
             if self.spot_writer is not None:
                 writer = self.spot_writer
+                # y_min_mean: best mean y value so far
                 y_min_mean = self.min_mean_y.copy()
+                # X_min_mean: X value of the best mean y value so far
                 X_min_mean = self.min_mean_X.copy()
+                # y_var: variance of the y values
                 y_var = self.var_y.copy()
-                writer.add_scalars("spot_y_noise", {"min_mean_y": y_min_mean, "last": y_last}, self.counter)
                 writer.add_scalar("spot_y_var", y_var, self.counter)
+                # y_min_mean: best mean y value so far (see above)
+                # y_last: last y value, can he worse than y_min_mean
+                writer.add_scalars("spot_y_noise", {"min_mean_y": y_min_mean, "last": y_last}, self.counter)
+                # X_min_mean: X value of the best mean y value so far (see above)
                 writer.add_scalars(
                     "spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter
                 )
@@ -574,10 +599,10 @@ class Spot:
             range(1, n_init + 1),
             s_y[:n_init],
             style[0],
-            range(1, n_init + 1),
-            [s_c[:n_init].min()] * n_init,
+            range(1, n_init + 2),
+            [s_c[:n_init].min()] * (n_init + 1),
             style[1],
-            range(n_init, len(s_c)),
+            range(n_init + 1, len(s_c) + 1),
             s_c[n_init:],
             style[2],
         )
