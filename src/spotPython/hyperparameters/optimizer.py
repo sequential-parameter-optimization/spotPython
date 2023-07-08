@@ -137,7 +137,7 @@ def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
         return torch.optim.SGD(
             params,
             lr=lr_mult * 1e-3,
-            momentum=kwargs["sgd_momentum"],
+            momentum=0,
             dampening=0,
             weight_decay=0,
             nesterov=False,
