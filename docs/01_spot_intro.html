@@ -318,6 +318,7 @@ div.csl-indent {
   <li><a href="#spot-parameters-fun_evals-init_size-and-show_models" id="toc-spot-parameters-fun_evals-init_size-and-show_models" class="nav-link" data-scroll-target="#spot-parameters-fun_evals-init_size-and-show_models"><span class="header-section-number">1.4</span> <code>Spot</code> Parameters: <code>fun_evals</code>, <code>init_size</code> and <code>show_models</code></a></li>
   <li><a href="#print-the-results" id="toc-print-the-results" class="nav-link" data-scroll-target="#print-the-results"><span class="header-section-number">1.5</span> Print the Results</a></li>
   <li><a href="#show-the-progress" id="toc-show-the-progress" class="nav-link" data-scroll-target="#show-the-progress"><span class="header-section-number">1.6</span> Show the Progress</a></li>
+  <li><a href="#sec-visualizing-tensorboard-01" id="toc-sec-visualizing-tensorboard-01" class="nav-link" data-scroll-target="#sec-visualizing-tensorboard-01"><span class="header-section-number">1.7</span> Visualizing the Hyperparameter Tuning Process with TensorBoard</a></li>
   </ul>
 </nav>
     </div>
@@ -430,17 +431,17 @@ Note
 <div class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>spot_0.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x1354290c0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x152d24190&gt;</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>spot_0.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>min y: 3.696886711914087e-10
-x0: 1.922728975158508e-05</code></pre>
+<pre><code>min y: 4.897545259852824e-10
+x0: 2.2130398233770724e-05</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="6">
-<pre><code>[['x0', 1.922728975158508e-05]]</code></pre>
+<pre><code>[['x0', 2.2130398233770724e-05]]</code></pre>
 </div>
 </div>
 <div class="cell" data-execution_count="7">
@@ -482,7 +483,7 @@ x0: 1.922728975158508e-05</code></pre>
 <p><img src="01_spot_intro_files/figure-html/cell-10-output-2.png" width="600" height="449"></p>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="9">
-<pre><code>&lt;spotPython.spot.spot.Spot at 0x135b389a0&gt;</code></pre>
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x1531ba980&gt;</code></pre>
 </div>
 </div>
 </section>
@@ -491,11 +492,11 @@ x0: 1.922728975158508e-05</code></pre>
 <div class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>spot_1.print_results()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>min y: 3.6779240309761575e-07
-x0: -0.0006064589047063418</code></pre>
+<pre><code>min y: 3.648984784366253e-07
+x0: -0.0006040682729929005</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="10">
-<pre><code>[['x0', -0.0006064589047063418]]</code></pre>
+<pre><code>[['x0', -0.0006040682729929005]]</code></pre>
 </div>
 </div>
 </section>
@@ -506,6 +507,55 @@ x0: -0.0006064589047063418</code></pre>
 <div class="cell-output cell-output-display">
 <p><img src="01_spot_intro_files/figure-html/cell-12-output-1.png" width="707" height="243"></p>
 </div>
+</div>
+</section>
+<section id="sec-visualizing-tensorboard-01" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="sec-visualizing-tensorboard-01"><span class="header-section-number">1.7</span> Visualizing the Hyperparameter Tuning Process with TensorBoard</h2>
+<p><code>spotPython</code> supports the visualization of the hyperparameter tuning process with TensorBoard. The following example shows how to use TensorBoard with <code>spotPython</code>.</p>
+<p>First, we define an “experiment name” to identify the hyperparameter tuning process. The experiment name is used to create a directory for the TensorBoard files.</p>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.<span class="bu">file</span> <span class="im">import</span> get_experiment_name</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.init <span class="im">import</span> fun_control_init</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> spotPython.utils.<span class="bu">file</span> <span class="im">import</span> get_spot_tensorboard_path</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>PREFIX <span class="op">=</span> <span class="st">"01"</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>experiment_name <span class="op">=</span> get_experiment_name(prefix<span class="op">=</span>PREFIX)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(experiment_name)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>fun_control <span class="op">=</span> fun_control_init(</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    spot_tensorboard_path<span class="op">=</span>get_spot_tensorboard_path(experiment_name))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>01_bartz08-2_2023-07-09_18-26-34</code></pre>
+</div>
+</div>
+<p>Since the <code>spot_tensorboard_path</code> is defined, <code>spotPython</code> will log the optimization process in the TensorBoard files. The TensorBoard files are stored in the directory <code>spot_tensorboard_path</code>. We can pass the TensorBoard information to the <code>Spot</code> method via the <code>fun_control</code> dictionary.</p>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>spot_tuner <span class="op">=</span> spot.Spot(fun<span class="op">=</span>fun,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                   lower <span class="op">=</span> np.array([<span class="op">-</span><span class="dv">1</span>]),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                   upper <span class="op">=</span> np.array([<span class="dv">2</span>]),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                   fun_evals<span class="op">=</span> <span class="dv">10</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                   seed<span class="op">=</span><span class="dv">123</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                   show_models<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                   design_control<span class="op">=</span>{<span class="st">"init_size"</span>: <span class="dv">5</span>},</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                   fun_control<span class="op">=</span>fun_control,)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>spot_tuner.run()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>&lt;spotPython.spot.spot.Spot at 0x2b23578e0&gt;</code></pre>
+</div>
+</div>
+<p>Now we can start TensorBoard in the background. The TensorBoard process will read the TensorBoard files and visualize the hyperparameter tuning process. From the terminal, we can start TensorBoard with the following command:</p>
+<pre class="{raw}"><code>tensorboard --logdir="./runs"</code></pre>
+<p><code>logdir</code> is the directory where the TensorBoard files are stored. In our case, the TensorBoard files are stored in the directory <code>./runs</code>.</p>
+<p>TensorBoard will start a web server on port 6006. We can access the TensorBoard web server with the following URL:</p>
+<pre class="{raw}"><code>http://localhost:6006/</code></pre>
+<p>The first TensorBoard visualization shows the objective function values plotted against the wall time. The wall time is the time that has passed since the start of the hyperparameter tuning process. The five initial design points are shown in the upper left region of the plot. The line visualizes the optimization process. <img src="figures_static/01_tensorboard_01.png" class="img-fluid" alt="TensorBoard visualization of the spotPython process. Objective function values plotted against wall time."></p>
+<p>The second TensorBoard visualization shows the input values, i.e., <span class="math inline">\(x_0\)</span>, plotted against the wall time. <img src="figures_static/01_tensorboard_02.png" class="img-fluid" alt="TensorBoard visualization of the spotPython process."></p>
+<p>The third TensorBoard plot illustrates how <code>spotPython</code> can be used as a microscope for the internal mechanisms of the surrogate-based optimization process. Here, one important parameter, the learning rate <span class="math inline">\(\theta\)</span> of the Kriging surrogate is plotted against the number of optimization steps.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures_static/01_tensorboard_03.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<figcaption class="figure-caption">TensorBoard visualization of the spotPython process.</figcaption>
+</figure>
 </div>
 
 
