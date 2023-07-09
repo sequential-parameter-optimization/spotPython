@@ -13,6 +13,8 @@ def fun_control_init(
     spot_tensorboard_path="runs_spot/",
     num_workers=0,
     device=None,
+    seed=1234,
+    sigma=0.0,
 ):
     """Initialize fun_control dictionary.
     Args:
@@ -54,8 +56,10 @@ def fun_control_init(
                 'path': None,
                 'prep_model': None,
                 'save_model': False,
+                'seed': 1234,
                 'show_batch_interval': 1000000,
                 'shuffle': None,
+                'sigma': 0.0,
                 'target_column': None,
                 'train': None,
                 'test': None,
@@ -111,8 +115,10 @@ def fun_control_init(
         "path": None,
         "prep_model": None,
         "save_model": False,
+        "seed": seed,
         "show_batch_interval": 1_000_000,
         "shuffle": None,
+        "sigma": sigma,
         "target_column": None,
         "train": None,
         "test": None,
