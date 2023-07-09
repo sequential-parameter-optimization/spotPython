@@ -436,8 +436,6 @@ class Spot:
 
         """
         self.min_y = min(self.y)
-        # get the last y value:
-        self.last_y = self.y[-1]
         self.min_X = self.X[argmin(self.y)]
         self.counter = self.y.size
         # Update aggregated x and y values (if noise):
@@ -446,43 +444,52 @@ class Spot:
             self.mean_X = Z[0]
             self.mean_y = Z[1]
             self.var_y = Z[2]
-            self.min_mean_y = min(self.mean_y)
+            # X value of the best mean y value so far:
             self.min_mean_X = self.mean_X[argmin(self.mean_y)]
+            # variance of the best mean y value so far:
+            self.min_var_y = self.var_y[argmin(self.mean_y)]
+            # best mean y value so far:
+            self.min_mean_y = self.mean_y[argmin(self.mean_y)]
 
     def update_writer(self):
         if self.spot_writer is not None:
             writer = self.spot_writer
-            y_min = self.min_y.copy()
-            y_last = self.last_y.copy()
-            X_min = self.min_X.copy()
-            # y_min: best y value so far
-            # y_last: last y value, can he worse than y_min
-            writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
-            # X_min: X value of the best y value so far
-            writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
+            # get the last y value:
+            y_last = self.y[-1].copy()
+            if self.noise is False:
+                y_min = self.min_y.copy()
+                X_min = self.min_X.copy()
+                # y_min: best y value so far
+                # y_last: last y value, can be worse than y_min
+                writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
+                # X_min: X value of the best y value so far
+                writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
+            else:
+                # get the last n y values:
+                y_last_n = self.y[-self.fun_repeats :].copy()
+                # y_min_mean: best mean y value so far
+                y_min_mean = self.min_mean_y.copy()
+                # X_min_mean: X value of the best mean y value so far
+                X_min_mean = self.min_mean_X.copy()
+                # y_min_var: variance of the min y value so far
+                y_min_var = self.min_var_y.copy()
+                writer.add_scalar("spot_y_min_var", y_min_var, self.counter)
+                # y_min_mean: best mean y value so far (see above)
+                writer.add_scalar("spot_y", y_min_mean, self.counter)
+                # last n y values (noisy):
+                writer.add_scalars(
+                    "spot_y", {f"y_last_n{i}": y_last_n[i] for i in range(self.fun_repeats)}, self.counter
+                )
+                # X_min_mean: X value of the best mean y value so far (see above)
+                writer.add_scalars(
+                    "spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter
+                )
             # get last value of self.X and convert to dict. take the values from self.var_name as keys:
             X_last = self.X[-1].copy()
             config = {self.var_name[i]: X_last[i] for i in range(self.k)}
             # hyperparameters X and value y of the last configuration:
             writer.add_hparams(config, {"spot_y": y_last})
             writer.flush()
-            if self.noise:
-                writer = self.spot_writer
-                # y_min_mean: best mean y value so far
-                y_min_mean = self.min_mean_y.copy()
-                # X_min_mean: X value of the best mean y value so far
-                X_min_mean = self.min_mean_X.copy()
-                # y_var: variance of the y values
-                y_var = self.var_y.copy()
-                writer.add_scalar("spot_y_var", y_var, self.counter)
-                # y_min_mean: best mean y value so far (see above)
-                # y_last: last y value, can he worse than y_min_mean
-                writer.add_scalars("spot_y_noise", {"min_mean_y": y_min_mean, "last": y_last}, self.counter)
-                # X_min_mean: X value of the best mean y value so far (see above)
-                writer.add_scalars(
-                    "spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter
-                )
-                writer.flush()
 
     def suggest_new_X_old(self):
         """
