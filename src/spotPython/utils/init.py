@@ -1,5 +1,6 @@
 import os
 import lightning as L
+import datetime
 
 # PyTorch TensorBoard support
 from torch.utils.tensorboard import SummaryWriter
@@ -10,7 +11,8 @@ def fun_control_init(
     _L_in=None,
     _L_out=None,
     enable_progress_bar=False,
-    spot_tensorboard_path="runs_spot/",
+    spot_tensorboard_path=None,
+    TENSORBOARD_CLEAN=False,
     num_workers=0,
     device=None,
     seed=1234,
@@ -82,10 +84,19 @@ def fun_control_init(
     os.makedirs(RESULTS_PATH, exist_ok=True)
     # Path to the folder where the tensorboard files are saved
     TENSORBOARD_PATH = os.environ.get("PATH_TENSORBOARD", "runs/")
+    if TENSORBOARD_CLEAN:
+        # if the folder "runs"  exists, move it to "runs_Y_M_D_H_M_S" to avoid overwriting old tensorboard files
+        if os.path.exists(TENSORBOARD_PATH):
+            now = datetime.datetime.now()
+            # use [:-1] to remove "/" from the end of the path
+            TENSORBOARD_PATH_OLD = TENSORBOARD_PATH[:-1] + now.strftime("%Y_%m_%d_%H_%M_%S")
+            os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
     os.makedirs(TENSORBOARD_PATH, exist_ok=True)
     if spot_tensorboard_path is not None:
         os.makedirs(spot_tensorboard_path, exist_ok=True)
         spot_writer = SummaryWriter(spot_tensorboard_path)
+    else:
+        spot_writer = None
 
     if not os.path.exists("./figures"):
         os.makedirs("./figures")
