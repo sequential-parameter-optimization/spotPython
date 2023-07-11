@@ -88,8 +88,9 @@ def fun_control_init(
         # if the folder "runs"  exists, move it to "runs_Y_M_D_H_M_S" to avoid overwriting old tensorboard files
         if os.path.exists(TENSORBOARD_PATH):
             now = datetime.datetime.now()
+            os.makedirs("runs_OLD", exist_ok=True)
             # use [:-1] to remove "/" from the end of the path
-            TENSORBOARD_PATH_OLD = TENSORBOARD_PATH[:-1] + now.strftime("%Y_%m_%d_%H_%M_%S")
+            TENSORBOARD_PATH_OLD = "runs_OLD/" + TENSORBOARD_PATH[:-1] + "_" + now.strftime("%Y_%m_%d_%H_%M_%S")
             os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
     os.makedirs(TENSORBOARD_PATH, exist_ok=True)
     if spot_tensorboard_path is not None:

@@ -87,3 +87,13 @@ def get_spot_tensorboard_path(experiment_name):
     spot_tensorboard_path = os.environ.get("PATH_TENSORBOARD", "runs/spot_logs/")
     spot_tensorboard_path = os.path.join(spot_tensorboard_path, experiment_name)
     return spot_tensorboard_path
+
+
+def get_tensorboard_path(fun_control):
+    """Get the path to the tensorboard files.
+    Args:
+        fun_control (dict): The function control dictionary.
+    Returns:
+        tensorboard_path (str): The path to the folder where the tensorboard files are saved.
+    """
+    return fun_control["TENSORBOARD_PATH"]
