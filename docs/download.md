@@ -1,3 +1,3 @@
-# Install spotRiver
+# Install spotPython
 
-    pip install spotRiver
+    pip install spotPython
