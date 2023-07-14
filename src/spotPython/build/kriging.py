@@ -215,17 +215,20 @@ class Kriging(surrogates):
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
 
-    def exp_imp(self, y0, s0):
+    def exp_imp(self, y0: float, s0: float) -> float:
         """
-        Returns the expected improvement for y0 and error s0 (in coded units).
+        Calculates the expected improvement for a given function value and error in coded units.
+
         Args:
-            y0 (float):
-                function value (in coded units)
-            s0 (float):
-                error
+            y0 (float): The function value in coded units.
+            s0 (float): The error value.
+
         Returns:
-            (float):
-                The expected improvement value.
+            float: The expected improvement value.
+
+        Example:
+            >>> exp_imp(1.0, 2.0)
+            0.1977966
         """
         # y_min = min(self.cod_y)
         y_min = min(self.mean_cod_y)

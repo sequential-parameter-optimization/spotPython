@@ -8,9 +8,12 @@ from numpy import argpartition, repeat
 from numpy import zeros, square, sqrt, full, around
 
 
-def get_ocba(means, vars, delta):
+def get_ocba(means, vars, delta) -> int32:
     """
     Optimal Computer Budget Allocation (OCBA)
+
+    This function calculates the budget recommendations for a given set of means,
+    variances, and incremental budget using the OCBA algorithm.
 
     References:
         Chun-Hung Chen and Loo Hay Lee:
@@ -24,6 +27,17 @@ def get_ocba(means, vars, delta):
         and
         https://github.com/TomMonks/sim-tools
 
+    Args:
+        means (numpy.array): An array of means.
+        vars (numpy.array): An array of variances.
+        delta (int): The incremental budget.
+
+    Returns:
+        numpy.array: An array of budget recommendations.
+
+    Note:
+        The implementation is based on the pseudo-code in the Chen et al. book (p. 49).
+
     Examples:
 
         From the Chen et al. book (p. 49):
@@ -32,18 +46,6 @@ def get_ocba(means, vars, delta):
         get_ocba(mean_y, var_y, 50)
 
         [11  9 19  9  2]
-
-        Args:
-        means (numpy.array):
-            means
-        vars (numpy.array):
-            variances
-        delta (int):
-            incremental budget
-
-        Returns:
-        (numpy.array):
-            budget recommendations. `(n,)` numpy.array
     """
     n_designs = means.shape[0]
     allocations = zeros(n_designs, int32)
@@ -79,6 +81,19 @@ def get_ocba(means, vars, delta):
     return add_budget - allocations
 
 
-def get_ocba_X(X, means, vars, delta):
+def get_ocba_X(X, means, vars, delta) -> float64:
+    """
+    This function calculates the OCBA allocation and repeats the input array X along the specified axis.
+
+    Args:
+        X (numpy.ndarray): Input array to be repeated.
+        means (list): List of means for each alternative.
+        vars (list): List of variances for each alternative.
+        delta (float): Indifference zone parameter.
+
+    Returns:
+        numpy.ndarray: Repeated array of X along the specified axis based on the OCBA allocation.
+
+    """
     o = get_ocba(means=means, vars=vars, delta=delta)
     return repeat(X, o, axis=0)
