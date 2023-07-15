@@ -1,5 +1,6 @@
 site_name: spotPython
-site_url: https://www.spotseven.de
+site_url: https://github.com/sequential-parameter-optimization/spotPython
+repo_url: https://github.com/sequential-parameter-optimization/spotPython/tree/main
 nav:
 - Home: index.md
 - Documentation: hyperparameter-tuning-cookbook.md
@@ -10,17 +11,21 @@ nav:
 theme:
   name: material
   favicon: img/favicon.png
-  logo: img/spotlogo.png
+  logo: img/spotLogo.png
 plugins:
-- search
-- gen-files:
-    scripts:
-    - docs/gen_ref_pages.py
-- literate-nav:
-    nav_file: SUMMARY.md
-- section-index
-- mkdocstrings:
-    watch:
-    - src/spotPython
-
-
+    - search:
+        indexing: 'full'
+    - gen-files:
+        scripts:
+        - docs/gen_ref_pages.py
+    - literate-nav:
+        nav_file: SUMMARY.md
+    - section-index
+    - mkdocstrings:
+        watch:
+        - src/spotPython
+markdown_extensions:
+    - smarty
+    - toc:
+        permalink: True
+    - sane_lists

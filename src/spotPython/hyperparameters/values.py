@@ -3,6 +3,7 @@ import copy
 import json
 from sklearn.pipeline import make_pipeline
 from river import compose
+from typing import Union, List
 
 from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
@@ -465,20 +466,32 @@ def get_var_name(fun_control) -> list:
     return list(fun_control["core_model_hyper_dict"].keys())
 
 
-def get_bound_values(fun_control: dict, bound: str, as_list=False) -> list or np.array:
-    """Generate a list from a dictionary.
-    It takes the values from the keys "bound" in the
-    fun_control[]"core_model_hyper_dict"] dictionary and
-    returns a list of the values in the same order as the keys in the
-    dictionary.
-    For example if the dictionary is
-    {"a": {"upper": 1}, "b": {"upper": 2}}
-    the list is [1, 2] if bound="upper".
+def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Union[List, np.ndarray]:
+    """Generate a list or array from a dictionary.
+
+    This function takes the values from the keys "bound" in the
+    fun_control["core_model_hyper_dict"] dictionary and returns a list or array of the values
+    in the same order as the keys in the dictionary.
+
     Args:
-        fun_control (dict): dictionary with upper values
-        bound (str): either "upper" or "lower"
+        fun_control (dict):
+            A dictionary containing a key "core_model_hyper_dict"
+            which is a dictionary with keys that have either an "upper" or "lower" value.
+        bound (str):
+            Either "upper" or "lower", indicating which value to extract from the inner dictionary.
+        as_list (bool):
+            If True, return a list. If False, return a numpy array. Default is False.
+
     Returns:
-        (list): list with lower or upper values
+        list or np.ndarray: A list or array of the extracted values.
+
+    Raises:
+        ValueError: If bound is not "upper" or "lower".
+
+    Example:
+        >>> fun_control = {"core_model_hyper_dict": {"a": {"upper": 1}, "b": {"upper": 2}}}
+        >>> get_bound_values(fun_control, "upper", as_list=True)
+        [1, 2]
     """
     # Throw value error if bound is not upper or lower:
     if bound not in ["upper", "lower"]:

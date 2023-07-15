@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # google-style docstring documentation, type information, an example, and return values: 2023, July, 15th
 # tests: None
 
@@ -31,7 +33,7 @@ from spotPython.utils.repair import repair_non_numeric
 from spotPython.utils.aggregate import aggregate_mean_var
 import logging
 import numpy as np
-from typing import List, Union, Tuple, Any, Optional
+from typing import List, Union, Tuple, Any, Optional, Object
 
 
 logger = logging.getLogger(__name__)
@@ -46,21 +48,21 @@ logger.addHandler(py_handler)
 
 class Kriging(surrogates):
     def __init__(
-            self,
-            noise=False,
-            cod_type="norm",
-            var_type=["num"],
-            use_cod_y=False,
-            name="kriging",
-            seed=124,
+            self: Object,
+            noise: bool = False,
+            cod_type: Optional[str] = "norm",
+            var_type: List[str] = ["num"],
+            use_cod_y: bool = False,
+            name: str = "kriging",
+            seed: int = 124,
             model_optimizer=None,
-            model_fun_evals=None,
-            min_theta=-3,  # TODO
-            max_theta=2,  # TODO
-            n_theta=1,
-            n_p=1,
-            optim_p=False,
-            log_level=50,
+            model_fun_evals: Optional[int] = None,
+            min_theta: float = -3,
+            max_theta: float = 2,
+            n_theta: int = 1,
+            n_p: int = 1,
+            optim_p: bool = False,
+            log_level: int = 50,
             spot_writer=None,
             counter=None,
             **kwargs
@@ -69,35 +71,26 @@ class Kriging(surrogates):
         Kriging surrogate.
 
         Args:
-            noise (bool):
-                use regression instead of interpolation kriging. Defaults to "False".
-            cod_type (bool):
-                normalize or standardize X and values. Can be None, "norm", or "std". Defaults to "norm".
-            var_type (str):
-                variable type. Can be either `"num`" (numerical) of `"factor"` (factor).
-                Defaults to `"num"`.
-            use_cod_y (bool):
-                use coded y values (instead of natural one). Defaults to `False`.
-            name (str):
-                Surrogate name. Defaults to `"kriging"`.
-            seed (int):
-                Random seed. Defaults to `124`.
-            model_optimizer (object):
-                Optimizer on the surrogate. If `None`, `differential_evolution` is selected.
-            model_fun_evals (int):
-                Number of iterations used by the optimizer on the surrogate.
-            min_theta (float):
-                min log10 theta value. Defaults to `-6.`.
-            max_theta (float):
-                max log10 theta value. Defaults to `3.`.
-            n_theta (int):
-                number of theta values. Defaults to `1`.
-            n_p (int):
-                number of p values. Defaults to `1`.
-            optim_p (bool):
-                Determines whether `p` should be optimized.
-            log_level (int):
-                logging level, e.g., `20` is `"INFO"`. Defaults to `50` (`"CRITICAL"`).
+            noise (bool): Use regression instead of interpolation kriging. Defaults to False.
+            cod_type (Optional[str]):
+                Normalize or standardize X and values.
+                Can be None, "norm", or "std". Defaults to "norm".
+            var_type (List[str]):
+                Variable type. Can be either "num" (numerical) or "factor" (factor).
+                Defaults to ["num"].
+            use_cod_y (bool): Use coded y values (instead of natural one). Defaults to False.
+            name (str): Surrogate name. Defaults to "kriging".
+            seed (int): Random seed. Defaults to 124.
+            model_optimizer : Optimizer on the surrogate. If None, differential_evolution is selected.
+            model_fun_evals (Optional[int]): Number of iterations used by the optimizer on the surrogate.
+            min_theta (float): Min log10 theta value. Defaults to -3.
+            max_theta (float): Max log10 theta value. Defaults to 2.
+            n_theta (int): Number of theta values. Defaults to 1.
+            n_p (int): Number of p values. Defaults to 1.
+            optim_p (bool): Determines whether p should be optimized.
+            log_level (int): Logging level, e.g., 20 is "INFO". Defaults to 50 ("CRITICAL").
+            spot_writer : Spot writer.
+            counter : Counter.
 
         Attributes:
             nat_range_X (list):
@@ -223,6 +216,7 @@ class Kriging(surrogates):
         Calculates the expected improvement for a given function value and error in coded units.
 
         Args:
+            self (object): The Kriging object.
             y0 (float): The function value in coded units.
             s0 (float): The error value.
 
@@ -263,6 +257,9 @@ class Kriging(surrogates):
         parameters being optimized (`n_theta` and `n_p`), as well as whether noise is
         being considered (`noise`).
 
+        Args:
+            self (object): The Kriging object.
+
         Examples:
 
             >>> from spotPython.build.kriging import Kriging
@@ -291,6 +288,7 @@ class Kriging(surrogates):
         `theta` as an array,  `p` as an array, and `Lambda` as a float.
 
         Args:
+            self (object): The Kriging object.
             new_theta_p_Lambda (np.ndarray):
                 1d-array with theta, p, and Lambda values. Order is important.
 
@@ -328,6 +326,9 @@ class Kriging(surrogates):
         The optimization is performed within the bounds specified by the attribute
         `de_bounds`.
         The result of the optimization is returned as a list or tuple of optimized parameter values.
+
+        Args:
+            self (object): The Kriging object.
 
         Examples:
 
@@ -379,6 +380,9 @@ class Kriging(surrogates):
         negLnLike, theta, p (if optim_p is True),
         and Lambda (if noise is True) to the spot_writer object.
 
+        Args:
+            self (object): The Kriging object.
+
         Returns:
             None
 
@@ -425,6 +429,7 @@ class Kriging(surrogates):
         2. Correlation matrix `Psi` via `rebuildPsi()`.
 
         Args:
+            self (object): The Kriging object.
             nat_X (np.ndarray): Sample points.
             nat_y (np.ndarray): Function values.
 
@@ -482,6 +487,7 @@ class Kriging(surrogates):
         and `nat_y` and stores them in the instance variables `cod_X` and `cod_y`.
 
         Args:
+            self (object): The Kriging object.
             nat_X (np.ndarray): The independent variable data.
             nat_y (np.ndarray): The dependent variable data.
 
@@ -518,6 +524,9 @@ class Kriging(surrogates):
         than `k`, all variable types are forced to 'num' and a warning is logged.
         The method then creates masks for each variable
         type ('num', 'factor', 'int', 'float') using numpy arrays.
+
+        Args:
+            self (object): The Kriging object.
 
         Examples:
 
@@ -556,6 +565,11 @@ class Kriging(surrogates):
         The `x0_theta` attribute is also initialized as a list of ones
         with length `n_theta`, multiplied by `n / (100 * k)`.
 
+        Args:
+            self (object): The Kriging object.
+        Returns:
+            None
+
         Examples:
 
             >>> from spotPython.build.kriging import Kriging
@@ -566,9 +580,8 @@ class Kriging(surrogates):
             >>>         self.k = 2
             >>> instance = MyClass()
             >>> instance.set_theta_values()
-
-        Returns:
-            None
+            >>> instance.theta
+            array([0., 0., 0.])
         """
         if self.n_theta > self.k:
             self.n_theta = self.k
@@ -590,6 +603,9 @@ class Kriging(surrogates):
         The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.
         The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.
         The `one` attribute is initialized as a list of ones with length `n`.
+
+        Args:
+            self (object): The Kriging object.
 
         Examples:
 
@@ -639,6 +655,7 @@ class Kriging(surrogates):
         7. Returns the computed negative log likelihood (`negLnLike`).
 
         Args:
+            self (object): The Kriging object.
             new_theta_p_Lambda (np.ndarray):
                 An array containing the `theta`, `p`, and `Lambda` values.
 
@@ -692,6 +709,7 @@ class Kriging(surrogates):
         the `array()` function.
 
         Args:
+            self (object): The Kriging object.
             x (np.ndarray or array-like):
                 The input array to check for the presence of value `v`.
             v (scalar):
@@ -731,7 +749,7 @@ class Kriging(surrogates):
         correlation matrix as described in [Forr08a, p.57].
 
         Args:
-            self: The object instance.
+            self (object): The Kriging object.
 
         Returns:
             None
@@ -791,14 +809,19 @@ class Kriging(surrogates):
         This method uses either `scipy_cholesky` or numpy's `cholesky` to perform the Cholesky factorization of Psi.
 
         Args:
-            self: The object instance.
-            scipy (bool): If True, use `scipy_cholesky`. If False, use numpy's `cholesky`. Defaults to True.
+            self (object):
+                The Kriging object.
+            scipy (bool):
+                If True, use `scipy_cholesky`.
+                If False, use numpy's `cholesky`.
+                Defaults to True.
 
         Returns:
             None
 
         Raises:
-            LinAlgError: If Cholesky factorization fails for Psi.
+            LinAlgError:
+                If Cholesky factorization fails for Psi.
 
         Examples:
 
@@ -833,7 +856,8 @@ class Kriging(surrogates):
             `build_Psi` and `build_U` should be called first.
 
         Args:
-            self: The object instance.
+            self (object):
+                The Kriging object.
 
         Returns:
             None
@@ -872,8 +896,11 @@ class Kriging(surrogates):
         This function plots 1D and 2D surrogates.
 
         Args:
-            show (bool): If `True`, the plots are displayed.
-            If `False`, `plt.show()` should be called outside this function.
+            self (object):
+                The Kriging object.
+            show (bool):
+                If `True`, the plots are displayed.
+                If `False`, `plt.show()` should be called outside this function.
 
         Returns:
             None
@@ -977,22 +1004,31 @@ class Kriging(surrogates):
         This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.
 
         Args:
-            nat_X (ndarray): Design variable to evaluate in natural units.
-            nat (bool): argument `nat_X` is in natural range. Default: `True`.
+            self (object):
+                The Kriging object.
+            nat_X (ndarray):
+                Design variable to evaluate in natural units.
+            nat (bool):
+                argument `nat_X` is in natural range. Default: `True`.
                 If set to `False`, `nat_X` will not be normalized (which might be useful
                 if already normalized y values are used).
-            return_val (str): whether `y`, `s`, neg. `ei` (negative expected improvement),
-            or all three values are returned.
+            return_val (str):
+                whether `y`, `s`, neg. `ei` (negative expected improvement),
+                or all three values are returned.
                 Default is (for compatibility with sklearn) "y". To return `s`, select "s",
                 to return neg. `ei`, select "ei".
                 To return the tuple `(y, s, ei)`, select "all".
 
         Returns:
-            float: The predicted value in natural units if return_val is "y".
-            float: predicted error if return_val is "s".
-            float: expected improvement if return_val is "ei".
-            Tuple[float, float, float]: The predicted value in natural units, predicted error
-            and expected improvement if return_val is "all".
+            float:
+                The predicted value in natural units if return_val is "y".
+            float:
+                predicted error if return_val is "s".
+            float:
+                expected improvement if return_val is "ei".
+            Tuple[float, float, float]:
+                The predicted value in natural units, predicted error
+                and expected improvement if return_val is "all".
 
         Examples:
 
@@ -1039,7 +1075,10 @@ class Kriging(surrogates):
         `regression_predict_coded`. Modifies `self.psi`.
 
         Args:
-            cod_x (ndarray): point to calculate psi
+            self (object):
+                The Kriging object.
+            cod_x (ndarray):
+                point to calculate psi
 
         Returns:
             None
@@ -1088,7 +1127,10 @@ class Kriging(surrogates):
         The error is returned as well.
 
         Args:
-            cod_x (np.ndarray): Point in coded units to make prediction at.
+            self (object):
+                The Kriging object.
+            cod_x (np.ndarray):
+                Point in coded units to make prediction at.
 
         Returns:
             f (float): Predicted value in coded units.
@@ -1128,6 +1170,7 @@ class Kriging(surrogates):
         Weighted expected improvement.
 
         Args:
+            self (object): The Kriging object.
             cod_x (np.ndarray): A coded design vector.
             w (float): Weight.
 
@@ -1173,9 +1216,13 @@ class Kriging(surrogates):
         Calculates the mean MSE metric of the model by evaluating MSE at a number of points.
 
         Args:
-            n_samples (int): Number of points to sample the mean squared error at.
-            Ignored if the points argument is specified.
-            points (np.ndarray): An array of points to sample the model at.
+            self (object):
+                The Kriging object.
+            n_samples (int):
+                Number of points to sample the mean squared error at.
+                Ignored if the points argument is specified.
+            points (np.ndarray):
+                An array of points to sample the model at.
 
         Returns:
             mean_MSE (float): The mean value of MSE.
@@ -1203,7 +1250,9 @@ class Kriging(surrogates):
         Converts an array representing one point in normalized (coded) units to natural (physical or real world) units.
 
         Args:
-            cod_X (np.ndarray): An array representing one point (self.k long) in normalized (coded) units.
+            self (object): The Kriging object.
+            cod_X (np.ndarray):
+                An array representing one point (self.k long) in normalized (coded) units.
 
         Returns:
             X (np.ndarray): An array of natural (physical or real world) units.
@@ -1240,7 +1289,9 @@ class Kriging(surrogates):
         to an array of observed values in real-world units.
 
         Args:
-            cod_y (np.ndarray): A normalized array of coded (model) units in the range of [0,1].
+            self (object): The Kriging object.
+            cod_y (np.ndarray):
+                A normalized array of coded (model) units in the range of [0,1].
 
         Returns:
             y (np.ndarray): An array of observed values in real-world units.
@@ -1270,7 +1321,9 @@ class Kriging(surrogates):
         Normalizes one point (row) of nat_X array to [0,1]. The internal nat_range_X values are not updated.
 
         Args:
-            nat_X (np.ndarray): An array representing one point (self.k long) in natural (physical or real world) units.
+            self (object): The Kriging object.
+            nat_X (np.ndarray):
+                An array representing one point (self.k long) in natural (physical or real world) units.
 
         Returns:
             X (np.ndarray): An array of coded values in the range of [0,1] for each dimension.
@@ -1318,10 +1371,13 @@ class Kriging(surrogates):
         Normalizes natural y values to [0,1].
 
         Args:
-            nat_y (np.ndarray): An array of observed values in natural (real-world) units.
+            self (object): The Kriging object.
+            nat_y (np.ndarray):
+                An array of observed values in natural (real-world) units.
 
         Returns:
-            y (np.ndarray): A normalized array of coded (model) units in the range of [0,1].
+            y (np.ndarray):
+                A normalized array of coded (model) units in the range of [0,1].
 
         Examples:
 
@@ -1346,6 +1402,9 @@ class Kriging(surrogates):
         Called when 1) surrogate is initialized and 2) new points arrive, i.e.,
         suggested by the surrogate as infill points.
         This method calls `nat_to_cod_x` and `nat_to_cod_y` and updates the ranges `nat_range_X` and `nat_range_y`.
+
+        Args:
+            self (object): The Kriging object.
 
         Examples:
 

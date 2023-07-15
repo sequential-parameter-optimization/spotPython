@@ -1,28 +1,69 @@
 import numpy as np
 from numpy.random import default_rng
 from random import random
+from Typing import List, Optional, Dict
 
 
-class analytical:
+class Analytical:
     """
-    Analytical test functions.
+    Class for analytical test functions.
 
     Args:
-        offset (float): offset
-        hz (float): hz
-        seed (int): seed.
-            See [Numpy Random Sampling](https://numpy.org/doc/stable/reference/random/index.html#random-quick-start)
+        offset (float):
+            Offset value. Defaults to 0.0.
+        hz (float):
+            Horizontal value. Defaults to 0.
+        seed (int):
+            Seed value for random number generation. Defaults to 126.
+    Note:
+        See [Numpy Random Sampling](https://numpy.org/doc/stable/reference/random/index.html#random-quick-start)
 
+    Attributes:
+        offset (float):
+            Offset value.
+        hz (float):
+            Horizontal value.
+        seed (int):
+            Seed value for random number generation.
+        rng (Generator):
+            Numpy random number generator object.
+        fun_control (dict):
+            Dictionary containing control parameters for the function.
     """
 
-    def __init__(self, offset=0.0, hz=0, seed=126):
+    def __init__(self, offset: float = 0.0, hz: float = 0, seed: int = 126) -> None:
         self.offset = offset
         self.hz = hz
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
         self.fun_control = {"sigma": 0, "seed": None, "sel_var": None}
 
-    def add_noise(self, y):
+    def __repr__(self) -> str:
+        return f"Analytical(offset={self.offset}, hz={self.hz}, seed={self.seed})"
+
+    def add_noise(self, y: List[float]) -> np.ndarray:
+        """
+        Adds noise to the input data.
+        This method takes in a list of float values y as input and adds noise to
+        the data using a random number generator. The method returns a numpy array
+        containing the noisy data.
+
+        Args:
+            self (Analytical): Analytical class object.
+            y (List[float]): Input data.
+
+        Returns:
+            np.ndarray: Noisy data.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import Analytical
+            >>> import numpy as np
+            >>> y = np.array([1, 2, 3, 4, 5])
+            >>> fun = Analytical()
+            >>> fun.add_noise(y)
+            array([1.        , 2.        , 3.        , 4.        , 5.        ])
+
+        """
         # Use own rng:
         if self.fun_control["seed"] is not None:
             rng = default_rng(seed=self.fun_control["seed"])
@@ -37,13 +78,26 @@ class analytical:
             )
         return noise_y
 
-    def fun_branin_factor(self, X, fun_control=None):
+    def fun_branin_factor(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """
-        This function calculates the Branin function with an additional factor based on the value of x3.
-        :param X: A 2D numpy array with shape (n, 3) where n is the number of samples.
-        :param fun_control: A dictionary containing control parameters for the function.
-            If None, self.fun_control is used.
-        :return: A 1D numpy array with shape (n,) containing the calculated values.
+        Calculates the Branin function with an additional factor based on the value of x3.
+
+        Args:
+            X (np.ndarray):
+                A 2D numpy array with shape (n, 3) where n is the number of samples.
+            fun_control (Optional[Dict]):
+                A dictionary containing control parameters for the function.
+                If None, self.fun_control is used. Defaults to None.
+
+        Returns:
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import Analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = Analytical()
+            >>> fun.fun_branin_factor(X)
         """
         if fun_control is None:
             fun_control = self.fun_control
