@@ -1924,7 +1924,8 @@
           </td>
           <td>
             <div class="doc-md-description">
-              <p>The name of the json file that contains the hyper parameter dictionary.</p>
+              <p>The name of the json file that contains the hyper parameter dictionary.
+Optional. Default is None.</p>
             </div>
           </td>
           <td>
@@ -1956,22 +1957,16 @@
     </tbody>
   </table>
 
-<details class="example" open>
-  <summary>Example</summary>
-  <blockquote>
-<blockquote>
-<blockquote>
-<p>from river.tree import HoeffdingAdaptiveTreeRegressor
-    from spotRiver.data.river_hyper_dict import RiverHyperDict
-    fun_control = {}
-    add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-        fun_control=func_control,
-        hyper_dict=RiverHyperDict,
-        filename=None)</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</details>
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">river.tree</span> <span class="kn">import</span> <span class="n">HoeffdingAdaptiveTreeRegressor</span>
+<span class="go">    from spotRiver.data.river_hyper_dict import RiverHyperDict</span>
+<span class="go">    fun_control = {}</span>
+<span class="go">    add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,</span>
+<span class="go">        fun_control=func_control,</span>
+<span class="go">        hyper_dict=RiverHyperDict,</span>
+<span class="go">        filename=None)</span>
+</code></pre></div>
+
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/hyperparameters/values.py</code></summary>
         <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">590</span>
@@ -2003,17 +1998,25 @@
 <span class="normal">616</span>
 <span class="normal">617</span>
 <span class="normal">618</span>
-<span class="normal">619</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_core_model_to_fun_control</span><span class="p">(</span><span class="n">core_model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">hyper_dict</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_core_model_to_fun_control</span><span class="p">(</span><span class="n">core_model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">hyper_dict</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add the core model to the function control dictionary.</span>
 <span class="sd">    Args:</span>
-<span class="sd">        core_model (class): The core model.</span>
-<span class="sd">        fun_control (dict): The function control dictionary.</span>
-<span class="sd">        hyper_dict (dict): The hyper parameter dictionary.</span>
-<span class="sd">        filename (str): The name of the json file that contains the hyper parameter dictionary.</span>
-<span class="sd">        Optional. Default is None.</span>
+<span class="sd">        core_model (class):</span>
+<span class="sd">            The core model.</span>
+<span class="sd">        fun_control (dict):</span>
+<span class="sd">            The function control dictionary.</span>
+<span class="sd">        hyper_dict (dict):</span>
+<span class="sd">            The hyper parameter dictionary.</span>
+<span class="sd">        filename (str):</span>
+<span class="sd">            The name of the json file that contains the hyper parameter dictionary.</span>
+<span class="sd">            Optional. Default is None.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        (dict): The function control dictionary.</span>
-<span class="sd">    Example:</span>
+<span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from river.tree import HoeffdingAdaptiveTreeRegressor</span>
 <span class="sd">            from spotRiver.data.river_hyper_dict import RiverHyperDict</span>
 <span class="sd">            fun_control = {}</span>
