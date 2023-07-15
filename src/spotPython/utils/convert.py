@@ -14,7 +14,7 @@ def class_for_name(module_name, class_name) -> object:
     Returns:
         object: The class.
 
-    Example:
+    Examples:
         >>> from spotPython.utils.convert import class_for_name
             from scipy.optimize import rosen
             bounds = [(0,2), (0, 2), (0, 2), (0, 2), (0, 2)]
@@ -33,7 +33,7 @@ def get_Xy_from_df(df, target_column) -> tuple:
         target_column (str): The name of the target column.
     Returns:
         tuple: The tuple (X, y).
-    Example:
+    Examples:
         >>> from spotPython.utils.convert import get_Xy_from_df
         >>> import pandas as pd
         >>> df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
@@ -57,8 +57,8 @@ def series_to_array(series):
     Args:
         series (pandas.Series): The input series.
     Returns:
-        numpy.ndarray: The output array.
-    Example:
+        (numpy.ndarray): The output array.
+    Examples:
         >>> from spotPython.utils.convert import series_to_array
         >>> import pandas as pd
         >>> series = pd.Series([1, 2, 3])

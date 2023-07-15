@@ -13,15 +13,22 @@ def generate_one_config_from_var_dict(var_dict, fun_control) -> dict:
     """Generate one configuration from a dictionary of variables (as a generator).
     This function takes a dictionary of variables as input arguments and returns a dictionary
     with the values from the arrays in the dictionary.
+
     Args:
-        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
-        fun_control (dict): A dictionary which (at least) has an entry with the following key:
-            - "var_type": A list of variable types. If the entry is not "num" the corresponding
+        var_dict (dict):
+            A dictionary where keys are variable names and values are numpy arrays.
+        fun_control (dict):
+            A dictionary which (at least) has an entry with the following key:
+            "var_type": A list of variable types. If the entry is not "num" the corresponding
             value will be converted to the type "int".
+
     Returns:
-        dict: A dictionary with the values from the arrays in the dictionary.
-    Example:
+        (dict):
+            A dictionary with the values from the arrays in the dictionary.
+
+    Examples:
         >>> import numpy as np
+        >>> from spotPython.utils.prepare import generate_one_config_from_var_dict
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {"var_type": ["int", "num"]}
         >>> generate_one_config_from_var_dict(var_dict, fun_control)
@@ -39,12 +46,16 @@ def return_conf_list_from_var_dict(var_dict: dict, fun_control: dict) -> list:
     It performs similar steps as generate_one_config_from_var_dict()
     but returns a list of dictionaries of hyper parameter values.
     Args:
-        var_dict (dict): A dictionary of variables.
-        fun_control (dict): A dictionary of function control.
+        var_dict (dict):
+            A dictionary of variables.
+        fun_control (dict):
+            A dictionary of function control.
     Returns:
-        list A list of dictionaries of hyper parameter values. Transformations are applied to the values.
+        (list):
+            A list of dictionaries of hyper parameter values. Transformations are applied to the values.
     Examples:
         >>> import numpy as np
+        >>> from spotPython.utils.prepare import return_conf_list_from_var_dict
             var_dict = {'a': np.array([1]),
                         'b': np.array([2])}
             fun_control = {'var_type': ['int', 'int']}
@@ -67,13 +78,16 @@ def iterate_dict_values(var_dict: dict):
     yields the values from the arrays in the dictionary.
 
     Parameters:
-        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+        var_dict (dict):
+            A dictionary where keys are variable names and values are numpy arrays.
 
     Returns:
-        iterator: An iterator that yields the values from the arrays in the dictionary.
+        iterator (generator):
+            An iterator that yields the values from the arrays in the dictionary.
 
-    Example:
+    Examples:
         >>> import numpy as np
+        >>> from spotPython.utils.prepare import iterate_dict_values
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> for values in iterate_dict_values(var_dict):
         ...     print(values)
@@ -96,14 +110,18 @@ def convert_keys(d: dict, var_type: list):
     the value associated with that key is converted to an integer.
 
     Args:
-        d (dict): The input dictionary.
-        var_type (list): A list of variable types. If the entry is not `"num"` the corresponding
-        value will be converted to the type `"int"`.
+        d (dict):
+            The input dictionary.
+        var_type (list):
+            A list of variable types. If the entry is not `"num"` the corresponding
+            value will be converted to the type `"int"`.
 
     Returns:
-        dict: The modified dictionary with values converted to integers based on `var_type`.
+        (dict):
+            The modified dictionary with values converted to integers based on `var_type`.
 
-    Example:
+    Examples:
+        >>> from spotPython.utils.prepare import convert_keys
         >>> d = {'a': '1.1', 'b': '2', 'c': '3.1'}
         >>> var_type = ["int", "num", "int"]
         >>> convert_keys(d, var_type)
@@ -178,14 +196,18 @@ def get_dict_with_levels_and_types(fun_control, v) -> dict:
         'max_size': 500.0}.
 
     Args:
-        fun_control (dict): dictionary with levels and types
-        v (dict): dictionary with values
+        fun_control (dict):
+            dictionary with levels and types
+        v (dict):
+            dictionary with values
 
     Returns:
-        new_dict (dict): dictionary with levels and types
+        new_dict (dict):
+            dictionary with levels and types
 
-    Example:
-        >>> fun_control = {"HoeffdingTreeRegressor":{
+    Examples:
+        >>> from spotPython.utils.prepare import get_dict_with_levels_and_types
+            fun_control = {"HoeffdingTreeRegressor":{
                 "leaf_prediction": {"levels": ["mean", "model", "adaptive"],
                                     "type": "factor",
                                     "default": "mean",
@@ -221,14 +243,18 @@ def assign_values(X: np.array, var_list: list) -> dict:
     and returns a dictionary where the keys are the variable names and the values are assigned from X.
 
     Parameters:
-        X (np.array): A 2D numpy array where each column represents a variable.
-        var_list (list): A list of strings representing variable names.
+        X (np.array):
+            A 2D numpy array where each column represents a variable.
+        var_list (list):
+            A list of strings representing variable names.
 
     Returns:
-        dict: A dictionary where keys are variable names and values are assigned from X.
+        dict:
+            A dictionary where keys are variable names and values are assigned from X.
 
-    Example:
+    Examples:
         >>> import numpy as np
+        >>> from spotPython.utils.prepare import assign_values
         >>> X = np.array([[1, 2], [3, 4], [5, 6]])
         >>> var_list = ['a', 'b']
         >>> result = assign_values(X, var_list)
@@ -243,16 +269,22 @@ def assign_values(X: np.array, var_list: list) -> dict:
 
 def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
     """
+    This function modifies the levels of a hyperparameter in the fun_control dictionary.
 
     Args:
-        fun_control (dict): fun_control dictionary
-        hyperparameter (str): hyperparameter name
-        levels (list): list of levels
+        fun_control (dict):
+            fun_control dictionary
+        hyperparameter (str):
+            hyperparameter name
+        levels (list):
+            list of levels
 
     Returns:
-        fun_control (dict): updated fun_control
-    Example:
+        fun_control (dict):
+            updated fun_control
+    Examples:
         >>> fun_control = {}
+            from spotPython.utils.prepare import modify_hyper_parameter_levels
             core_model  = HoeffdingTreeRegressor
             fun_control.update({"core_model": core_model})
             fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
@@ -268,15 +300,20 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
     """
 
     Args:
-        fun_control (dict): fun_control dictionary
-        hyperparameter (str): hyperparameter name
-        bounds (list): list of two bound values. The first value represents the lower bound
+        fun_control (dict):
+            fun_control dictionary
+        hyperparameter (str):
+            hyperparameter name
+        bounds (list):
+            list of two bound values. The first value represents the lower bound
             and the second value represents the upper bound.
 
     Returns:
-        fun_control (dict): updated fun_control
-    Example:
-        >>> fun_control = {}
+        fun_control (dict):
+            updated fun_control
+    Examples:
+        >>> from spotPython.utils.prepare import modify_hyper_parameter_levels
+            fun_control = {}
             core_model  = HoeffdingTreeRegressor
             fun_control.update({"core_model": core_model})
             fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
@@ -291,11 +328,14 @@ def get_default_values(fun_control) -> dict:
     """Get the values from the "default" keys from the dictionary fun_control as a dict.
     If the key of the value has as "type" the value "int" or "float", convert the value to the corresponding type.
     Args:
-        fun_control (dict): dictionary with levels and types
+        fun_control (dict):
+            dictionary with levels and types
     Returns:
-        new_dict (dict): dictionary with default values
-    Example:
-        >>> d = {"core_model_hyper_dict":{
+        new_dict (dict):
+            dictionary with default values
+    Examples:
+        >>> from spotPython.utils.prepare import get_default_values
+            d = {"core_model_hyper_dict":{
                 "leaf_prediction": {
                     "levels": ["mean", "model", "adaptive"],
                     "type": "factor",
@@ -321,12 +361,12 @@ def get_default_values(fun_control) -> dict:
                     "type": "factor",
                     "default": 0,
                     "core_model_parameter_type": "bool"}}}
-        get_default_values_from_dict(d)
-        {'leaf_prediction': 'mean',
-        'leaf_model': 'linear_model.LinearRegression',
-        'splitter': 'EBSTSplitter',
-        'binary_split': 0,
-        'stop_mem_management': 0}
+            get_default_values_from_dict(d)
+            {'leaf_prediction': 'mean',
+            'leaf_model': 'linear_model.LinearRegression',
+            'splitter': 'EBSTSplitter',
+            'binary_split': 0,
+            'stop_mem_management': 0}
     """
     d = fun_control["core_model_hyper_dict"]
     new_dict = {}
@@ -343,11 +383,14 @@ def get_default_values(fun_control) -> dict:
 def get_var_type(fun_control) -> list:
     """Get the types of the values from the dictionary fun_control as a list.
     Args:
-        fun_control (dict): dictionary with levels and types
+        fun_control (dict):
+            dictionary with levels and types
     Returns:
-        (list): list with types
-    Example:
-        >>> d = {"core_model_hyper_dict":{
+        (list):
+            list with types
+    Examples:
+        >>> from spotPython.utils.prepare import get_var_type
+            d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
                 "type": "factor",
@@ -373,8 +416,8 @@ def get_var_type(fun_control) -> list:
                 "default": 0,
                 "core_model_parameter_type": "bool"}}}
 
-        get_var_type(d)
-        ['factor', 'factor', 'factor', 'factor', 'factor']
+            get_var_type(d)
+            ['factor', 'factor', 'factor', 'factor', 'factor']
     """
     return list(
         fun_control["core_model_hyper_dict"][key]["type"] for key in fun_control["core_model_hyper_dict"].keys()
@@ -384,11 +427,14 @@ def get_var_type(fun_control) -> list:
 def get_transform(fun_control) -> list:
     """Get the transformations of the values from the dictionary fun_control as a list.
     Args:
-        fun_control (dict): dictionary with levels and types
+        fun_control (dict):
+            dictionary with levels and types
     Returns:
-        (list): list with transformations
-    Example:
-        >>> d = {"core_model_hyper_dict":{
+        (list):
+            list with transformations
+    Examples:
+        >>> from spotPython.utils.prepare import get_transform
+            d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
                 "type": "factor",
@@ -419,8 +465,8 @@ def get_transform(fun_control) -> list:
                 "transform": "None",
                 "core_model_parameter_type": "bool"}}}
 
-        get_transform(d)
-        ['None', 'None', 'None', 'None', 'None']
+            get_transform(d)
+            ['None', 'None', 'None', 'None', 'None']
     """
     return list(
         fun_control["core_model_hyper_dict"][key]["transform"] for key in fun_control["core_model_hyper_dict"].keys()
@@ -430,10 +476,12 @@ def get_transform(fun_control) -> list:
 def get_var_name(fun_control) -> list:
     """Get the names of the values from the dictionary fun_control as a list.
     Args:
-        fun_control (dict): dictionary with names
+        fun_control (dict):
+            dictionary with names
     Returns:
-        (list): list with names
-    Example:
+        (list):
+            ist with names
+    Examples:
         >>> d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
@@ -478,17 +526,22 @@ def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Un
             A dictionary containing a key "core_model_hyper_dict"
             which is a dictionary with keys that have either an "upper" or "lower" value.
         bound (str):
-            Either "upper" or "lower", indicating which value to extract from the inner dictionary.
+            Either "upper" or "lower",
+            indicating which value to extract from the inner dictionary.
         as_list (bool):
-            If True, return a list. If False, return a numpy array. Default is False.
+            If True, return a list.
+            If False, return a numpy array. Default is False.
 
     Returns:
-        list or np.ndarray: A list or array of the extracted values.
+        list or np.ndarray:
+            A list or array of the extracted values.
 
     Raises:
-        ValueError: If bound is not "upper" or "lower".
+        ValueError:
+            If bound is not "upper" or "lower".
 
-    Example:
+    Examples:
+        >>> from spotPython.utils.prepare import get_bound_values
         >>> fun_control = {"core_model_hyper_dict": {"a": {"upper": 1}, "b": {"upper": 2}}}
         >>> get_bound_values(fun_control, "upper", as_list=True)
         [1, 2]
@@ -520,48 +573,53 @@ def replace_levels_with_positions(hyper_dict, hyper_dict_values) -> dict:
         "b": {"levels": ["model4", "model5", "model1"]},
         "d": {"type": "float"}},
     then the function should return {"a": 1, "b": 2, "c": 3}.
+
     Args:
-        hyper_dict (dict): dictionary with levels
-        hyper_dict_values (dict): dictionary with values
+        hyper_dict (dict):
+            dictionary with levels
+        hyper_dict_values (dict):
+            dictionary with values
     Returns:
-        (dict): dictionary with values
-    Example:
-        >>> hyper_dict = {"leaf_prediction": {
-        "levels": ["mean", "model", "adaptive"],
-        "type": "factor",
-        "default": "mean",
-        "core_model_parameter_type": "str"},
-        "leaf_model": {
-            "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-            "type": "factor",
-            "default": "LinearRegression",
-            "core_model_parameter_type": "instance"},
-        "splitter": {
-            "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-            "type": "factor",
-            "default": "EBSTSplitter",
-            "core_model_parameter_type": "instance()"},
-        "binary_split": {
-            "levels": [0, 1],
-            "type": "factor",
-            "default": 0,
-            "core_model_parameter_type": "bool"},
-        "stop_mem_management": {
-            "levels": [0, 1],
-            "type": "factor",
-            "default": 0,
-            "core_model_parameter_type": "bool"}}
-        >>> hyper_dict_values = {"leaf_prediction": "mean",
-        "leaf_model": "linear_model.LinearRegression",
-        "splitter": "EBSTSplitter",
-        "binary_split": 0,
-        "stop_mem_management": 0}
-        >>> replace_levels_with_position(hyper_dict, hyper_dict_values)
-        {'leaf_prediction': 0,
-        'leaf_model': 0,
-        'splitter': 0,
-        'binary_split': 0,
-        'stop_mem_management': 0}
+        (dict):
+            dictionary with values
+    Examples:
+        >>> from spotPython.utils.prepare import replace_levels_with_positions
+            hyper_dict = {"leaf_prediction": {
+                "levels": ["mean", "model", "adaptive"],
+                "type": "factor",
+                "default": "mean",
+                "core_model_parameter_type": "str"},
+                "leaf_model": {
+                    "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
+                    "type": "factor",
+                    "default": "LinearRegression",
+                    "core_model_parameter_type": "instance"},
+                "splitter": {
+                    "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
+                    "type": "factor",
+                    "default": "EBSTSplitter",
+                    "core_model_parameter_type": "instance()"},
+                "binary_split": {
+                    "levels": [0, 1],
+                    "type": "factor",
+                    "default": 0,
+                    "core_model_parameter_type": "bool"},
+                "stop_mem_management": {
+                    "levels": [0, 1],
+                    "type": "factor",
+                    "default": 0,
+                    "core_model_parameter_type": "bool"}}
+            hyper_dict_values = {"leaf_prediction": "mean",
+                "leaf_model": "linear_model.LinearRegression",
+                "splitter": "EBSTSplitter",
+                "binary_split": 0,
+                "stop_mem_management": 0}
+            replace_levels_with_position(hyper_dict, hyper_dict_values)
+                {'leaf_prediction': 0,
+                'leaf_model': 0,
+                'splitter': 0,
+                'binary_split': 0,
+                'stop_mem_management': 0}
     """
     hyper_dict_values_new = copy.deepcopy(hyper_dict_values)
     for key, value in hyper_dict_values.items():
@@ -576,10 +634,13 @@ def get_values_from_dict(dictionary) -> np.array:
     Generate an np.array that contains the values of the keys of a dictionary
     in the same order as the keys of the dictionary.
     Args:
-        dictionary (dict): dictionary with values
+        dictionary (dict):
+            dictionary with values
     Returns:
-        (np.array): array with values
-    Example:
+        (np.array):
+            array with values
+    Examples:
+        >>> from spotPython.utils.prepare import get_values_from_dict
         >>> d = {"a": 1, "b": 2, "c": 3}
         >>> get_values_from_dict(d)
         array([1, 2, 3])
@@ -600,7 +661,8 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=
             The name of the json file that contains the hyper parameter dictionary.
             Optional. Default is None.
     Returns:
-        (dict): The function control dictionary.
+        (dict):
+            The function control dictionary.
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
             from spotRiver.data.river_hyper_dict import RiverHyperDict
@@ -624,6 +686,27 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=
 
 
 def get_one_core_model_from_X(X, fun_control=None):
+    """Get one core model from X.
+    Args:
+        X (np.array):
+            The array with the hyper parameter values.
+        fun_control (dict):
+            The function control dictionary.
+    Returns:
+        (class):
+            The core model.
+    Examples:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+            X = np.array([0, 0, 0, 0, 0])
+            get_one_core_model_from_X(X, fun_control)
+            HoeffdingAdaptiveTreeRegressor()
+    """
     var_dict = assign_values(X, fun_control["var_name"])
     config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
     core_model = fun_control["core_model"](**config)
@@ -631,12 +714,58 @@ def get_one_core_model_from_X(X, fun_control=None):
 
 
 def get_one_config_from_X(X, fun_control=None):
+    """Get one config from X.
+    Args:
+        X (np.array):
+            The array with the hyper parameter values.
+        fun_control (dict):
+            The function control dictionary.
+    Returns:
+        (dict):
+            The config dictionary.
+    Examples:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+            X = np.array([0, 0, 0, 0, 0])
+            get_one_config_from_X(X, fun_control)
+            {'leaf_prediction': 'mean',
+            'leaf_model': 'NBAdaptive',
+            'splitter': 'HoeffdingAdaptiveTreeSplitter',
+            'binary_split': 'info_gain',
+            'stop_mem_management': False}
+    """
     var_dict = assign_values(X, fun_control["var_name"])
     config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
     return config
 
 
 def get_one_sklearn_model_from_X(X, fun_control=None):
+    """Get one sklearn model from X.
+    Args:
+        X (np.array):
+            The array with the hyper parameter values.
+        fun_control (dict):
+            The function control dictionary.
+    Returns:
+        (class):
+            The sklearn model.
+    Examples:
+    >>> from sklearn.linear_model import LinearRegression
+        from spotRiver.data.sklearn_hyper_dict import SklearnHyperDict
+        fun_control = {}
+        add_core_model_to_fun_control(core_model=LinearRegression,
+            fun_control=func_control,
+            hyper_dict=SklearnHyperDict,
+            filename=None)
+        X = np.array([0, 0, 0, 0, 0])
+        get_one_sklearn_model_from_X(X, fun_control)
+        LinearRegression()
+    """
     core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
         model = make_pipeline(fun_control["prep_model"], core_model)
@@ -646,6 +775,30 @@ def get_one_sklearn_model_from_X(X, fun_control=None):
 
 
 def get_one_river_model_from_X(X, fun_control=None):
+    """Get one river model from X.
+
+    Args:
+        X (np.array):
+            The array with the hyper parameter values.
+        fun_control (dict):
+            The function control dictionary.
+
+    Returns:
+        (class):
+            The river model.
+
+    Examples:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+            X = np.array([0, 0, 0, 0, 0])
+            get_one_river_model_from_X(X, fun_control)
+            HoeffdingAdaptiveTreeRegressor()
+    """
     core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
         model = compose.Pipeline(fun_control["prep_model"], core_model)
@@ -655,6 +808,26 @@ def get_one_river_model_from_X(X, fun_control=None):
 
 
 def get_default_hyperparameters_as_array(fun_control) -> np.array:
+    """Get the default hyper parameters as array.
+    Args:
+        fun_control (dict):
+            The function control dictionary.
+
+    Returns:
+        (np.array):
+            The default hyper parameters as array.
+
+    Examples:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+            get_default_hyperparameters_as_array(fun_control)
+            array([0, 0, 0, 0, 0])
+    """
     X0 = get_default_values(fun_control)
     X0 = replace_levels_with_positions(fun_control["core_model_hyper_dict"], X0)
     X0 = get_values_from_dict(X0)
@@ -664,6 +837,30 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
 
 
 def get_default_hyperparameters_for_core_model(fun_control) -> dict:
+    """Get the default hyper parameters for the core model.
+    Args:
+        fun_control (dict):
+            The function control dictionary.
+
+    Returns:
+        (dict):
+            The default hyper parameters for the core model.
+
+    Examples:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+            get_default_hyperparameters_for_core_model(fun_control)
+            {'leaf_prediction': 'mean',
+            'leaf_model': 'NBAdaptive',
+            'splitter': 'HoeffdingAdaptiveTreeSplitter',
+            'binary_split': 'info_gain',
+            'stop_mem_management': False}
+    """
     values = get_default_values(fun_control)
     values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
     values = convert_keys(values, fun_control["var_type"])

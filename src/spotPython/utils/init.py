@@ -20,18 +20,26 @@ def fun_control_init(
 ):
     """Initialize fun_control dictionary.
     Args:
-        task (str): The task to perform. It can be either "classification" or "regression".
-        _L_in (int): The number of input features.
-        _L_out (int): The number of output features.
-        enable_progress_bar (bool): Whether to enable the progress bar or not.
-        spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
-        If None, no spot tensorboard files are saved.
-        num_workers (int): The number of workers to use for the data loading.
-        device (str): The device to use for the training. It can be either "cpu", "mps", or "cuda".
+        task (str):
+            The task to perform. It can be either "classification" or "regression".
+        _L_in (int):
+            The number of input features.
+        _L_out (int):
+            The number of output features.
+        enable_progress_bar (bool):
+            Whether to enable the progress bar or not.
+        spot_tensorboard_path (str):
+            The path to the folder where the spot tensorboard files are saved.
+            If None, no spot tensorboard files are saved.
+        num_workers (int):
+            The number of workers to use for the data loading.
+        device (str):
+            The device to use for the training. It can be either "cpu", "mps", or "cuda".
     Returns:
-        fun_control (dict): A dictionary containing the information about the core model, loss function, metrics,
-        and the hyperparameters.
-    Example:
+        fun_control (dict):
+            A dictionary containing the information about the core model,
+            loss function, metrics, and the hyperparameters.
+    Examples:
         >>> fun_control = fun_control_init(_L_in=64, _L_out=11, num_workers=0, device=None)
         >>> fun_control
         >>> {'CHECKPOINT_PATH': 'saved_models/',
@@ -147,7 +155,10 @@ def check_and_create_dir(path):
     Args:
         path (str): Path to the directory.
     Returns:
-        None
+        (noneType): None
+    Examples:
+        >>> fromspotPy.utils.init import check_and_create_dir
+        >>> check_and_create_dir("data/")
     """
     if not isinstance(path, str):
         raise Exception("path must be a string")

@@ -66,7 +66,7 @@ def load_pickle(filename: str):
     Args:
         filename (str): Name of the pickle file.
     Returns:
-        object: Loaded object.
+        (object): Loaded object.
     Examples:
         >>> from spotPython.utils.file import load_pickle
         >>> obj = load_pickle(filename="obj.pkl")

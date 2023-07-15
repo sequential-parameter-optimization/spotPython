@@ -20,8 +20,9 @@ def get_stars(input_list) -> list:
     Args:
         input_list (list): A list of values.
     Returns:
-        list: A list of strings.
-    Example:
+        (list):
+            A list of strings.
+    Examples:
         >>> from spotPython.utils.eda import convert_list
         >>> get_stars([100, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
         [***, '', '', '', '', '', '', '', '']
@@ -44,14 +45,31 @@ def get_stars(input_list) -> list:
 def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") -> str:
     """Generates a table with the design variables and their bounds.
     Args:
-        fun_control (dict): A dictionary with function design variables.
-        spot (object): A spot object. Defaults to None.
+        fun_control (dict):
+            A dictionary with function design variables.
+        spot (object):
+            A spot object. Defaults to None.
     Returns:
-        str: A table with the design variables, their default values, and their bounds.
+        (str):
+            a table with the design variables, their default values, and their bounds.
             If a spot object is provided,
-            the table will also include the value
-            and the importance of each hyperparameter.
-        Use the `print` function to display the table.
+            the table will also include the value and the importance of each hyperparameter.
+            Use the `print` function to display the table.
+    Examples:
+        >>> from spotPython.utils.eda import gen_design_table
+        >>> from spotPython.hyperparameters.values import get_default_values
+        >>> fun_control = {
+        ...     "x1": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x2": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x3": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x4": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x5": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x6": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x7": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x8": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x9": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x10": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ... }
     """
     default_values = get_default_values(fun_control)
     defaults = list(default_values.values())
@@ -96,6 +114,37 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
 
 
 def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Spot"]):
+    """Compares two tree models.
+    Args:
+        model1 (object):
+            A tree model.
+        model2 (object):
+            A tree model.
+        headers (list):
+            A list with the headers of the table.
+    Returns:
+        (str):
+            A table with the comparison of the two models.
+    Examples:
+        >>> from spotPython.utils.eda import compare_two_tree_models
+        >>> from spotPython.hyperparameters.values import get_default_values
+        >>> fun_control = {
+        ...     "x1": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x2": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x3": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x4": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x5": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x6": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x7": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x8": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x9": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ...     "x10": {"type": "int", "default": 1, "lower": 1, "upper": 10},
+        ... }
+        >>> default_values = get_default_values(fun_control)
+        >>> model1 = spot_tuner.get_model("rf", default_values)
+        >>> model2 = spot_tuner.get_model("rf", default_values)
+        >>> compare_two_tree_models(model1, model2)
+    """
     keys = model1.summary.keys()
     values1 = model1.summary.values()
     values2 = model2.summary.values()
@@ -108,9 +157,16 @@ def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Sp
 def generate_config_id(config):
     """Generates a unique id for a configuration.
     Args:
-        config (dict): A dictionary with the configuration.
+        config (dict):
+            A dictionary with the configuration.
     Returns:
-        str: A unique id for the configuration.
+        (str):
+            A unique id for the configuration.
+    Examples:
+        >>> from spotPython.hyperparameters.values import get_one_config_from_X
+        >>> X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))
+        >>> config = get_one_config_from_X(X, fun_control)
+        >>> generate_config_id(config)
     """
     config_id = ""
     for key in config:
@@ -120,16 +176,17 @@ def generate_config_id(config):
 
 def visualize_activations(net, device="cpu", color="C0"):
     """Visualizes the activations of a neural network.
-    Code is based on:
-    PyTorch Lightning TUTORIAL 2: ACTIVATION FUNCTIONS,
-    Author: Phillip Lippe,
-    License: CC BY-SA.
+    Code is based on: PyTorch Lightning TUTORIAL 2: ACTIVATION FUNCTIONS, Author: Phillip Lippe,
+        License: CC BY-SA.
 
     Args:
-        net (object): A neural network.
-        device (str, optional): The device to use. Defaults to "cpu".
-        color (str, optional): The color to use. Defaults to "C0".
-    Example:
+        net (object):
+            A neural network.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
+        color (str, optional):
+            The color to use. Defaults to "C0".
+    Examples:
         >>> from spotPython.hyperparameters.values import get_one_config_from_X
         >>> X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))
         >>> config = get_one_config_from_X(X, fun_control)

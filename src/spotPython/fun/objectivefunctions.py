@@ -442,7 +442,7 @@ class analytical:
                 dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+            (np.ndarray): A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical
@@ -485,7 +485,7 @@ class analytical:
                 dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+            (np.ndarray): A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical

@@ -1,6 +1,7 @@
 import torchmetrics
 import torch
 import numpy as np
+from typing import List
 
 
 class MAPK(torchmetrics.Metric):
@@ -10,28 +11,32 @@ class MAPK(torchmetrics.Metric):
     This class inherits from the `Metric` class of the `torchmetrics` library.
 
     Args:
-        k (int): The number of top predictions to consider when calculating the metric.
-        dist_sync_on_step (bool): Whether to synchronize the metric states across processes during the forward pass.
+        k (int):
+            The number of top predictions to consider when calculating the metric.
+        dist_sync_on_step (bool):
+            Whether to synchronize the metric states across processes during the forward pass.
 
     Attributes:
-        total (torch.Tensor): The cumulative sum of the metric scores across all batches.
-        count (torch.Tensor): The number of batches processed.
+        total (torch.Tensor):
+            The cumulative sum of the metric scores across all batches.
+        count (torch.Tensor):
+            The number of batches processed.
 
-    Example:
-        from spotPython.torch.mapk import MAPK
-        import torch
-        mapk = MAPK(k=2)
-        target = torch.tensor([0, 1, 2, 2])
-        preds = torch.tensor(
-            [
-                [0.5, 0.2, 0.2],  # 0 is in top 2
-                [0.3, 0.4, 0.2],  # 1 is in top 2
-                [0.2, 0.4, 0.3],  # 2 is in top 2
-                [0.7, 0.2, 0.1],  # 2 isn't in top 2
-            ]
-        )
-        mapk.update(preds, target)
-        print(mapk.compute()) # tensor(0.6250)
+    Examples:
+        >>> from spotPython.torch.mapk import MAPK
+            import torch
+            mapk = MAPK(k=2)
+            target = torch.tensor([0, 1, 2, 2])
+            preds = torch.tensor(
+                [
+                    [0.5, 0.2, 0.2],  # 0 is in top 2
+                    [0.3, 0.4, 0.2],  # 1 is in top 2
+                    [0.2, 0.4, 0.3],  # 2 is in top 2
+                    [0.7, 0.2, 0.1],  # 2 isn't in top 2
+                ]
+            )
+            mapk.update(preds, target)
+            print(mapk.compute()) # tensor(0.6250)
     """
 
     def __init__(self, k=10, dist_sync_on_step=False):
@@ -45,13 +50,17 @@ class MAPK(torchmetrics.Metric):
         Update the state variables with a new batch of data.
 
         Args:
-            predicted (torch.Tensor): A 2D tensor containing the predicted scores for each class.
-            actual (torch.Tensor): A 1D tensor containing the ground truth labels.
-
+            predicted (torch.Tensor):
+                A 2D tensor containing the predicted scores for each class.
+            actual (torch.Tensor):
+                A 1D tensor containing the ground truth labels.
+        Returns:
+            (NoneType): None
 
         Raises:
-            AssertionError: If `actual` is not a 1D tensor or if `predicted` is not a 2D tensor
-            or if `actual` and `predicted` do not have the same number of elements.
+            AssertionError:
+                If `actual` is not a 1D tensor or if `predicted` is not a 2D tensor
+                or if `actual` and `predicted` do not have the same number of elements.
         """
         assert len(actual.shape) == 1, "actual must be a 1D tensor"
         assert len(predicted.shape) == 2, "predicted must be a 2D tensor"
@@ -70,17 +79,29 @@ class MAPK(torchmetrics.Metric):
         self.total = self.total + score
         self.count = self.count + 1
 
-    def compute(self):
+    def compute(self) -> float:
         """
         Compute the mean average precision at k.
 
+        Args:
+            self (MAPK):
+                The current instance of the class.
+
         Returns:
-            float: The mean average precision at k.
+            (float):
+                The mean average precision at k.
+
+        Examples:
+            >>> evaluator = Evaluator()
+            >>> evaluator.total = 3.0
+            >>> evaluator.count = 2
+            >>> evaluator.compute()
+            1.5
         """
         return self.total / self.count
 
     @staticmethod
-    def apk(predicted, actual, k=10):
+    def apk(predicted: List[int], actual: List[int], k: int = 10) -> float:
         """
         Calculate the average precision at k for a single pair of actual and predicted labels.
 
@@ -91,6 +112,10 @@ class MAPK(torchmetrics.Metric):
 
         Returns:
             float: The average precision at k.
+
+        Examples:
+            >>> Evaluator.apk([1, 3, 2, 4], [1, 2, 3], 3)
+            0.8888888888888888
         """
         if not actual:
             return 0.0

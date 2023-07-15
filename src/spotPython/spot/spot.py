@@ -128,7 +128,7 @@ class Spot:
             "max_iter": `1000`.
 
     Returns:
-        None
+        (NoneType): None
 
     Note:
         Description in the source code refers to [bart21i]:
@@ -656,12 +656,17 @@ class Spot:
     ) -> None:
         """Plot the progress of the hyperparameter tuning (optimization).
         Args:
-            show (bool): Show the plot.
-            log_x (bool): Use logarithmic scale for x-axis.
-            log_y (bool): Use logarithmic scale for y-axis.
-            filename (str): Filename to save the plot.
-            style (list): Style of the plot. Default: ['k', 'ro-'], i.e., the initial points are plotted as a black line
-            and the subsequent points as red dots connected by a line.
+            show (bool):
+                Show the plot.
+            log_x (bool):
+                Use logarithmic scale for x-axis.
+            log_y (bool):
+                Use logarithmic scale for y-axis.
+            filename (str):
+                Filename to save the plot.
+            style (list):
+                Style of the plot. Default: ['k', 'ro-'], i.e., the initial points are plotted as a black line
+                and the subsequent points as red dots connected by a line.
         Returns:
             None
         """
@@ -779,9 +784,9 @@ class Spot:
             j (int): The index of the element to be changed to `y`.
 
         Returns:
-            list or numpy.ndarray: The modified array.
+            (list) or (numpy.ndarray): The modified array.
 
-        Example:
+        Examples:
             >>> z0 = [1, 2, 3]
             >>> chg(4, 5, z0, 0, 2)
             [4, 2, 5]
