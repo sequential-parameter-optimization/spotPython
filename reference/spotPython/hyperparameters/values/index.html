@@ -2125,10 +2125,10 @@ and returns a dictionary where the keys are the variable names and the values ar
 <blockquote>
 <p>import numpy as np
 X = np.array([[1, 2], [3, 4], [5, 6]])
-var_list = ['a', 'b']
+var_list = [&lsquo;a&rsquo;, &lsquo;b&rsquo;]
 result = assign_values(X, var_list)
 print(result)
-{'a': array([1, 3, 5]), 'b': array([2, 4, 6])}</p>
+{&lsquo;a&rsquo;: array([1, 3, 5]), &lsquo;b&rsquo;: array([2, 4, 6])}</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -2274,10 +2274,10 @@ the value associated with that key is converted to an integer.</p>
   <blockquote>
 <blockquote>
 <blockquote>
-<p>d = {'a': '1.1', 'b': '2', 'c': '3.1'}
-var_type = ["int", "num", "int"]
+<p>d = {&lsquo;a&rsquo;: &lsquo;1.1&rsquo;, &lsquo;b&rsquo;: &lsquo;2&rsquo;, &lsquo;c&rsquo;: &lsquo;3.1&rsquo;}
+var_type = [&ldquo;int&rdquo;, &ldquo;num&rdquo;, &ldquo;int&rdquo;]
 convert_keys(d, var_type)
-{'a': 1, 'b': '2', 'c': 3}</p>
+{&lsquo;a&rsquo;: 1, &lsquo;b&rsquo;: &lsquo;2&rsquo;, &lsquo;c&rsquo;: 3}</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -2394,8 +2394,8 @@ with the values from the arrays in the dictionary.</p>
           <td>
             <div class="doc-md-description">
               <p>A dictionary which (at least) has an entry with the following key:
-- "var_type": A list of variable types. If the entry is not "num" the corresponding
-value will be converted to the type "int".</p>
+- &ldquo;var_type&rdquo;: A list of variable types. If the entry is not &ldquo;num&rdquo; the corresponding
+value will be converted to the type &ldquo;int&rdquo;.</p>
             </div>
           </td>
           <td>
@@ -2433,10 +2433,10 @@ value will be converted to the type "int".</p>
 <blockquote>
 <blockquote>
 <p>import numpy as np
-var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-fun_control = {"var_type": ["int", "num"]}
+var_dict = {&lsquo;a&rsquo;: np.array([1, 3, 5]), &lsquo;b&rsquo;: np.array([2, 4, 6])}
+fun_control = {&ldquo;var_type&rdquo;: [&ldquo;int&rdquo;, &ldquo;num&rdquo;]}
 generate_one_config_from_var_dict(var_dict, fun_control)
-{'a': 1, 'b': 2}</p>
+{&lsquo;a&rsquo;: 1, &lsquo;b&rsquo;: 2}</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -2507,13 +2507,13 @@ generate_one_config_from_var_dict(var_dict, fun_control)
   <div class="doc doc-contents ">
   
       <p>Generate a list from a dictionary.
-It takes the values from the keys "bound" in the
-fun_control[]"core_model_hyper_dict"] dictionary and
+It takes the values from the keys &ldquo;bound&rdquo; in the
+fun_control[]&rdquo;core_model_hyper_dict&rdquo;] dictionary and
 returns a list of the values in the same order as the keys in the
 dictionary.
 For example if the dictionary is
-{"a": {"upper": 1}, "b": {"upper": 2}}
-the list is [1, 2] if bound="upper".</p>
+{&ldquo;a&rdquo;: {&ldquo;upper&rdquo;: 1}, &ldquo;b&rdquo;: {&ldquo;upper&rdquo;: 2}}
+the list is [1, 2] if bound=&rdquo;upper&rdquo;.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2547,7 +2547,7 @@ the list is [1, 2] if bound="upper".</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>either "upper" or "lower"</p>
+              <p>either &ldquo;upper&rdquo; or &ldquo;lower&rdquo;</p>
             </div>
           </td>
           <td>
@@ -2650,8 +2650,8 @@ the list is [1, 2] if bound="upper".</p>
 
   <div class="doc doc-contents ">
   
-      <p>Get the values from the "default" keys from the dictionary fun_control as a dict.
-If the key of the value has as "type" the value "int" or "float", convert the value to the corresponding type.</p>
+      <p>Get the values from the &ldquo;default&rdquo; keys from the dictionary fun_control as a dict.
+If the key of the value has as &ldquo;type&rdquo; the value &ldquo;int&rdquo; or &ldquo;float&rdquo;, convert the value to the corresponding type.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2708,38 +2708,38 @@ If the key of the value has as "type" the value "int" or "float", convert the va
   <blockquote>
 <blockquote>
 <blockquote>
-<p>d = {"core_model_hyper_dict":{
-        "leaf_prediction": {
-            "levels": ["mean", "model", "adaptive"],
-            "type": "factor",
-            "default": "mean",
-            "core_model_parameter_type": "str"},
-        "leaf_model": {
-            "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-            "type": "factor",
-            "default": "LinearRegression",
-            "core_model_parameter_type": "instance"},
-        "splitter": {
-            "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-            "type": "factor",
-            "default": "EBSTSplitter",
-            "core_model_parameter_type": "instance()"},
-        "binary_split": {
-            "levels": [0, 1],
-            "type": "factor",
-            "default": 0,
-            "core_model_parameter_type": "bool"},
-        "stop_mem_management": {
-            "levels": [0, 1],
-            "type": "factor",
-            "default": 0,
-            "core_model_parameter_type": "bool"}}}
+<p>d = {&ldquo;core_model_hyper_dict&rdquo;:{
+        &ldquo;leaf_prediction&rdquo;: {
+            &ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+            &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+            &ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+            &ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;},
+        &ldquo;leaf_model&rdquo;: {
+            &ldquo;levels&rdquo;: [&ldquo;linear_model.LinearRegression&rdquo;, &ldquo;linear_model.PARegressor&rdquo;, &ldquo;linear_model.Perceptron&rdquo;],
+            &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+            &ldquo;default&rdquo;: &ldquo;LinearRegression&rdquo;,
+            &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance&rdquo;},
+        &ldquo;splitter&rdquo;: {
+            &ldquo;levels&rdquo;: [&ldquo;EBSTSplitter&rdquo;, &ldquo;TEBSTSplitter&rdquo;, &ldquo;QOSplitter&rdquo;],
+            &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+            &ldquo;default&rdquo;: &ldquo;EBSTSplitter&rdquo;,
+            &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance()&rdquo;},
+        &ldquo;binary_split&rdquo;: {
+            &ldquo;levels&rdquo;: [0, 1],
+            &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+            &ldquo;default&rdquo;: 0,
+            &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;},
+        &ldquo;stop_mem_management&rdquo;: {
+            &ldquo;levels&rdquo;: [0, 1],
+            &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+            &ldquo;default&rdquo;: 0,
+            &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;}}}
 get_default_values_from_dict(d)
-{'leaf_prediction': 'mean',
-'leaf_model': 'linear_model.LinearRegression',
-'splitter': 'EBSTSplitter',
-'binary_split': 0,
-'stop_mem_management': 0}</p>
+{&lsquo;leaf_prediction&rsquo;: &lsquo;mean&rsquo;,
+&lsquo;leaf_model&rsquo;: &lsquo;linear_model.LinearRegression&rsquo;,
+&lsquo;splitter&rsquo;: &lsquo;EBSTSplitter&rsquo;,
+&lsquo;binary_split&rsquo;: 0,
+&lsquo;stop_mem_management&rsquo;: 0}</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -2874,56 +2874,56 @@ If the key value in the dictionary is 0, it takes the first value from the list,
 if it is 1, it takes the second and so on.
 If a key is not in fun_control, it takes the key from v.
 If the core_model_parameter_type value is instance, it returns the class of the value from the module
-via getattr("class", value).
+via getattr(&ldquo;class&rdquo;, value).
 For example,
-if fun_control = {"HoeffdingTreeRegressor":{
-    "leaf_prediction": {
-        "levels": ["mean", "model", "adaptive"],
-        "type": "factor",
-        "default": "mean",
-        "core_model_parameter_type": "str"},
-    "leaf_model": {
-        "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-        "type": "factor",
-        "default": "LinearRegression",
-        "core_model_parameter_type": "instance"},
-        "splitter": {"levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-        "type": "factor",
-        "default": "EBSTSplitter", "core_model_parameter_type": "instance()"},
-    "binary_split": {
-        "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "core_model_parameter_type": "bool"},
-    "stop_mem_management": {
-        "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "core_model_parameter_type": "bool"}}}
+if fun_control = {&ldquo;HoeffdingTreeRegressor&rdquo;:{
+    &ldquo;leaf_prediction&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;},
+    &ldquo;leaf_model&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;linear_model.LinearRegression&rdquo;, &ldquo;linear_model.PARegressor&rdquo;, &ldquo;linear_model.Perceptron&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;LinearRegression&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance&rdquo;},
+        &ldquo;splitter&rdquo;: {&ldquo;levels&rdquo;: [&ldquo;EBSTSplitter&rdquo;, &ldquo;TEBSTSplitter&rdquo;, &ldquo;QOSplitter&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;EBSTSplitter&rdquo;, &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance()&rdquo;},
+    &ldquo;binary_split&rdquo;: {
+        &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;},
+    &ldquo;stop_mem_management&rdquo;: {
+        &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;}}}
     and
-    v = {'grace_period': 200,
-        'max_depth': 10,
-        'delta': 1e-07,
-        'tau': 0.05,
-        'leaf_prediction': 0,
-        'leaf_model': 0,
-        'model_selector_decay': 0.95,
-        'splitter': 1,
-        'min_samples_split': 9,
-        'binary_split': 0,
-        'max_size': 500.0}
+    v = {&lsquo;grace_period&rsquo;: 200,
+        &lsquo;max_depth&rsquo;: 10,
+        &lsquo;delta&rsquo;: 1e-07,
+        &lsquo;tau&rsquo;: 0.05,
+        &lsquo;leaf_prediction&rsquo;: 0,
+        &lsquo;leaf_model&rsquo;: 0,
+        &lsquo;model_selector_decay&rsquo;: 0.95,
+        &lsquo;splitter&rsquo;: 1,
+        &lsquo;min_samples_split&rsquo;: 9,
+        &lsquo;binary_split&rsquo;: 0,
+        &lsquo;max_size&rsquo;: 500.0}
     then the function returns
-    {'grace_period': 200,
-    'max_depth': 10,
-    'delta': 1e-07,
-    'tau': 0.05,
-    'leaf_prediction': 'mean',
-    'leaf_model': linear_model.LinearRegression,
-    'model_selector_decay': 0.95,
-    'splitter': 'TEBSTSplitter',
-    'min_samples_split': 9,
-    'binary_split': 0,
-    'max_size': 500.0}.</p>
+    {&lsquo;grace_period&rsquo;: 200,
+    &lsquo;max_depth&rsquo;: 10,
+    &lsquo;delta&rsquo;: 1e-07,
+    &lsquo;tau&rsquo;: 0.05,
+    &lsquo;leaf_prediction&rsquo;: &lsquo;mean&rsquo;,
+    &lsquo;leaf_model&rsquo;: linear_model.LinearRegression,
+    &lsquo;model_selector_decay&rsquo;: 0.95,
+    &lsquo;splitter&rsquo;: &lsquo;TEBSTSplitter&rsquo;,
+    &lsquo;min_samples_split&rsquo;: 9,
+    &lsquo;binary_split&rsquo;: 0,
+    &lsquo;max_size&rsquo;: 500.0}.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -2994,14 +2994,14 @@ if fun_control = {"HoeffdingTreeRegressor":{
   <blockquote>
 <blockquote>
 <blockquote>
-<p>fun_control = {"HoeffdingTreeRegressor":{
-        "leaf_prediction": {"levels": ["mean", "model", "adaptive"],
-                            "type": "factor",
-                            "default": "mean",
-                            "core_model_parameter_type": "str"}}}
-    v = {"leaf_prediction": 0}
+<p>fun_control = {&ldquo;HoeffdingTreeRegressor&rdquo;:{
+        &ldquo;leaf_prediction&rdquo;: {&ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+                            &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+                            &ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+                            &ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;}}}
+    v = {&ldquo;leaf_prediction&rdquo;: 0}
     get_dict_with_levels_and_types(fun_control, v)
-    {"leaf_prediction": "mean"}</p>
+    {&ldquo;leaf_prediction&rdquo;: &ldquo;mean&rdquo;}</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -3276,41 +3276,41 @@ if fun_control = {"HoeffdingTreeRegressor":{
   <blockquote>
 <blockquote>
 <blockquote>
-<p>d = {"core_model_hyper_dict":{
-    "leaf_prediction": {
-        "levels": ["mean", "model", "adaptive"],
-        "type": "factor",
-        "default": "mean",
-        "transform": "None",
-        "core_model_parameter_type": "str"},
-    "leaf_model": {
-        "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-        "type": "factor",
-        "default": "LinearRegression",
-        "transform": "None",
-        "core_model_parameter_type": "instance"},
-    "splitter": {
-        "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-        "type": "factor",
-        "default": "EBSTSplitter",
-        "transform": "None",
-        "core_model_parameter_type": "instance()"},
-    "binary_split": {
-        "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "transform": "None",
-        "core_model_parameter_type": "bool"},
-    "stop_mem_management": {                                                         "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "transform": "None",
-        "core_model_parameter_type": "bool"}}}</p>
+<p>d = {&ldquo;core_model_hyper_dict&rdquo;:{
+    &ldquo;leaf_prediction&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+        &ldquo;transform&rdquo;: &ldquo;None&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;},
+    &ldquo;leaf_model&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;linear_model.LinearRegression&rdquo;, &ldquo;linear_model.PARegressor&rdquo;, &ldquo;linear_model.Perceptron&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;LinearRegression&rdquo;,
+        &ldquo;transform&rdquo;: &ldquo;None&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance&rdquo;},
+    &ldquo;splitter&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;EBSTSplitter&rdquo;, &ldquo;TEBSTSplitter&rdquo;, &ldquo;QOSplitter&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;EBSTSplitter&rdquo;,
+        &ldquo;transform&rdquo;: &ldquo;None&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance()&rdquo;},
+    &ldquo;binary_split&rdquo;: {
+        &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;transform&rdquo;: &ldquo;None&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;},
+    &ldquo;stop_mem_management&rdquo;: {                                                         &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;transform&rdquo;: &ldquo;None&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;}}}</p>
 </blockquote>
 </blockquote>
 </blockquote>
 <p>get_transform(d)
-['None', 'None', 'None', 'None', 'None']</p>
+[&lsquo;None&rsquo;, &lsquo;None&rsquo;, &lsquo;None&rsquo;, &lsquo;None&rsquo;, &lsquo;None&rsquo;]</p>
 </details>
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/hyperparameters/values.py</code></summary>
@@ -3478,7 +3478,7 @@ in the same order as the keys of the dictionary.</p>
   <blockquote>
 <blockquote>
 <blockquote>
-<p>d = {"a": 1, "b": 2, "c": 3}
+<p>d = {&ldquo;a&rdquo;: 1, &ldquo;b&rdquo;: 2, &ldquo;c&rdquo;: 3}
 get_values_from_dict(d)
 array([1, 2, 3])</p>
 </blockquote>
@@ -3589,36 +3589,36 @@ array([1, 2, 3])</p>
   <blockquote>
 <blockquote>
 <blockquote>
-<p>d = {"core_model_hyper_dict":{
-    "leaf_prediction": {
-        "levels": ["mean", "model", "adaptive"],
-        "type": "factor",
-        "default": "mean",
-        "core_model_parameter_type": "str"},
-    "leaf_model": {
-        "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-        "type": "factor",
-        "default": "LinearRegression",
-        "core_model_parameter_type": "instance"},
-    "splitter": {
-        "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-        "type": "factor",
-        "default": "EBSTSplitter",
-        "core_model_parameter_type": "instance()"},
-    "binary_split": {
-        "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "core_model_parameter_type": "bool"},
-    "stop_mem_management": {                                                         "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "core_model_parameter_type": "bool"}}}</p>
+<p>d = {&ldquo;core_model_hyper_dict&rdquo;:{
+    &ldquo;leaf_prediction&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;},
+    &ldquo;leaf_model&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;linear_model.LinearRegression&rdquo;, &ldquo;linear_model.PARegressor&rdquo;, &ldquo;linear_model.Perceptron&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;LinearRegression&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance&rdquo;},
+    &ldquo;splitter&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;EBSTSplitter&rdquo;, &ldquo;TEBSTSplitter&rdquo;, &ldquo;QOSplitter&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;EBSTSplitter&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance()&rdquo;},
+    &ldquo;binary_split&rdquo;: {
+        &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;},
+    &ldquo;stop_mem_management&rdquo;: {                                                         &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;}}}</p>
 </blockquote>
 </blockquote>
 </blockquote>
 <p>get_var_name(d)
-['leaf_prediction', 'leaf_model', 'splitter', 'binary_split', 'stop_mem_management']</p>
+[&lsquo;leaf_prediction&rsquo;, &lsquo;leaf_model&rsquo;, &lsquo;splitter&rsquo;, &lsquo;binary_split&rsquo;, &lsquo;stop_mem_management&rsquo;]</p>
 </details>
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/hyperparameters/values.py</code></summary>
@@ -3770,36 +3770,36 @@ array([1, 2, 3])</p>
   <blockquote>
 <blockquote>
 <blockquote>
-<p>d = {"core_model_hyper_dict":{
-    "leaf_prediction": {
-        "levels": ["mean", "model", "adaptive"],
-        "type": "factor",
-        "default": "mean",
-        "core_model_parameter_type": "str"},
-    "leaf_model": {
-        "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-        "type": "factor",
-        "default": "LinearRegression",
-        "core_model_parameter_type": "instance"},
-    "splitter": {
-        "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-        "type": "factor",
-        "default": "EBSTSplitter",
-        "core_model_parameter_type": "instance()"},
-    "binary_split": {
-        "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "core_model_parameter_type": "bool"},
-    "stop_mem_management": {                                                         "levels": [0, 1],
-        "type": "factor",
-        "default": 0,
-        "core_model_parameter_type": "bool"}}}</p>
+<p>d = {&ldquo;core_model_hyper_dict&rdquo;:{
+    &ldquo;leaf_prediction&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;},
+    &ldquo;leaf_model&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;linear_model.LinearRegression&rdquo;, &ldquo;linear_model.PARegressor&rdquo;, &ldquo;linear_model.Perceptron&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;LinearRegression&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance&rdquo;},
+    &ldquo;splitter&rdquo;: {
+        &ldquo;levels&rdquo;: [&ldquo;EBSTSplitter&rdquo;, &ldquo;TEBSTSplitter&rdquo;, &ldquo;QOSplitter&rdquo;],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: &ldquo;EBSTSplitter&rdquo;,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance()&rdquo;},
+    &ldquo;binary_split&rdquo;: {
+        &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;},
+    &ldquo;stop_mem_management&rdquo;: {                                                         &ldquo;levels&rdquo;: [0, 1],
+        &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+        &ldquo;default&rdquo;: 0,
+        &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;}}}</p>
 </blockquote>
 </blockquote>
 </blockquote>
 <p>get_var_type(d)
-['factor', 'factor', 'factor', 'factor', 'factor']</p>
+[&lsquo;factor&rsquo;, &lsquo;factor&rsquo;, &lsquo;factor&rsquo;, &lsquo;factor&rsquo;, &lsquo;factor&rsquo;]</p>
 </details>
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/hyperparameters/values.py</code></summary>
@@ -3956,12 +3956,12 @@ yields the values from the arrays in the dictionary.</p>
 <blockquote>
 <blockquote>
 <p>import numpy as np
-var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+var_dict = {&lsquo;a&rsquo;: np.array([1, 3, 5]), &lsquo;b&rsquo;: np.array([2, 4, 6])}
 for values in iterate_dict_values(var_dict):
-...     print(values)
-{'a': 1, 'b': 2}
-{'a': 3, 'b': 4}
-{'a': 5, 'b': 6}</p>
+&hellip;     print(values)
+{&lsquo;a&rsquo;: 1, &lsquo;b&rsquo;: 2}
+{&lsquo;a&rsquo;: 3, &lsquo;b&rsquo;: 4}
+{&lsquo;a&rsquo;: 5, &lsquo;b&rsquo;: 6}</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -4118,10 +4118,10 @@ and the second value represents the upper bound.</p>
 <blockquote>
 <p>fun_control = {}
     core_model  = HoeffdingTreeRegressor
-    fun_control.update({"core_model": core_model})
-    fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.<strong>name</strong>]})
+    fun_control.update({&ldquo;core_model&rdquo;: core_model})
+    fun_control.update({&ldquo;core_model_hyper_dict&rdquo;: river_hyper_dict[core_model.<strong>name</strong>]})
     bounds = [3, 11]
-    fun_control = modify_hyper_parameter_levels(fun_control, "min_samples_split", bounds)</p>
+    fun_control = modify_hyper_parameter_levels(fun_control, &ldquo;min_samples_split&rdquo;, bounds)</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -4273,10 +4273,10 @@ and the second value represents the upper bound.</p>
 <blockquote>
 <p>fun_control = {}
     core_model  = HoeffdingTreeRegressor
-    fun_control.update({"core_model": core_model})
-    fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.<strong>name</strong>]})
-    levels = ["mean", "model"]
-    fun_control = modify_hyper_parameter_levels(fun_control, "leaf_prediction", levels)</p>
+    fun_control.update({&ldquo;core_model&rdquo;: core_model})
+    fun_control.update({&ldquo;core_model_hyper_dict&rdquo;: river_hyper_dict[core_model.<strong>name</strong>]})
+    levels = [&ldquo;mean&rdquo;, &ldquo;model&rdquo;]
+    fun_control = modify_hyper_parameter_levels(fun_control, &ldquo;leaf_prediction&rdquo;, levels)</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -4345,16 +4345,16 @@ and the second value represents the upper bound.</p>
       <p>Replace the levels with the position in the levels list.
 The function that takes two dictionaries.
 The first contains as hyperparameters as keys.
-If the hyperparameter has the key "levels",
+If the hyperparameter has the key &ldquo;levels&rdquo;,
 then the value of the corresponding hyperparameter in the second dictionary is
 replaced by the position of the value in the list of levels.
 The function returns a dictionary with the same keys as the second dictionary.
-For example, if the second dictionary is {"a": 1, "b": "model1", "c": 3}
+For example, if the second dictionary is {&ldquo;a&rdquo;: 1, &ldquo;b&rdquo;: &ldquo;model1&rdquo;, &ldquo;c&rdquo;: 3}
 and the first dictionary is {
-    "a": {"type": "int"},
-    "b": {"levels": ["model4", "model5", "model1"]},
-    "d": {"type": "float"}},
-then the function should return {"a": 1, "b": 2, "c": 3}.</p>
+    &ldquo;a&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;},
+    &ldquo;b&rdquo;: {&ldquo;levels&rdquo;: [&ldquo;model4&rdquo;, &ldquo;model5&rdquo;, &ldquo;model1&rdquo;]},
+    &ldquo;d&rdquo;: {&ldquo;type&rdquo;: &ldquo;float&rdquo;}},
+then the function should return {&ldquo;a&rdquo;: 1, &ldquo;b&rdquo;: 2, &ldquo;c&rdquo;: 3}.</p>
 
   <p><strong>Parameters:</strong></p>
   <table>
@@ -4425,42 +4425,42 @@ then the function should return {"a": 1, "b": 2, "c": 3}.</p>
   <blockquote>
 <blockquote>
 <blockquote>
-<p>hyper_dict = {"leaf_prediction": {
-"levels": ["mean", "model", "adaptive"],
-"type": "factor",
-"default": "mean",
-"core_model_parameter_type": "str"},
-"leaf_model": {
-    "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-    "type": "factor",
-    "default": "LinearRegression",
-    "core_model_parameter_type": "instance"},
-"splitter": {
-    "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-    "type": "factor",
-    "default": "EBSTSplitter",
-    "core_model_parameter_type": "instance()"},
-"binary_split": {
-    "levels": [0, 1],
-    "type": "factor",
-    "default": 0,
-    "core_model_parameter_type": "bool"},
-"stop_mem_management": {
-    "levels": [0, 1],
-    "type": "factor",
-    "default": 0,
-    "core_model_parameter_type": "bool"}}
-hyper_dict_values = {"leaf_prediction": "mean",
-"leaf_model": "linear_model.LinearRegression",
-"splitter": "EBSTSplitter",
-"binary_split": 0,
-"stop_mem_management": 0}
+<p>hyper_dict = {&ldquo;leaf_prediction&rdquo;: {
+&ldquo;levels&rdquo;: [&ldquo;mean&rdquo;, &ldquo;model&rdquo;, &ldquo;adaptive&rdquo;],
+&ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+&ldquo;default&rdquo;: &ldquo;mean&rdquo;,
+&ldquo;core_model_parameter_type&rdquo;: &ldquo;str&rdquo;},
+&ldquo;leaf_model&rdquo;: {
+    &ldquo;levels&rdquo;: [&ldquo;linear_model.LinearRegression&rdquo;, &ldquo;linear_model.PARegressor&rdquo;, &ldquo;linear_model.Perceptron&rdquo;],
+    &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+    &ldquo;default&rdquo;: &ldquo;LinearRegression&rdquo;,
+    &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance&rdquo;},
+&ldquo;splitter&rdquo;: {
+    &ldquo;levels&rdquo;: [&ldquo;EBSTSplitter&rdquo;, &ldquo;TEBSTSplitter&rdquo;, &ldquo;QOSplitter&rdquo;],
+    &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+    &ldquo;default&rdquo;: &ldquo;EBSTSplitter&rdquo;,
+    &ldquo;core_model_parameter_type&rdquo;: &ldquo;instance()&rdquo;},
+&ldquo;binary_split&rdquo;: {
+    &ldquo;levels&rdquo;: [0, 1],
+    &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+    &ldquo;default&rdquo;: 0,
+    &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;},
+&ldquo;stop_mem_management&rdquo;: {
+    &ldquo;levels&rdquo;: [0, 1],
+    &ldquo;type&rdquo;: &ldquo;factor&rdquo;,
+    &ldquo;default&rdquo;: 0,
+    &ldquo;core_model_parameter_type&rdquo;: &ldquo;bool&rdquo;}}
+hyper_dict_values = {&ldquo;leaf_prediction&rdquo;: &ldquo;mean&rdquo;,
+&ldquo;leaf_model&rdquo;: &ldquo;linear_model.LinearRegression&rdquo;,
+&ldquo;splitter&rdquo;: &ldquo;EBSTSplitter&rdquo;,
+&ldquo;binary_split&rdquo;: 0,
+&ldquo;stop_mem_management&rdquo;: 0}
 replace_levels_with_position(hyper_dict, hyper_dict_values)
-{'leaf_prediction': 0,
-'leaf_model': 0,
-'splitter': 0,
-'binary_split': 0,
-'stop_mem_management': 0}</p>
+{&lsquo;leaf_prediction&rsquo;: 0,
+&lsquo;leaf_model&rsquo;: 0,
+&lsquo;splitter&rsquo;: 0,
+&lsquo;binary_split&rsquo;: 0,
+&lsquo;stop_mem_management&rsquo;: 0}</p>
 </blockquote>
 </blockquote>
 </blockquote>
