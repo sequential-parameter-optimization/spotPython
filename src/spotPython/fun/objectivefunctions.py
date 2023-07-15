@@ -4,7 +4,7 @@ from random import random
 from typing import List, Optional, Dict
 
 
-class Analytical:
+class analytical:
     """
     Class for analytical test functions.
 
@@ -39,7 +39,7 @@ class Analytical:
         self.fun_control = {"sigma": 0, "seed": None, "sel_var": None}
 
     def __repr__(self) -> str:
-        return f"Analytical(offset={self.offset}, hz={self.hz}, seed={self.seed})"
+        return f"analytical(offset={self.offset}, hz={self.hz}, seed={self.seed})"
 
     def add_noise(self, y: List[float]) -> np.ndarray:
         """
@@ -49,17 +49,17 @@ class Analytical:
         containing the noisy data.
 
         Args:
-            self (Analytical): Analytical class object.
+            self (analytical): analytical class object.
             y (List[float]): Input data.
 
         Returns:
             np.ndarray: Noisy data.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import Analytical
+            >>> from spotPython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> y = np.array([1, 2, 3, 4, 5])
-            >>> fun = Analytical()
+            >>> fun = analytical()
             >>> fun.add_noise(y)
             array([1.        , 2.        , 3.        , 4.        , 5.        ])
 
@@ -93,10 +93,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import Analytical
+            >>> from spotPython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = Analytical()
+            >>> fun = analytical()
             >>> fun.fun_branin_factor(X)
         """
         if fun_control is None:

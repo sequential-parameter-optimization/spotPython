@@ -33,7 +33,7 @@ from spotPython.utils.repair import repair_non_numeric
 from spotPython.utils.aggregate import aggregate_mean_var
 import logging
 import numpy as np
-from typing import List, Union, Tuple, Any, Optional, Object
+from typing import List, Union, Tuple, Any, Optional
 
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ logger.addHandler(py_handler)
 
 class Kriging(surrogates):
     def __init__(
-            self: Object,
+            self: object,
             noise: bool = False,
             cod_type: Optional[str] = "norm",
             var_type: List[str] = ["num"],
