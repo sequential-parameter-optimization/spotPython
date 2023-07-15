@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.random import default_rng
 from random import random
-from Typing import List, Optional, Dict
+from typing import List, Optional, Dict
 
 
 class Analytical:
