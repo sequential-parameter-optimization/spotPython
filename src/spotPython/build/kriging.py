@@ -229,9 +229,15 @@ class Kriging(surrogates):
         Returns:
             float: The expected improvement value.
 
-        Example:
-            >>> exp_imp(1.0, 2.0)
-            0.1977966
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> S = Kriging(name='kriging', seed=124)
+            >>> S.cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+            >>> S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+            >>> S.exp_imp(1.0, 2.0)
+            0.0
+
         """
         # y_min = min(self.cod_y)
         y_min = min(self.mean_cod_y)
@@ -257,7 +263,10 @@ class Kriging(surrogates):
         parameters being optimized (`n_theta` and `n_p`), as well as whether noise is
         being considered (`noise`).
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> MyClass = Kriging(name='kriging', seed=124)
             >>> obj = MyClass()
             >>> obj.set_de_bounds()
             >>> print(obj.de_bounds)
@@ -285,7 +294,10 @@ class Kriging(surrogates):
             new_theta_p_Lambda (np.ndarray):
                 1d-array with theta, p, and Lambda values. Order is important.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> MyClass = Kriging(name='kriging', seed=124)
             >>> obj = MyClass()
             >>> obj.extract_from_bounds(np.array([1, 2, 3]))
             >>> print(obj.theta)
@@ -317,7 +329,10 @@ class Kriging(surrogates):
         `de_bounds`.
         The result of the optimization is returned as a list or tuple of optimized parameter values.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> MyClass = Kriging(name='kriging', seed=124)
             >>> obj = MyClass()
             >>> result = obj.optimize_model()
             >>> print(result)
@@ -367,7 +382,10 @@ class Kriging(surrogates):
         Returns:
             None
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> MyClass = Kriging(name='kriging', seed=124)
             >>> obj = MyClass()
             >>> obj.update_log()
             >>> print(obj.log)
@@ -425,7 +443,11 @@ class Kriging(surrogates):
             SigmaSqr (np.float64): Sigma squared value.
             Lambda (float): lambda noise value.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> nat_X = np.array([[1, 2], [3, 4]])
+            >>> nat_y = np.array([1, 2])
             >>> surrogate = Kriging()
             >>> surrogate.fit(nat_X, nat_y)
         """
@@ -466,8 +488,19 @@ class Kriging(surrogates):
         Returns:
             None
 
-        Example:
-            >>> initialize_variables(np.array([[1, 2], [3, 4]]), np.array([1, 2]))
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> surrogate = Kriging()
+            >>> nat_X = np.array([[1, 2], [3, 4]])
+            >>> nat_y = np.array([1, 2])
+            >>> surrogate.initialize_variables(nat_X, nat_y)
+            >>> surrogate.nat_X
+            array([[1, 2],
+                     [3, 4]])
+            >>> surrogate.nat_y
+            array([1, 2])
+
         """
         self.nat_X = copy.deepcopy(nat_X)
         self.nat_y = copy.deepcopy(nat_y)
@@ -486,9 +519,17 @@ class Kriging(surrogates):
         The method then creates masks for each variable
         type ('num', 'factor', 'int', 'float') using numpy arrays.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.var_type = ["num", "factor"]
             >>> instance = MyClass()
             >>> instance.set_variable_types()
+            >>> instance.num_mask
+            array([ True, False])
 
         Returns:
             None
@@ -515,7 +556,14 @@ class Kriging(surrogates):
         The `x0_theta` attribute is also initialized as a list of ones
         with length `n_theta`, multiplied by `n / (100 * k)`.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_theta = 3
+            >>>         self.k = 2
             >>> instance = MyClass()
             >>> instance.set_theta_values()
 
@@ -543,7 +591,17 @@ class Kriging(surrogates):
         The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.
         The `one` attribute is initialized as a list of ones with length `n`.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
             >>> instance = MyClass()
             >>> instance.initialize_matrices()
 
@@ -588,9 +646,21 @@ class Kriging(surrogates):
             float:
                 The negative log likelihood of the surface at the specified hyperparameters.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
             >>> instance = MyClass()
             >>> negLnLike = instance.fun_likelihood(new_theta_p_Lambda)
+            >>> print(negLnLike)
+
         """
         self.extract_from_bounds(new_theta_p_Lambda)
         if self.__is_any__(power(10.0, self.theta), 0):
@@ -631,9 +701,22 @@ class Kriging(surrogates):
             bool:
                 True if any element in `x` is equal to `v`, False otherwise.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
+
             >>> instance = MyClass()
             >>> result = instance.__is_any__(x, v)
+            >>> print(result)
+
         """
         if not isinstance(x, ndarray):
             x = array([x])
@@ -656,9 +739,21 @@ class Kriging(surrogates):
         Raises:
             LinAlgError: If building Psi fails.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
+
             >>> obj = MyClass()
             >>> obj.build_Psi()
+
         """
         self.Psi = zeros((self.n, self.n), dtype=float64)
         theta = power(10.0, self.theta)
@@ -705,7 +800,18 @@ class Kriging(surrogates):
         Raises:
             LinAlgError: If Cholesky factorization fails for Psi.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
+
             >>> obj = MyClass()
             >>> obj.build_U()
         """
@@ -732,7 +838,18 @@ class Kriging(surrogates):
         Returns:
             None
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
+
             >>> obj = MyClass()
             >>> obj.build_Psi()
             >>> obj.build_U()
@@ -761,7 +878,18 @@ class Kriging(surrogates):
         Returns:
             None
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> class MyClass(Kriging):
+            >>>     def __init__(self):
+            >>>         super().__init__()
+            >>>         self.n_p = 2
+            >>>         self.n = 3
+            >>>         self.nat_y = np.array([1, 2, 3])
+            >>>         self.k = 2
+            >>>         self.seed = 1
+
             >>> plot(show=True)
         """
         if self.k == 1:
@@ -866,9 +994,16 @@ class Kriging(surrogates):
             Tuple[float, float, float]: The predicted value in natural units, predicted error
             and expected improvement if return_val is "all".
 
-        Example:
-            >>> predict(nat_X = np.array([1.0, 2.0]), nat = True, return_val = "all")
-            (1.5, 0.5, 0.25)
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> k.predict(array([[0.3, 0.3]]))
+            array([0.09])
+
         """
         # Check for the shape and the type of the Input
         if isinstance(nat_X, ndarray):
@@ -909,8 +1044,16 @@ class Kriging(surrogates):
         Returns:
             None
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> cod_x = array([0.3, 0.3])
             >>> build_psi_vec(cod_x)
+
         """
         self.psi = zeros((self.n))
         # theta = self.theta  # TODO:
@@ -952,11 +1095,16 @@ class Kriging(surrogates):
             SSqr (float): Predicted error.
             EI (float): Expected improvement.
 
-        Example:
-            >>> kriging = Kriging()
-            >>> cod_x = np.array([0.5, 0.5])
-            >>> f, SSqr, EI = kriging.predict_coded(cod_x)
-            >>> print(f"Predicted value: {f}, Predicted error: {SSqr}, Expected improvement: {EI}")
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> cod_x = array([0.3, 0.3])
+            >>> k.predict_coded(cod_x)
+            (0.09, 0.0, 0.0)
 
         Note:
             `self.mu` and `self.SigmaSqr` are computed in `likelihood`, not here.
@@ -986,14 +1134,20 @@ class Kriging(surrogates):
         Returns:
             EI (float): Weighted expected improvement.
 
-        Example:
-            >>> kriging = Kriging()
-            >>> cod_x = np.array([0.5, 0.5])
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> cod_x = array([0.3, 0.3])
             >>> w = 0.5
-            >>> EI = kriging.weighted_exp_imp(cod_x, w)
-            >>> print(f"Weighted expected improvement: {EI}")
+            >>> k.weighted_exp_imp(cod_x, w)
+            0.0
 
         References:
+
             [Sobester et al. 2005].
         """
         y0, s0 = self.predict_coded(cod_x)
@@ -1027,11 +1181,17 @@ class Kriging(surrogates):
             mean_MSE (float): The mean value of MSE.
             std_MSE (float): The standard deviation of the MSE points.
 
-        Example:
-            >>> kriging = Kriging()
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
             >>> n_samples = 200
-            >>> mean_MSE, std_MSE = kriging.calculate_mean_MSE(n_samples)
+            >>> mean_MSE, std_MSE = k.calculate_mean_MSE(n_samples)
             >>> print(f"Mean MSE: {mean_MSE}, Standard deviation of MSE: {std_MSE}")
+
         """
         if points is None:
             points = self.gen.lhd(n_samples)
@@ -1048,11 +1208,17 @@ class Kriging(surrogates):
         Returns:
             X (np.ndarray): An array of natural (physical or real world) units.
 
-        Example:
-            >>> kriging = Kriging()
-            >>> cod_X = np.array([0.5, 0.5])
-            >>> nat_X = kriging.cod_to_nat_x(cod_X)
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> cod_X = array([0.3, 0.3])
+            >>> nat_X = k.cod_to_nat_x(cod_X)
             >>> print(f"Natural units: {nat_X}")
+
         """
         X = copy.deepcopy(cod_X)
         if self.cod_type == "norm":
@@ -1079,11 +1245,17 @@ class Kriging(surrogates):
         Returns:
             y (np.ndarray): An array of observed values in real-world units.
 
-        Example:
-            >>> kriging = Kriging()
-            >>> cod_y = np.array([0.5, 0.5])
-            >>> nat_y = kriging.cod_to_nat_y(cod_y)
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> cod_y = array([0.5, 0.5])
+            >>> nat_y = k.cod_to_nat_y(cod_y)
             >>> print(f"Real-world units: {nat_y}")
+
         """
         return (
             cod_y * (self.nat_range_y[1] - self.nat_range_y[0]) + self.nat_range_y[0]
@@ -1103,11 +1275,17 @@ class Kriging(surrogates):
         Returns:
             X (np.ndarray): An array of coded values in the range of [0,1] for each dimension.
 
-        Example:
-            >>> kriging = Kriging()
-            >>> nat_X = np.array([5.0, 5.0])
-            >>> cod_X = kriging.nat_to_cod_x(nat_X)
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> nat_X = array([5.0, 5.0])
+            >>> cod_X = k.nat_to_cod_x(nat_X)
             >>> print(f"Coded values: {cod_X}")
+
         """
         X = copy.deepcopy(nat_X)
         if self.cod_type == "norm":
@@ -1145,7 +1323,10 @@ class Kriging(surrogates):
         Returns:
             y (np.ndarray): A normalized array of coded (model) units in the range of [0,1].
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> import numpy as np
             >>> kriging = Kriging()
             >>> nat_y = np.array([5.0, 5.0])
             >>> cod_y = kriging.nat_to_cod_y(nat_y)
@@ -1166,7 +1347,9 @@ class Kriging(surrogates):
         suggested by the surrogate as infill points.
         This method calls `nat_to_cod_x` and `nat_to_cod_y` and updates the ranges `nat_range_X` and `nat_range_y`.
 
-        Example:
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
             >>> kriging = Kriging()
             >>> kriging.nat_to_cod_init()
         """
