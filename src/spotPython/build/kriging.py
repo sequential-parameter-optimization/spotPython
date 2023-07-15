@@ -1,3 +1,6 @@
+# google-style docstring documentation, type information, an example, and return values: 2023, July, 15th
+# tests: None
+
 import copy
 from math import erf
 import matplotlib.pyplot as plt
@@ -28,7 +31,7 @@ from spotPython.utils.repair import repair_non_numeric
 from spotPython.utils.aggregate import aggregate_mean_var
 import logging
 import numpy as np
-from typing import List
+from typing import List, Union, Tuple, Any, Optional
 
 
 logger = logging.getLogger(__name__)
@@ -244,9 +247,24 @@ class Kriging(surrogates):
             EI = EI_one + EI_two
         return EI
 
-    def set_de_bounds(self):
+    def set_de_bounds(self) -> None:
         """
         Determine search bounds for model_optimizer, e.g., differential evolution.
+
+        This method sets the attribute `de_bounds` of the object to a list of lists,
+        where each inner list represents the lower and upper bounds for a parameter
+        being optimized. The number of inner lists is determined by the number of
+        parameters being optimized (`n_theta` and `n_p`), as well as whether noise is
+        being considered (`noise`).
+
+        Example:
+            >>> obj = MyClass()
+            >>> obj.set_de_bounds()
+            >>> print(obj.de_bounds)
+            [[min_theta, max_theta], [min_theta, max_theta], ..., [min_p, max_p], [min_Lambda, max_Lambda]]
+
+        Returns:
+            None
         """
         de_bounds = [[self.min_theta, self.max_theta] for _ in range(self.n_theta)]
         if self.optim_p:
@@ -258,15 +276,27 @@ class Kriging(surrogates):
                 de_bounds.append([self.min_Lambda, self.max_Lambda])
         self.de_bounds = de_bounds
 
-    def extract_from_bounds(self, new_theta_p_Lambda):
+    def extract_from_bounds(self, new_theta_p_Lambda: np.ndarray) -> None:
         """
         Extract `theta`, `p`, and `Lambda` from bounds. The kriging object stores
-            `theta` as an array,  `p` as an array, and `Lambda` as a float.
+        `theta` as an array,  `p` as an array, and `Lambda` as a float.
 
         Args:
-            new_theta_p_Lambda (numpy.array):
+            new_theta_p_Lambda (np.ndarray):
                 1d-array with theta, p, and Lambda values. Order is important.
 
+        Example:
+            >>> obj = MyClass()
+            >>> obj.extract_from_bounds(np.array([1, 2, 3]))
+            >>> print(obj.theta)
+            [1]
+            >>> print(obj.p)
+            [2]
+            >>> print(obj.Lambda)
+            3
+
+        Returns:
+            None
         """
         self.theta = new_theta_p_Lambda[:self.n_theta]
         if self.optim_p:
@@ -277,7 +307,26 @@ class Kriging(surrogates):
             if self.noise:
                 self.Lambda = new_theta_p_Lambda[self.n_theta]
 
-    def optimize_model(self):
+    def optimize_model(self) -> Union[List[float], Tuple[float]]:
+        """
+        Optimize the model using the specified model_optimizer.
+
+        This method uses the specified model_optimizer to optimize the
+        likelihood function (`fun_likelihood`) with respect to the model parameters.
+        The optimization is performed within the bounds specified by the attribute
+        `de_bounds`.
+        The result of the optimization is returned as a list or tuple of optimized parameter values.
+
+        Example:
+            >>> obj = MyClass()
+            >>> result = obj.optimize_model()
+            >>> print(result)
+            [optimized_theta, optimized_p, optimized_Lambda]
+
+        Returns:
+            result["x"] (Union[List[float], Tuple[float]]):
+                A list or tuple of optimized parameter values.
+        """
         if self.model_optimizer.__name__ == 'dual_annealing':
             result = self.model_optimizer(func=self.fun_likelihood,
                                           bounds=self.de_bounds)
@@ -301,7 +350,29 @@ class Kriging(surrogates):
             result = self.model_optimizer(func=self.fun_likelihood, bounds=self.de_bounds)
         return result["x"]
 
-    def update_log(self):
+    def update_log(self) -> None:
+        """
+        Update the log with the current values of negLnLike, theta, p, and Lambda.
+
+        This method appends the current values of negLnLike, theta, p (if optim_p is True),
+        and Lambda (if noise is True)
+        to their respective lists in the log dictionary.
+        It also updates the log_length attribute with the current length
+        of the negLnLike list in the log.
+
+        If spot_writer is not None, this method also writes the current values of
+        negLnLike, theta, p (if optim_p is True),
+        and Lambda (if noise is True) to the spot_writer object.
+
+        Returns:
+            None
+
+        Example:
+            >>> obj = MyClass()
+            >>> obj.update_log()
+            >>> print(obj.log)
+            {'negLnLike': [0.5], 'theta': [0.1], 'p': [0.2], 'Lambda': [0.3]}
+        """
         self.log["negLnLike"] = append(self.log["negLnLike"], self.negLnLike)
         self.log["theta"] = append(self.log["theta"], self.theta)
         if self.optim_p:
@@ -327,46 +398,36 @@ class Kriging(surrogates):
                 writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
             writer.flush()
 
-    def fit(self, nat_X, nat_y):
+    def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
         """
-        The function fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model, i.e.,
-        the following internal values are computed:
+        Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
 
+        The function computes the following internal values:
         1. `theta`, `p`, and `Lambda` values via optimization of the function `fun_likelihood()`.
         2. Correlation matrix `Psi` via `rebuildPsi()`.
 
         Args:
-            nat_X (array):
-                sample points
-            nat_y (array):
-                function values
+            nat_X (np.ndarray): Sample points.
+            nat_y (np.ndarray): Function values.
 
         Returns:
-            surrogate (object):
-                Fitted estimator.
+            object: Fitted estimator.
 
         Attributes:
-            theta (numpy.ndarray):
-                Kriging theta values. Shape (k,).
-            p (numpy.ndarray):
-                Kriging p values. Shape (k,).
-            LnDetPsi (numpy.float64):
-                Determinant Psi matrix.
-            Psi (numpy.matrix):
-                Correlation matrix Psi. Shape (n,n).
-            psi (numpy.ndarray):
-                psi vector. Shape (n,).
-            one (numpy.ndarray):
-                vector of ones. Shape (n,).
-            mu (numpy.float64):
-                Kriging expected mean value mu.
-            U (numpy.matrix):
-                Kriging U matrix, Cholesky decomposition. Shape (n,n).
-            SigmaSqr (numpy.float64):
-                Sigma squared value.
-            Lambda (float):
-                lambda noise value.
+            theta (np.ndarray): Kriging theta values. Shape (k,).
+            p (np.ndarray): Kriging p values. Shape (k,).
+            LnDetPsi (np.float64): Determinant Psi matrix.
+            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
+            psi (np.ndarray): psi vector. Shape (n,).
+            one (np.ndarray): vector of ones. Shape (n,).
+            mu (np.float64): Kriging expected mean value mu.
+            U (np.matrix): Kriging U matrix, Cholesky decomposition. Shape (n,n).
+            SigmaSqr (np.float64): Sigma squared value.
+            Lambda (float): lambda noise value.
 
+        Example:
+            >>> surrogate = Kriging()
+            >>> surrogate.fit(nat_X, nat_y)
         """
         self.initialize_variables(nat_X, nat_y)
         self.set_variable_types()
@@ -389,9 +450,21 @@ class Kriging(surrogates):
         """
         Initialize variables for the class instance.
 
+        This method takes in the independent and dependent variable data as input
+        and initializes the class instance variables.
+        It creates deep copies of the input data and stores them in the
+        instance variables `nat_X` and `nat_y`.
+        It also calculates the number of observations `n` and
+        the number of independent variables `k` from the shape of `nat_X`.
+        Finally, it creates empty arrays with the same shape as `nat_X`
+        and `nat_y` and stores them in the instance variables `cod_X` and `cod_y`.
+
         Args:
             nat_X (np.ndarray): The independent variable data.
             nat_y (np.ndarray): The dependent variable data.
+
+        Returns:
+            None
 
         Example:
             >>> initialize_variables(np.array([[1, 2], [3, 4]]), np.array([1, 2]))
@@ -407,8 +480,18 @@ class Kriging(surrogates):
         """
         Set the variable types for the class instance.
 
+        This method sets the variable types for the class instance based
+        on the `var_type` attribute. If the length of `var_type` is less
+        than `k`, all variable types are forced to 'num' and a warning is logged.
+        The method then creates masks for each variable
+        type ('num', 'factor', 'int', 'float') using numpy arrays.
+
         Example:
-            >>> set_variable_types()
+            >>> instance = MyClass()
+            >>> instance.set_variable_types()
+
+        Returns:
+            None
         """
         # assume all variable types are "num" if "num" is
         # specified once:
@@ -421,7 +504,24 @@ class Kriging(surrogates):
         self.ordered_mask = np.array(list(map(lambda x: x == "int" or x == "num" or x == "float", self.var_type)))
 
     def set_theta_values(self) -> None:
-        """ Set the theta values for the class instance."""
+        """
+        Set the theta values for the class instance.
+
+        This method sets the theta values for the class instance based
+        on the `n_theta` and `k` attributes. If `n_theta` is greater than
+        `k`, `n_theta` is set to `k` and a warning is logged.
+        The method then initializes the `theta` attribute as a list
+        of zeros with length `n_theta`.
+        The `x0_theta` attribute is also initialized as a list of ones
+        with length `n_theta`, multiplied by `n / (100 * k)`.
+
+        Example:
+            >>> instance = MyClass()
+            >>> instance.set_theta_values()
+
+        Returns:
+            None
+        """
         if self.n_theta > self.k:
             self.n_theta = self.k
             logger.warning("More theta values than dimensions. `n_theta` set to `k`.")
@@ -430,7 +530,26 @@ class Kriging(surrogates):
         self.x0_theta: List[float] = ones((self.n_theta,)) * self.n / (100 * self.k)
 
     def initialize_matrices(self) -> None:
-        """ Initialize the matrices for the class instance."""
+        """
+        Initialize the matrices for the class instance.
+
+        This method initializes several matrices and attributes for the class instance.
+        The `p` attribute is initialized as a list of ones with length `n_p`, multiplied by 2.0.
+        The `pen_val` attribute is initialized as the natural logarithm of the
+        variance of `nat_y`, multiplied by `n`, plus 1e4.
+        The `negLnLike`, `LnDetPsi`, `mu`, `U`, `SigmaSqr`, and `Lambda` attributes are all set to None.
+        The `gen` attribute is initialized using the `spacefilling` function with arguments `k` and `seed`.
+        The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.
+        The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.
+        The `one` attribute is initialized as a list of ones with length `n`.
+
+        Example:
+            >>> instance = MyClass()
+            >>> instance.initialize_matrices()
+
+        Returns:
+            None
+        """
         self.p = ones(self.n_p) * 2.0
         self.pen_val = self.n * log(var(self.nat_y)) + 1e4
         self.negLnLike = None
@@ -444,21 +563,34 @@ class Kriging(surrogates):
         self.SigmaSqr = None
         self.Lambda = None
 
-    def fun_likelihood(self, new_theta_p_Lambda):
+    def fun_likelihood(self, new_theta_p_Lambda: np.ndarray) -> float:
         """
         Compute log likelihood for a set of hyperparameters (theta, p, Lambda).
-        Performs the following steps:
 
-        1. Build Psi via `build_Psi()` and `build_U()`.
-        2. Compute negLnLikelihood via `likelihood()
-        3. If successful, the return `negLnLike` value, otherwise a penalty value (`pen_val`).
+        This method computes the log likelihood for a set of hyperparameters
+        (theta, p, Lambda) by performing the following steps:
+        1. Extracts the hyperparameters from the input array using `extract_from_bounds()`.
+        2. Checks if any element in `10^theta` is equal to 0. If so, logs a warning and
+        returns the penalty value (`pen_val`).
+        3. Builds the `Psi` matrix using `build_Psi()`.
+        4. Checks if `Psi` is ill-conditioned or infinite. If so, logs a warning and returns
+        the penalty value (`pen_val`).
+        5. Builds the `U` matrix using `build_U()`. If an exception occurs, logs an error and
+        returns the penalty value (`pen_val`).
+        6. Computes the negative log likelihood using `likelihood()`.
+        7. Returns the computed negative log likelihood (`negLnLike`).
 
         Args:
-            new_theta_p_Lambda (array):
-                `theta`, `p`, and `Lambda` values stored in an array.
+            new_theta_p_Lambda (np.ndarray):
+                An array containing the `theta`, `p`, and `Lambda` values.
+
         Returns:
-            (float):
-                negLnLike, th negative log likelihood of the surface at the hyperparameters specified.
+            float:
+                The negative log likelihood of the surface at the specified hyperparameters.
+
+        Example:
+            >>> instance = MyClass()
+            >>> negLnLike = instance.fun_likelihood(new_theta_p_Lambda)
         """
         self.extract_from_bounds(new_theta_p_Lambda)
         if self.__is_any__(power(10.0, self.theta), 0):
@@ -481,33 +613,52 @@ class Kriging(surrogates):
         self.likelihood()
         return self.negLnLike
 
-    def __is_any__(self, x, v):
+    def __is_any__(self, x: Union[np.ndarray, Any], v: Any) -> bool:
         """
         Check if any element in `x` is equal to `v`.
 
-        This function checks if any element in the input array `x` is equal to the value `v`.
-        If `x` is not an instance of `ndarray`, it is first converted to a numpy array.
+        This method checks if any element in the input array `x` is equal to the value `v`.
+        If `x` is not an instance of `ndarray`, it is first converted to a numpy array using
+        the `array()` function.
 
         Args:
-            x (ndarray or array-like):
-                Input array to check for the presence of value `v`.
+            x (np.ndarray or array-like):
+                The input array to check for the presence of value `v`.
             v (scalar):
-                Value to check for in the input array `x`.
+                The value to check for in the input array `x`.
 
         Returns:
             bool:
                 True if any element in `x` is equal to `v`, False otherwise.
+
+        Example:
+            >>> instance = MyClass()
+            >>> result = instance.__is_any__(x, v)
         """
         if not isinstance(x, ndarray):
             x = array([x])
         return any(x == v)
 
-    def build_Psi(self):
+    def build_Psi(self) -> None:
         """
-        New construction (rebuild to reflect new data or a change in hyperparameters)
-        of the (nxn) correlation matrix Psi as described in [Forr08a, p.57].
-        Note:
-            Method uses `theta`, `p`, and coded `X` values.
+        Constructs a new (n x n) correlation matrix Psi to reflect new data
+        or a change in hyperparameters.
+
+        This method uses `theta`, `p`, and coded `X` values to construct the
+        correlation matrix as described in [Forr08a, p.57].
+
+        Args:
+            self: The object instance.
+
+        Returns:
+            None
+
+        Raises:
+            LinAlgError: If building Psi fails.
+
+        Example:
+            >>> obj = MyClass()
+            >>> obj.build_Psi()
         """
         self.Psi = zeros((self.n, self.n), dtype=float64)
         theta = power(10.0, self.theta)
@@ -538,12 +689,25 @@ class Kriging(surrogates):
             self.inf_Psi = True
         self.cnd_Psi = cond(self.Psi)
 
-    def build_U(self, scipy=True):
+    def build_U(self, scipy: bool = True) -> None:
         """
-        Cholesky factorization of Psi as U as described in [Forr08a, p.57].
+        Performs Cholesky factorization of Psi as U as described in [Forr08a, p.57].
+
+        This method uses either `scipy_cholesky` or numpy's `cholesky` to perform the Cholesky factorization of Psi.
 
         Args:
-            scipy (bool): Use `scipy_cholesky`. If `False`, numpy's `cholesky` is used.
+            self: The object instance.
+            scipy (bool): If True, use `scipy_cholesky`. If False, use numpy's `cholesky`. Defaults to True.
+
+        Returns:
+            None
+
+        Raises:
+            LinAlgError: If Cholesky factorization fails for Psi.
+
+        Example:
+            >>> obj = MyClass()
+            >>> obj.build_U()
         """
         try:
             self.U = scipy_cholesky(self.Psi, lower=True) if scipy else cholesky(self.Psi)
@@ -551,19 +715,28 @@ class Kriging(surrogates):
         except LinAlgError as err:
             print(f"build_U() Cholesky failed for Psi:\n {self.Psi}. {err=}, {type(err)=}")
 
-    def likelihood(self):
+    def likelihood(self) -> None:
         """
         Calculates the negative of the concentrated log-likelihood.
-        Implementation of (2.32)  in [Forr08a].
-        See also function krigingLikelihood() in spot.
+
+        This method implements equation (2.32) in [Forr08a] to calculate
+        the negative of the concentrated log-likelihood. It also modifies `mu`,
+        `SigmaSqr`, `LnDetPsi`, and `negLnLike`.
+
         Note:
             `build_Psi` and `build_U` should be called first.
-        Modifies:
-            `mu`,
-            `SigmaSqr`,
-            `LnDetPsi`, and
-            `negLnLike`, concentrated log-likelihood *-1 for minimizing
 
+        Args:
+            self: The object instance.
+
+        Returns:
+            None
+
+        Example:
+            >>> obj = MyClass()
+            >>> obj.build_Psi()
+            >>> obj.build_U()
+            >>> obj.likelihood()
         """
         # (2.20) in [Forr08a]:
         U_T_inv_one = solve(self.U.T, self.one)
@@ -577,13 +750,19 @@ class Kriging(surrogates):
         self.LnDetPsi = 2.0 * sum(log(abs(diag(self.U))))
         self.negLnLike = -1.0 * (-(self.n / 2.0) * log(self.SigmaSqr) - 0.5 * self.LnDetPsi)
 
-    def plot(self, show=True):
+    def plot(self, show: Optional[bool] = True) -> None:
         """
-        This function plots 1d and 2d surrogates.
+        This function plots 1D and 2D surrogates.
+
         Args:
-            show (boolean):
-                If `True`, the plots are displayed.
-                If `False`, `plt.show()` should be called outside this function.
+            show (bool): If `True`, the plots are displayed.
+            If `False`, `plt.show()` should be called outside this function.
+
+        Returns:
+            None
+
+        Example:
+            >>> plot(show=True)
         """
         if self.k == 1:
             # TODO: Improve plot (add conf. interval etc.)
@@ -662,29 +841,34 @@ class Kriging(surrogates):
             #
             pylab.show()
 
-    def predict(self, nat_X, nat=True, return_val="y"):
+    def predict(self, nat_X: ndarray, nat: bool = True, return_val: str = "y") -> Union[float,
+                                                                                        Tuple[float,
+                                                                                              float,
+                                                                                              float]]:
         """
-        This function returns the prediction (in natural units) of the surrogate
-        at the natural coordinates of X.
+        This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.
 
         Args:
-            nat_X (array):
-                Design variable to evaluate in natural units.
-            nat (bool):
-                argument `nat_X` is in natural range. Default: `True`. If set to `False`,
-                `nat_X` will not be normalized (which might be useful if already normalized
-                y values are used).
-            return_val (string): whether `y`, `s`, neg. `ei` (negative expected improvement),
-                or all three values are returned. Default is (for compatibility with sklearn) "y".
-                To return `s`, select "s", to return neg. `ei`, select "ei".
+            nat_X (ndarray): Design variable to evaluate in natural units.
+            nat (bool): argument `nat_X` is in natural range. Default: `True`.
+                If set to `False`, `nat_X` will not be normalized (which might be useful
+                if already normalized y values are used).
+            return_val (str): whether `y`, `s`, neg. `ei` (negative expected improvement),
+            or all three values are returned.
+                Default is (for compatibility with sklearn) "y". To return `s`, select "s",
+                to return neg. `ei`, select "ei".
                 To return the tuple `(y, s, ei)`, select "all".
+
         Returns:
-            (float):
-                The predicted value in natural units.
-            (float):
-                predicted error
-            (float):
-                expected improvement
+            float: The predicted value in natural units if return_val is "y".
+            float: predicted error if return_val is "s".
+            float: expected improvement if return_val is "ei".
+            Tuple[float, float, float]: The predicted value in natural units, predicted error
+            and expected improvement if return_val is "all".
+
+        Example:
+            >>> predict(nat_X = np.array([1.0, 2.0]), nat = True, return_val = "all")
+            (1.5, 0.5, 0.25)
         """
         # Check for the shape and the type of the Input
         if isinstance(nat_X, ndarray):
@@ -720,8 +904,13 @@ class Kriging(surrogates):
         `regression_predict_coded`. Modifies `self.psi`.
 
         Args:
-            cod_x (array): point to calculate psi
+            cod_x (ndarray): point to calculate psi
 
+        Returns:
+            None
+
+        Example:
+            >>> build_psi_vec(cod_x)
         """
         self.psi = zeros((self.n))
         # theta = self.theta  # TODO:
@@ -750,21 +939,28 @@ class Kriging(surrogates):
         except LinAlgError as err:
             print(f"Building psi failed:\n {self.psi}. {err=}, {type(err)=}")
 
-    def predict_coded(self, cod_x):
+    def predict_coded(self, cod_x: np.ndarray) -> Tuple[float, float, float]:
         """
         Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].
         The error is returned as well.
-        See also [Forr08a, p.60].
+
+        Args:
+            cod_x (np.ndarray): Point in coded units to make prediction at.
+
+        Returns:
+            f (float): Predicted value in coded units.
+            SSqr (float): Predicted error.
+            EI (float): Expected improvement.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> cod_x = np.array([0.5, 0.5])
+            >>> f, SSqr, EI = kriging.predict_coded(cod_x)
+            >>> print(f"Predicted value: {f}, Predicted error: {SSqr}, Expected improvement: {EI}")
+
         Note:
             `self.mu` and `self.SigmaSqr` are computed in `likelihood`, not here.
-        Args:
-           cod_x (array):
-            point in coded units to make prediction at
-        Returns:
-            (float):
-                predicted value in coded units.
-            (float):
-                predicted error.
+            See also [Forr08a, p.60].
         """
         self.build_psi_vec(cod_x)
         U_T_inv = solve(self.U.T, self.cod_y - self.one.dot(self.mu))
@@ -779,22 +975,26 @@ class Kriging(surrogates):
         EI = self.exp_imp(y0=f[0], s0=SSqr)
         return f[0], SSqr, EI
 
-    def weighted_exp_imp(self, cod_x, w):
+    def weighted_exp_imp(self, cod_x: np.ndarray, w: float) -> float:
         """
         Weighted expected improvement.
 
-        References:
-            [Sobester et al. 2005].
-
         Args:
-            cod_x (array):
-                A coded design vector.
-            w (float):
-                weight
+            cod_x (np.ndarray): A coded design vector.
+            w (float): Weight.
 
         Returns:
-            (float):
-                weighted expected improvement.
+            EI (float): Weighted expected improvement.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> cod_x = np.array([0.5, 0.5])
+            >>> w = 0.5
+            >>> EI = kriging.weighted_exp_imp(cod_x, w)
+            >>> print(f"Weighted expected improvement: {EI}")
+
+        References:
+            [Sobester et al. 2005].
         """
         y0, s0 = self.predict_coded(cod_x)
         y_min = min(self.cod_y)
@@ -814,32 +1014,45 @@ class Kriging(surrogates):
             EI = EI_one + EI_two
         return EI
 
-    def calculate_mean_MSE(self, n_samples=200, points=None):
+    def calculate_mean_MSE(self, n_samples: int = 200, points: Optional[np.ndarray] = None) -> Tuple[float, float]:
         """
-        This function calculates the mean MSE metric of the model by evaluating MSE at a number of points.
+        Calculates the mean MSE metric of the model by evaluating MSE at a number of points.
+
         Args:
-            n_samples (integer):
-                Number of points to sample the mean squared error at.
-                Ignored if the points argument is specified.
-            points (array):
-                an array of points to sample the model at.
+            n_samples (int): Number of points to sample the mean squared error at.
+            Ignored if the points argument is specified.
+            points (np.ndarray): An array of points to sample the model at.
+
         Returns:
-            (float):
-                the mean value of MSE and the standard deviation of the MSE points
+            mean_MSE (float): The mean value of MSE.
+            std_MSE (float): The standard deviation of the MSE points.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> n_samples = 200
+            >>> mean_MSE, std_MSE = kriging.calculate_mean_MSE(n_samples)
+            >>> print(f"Mean MSE: {mean_MSE}, Standard deviation of MSE: {std_MSE}")
         """
         if points is None:
             points = self.gen.lhd(n_samples)
         values = [self.predict(cod_X=point, nat=True, return_val="s") for point in points]
         return mean(values), std(values)
 
-    def cod_to_nat_x(self, cod_X):
+    def cod_to_nat_x(self, cod_X: np.ndarray) -> np.ndarray:
         """
+        Converts an array representing one point in normalized (coded) units to natural (physical or real world) units.
+
         Args:
-            cod_X (array):
-                An array representing one point (self.k long) in normalized (coded) units.
+            cod_X (np.ndarray): An array representing one point (self.k long) in normalized (coded) units.
+
         Returns:
-            (array):
-                An array of natural (physical or real world) units.
+            X (np.ndarray): An array of natural (physical or real world) units.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> cod_X = np.array([0.5, 0.5])
+            >>> nat_X = kriging.cod_to_nat_x(cod_X)
+            >>> print(f"Natural units: {nat_X}")
         """
         X = copy.deepcopy(cod_X)
         if self.cod_type == "norm":
@@ -855,14 +1068,22 @@ class Kriging(surrogates):
         else:
             return cod_X
 
-    def cod_to_nat_y(self, cod_y):
+    def cod_to_nat_y(self, cod_y: np.ndarray) -> np.ndarray:
         """
+        Converts a normalized array of coded (model) units in the range of [0,1]
+        to an array of observed values in real-world units.
+
         Args:
-            cod_y (array):
-                A normalized array of coded (model) units in the range of [0,1].
+            cod_y (np.ndarray): A normalized array of coded (model) units in the range of [0,1].
+
         Returns:
-            (array):
-                An array of observed values in real-world units.
+            y (np.ndarray): An array of observed values in real-world units.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> cod_y = np.array([0.5, 0.5])
+            >>> nat_y = kriging.cod_to_nat_y(cod_y)
+            >>> print(f"Real-world units: {nat_y}")
         """
         return (
             cod_y * (self.nat_range_y[1] - self.nat_range_y[0]) + self.nat_range_y[0]
@@ -872,16 +1093,21 @@ class Kriging(surrogates):
             else cod_y
         )
 
-    def nat_to_cod_x(self, nat_X):
+    def nat_to_cod_x(self, nat_X: np.ndarray) -> np.ndarray:
         """
-        Normalize one point (row) of nat_X array to [0,1]. The internal nat_range_X values are not updated.
+        Normalizes one point (row) of nat_X array to [0,1]. The internal nat_range_X values are not updated.
 
         Args:
-            nat_X (array):
-                An array representing one points (self.k long) in natural (physical or real world) units.
+            nat_X (np.ndarray): An array representing one point (self.k long) in natural (physical or real world) units.
+
         Returns:
-            (array):
-                An array of coded values in the range of [0,1] for each dimension.
+            X (np.ndarray): An array of coded values in the range of [0,1] for each dimension.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> nat_X = np.array([5.0, 5.0])
+            >>> cod_X = kriging.nat_to_cod_x(nat_X)
+            >>> print(f"Coded values: {cod_X}")
         """
         X = copy.deepcopy(nat_X)
         if self.cod_type == "norm":
@@ -909,16 +1135,21 @@ class Kriging(surrogates):
         else:
             return nat_X
 
-    def nat_to_cod_y(self, nat_y):
+    def nat_to_cod_y(self, nat_y: np.ndarray) -> np.ndarray:
         """
-        Normalize natural y values to [0,1].
-        Args:
-            nat_y (array):
-                An array of observed values in natural (real-world) units.
-        Returns:
-            (array):
-                A normalized array of coded (model) units in the range of [0,1].
+        Normalizes natural y values to [0,1].
 
+        Args:
+            nat_y (np.ndarray): An array of observed values in natural (real-world) units.
+
+        Returns:
+            y (np.ndarray): A normalized array of coded (model) units in the range of [0,1].
+
+        Example:
+            >>> kriging = Kriging()
+            >>> nat_y = np.array([5.0, 5.0])
+            >>> cod_y = kriging.nat_to_cod_y(nat_y)
+            >>> print(f"Coded values: {cod_y}")
         """
         return (
             (nat_y - self.nat_range_y[0]) / (self.nat_range_y[1] - self.nat_range_y[0])
@@ -928,13 +1159,16 @@ class Kriging(surrogates):
             else nat_y
         )
 
-    def nat_to_cod_init(self):
+    def nat_to_cod_init(self) -> None:
         """
-        Determine max and min of each dimension and normalize that axis to a range of [0,1].
-        Called when 1) surrogate is initialized and 2) new points arrive, i.e., suggested
-        by the surrogate as infill points.
-        This method calls `nat_to_cod_x` and `nat_to_cod_y` and updates the ranges `nat_range_X` and
-        `nat_range_y`.
+        Determines max and min of each dimension and normalizes that axis to a range of [0,1].
+        Called when 1) surrogate is initialized and 2) new points arrive, i.e.,
+        suggested by the surrogate as infill points.
+        This method calls `nat_to_cod_x` and `nat_to_cod_y` and updates the ranges `nat_range_X` and `nat_range_y`.
+
+        Example:
+            >>> kriging = Kriging()
+            >>> kriging.nat_to_cod_init()
         """
         self.nat_range_X = []
         self.nat_range_y = []
