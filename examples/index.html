@@ -41,8 +41,6 @@
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
-    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -289,6 +287,13 @@
         <li class="md-nav__item">
   <a href="#simple-spotpython-run" class="md-nav__link">
     Simple spotPython run
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-examples" class="md-nav__link">
+    Further Examples
   </a>
   
 </li>
@@ -1588,6 +1593,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#further-examples" class="md-nav__link">
+    Further Examples
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1608,26 +1620,31 @@
 
 <h1 id="spot-examples">SPOT Examples<a class="headerlink" href="#spot-examples" title="Permanent link">&para;</a></h1>
 <h2 id="simple-spotpython-run">Simple spotPython run<a class="headerlink" href="#simple-spotpython-run" title="Permanent link">&para;</a></h2>
-<p>import numpy as np
+<pre><code class="language-python">import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
 import numpy as np
-from math import inf</p>
-<h1 id="number-of-initial-points">number of initial points:<a class="headerlink" href="#number-of-initial-points" title="Permanent link">&para;</a></h1>
-<p>ni = 7</p>
-<h1 id="number-of-points">number of points<a class="headerlink" href="#number-of-points" title="Permanent link">&para;</a></h1>
-<p>n = 10</p>
-<p>fun = analytical().fun_sphere
+from math import inf
+# number of initial points:
+ni = 7
+# number of points
+n = 10
+
+fun = analytical().fun_sphere
 lower = np.array([-1])
 upper = np.array([1])
-design_control={&ldquo;init_size&rdquo;: ni}</p>
-<p>spot_1 = spot.Spot(fun=fun,
+design_control={&quot;init_size&quot;: ni}
+
+spot_1 = spot.Spot(fun=fun,
             lower = lower,
             upper= upper,
             fun_evals = n,
             show_progress=True,
             design_control=design_control,)
-spot_1.run()</p>
+spot_1.run()
+</code></pre>
+<h2 id="further-examples">Further Examples<a class="headerlink" href="#further-examples" title="Permanent link">&para;</a></h2>
+<p>Examples can be found in the Hyperparameter Tuning Cookbook, e.g., <a href="https://sequential-parameter-optimization.github.io/Hyperparameter-Tuning-Cookbook/99_spot_doc.html">Documentation of the Sequential Parameter Optimization</a>.</p>
 
 
 
