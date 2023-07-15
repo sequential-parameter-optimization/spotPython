@@ -125,14 +125,26 @@ class analytical:
         else:
             return y
 
-    def fun_linear(self, X, fun_control=None):
+    def fun_linear(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Linear function.
 
         Args:
-            X (array): input
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            (float): objective function value.
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_linear(X)
+            array([ 6., 15.])
+
         """
         if fun_control is not None:
             self.fun_control = fun_control
@@ -152,15 +164,26 @@ class analytical:
         else:
             return y
 
-    def fun_sphere(self, X, fun_control=None):
+    def fun_sphere(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Sphere function.
 
         Args:
-            X (array): input
-            fun_control (dict): dict with entries `seed` and `sigma`.
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            (float): function values
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_sphere(X)
+            array([14., 77.])
+
         """
         if fun_control is not None:
             self.fun_control = fun_control
@@ -190,7 +213,27 @@ class analytical:
         else:
             return y
 
-    def fun_cubed(self, X, fun_control=None):
+    def fun_cubed(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Cubed function.
+
+        Args:
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
+
+        Returns:
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_cubed(X)
+            array([ 0., 27.])
+        """
+
         if fun_control is None:
             fun_control = self.fun_control
         try:
@@ -221,17 +264,26 @@ class analytical:
         else:
             return y
 
-    def fun_forrester(self, X, fun_control=None):
-        """
-        Function used by [Forr08a, p.83].
-        f(x) = (6x- 2)^2 sin(12x-4) for x in [0,1].
-        Starts with three sample points at x=0, x=0.5, and x=1.
+    def fun_forrester(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Forrester function. Function used by [Forr08a, p.83].
+           f(x) = (6x- 2)^2 sin(12x-4) for x in [0,1].
+           Starts with three sample points at x=0, x=0.5, and x=1.
 
         Args:
-            X (flooat): input values (1-dim)
-
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
         Returns:
-            (float): function value
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_forrester(X)
+            array([  0.        ,  11.99999999])
         """
         if fun_control is None:
             fun_control = self.fun_control
@@ -262,26 +314,32 @@ class analytical:
         else:
             return y
 
-    def fun_branin(self, X, fun_control=None):
-        """Branin function.
+    def fun_branin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Branin function. The 2-dim Branin function is defined as
+            y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s,
+            where values of a, b, c, r, s and t are: a = 1, b = 5.1 / (4*pi**2),
+            c = 5 / pi, r = 6, s = 10 and t = 1 / (8*pi).
 
-        The 2-dim Branin function is
-        y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s,
-        where values of a, b, c, r, s and t are: a = 1, b = 5.1 / (4*pi**2),
-        c = 5 / pi, r = 6, s = 10 and t = 1 / (8*pi).
-
-        It has three global minima:
-        f(x) = 0.397887 at (-pi, 12.275), (pi, 2.275), and (9.42478, 2.475).
-
-        Input Domain:
-        This function is usually evaluated on the square  x1 in  [-5, 10] x x2 in [0, 15].
+            It has three global minima:
+            f(x) = 0.397887 at (-pi, 12.275), (pi, 2.275), and (9.42478, 2.475).
+            Input domain: This function is usually evaluated on the square  x1 in  [-5, 10] x x2 in [0, 15].
 
         Args:
-            X (array): input value
-            fun_control (dict): dict with entries `seed` and `sigma`.
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            (float): function value
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_branin(X)
+            array([  0.        ,  11.99999999])
 
         """
         if fun_control is None:
@@ -318,7 +376,27 @@ class analytical:
         else:
             return y
 
-    def fun_branin_modified(self, X, fun_control=None):
+    def fun_branin_modified(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Modified Branin function.
+
+        Args:
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
+
+        Returns:
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_branin_modified(X)
+            array([  0.        ,  11.99999999])
+
+        """
         if fun_control is None:
             fun_control = self.fun_control
         try:
@@ -354,7 +432,27 @@ class analytical:
         else:
             return y
 
-    def branin_noise(self, X):
+    def branin_noise(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Branin function with noise.
+
+        Args:
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
+
+        Returns:
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.branin_noise(X)
+            array([  0.        ,  11.99999999])
+
+        """
         try:
             X.shape[1]
         except ValueError:
@@ -379,6 +477,25 @@ class analytical:
         return np.array(noise_y)
 
     def fun_sin_cos(self, X, fun_control=None):
+        """Sinusoidal function.
+        Args:
+            X (array):
+                input
+            fun_control (dict):
+                dict with entries `sigma` (noise level) and `seed` (random seed).
+
+        Returns:
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_sin_cos(X)
+            array([-1.        , -0.41614684])
+        """
+
         if fun_control is None:
             fun_control = self.fun_control
         try:
@@ -436,22 +553,25 @@ class analytical:
     #     else:
     #         return y
 
-    def fun_runge(self, X, fun_control=None):
-        """
-        Runge function.
-        Formula: f(x) = 1/ (1 + sum(x_i) - offset)^2
-        Dim: k >= 1
-        Interval: -5 <= x <= 5
+    def fun_runge(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Runge function. Formula: f(x) = 1/ (1 + sum(x_i) - offset)^2. Dim: k >= 1.
+           Interval: -5 <= x <= 5
 
         Args:
-            X (numpy.array):
-            input
-            fun_control (dictionary, optional):
-            control parameters. Defaults to None.
+            X (array): input
+            fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            (float) :
-            function value
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> fun = analytical()
+            >>> fun.fun_runge(X)
+            array([0.0625    , 0.015625  , 0.00390625])
+
         """
         if fun_control is None:
             fun_control = self.fun_control
@@ -466,28 +586,16 @@ class analytical:
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, (1 / (1 + np.sum((X[i] - offset) ** 2))))
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
-    def fun_wingwt(self, X, fun_control=None):
-        """
-        Wing weight function. Example from Forrester et al. to understand the weight
-        of an unpainted light aircraft wing as a function of nine design and operational parameters:
-        W = 0.036 S_W**0.758 * Wfw**0.0035 ( A / (cos**2 Lambda))**0.6 *
-            q**0.006  * lambda**0.04 * ( (100 Rtc)/(cos Lambda) ))**-0.3*
-            (Nz Wdg)**0.49
+    def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Wing weight function. Example from Forrester et al. to understand the weight
+            of an unpainted light aircraft wing as a function of nine design and operational parameters:
+            W = 0.036 S_W**0.758 * Wfw**0.0035 ( A / (cos**2 Lambda))**0.6 *
+            q**0.006  * lambda**0.04 * ( (100 Rtc)/(cos Lambda) ))**-0.3*(Nz Wdg)**0.49
 
         | Symbol    | Parameter                              | Baseline | Minimum | Maximum |
         |-----------|----------------------------------------|----------|---------|---------|
@@ -503,14 +611,20 @@ class analytical:
         | $W_p$     | paint weight (lb/ft^2)                   | 0.064 |   0.025  | 0.08    |
 
         Args:
-            X (numpy.array):
-                10-dim input vector
-            fun_control (dictionary, optional):
-                control parameters. Defaults to None.
+            X (array): input
+            fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            (float) :
-            function value
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10, 11, 12]])
+            >>> fun = analytical()
+            >>> fun.fun_wingwt(X)
+            array([0.0625    , 0.015625  , 0.00390625])
+
         """
         if fun_control is None:
             fun_control = self.fun_control
@@ -537,13 +651,23 @@ class analytical:
             W_res = np.append(W_res, W)
         return W_res
 
-    def fun_xsin(self, X, fun_control=None):
-        """
+    def fun_xsin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Example function.
         Args:
-            X (float): input values (1-dim)
+            X (array): input
+            fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            (float): function value
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10, 11, 12]])
+            >>> fun = analytical()
+            >>> fun.fun_xsin(X)
+            array([0.84147098, 0.90929743, 0.14112001])
+
         """
         if fun_control is None:
             fun_control = self.fun_control
@@ -557,24 +681,27 @@ class analytical:
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, X[i] * np.sin(1.0 / X[i]))
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                # noise_y = np.append(
-                #     noise_y, i + np.random.normal(loc=0, scale=self.sigma, size=1)
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
-    def fun_rosen(self, X, fun_control=None):
+    def fun_rosen(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """Rosenbrock function.
+        Args:
+            X (array): input
+            fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
+        Returns:
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2,], [4, 5 ]])
+            >>> fun = analytical()
+            >>> fun.fun_rosen(X)
+            array([24,  0])
+        """
+
         if fun_control is None:
             fun_control = self.fun_control
         try:
@@ -592,14 +719,21 @@ class analytical:
         else:
             return y
 
-    def fun_random_error(self, X, fun_control=None):
+    def fun_random_error(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Return errors for testing spot stability.
-
         Args:
             X (array): input
-
+            fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
         Returns:
-            (float): objective function value.
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+        Examples:
+            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([[1, 2,], [4, 5 ]])
+            >>> fun = analytical()
+            >>> fun.fun_random_error(X)
+            array([24,  0])
+
         """
         if fun_control is not None:
             self.fun_control = fun_control

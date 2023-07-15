@@ -590,14 +590,18 @@ def get_values_from_dict(dictionary) -> np.array:
 def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=None) -> dict:
     """Add the core model to the function control dictionary.
     Args:
-        core_model (class): The core model.
-        fun_control (dict): The function control dictionary.
-        hyper_dict (dict): The hyper parameter dictionary.
-        filename (str): The name of the json file that contains the hyper parameter dictionary.
-        Optional. Default is None.
+        core_model (class):
+            The core model.
+        fun_control (dict):
+            The function control dictionary.
+        hyper_dict (dict):
+            The hyper parameter dictionary.
+        filename (str):
+            The name of the json file that contains the hyper parameter dictionary.
+            Optional. Default is None.
     Returns:
         (dict): The function control dictionary.
-    Example:
+    Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
             from spotRiver.data.river_hyper_dict import RiverHyperDict
             fun_control = {}
