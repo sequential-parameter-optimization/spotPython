@@ -41,6 +41,8 @@
       
     
     
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -61,6 +63,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#spotPython.utils.aggregate" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -1323,9 +1330,52 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          aggregate
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         aggregate
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.utils.aggregate" class="md-nav__link">
+    spotPython.utils.aggregate
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.utils.aggregate.aggregate_mean_var" class="md-nav__link">
+    aggregate_mean_var()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.utils.aggregate.get_ranks" class="md-nav__link">
+    get_ranks()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1539,6 +1589,35 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.utils.aggregate" class="md-nav__link">
+    spotPython.utils.aggregate
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.utils.aggregate.aggregate_mean_var" class="md-nav__link">
+    aggregate_mean_var()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.utils.aggregate.get_ranks" class="md-nav__link">
+    get_ranks()
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1557,7 +1636,383 @@
 
   <h1>aggregate</h1>
 
-<p>::: spotPython.utils.aggregate</p>
+<div class="doc doc-object doc-module">
+
+
+<a id="spotPython.utils.aggregate"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="spotPython.utils.aggregate.aggregate_mean_var" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">aggregate_mean_var</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#spotPython.utils.aggregate.aggregate_mean_var" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Aggregate array to mean.</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>X</code></td>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>X array, shape <code>(n, k)</code>.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>y</code></td>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>values, shape <code>(n,)</code>.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>sort</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Whether to sort the resulting DataFrame by the group keys.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>aggregated <code>X</code> values, shape <code>(n-m, k)</code>, if <code>m</code> duplicates in <code>X</code>.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>aggregated (mean per group) <code>y</code> values, shape <code>(1,)</code>, if <code>m</code> duplicates in <code>X</code>.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>aggregated (variance per group) <code>y</code> values, shape <code>(1,)</code>, if <code>m</code> duplicates in <code>X</code>.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>X = np.array([[1, 2], [3, 4], [1, 2]])
+y = np.array([1, 2, 3])
+X_agg, y_mean, y_var = aggregate_mean_var(X, y)
+print(X_agg)
+[[1. 2.]
+ [3. 4.]]
+print(y_mean)
+[2. 2.]
+print(y_var)
+[1. 0.]</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+      <details class="quote">
+        <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/utils/aggregate.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aggregate_mean_var</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Aggregate array to mean.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (numpy.ndarray): X array, shape `(n, k)`.</span>
+<span class="sd">        y (numpy.ndarray): values, shape `(n,)`.</span>
+<span class="sd">        sort (bool): Whether to sort the resulting DataFrame by the group keys.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (numpy.ndarray): aggregated `X` values, shape `(n-m, k)`, if `m` duplicates in `X`.</span>
+<span class="sd">        (numpy.ndarray): aggregated (mean per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.</span>
+<span class="sd">        (numpy.ndarray): aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; X = np.array([[1, 2], [3, 4], [1, 2]])</span>
+<span class="sd">        &gt;&gt;&gt; y = np.array([1, 2, 3])</span>
+<span class="sd">        &gt;&gt;&gt; X_agg, y_mean, y_var = aggregate_mean_var(X, y)</span>
+<span class="sd">        &gt;&gt;&gt; print(X_agg)</span>
+<span class="sd">        [[1. 2.]</span>
+<span class="sd">         [3. 4.]]</span>
+<span class="sd">        &gt;&gt;&gt; print(y_mean)</span>
+<span class="sd">        [2. 2.]</span>
+<span class="sd">        &gt;&gt;&gt; print(y_var)</span>
+<span class="sd">        [1. 0.]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a DataFrame from X and y</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
+
+    <span class="c1"># Group by all columns except &#39;y&#39; and calculate the mean and variance of &#39;y&#39; for each group</span>
+    <span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">([</span><span class="s2">&quot;y&quot;</span><span class="p">])),</span> <span class="n">as_index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="n">sort</span><span class="p">)</span>
+    <span class="n">df_mean</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">df_var</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">var</span><span class="p">()</span>
+
+    <span class="c1"># Convert the resulting DataFrames to numpy arrays</span>
+    <span class="n">mean_array</span> <span class="o">=</span> <span class="n">df_mean</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">var_array</span> <span class="o">=</span> <span class="n">df_var</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+
+    <span class="c1"># Split the resulting arrays into separate arrays for X and y</span>
+    <span class="n">X_agg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">mean_array</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_mean</span> <span class="o">=</span> <span class="n">mean_array</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y_var</span> <span class="o">=</span> <span class="n">var_array</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">X_agg</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">y_var</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="spotPython.utils.aggregate.get_ranks" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_ranks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></code>
+
+<a href="#spotPython.utils.aggregate.get_ranks" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns a numpy array containing ranks of numbers within an input numpy array x:</p>
+
+<p><strong>Examples:</strong></p>
+    
+      <p>get_ranks([2, 1])
+[1, 0]</p>
+<p>get_ranks([20, 10, 100])
+[1, 0, 2]</p>
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>x</code></td>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>numpy array</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>numpy.<span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>ranks</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+      <details class="quote">
+        <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/utils/aggregate.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ranks</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns a numpy array containing ranks of numbers within an input numpy array x:</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    get_ranks([2, 1])</span>
+<span class="sd">    [1, 0]</span>
+
+<span class="sd">    get_ranks([20, 10, 100])</span>
+<span class="sd">    [1, 0, 2]</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x (numpy.ndarray): numpy array</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (numpy.ndarray): ranks</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="n">ranks</span><span class="p">[</span><span class="n">ts</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ranks</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
 
 
 

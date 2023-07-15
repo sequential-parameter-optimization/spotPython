@@ -41,6 +41,8 @@
       
     
     
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -61,6 +63,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#spotPython.sklearn.traintest" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -1053,9 +1060,45 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          traintest
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         traintest
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.sklearn.traintest" class="md-nav__link">
+    spotPython.sklearn.traintest
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.sklearn.traintest.evaluate_model_oob" class="md-nav__link">
+    evaluate_model_oob()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1539,6 +1582,28 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.sklearn.traintest" class="md-nav__link">
+    spotPython.sklearn.traintest
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotPython.sklearn.traintest.evaluate_model_oob" class="md-nav__link">
+    evaluate_model_oob()
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1557,7 +1622,81 @@
 
   <h1>traintest</h1>
 
-<p>::: spotPython.sklearn.traintest</p>
+<div class="doc doc-object doc-module">
+
+
+<a id="spotPython.sklearn.traintest"></a>
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="spotPython.sklearn.traintest.evaluate_model_oob" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">evaluate_model_oob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span></code>
+
+<a href="#spotPython.sklearn.traintest.evaluate_model_oob" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Out-of-bag evaluation (Only for RandomForestClassifier).
+If fun_control[&ldquo;eval&rdquo;] == &ldquo;eval_oob_score&rdquo;.</p>
+
+      <details class="quote">
+        <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/sklearn/traintest.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_model_oob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Out-of-bag evaluation (Only for RandomForestClassifier).</span>
+<span class="sd">    If fun_control[&quot;eval&quot;] == &quot;eval_oob_score&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">get_Xy_from_df</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;target_column&quot;</span><span class="p">])</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="n">df_preds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">oob_decision_function_</span>
+        <span class="n">df_eval</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;metric_sklearn&quot;</span><span class="p">](</span><span class="n">y</span><span class="p">,</span> <span class="n">df_preds</span><span class="p">,</span> <span class="o">**</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;metric_params&quot;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in fun_sklearn(). Call to evaluate_model_oob failed. </span><span class="si">{</span><span class="n">err</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">df_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">df_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">return</span> <span class="n">df_eval</span><span class="p">,</span> <span class="n">df_preds</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
 
 
 
