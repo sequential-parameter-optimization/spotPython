@@ -10,13 +10,15 @@ nav:
 - About: about.md
 theme:
   name: material
+  locale: en
+  highlightjs: true
   favicon: images/favicon.png
   logo: images/spotlogo.png
   palette:
-    - primary: blue grey
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: grey
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
@@ -24,11 +26,15 @@ theme:
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: blue grey
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
 plugins:
     - search:
+    - exclude:
+        glob:
+        - src/spotPython/_version.py
     - gen-files:
         scripts:
         - docs/gen_ref_pages.py
