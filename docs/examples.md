@@ -4,10 +4,9 @@
 
 ```python
 import numpy as np
+from math import inf
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
-import numpy as np
-from math import inf
 # number of initial points:
 ni = 7
 # number of points
