@@ -1,7 +1,34 @@
 import torch.optim
+from typing import Any, Union
 
 
-def optimizer_handler(optimizer_name: str, params, lr_mult=1.0, **kwargs):
+def optimizer_handler(
+    optimizer_name: str, params: Union[list, torch.Tensor], lr_mult: float = 1.0, **kwargs: Any
+) -> torch.optim.Optimizer:
+    """Returns an instance of the specified optimizer.
+
+    Args:
+        optimizer_name (str): The name of the optimizer to use.
+        params (list or torch.Tensor): The parameters to optimize.
+        lr_mult (float, optional): A multiplier for the learning rate. Defaults to 1.0.
+        **kwargs: Additional keyword arguments for the optimizer.
+
+    Returns:
+        (torch.optim.Optimizer):
+            An instance of the specified optimizer.
+
+    Examples:
+        >>> model = torch.nn.Linear(10, 1)
+        >>> optimizer = optimizer_handler("Adadelta", model.parameters(), lr_mult=0.5)
+        >>> print(optimizer)
+        Adadelta (
+            Parameter Group 0
+                eps: 1e-06
+                lr: 0.5
+                rho: 0.9
+                weight_decay: 0
+        )
+    """
     if optimizer_name == "Adadelta":
         return torch.optim.Adadelta(
             params,

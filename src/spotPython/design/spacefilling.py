@@ -7,7 +7,7 @@ from .designs import designs
 
 
 class spacefilling(designs):
-    def __init__(self, k=2, seed=123):
+    def __init__(self, k: int = 2, seed: int = 123) -> None:
         """
         Spacefilling design class
 
@@ -33,26 +33,27 @@ class spacefilling(designs):
         Args:
             n (int): number of samples
             repeats (int): number of repeats (replicates)
-            lower (int, optional): lower bound. Defaults to 0.
-            upper (int, optional): upper bound. Defaults to 1.
+            lower (int or float, optional): lower bound. Defaults to 0.
+            upper (int or float, optional): upper bound. Defaults to 1.
 
         Returns:
-            (numpy.ndarray): Latin hypercube design.
-        Examples:
+            (ndarray): Latin hypercube design.
+
+        Example:
             >>> from spotPython.design.spacefilling import spacefilling
-                import numpy as np
-                lhd = spacefilling(k=2, seed=123)
-                lhd.scipy_lhd(n=5, repeats=2, lower=np.array([0,0]), upper=np.array([1,1]))
-                array([[0.66352963, 0.5892358 ],
-                [0.66352963, 0.5892358 ],
-                [0.55592803, 0.96312564],
-                [0.55592803, 0.96312564],
-                [0.16481882, 0.0375811 ],
-                [0.16481882, 0.0375811 ],
-                [0.215331  , 0.34468512],
-                [0.215331  , 0.34468512],
-                [0.83604909, 0.62202146],
-                [0.83604909, 0.62202146]])
+            >>> import numpy as np
+            >>> lhd = spacefilling(k=2, seed=123)
+            >>> lhd.scipy_lhd(n=5, repeats=2, lower=np.array([0,0]), upper=np.array([1,1]))
+            array([[0.66352963, 0.5892358 ],
+                   [0.66352963, 0.5892358 ],
+                   [0.55592803, 0.96312564],
+                   [0.55592803, 0.96312564],
+                   [0.16481882, 0.0375811 ],
+                   [0.16481882, 0.0375811 ],
+                   [0.215331  , 0.34468512],
+                   [0.215331  , 0.34468512],
+                   [0.83604909, 0.62202146],
+                   [0.83604909, 0.62202146]])
         """
         if lower is None:
             lower = zeros(self.k)

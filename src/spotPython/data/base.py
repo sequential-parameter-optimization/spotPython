@@ -271,7 +271,7 @@ class SyntheticDataset(Dataset):
         sparse (bool): Whether the dataset is sparse or not.
 
     Returns:
-        SyntheticDataset: A synthetic dataset object.
+        (SyntheticDataset): A synthetic dataset object.
 
     Examples:
         >>> from sklearn.datasets import make_classification
@@ -379,7 +379,7 @@ class FileConfig(Config):
         desc (dict): Extra config parameters to pass as keyword arguments.
 
     Returns:
-        FileConfig: A FileConfig object.
+        (FileConfig): A FileConfig object.
 
     Examples:
         >>> config = FileConfig(filename="config.json", directory="/path/to/directory")
@@ -436,7 +436,7 @@ class FileDataset(Dataset):
         desc (dict): Extra dataset parameters to pass as keyword arguments.
 
     Returns:
-        FileDataset: A FileDataset object.
+        (FileDataset): A FileDataset object.
 
     Examples:
         >>> dataset = FileDataset(filename="dataset.csv", directory="/path/to/directory")
@@ -494,7 +494,7 @@ class RemoteDataset(FileDataset):
         unpack (bool): Whether to unpack the download or not. Defaults to True.
         filename (str):
             An optional name to given to the file if the file is unpacked. Defaults to None.
-        desc: Extra dataset parameters to pass as keyword arguments.
+        desc (dict): Extra dataset parameters to pass as keyword arguments.
 
     Examples:
 
@@ -507,7 +507,7 @@ class RemoteDataset(FileDataset):
 
     """
 
-    def __init__(self, url: str, size: int, unpack: bool = True, filename: str = None, **desc):
+    def __init__(self, url: str, size: int, unpack: bool = True, filename: str = None, **desc: dict):
         if filename is None:
             filename = path.basename(url)
 
@@ -621,7 +621,8 @@ class GenericFileDataset(Dataset):
         parse_dates (list): A list of columns to parse as dates. Defaults to None.
         directory (str):
             The directory where the file is contained. Defaults to the location of the `datasets` module.
-        desc: Extra dataset parameters to pass as keyword arguments.
+        desc (dict): Extra dataset parameters to pass as keyword arguments.
+
 
     Examples:
 
@@ -630,7 +631,11 @@ class GenericFileDataset(Dataset):
         >>> for x, y in dataset:
         ...     print(x, y)
         ...     break
-        ({'sepal_length': 5.1, 'sepal_width': 3.5, 'petal_length': 1.4, 'petal_width': 0.2}, 'setosa')
+        ({'sepal_length': 5.1,
+          'sepal_width': 3.5,
+          'petal_length': 1.4,
+          'petal_width': 0.2},
+          'setosa')
 
     """
 
@@ -641,7 +646,7 @@ class GenericFileDataset(Dataset):
         converters: dict = None,
         parse_dates: list = None,
         directory: str = None,
-        **desc,
+        **desc: dict,
     ):
         super().__init__(**desc)
         self.filename = filename

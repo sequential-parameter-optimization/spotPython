@@ -3,36 +3,36 @@ import copy
 import json
 from sklearn.pipeline import make_pipeline
 from river import compose
-from typing import Union, List
+from typing import Union, List, Dict, Generator, Any
 
 from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
 
 
-def generate_one_config_from_var_dict(var_dict, fun_control) -> dict:
+def generate_one_config_from_var_dict(
+    var_dict: Dict[str, np.ndarray], fun_control: Dict[str, Union[List[str], str]]
+) -> Generator[Dict[str, Union[int, float]], None, None]:
     """Generate one configuration from a dictionary of variables (as a generator).
-    This function takes a dictionary of variables as input arguments and returns a dictionary
-    with the values from the arrays in the dictionary.
+
+    This function takes a dictionary of variables as input arguments and returns a generator
+    that yields dictionaries with the values from the arrays in the input dictionary.
 
     Args:
-        var_dict (dict):
-            A dictionary where keys are variable names and values are numpy arrays.
-        fun_control (dict):
-            A dictionary which (at least) has an entry with the following key:
-            "var_type": A list of variable types. If the entry is not "num" the corresponding
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+        fun_control (dict): A dictionary which (at least) has an entry with the following key:
+            "var_type" (list): A list of variable types. If the entry is not "num" the corresponding
             value will be converted to the type "int".
 
     Returns:
-        (dict):
-            A dictionary with the values from the arrays in the dictionary.
+        Generator[dict]: A generator that yields dictionaries with the values from the arrays in the input dictionary.
 
     Examples:
         >>> import numpy as np
         >>> from spotPython.utils.prepare import generate_one_config_from_var_dict
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {"var_type": ["int", "num"]}
-        >>> generate_one_config_from_var_dict(var_dict, fun_control)
-        {'a': 1, 'b': 2}
+        >>> list(generate_one_config_from_var_dict(var_dict, fun_control))
+        [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
     """
     for values in iterate_dict_values(var_dict):
         values = convert_keys(values, fun_control["var_type"])
@@ -41,30 +41,31 @@ def generate_one_config_from_var_dict(var_dict, fun_control) -> dict:
         yield values
 
 
-def return_conf_list_from_var_dict(var_dict: dict, fun_control: dict) -> list:
-    """This function takes a dictionary of variables and a dictionary of function control.
-    It performs similar steps as generate_one_config_from_var_dict()
-    but returns a list of dictionaries of hyper parameter values.
+def return_conf_list_from_var_dict(
+    var_dict: Dict[str, np.ndarray], fun_control: Dict[str, Union[List[str], str]]
+) -> List[Dict[str, Union[int, float]]]:
+    """Return a list of configurations from a dictionary of variables.
+
+    This function takes a dictionary of variables and a dictionary of function control as input arguments.
+    It performs similar steps as generate_one_config_from_var_dict() but returns a list of dictionaries
+    of hyper parameter values.
+
     Args:
-        var_dict (dict):
-            A dictionary of variables.
-        fun_control (dict):
-            A dictionary of function control.
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+        fun_control (dict): A dictionary which (at least) has an entry with the following key:
+            "var_type" (list): A list of variable types. If the entry is not "num" the corresponding
+            value will be converted to the type "int".
+
     Returns:
-        (list):
-            A list of dictionaries of hyper parameter values. Transformations are applied to the values.
+        list: A list of dictionaries of hyper parameter values. Transformations are applied to the values.
+
     Examples:
         >>> import numpy as np
         >>> from spotPython.utils.prepare import return_conf_list_from_var_dict
-            var_dict = {'a': np.array([1]),
-                        'b': np.array([2])}
-            fun_control = {'var_type': ['int', 'int']}
-            return_conf_list_from_var_dict(var_dict, fun_control)
-            var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-            fun_control = {'var_type': ['int', 'int']}
-            return_conf_list_from_var_dict(var_dict, fun_control)
-            {'a': [1, 3, 5], 'b': [2, 4, 6]}
-
+        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+        >>> fun_control = {'var_type': ['int', 'int']}
+        >>> return_conf_list_from_var_dict(var_dict, fun_control)
+        [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
     """
     conf_list = []
     for values in generate_one_config_from_var_dict(var_dict, fun_control):
@@ -72,37 +73,33 @@ def return_conf_list_from_var_dict(var_dict: dict, fun_control: dict) -> list:
     return conf_list
 
 
-def iterate_dict_values(var_dict: dict):
-    """
-    This function takes a dictionary of variables as input arguments and returns an iterator that
-    yields the values from the arrays in the dictionary.
+def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, Union[int, float]], None, None]:
+    """Iterate over the values of a dictionary of variables.
 
-    Parameters:
-        var_dict (dict):
-            A dictionary where keys are variable names and values are numpy arrays.
+    This function takes a dictionary of variables as input arguments and returns a generator that
+    yields dictionaries with the values from the arrays in the input dictionary.
+
+    Args:
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
 
     Returns:
-        iterator (generator):
-            An iterator that yields the values from the arrays in the dictionary.
+        Generator[dict]:
+            A generator that yields dictionaries with the values from the arrays in the input dictionary.
 
     Examples:
         >>> import numpy as np
         >>> from spotPython.utils.prepare import iterate_dict_values
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-        >>> for values in iterate_dict_values(var_dict):
-        ...     print(values)
-        {'a': 1, 'b': 2}
-        {'a': 3, 'b': 4}
-        {'a': 5, 'b': 6}
+        >>> list(iterate_dict_values(var_dict))
+        [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
     """
     n = len(next(iter(var_dict.values())))
     for i in range(n):
         yield {key: value[i] for key, value in var_dict.items()}
 
 
-def convert_keys(d: dict, var_type: list):
-    """
-    Convert values in a dictionary to integers based on a list of variable types.
+def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> Dict[str, Union[int, float]]:
+    """Convert values in a dictionary to integers based on a list of variable types.
 
     This function takes a dictionary `d` and a list of variable types `var_type` as arguments.
     For each key in the dictionary,
@@ -110,15 +107,13 @@ def convert_keys(d: dict, var_type: list):
     the value associated with that key is converted to an integer.
 
     Args:
-        d (dict):
-            The input dictionary.
+        d (dict): The input dictionary.
         var_type (list):
             A list of variable types. If the entry is not `"num"` the corresponding
             value will be converted to the type `"int"`.
 
     Returns:
-        (dict):
-            The modified dictionary with values converted to integers based on `var_type`.
+        dict: The modified dictionary with values converted to integers based on `var_type`.
 
     Examples:
         >>> from spotPython.utils.prepare import convert_keys
@@ -134,8 +129,9 @@ def convert_keys(d: dict, var_type: list):
     return d
 
 
-def get_dict_with_levels_and_types(fun_control, v) -> dict:
+def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any]) -> Dict[str, Any]:
     """Get dictionary with levels and types.
+
     The function maps the numerical output of the hyperparameter optimization to the corresponding levels
     of the hyperparameter needed by the core model, i.e., the tuned algorithm.
     The function takes the dictionaries fun_control and v and returns a new dictionary with the same keys as v
@@ -145,76 +141,81 @@ def get_dict_with_levels_and_types(fun_control, v) -> dict:
     If a key is not in fun_control, it takes the key from v.
     If the core_model_parameter_type value is instance, it returns the class of the value from the module
     via getattr("class", value).
-    For example,
-    if fun_control = {"HoeffdingTreeRegressor":{
-        "leaf_prediction": {
-            "levels": ["mean", "model", "adaptive"],
-            "type": "factor",
-            "default": "mean",
-            "core_model_parameter_type": "str"},
-        "leaf_model": {
-            "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-            "type": "factor",
-            "default": "LinearRegression",
-            "core_model_parameter_type": "instance"},
-            "splitter": {"levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-            "type": "factor",
-            "default": "EBSTSplitter", "core_model_parameter_type": "instance()"},
-        "binary_split": {
-            "levels": [0, 1],
-            "type": "factor",
-            "default": 0,
-            "core_model_parameter_type": "bool"},
-        "stop_mem_management": {
-            "levels": [0, 1],
-            "type": "factor",
-            "default": 0,
-            "core_model_parameter_type": "bool"}}}
-        and
-        v = {'grace_period': 200,
+
+    Args:
+        fun_control (Dict[str, Any]): A dictionary containing information about the core model hyperparameters.
+        v (Dict[str, Any]): A dictionary containing the numerical output of the hyperparameter optimization.
+
+    Returns:
+        Dict[str, Any]:
+            A new dictionary with the same keys as v but with the values of the levels of the keys from fun_control.
+
+    Examples:
+        >>> fun_control = {
+        ...     "core_model_hyper_dict": {
+        ...         "leaf_prediction": {
+        ...             "levels": ["mean", "model", "adaptive"],
+        ...             "type": "factor",
+        ...             "default": "mean",
+        ...             "core_model_parameter_type": "str"
+        ...         },
+        ...         "leaf_model": {
+        ...             "levels": [
+        ...                 "linear_model.LinearRegression",
+        ...                 "linear_model.PARegressor",
+        ...                 "linear_model.Perceptron"
+        ...             ],
+        ...             "type": "factor",
+        ...             "default": "LinearRegression",
+        ...             "core_model_parameter_type": "instance"
+        ...         },
+        ...         "splitter": {
+        ...             "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
+        ...             "type": "factor",
+        ...             "default": "EBSTSplitter",
+        ...             "core_model_parameter_type": "instance()"
+        ...         },
+        ...         "binary_split": {
+        ...             "levels": [0, 1],
+        ...             "type": "factor",
+        ...             "default": 0,
+        ...             "core_model_parameter_type": "bool"
+        ...         },
+        ...         "stop_mem_management": {
+        ...             "levels": [0, 1],
+        ...             "type": "factor",
+        ...             "default": 0,
+        ...             "core_model_parameter_type": "bool"
+        ...         }
+        ...     }
+        ... }
+        >>> v = {
+        ...     'grace_period': 200,
+        ...     'max_depth': 10,
+        ...     'delta': 1e-07,
+        ...     'tau': 0.05,
+        ...     'leaf_prediction': 0,
+        ...     'leaf_model': 0,
+        ...     'model_selector_decay': 0.95,
+        ...     'splitter': 1,
+        ...     'min_samples_split': 9,
+        ...     'binary_split': 0,
+        ...     'max_size': 500.0
+        ... }
+        >>> get_dict_with_levels_and_types(fun_control, v)
+        {
+            'grace_period': 200,
             'max_depth': 10,
             'delta': 1e-07,
             'tau': 0.05,
-            'leaf_prediction': 0,
-            'leaf_model': 0,
+            'leaf_prediction': 'mean',
+            'leaf_model': linear_model.LinearRegression,
             'model_selector_decay': 0.95,
-            'splitter': 1,
+            'splitter': TEBSTSplitter,
             'min_samples_split': 9,
-            'binary_split': 0,
-            'max_size': 500.0}
-        then the function returns
-        {'grace_period': 200,
-        'max_depth': 10,
-        'delta': 1e-07,
-        'tau': 0.05,
-        'leaf_prediction': 'mean',
-        'leaf_model': linear_model.LinearRegression,
-        'model_selector_decay': 0.95,
-        'splitter': 'TEBSTSplitter',
-        'min_samples_split': 9,
-        'binary_split': 0,
-        'max_size': 500.0}.
-
-    Args:
-        fun_control (dict):
-            dictionary with levels and types
-        v (dict):
-            dictionary with values
-
-    Returns:
-        new_dict (dict):
-            dictionary with levels and types
-
-    Examples:
-        >>> from spotPython.utils.prepare import get_dict_with_levels_and_types
-            fun_control = {"HoeffdingTreeRegressor":{
-                "leaf_prediction": {"levels": ["mean", "model", "adaptive"],
-                                    "type": "factor",
-                                    "default": "mean",
-                                    "core_model_parameter_type": "str"}}}
-            v = {"leaf_prediction": 0}
-            get_dict_with_levels_and_types(fun_control, v)
-            {"leaf_prediction": "mean"}
+            'binary_split': False,
+            'max_size': 500.0
+        }
     """
     d = fun_control["core_model_hyper_dict"]
     new_dict = {}
@@ -242,7 +243,7 @@ def assign_values(X: np.array, var_list: list) -> dict:
     This function takes an np.array X and a list of variable names as input arguments
     and returns a dictionary where the keys are the variable names and the values are assigned from X.
 
-    Parameters:
+    Args:
         X (np.array):
             A 2D numpy array where each column represents a variable.
         var_list (list):

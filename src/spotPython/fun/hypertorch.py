@@ -10,7 +10,6 @@ from spotPython.hyperparameters.values import (
 )
 from spotPython.utils.eda import generate_config_id
 
-
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
 py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
@@ -23,12 +22,18 @@ class HyperTorch:
     Hyperparameter Tuning for Torch.
 
     Args:
-        seed (int): seed.
-            See [Numpy Random Sampling](https://numpy.org/doc/stable/reference/random/index.html#random-quick-start)
+        seed (int): seed for random number generator.
+            See Numpy Random Sampling
+        log_level (int): log level for logger. Default is 50.
 
+    Attributes:
+        seed (int): seed for random number generator.
+        rng (Generator): random number generator.
+        fun_control (dict): dictionary containing control parameters for the function.
+        log_level (int): log level for logger.
     """
 
-    def __init__(self, seed=126, log_level=50):
+    def __init__(self, seed: int = 126, log_level: int = 50):
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
         self.fun_control = {
@@ -49,7 +54,27 @@ class HyperTorch:
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
 
-    def check_X_shape(self, X):
+    def check_X_shape(self, X: np.ndarray) -> None:
+        """
+        Check the shape of the input array X.
+
+        Args:
+            X (np.ndarray): input array.
+
+        Raises:
+            Exception: if the second dimension of X does not match the length of var_name in fun_control.
+        Examples:
+            >>> from spotPython.fun.hypertorch import HyperTorch
+            >>> import numpy as np
+            >>> hyper_torch = HyperTorch(seed=126, log_level=50)
+            >>> hyper_torch.fun_control["var_name"] = ["x1", "x2"]
+            >>> hyper_torch.check_X_shape(np.array([[1, 2], [3, 4]]))
+            >>> hyper_torch.check_X_shape(np.array([1, 2]))
+            Traceback (most recent call last):
+            ...
+            Exception
+
+        """
         try:
             X.shape[1]
         except ValueError:
@@ -57,12 +82,27 @@ class HyperTorch:
         if X.shape[1] != len(self.fun_control["var_name"]):
             raise Exception
 
-    def fun_torch(self, X, fun_control=None):
+    def fun_torch(self, X: np.ndarray, fun_control: dict = None) -> np.ndarray:
+        """
+        Function to be optimized.
+
+        Args:
+            X (np.ndarray): input array.
+            fun_control (dict): dictionary containing control parameters for the function.
+        Returns:
+            np.ndarray: output array.
+        Examples:
+            >>> from spotPython.fun.hypertorch import HyperTorch
+            >>> import numpy as np
+            >>> hyper_torch = HyperTorch(seed=126, log_level=50)
+            >>> hyper_torch.fun_control["var_name"] = ["x1", "x2"]
+            >>> hyper_torch.fun_torch(np.array([[1, 2], [3, 4]]))
+
+        """
         z_res = np.array([], dtype=float)
         self.fun_control.update(fun_control)
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
-        # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
             print(f"\nconfig: {config}")
             config_id = generate_config_id(config)

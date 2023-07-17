@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from numpy.random import default_rng
 from numpy import array
 from spotPython.light.traintest import train_model
@@ -6,10 +7,6 @@ from spotPython.hyperparameters.values import (
     assign_values,
     generate_one_config_from_var_dict,
 )
-
-# from spotPython.utils.eda import generate_config_id
-import numpy as np
-
 
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -23,12 +20,22 @@ class HyperLight:
     Hyperparameter Tuning for Lightning 2.
 
     Args:
-        seed (int): seed.
-            See [Numpy Random Sampling](https://numpy.org/doc/stable/reference/random/index.html#random-quick-start)
+        seed (int): seed for the random number generator. See Numpy Random Sampling.
+        log_level (int): log level for the logger.
 
+    Attributes:
+        seed (int): seed for the random number generator.
+        rng (Generator): random number generator.
+        fun_control (dict): dictionary containing control parameters for the hyperparameter tuning.
+        log_level (int): log level for the logger.
+
+    Example:
+        >>> hyper_light = HyperLight(seed=126, log_level=50)
+        >>> print(hyper_light.seed)
+        126
     """
 
-    def __init__(self, seed=126, log_level=50):
+    def __init__(self, seed: int = 126, log_level: int = 50) -> None:
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
         self.fun_control = {
@@ -49,30 +56,74 @@ class HyperLight:
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
 
-    def check_X_shape(self, X):
+    def check_X_shape(self, X: np.ndarray) -> np.ndarray:
+        """
+        Checks the shape of the input array X and raises an exception if it is not valid.
+
+        Args:
+            X (np.ndarray):
+                input array.
+
+        Returns:
+            np.ndarray:
+                input array with valid shape.
+
+        Raises:
+            Exception:
+                if the shape of the input array is not valid.
+
+        Example:
+            >>> hyper_light = HyperLight(seed=126, log_level=50)
+            >>> X = np.array([[1, 2], [3, 4]])
+            >>> hyper_light.check_X_shape(X)
+            array([[1, 2],
+                   [3, 4]])
+        """
         try:
             X.shape[1]
         except ValueError:
             X = np.array([X])
         if X.shape[1] != len(self.fun_control["var_name"]):
-            raise Exception
+            raise Exception("Invalid shape of input array X.")
+        return X
 
-    def fun(self, X, fun_control=None):
+    def fun(self, X: np.ndarray, fun_control: dict = None) -> np.ndarray:
+        """
+        Evaluates the function for the given input array X and control parameters.
+
+        Args:
+            X (np.ndarray):
+                input array.
+            fun_control (dict):
+                dictionary containing control parameters for the hyperparameter tuning.
+
+        Returns:
+            (np.ndarray):
+                array containing the evaluation results.
+
+        Example:
+            >>> hyper_light = HyperLight(seed=126, log_level=50)
+            >>> X = np.array([[1, 2], [3, 4]])
+            >>> fun_control = {"weights": np.array([1, 0, 0])}
+            >>> hyper_light.fun(X, fun_control)
+            array([nan, nan])
+        """
         z_res = np.array([], dtype=float)
-        self.fun_control.update(fun_control)
+        if fun_control is not None:
+            self.fun_control.update(fun_control)
         self.check_X_shape(X)
         var_dict = assign_values(X, self.fun_control["var_name"])
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
-            print(f"\nconfig: {config}")
+            logger.debug(f"\nconfig: {config}")
             # extract parameters like epochs, batch_size, lr, etc. from config
             # config_id = generate_config_id(config)
             try:
                 df_eval = train_model(config, self.fun_control)
             except Exception as err:
-                print(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
-                print("Setting df_eval to np.nan")
+                logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
+                logger.error("Setting df_eval to np.nan")
                 df_eval = np.nan
-            z_val = fun_control["weights"] * df_eval
+            z_val = self.fun_control["weights"] * df_eval
             z_res = np.append(z_res, z_val)
         return z_res
