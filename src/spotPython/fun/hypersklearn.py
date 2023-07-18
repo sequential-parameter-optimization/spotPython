@@ -31,6 +31,11 @@ class HyperSklearn:
         rng (Generator): random number generator.
         fun_control (dict): dictionary containing control parameters for the function.
         log_level (int): log level for logger.
+    Examples:
+        >>> from spotPython.fun.hypersklearn import HyperSklearn
+        >>> hyper_sklearn = HyperSklearn(seed=126, log_level=50)
+        >>> print(hyper_sklearn.seed)
+        126
     """
 
     def __init__(self, seed: int = 126, log_level: int = 50):
@@ -65,6 +70,16 @@ class HyperSklearn:
 
         Raises:
             Exception: if the second dimension of X does not match the length of var_name in fun_control.
+        Examples:
+            >>> from spotPython.fun.hypersklearn import HyperSklearn
+            >>> hyper_sklearn = HyperSklearn(seed=126, log_level=50)
+            >>> hyper_sklearn.fun_control["var_name"] = ["a", "b", "c"]
+            >>> hyper_sklearn.check_X_shape(X=np.array([[1, 2, 3]]))
+            >>> hyper_sklearn.check_X_shape(X=np.array([[1, 2]]))
+            Traceback (most recent call last):
+            ...
+            Exception
+
         """
         try:
             X.shape[1]
@@ -84,6 +99,7 @@ class HyperSklearn:
 
         Raises:
             Exception: if call to evaluate_model fails.
+
         """
         try:
             df_eval, df_preds = self.evaluate_model(model, self.fun_control)
@@ -108,32 +124,6 @@ class HyperSklearn:
         Raises:
             Exception: if call to evaluate_model fails.
 
-         Example:
-             >>> from sklearn.tree import DecisionTreeRegressor
-             >>> from spotPython.data.load import load_data
-             >>> from spotPython.hyperparameters.values import generate_var_dict_from_config_space
-             >>> from spotPython.sklearn.traintest import split_data_for_hold_out
-             >>> data = load_data("boston")
-             >>> data_train, data_test = split_data_for_hold_out(data)
-             >>> config_space = {
-             ...     "max_depth": [3, 4],
-             ...     "min_samples_split": [2],
-             ...     "min_samples_leaf": [1],
-             ... }
-             >>> var_dict = generate_var_dict_from_config_space(config_space)
-             >>> var_name = list(var_dict.keys())
-             >>> var_type = ["int"] * len(var_name)
-             >>> fun_control = {
-             ...     "data": data_train,
-             ...     "var_name": var_name,
-             ...     "var_type": var_type,
-             ...     "core_model": DecisionTreeRegressor,
-             ...     "eval": "train_hold_out",
-             ... }
-             >>> h = HyperSklearn()
-             >>> X = np.array([[3, 2, 1]])
-             >>> h.fun_sklearn(X, fun_control)
-             array([3.05555556])
         """
         z_res = np.array([], dtype=float)
         self.fun_control.update(fun_control)

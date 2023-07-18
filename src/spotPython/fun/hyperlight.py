@@ -72,7 +72,7 @@ class HyperLight:
             Exception:
                 if the shape of the input array is not valid.
 
-        Example:
+        Examples:
             >>> hyper_light = HyperLight(seed=126, log_level=50)
             >>> X = np.array([[1, 2], [3, 4]])
             >>> hyper_light.check_X_shape(X)
@@ -101,7 +101,7 @@ class HyperLight:
             (np.ndarray):
                 array containing the evaluation results.
 
-        Example:
+        Examples:
             >>> hyper_light = HyperLight(seed=126, log_level=50)
             >>> X = np.array([[1, 2], [3, 4]])
             >>> fun_control = {"weights": np.array([1, 0, 0])}
