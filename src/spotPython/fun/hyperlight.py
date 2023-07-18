@@ -29,7 +29,7 @@ class HyperLight:
         fun_control (dict): dictionary containing control parameters for the hyperparameter tuning.
         log_level (int): log level for the logger.
 
-    Example:
+    Examples:
         >>> hyper_light = HyperLight(seed=126, log_level=50)
         >>> print(hyper_light.seed)
         126
