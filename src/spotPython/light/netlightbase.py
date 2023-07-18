@@ -12,24 +12,39 @@ class NetLightBase(L.LightningModule):
     A LightningModule class for a neural network model.
 
     Attributes:
-        l1 (int): The number of neurons in the first hidden layer.
-        epochs (int): The number of epochs to train the model for.
-        batch_size (int): The batch size to use during training.
-        initialization (str): The initialization method to use for the weights.
-        act_fn (nn.Module): The activation function to use in the hidden layers.
-        optimizer (str): The optimizer to use during training.
-        dropout_prob (float): The probability of dropping out a neuron during training.
-        lr_mult (float): The learning rate multiplier for the optimizer.
-        patience (int): The number of epochs to wait before early stopping.
-        _L_in (int): The number of input features.
-        _L_out (int): The number of output classes.
-        layers (nn.Sequential): The neural network model.
+        l1 (int):
+            The number of neurons in the first hidden layer.
+        epochs (int):
+            The number of epochs to train the model for.
+        batch_size (int):
+            The batch size to use during training.
+        initialization (str):
+            The initialization method to use for the weights.
+        act_fn (nn.Module):
+            The activation function to use in the hidden layers.
+        optimizer (str):
+            The optimizer to use during training.
+        dropout_prob (float):
+            The probability of dropping out a neuron during training.
+        lr_mult (float):
+            The learning rate multiplier for the optimizer.
+        patience (int):
+            The number of epochs to wait before early stopping.
+        _L_in (int):
+            The number of input features.
+        _L_out (int):
+            The number of output classes.
+        layers (nn.Sequential):
+            The neural network model.
 
-    Example:
+    Examples:
         >>> from torch.utils.data import DataLoader
         >>> from torchvision.datasets import MNIST
         >>> from torchvision.transforms import ToTensor
-        >>> train_data = MNIST(PATH_DATASETS, train=True, download=True, transform=ToTensor())
+        >>> train_data = MNIST(PATH_DATASETS,
+                               train=True,
+                               download=True,
+                               transform=ToTensor())
         >>> train_loader = DataLoader(train_data,
                                       batch_size=BATCH_SIZE)
         >>> net_light_base = NetLightBase(l1=128,
