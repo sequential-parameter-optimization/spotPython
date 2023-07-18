@@ -1845,6 +1845,13 @@ See Numpy Random Sampling</p>
     </tbody>
   </table>
 
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.fun.hypersklearn</span> <span class="kn">import</span> <span class="n">HyperSklearn</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_sklearn</span> <span class="o">=</span> <span class="n">HyperSklearn</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">hyper_sklearn</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+<span class="go">126</span>
+</code></pre></div>
+
 
         <details class="quote">
           <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/fun/hypersklearn.py</code></summary>
@@ -1979,17 +1986,7 @@ See Numpy Random Sampling</p>
 <span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperSklearn</span><span class="p">:</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperSklearn</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Sklearn.</span>
 
@@ -2003,6 +2000,11 @@ See Numpy Random Sampling</p>
 <span class="sd">        rng (Generator): random number generator.</span>
 <span class="sd">        fun_control (dict): dictionary containing control parameters for the function.</span>
 <span class="sd">        log_level (int): log level for logger.</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from spotPython.fun.hypersklearn import HyperSklearn</span>
+<span class="sd">        &gt;&gt;&gt; hyper_sklearn = HyperSklearn(seed=126, log_level=50)</span>
+<span class="sd">        &gt;&gt;&gt; print(hyper_sklearn.seed)</span>
+<span class="sd">        126</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
@@ -2037,6 +2039,16 @@ See Numpy Random Sampling</p>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            Exception: if the second dimension of X does not match the length of var_name in fun_control.</span>
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from spotPython.fun.hypersklearn import HyperSklearn</span>
+<span class="sd">            &gt;&gt;&gt; hyper_sklearn = HyperSklearn(seed=126, log_level=50)</span>
+<span class="sd">            &gt;&gt;&gt; hyper_sklearn.fun_control[&quot;var_name&quot;] = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; hyper_sklearn.check_X_shape(X=np.array([[1, 2, 3]]))</span>
+<span class="sd">            &gt;&gt;&gt; hyper_sklearn.check_X_shape(X=np.array([[1, 2]]))</span>
+<span class="sd">            Traceback (most recent call last):</span>
+<span class="sd">            ...</span>
+<span class="sd">            Exception</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -2056,6 +2068,7 @@ See Numpy Random Sampling</p>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            Exception: if call to evaluate_model fails.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">df_eval</span><span class="p">,</span> <span class="n">df_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
@@ -2080,32 +2093,6 @@ See Numpy Random Sampling</p>
 <span class="sd">        Raises:</span>
 <span class="sd">            Exception: if call to evaluate_model fails.</span>
 
-<span class="sd">         Example:</span>
-<span class="sd">             &gt;&gt;&gt; from sklearn.tree import DecisionTreeRegressor</span>
-<span class="sd">             &gt;&gt;&gt; from spotPython.data.load import load_data</span>
-<span class="sd">             &gt;&gt;&gt; from spotPython.hyperparameters.values import generate_var_dict_from_config_space</span>
-<span class="sd">             &gt;&gt;&gt; from spotPython.sklearn.traintest import split_data_for_hold_out</span>
-<span class="sd">             &gt;&gt;&gt; data = load_data(&quot;boston&quot;)</span>
-<span class="sd">             &gt;&gt;&gt; data_train, data_test = split_data_for_hold_out(data)</span>
-<span class="sd">             &gt;&gt;&gt; config_space = {</span>
-<span class="sd">             ...     &quot;max_depth&quot;: [3, 4],</span>
-<span class="sd">             ...     &quot;min_samples_split&quot;: [2],</span>
-<span class="sd">             ...     &quot;min_samples_leaf&quot;: [1],</span>
-<span class="sd">             ... }</span>
-<span class="sd">             &gt;&gt;&gt; var_dict = generate_var_dict_from_config_space(config_space)</span>
-<span class="sd">             &gt;&gt;&gt; var_name = list(var_dict.keys())</span>
-<span class="sd">             &gt;&gt;&gt; var_type = [&quot;int&quot;] * len(var_name)</span>
-<span class="sd">             &gt;&gt;&gt; fun_control = {</span>
-<span class="sd">             ...     &quot;data&quot;: data_train,</span>
-<span class="sd">             ...     &quot;var_name&quot;: var_name,</span>
-<span class="sd">             ...     &quot;var_type&quot;: var_type,</span>
-<span class="sd">             ...     &quot;core_model&quot;: DecisionTreeRegressor,</span>
-<span class="sd">             ...     &quot;eval&quot;: &quot;train_hold_out&quot;,</span>
-<span class="sd">             ... }</span>
-<span class="sd">             &gt;&gt;&gt; h = HyperSklearn()</span>
-<span class="sd">             &gt;&gt;&gt; X = np.array([[3, 2, 1]])</span>
-<span class="sd">             &gt;&gt;&gt; h.fun_sklearn(X, fun_control)</span>
-<span class="sd">             array([3.05555556])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
@@ -2210,14 +2197,20 @@ See Numpy Random Sampling</p>
     </tbody>
   </table>
 
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.fun.hypersklearn</span> <span class="kn">import</span> <span class="n">HyperSklearn</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_sklearn</span> <span class="o">=</span> <span class="n">HyperSklearn</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_sklearn</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;var_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_sklearn</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_sklearn</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">Exception</span>
+</code></pre></div>
+
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/fun/hypersklearn.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
 <span class="normal">67</span>
@@ -2227,7 +2220,22 @@ See Numpy Random Sampling</p>
 <span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
-<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_X_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_X_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check the shape of the input array X.</span>
 
@@ -2236,6 +2244,16 @@ See Numpy Random Sampling</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        Exception: if the second dimension of X does not match the length of var_name in fun_control.</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from spotPython.fun.hypersklearn import HyperSklearn</span>
+<span class="sd">        &gt;&gt;&gt; hyper_sklearn = HyperSklearn(seed=126, log_level=50)</span>
+<span class="sd">        &gt;&gt;&gt; hyper_sklearn.fun_control[&quot;var_name&quot;] = [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; hyper_sklearn.check_X_shape(X=np.array([[1, 2, 3]]))</span>
+<span class="sd">        &gt;&gt;&gt; hyper_sklearn.check_X_shape(X=np.array([[1, 2]]))</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        Exception</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -2348,52 +2366,10 @@ See Numpy Random Sampling</p>
         </tr>
     </tbody>
   </table>
-      <p>Example:
-     &gt;&gt;&gt; from sklearn.tree import DecisionTreeRegressor
-     &gt;&gt;&gt; from spotPython.data.load import load_data
-     &gt;&gt;&gt; from spotPython.hyperparameters.values import generate_var_dict_from_config_space
-     &gt;&gt;&gt; from spotPython.sklearn.traintest import split_data_for_hold_out
-     &gt;&gt;&gt; data = load_data(&ldquo;boston&rdquo;)
-     &gt;&gt;&gt; data_train, data_test = split_data_for_hold_out(data)
-     &gt;&gt;&gt; config_space = {
-     &hellip;     &ldquo;max_depth&rdquo;: [3, 4],
-     &hellip;     &ldquo;min_samples_split&rdquo;: [2],
-     &hellip;     &ldquo;min_samples_leaf&rdquo;: [1],
-     &hellip; }
-     &gt;&gt;&gt; var_dict = generate_var_dict_from_config_space(config_space)
-     &gt;&gt;&gt; var_name = list(var_dict.keys())
-     &gt;&gt;&gt; var_type = [&ldquo;int&rdquo;] * len(var_name)
-     &gt;&gt;&gt; fun_control = {
-     &hellip;     &ldquo;data&rdquo;: data_train,
-     &hellip;     &ldquo;var_name&rdquo;: var_name,
-     &hellip;     &ldquo;var_type&rdquo;: var_type,
-     &hellip;     &ldquo;core_model&rdquo;: DecisionTreeRegressor,
-     &hellip;     &ldquo;eval&rdquo;: &ldquo;train_hold_out&rdquo;,
-     &hellip; }
-     &gt;&gt;&gt; h = HyperSklearn()
-     &gt;&gt;&gt; X = np.array([[3, 2, 1]])
-     &gt;&gt;&gt; h.fun_sklearn(X, fun_control)
-     array([3.05555556])</p>
 
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/fun/hypersklearn.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -2431,17 +2407,7 @@ See Numpy Random Sampling</p>
 <span class="normal">148</span>
 <span class="normal">149</span>
 <span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun_sklearn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">151</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun_sklearn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate a sklearn model using hyperparameters specified in X.</span>
 
@@ -2455,32 +2421,6 @@ See Numpy Random Sampling</p>
 <span class="sd">    Raises:</span>
 <span class="sd">        Exception: if call to evaluate_model fails.</span>
 
-<span class="sd">     Example:</span>
-<span class="sd">         &gt;&gt;&gt; from sklearn.tree import DecisionTreeRegressor</span>
-<span class="sd">         &gt;&gt;&gt; from spotPython.data.load import load_data</span>
-<span class="sd">         &gt;&gt;&gt; from spotPython.hyperparameters.values import generate_var_dict_from_config_space</span>
-<span class="sd">         &gt;&gt;&gt; from spotPython.sklearn.traintest import split_data_for_hold_out</span>
-<span class="sd">         &gt;&gt;&gt; data = load_data(&quot;boston&quot;)</span>
-<span class="sd">         &gt;&gt;&gt; data_train, data_test = split_data_for_hold_out(data)</span>
-<span class="sd">         &gt;&gt;&gt; config_space = {</span>
-<span class="sd">         ...     &quot;max_depth&quot;: [3, 4],</span>
-<span class="sd">         ...     &quot;min_samples_split&quot;: [2],</span>
-<span class="sd">         ...     &quot;min_samples_leaf&quot;: [1],</span>
-<span class="sd">         ... }</span>
-<span class="sd">         &gt;&gt;&gt; var_dict = generate_var_dict_from_config_space(config_space)</span>
-<span class="sd">         &gt;&gt;&gt; var_name = list(var_dict.keys())</span>
-<span class="sd">         &gt;&gt;&gt; var_type = [&quot;int&quot;] * len(var_name)</span>
-<span class="sd">         &gt;&gt;&gt; fun_control = {</span>
-<span class="sd">         ...     &quot;data&quot;: data_train,</span>
-<span class="sd">         ...     &quot;var_name&quot;: var_name,</span>
-<span class="sd">         ...     &quot;var_type&quot;: var_type,</span>
-<span class="sd">         ...     &quot;core_model&quot;: DecisionTreeRegressor,</span>
-<span class="sd">         ...     &quot;eval&quot;: &quot;train_hold_out&quot;,</span>
-<span class="sd">         ... }</span>
-<span class="sd">         &gt;&gt;&gt; h = HyperSklearn()</span>
-<span class="sd">         &gt;&gt;&gt; X = np.array([[3, 2, 1]])</span>
-<span class="sd">         &gt;&gt;&gt; h.fun_sklearn(X, fun_control)</span>
-<span class="sd">         array([3.05555556])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
@@ -2600,26 +2540,27 @@ See Numpy Random Sampling</p>
 
       <details class="quote">
         <summary>Source code in <code>/Users/bartz/miniforge3/envs/spotCondaEnv/lib/python3.10/site-packages/spotPython/fun/hypersklearn.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_sklearn_df_eval_preds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_sklearn_df_eval_preds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get evaluation and prediction dataframes for a given model.</span>
 <span class="sd">    Args:</span>
@@ -2630,6 +2571,7 @@ See Numpy Random Sampling</p>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        Exception: if call to evaluate_model fails.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">df_eval</span><span class="p">,</span> <span class="n">df_preds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
