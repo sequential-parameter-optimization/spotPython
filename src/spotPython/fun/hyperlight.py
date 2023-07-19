@@ -17,7 +17,7 @@ logger.addHandler(py_handler)
 
 class HyperLight:
     """
-    Hyperparameter Tuning for Lightning 2.
+    Hyperparameter Tuning for Lightning.
 
     Args:
         seed (int): seed for the random number generator. See Numpy Random Sampling.

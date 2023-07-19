@@ -29,8 +29,8 @@ class CIFAR10DataModule(pl.LightningDataModule):
     def prepare_data(self) -> None:
         """Prepares the data for use."""
         # download
-        CIFAR10(self.data_dir, train=True, download=True)
-        CIFAR10(self.data_dir, train=False, download=True)
+        CIFAR10(root=self.data_dir, train=True, download=True)
+        CIFAR10(root=self.data_dir, train=False, download=True)
 
     def setup(self, stage: Optional[str] = None) -> None:
         """
@@ -42,14 +42,21 @@ class CIFAR10DataModule(pl.LightningDataModule):
         """
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
-            transform = transforms.Compose([transforms.ToTensor()])
-            cifar_full = CIFAR10(self.data_dir, train=True, transform=transform)
-            self.data_train, self.data_val = random_split(cifar_full, [45000, 5000])
+            transform = transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+            )
+            data_full = CIFAR10(root=self.data_dir, train=True, transform=transform)
+            # self.data_train, self.data_val = random_split(daata_full, [45000, 5000])
+            test_abs = int(len(data_full) * 0.6)
+            print("test_abs", test_abs)
+            self.data_train, self.data_val = random_split(data_full, [test_abs, len(data_full) - test_abs])
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
-            transform = transforms.Compose([transforms.ToTensor()])
-            self.data_test = CIFAR10(self.data_dir, train=False, transform=transform)
+            transform = transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+            )
+            self.data_test = CIFAR10(root=self.data_dir, train=False, transform=transform)
 
     def train_dataloader(self) -> DataLoader:
         """
@@ -59,7 +66,8 @@ class CIFAR10DataModule(pl.LightningDataModule):
             DataLoader: The training dataloader.
 
         """
-        return DataLoader(self.data_train, batch_size=self.batch_size, num_workers=self.num_workers)
+        print("self.batch_size", self.batch_size)
+        return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:
         """
@@ -70,7 +78,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
 
         """
-        return DataLoader(self.data_val, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_val, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
         """
@@ -81,4 +89,4 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
 
         """
-        return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_test, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
