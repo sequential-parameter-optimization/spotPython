@@ -10,7 +10,7 @@ class CSVDataModule(L.LightningDataModule):
 
     Args:
         batch_size (int): The size of the batch.
-        DATASET_PATH (str): The path to the dataset. Defaults to "./data".
+        data_dir (str): The path to the dataset. Defaults to "./data".
         num_workers (int): The number of workers for data loading. Defaults to 0.
 
     Attributes:
@@ -19,7 +19,7 @@ class CSVDataModule(L.LightningDataModule):
         data_test (Dataset): The test dataset.
     """
 
-    def __init__(self, batch_size: int, DATASET_PATH: str = "./data", num_workers: int = 0):
+    def __init__(self, batch_size: int, data_dir: str = "./data", num_workers: int = 0):
         super().__init__()
         self.batch_size = batch_size
         self.num_workers = num_workers

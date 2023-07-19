@@ -15,7 +15,7 @@ class CrossValidationDataModule(L.LightningDataModule):
         k (int): The fold number. Defaults to 1.
         split_seed (int): The random seed for splitting the data. Defaults to 42.
         num_splits (int): The number of splits for cross-validation. Defaults to 10.
-        DATASET_PATH (str): The path to the dataset. Defaults to "./data".
+        data_dir (str): The path to the dataset. Defaults to "./data".
         num_workers (int): The number of workers for data loading. Defaults to 0.
         pin_memory (bool): Whether to pin memory for data loading. Defaults to False.
 
@@ -40,13 +40,13 @@ class CrossValidationDataModule(L.LightningDataModule):
         k: int = 1,
         split_seed: int = 42,
         num_splits: int = 10,
-        DATASET_PATH: str = "./data",
+        data_dir: str = "./data",
         num_workers: int = 0,
         pin_memory: bool = False,
     ):
         super().__init__()
         self.batch_size = batch_size
-        self.DATASET_PATH = DATASET_PATH
+        self.data_dir = data_dir
         self.num_workers = num_workers
         self.k = k
         self.split_seed = split_seed

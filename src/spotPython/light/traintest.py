@@ -62,7 +62,7 @@ def train_model(config: dict, fun_control: dict) -> float:
     dm = CSVDataModule(
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
-        DATASET_PATH=fun_control["DATASET_PATH"],
+        data_dir=fun_control["DATASET_PATH"],
     )
 
     # Init trainer
@@ -130,7 +130,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     dm = CSVDataModule(
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
-        DATASET_PATH=fun_control["DATASET_PATH"],
+        data_dir=fun_control["DATASET_PATH"],
     )
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
@@ -224,7 +224,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
             num_splits=num_folds,
             split_seed=split_seed,
             batch_size=config["batch_size"],
-            DATASET_PATH=fun_control["DATASET_PATH"],
+            data_dir=fun_control["DATASET_PATH"],
         )
         dm.prepare_data()
         dm.setup()
