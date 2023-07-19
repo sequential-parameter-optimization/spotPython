@@ -119,7 +119,9 @@ class HyperLight:
             # extract parameters like epochs, batch_size, lr, etc. from config
             # config_id = generate_config_id(config)
             try:
+                print("fun: Calling train_model")
                 df_eval = train_model(config, self.fun_control)
+                print("fun: train_model returned")
             except Exception as err:
                 logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                 logger.error("Setting df_eval to np.nan")

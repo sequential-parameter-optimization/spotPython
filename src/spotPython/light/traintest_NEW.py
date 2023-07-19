@@ -60,7 +60,7 @@ def train_model(config: dict, fun_control: dict) -> float:
         kaiming_init(model)
     else:
         pass
-    print(f"model: {model}")
+    # print(f"model: {model}")
 
     # Init DataModule
     dm = CIFAR10DataModule(
@@ -68,14 +68,7 @@ def train_model(config: dict, fun_control: dict) -> float:
     )
     dm.prepare_data()
     dm.setup()
-
-    dataiter = iter(dm)
-    images, labels = next(dataiter)
-    batch_size = 3
-    # print labels
-    classes = ("plane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck")
-    print(" ".join(f"{classes[labels[j]]:5s}" for j in range(batch_size)))
-
+    print("Leaving dm.setup()")
     # Init trainer
     trainer = L.Trainer(
         # Where to save models
@@ -90,7 +83,9 @@ def train_model(config: dict, fun_control: dict) -> float:
         enable_progress_bar=enable_progress_bar,
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
+    print("train.model: Entering trainer.fit()")
     trainer.fit(model=model, datamodule=dm)
+    print("train.model: Leaving trainer.fit()")
     # Test best model on validation and test set
     # result = trainer.validate(model=model, datamodule=dm, ckpt_path="last")
     result = trainer.validate(model=model, datamodule=dm)

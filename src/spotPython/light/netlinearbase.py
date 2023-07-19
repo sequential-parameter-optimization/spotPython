@@ -1,7 +1,8 @@
 import lightning as L
 import torch
 from torch import nn
-import torchmetrics
+
+# import torchmetrics
 import torch.nn.functional as F
 from torchmetrics.functional import accuracy
 from spotPython.hyperparameters.optimizer import optimizer_handler
@@ -77,8 +78,8 @@ class NetLinearBase(L.LightningModule):
         patience: int,
         _L_in: int,
         _L_out: int,
-        _metric: torchmetrics.functional = accuracy,
-        _loss: torch.nn.functional = F.cross_entropy,
+        # _metric: torchmetrics.functional = accuracy,
+        # _loss: torch.nn.functional = F.cross_entropy,
     ):
         """
         Initializes the NetLightBase object.
@@ -131,6 +132,7 @@ class NetLinearBase(L.LightningModule):
 
         """
         super().__init__()
+        print("NetLinearBase.__init__(): l1", l1)
         # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during
         # checkpointing. It is recommended to ignore them
         # using `self.save_hyperparameters(ignore=['act_fn'])`
@@ -139,8 +141,8 @@ class NetLinearBase(L.LightningModule):
         self._L_in = _L_in
         self._L_out = _L_out
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
-        self._metric = _metric
-        self._loss = _loss
+        self._metric = accuracy
+        self._loss = F.cross_entropy
         self.save_hyperparameters(ignore=["_L_in", "_L_out", "_metric", "_loss"])
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
@@ -161,6 +163,7 @@ class NetLinearBase(L.LightningModule):
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
         # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
         self.layers = nn.Sequential(*layers)
+        print("Leaving NetLinearBase.__init__()")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -185,6 +188,7 @@ class NetLinearBase(L.LightningModule):
                                               patience=5)
 
         """
+        print("Entering NetLinearBase.forward()")
         x = self.layers(x)
         return F.softmax(x, dim=1)
 
@@ -213,13 +217,17 @@ class NetLinearBase(L.LightningModule):
             >>> trainer.fit(net_light_base, train_loader)
 
         """
-        x, y = batch
-        logits = self(x)
-        # compute loss (default: cross entropy loss) from logits and y
-        loss = self._loss(logits, y)
-        # self.train_mapk(logits, y)
-        # self.log("train_mapk", self.train_mapk, on_step=True, on_epoch=False)
-        return loss
+        print("Entering NetLinearBase.training_step()")
+        # x, y = batch
+        # print("NetLinearBase.training_step(): batch")
+        # logits = self(x)
+        # print("NetLinearBase.training_step(): logits")
+        # # compute loss (default: cross entropy loss) from logits and y
+        # loss = self._loss(logits, y)
+        # # self.train_mapk(logits, y)
+        # # self.log("train_mapk", self.train_mapk, on_step=True, on_epoch=False)
+        # return loss
+        return 0.1234
 
     def validation_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False):
         """
@@ -248,6 +256,7 @@ class NetLinearBase(L.LightningModule):
             >>> trainer.fit(net_light_base, val_loader)
 
         """
+        print("Entering NetLinearBase.validation_step()")
         x, y = batch
         logits = self(x)
         # compute cross entropy loss from logits and y
@@ -271,6 +280,7 @@ class NetLinearBase(L.LightningModule):
         Returns:
             tuple: A tuple containing the loss and accuracy for this batch.
         """
+        print("Entering NetLinearBase.test_step()")
         x, y = batch
         logits = self(x)
         # compute cross entropy loss from logits and y
@@ -291,7 +301,9 @@ class NetLinearBase(L.LightningModule):
 
         """
         # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        print("Entering NetLinearBase.configure_optimizers()")
         optimizer = optimizer_handler(
             optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
         )
+        print("Leaving NetLinearBase.configure_optimizers()")
         return optimizer

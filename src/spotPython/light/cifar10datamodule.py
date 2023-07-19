@@ -48,7 +48,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
             data_full = CIFAR10(root=self.data_dir, train=True, transform=transform)
             # self.data_train, self.data_val = random_split(daata_full, [45000, 5000])
             test_abs = int(len(data_full) * 0.6)
-            print("test_abs", test_abs)
+            print("dm.setup(): test_abs", test_abs)
             self.data_train, self.data_val = random_split(data_full, [test_abs, len(data_full) - test_abs])
 
         # Assign test dataset for use in dataloader(s)
@@ -66,7 +66,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
             DataLoader: The training dataloader.
 
         """
-        print("self.batch_size", self.batch_size)
+        print("train_dataloader: self.batch_size", self.batch_size)
         return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:
@@ -78,6 +78,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
 
         """
+        print("val_dataloader: self.batch_size", self.batch_size)
         return DataLoader(self.data_val, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
@@ -89,4 +90,5 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
 
         """
+        print("train_data_loader: self.batch_size", self.batch_size)
         return DataLoader(self.data_test, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
