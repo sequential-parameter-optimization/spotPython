@@ -32,13 +32,14 @@ class factorial(designs):
         Returns:
             numpy.ndarray: A 2D array representing the full factorial design.
 
-        Example:
-            >>> factorial_design = factorial(k=2)
-            >>> factorial_design.full_factorial(p=2)
-            array([[0., 0.],
-                   [0., 1.],
-                   [1., 0.],
-                   [1., 1.]])
+        Examples:
+            >>> from spotPython.design.factorial import factorial
+                factorial_design = factorial(k=2)
+                factorial_design.full_factorial(p=2)
+                array([[0., 0.],
+                    [0., 1.],
+                    [1., 0.],
+                    [1., 1.]])
         """
         i = (slice(0, 1, p * 1j),) * self.k
         return mgrid[i].reshape(self.k, p**self.k).T

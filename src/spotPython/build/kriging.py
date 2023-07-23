@@ -1,8 +1,3 @@
-from __future__ import annotations
-
-# google-style docstring documentation, type information, an example, and return values: 2023, July, 15th
-# tests: None
-
 import copy
 from math import erf
 import matplotlib.pyplot as plt
@@ -47,6 +42,45 @@ logger.addHandler(py_handler)
 
 
 class Kriging(surrogates):
+    """Kriging surrogate.
+
+    Attributes:
+        nat_range_X (list):
+            List of X natural ranges.
+        nat_range_y (list):
+            List of y nat ranges.
+        noise (bool):
+            noisy objective function. Default: False. If `True`, regression kriging will be used.
+        var_type (str):
+            variable type. Can be either `"num`" (numerical) of `"factor"` (factor).
+        num_mask (array):
+            array of bool variables. `True` represent numerical (float) variables.
+        factor_mask (array):
+            array of factor variables. `True` represents factor (unordered) variables.
+        int_mask (array):
+            array of integer variables. `True` represents integers (ordered) variables.
+        ordered_mask (array):
+            array of ordered variables. `True` represents integers or float (ordered) variables.
+            Set of veriables which an order relation, i.e., they are either num (float) or int.
+        name (str):
+            Surrogate name
+        seed (int):
+            Random seed.
+        use_cod_y (bool):
+            Use coded y values.
+        sigma (float):
+            Kriging sigma.
+        gen (method):
+            Design generator, e.g., spotPython.design.spacefilling.spacefilling.
+        min_theta (float):
+            min log10 theta value. Defaults: -6.
+        max_theta (float):
+            max log10 theta value. Defaults: 3.
+        min_p (float):
+            min p value. Default: 1.
+        max_p (float):
+            max p value. Default: 2.
+    """
     def __init__(
             self: object,
             noise: bool = False,
@@ -68,7 +102,7 @@ class Kriging(surrogates):
             **kwargs
     ):
         """
-        Kriging surrogate.
+        Initialize the Kriging surrogate.
 
         Args:
             noise (bool): Use regression instead of interpolation kriging. Defaults to False.
@@ -92,73 +126,39 @@ class Kriging(surrogates):
             spot_writer : Spot writer.
             counter : Counter.
 
-        Attributes:
-            nat_range_X (list):
-                List of X natural ranges.
-            nat_range_y (list):
-                List of y nat ranges.
-            noise (bool):
-                noisy objective function. Default: False. If `True`, regression kriging will be used.
-            var_type (str):
-                variable type. Can be either `"num`" (numerical) of `"factor"` (factor).
-            num_mask (array):
-                array of bool variables. `True` represent numerical (float) variables.
-            factor_mask (array):
-                array of factor variables. `True` represents factor (unordered) variables.
-            int_mask (array):
-                array of integer variables. `True` represents integers (ordered) variables.
-            ordered_mask (array):
-                array of ordered variables. `True` represents integers or float (ordered) variables.
-                Set of veriables which an order relation, i.e., they are either num (float) or int.
-            name (str):
-                Surrogate name
-            seed (int):
-                Random seed.
-            use_cod_y (bool):
-                Use coded y values.
-            sigma (float):
-                Kriging sigma.
-            gen (method):
-                Design generator, e.g., spotPython.design.spacefilling.spacefilling.
-            min_theta (float):
-                min log10 theta value. Defaults: -6.
-            max_theta (float):
-                max log10 theta value. Defaults: 3.
-            min_p (float):
-                min p value. Default: 1.
-            max_p (float):
-                max p value. Default: 2.
-
         Examples:
-            Surrogate of the x*sin(x) function.
-            See:
-            [scikit-learn](https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html)
+            Surrogate of the x*sin(x) function, see [1].
 
             >>> from spotPython.build.kriging import Kriging
-            >>> import numpy as np
-            >>> import matplotlib.pyplot as plt
-            >>> rng = np.random.RandomState(1)
-            >>> X = linspace(start=0, stop=10, num=1_000).reshape(-1, 1)
-            >>> y = np.squeeze(X * np.sin(X))
-            >>> training_indices = rng.choice(arange(y.size), size=6, replace=False)
-            >>> X_train, y_train = X[training_indices], y[training_indices]
-            >>> S = Kriging(name='kriging', seed=124)
-            >>> S.fit(X_train, y_train)
-            >>> mean_prediction, std_prediction = S.predict(X)
-            >>> plt.plot(X, y, label=r"$f(x)$", linestyle="dotted")
-            >>> plt.scatter(X_train, y_train, label="Observations")
-            >>> plt.plot(X, mean_prediction, label="Mean prediction")
-            >>> plt.fill_between(
-                X.ravel(),
-                mean_prediction - 1.96 * std_prediction,
-                mean_prediction + 1.96 * std_prediction,
-                alpha=0.5,
-                label=r"95% confidence interval",
-                )
-            >>> plt.legend()
-            >>> plt.xlabel("$x$")
-            >>> plt.ylabel("$f(x)$")
-            >>> _ = plt.title("Gaussian process regression on noise-free dataset")
+                import numpy as np
+                import matplotlib.pyplot as plt
+                rng = np.random.RandomState(1)
+                X = linspace(start=0, stop=10, num=1_000).reshape(-1, 1)
+                y = np.squeeze(X * np.sin(X))
+                training_indices = rng.choice(arange(y.size), size=6, replace=False)
+                X_train, y_train = X[training_indices], y[training_indices]
+                S = Kriging(name='kriging', seed=124)
+                S.fit(X_train, y_train)
+                mean_prediction, std_prediction = S.predict(X)
+                plt.plot(X, y, label=r"$f(x)$", linestyle="dotted")
+                plt.scatter(X_train, y_train, label="Observations")
+                plt.plot(X, mean_prediction, label="Mean prediction")
+                plt.fill_between(
+                    X.ravel(),
+                    mean_prediction - 1.96 * std_prediction,
+                    mean_prediction + 1.96 * std_prediction,
+                    alpha=0.5,
+                    label=r"95% confidence interval",
+                    )
+                plt.legend()
+                plt.xlabel("$x$")
+                plt.ylabel("$f(x)$")
+                _ = plt.title("Gaussian process regression on noise-free dataset")
+                plt.show()
+
+        References:
+
+            [[1](https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html)] scikit-learn: Gaussian Processes regression: basic introductory example
 
         """
         super().__init__(name, seed, log_level)

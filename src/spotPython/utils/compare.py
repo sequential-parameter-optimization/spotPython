@@ -16,6 +16,14 @@ def selectNew(A: np.ndarray, X: np.ndarray, tolerance: float = 0) -> Tuple[np.nd
     Returns:
         (numpy.ndarray): array with unknown (new) values
         (numpy.ndarray): array with `True` if value is new, otherwise `False`.
+
+    Examples:
+        >>> from spotPython.utils.compare import selectNew
+            A = np.array([[1,2,3],[4,5,6]])
+            X = np.array([[1,2,3],[4,5,6]])
+            selectNew(A, X)
+            (array([], shape=(0, 3), dtype=int64), array([], dtype=bool))
+
     """
     B = np.abs(A[:, None] - X)
     ind = np.any(np.all(B <= tolerance, axis=2), axis=1)
@@ -31,12 +39,12 @@ def find_equal_in_lists(a: List[int], b: List[int]) -> List[int]:
 
     Returns:
         list: list with 1 if equal, otherwise 0
-    Example:
-        >>> a = [1, 2, 3, 4, 5]
-        >>> b = [1, 2, 3, 4, 5]
-        >>> find_equal_in_lists(a, b)
-        [1, 1, 1, 1, 1]
+    Examples:
+        >>> from spotPython.utils.compare import find_equal_in_lists
+            a = [1, 2, 3, 4, 5]
+            b = [1, 2, 3, 4, 5]
+            find_equal_in_lists(a, b)
+            [1, 1, 1, 1, 1]
     """
     equal = [1 if a[i] == b[i] else 0 for i in range(len(a))]
-    return equal
     return equal

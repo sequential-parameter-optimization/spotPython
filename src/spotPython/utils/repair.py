@@ -14,7 +14,7 @@ def repair_non_numeric(X: np.ndarray, var_type: List[str]) -> np.ndarray:
     Returns:
         numpy.ndarray: X array with non-numeric values rounded to integers
 
-    Example:
+    Examples:
         >>> X = np.array([[1.2, 2.3], [3.4, 4.5]])
         >>> var_type = ["num", "factor"]
         >>> repair_non_numeric(X, var_type)
@@ -37,7 +37,7 @@ def remove_nan(X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     Returns:
         Tuple[numpy.ndarray, numpy.ndarray]: X and y arrays with rows containing NaN values in y removed
 
-    Example:
+    Examples:
         >>> X = np.array([[1, 2], [3, 4], [5, 6]])
         >>> y = np.array([1, np.nan, 2])
         >>> remove_nan(X, y)

@@ -27,12 +27,12 @@ def simple_contour(
         n_samples (int, optional): _description_. Defaults to 100.
         n_levels (int, optional): _description_. Defaults to 5.
 
-    Example:
+    Examples:
         >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> from spotPython.fun.objectivefunctions import analytical
-        >>> fun = analytical().fun_branin
-        >>> simple_contour(fun=fun, n_levels=30, min_x=-5, max_x=10, min_y=0, max_y=15)
+            import numpy as np
+            from spotPython.fun.objectivefunctions import analytical
+            fun = analytical().fun_branin
+            simple_contour(fun=fun, n_levels=30, min_x=-5, max_x=10, min_y=0, max_y=15)
 
     """
     XX, YY = np.meshgrid(np.linspace(min_x, max_x, n_samples), np.linspace(min_y, max_y, n_samples))

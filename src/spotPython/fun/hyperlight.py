@@ -103,10 +103,10 @@ class HyperLight:
 
         Examples:
             >>> hyper_light = HyperLight(seed=126, log_level=50)
-            >>> X = np.array([[1, 2], [3, 4]])
-            >>> fun_control = {"weights": np.array([1, 0, 0])}
-            >>> hyper_light.fun(X, fun_control)
-            array([nan, nan])
+                X = np.array([[1, 2], [3, 4]])
+                fun_control = {"weights": np.array([1, 0, 0])}
+                hyper_light.fun(X, fun_control)
+                array([nan, nan])
         """
         z_res = np.array([], dtype=float)
         if fun_control is not None:

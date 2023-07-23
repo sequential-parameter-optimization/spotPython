@@ -39,21 +39,21 @@ class spacefilling(designs):
         Returns:
             (ndarray): Latin hypercube design.
 
-        Example:
+        Examples:
             >>> from spotPython.design.spacefilling import spacefilling
-            >>> import numpy as np
-            >>> lhd = spacefilling(k=2, seed=123)
-            >>> lhd.scipy_lhd(n=5, repeats=2, lower=np.array([0,0]), upper=np.array([1,1]))
-            array([[0.66352963, 0.5892358 ],
-                   [0.66352963, 0.5892358 ],
-                   [0.55592803, 0.96312564],
-                   [0.55592803, 0.96312564],
-                   [0.16481882, 0.0375811 ],
-                   [0.16481882, 0.0375811 ],
-                   [0.215331  , 0.34468512],
-                   [0.215331  , 0.34468512],
-                   [0.83604909, 0.62202146],
-                   [0.83604909, 0.62202146]])
+                import numpy as np
+                lhd = spacefilling(k=2, seed=123)
+                lhd.scipy_lhd(n=5, repeats=2, lower=np.array([0,0]), upper=np.array([1,1]))
+                array([[0.66352963, 0.5892358 ],
+                    [0.66352963, 0.5892358 ],
+                    [0.55592803, 0.96312564],
+                    [0.55592803, 0.96312564],
+                    [0.16481882, 0.0375811 ],
+                    [0.16481882, 0.0375811 ],
+                    [0.215331  , 0.34468512],
+                    [0.215331  , 0.34468512],
+                    [0.83604909, 0.62202146],
+                    [0.83604909, 0.62202146]])
         """
         if lower is None:
             lower = zeros(self.k)

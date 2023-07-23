@@ -7,7 +7,7 @@ def one_hot_encode(strings) -> dict:
         strings (list): List of strings to encode.
     Returns:
         dict: Dictionary of strings and their one hot encoded values.
-    Example:
+    Examples:
         >>> one_hot_encode(['a', 'b', 'c'])
         {'a': [1, 0, 0], 'b': [0, 1, 0], 'c': [0, 0, 1]}
     """
@@ -30,7 +30,7 @@ def sum_encoded_values(strings, encoding_dict) -> int:
     Returns:
         int: Decimal value of the sum of the encoded values.
 
-    Example:
+    Examples:
         >>> encoding_dict = {'a': [1, 0, 0], 'b': [0, 1, 0], 'c': [0, 0, 1]}
             sum_encoded_values(['a', 'b', 'c'], encoding_dict)
             7
@@ -57,7 +57,7 @@ def get_one_hot(alg: str, hyper_param: str, d: dict = None, filename: str = "dat
         filename (str): Name of the file containing the dictionary.
     Returns:
         dict: Dictionary of hyper parameter values and their one hot encoded values.
-    Example:
+    Examples:
         >>> alg = "HoeffdingAdaptiveTreeClassifier"
             hyper_param = "split_criterion"
             d = {
@@ -93,7 +93,7 @@ def add_missing_elements(a: list, b: list) -> list:
     Returns:
         list: List of elements with missing elements from list a added.
 
-    Example:
+    Examples:
         >>> a = [1, 4]
             b = [1, 2]
             add_missing_elements(a, b)
@@ -116,7 +116,7 @@ def find_closest_key(integer_value: int, encoding_dict: dict) -> str:
     Returns:
         str: The key in the encoding dictionary whose binary value is
         closest to the binary representation of the integer value.
-    Example:
+    Examples:
         >>> encoding_dict = {'A': [1, 0, 0], 'B': [0, 1, 0], 'C': [0, 0, 1]}
             find_closest_key(6, encoding_dict)
             'B'
