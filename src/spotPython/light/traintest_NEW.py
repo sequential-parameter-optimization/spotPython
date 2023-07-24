@@ -1,5 +1,5 @@
 import lightning as L
-from spotPython.light.cifar10datamodule import CIFAR10DataModule
+from spotPython.light.cifar10.cifar10datamodule import CIFAR10DataModule
 from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger

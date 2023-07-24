@@ -32,13 +32,6 @@ from PIL import Image
 from torchvision import transforms
 from torchvision.datasets import CIFAR10
 
-matplotlib_inline.backend_inline.set_matplotlib_formats("svg", "pdf")  # For export
-matplotlib.rcParams["lines.linewidth"] = 2.0
-sns.reset_orig()
-
-# PyTorch
-# Torchvision
-
 
 class NetCNNBase(L.LightningModule):
     def __init__(self, model_name, model_hparams, optimizer_name, optimizer_hparams):
