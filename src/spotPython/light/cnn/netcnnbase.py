@@ -26,7 +26,6 @@ import torch.optim as optim
 import torch.utils.data as data
 import torchvision
 
-%matplotlib inline
 from IPython.display import HTML, display
 from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
 from PIL import Image
