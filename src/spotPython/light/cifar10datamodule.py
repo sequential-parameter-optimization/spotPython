@@ -67,7 +67,8 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
         """
         print("train_dataloader: self.batch_size", self.batch_size)
-        return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
+        return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True, drop_last = True,
+                          num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:
         """
@@ -79,7 +80,8 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
         """
         print("val_dataloader: self.batch_size", self.batch_size)
-        return DataLoader(self.data_val, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
+        return DataLoader(self.data_val, batch_size=self.batch_size, shuffle=False,
+                          drop_last=False, num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
         """
@@ -91,4 +93,5 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
         """
         print("train_data_loader: self.batch_size", self.batch_size)
-        return DataLoader(self.data_test, batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
+        return DataLoader(self.data_test, batch_size=self.batch_size, shuffle=False,
+                          drop_last=False, num_workers=self.num_workers)

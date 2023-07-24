@@ -57,10 +57,26 @@ class MAPK(torchmetrics.Metric):
         Returns:
             (NoneType): None
 
+        Examples:
+            >>> from spotPython.torch.mapk import MAPK
+            >>> import torch
+            >>> mapk = MAPK(k=2)
+            >>> target = torch.tensor([0, 1, 2, 2])
+            >>> preds = torch.tensor(
+            ...     [
+            ...         [0.5, 0.2, 0.2],  # 0 is in top 2
+            ...         [0.3, 0.4, 0.2],  # 1 is in top 2
+            ...         [0.2, 0.4, 0.3],  # 2 is in top 2
+            ...         [0.7, 0.2, 0.1],  # 2 isn't in top 2
+            ...     ]
+            ... )
+            >>> mapk.update(preds, target)
+            >>> print(mapk.compute()) # tensor(0.6250)
+
         Raises:
-            AssertionError:
-                If `actual` is not a 1D tensor or if `predicted` is not a 2D tensor
-                or if `actual` and `predicted` do not have the same number of elements.
+            AssertionError: If the actual tensor is not 1D or the predicted tensor is not 2D.
+            AssertionError: If the number of elements in the actual and predicted tensors are not equal.
+
         """
         assert len(actual.shape) == 1, "actual must be a 1D tensor"
         assert len(predicted.shape) == 2, "predicted must be a 2D tensor"
