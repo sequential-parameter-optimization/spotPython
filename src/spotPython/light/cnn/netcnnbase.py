@@ -1,52 +1,41 @@
 import lightning as L
 import torch
 from torch import nn
-
-# import torchmetrics
-import torch.nn.functional as F
-from torchmetrics.functional import accuracy
-from spotPython.hyperparameters.optimizer import optimizer_handler
-
-
-import os
-import urllib.request
-from types import SimpleNamespace
-from urllib.error import HTTPError
-
-import lightning as L
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib_inline.backend_inline
-import numpy as np
-import seaborn as sns
-import tabulate
-import torch
-import torch.nn as nn
+from spotPython.light.utils import create_model
 import torch.optim as optim
-import torch.utils.data as data
-import torchvision
-
-from IPython.display import HTML, display
-from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
-from PIL import Image
-from torchvision import transforms
-from torchvision.datasets import CIFAR10
 
 
 class NetCNNBase(L.LightningModule):
-    def __init__(self, model_name, model_hparams, optimizer_name, optimizer_hparams):
+    def __init__(self, config, fun_control):
         """
-        Inputs:
-            model_name - Name of the model/CNN to run. Used for creating the model (see function below)
-            model_hparams - Hyperparameters for the model, as dictionary.
-            optimizer_name - Name of the optimizer to use. Currently supported: Adam, SGD
-            optimizer_hparams - Hyperparameters for the optimizer, as dictionary. This includes learning rate, weight decay, etc.
+        Initializes the CNN model.
+
+        Args:
+            config (dict): dictionary containing the configuration for the hyperparameter tuning.
+            fun_control (dict): dictionary containing control parameters for the hyperparameter tuning.
+
+        Returns:
+            (object): model object.
+
+        Examples:
+            >>> from spotPython.light.cnn.netcnnbase import NetCNNBase
+                from spotPython.light.cnn.googlenet import GoogleNet
+                import torch
+                import torch.nn as nn
+                config = {"c_in": 3, "c_out": 10, "act_fn": nn.ReLU, "optimizer_name": "Adam"}
+                fun_control = {"core_model": GoogleNet}
+                model = NetCNNBase(config, fun_control)
+                x = torch.randn(1, 3, 32, 32)
+                y = model(x)
+                y.shape
+                torch.Size([1, 10])
+
         """
         super().__init__()
         # Exports the hyperparameters to a YAML file, and create "self.hparams" namespace
         self.save_hyperparameters()
         # Create model
-        self.model = create_model(model_name, model_hparams)
+        self.model = create_model(config, fun_control)
         # Create loss module
         self.loss_module = nn.CrossEntropyLoss()
         # Example input for visualizing the graph in Tensorboard
@@ -58,10 +47,10 @@ class NetCNNBase(L.LightningModule):
 
     def configure_optimizers(self):
         # We will support Adam or SGD as optimizers.
-        if self.hparams.optimizer_name == "Adam":
+        if self.hparams.config["optimizer_name"] == "Adam":
             # AdamW is Adam with a correct implementation of weight decay (see here
             # for details: https://arxiv.org/pdf/1711.05101.pdf)
-            optimizer = optim.AdamW(self.parameters(), **self.hparams.optimizer_hparams)
+            optimizer = optim.AdamW(self.parameters(), **self.hparams.config["optimizer_hparams"])
         elif self.hparams.optimizer_name == "SGD":
             optimizer = optim.SGD(self.parameters(), **self.hparams.optimizer_hparams)
         else:

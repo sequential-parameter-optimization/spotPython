@@ -53,9 +53,7 @@ class CIFAR10DataModule(pl.LightningDataModule):
         # https://lightning.ai/docs/pytorch/latest/notebooks/course_UvA-DL/04-inception-resnet-densenet.html
         DATA_MEANS = (0.49139968, 0.48215841, 0.44653091)
         DATA_STDS = (0.24703223, 0.24348513, 0.26158784)
-        transform = transforms.Compose(
-                [transforms.ToTensor(), transforms.Normalize(DATA_MEANS, DATA_STDS)]
-            )
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(DATA_MEANS, DATA_STDS)])
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
             data_full = CIFAR10(root=self.data_dir, train=True, transform=transform)
@@ -75,8 +73,9 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
         """
         print("train_dataloader: self.batch_size", self.batch_size)
-        return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=True, drop_last = True,
-                          num_workers=self.num_workers)
+        return DataLoader(
+            self.data_train, batch_size=self.batch_size, shuffle=True, drop_last=True, num_workers=self.num_workers
+        )
 
     def val_dataloader(self) -> DataLoader:
         """
@@ -88,8 +87,9 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
         """
         print("val_dataloader: self.batch_size", self.batch_size)
-        return DataLoader(self.data_val, batch_size=self.batch_size, shuffle=False,
-                          drop_last=False, num_workers=self.num_workers)
+        return DataLoader(
+            self.data_val, batch_size=self.batch_size, shuffle=False, drop_last=False, num_workers=self.num_workers
+        )
 
     def test_dataloader(self) -> DataLoader:
         """
@@ -101,5 +101,6 @@ class CIFAR10DataModule(pl.LightningDataModule):
 
         """
         print("train_data_loader: self.batch_size", self.batch_size)
-        return DataLoader(self.data_test, batch_size=self.batch_size, shuffle=False,
-                          drop_last=False, num_workers=self.num_workers)
+        return DataLoader(
+            self.data_test, batch_size=self.batch_size, shuffle=False, drop_last=False, num_workers=self.num_workers
+        )

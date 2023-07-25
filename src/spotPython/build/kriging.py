@@ -158,7 +158,8 @@ class Kriging(surrogates):
 
         References:
 
-            [[1](https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html)] scikit-learn: Gaussian Processes regression: basic introductory example
+            [[1](https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html)]
+            scikit-learn: Gaussian Processes regression: basic introductory example
 
         """
         super().__init__(name, seed, log_level)

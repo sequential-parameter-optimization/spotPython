@@ -16,10 +16,13 @@ def get_ocba(means, vars, delta) -> int32:
     variances, and incremental budget using the OCBA algorithm.
 
     References:
-        [1]: Chun-Hung Chen and Loo Hay Lee: Stochastic Simulation Optimization: An Optimal Computer Budget Allocation, pp. 49 and pp. 215
-        [2]: C.S.M Currie and T. Monks: How to choose the best setup for a system. A tutorial for the Simulation Workshop 2021, see:
-        [sw21_tutorial.ipynb](https://colab.research.google.com/github/TomMonks/sim-tools/blob/master/examples/sw21_tutorial.ipynb) and
-        [sim-tools](https://github.com/TomMonks/sim-tools)
+        [1]: Chun-Hung Chen and Loo Hay Lee: Stochastic Simulation Optimization: An Optimal Computer Budget Allocation,
+        pp. 49 and pp. 215
+        [2]: C.S.M Currie and T. Monks: How to choose the best setup for a system.
+        A tutorial for the Simulation Workshop 2021, see:
+        https://colab.research.google.com/github/TomMonks/sim-tools/blob/master/examples/sw21_tutorial.ipynb
+        and
+        https://github.com/TomMonks/sim-tools
 
     Args:
         means (numpy.array): An array of means.

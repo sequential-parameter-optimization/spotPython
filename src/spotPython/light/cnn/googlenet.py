@@ -1,35 +1,48 @@
-import os
-import urllib.request
 from types import SimpleNamespace
-from urllib.error import HTTPError
-
-import lightning as L
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib_inline.backend_inline
-import numpy as np
-import seaborn as sns
-import tabulate
-import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.utils.data as data
-import torchvision
-
-from IPython.display import HTML, display
-from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
-from PIL import Image
-from torchvision import transforms
-from torchvision.datasets import CIFAR10
-
-matplotlib_inline.backend_inline.set_matplotlib_formats("svg", "pdf")  # For export
-matplotlib.rcParams["lines.linewidth"] = 2.0
-sns.reset_orig()
+from spotPython.light.cnn.inceptionblock import InceptionBlock
 
 
 class GoogleNet(nn.Module):
-    def __init__(self, num_classes=10, act_fn_name="relu", **kwargs):
+    """GoogleNet architecture
+
+    Args:
+        num_classes (int):
+            Number of classes for the classification task. Defaults to 10.
+        act_fn_name (str):
+            Name of the activation function. Defaults to "relu".
+        **kwargs:
+            Additional keyword arguments.
+
+    Attributes:
+        hparams (SimpleNamespace):
+            Namespace containing the hyperparameters.
+        input_net (nn.Sequential):
+            Input network.
+        inception_blocks (nn.Sequential):
+            Inception blocks.
+        output_net (nn.Sequential):
+            Output network.
+
+    Returns:
+        (torch.Tensor):
+            Output tensor of the GoogleNet architecture
+
+    Examples:
+        >>> from spotPython.light.cnn.googlenet import GoogleNet
+            import torch
+            import torch.nn as nn
+            model = GoogleNet()
+            x = torch.randn(1, 3, 32, 32)
+            y = model(x)
+            y.shape
+            torch.Size([1, 10])
+    """
+
+    def __init__(self, num_classes: int = 10, act_fn_name: str = "relu", **kwargs):
         super().__init__()
+        # TODO: Replace this by act_fn handlers specified in the config file:
+        act_fn_by_name = {"tanh": nn.Tanh, "relu": nn.ReLU, "leakyrelu": nn.LeakyReLU, "gelu": nn.GELU}
         self.hparams = SimpleNamespace(
             num_classes=num_classes, act_fn_name=act_fn_name, act_fn=act_fn_by_name[act_fn_name]
         )
@@ -100,7 +113,7 @@ class GoogleNet(nn.Module):
         )
 
     def _init_params(self):
-        # Based on our discussion in Tutorial 4, we should initialize the
+        # We should initialize the
         # convolutions according to the activation function
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

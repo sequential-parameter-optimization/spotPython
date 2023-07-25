@@ -1,42 +1,50 @@
-import os
-import urllib.request
-from types import SimpleNamespace
-from urllib.error import HTTPError
-
-import lightning as L
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib_inline.backend_inline
-import numpy as np
-import seaborn as sns
-import tabulate
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.utils.data as data
-import torchvision
 
-from IPython.display import HTML, display
-from lightning.pytorch.callbacks import LearningRateMonitor, ModelCheckpoint
-from PIL import Image
-from torchvision import transforms
-from torchvision.datasets import CIFAR10
-
-matplotlib_inline.backend_inline.set_matplotlib_formats("svg", "pdf")  # For export
-matplotlib.rcParams["lines.linewidth"] = 2.0
-sns.reset_orig()
-
-# PyTorch
-# Torchvision
 
 class InceptionBlock(nn.Module):
     def __init__(self, c_in, c_red: dict, c_out: dict, act_fn):
         """
-        Inputs:
-            c_in - Number of input feature maps from the previous layers
-            c_red - Dictionary with keys "3x3" and "5x5" specifying the output of the dimensionality reducing 1x1 convolutions
-            c_out - Dictionary with keys "1x1", "3x3", "5x5", and "max"
-            act_fn - Activation class constructor (e.g. nn.ReLU)
+        Inception block as used in GoogLeNet.
+
+        Description from
+        [P. Lippe:INCEPTION, RESNET AND DENSENET](https://lightning.ai/docs/pytorch/stable/)
+        An Inception block applies four convolution blocks separately on the same feature map:
+        a 1x1, 3x3, and 5x5 convolution, and a max pool operation.
+        This allows the network to look at the same data with different receptive fields.
+        Of course, learning only 5x5 convolution would be theoretically more powerful.
+        However, this is not only more computation and memory heavy but also tends to overfit much easier.
+        The 1x1 convolutions are used to reduce the number of input channels to the 3x3 and 5x5 convolutions,
+        which reduces the number of parameters and computation.
+
+        Args:
+            c_in:
+                Number of input feature maps from the previous layers
+            c_red:
+                Dictionary with keys "3x3" and "5x5" specifying
+                the output of the dimensionality reducing 1x1 convolutions
+            c_out:
+                Dictionary with keys "1x1", "3x3", "5x5", and "max"
+            act_fn:
+                Activation class constructor (e.g. nn.ReLU)
+
+        Returns:
+            torch.Tensor:
+                Output tensor of the inception block
+
+        Examples:
+            >>> from spotPython.light.cnn.googlenet import InceptionBlock
+                import torch
+                import torch.nn as nn
+                block = InceptionBlock(3,
+                            {"3x3": 32, "5x5": 16},
+                            {"1x1": 16, "3x3": 32, "5x5": 8, "max": 8},
+                            nn.ReLU)
+                x = torch.randn(1, 3, 32, 32)
+                y = block(x)
+                y.shape
+                torch.Size([1, 64, 32, 32])
+
         """
         super().__init__()
 
