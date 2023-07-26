@@ -1,8 +1,12 @@
 import lightning as L
 import torch
 from torch import nn
-from spotPython.light.utils import create_model
+
+# from spotPython.light.utils import create_model
 import torch.optim as optim
+
+# from spotPython.light.cnn.googlenet import GoogleNet
+import spotPython.light.cnn.googlenet
 
 
 class NetCNNBase(L.LightningModule):
@@ -31,11 +35,30 @@ class NetCNNBase(L.LightningModule):
                 torch.Size([1, 10])
 
         """
+        print("NetCNNBase: Starting")
+        print(f"NetCNNBase: config: {config}")
+        print(f"NetCNNBase: fun_control['core_model']: {fun_control['core_model']}")
+        config = {
+            "c_in": 3,
+            "c_out": 10,
+            "act_fn": nn.ReLU,
+            "optimizer_name": "Adam",
+            "optimizer_hparams": {"lr": 1e-3, "weight_decay": 1e-4},
+        }
+        print("fun_control['core_model']: ", fun_control["core_model"])
+        print("fun_control['core_model'].type: ", fun_control["core_model"].type)
+        # fun_control = {"core_model": GoogleNet}
+        fun_control = {"core_model": spotPython.light.cnn.googlenet.GoogleNet}
         super().__init__()
         # Exports the hyperparameters to a YAML file, and create "self.hparams" namespace
-        self.save_hyperparameters()
+        self.save_hyperparameters()  # "fun_control" is not a hyperparameter )
+        print(f"config: {config}")
         # Create model
-        self.model = create_model(config, fun_control)
+        print("Creating model")
+        # self.model = create_model(config, fun_control)
+        self.model = fun_control["core_model"](**config)
+        print("Model created")
+        print(f"self.model: {self.model}")
         # Create loss module
         self.loss_module = nn.CrossEntropyLoss()
         # Example input for visualizing the graph in Tensorboard

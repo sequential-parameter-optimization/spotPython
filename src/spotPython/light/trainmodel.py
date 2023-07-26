@@ -39,6 +39,8 @@ def train_model(config: dict, fun_control: dict):
             {'test': 0.8772, 'val': 0.8772}
 
     """
+    print("train_model: Starting")
+    print(f"train_model: config: {config}")
     save_name = "saved_models"
     # Create PyTorch Lightning data loaders
     CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "saved_models/ConvNets")
@@ -85,13 +87,14 @@ def train_model(config: dict, fun_control: dict):
     # END TODO
 
     # Create a PyTorch Lightning trainer with the generation callback
+    print("train_model: Creating trainer")
     trainer = L.Trainer(
         default_root_dir=os.path.join(CHECKPOINT_PATH, save_name),  # Where to save models
         # We run on a single GPU (if possible)
         accelerator="auto",
         devices=1,
         # How many epochs to train for if no patience is set
-        max_epochs=180,
+        max_epochs=4,
         callbacks=[
             ModelCheckpoint(
                 save_weights_only=True, mode="max", monitor="val_acc"
@@ -101,6 +104,7 @@ def train_model(config: dict, fun_control: dict):
     )  # In case your notebook crashes due to the progress bar, consider increasing the refresh rate
     trainer.logger._log_graph = True  # If True, we plot the computation graph in tensorboard
     trainer.logger._default_hp_metric = None  # Optional logging argument that we don't need
+    print("train_model: Created trainer")
 
     # Check whether pretrained model exists. If yes, load it and skip training
     pretrained_filename = os.path.join(CHECKPOINT_PATH, save_name + ".ckpt")
@@ -110,6 +114,7 @@ def train_model(config: dict, fun_control: dict):
         model = NetCNNBase.load_from_checkpoint(pretrained_filename)
     else:
         L.seed_everything(42)  # To be reproducable
+        print("train_model: Creating model")
         model = NetCNNBase(config=config, fun_control=fun_control)  # Create model
         trainer.fit(model, train_loader, val_loader)
         model = NetCNNBase.load_from_checkpoint(

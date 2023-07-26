@@ -21,6 +21,21 @@ logger.addHandler(py_handler)
 class HyperLightning:
     """
     Hyperparameter Tuning for Lightning.
+
+    Args:
+        seed (int): seed for the random number generator. See Numpy Random Sampling.
+        log_level (int): log level for the logger.
+
+    Attributes:
+        seed (int): seed for the random number generator.
+        rng (Generator): random number generator.
+        fun_control (dict): dictionary containing control parameters for the hyperparameter tuning.
+        log_level (int): log level for the logger.
+
+    Examples:
+        >>> hyper_light = HyperLight(seed=126, log_level=50)
+        >>> print(hyper_light.seed)
+        126
     """
 
     def __init__(self, seed: int = 126, log_level: int = 50) -> None:
@@ -90,11 +105,33 @@ class HyperLightning:
                 array containing the evaluation results.
 
         Examples:
-            >>> hyper_light = HyperLight(seed=126, log_level=50)
-                X = np.array([[1, 2], [3, 4]])
-                fun_control = {"weights": np.array([1, 0, 0])}
-                hyper_light.fun(X, fun_control)
-                array([nan, nan])
+            >>> MAX_TIME = 1
+                INIT_SIZE = 5
+                WORKERS = 0
+                PREFIX="TEST"
+                from spotPython.utils.init import fun_control_init
+                from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
+                from spotPython.utils.device import getDevice
+                experiment_name = get_experiment_name(prefix=PREFIX)
+                fun_control = fun_control_init(
+                    spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),
+                    num_workers=WORKERS,
+                    device=getDevice(),
+                    _L_in=3,
+                    _L_out=10,
+                    TENSORBOARD_CLEAN=True)
+                from spotPython.light.cnn.googlenet import GoogleNet
+                from spotPython.data.lightning_hyper_dict import LightningHyperDict
+                from spotPython.hyperparameters.values import add_core_model_to_fun_control
+                add_core_model_to_fun_control(core_model=GoogleNet,
+                                            fun_control=fun_control,
+                                            hyper_dict= LightningHyperDict)
+                from spotPython.hyperparameters.values import get_default_hyperparameters_as_array
+                X_start = get_default_hyperparameters_as_array(fun_control)
+                from spotPython.fun.hyperlightning import HyperLightning
+                hyper_light = HyperLightning(seed=126, log_level=50)
+                hyper_light.fun(X=X_start, fun_control=fun_control)
+
         """
         z_res = np.array([], dtype=float)
         if fun_control is not None:
@@ -104,6 +141,8 @@ class HyperLightning:
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
             logger.debug(f"\nconfig: {config}")
+            print(f"\ncore_model: {fun_control['core_model']}")
+            print(f"config: {config}")
             # extract parameters like epochs, batch_size, lr, etc. from config
             # config_id = generate_config_id(config)
             try:
