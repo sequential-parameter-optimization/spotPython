@@ -82,7 +82,7 @@ def fun_control_init(
     L.seed_everything(42)
 
     # Path to the folder where the pretrained models are saved
-    CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "saved_models/")
+    CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "runs/saved_models/")
     os.makedirs(CHECKPOINT_PATH, exist_ok=True)
     # Path to the folder where the datasets are/should be downloaded (e.g. MNIST)
     DATASET_PATH = os.environ.get("PATH_DATASETS", "data/")

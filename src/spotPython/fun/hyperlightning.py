@@ -105,13 +105,18 @@ class HyperLightning:
                 array containing the evaluation results.
 
         Examples:
-            >>> MAX_TIME = 1
-                INIT_SIZE = 5
-                WORKERS = 0
-                PREFIX="TEST"
-                from spotPython.utils.init import fun_control_init
+            >>> from spotPython.utils.init import fun_control_init
                 from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
                 from spotPython.utils.device import getDevice
+                from spotPython.light.cnn.googlenet import GoogleNet
+                from spotPython.data.lightning_hyper_dict import LightningHyperDict
+                from spotPython.hyperparameters.values import add_core_model_to_fun_control
+                from spotPython.fun.hyperlightning import HyperLightning
+                from spotPython.hyperparameters.values import get_default_hyperparameters_as_array
+                MAX_TIME = 1
+                INIT_SIZE = 3
+                WORKERS = 8
+                PREFIX="TEST"
                 experiment_name = get_experiment_name(prefix=PREFIX)
                 fun_control = fun_control_init(
                     spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),
@@ -120,15 +125,10 @@ class HyperLightning:
                     _L_in=3,
                     _L_out=10,
                     TENSORBOARD_CLEAN=True)
-                from spotPython.light.cnn.googlenet import GoogleNet
-                from spotPython.data.lightning_hyper_dict import LightningHyperDict
-                from spotPython.hyperparameters.values import add_core_model_to_fun_control
                 add_core_model_to_fun_control(core_model=GoogleNet,
                                             fun_control=fun_control,
                                             hyper_dict= LightningHyperDict)
-                from spotPython.hyperparameters.values import get_default_hyperparameters_as_array
                 X_start = get_default_hyperparameters_as_array(fun_control)
-                from spotPython.fun.hyperlightning import HyperLightning
                 hyper_light = HyperLightning(seed=126, log_level=50)
                 hyper_light.fun(X=X_start, fun_control=fun_control)
 

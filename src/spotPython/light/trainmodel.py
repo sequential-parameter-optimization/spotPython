@@ -41,12 +41,10 @@ def train_model(config: dict, fun_control: dict):
     """
     print("train_model: Starting")
     print(f"train_model: config: {config}")
-    save_name = "saved_models"
+    save_name = fun_control["core_model"].__name__
     # Create PyTorch Lightning data loaders
-    CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "saved_models/ConvNets")
-    os.makedirs(CHECKPOINT_PATH, exist_ok=True)
-    DATASET_PATH = os.environ.get("PATH_DATASETS", "data/")
-    os.makedirs(DATASET_PATH, exist_ok=True)
+    CHECKPOINT_PATH = fun_control["CHECKPOINT_PATH"]
+    DATASET_PATH = fun_control["DATASET_PATH"]
 
     # Create PyTorch Lightning data loaders
     # TODO: Replace this by data loaders external to train_model method:
@@ -115,7 +113,12 @@ def train_model(config: dict, fun_control: dict):
     else:
         L.seed_everything(42)  # To be reproducable
         print("train_model: Creating model")
-        model = NetCNNBase(config=config, fun_control=fun_control)  # Create model
+        model = NetCNNBase(
+            model_name=fun_control["core_model"].__name__,
+            model_hparams=config,
+            optimizer_name="Adam",
+            optimizer_hparams={"lr": 1e-3, "weight_decay": 1e-4},
+        )  # Create model
         trainer.fit(model, train_loader, val_loader)
         model = NetCNNBase.load_from_checkpoint(
             trainer.checkpoint_callback.best_model_path
