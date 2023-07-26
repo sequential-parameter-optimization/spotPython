@@ -2280,8 +2280,7 @@
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLightning</span><span class="p">:</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLightning</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Lightning.</span>
 
@@ -2391,7 +2390,6 @@
 <span class="sd">                add_core_model_to_fun_control(core_model=GoogleNet,</span>
 <span class="sd">                                            fun_control=fun_control,</span>
 <span class="sd">                                            hyper_dict= LightningHyperDict)</span>
-
 <span class="sd">                X_start = get_default_hyperparameters_as_array(fun_control)</span>
 <span class="sd">                hyper_light = HyperLightning(seed=126, log_level=50)</span>
 <span class="sd">                hyper_light.fun(X=X_start, fun_control=fun_control)</span>
@@ -2657,11 +2655,10 @@ input array with valid shape.</p></td>
 <span class="go">    add_core_model_to_fun_control(core_model=GoogleNet,</span>
 <span class="go">                                fun_control=fun_control,</span>
 <span class="go">                                hyper_dict= LightningHyperDict)</span>
+<span class="go">    X_start = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="go">    hyper_light = HyperLightning(seed=126, log_level=50)</span>
+<span class="go">    hyper_light.fun(X=X_start, fun_control=fun_control)</span>
 </code></pre></div>
-    <pre><code>X_start = get_default_hyperparameters_as_array(fun_control)
-hyper_light = HyperLightning(seed=126, log_level=50)
-hyper_light.fun(X=X_start, fun_control=fun_control)
-</code></pre>
 
       <details class="quote">
         <summary>Source code in <code>spotPython/fun/hyperlightning.py</code></summary>
@@ -2730,8 +2727,7 @@ hyper_light.fun(X=X_start, fun_control=fun_control)
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates the function for the given input array X and control parameters.</span>
 
@@ -2769,7 +2765,6 @@ hyper_light.fun(X=X_start, fun_control=fun_control)
 <span class="sd">            add_core_model_to_fun_control(core_model=GoogleNet,</span>
 <span class="sd">                                        fun_control=fun_control,</span>
 <span class="sd">                                        hyper_dict= LightningHyperDict)</span>
-
 <span class="sd">            X_start = get_default_hyperparameters_as_array(fun_control)</span>
 <span class="sd">            hyper_light = HyperLightning(seed=126, log_level=50)</span>
 <span class="sd">            hyper_light.fun(X=X_start, fun_control=fun_control)</span>
