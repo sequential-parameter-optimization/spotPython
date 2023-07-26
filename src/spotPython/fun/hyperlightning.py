@@ -129,8 +129,8 @@ class HyperLightning:
                                             fun_control=fun_control,
                                             hyper_dict= LightningHyperDict)
                 X_start = get_default_hyperparameters_as_array(fun_control)
-                hyper_light = HyperLightning(seed=126, log_level=50)
-                hyper_light.fun(X=X_start, fun_control=fun_control)
+                hyper_lightning = HyperLightning(seed=126, log_level=50)
+                hyper_lightning.fun(X=X_start, fun_control=fun_control)
 
         """
         z_res = np.array([], dtype=float)
