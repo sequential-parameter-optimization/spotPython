@@ -12,6 +12,8 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import math
 import seaborn as sns
+import pandas as pd
+import numpy as np
 
 
 def get_stars(input_list) -> list:
@@ -228,3 +230,155 @@ def visualize_activations(net, device="cpu", color="C0"):
     fig.subplots_adjust(hspace=0.4, wspace=0.4)
     plt.show()
     plt.close()
+
+
+def filter_highly_correlated(df: pd.DataFrame, sorted: bool = True, threshold: float = 1 - 1e-5) -> pd.DataFrame:
+    """
+    Return a new DataFrame with only those columns that are highly correlated.
+
+    Args:
+    df (DataFrame): The input DataFrame.
+    threshold (float): The correlation threshold.
+    sorted (bool): If True, the columns are sorted by name.
+
+    Returns:
+    DataFrame: A new DataFrame with only highly correlated columns.
+
+    Examples:
+    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
+        df = filter_highly_correlated(df, sorted=True, threshold=0.99)
+
+    """
+    corr_matrix = df.corr()
+    # Find pairs of columns with correlation greater than threshold
+    corr_pairs = corr_matrix.abs().unstack()
+    corr_pairs = corr_pairs[corr_pairs < 1]  # Remove self-correlations
+    high_corr = corr_pairs[corr_pairs > threshold]
+    high_corr = high_corr[high_corr < 1]  # Remove self-correlations
+
+    # Get the column names of highly correlated columns
+    high_corr_cols = list(set([col[0] for col in high_corr.index]))
+
+    # Create new DataFrame with only highly correlated columns
+    new_df = df[high_corr_cols]
+    # sort the columns by name
+    if sorted:
+        new_df = new_df.sort_index(axis=1)
+
+    return new_df
+
+
+def plot_sns_heatmap(
+    df_heat,
+    figsize=(16, 12),
+    cmap="vlag",
+    vmin=-1,
+    vmax=1,
+    annot=True,
+    fmt=".5f",
+    linewidths=0.5,
+    annot_kws={"size": 8},
+):
+    """
+    Plots a heatmap of the correlation matrix of the given DataFrame.
+
+    Args:
+        df_heat (pd.DataFrame): DataFrame containing the data to be plotted.
+        figsize (tuple): Size of the figure to be plotted.
+        cmap (str): Color map to be used for the heatmap.
+        vmin (int): Minimum value for the color scale.
+        vmax (int): Maximum value for the color scale.
+        annot (bool): Whether to display annotations on the heatmap.
+        fmt (str): Format string for annotations.
+        linewidths (float): Width of lines separating cells in the heatmap.
+        annot_kws (dict): Keyword arguments for annotations.
+
+    Returns:
+        None
+
+    Example:
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6], 'C': [7, 8, 9]})
+        >>> plot_heatmap(df)
+    """
+    plt.figure(figsize=figsize)
+    matrix = np.triu(np.ones_like(df_heat.corr()))
+    sns.heatmap(
+        data=df_heat.corr(),
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        annot=annot,
+        fmt=fmt,
+        linewidths=linewidths,
+        annot_kws=annot_kws,
+        mask=matrix,
+    )
+    plt.show()
+    plt.gcf().clear()
+
+
+def count_missing_data(df):
+    """
+    Counts the number of missing values in each column of the given DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the data to be counted.
+
+    Returns:
+        pd.DataFrame: DataFrame containing the number of missing values in each column.
+
+    Example:
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'A': [1, 2, None], 'B': [4, None, 6], 'C': [7, 8, 9]})
+        >>> count_missing_data(df)
+           column_name  missing_count
+        0           A              1
+        1           B              1
+    """
+    missing_df = df.isnull().sum(axis=0).reset_index()
+    missing_df.columns = ["column_name", "missing_count"]
+    missing_df = missing_df.loc[missing_df["missing_count"] > 0]
+    missing_df = missing_df.sort_values(by="missing_count")
+
+    return missing_df
+
+
+def plot_missing_data(df, relative=False, figsize=(7, 5), color="grey", xlabel="Missing Data", title="Missing Data"):
+    """
+    Plots a horizontal bar chart of the number of missing values in each column of the given DataFrame.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the data to be plotted.
+        relative (bool): Whether to plot relative values (percentage) or absolute values.
+        figsize (tuple): Size of the figure to be plotted.
+        color (str): Color of the bars in the bar chart.
+        xlabel (str): Label for the x-axis.
+        title (str): Title for the plot.
+
+    Returns:
+        None
+
+    Example:
+        >>> import pandas as pd
+        >>> df = pd.DataFrame({'A': [1, 2, np.nan], 'B': [4, np.nan, 6], 'C': [7, 8, 9]})
+        >>> plot_missing_data(df)
+    """
+    missing_df = count_missing_data(df)
+
+    if relative:
+        missing_df["missing_count"] = missing_df["missing_count"] / df.shape[0]
+        xlabel = "Percentage of " + xlabel
+        title = "Percentage of " + title
+
+    ind = np.arange(missing_df.shape[0])
+    _ , ax = plt.subplots(figsize=figsize)
+    _ = ax.barh(ind, missing_df.missing_count.values, color=color)
+    ax.set_yticks(ind)
+    ax.set_yticklabels(missing_df.column_name.values, rotation="horizontal")
+    ax.set_xlabel(xlabel)
+    ax.set_title(title)
+    plt.vlines(1, 0, missing_df.shape[0])
+    plt.vlines(0.97, 0, missing_df.shape[0])
+    plt.vlines(0.5, 0, missing_df.shape[0])
+    plt.show()
