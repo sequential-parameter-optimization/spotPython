@@ -41,6 +41,9 @@ def get_Xy_from_df(df, target_column) -> tuple:
     """
     X = df.drop(columns=[target_column])
     y = df[target_column]
+    # convert to numpy arrays
+    X = X.to_numpy()
+    y = y.to_numpy()
     return X, y
 
 

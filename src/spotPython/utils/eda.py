@@ -372,7 +372,7 @@ def plot_missing_data(df, relative=False, figsize=(7, 5), color="grey", xlabel="
         title = "Percentage of " + title
 
     ind = np.arange(missing_df.shape[0])
-    _ , ax = plt.subplots(figsize=figsize)
+    _, ax = plt.subplots(figsize=figsize)
     _ = ax.barh(ind, missing_df.missing_count.values, color=color)
     ax.set_yticks(ind)
     ax.set_yticklabels(missing_df.column_name.values, rotation="horizontal")

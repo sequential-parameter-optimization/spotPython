@@ -33,8 +33,10 @@ def evaluate_hold_out(model, fun_control):
             test_size=0.25,
             stratify=train_df[target_column],
         )
-        # print(f"X_train.shape: {X_train.shape}, y_train.shape: {y_train.shape}")
         model.fit(X_train, y_train)
+        # convert to numpy array, see https://github.com/scikit-learn/scikit-learn/pull/26772
+        X_test = np.array(X_test)
+        y_test = np.array(y_test)
         if fun_control["predict_proba"]:
             df_preds = model.predict_proba(X_test)
         else:
