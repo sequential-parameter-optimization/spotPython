@@ -173,6 +173,8 @@ def generate_config_id(config):
     config_id = ""
     for key in config:
         config_id += str(config[key]) + "_"
+        # hash the config_id to make it shorter and unique
+        config_id = str(hash(config_id)) + "_"
     return config_id[:-1]
 
 

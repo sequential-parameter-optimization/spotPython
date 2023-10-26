@@ -152,7 +152,9 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True),
         callbacks=[
             EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False),
-            ModelCheckpoint(save_last=True),  # Save the last checkpoint
+            ModelCheckpoint(
+                dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True
+            ),  # Save the last checkpoint
         ],
         enable_progress_bar=enable_progress_bar,
     )
@@ -287,7 +289,8 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
         >>> model = load_light_from_checkpoint(config, fun_control)
     """
     config_id = generate_config_id(config) + postfix
-    default_root_dir = fun_control["TENSORBOARD_PATH"] + "lightning_logs/" + config_id + "/checkpoints/last.ckpt"
+    # default_root_dir = fun_control["TENSORBOARD_PATH"] + "lightning_logs/" + config_id + "/checkpoints/last.ckpt"
+    default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id, "last.ckpt")
     # default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
     print(f"Loading model from {default_root_dir}")
     model = fun_control["core_model"].load_from_checkpoint(
