@@ -157,7 +157,7 @@ def plot_roc_from_dataframes(
 
 
 def plot_confusion_matrix(
-    model=None, df=None, target_names=None, fun_control=None, title=None, y_true_name=None, y_pred_name=None
+    model=None, fun_control=None, df=None, title=None, target_names=None, y_true_name=None, y_pred_name=None
 ):
     """
     Plotting a confusion matrix. If a model and the fun_control dictionary are passed,
@@ -168,14 +168,14 @@ def plot_confusion_matrix(
     Args:
         model (Any, optional):
             Sklearn model. The model to be used for cross-validation. Defaults to None.
-        df (pd.DataFrame, optional):
-            Dataframe containing the predictions and the target column. Defaults to None.
         fun_control (Dict, optional):
             Dictionary containing the data and the target column. Defaults to None.
-        target_names (List[str], optional):
-            List of target names. Defaults to None.
         title (str, optional):
             Title of the plot. Defaults to None.
+        df (pd.DataFrame, optional):
+            Dataframe containing the predictions and the target column. Defaults to None.
+        target_names (List[str], optional):
+            List of target names. Defaults to None.
         y_true_name (str, optional):
             Name of the column with the true values if a dataframe is specified. Defaults to None.
         y_pred_name (str, optional):
