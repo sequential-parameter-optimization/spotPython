@@ -116,16 +116,87 @@ def plot_roc(
     plt.show()
 
 
-def plot_confusion_matrix(model, fun_control, target_names=None, title=None):
+def plot_roc_from_dataframes(
+    df_list: List[pd.DataFrame],
+    alpha: float = 0.8,
+    model_names: List[str] = None,
+    target_column: str = None,
+) -> None:
     """
-    Plotting a confusion matrix
+    Plot ROC curve for a list of dataframes from model evaluations.
+
+    Args:
+        df_list: List of dataframes with results from models.
+        alpha: Transparency of the plotted lines.
+        model_names: List of model names.
+        target_column: Name of the target column.
+
+    Returns:
+        None
+
+    Examples:
+        >>> import pandas as pd
+            from spotPython.plot.validation import plot_roc_from_dataframes
+            df1 = pd.DataFrame({"y": [1, 0, 0, 1], "Prediction": [1,0,0,0]})
+            df2 = pd.DataFrame({"y": [1, 0, 0, 1], "Prediction": [1,0,1,1]})
+            df_list = [df1, df2]
+            model_names = ["Model 1", "Model 2"]
+            plot_roc_from_dataframes(df_list, model_names=model_names, target_column="y")
+
     """
-    X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
-    X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
-    model.fit(X_train, y_train)
-    pred = model.predict(X_test)
+    ax = plt.gca()
+    for i, df in enumerate(df_list):
+        y_test = df[target_column]
+        y_pred = df["Prediction"]
+        if model_names is not None:
+            model_name = model_names[i]
+        else:
+            model_name = None
+        RocCurveDisplay.from_predictions(y_test, y_pred, ax=ax, alpha=alpha, name=model_name)
+    plt.show()
+
+
+def plot_confusion_matrix(
+    model=None, df=None, target_names=None, fun_control=None, title=None, y_true_name=None, y_pred_name=None
+):
+    """
+    Plotting a confusion matrix. If a model and the fun_control dictionary are passed,
+    the confusion matrix is computed. If a dataframe is passed, the confusion matrix is
+    computed from the dataframe. In this case, the names of the columns with the true and
+    the predicted values must be specified. Default the dataframe is None.
+
+    Args:
+        model (Any, optional):
+            Sklearn model. The model to be used for cross-validation. Defaults to None.
+        df (pd.DataFrame, optional):
+            Dataframe containing the predictions and the target column. Defaults to None.
+        fun_control (Dict, optional):
+            Dictionary containing the data and the target column. Defaults to None.
+        target_names (List[str], optional):
+            List of target names. Defaults to None.
+        title (str, optional):
+            Title of the plot. Defaults to None.
+        y_true_name (str, optional):
+            Name of the column with the true values if a dataframe is specified. Defaults to None.
+        y_pred_name (str, optional):
+            Name of the column with the predicted values if a dataframe is specified. Defaults to None.
+
+    Returns:
+        (NoneType): None
+
+    """
+    if df is not None:
+        # assign the column y_true_name from df to y_true
+        y_true = df[y_true_name]
+        # assign the column y_pred_name from df to y_pred
+        y_pred = df[y_pred_name]
+    else:
+        X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
+        X_test, y_true = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
     fig, ax = plt.subplots(figsize=(10, 5))
-    ConfusionMatrixDisplay.from_predictions(y_test, pred, ax=ax)
+    ConfusionMatrixDisplay.from_predictions(y_true=y_true, y_pred=y_pred, ax=ax)
     if target_names is not None:
         ax.xaxis.set_ticklabels(target_names)
         ax.yaxis.set_ticklabels(target_names)
