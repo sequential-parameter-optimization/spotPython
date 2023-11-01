@@ -158,7 +158,7 @@ def plot_roc_from_dataframes(
             plot_roc_from_dataframes(df_list, model_names=model_names, target_column="y")
 
     """
-    ax = plt.gca()
+    fig, ax = plt.subplots(figsize=(10, 5))
     for i, df in enumerate(df_list):
         y_test = df[target_column]
         y_pred = df["Prediction"]
