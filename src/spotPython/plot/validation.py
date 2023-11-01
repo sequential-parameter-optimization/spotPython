@@ -167,7 +167,8 @@ def plot_roc_from_dataframes(
         else:
             model_name = None
         RocCurveDisplay.from_predictions(y_test, y_pred, ax=ax, alpha=alpha, name=model_name)
-    plt.show()
+    if show:
+        plt.show()
 
 
 def plot_confusion_matrix(
