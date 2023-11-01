@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Union
 import pandas as pd
 
 
-def plot_cv_predictions(model: Any, fun_control: Dict) -> None:
+def plot_cv_predictions(model: Any, fun_control: Dict, show=True) -> None:
     """
     Plots cross-validated predictions for regression.
 
@@ -23,6 +23,8 @@ def plot_cv_predictions(model: Any, fun_control: Dict) -> None:
             Sklearn model. The model to be used for cross-validation.
         fun_control (Dict):
             Dictionary containing the data and the target column.
+        show (bool, optional):
+            If True, the plot is shown. Defaults to True.
 
     Returns:
         (NoneType): None
@@ -59,7 +61,8 @@ def plot_cv_predictions(model: Any, fun_control: Dict) -> None:
     axs[1].set_title("Residuals vs. Predicted Values")
     fig.suptitle("Plotting cross-validated predictions")
     plt.tight_layout()
-    plt.show()
+    if show:
+        plt.show()
 
 
 def plot_roc(
@@ -67,6 +70,7 @@ def plot_roc(
     fun_control: Dict[str, Union[str, pd.DataFrame]],
     alpha: float = 0.8,
     model_names: List[str] = None,
+    show=True,
 ) -> None:
     """
     Plots ROC curves for a list of models using the Visualization API from scikit-learn.
@@ -80,6 +84,8 @@ def plot_roc(
             The alpha value for the ROC curve. Defaults to 0.8.
         model_names (List[str], optional):
             A list of names for the models. Defaults to None.
+        show (bool, optional):
+            If True, the plot is shown. Defaults to True.
 
     Returns:
         (NoneType): None
@@ -113,7 +119,8 @@ def plot_roc(
             model_name = None
         y_pred = model.predict(X_test)
         RocCurveDisplay.from_predictions(y_test, y_pred, ax=ax, alpha=alpha, name=model_name)
-    plt.show()
+    if show:
+        plt.show()
 
 
 def plot_roc_from_dataframes(
@@ -121,15 +128,22 @@ def plot_roc_from_dataframes(
     alpha: float = 0.8,
     model_names: List[str] = None,
     target_column: str = None,
+    show=True,
 ) -> None:
     """
     Plot ROC curve for a list of dataframes from model evaluations.
 
     Args:
-        df_list: List of dataframes with results from models.
-        alpha: Transparency of the plotted lines.
-        model_names: List of model names.
-        target_column: Name of the target column.
+        df_list:
+            List of dataframes with results from models.
+        alpha:
+            Transparency of the plotted lines.
+        model_names:
+            List of model names.
+        target_column:
+            Name of the target column.
+        show:
+            If True, the plot is shown.
 
     Returns:
         None
@@ -157,7 +171,7 @@ def plot_roc_from_dataframes(
 
 
 def plot_confusion_matrix(
-    model=None, fun_control=None, df=None, title=None, target_names=None, y_true_name=None, y_pred_name=None
+    model=None, fun_control=None, df=None, title=None, target_names=None, y_true_name=None, y_pred_name=None, show=False
 ):
     """
     Plotting a confusion matrix. If a model and the fun_control dictionary are passed,
@@ -180,6 +194,8 @@ def plot_confusion_matrix(
             Name of the column with the true values if a dataframe is specified. Defaults to None.
         y_pred_name (str, optional):
             Name of the column with the predicted values if a dataframe is specified. Defaults to None.
+        show (bool, optional):
+            If True, the plot is shown. Defaults to False.
 
     Returns:
         (NoneType): None
@@ -202,9 +218,22 @@ def plot_confusion_matrix(
         ax.yaxis.set_ticklabels(target_names)
     if title is not None:
         _ = ax.set_title(title)
+    if show:
+        plt.show()
 
 
-def plot_actual_vs_predicted(y_test, y_pred, title=None):
+def plot_actual_vs_predicted(y_test, y_pred, title=None, show=True) -> None:
+    """Plot actual vs. predicted values.
+
+    Args:
+        y_test (np.ndarray): True values.
+        y_pred (np.ndarray): Predicted values.
+        title (str, optional): Title of the plot. Defaults to None.
+        show (bool, optional): If True, the plot is shown. Defaults to True.
+
+    Returns:
+        (NoneType): None
+    """
     fig, axs = plt.subplots(ncols=2, figsize=(8, 4))
     PredictionErrorDisplay.from_predictions(
         y_test,
@@ -228,4 +257,5 @@ def plot_actual_vs_predicted(y_test, y_pred, title=None):
     if title is not None:
         fig.suptitle(title)
     plt.tight_layout()
-    plt.show()
+    if show:
+        plt.show()
