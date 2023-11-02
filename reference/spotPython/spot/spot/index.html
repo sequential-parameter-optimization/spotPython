@@ -1842,6 +1842,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotPython.spot.spot.Spot.parallel_plot" class="md-nav__link">
+    parallel_plot()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotPython.spot.spot.Spot.plot_contour" class="md-nav__link">
     plot_contour()
   </a>
@@ -2671,6 +2678,13 @@
           <li class="md-nav__item">
   <a href="#spotPython.spot.spot.Spot.infill" class="md-nav__link">
     infill()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spotPython.spot.spot.Spot.parallel_plot" class="md-nav__link">
+    parallel_plot()
   </a>
   
 </li>
@@ -4156,7 +4170,19 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">950</span>
 <span class="normal">951</span>
 <span class="normal">952</span>
-<span class="normal">953</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">953</span>
+<span class="normal">954</span>
+<span class="normal">955</span>
+<span class="normal">956</span>
+<span class="normal">957</span>
+<span class="normal">958</span>
+<span class="normal">959</span>
+<span class="normal">960</span>
+<span class="normal">961</span>
+<span class="normal">962</span>
+<span class="normal">963</span>
+<span class="normal">964</span>
+<span class="normal">965</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -4963,7 +4989,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">pylab</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">impo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_importance</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">var_plots</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">impo</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">]</span>
         <span class="n">min_z</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
@@ -4975,7 +5001,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                         <span class="n">filename_full</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_contour_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">filename_full</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">plot_contour</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename_full</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">plot_contour</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename_full</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
@@ -5048,7 +5074,17 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                 <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parallel plot.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            show (bool): show the plot</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">                fig (plotly.graph_objects.Figure): figure object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
@@ -5064,7 +5100,9 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                 <span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span>
 </code></pre></div></td></tr></table></div>
             </details>
 
@@ -5455,6 +5493,141 @@ infill criterion is calculated in natural units.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_reshaped</span><span class="p">,</span> <span class="n">return_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infill_criterion</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_reshaped</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="spotPython.spot.spot.Spot.parallel_plot" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">parallel_plot</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+<a href="#spotPython.spot.spot.Spot.parallel_plot" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Parallel plot.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>show</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>show the plot</p>
+            </div>
+          </td>
+          <td>
+                <code>True</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>fig</code></td>          <td>
+                <code><span title="plotly.graph_objects.Figure">Figure</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>figure object</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">937</span>
+<span class="normal">938</span>
+<span class="normal">939</span>
+<span class="normal">940</span>
+<span class="normal">941</span>
+<span class="normal">942</span>
+<span class="normal">943</span>
+<span class="normal">944</span>
+<span class="normal">945</span>
+<span class="normal">946</span>
+<span class="normal">947</span>
+<span class="normal">948</span>
+<span class="normal">949</span>
+<span class="normal">950</span>
+<span class="normal">951</span>
+<span class="normal">952</span>
+<span class="normal">953</span>
+<span class="normal">954</span>
+<span class="normal">955</span>
+<span class="normal">956</span>
+<span class="normal">957</span>
+<span class="normal">958</span>
+<span class="normal">959</span>
+<span class="normal">960</span>
+<span class="normal">961</span>
+<span class="normal">962</span>
+<span class="normal">963</span>
+<span class="normal">964</span>
+<span class="normal">965</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parallel plot.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        show (bool): show the plot</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">            fig (plotly.graph_objects.Figure): figure object</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">go</span><span class="o">.</span><span class="n">Parcoords</span><span class="p">(</span>
+            <span class="n">line</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">colorscale</span><span class="o">=</span><span class="s2">&quot;Jet&quot;</span><span class="p">,</span> <span class="n">showscale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmin</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]),</span> <span class="n">cmax</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])),</span>
+            <span class="n">dimensions</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="nb">dict</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]),</span> <span class="nb">max</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])],</span> <span class="n">label</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">values</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
