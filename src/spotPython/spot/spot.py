@@ -911,11 +911,13 @@ class Spot:
             print("Importance requires more than one theta values (n_theta>1).")
         return output
 
-    def plot_importance(self, threshold=0.1, filename=None, dpi=300) -> None:
+    def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True) -> None:
         """Plot the importance of each variable.
         Args:
             threshold (float):  The threshold of the importance.
             filename (str): The filename of the plot.
+            dpi (int): The dpi of the plot.
+            show (bool): Show the plot. Default is `True`.
         Returns:
             None
         """
@@ -932,7 +934,8 @@ class Spot:
                 plt.xticks(range(len(imp[idx])), var_name)
             if filename is not None:
                 plt.savefig(filename, bbox_inches="tight", dpi=dpi)
-            plt.show()
+            if show:
+                plt.show()
 
     def parallel_plot(self, show=True) -> go.Figure:
         """
