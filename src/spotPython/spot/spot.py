@@ -849,7 +849,7 @@ class Spot:
         if show:
             pylab.show()
 
-    def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None):
+    def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None, show=True) -> None:
         impo = self.print_importance(threshold=threshold, print_screen=True)
         var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
         min_z = min(self.y)
@@ -861,7 +861,7 @@ class Spot:
                         filename_full = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
                     else:
                         filename_full = None
-                    self.plot_contour(i=i, j=j, min_z=min_z, max_z=max_z, filename=filename_full)
+                    self.plot_contour(i=i, j=j, min_z=min_z, max_z=max_z, filename=filename_full, show=show)
 
     def get_importance(self) -> list:
         """Get importance of each variable and return the results as a list.
@@ -934,7 +934,17 @@ class Spot:
                 plt.savefig(filename, bbox_inches="tight", dpi=dpi)
             plt.show()
 
-    def parallel_plot(self):
+    def parallel_plot(self, show=True) -> go.Figure:
+        """
+        Parallel plot.
+
+        Args:
+            show (bool): show the plot
+
+        Returns:
+                fig (plotly.graph_objects.Figure): figure object
+
+        """
         X = self.X
         y = self.y
         df = pd.DataFrame(np.concatenate((X, y.reshape(-1, 1)), axis=1), columns=self.var_name + ["y"])
@@ -950,4 +960,6 @@ class Spot:
                 ),
             )
         )
-        fig.show()
+        if show:
+            fig.show()
+        return fig
