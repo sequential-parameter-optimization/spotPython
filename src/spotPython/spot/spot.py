@@ -320,6 +320,41 @@ class Spot:
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
 
+    def get_vars(self):
+        """
+        Get the variables of the class.
+
+        Returns:
+            (pandas.DataFrame): variables of the class.
+
+        Examples:
+            >>> import numpy as np
+                from math import inf
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 7
+                # number of points
+                n = 10
+
+                fun = analytical().fun_sphere
+                lower = np.array([-1])
+                upper = np.array([1])
+                design_control={"init_size": ni}
+
+                spot_1 = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            fun_evals = n,
+                            show_progress=True,
+                            design_control=design_control,)
+                spot_1.run()
+                spot_1.get_vars()
+
+        """
+        df = pd.DataFrame.from_records([vars(self)])
+        return df.T
+
     def to_red_dim(self):
         self.all_lower = self.lower
         self.all_upper = self.upper
@@ -937,12 +972,12 @@ class Spot:
             if show:
                 plt.show()
 
-    def parallel_plot(self, show=True) -> go.Figure:
+    def parallel_plot(self, show=False) -> go.Figure:
         """
         Parallel plot.
 
         Args:
-            show (bool): show the plot
+            show (bool): show the plot. Default is `False`.
 
         Returns:
                 fig (plotly.graph_objects.Figure): figure object
