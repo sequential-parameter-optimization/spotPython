@@ -128,7 +128,7 @@ def plot_roc_from_dataframes(
     alpha: float = 0.8,
     model_names: List[str] = None,
     target_column: str = None,
-    show=True,
+    show: bool = True,
 ) -> None:
     """
     Plot ROC curve for a list of dataframes from model evaluations.

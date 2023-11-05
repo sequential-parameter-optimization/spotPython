@@ -280,7 +280,7 @@ def plot_sns_heatmap(
     fmt=".5f",
     linewidths=0.5,
     annot_kws={"size": 8},
-):
+) -> None:
     """
     Plots a heatmap of the correlation matrix of the given DataFrame.
 
@@ -296,7 +296,7 @@ def plot_sns_heatmap(
         annot_kws (dict): Keyword arguments for annotations.
 
     Returns:
-        None
+        (NoneType): None
 
     Example:
         >>> import pandas as pd
@@ -320,7 +320,7 @@ def plot_sns_heatmap(
     plt.gcf().clear()
 
 
-def count_missing_data(df):
+def count_missing_data(df) -> pd.DataFrame:
     """
     Counts the number of missing values in each column of the given DataFrame.
 
@@ -328,7 +328,7 @@ def count_missing_data(df):
         df (pd.DataFrame): DataFrame containing the data to be counted.
 
     Returns:
-        pd.DataFrame: DataFrame containing the number of missing values in each column.
+        (pd.DataFrame): DataFrame containing the number of missing values in each column.
 
     Example:
         >>> import pandas as pd
@@ -346,7 +346,9 @@ def count_missing_data(df):
     return missing_df
 
 
-def plot_missing_data(df, relative=False, figsize=(7, 5), color="grey", xlabel="Missing Data", title="Missing Data"):
+def plot_missing_data(
+    df, relative=False, figsize=(7, 5), color="grey", xlabel="Missing Data", title="Missing Data"
+) -> None:
     """
     Plots a horizontal bar chart of the number of missing values in each column of the given DataFrame.
 
@@ -359,7 +361,7 @@ def plot_missing_data(df, relative=False, figsize=(7, 5), color="grey", xlabel="
         title (str): Title for the plot.
 
     Returns:
-        None
+        (NoneType): None
 
     Example:
         >>> import pandas as pd
