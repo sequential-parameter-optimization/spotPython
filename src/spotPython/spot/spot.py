@@ -320,12 +320,11 @@ class Spot:
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
 
-    def get_vars(self):
-        """
-        Get the variables of the class.
+    def get_spot_attributes_as_df(self):
+        """Get all attributes of the spot object as a pandas dataframe.
 
         Returns:
-            (pandas.DataFrame): variables of the class.
+            (pandas.DataFrame): dataframe with all attributes of the spot object.
 
         Examples:
             >>> import numpy as np
@@ -349,11 +348,59 @@ class Spot:
                             show_progress=True,
                             design_control=design_control,)
                 spot_1.run()
-                spot_1.get_vars()
+                df = spot_1.get_spot_attributes_as_df()
+                df
+                    Attribute Name                                    Attribute Value
+                0                   X  [[-0.3378148180708981], [0.698908280342222], [...
+                1           all_lower                                               [-1]
+                2           all_upper                                                [1]
+                3        all_var_name                                               [x0]
+                4        all_var_type                                              [num]
+                5             counter                                                 10
+                6           de_bounds                                          [[-1, 1]]
+                7              design  <spotPython.design.spacefilling.spacefilling o...
+                8      design_control                     {'init_size': 7, 'repeats': 1}
+                9                 eps                                                0.0
+                10        fun_control                         {'sigma': 0, 'seed': None}
+                11          fun_evals                                                 10
+                12        fun_repeats                                                  1
+                13              ident                                            [False]
+                14   infill_criterion                                                  y
+                15                  k                                                  1
+                16          log_level                                                 50
+                17              lower                                               [-1]
+                18           max_time                                                inf
+                19             mean_X                                               None
+                20             mean_y                                               None
+                21              min_X                           [1.5392206722432657e-05]
+                22         min_mean_X                                               None
+                23         min_mean_y                                               None
+                24              min_y                                                0.0
+                25           n_points                                                  1
+                26              noise                                              False
+                27         ocba_delta                                                  0
+                28  optimizer_control                    {'max_iter': 1000, 'seed': 125}
+                29            red_dim                                              False
+                30                rng                                   Generator(PCG64)
+                31               seed                                                123
+                32        show_models                                              False
+                33      show_progress                                               True
+                34        spot_writer                                               None
+                35          surrogate  <spotPython.build.kriging.Kriging object at 0x...
+                36  surrogate_control  {'noise': False, 'model_optimizer': <function ...
+                37        tolerance_x                                                  0
+                38              upper                                                [1]
+                39           var_name                                               [x0]
+                40           var_type                                              [num]
+                41              var_y                                               None
+                42                  y  [0.11411885130827397, 0.48847278433092195, 0.0...
 
         """
-        df = pd.DataFrame.from_records([vars(self)])
-        return df.T
+
+        attributes = [attr for attr in dir(self) if not callable(getattr(self, attr)) and not attr.startswith("__")]
+        values = [getattr(self, attr) for attr in attributes]
+        df = pd.DataFrame({"Attribute Name": attributes, "Attribute Value": values})
+        return df
 
     def to_red_dim(self):
         self.all_lower = self.lower

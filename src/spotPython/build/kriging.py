@@ -626,7 +626,12 @@ class Kriging(surrogates):
             None
         """
         self.p = ones(self.n_p) * 2.0
-        self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+        # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+        # else self.pen_val = self.n * var(self.nat_y) + 1e4
+        if var(self.nat_y) > 0:
+            self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+        else:
+            self.pen_val = self.n * var(self.nat_y) + 1e4
         self.negLnLike = None
         self.gen = spacefilling(k=self.k, seed=self.seed)
         self.LnDetPsi = None
