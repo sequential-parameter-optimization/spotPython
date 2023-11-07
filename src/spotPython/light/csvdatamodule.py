@@ -1,6 +1,6 @@
 import lightning as L
 from torch.utils.data import DataLoader, random_split
-from spotPython.light.csvdataset import CSVDataset
+from spotPython.light.vbdpdataset import CSVDataset
 from typing import Optional
 
 

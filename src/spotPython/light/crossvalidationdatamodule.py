@@ -1,7 +1,7 @@
 import lightning as L
 from torch.utils.data import DataLoader, Subset
 from typing import Optional
-from spotPython.light.csvdataset import CSVDataset
+from spotPython.light.vbdpdataset import CSVDataset
 from sklearn.model_selection import KFold
 from torch.utils.data import Dataset
 

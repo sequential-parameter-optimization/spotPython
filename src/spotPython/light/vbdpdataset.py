@@ -9,7 +9,7 @@ class CSVDataset(Dataset):
     A PyTorch Dataset for handling CSV data.
 
     Args:
-        csv_file (str): The path to the CSV file. Defaults to "./data/spotPython/data.csv".
+        csv_file (str): The path to the CSV file. Defaults to "./data/VBDP/train.csv".
         train (bool): Whether the dataset is for training or not. Defaults to True.
 
     Attributes:
@@ -19,28 +19,33 @@ class CSVDataset(Dataset):
 
     def __init__(
         self,
-        csv_file: str = "./data/spotPython/data.csv",
-        target_column: str = "y",
+        csv_file: str = "./data/VBDP/train.csv",
         train: bool = True,
     ) -> None:
         super().__init__()
         self.csv_file = csv_file
         self.train = train
-        self.data, self.targets = self._load_data(target_column=target_column)
+        self.data, self.targets = self._load_data()
 
-    def _load_data(self, target_column: str) -> tuple:
+    def _load_data(self) -> tuple:
         """
         Loads the data from the CSV file.
 
-        Args:
-            target_column (str): The name of the target column.
-
         Returns:
             tuple: A tuple containing the features and targets as tensors.
+        Examples:
+            >>> from spotPython.light import CSVDataset
+            >>> dataset = CSVDataset()
+            >>> print(dataset.data.shape)
+            torch.Size([60000, 784])
+            >>> print(dataset.targets.shape)
+            torch.Size([60000])
+
         """
         data_df = pd.read_csv(self.csv_file)
         # drop the id column
         data_df = data_df.drop(columns=["id"])
+        target_column = "prognosis"
 
         # Encode prognosis labels as integers
         label_encoder = LabelEncoder()

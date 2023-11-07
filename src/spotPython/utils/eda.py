@@ -7,7 +7,7 @@ from spotPython.hyperparameters.values import (
     get_transform,
 )
 import torch
-from spotPython.light.csvdataset import CSVDataset
+from spotPython.light.vbdpdataset import CSVDataset
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import math
