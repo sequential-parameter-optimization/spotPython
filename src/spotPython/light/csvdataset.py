@@ -66,14 +66,12 @@ class CSVDataset(Dataset):
             tuple: A tuple containing the feature and target at the given index.
 
         Examples:
-            >>> from spotPython.light import CSVDataset
-            >>> dataset = CSVDataset()
-            >>> feature, target = dataset[0]
-            >>> print(feature.shape)
-            torch.Size([784])
-            >>> print(target)
-            tensor(0)
-
+            >>> from spotPython.light.csvdataset import CSVDataset
+                dataset = CSVDataset(csv_file='./data/spotPython/data.csv', target_column='prognosis')
+                print(dataset.data.shape)
+                print(dataset.targets.shape)
+                torch.Size([11, 65])
+                torch.Size([11])
         """
         feature = self.data[idx]
         target = self.targets[idx]
