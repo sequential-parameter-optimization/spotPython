@@ -1,6 +1,7 @@
 import torch
 import pandas as pd
 from torch.utils.data import Dataset
+from sklearn.preprocessing import LabelEncoder
 
 
 class CSVDataset(Dataset):
@@ -19,50 +20,39 @@ class CSVDataset(Dataset):
     def __init__(
         self,
         csv_file: str = "./data/spotPython/data.csv",
+        feature_type: torch.dtype = torch.float,
         target_column: str = "y",
-        target_type: str = "float",
+        target_type: torch.dtype = torch.long,
         train: bool = True,
+        rmNA=True,
     ) -> None:
         super().__init__()
         self.csv_file = csv_file
+        self.feature_type = feature_type
+        self.target_type = target_type
         self.target_column = target_column
         self.train = train
+        self.rmNA = rmNA
         self.data, self.targets = self._load_data()
 
     def _load_data(self) -> tuple:
-        print(f"Loading data from {self.csv_file}")
-        print(f"Target column: {self.target_column}")
-        # read the csv file into a pandas dataframe and use every column as a feature
         df = pd.read_csv(self.csv_file, index_col=False)
-        print(f"Data shape: {df.shape}")
-        print(f"Data head:\n{df.head()}")
-        print(f"Data describe:\n{df.describe()}")
+        # rm rows with NA
+        if self.rmNA:
+            df = df.dropna()
+        # Apply LabelEncoder to string columns
+        le = LabelEncoder()
+        df = df.apply(lambda col: le.fit_transform(col) if col.dtypes == object else col)
 
-        # Identify types
-        numerical_cols = df.select_dtypes(include=[int, float]).columns
-        string_cols = df.select_dtypes(include=[object]).columns
+        # Split DataFrame into feature and target DataFrames
+        feature_df = df.drop(columns=[self.target_column])
+        target_df = df[self.target_column]
 
-        # Convert numerical columns to torch.float
-        for col in numerical_cols:
-            df[col] = torch.tensor(df[col].values, dtype=torch.float)
+        # Convert DataFrames to PyTorch tensors
+        feature_tensor = torch.tensor(feature_df.values, dtype=self.feature_type)
+        target_tensor = torch.tensor(target_df.values, dtype=self.target_type)
 
-        # Convert string columns to torch.long
-        for col in string_cols:
-            df[col] = torch.tensor(df[col].astype("category").cat.codes.values, dtype=torch.long)
-
-        # Extract target column and convert to torch.tensor
-        # target_column = torch.tensor(df[self.target_column].values, dtype=df[self.target_column].dtype)
-        target_column_tensor = torch.tensor(
-            df[self.target_column].values, dtype=torch.tensor(df[self.target_column].values).dtype
-        )
-
-        # Drop target column to get features
-        features_df = df.drop(columns=[self.target_column])
-
-        # Convert dataframe to tensor and return
-        features_tensor = torch.tensor(features_df.values, dtype=torch.float)
-
-        return features_tensor, target_column_tensor
+        return feature_tensor, target_tensor
 
     def __getitem__(self, idx: int) -> tuple:
         """
