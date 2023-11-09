@@ -1,7 +1,6 @@
 import torch
 import pandas as pd
 from torch.utils.data import Dataset
-from sklearn.preprocessing import LabelEncoder
 
 
 class CSVDataset(Dataset):
@@ -26,34 +25,44 @@ class CSVDataset(Dataset):
     ) -> None:
         super().__init__()
         self.csv_file = csv_file
+        self.target_column = target_column
         self.train = train
-        self.data, self.targets = self._load_data(csv_file=csv_file, target_column=target_column)
+        self.data, self.targets = self._load_data()
 
-    def _load_data(self, csv_file, target_column):
-        data_df = pd.read_csv(self.csv_file)
+    def _load_data(self) -> tuple:
+        print(f"Loading data from {self.csv_file}")
+        print(f"Target column: {self.target_column}")
+        # read the csv file into a pandas dataframe and use every column as a feature
+        df = pd.read_csv(self.csv_file, index_col=False)
+        print(f"Data shape: {df.shape}")
+        print(f"Data head:\n{df.head()}")
+        print(f"Data describe:\n{df.describe()}")
 
-        # Identify numerical and string columns
-        numerical_columns = data_df.select_dtypes(include=[int, float]).columns
-        string_columns = data_df.select_dtypes(include=[object]).columns
+        # Identify types
+        numerical_cols = df.select_dtypes(include=[int, float]).columns
+        string_cols = df.select_dtypes(include=[object]).columns
 
-        # Convert numerical columns to float32 tensors
-        numerical_features = data_df[numerical_columns].values
-        numerical_features_tensor = torch.tensor(numerical_features, dtype=torch.float32)
+        # Convert numerical columns to torch.float
+        for col in numerical_cols:
+            df[col] = torch.tensor(df[col].values, dtype=torch.float)
 
-        # Encode string columns as label-encoded long tensors
-        label_encoder = LabelEncoder()
-        string_features = data_df[string_columns].apply(label_encoder.fit_transform).values
-        string_features_tensor = torch.tensor(string_features, dtype=torch.long)
+        # Convert string columns to torch.long
+        for col in string_cols:
+            df[col] = torch.tensor(df[col].astype("category").cat.codes.values, dtype=torch.long)
 
-        # Concatenate numerical and string tensors to create the features tensor
-        features_tensor = torch.cat((numerical_features_tensor, string_features_tensor), dim=1)
+        # Extract target column and convert to torch.tensor
+        # target_column = torch.tensor(df[self.target_column].values, dtype=df[self.target_column].dtype)
+        target_column_tensor = torch.tensor(
+            df[self.target_column].values, dtype=torch.tensor(df[self.target_column].values).dtype
+        )
 
-        # Encode prognosis labels as integers
-        targets = label_encoder.fit_transform(data_df[target_column])
+        # Drop target column to get features
+        features_df = df.drop(columns=[self.target_column])
 
-        # Convert targets to tensor
-        targets_tensor = torch.tensor(targets, dtype=torch.long)
-        return features_tensor, targets_tensor
+        # Convert dataframe to tensor and return
+        features_tensor = torch.tensor(features_df.values, dtype=torch.float)
+
+        return features_tensor, target_column_tensor
 
     def __getitem__(self, idx: int) -> tuple:
         """
