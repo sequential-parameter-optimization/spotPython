@@ -4,8 +4,8 @@ from torch.utils.data import DataLoader
 from spotPython.data.pkldataset import PKLDataset
 
 
-def test_csv_dataset():
-    # Create an instance of CSVDataset for testing
+def test_pkl_dataset():
+    # Create an instance of PKLDataset for testing
     dataset = PKLDataset(target_column='prognosis')
 
     # Test the length of the dataset
