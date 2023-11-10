@@ -2,6 +2,7 @@ import torch
 import pandas as pd
 from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
+import pathlib
 
 
 class CSVDataset(Dataset):
@@ -9,25 +10,52 @@ class CSVDataset(Dataset):
     A PyTorch Dataset for handling CSV data.
 
     Args:
-        csv_file (str): The path to the CSV file. Defaults to "./data/spotPython/data.csv".
+        filename (str): The path to the CSV file. Defaults to "data.csv".
+        directory (str): The path to the directory where the CSV file is stored. Defaults to None.
+        feature_type (torch.dtype): The data type of the features. Defaults to torch.float.
+        target_column (str): The name of the target column. Defaults to "y".
+        target_type (torch.dtype): The data type of the targets. Defaults to torch.long.
         train (bool): Whether the dataset is for training or not. Defaults to True.
+        rmNA (bool): Whether to remove rows with NA values or not. Defaults to True.
+        **desc: Additional keyword arguments.
 
     Attributes:
         data (Tensor): The data features.
         targets (Tensor): The data targets.
+
+    Examples:
+        >>> from torch.utils.data import DataLoader
+            from spotPython.data.csvdataset import CSVDataset
+            import torch
+            dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
+            # Set batch size for DataLoader
+            batch_size = 5
+            # Create DataLoader
+            dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+
+            # Iterate over the data in the DataLoader
+            for batch in dataloader:
+                inputs, targets = batch
+                print(f"Batch Size: {inputs.size(0)}")
+                print("---------------")
+                print(f"Inputs: {inputs}")
+                print(f"Targets: {targets}")
     """
 
     def __init__(
         self,
-        csv_file: str = "./data/spotPython/data.csv",
+        filename: str = "data.csv",
+        directory: None = None,
         feature_type: torch.dtype = torch.float,
         target_column: str = "y",
         target_type: torch.dtype = torch.long,
         train: bool = True,
         rmNA=True,
+        **desc,
     ) -> None:
         super().__init__()
-        self.csv_file = csv_file
+        self.filename = filename
+        self.directory = directory
         self.feature_type = feature_type
         self.target_type = target_type
         self.target_column = target_column
@@ -35,8 +63,21 @@ class CSVDataset(Dataset):
         self.rmNA = rmNA
         self.data, self.targets = self._load_data()
 
+    @property
+    def path(self):
+        if self.directory:
+            return pathlib.Path(self.directory).joinpath(self.filename)
+        return pathlib.Path(__file__).parent.joinpath(self.filename)
+
+    @property
+    def _repr_content(self):
+        content = super()._repr_content
+        content["Path"] = str(self.path)
+        return content
+
     def _load_data(self) -> tuple:
-        df = pd.read_csv(self.csv_file, index_col=False)
+        print(f"Loading data from {self.path}")
+        df = pd.read_csv(self.path, index_col=False)
         # rm rows with NA
         if self.rmNA:
             df = df.dropna()
@@ -66,7 +107,7 @@ class CSVDataset(Dataset):
 
         Examples:
             >>> from spotPython.light.csvdataset import CSVDataset
-                dataset = CSVDataset(csv_file='./data/spotPython/data.csv', target_column='prognosis')
+                dataset = CSVDataset(filename='./data/spotPython/data.csv', target_column='prognosis')
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
                 torch.Size([11, 65])
