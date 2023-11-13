@@ -17,5 +17,6 @@ def test_set_data_module():
     # if assinged correctly, the length of the data_test should be the same as the length of the dataset dm:
     assert len(dm.data_test) == len(data_module.data_test)
 
+
 if __name__ == "__main__":
     pytest.main(["-v", __file__])

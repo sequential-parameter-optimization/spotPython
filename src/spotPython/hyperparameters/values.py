@@ -869,6 +869,35 @@ def get_default_hyperparameters_for_core_model(fun_control) -> dict:
     return values
 
 
+def set_data_set(fun_control, data_set) -> dict:
+    """
+    This function sets the lightning dataset in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        data_set (class): Dataset class from torch.utils.data
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.utils.prepare import set_data_module
+            from spotPython.data.lightdatamodule import LightDataModule
+            from spotPython.data.csvdataset import CSVDataset
+            from spotPython.data.pkldataset import PKLDataset
+            import torch
+            fun_control = fun_control_init()
+            ds = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
+            set_data_set(fun_control=fun_control,
+                         data_set=ds)
+            fun_control["data_set"]
+    """
+    fun_control.update({"data_set": data_set})
+
+
 def set_data_module(fun_control, data_module) -> dict:
     """
     This function sets the lightning datamodule in the fun_control dictionary.

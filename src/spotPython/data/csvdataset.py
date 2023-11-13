@@ -17,6 +17,7 @@ class CSVDataset(Dataset):
         target_type (torch.dtype): The data type of the targets. Defaults to torch.long.
         train (bool): Whether the dataset is for training or not. Defaults to True.
         rmNA (bool): Whether to remove rows with NA values or not. Defaults to True.
+        dropId (bool): Whether to drop the "id" column or not. Defaults to False.
         **desc: Additional keyword arguments.
 
     Attributes:
@@ -51,6 +52,7 @@ class CSVDataset(Dataset):
         target_type: torch.dtype = torch.long,
         train: bool = True,
         rmNA=True,
+        dropId=False,
         **desc,
     ) -> None:
         super().__init__()
@@ -61,6 +63,7 @@ class CSVDataset(Dataset):
         self.target_column = target_column
         self.train = train
         self.rmNA = rmNA
+        self.dropId = dropId
         self.data, self.targets = self._load_data()
 
     @property
@@ -81,6 +84,8 @@ class CSVDataset(Dataset):
         # rm rows with NA
         if self.rmNA:
             df = df.dropna()
+        if self.dropId:
+            df = df.drop(columns=["id"])
         # Apply LabelEncoder to string columns
         le = LabelEncoder()
         df = df.apply(lambda col: le.fit_transform(col) if col.dtypes == object else col)

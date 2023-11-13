@@ -84,10 +84,10 @@ class LightDataModule(L.LightningDataModule):
             val_size = int(full_train_size * test_size / len(self.data_full))
             train_size = full_train_size - val_size
 
-        print(f"full_train_size: {full_train_size}")
-        print(f"val_size: {val_size}")
-        print(f"train_size: {train_size}")
-        print(f"test_size: {test_size}")
+        # print(f"full_train_size: {full_train_size}")
+        # print(f"val_size: {val_size}")
+        # print(f"train_size: {train_size}")
+        # print(f"test_size: {test_size}")
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:

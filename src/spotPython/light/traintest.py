@@ -1,5 +1,7 @@
 import lightning as L
-from spotPython.light.csvdatamodule import CSVDataModule
+
+# from spotPython.light.csvdatamodule import CSVDataModule
+from spotPython.data.lightdatamodule import LightDataModule
 from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
@@ -58,12 +60,22 @@ def train_model(config: dict, fun_control: dict) -> float:
         pass
     # print(f"model: {model}")
 
-    # Init DataModule
-    dm = CSVDataModule(
+    # # Init DataModule
+    # dm = CSVDataModule(
+    #     batch_size=config["batch_size"],
+    #     num_workers=fun_control["num_workers"],
+    #     data_dir=fun_control["DATASET_PATH"],
+    # )
+
+    print(fun_control["data_set"].data.shape)
+    print(fun_control["data_set"].targets.shape)
+    dm = LightDataModule(
+        dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
-        data_dir=fun_control["DATASET_PATH"],
     )
+    dm.setup()
+    print(f"train_model(): Test set size: {len(dm.data_test)}")
 
     # Init trainer
     trainer = L.Trainer(
@@ -127,11 +139,22 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     # Add "TEST" postfix to config_id
     config_id = generate_config_id(config) + "_TEST"
     # Init DataModule
-    dm = CSVDataModule(
+    # dm = CSVDataModule(
+    #     batch_size=config["batch_size"],
+    #     num_workers=fun_control["num_workers"],
+    #     data_dir=fun_control["DATASET_PATH"],
+    # )
+
+    print("\n******\nIn test_model:", fun_control["data_set"].data.shape)
+    print(fun_control["data_set"].targets.shape)
+    dm = LightDataModule(
+        dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
-        data_dir=fun_control["DATASET_PATH"],
     )
+    dm.setup()
+    print(f"Test set size: {len(dm.data_test)}")
+
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
     initialization = config["initialization"]
