@@ -649,29 +649,40 @@ def get_values_from_dict(dictionary) -> np.array:
     return np.array(list(dictionary.values()))
 
 
-def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=None) -> dict:
+def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, filename=None) -> dict:
     """Add the core model to the function control dictionary.
+
     Args:
         core_model (class):
             The core model.
         fun_control (dict):
-            The function control dictionary.
+            The fun_control dictionary.
         hyper_dict (dict):
-            The hyper parameter dictionary.
+            The hyper parameter dictionary. Optional. Default is None. If no hyper_dict is provided,
+            the function will try to load the hyper_dict from the file specified by filename.
         filename (str):
             The name of the json file that contains the hyper parameter dictionary.
-            Optional. Default is None.
+            Optional. Default is None. If no filename is provided, the function will try to load the
+            hyper_dict from the hyper_dict dictionary.
+
     Returns:
         (dict):
-            The function control dictionary.
+            The updated fun_control dictionary.
+
     Examples:
-        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotRiver.data.river_hyper_dict import RiverHyperDict
-            fun_control = {}
-            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-                fun_control=func_control,
-                hyper_dict=RiverHyperDict,
-                filename=None)
+        >>> from spotPython.light.netlightbase import NetLightBase
+            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+            add_core_model_to_fun_control(core_model=NetLightBase,
+                              fun_control=fun_control,
+                              hyper_dict=LightHyperDict)
+        # or, if a user wants to use a custom hyper_dict:
+        >>> from spotPython.light.netlightbase import NetLightBase
+            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+            add_core_model_to_fun_control(core_model=NetLightBase,
+                                        fun_control=fun_control,
+                                        filename="./hyperdict/user_hyper_dict.json")
+
     """
     fun_control.update({"core_model": core_model})
     if filename is None:
@@ -679,7 +690,6 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict, filename=
     else:
         with open(filename, "r") as f:
             new_hyper_dict = json.load(f)
-    hyper_dict().load()
     fun_control.update({"core_model_hyper_dict": new_hyper_dict[core_model.__name__]})
     var_type = get_var_type(fun_control)
     var_name = get_var_name(fun_control)
