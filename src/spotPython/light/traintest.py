@@ -97,7 +97,7 @@ def train_model(config: dict, fun_control: dict) -> float:
     result = trainer.validate(model=model, datamodule=dm)
     # unlist the result (from a list of one dict)
     result = result[0]
-    # print(f"train_model result: {result}")
+    print(f"train_model result: {result}")
     return result["val_loss"]
 
 
@@ -185,8 +185,8 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     trainer.fit(model=model, datamodule=dm)
     test_result = trainer.test(datamodule=dm, ckpt_path="last")
     test_result = test_result[0]
-    # print(f"test_model result: {test_result}")
-    return test_result["val_loss"], test_result["val_acc"]
+    print(f"test_model result: {test_result}")
+    return test_result["val_loss"], test_result["hp_metric"]
 
 
 def cv_model(config: dict, fun_control: dict) -> float:
