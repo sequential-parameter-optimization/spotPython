@@ -4,7 +4,9 @@ from torch import nn
 
 # import torchmetrics
 import torch.nn.functional as F
-from torchmetrics.functional import accuracy
+
+# from torchmetrics.functional import accuracy
+from torchmetrics.regression import MeanAbsoluteError
 from spotPython.hyperparameters.optimizer import optimizer_handler
 
 
@@ -141,8 +143,10 @@ class NetLinearBase(L.LightningModule):
         self._L_in = _L_in
         self._L_out = _L_out
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
-        self._metric = accuracy
-        self._loss = F.cross_entropy
+        # self._metric = accuracy
+        self._metric = MeanAbsoluteError()
+        # self._loss = F.cross_entropy
+        self._loss = F.mse_loss
         self.save_hyperparameters(ignore=["_L_in", "_L_out", "_metric", "_loss"])
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
@@ -190,7 +194,8 @@ class NetLinearBase(L.LightningModule):
         """
         print("Entering NetLinearBase.forward()")
         x = self.layers(x)
-        return F.softmax(x, dim=1)
+        # return F.softmax(x, dim=1)
+        return x
 
     def training_step(self, batch: tuple) -> torch.Tensor:
         """
@@ -262,8 +267,10 @@ class NetLinearBase(L.LightningModule):
         # compute cross entropy loss from logits and y
         loss = self._loss(logits, y)
         # loss = F.nll_loss(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        metric = self._metric(preds, y, task="multiclass", num_classes=self._L_out)
+        # metric
+        metric = self._metric(logits, y)
+        # preds = torch.argmax(logits, dim=1)
+        # metric = self._metric(preds, y, task="multiclass", num_classes=self._L_out)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_metric", metric, prog_bar=prog_bar)
         self.log("hp_metric", loss, prog_bar=prog_bar)
@@ -285,8 +292,9 @@ class NetLinearBase(L.LightningModule):
         logits = self(x)
         # compute cross entropy loss from logits and y
         loss = self._loss(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        metric = self._metric(preds, y, task="multiclass", num_classes=self._L_out)
+        metric = self._metric(logits, y)
+        # preds = torch.argmax(logits, dim=1)
+        # metric = self._metric(preds, y, task="multiclass", num_classes=self._L_out)
         self.log("val_loss", loss, prog_bar=prog_bar)
         self.log("val_metric", metric, prog_bar=prog_bar)
         self.log("hp_metric", loss, prog_bar=prog_bar)

@@ -2,8 +2,10 @@ import lightning as L
 import torch
 import torch.nn.functional as F
 from torch import nn
-from torchmetrics.functional import accuracy
-from spotPython.torch.mapk import MAPK
+
+# from torchmetrics.regression import MeanAbsoluteError
+
+# from spotPython.torch.mapk import MAPK
 from spotPython.hyperparameters.optimizer import optimizer_handler
 
 
@@ -123,9 +125,9 @@ class NetLightBase(L.LightningModule):
             raise ValueError("l1 must be at least 4")
 
         hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
-        self.train_mapk = MAPK(k=3)
-        self.valid_mapk = MAPK(k=3)
-        self.test_mapk = MAPK(k=3)
+        # self.train_mapk = MAPK(k=3)
+        # self.valid_mapk = MAPK(k=3)
+        # self.test_mapk = MAPK(k=3)
 
         # Create the network based on the specified hidden sizes
         layers = []
@@ -166,7 +168,8 @@ class NetLightBase(L.LightningModule):
 
         """
         x = self.layers(x)
-        return F.softmax(x, dim=1)
+        # return F.softmax(x, dim=1)
+        return x
 
     def training_step(self, batch: tuple) -> torch.Tensor:
         """
@@ -194,6 +197,7 @@ class NetLightBase(L.LightningModule):
 
         """
         x, y = batch
+        y = y.view(len(y), 1)
         logits = self(x)
         # compute cross entropy loss from logits and y
         loss = F.cross_entropy(logits, y)
@@ -229,16 +233,18 @@ class NetLightBase(L.LightningModule):
 
         """
         x, y = batch
+        y = y.view(len(y), 1)
         logits = self(x)
         # compute cross entropy loss from logits and y
-        loss = F.cross_entropy(logits, y)
+        # loss = F.cross_entropy(logits, y)
+        loss = F.mse_loss(logits, y)
         # loss = F.nll_loss(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
-        self.valid_mapk(logits, y)
-        self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True, prog_bar=prog_bar)
+        # preds = torch.argmax(logits, dim=1)
+        # acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
+        # self.valid_mapk(logits, y)
+        # self.log("valid_mapk", self.valid_mapk, on_step=False, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
-        self.log("val_acc", acc, prog_bar=prog_bar)
+        # self.log("val_acc", acc, prog_bar=prog_bar)
         self.log("hp_metric", loss, prog_bar=prog_bar)
 
     def test_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> tuple:
@@ -255,15 +261,18 @@ class NetLightBase(L.LightningModule):
         """
         x, y = batch
         logits = self(x)
-        # compute cross entropy loss from logits and y
-        loss = F.cross_entropy(logits, y)
-        preds = torch.argmax(logits, dim=1)
-        acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
-        self.test_mapk(logits, y)
-        self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True, prog_bar=prog_bar)
+        y = y.view(len(y), 1)
+        # # compute cross entropy loss from logits and y
+        # loss = F.cross_entropy(logits, y)
+        loss = F.mse_loss(logits, y)
+        # preds = torch.argmax(logits, dim=1)
+        # acc = accuracy(preds, y, task="multiclass", num_classes=self._L_out)
+        # self.test_mapk(logits, y)
+        # self.log("test_mapk", self.test_mapk, on_step=True, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", loss, prog_bar=prog_bar)
-        self.log("val_acc", acc, prog_bar=prog_bar)
+        # self.log("val_acc", acc, prog_bar=prog_bar)
         self.log("hp_metric", loss, prog_bar=prog_bar)
+        acc = torch.tensor(0.0)
         return loss, acc
 
     def configure_optimizers(self) -> torch.optim.Optimizer:
