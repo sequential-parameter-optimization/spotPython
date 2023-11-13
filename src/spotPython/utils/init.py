@@ -119,6 +119,7 @@ def fun_control_init(
         "_L_out": _L_out,
         "data": None,
         "data_dir": "./data",
+        "data_module": None,
         "device": device,
         "enable_progress_bar": enable_progress_bar,
         "eval": None,

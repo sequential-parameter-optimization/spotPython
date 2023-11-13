@@ -867,3 +867,34 @@ def get_default_hyperparameters_for_core_model(fun_control) -> dict:
     values = convert_keys(values, fun_control["var_type"])
     values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
     return values
+
+
+def set_data_module(fun_control, data_module) -> dict:
+    """
+    This function sets the lightning datamodule in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        data_module (class): DataLoader class from torch.utils.data
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.utils.prepare import set_data_module
+            from spotPython.data.lightdatamodule import LightDataModule
+            from spotPython.data.csvdataset import CSVDataset
+            from spotPython.data.pkldataset import PKLDataset
+            import torch
+            fun_control = fun_control_init()
+            dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
+            dm = LightDataModule(dataset=dataset, batch_size=5, test_size=7)
+            dm.setup()
+            set_data_module(fun_control=fun_control,
+                            data_module=dm)
+            fun_control["data_module"]
+    """
+    fun_control.update({"data_module": data_module})

@@ -76,7 +76,7 @@ class CSVDataset(Dataset):
         return content
 
     def _load_data(self) -> tuple:
-        print(f"Loading data from {self.path}")
+        # print(f"Loading data from {self.path}")
         df = pd.read_csv(self.path, index_col=False)
         # rm rows with NA
         if self.rmNA:
