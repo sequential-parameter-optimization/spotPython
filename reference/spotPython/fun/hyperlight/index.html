@@ -700,6 +700,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -761,6 +765,46 @@
   
   <span class="md-ellipsis">
     csvdataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/diabetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    diabetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/lightcrossvalidationdatamodule/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    lightcrossvalidationdatamodule
   </span>
   
 
@@ -1476,6 +1520,8 @@
       
         
       
+        
+      
     
     
     
@@ -1797,6 +1843,26 @@
   
   <span class="md-ellipsis">
     netlightbasemapk
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../light/netlightregression/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    netlightregression
   </span>
   
 
@@ -3090,12 +3156,16 @@
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_light</span> <span class="o">=</span> <span class="n">HyperLight</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">hyper_light</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
-<span class="go">126</span>
+<span class="go">    126</span>
 </code></pre></div>
 
             <details class="quote">
               <summary>Source code in <code>spotPython/fun/hyperlight.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 18</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 14</span>
+<span class="normal"> 15</span>
+<span class="normal"> 16</span>
+<span class="normal"> 17</span>
+<span class="normal"> 18</span>
 <span class="normal"> 19</span>
 <span class="normal"> 20</span>
 <span class="normal"> 21</span>
@@ -3208,7 +3278,26 @@
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Lightning.</span>
 
@@ -3225,37 +3314,25 @@
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; hyper_light = HyperLight(seed=126, log_level=50)</span>
 <span class="sd">        &gt;&gt;&gt; print(hyper_light.seed)</span>
-<span class="sd">        126</span>
+<span class="sd">            126</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
-            <span class="s2">&quot;horizon&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;grace_period&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;metric_river&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;metric_sklearn&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;weights&quot;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-            <span class="s2">&quot;weight_coeff&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-            <span class="s2">&quot;log_level&quot;</span><span class="p">:</span> <span class="n">log_level</span><span class="p">,</span>
-            <span class="s2">&quot;var_name&quot;</span><span class="p">:</span> <span class="p">[],</span>
-            <span class="s2">&quot;var_type&quot;</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;log_level&quot;</span><span class="p">]</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting the logger at level </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="si">}</span><span class="s2"> for module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="n">log_level</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting the logger at level </span><span class="si">{</span><span class="n">log_level</span><span class="si">}</span><span class="s2"> for module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">check_X_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">check_X_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks the shape of the input array X and raises an exception if it is not valid.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            X (np.ndarray):</span>
 <span class="sd">                input array.</span>
+<span class="sd">            fun_control (dict):</span>
+<span class="sd">                dictionary containing control parameters for the hyperparameter tuning.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            np.ndarray:</span>
@@ -3266,17 +3343,31 @@
 <span class="sd">                if the shape of the input array is not valid.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; hyper_light = HyperLight(seed=126, log_level=50)</span>
-<span class="sd">            &gt;&gt;&gt; X = np.array([[1, 2], [3, 4]])</span>
-<span class="sd">            &gt;&gt;&gt; hyper_light.check_X_shape(X)</span>
-<span class="sd">            array([[1, 2],</span>
-<span class="sd">                   [3, 4]])</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                from spotPython.utils.init import fun_control_init</span>
+<span class="sd">                from spotPython.light.netlightregression import NetLightRegression</span>
+<span class="sd">                from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">                from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
+<span class="sd">                from spotPython.fun.hyperlight import HyperLight</span>
+<span class="sd">                from spotPython.hyperparameters.values import get_var_name</span>
+<span class="sd">                fun_control = fun_control_init()</span>
+<span class="sd">                add_core_model_to_fun_control(core_model=NetLightRegression,</span>
+<span class="sd">                                            fun_control=fun_control,</span>
+<span class="sd">                                            hyper_dict=LightHyperDict)</span>
+<span class="sd">                hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="sd">                n_hyperparams = len(get_var_name(fun_control))</span>
+<span class="sd">                # generate a random np.array X with shape (2, n_hyperparams)</span>
+<span class="sd">                X = np.random.rand(2, n_hyperparams)</span>
+<span class="sd">                X == hyper_light.check_X_shape(X, fun_control)</span>
+<span class="sd">                array([[ True,  True,  True,  True,  True,  True,  True,  True,  True],</span>
+<span class="sd">                [ True,  True,  True,  True,  True,  True,  True,  True,  True]])</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">X</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;var_name&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Invalid shape of input array X.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">X</span>
 
@@ -3295,31 +3386,52 @@
 <span class="sd">                array containing the evaluation results.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; hyper_light = HyperLight(seed=126, log_level=50)</span>
-<span class="sd">                X = np.array([[1, 2], [3, 4]])</span>
-<span class="sd">                fun_control = {&quot;weights&quot;: np.array([1, 0, 0])}</span>
+<span class="sd">            &gt;&gt;&gt; from spotPython.utils.init import fun_control_init</span>
+<span class="sd">                from spotPython.light.netlightregression import NetLightRegression</span>
+<span class="sd">                from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">                from spotPython.hyperparameters.values import</span>
+<span class="sd">                 (add_core_model_to_fun_control,</span>
+<span class="sd">                 get_default_hyperparameters_as_array)</span>
+<span class="sd">                from spotPython.fun.hyperlight import HyperLight</span>
+<span class="sd">                from spotPython.data.diabetes import Diabetes</span>
+<span class="sd">                from spotPython.hyperparameters.values import set_data_set</span>
+<span class="sd">                import numpy as np</span>
+<span class="sd">                fun_control = fun_control_init(</span>
+<span class="sd">                    _L_in=10,</span>
+<span class="sd">                    _L_out=1,)</span>
+
+<span class="sd">                dataset = Diabetes()</span>
+<span class="sd">                set_data_set(fun_control=fun_control,</span>
+<span class="sd">                                data_set=dataset)</span>
+
+<span class="sd">                add_core_model_to_fun_control(core_model=NetLightRegression,</span>
+<span class="sd">                                            fun_control=fun_control,</span>
+<span class="sd">                                            hyper_dict=LightHyperDict)</span>
+<span class="sd">                hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="sd">                X = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="sd">                # combine X and X to a np.array with shape (2, n_hyperparams)</span>
+<span class="sd">                # so that two values are returned</span>
+<span class="sd">                X = np.vstack((X, X))</span>
 <span class="sd">                hyper_light.fun(X, fun_control)</span>
-<span class="sd">                array([nan, nan])</span>
+<span class="sd">                array([27462.84179688, 20990.08007812])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">fun_control</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">var_dict</span> <span class="o">=</span> <span class="n">assign_values</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;var_name&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">)</span>
+        <span class="n">var_dict</span> <span class="o">=</span> <span class="n">assign_values</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">get_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">))</span>
         <span class="c1"># type information and transformations are considered in generate_one_config_from_var_dict:</span>
-        <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">generate_one_config_from_var_dict</span><span class="p">(</span><span class="n">var_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">generate_one_config_from_var_dict</span><span class="p">(</span><span class="n">var_dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">config: </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="c1"># extract parameters like epochs, batch_size, lr, etc. from config</span>
             <span class="c1"># config_id = generate_config_id(config)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fun: Calling train_model&quot;</span><span class="p">)</span>
-                <span class="n">df_eval</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fun: train_model returned&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;fun: Calling train_model&quot;</span><span class="p">)</span>
+                <span class="n">df_eval</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;fun: train_model returned&quot;</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in fun(). Call to train_model failed. </span><span class="si">{</span><span class="n">err</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Setting df_eval to np.nan&quot;</span><span class="p">)</span>
                 <span class="n">df_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-            <span class="n">z_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
+            <span class="n">z_val</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
             <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_res</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">z_res</span>
 </code></pre></div></td></tr></table></div>
@@ -3344,7 +3456,7 @@
 
 
 <h3 id="spotPython.fun.hyperlight.HyperLight.check_X_shape" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span></code>
 
 <a href="#spotPython.fun.hyperlight.HyperLight.check_X_shape" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -3374,6 +3486,20 @@
           <td>
             <div class="doc-md-description">
               <p>input array.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>fun_control</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dictionary containing control parameters for the hyperparameter tuning.</p>
             </div>
           </td>
           <td>
@@ -3435,16 +3561,47 @@ input array with valid shape.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_light</span> <span class="o">=</span> <span class="n">HyperLight</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_light</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="go">array([[1, 2],</span>
-<span class="go">       [3, 4]])</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="go">    from spotPython.utils.init import fun_control_init</span>
+<span class="go">    from spotPython.light.netlightregression import NetLightRegression</span>
+<span class="go">    from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="go">    from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
+<span class="go">    from spotPython.fun.hyperlight import HyperLight</span>
+<span class="go">    from spotPython.hyperparameters.values import get_var_name</span>
+<span class="go">    fun_control = fun_control_init()</span>
+<span class="go">    add_core_model_to_fun_control(core_model=NetLightRegression,</span>
+<span class="go">                                fun_control=fun_control,</span>
+<span class="go">                                hyper_dict=LightHyperDict)</span>
+<span class="go">    hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="go">    n_hyperparams = len(get_var_name(fun_control))</span>
+<span class="go">    # generate a random np.array X with shape (2, n_hyperparams)</span>
+<span class="go">    X = np.random.rand(2, n_hyperparams)</span>
+<span class="go">    X == hyper_light.check_X_shape(X, fun_control)</span>
+<span class="go">    array([[ True,  True,  True,  True,  True,  True,  True,  True,  True],</span>
+<span class="go">    [ True,  True,  True,  True,  True,  True,  True,  True,  True]])</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/fun/hyperlight.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span>
 <span class="normal">62</span>
@@ -3471,15 +3628,15 @@ input array with valid shape.</p>
 <span class="normal">83</span>
 <span class="normal">84</span>
 <span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_X_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">check_X_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks the shape of the input array X and raises an exception if it is not valid.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        X (np.ndarray):</span>
 <span class="sd">            input array.</span>
+<span class="sd">        fun_control (dict):</span>
+<span class="sd">            dictionary containing control parameters for the hyperparameter tuning.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray:</span>
@@ -3490,17 +3647,31 @@ input array with valid shape.</p>
 <span class="sd">            if the shape of the input array is not valid.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; hyper_light = HyperLight(seed=126, log_level=50)</span>
-<span class="sd">        &gt;&gt;&gt; X = np.array([[1, 2], [3, 4]])</span>
-<span class="sd">        &gt;&gt;&gt; hyper_light.check_X_shape(X)</span>
-<span class="sd">        array([[1, 2],</span>
-<span class="sd">               [3, 4]])</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            from spotPython.utils.init import fun_control_init</span>
+<span class="sd">            from spotPython.light.netlightregression import NetLightRegression</span>
+<span class="sd">            from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">            from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
+<span class="sd">            from spotPython.fun.hyperlight import HyperLight</span>
+<span class="sd">            from spotPython.hyperparameters.values import get_var_name</span>
+<span class="sd">            fun_control = fun_control_init()</span>
+<span class="sd">            add_core_model_to_fun_control(core_model=NetLightRegression,</span>
+<span class="sd">                                        fun_control=fun_control,</span>
+<span class="sd">                                        hyper_dict=LightHyperDict)</span>
+<span class="sd">            hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="sd">            n_hyperparams = len(get_var_name(fun_control))</span>
+<span class="sd">            # generate a random np.array X with shape (2, n_hyperparams)</span>
+<span class="sd">            X = np.random.rand(2, n_hyperparams)</span>
+<span class="sd">            X == hyper_light.check_X_shape(X, fun_control)</span>
+<span class="sd">            array([[ True,  True,  True,  True,  True,  True,  True,  True,  True],</span>
+<span class="sd">            [ True,  True,  True,  True,  True,  True,  True,  True,  True]])</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">X</span><span class="p">])</span>
-    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;var_name&quot;</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Invalid shape of input array X.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">X</span>
 </code></pre></div></td></tr></table></div>
@@ -3596,16 +3767,41 @@ input array with valid shape.</p>
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">hyper_light</span> <span class="o">=</span> <span class="n">HyperLight</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">126</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-<span class="go">    X = np.array([[1, 2], [3, 4]])</span>
-<span class="go">    fun_control = {&quot;weights&quot;: np.array([1, 0, 0])}</span>
-<span class="go">    hyper_light.fun(X, fun_control)</span>
-<span class="go">    array([nan, nan])</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.init</span> <span class="kn">import</span> <span class="n">fun_control_init</span>
+<span class="go">    from spotPython.light.netlightregression import NetLightRegression</span>
+<span class="go">    from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="go">    from spotPython.hyperparameters.values import</span>
+<span class="go">     (add_core_model_to_fun_control,</span>
+<span class="go">     get_default_hyperparameters_as_array)</span>
+<span class="go">    from spotPython.fun.hyperlight import HyperLight</span>
+<span class="go">    from spotPython.data.diabetes import Diabetes</span>
+<span class="go">    from spotPython.hyperparameters.values import set_data_set</span>
+<span class="go">    import numpy as np</span>
+<span class="go">    fun_control = fun_control_init(</span>
+<span class="go">        _L_in=10,</span>
+<span class="go">        _L_out=1,)</span>
 </code></pre></div>
+    <pre><code>dataset = Diabetes()
+set_data_set(fun_control=fun_control,
+                data_set=dataset)
+
+add_core_model_to_fun_control(core_model=NetLightRegression,
+                            fun_control=fun_control,
+                            hyper_dict=LightHyperDict)
+hyper_light = HyperLight(seed=126, log_level=50)
+X = get_default_hyperparameters_as_array(fun_control)
+# combine X and X to a np.array with shape (2, n_hyperparams)
+# so that two values are returned
+X = np.vstack((X, X))
+hyper_light.fun(X, fun_control)
+array([27462.84179688, 20990.08007812])
+</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/fun/hyperlight.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 90</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
 <span class="normal"> 91</span>
 <span class="normal"> 92</span>
 <span class="normal"> 93</span>
@@ -3646,7 +3842,26 @@ input array with valid shape.</p>
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates the function for the given input array X and control parameters.</span>
 
@@ -3661,31 +3876,52 @@ input array with valid shape.</p>
 <span class="sd">            array containing the evaluation results.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; hyper_light = HyperLight(seed=126, log_level=50)</span>
-<span class="sd">            X = np.array([[1, 2], [3, 4]])</span>
-<span class="sd">            fun_control = {&quot;weights&quot;: np.array([1, 0, 0])}</span>
+<span class="sd">        &gt;&gt;&gt; from spotPython.utils.init import fun_control_init</span>
+<span class="sd">            from spotPython.light.netlightregression import NetLightRegression</span>
+<span class="sd">            from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">            from spotPython.hyperparameters.values import</span>
+<span class="sd">             (add_core_model_to_fun_control,</span>
+<span class="sd">             get_default_hyperparameters_as_array)</span>
+<span class="sd">            from spotPython.fun.hyperlight import HyperLight</span>
+<span class="sd">            from spotPython.data.diabetes import Diabetes</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_data_set</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            fun_control = fun_control_init(</span>
+<span class="sd">                _L_in=10,</span>
+<span class="sd">                _L_out=1,)</span>
+
+<span class="sd">            dataset = Diabetes()</span>
+<span class="sd">            set_data_set(fun_control=fun_control,</span>
+<span class="sd">                            data_set=dataset)</span>
+
+<span class="sd">            add_core_model_to_fun_control(core_model=NetLightRegression,</span>
+<span class="sd">                                        fun_control=fun_control,</span>
+<span class="sd">                                        hyper_dict=LightHyperDict)</span>
+<span class="sd">            hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="sd">            X = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="sd">            # combine X and X to a np.array with shape (2, n_hyperparams)</span>
+<span class="sd">            # so that two values are returned</span>
+<span class="sd">            X = np.vstack((X, X))</span>
 <span class="sd">            hyper_light.fun(X, fun_control)</span>
-<span class="sd">            array([nan, nan])</span>
+<span class="sd">            array([27462.84179688, 20990.08007812])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">fun_control</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="n">var_dict</span> <span class="o">=</span> <span class="n">assign_values</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;var_name&quot;</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">)</span>
+    <span class="n">var_dict</span> <span class="o">=</span> <span class="n">assign_values</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">get_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">))</span>
     <span class="c1"># type information and transformations are considered in generate_one_config_from_var_dict:</span>
-    <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">generate_one_config_from_var_dict</span><span class="p">(</span><span class="n">var_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">generate_one_config_from_var_dict</span><span class="p">(</span><span class="n">var_dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">config: </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># extract parameters like epochs, batch_size, lr, etc. from config</span>
         <span class="c1"># config_id = generate_config_id(config)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fun: Calling train_model&quot;</span><span class="p">)</span>
-            <span class="n">df_eval</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;fun: train_model returned&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;fun: Calling train_model&quot;</span><span class="p">)</span>
+            <span class="n">df_eval</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;fun: train_model returned&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in fun(). Call to train_model failed. </span><span class="si">{</span><span class="n">err</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Setting df_eval to np.nan&quot;</span><span class="p">)</span>
             <span class="n">df_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-        <span class="n">z_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
+        <span class="n">z_val</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
         <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_res</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">z_res</span>
 </code></pre></div></td></tr></table></div>
