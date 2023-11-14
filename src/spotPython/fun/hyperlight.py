@@ -1,12 +1,8 @@
 import logging
 import numpy as np
 from numpy.random import default_rng
-from numpy import array
 from spotPython.light.traintest import train_model
-from spotPython.hyperparameters.values import (
-    assign_values,
-    generate_one_config_from_var_dict,
-)
+from spotPython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
 
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -32,37 +28,25 @@ class HyperLight:
     Examples:
         >>> hyper_light = HyperLight(seed=126, log_level=50)
         >>> print(hyper_light.seed)
-        126
+            126
     """
 
     def __init__(self, seed: int = 126, log_level: int = 50) -> None:
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
-        self.fun_control = {
-            "seed": None,
-            "data": None,
-            "step": 10_000,
-            "horizon": None,
-            "grace_period": None,
-            "metric_river": None,
-            "metric_sklearn": None,
-            "weights": array([1, 0, 0]),
-            "weight_coeff": 0.0,
-            "log_level": log_level,
-            "var_name": [],
-            "var_type": [],
-        }
-        self.log_level = self.fun_control["log_level"]
-        logger.setLevel(self.log_level)
-        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
+        self.log_level = log_level
+        logger.setLevel(log_level)
+        logger.info(f"Starting the logger at level {log_level} for module {__name__}:")
 
-    def check_X_shape(self, X: np.ndarray) -> np.ndarray:
+    def check_X_shape(self, X: np.ndarray, fun_control: dict) -> np.ndarray:
         """
         Checks the shape of the input array X and raises an exception if it is not valid.
 
         Args:
             X (np.ndarray):
                 input array.
+            fun_control (dict):
+                dictionary containing control parameters for the hyperparameter tuning.
 
         Returns:
             np.ndarray:
@@ -73,17 +57,31 @@ class HyperLight:
                 if the shape of the input array is not valid.
 
         Examples:
-            >>> hyper_light = HyperLight(seed=126, log_level=50)
-            >>> X = np.array([[1, 2], [3, 4]])
-            >>> hyper_light.check_X_shape(X)
-            array([[1, 2],
-                   [3, 4]])
+            >>> import numpy as np
+                from spotPython.utils.init import fun_control_init
+                from spotPython.light.netlightregression import NetLightRegression
+                from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotPython.hyperparameters.values import add_core_model_to_fun_control
+                from spotPython.fun.hyperlight import HyperLight
+                from spotPython.hyperparameters.values import get_var_name
+                fun_control = fun_control_init()
+                add_core_model_to_fun_control(core_model=NetLightRegression,
+                                            fun_control=fun_control,
+                                            hyper_dict=LightHyperDict)
+                hyper_light = HyperLight(seed=126, log_level=50)
+                n_hyperparams = len(get_var_name(fun_control))
+                # generate a random np.array X with shape (2, n_hyperparams)
+                X = np.random.rand(2, n_hyperparams)
+                X == hyper_light.check_X_shape(X, fun_control)
+                array([[ True,  True,  True,  True,  True,  True,  True,  True,  True],
+                [ True,  True,  True,  True,  True,  True,  True,  True,  True]])
+
         """
         try:
             X.shape[1]
         except ValueError:
             X = np.array([X])
-        if X.shape[1] != len(self.fun_control["var_name"]):
+        if X.shape[1] != len(get_var_name(fun_control)):
             raise Exception("Invalid shape of input array X.")
         return X
 
@@ -102,30 +100,51 @@ class HyperLight:
                 array containing the evaluation results.
 
         Examples:
-            >>> hyper_light = HyperLight(seed=126, log_level=50)
-                X = np.array([[1, 2], [3, 4]])
-                fun_control = {"weights": np.array([1, 0, 0])}
+            >>> from spotPython.utils.init import fun_control_init
+                from spotPython.light.netlightregression import NetLightRegression
+                from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotPython.hyperparameters.values import
+                 (add_core_model_to_fun_control,
+                 get_default_hyperparameters_as_array)
+                from spotPython.fun.hyperlight import HyperLight
+                from spotPython.data.diabetes import Diabetes
+                from spotPython.hyperparameters.values import set_data_set
+                import numpy as np
+                fun_control = fun_control_init(
+                    _L_in=10,
+                    _L_out=1,)
+
+                dataset = Diabetes()
+                set_data_set(fun_control=fun_control,
+                                data_set=dataset)
+
+                add_core_model_to_fun_control(core_model=NetLightRegression,
+                                            fun_control=fun_control,
+                                            hyper_dict=LightHyperDict)
+                hyper_light = HyperLight(seed=126, log_level=50)
+                X = get_default_hyperparameters_as_array(fun_control)
+                # combine X and X to a np.array with shape (2, n_hyperparams)
+                # so that two values are returned
+                X = np.vstack((X, X))
                 hyper_light.fun(X, fun_control)
-                array([nan, nan])
+                array([27462.84179688, 20990.08007812])
         """
         z_res = np.array([], dtype=float)
-        if fun_control is not None:
-            self.fun_control.update(fun_control)
-        self.check_X_shape(X)
-        var_dict = assign_values(X, self.fun_control["var_name"])
+        self.check_X_shape(X=X, fun_control=fun_control)
+        var_dict = assign_values(X, get_var_name(fun_control))
         # type information and transformations are considered in generate_one_config_from_var_dict:
-        for config in generate_one_config_from_var_dict(var_dict, self.fun_control):
+        for config in generate_one_config_from_var_dict(var_dict, fun_control):
             logger.debug(f"\nconfig: {config}")
             # extract parameters like epochs, batch_size, lr, etc. from config
             # config_id = generate_config_id(config)
             try:
-                print("fun: Calling train_model")
-                df_eval = train_model(config, self.fun_control)
-                print("fun: train_model returned")
+                logger.debug("fun: Calling train_model")
+                df_eval = train_model(config, fun_control)
+                logger.debug("fun: train_model returned")
             except Exception as err:
                 logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                 logger.error("Setting df_eval to np.nan")
                 df_eval = np.nan
-            z_val = self.fun_control["weights"] * df_eval
+            z_val = fun_control["weights"] * df_eval
             z_res = np.append(z_res, z_val)
         return z_res

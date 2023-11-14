@@ -146,6 +146,8 @@ def fun_control_init(
         "test": None,
         "task": task,
         "spot_tensorboard_path": spot_tensorboard_path,
+        "var_name": [],
+        "var_type": [],
         "weights": 1.0,
         "spot_writer": spot_writer,
     }

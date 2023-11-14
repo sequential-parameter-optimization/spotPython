@@ -483,34 +483,41 @@ def get_var_name(fun_control) -> list:
         (list):
             ist with names
     Examples:
-        >>> d = {"core_model_hyper_dict":{
-            "leaf_prediction": {
-                "levels": ["mean", "model", "adaptive"],
-                "type": "factor",
-                "default": "mean",
-                "core_model_parameter_type": "str"},
-            "leaf_model": {
-                "levels": ["linear_model.LinearRegression", "linear_model.PARegressor", "linear_model.Perceptron"],
-                "type": "factor",
-                "default": "LinearRegression",
-                "core_model_parameter_type": "instance"},
-            "splitter": {
-                "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-                "type": "factor",
-                "default": "EBSTSplitter",
-                "core_model_parameter_type": "instance()"},
-            "binary_split": {
-                "levels": [0, 1],
-                "type": "factor",
-                "default": 0,
-                "core_model_parameter_type": "bool"},
-            "stop_mem_management": {                                                         "levels": [0, 1],
-                "type": "factor",
-                "default": 0,
-                "core_model_parameter_type": "bool"}}}
-
-        get_var_name(d)
-        ['leaf_prediction', 'leaf_model', 'splitter', 'binary_split', 'stop_mem_management']
+        >>> from spotPython.hyperparameters.values import get_var_name
+            fun_control = {"core_model_hyper_dict":{
+                        "leaf_prediction": {
+                            "levels": ["mean", "model", "adaptive"],
+                            "type": "factor",
+                            "default": "mean",
+                            "core_model_parameter_type": "str"},
+                        "leaf_model": {
+                            "levels": ["linear_model.LinearRegression",
+                                        "linear_model.PARegressor",
+                                        "linear_model.Perceptron"],
+                            "type": "factor",
+                            "default": "LinearRegression",
+                            "core_model_parameter_type": "instance"},
+                        "splitter": {
+                            "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
+                            "type": "factor",
+                            "default": "EBSTSplitter",
+                            "core_model_parameter_type": "instance()"},
+                        "binary_split": {
+                            "levels": [0, 1],
+                            "type": "factor",
+                            "default": 0,
+                            "core_model_parameter_type": "bool"},
+                        "stop_mem_management": {
+                            "levels": [0, 1],
+                            "type": "factor",
+                            "default": 0,
+                            "core_model_parameter_type": "bool"}}}
+            get_var_name(fun_control)
+            ['leaf_prediction',
+                'leaf_model',
+                'splitter',
+                'binary_split',
+                'stop_mem_management']
     """
     return list(fun_control["core_model_hyper_dict"].keys())
 
@@ -831,6 +838,9 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
             from spotRiver.data.river_hyper_dict import RiverHyperDict
+            from spotPython.hyperparameters.values import (
+                get_default_hyperparameters_as_array,
+                add_core_model_to_fun_control)
             fun_control = {}
             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
                 fun_control=func_control,
