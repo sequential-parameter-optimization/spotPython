@@ -117,6 +117,9 @@ class NetLightRegression(L.LightningModule):
         self._L_out = _L_out
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
         self.save_hyperparameters(ignore=["_L_in", "_L_out"])
+        # set dummy input array for Tensorboard Graphs
+        # set log_graph=True in Trainer to see the graph (in traintest.py)
+        self.example_input_array = torch.zeros((batch_size, self._L_in))
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
 

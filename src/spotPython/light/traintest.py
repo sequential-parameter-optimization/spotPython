@@ -72,7 +72,9 @@ def train_model(config: dict, fun_control: dict) -> float:
         max_epochs=model.hparams.epochs,
         accelerator="auto",
         devices=1,
-        logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True),
+        logger=TensorBoardLogger(
+            save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=True
+        ),
         callbacks=[
             EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
         ],
@@ -160,7 +162,9 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         max_epochs=model.hparams.epochs,
         accelerator="auto",
         devices=1,
-        logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True),
+        logger=TensorBoardLogger(
+            save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=True
+        ),
         callbacks=[
             EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False),
             ModelCheckpoint(
@@ -252,7 +256,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
             accelerator="auto",
             devices=1,
             logger=TensorBoardLogger(
-                save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True
+                save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=True
             ),
             callbacks=[
                 EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
