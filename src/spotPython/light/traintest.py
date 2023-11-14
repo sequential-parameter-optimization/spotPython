@@ -2,7 +2,7 @@ import lightning as L
 
 # from spotPython.light.csvdatamodule import CSVDataModule
 from spotPython.data.lightdatamodule import LightDataModule
-from spotPython.light.crossvalidationdatamodule import CrossValidationDataModule
+from spotPython.data.lightcrossvalidationdatamodule import LightCrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import ModelCheckpoint
@@ -43,8 +43,6 @@ def train_model(config: dict, fun_control: dict) -> float:
     """
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
-    # print(f"_L_in: {_L_in}")
-    # print(f"_L_out: {_L_out}")
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
@@ -58,24 +56,14 @@ def train_model(config: dict, fun_control: dict) -> float:
         kaiming_init(model)
     else:
         pass
-    # print(f"model: {model}")
 
-    # # Init DataModule
-    # dm = CSVDataModule(
-    #     batch_size=config["batch_size"],
-    #     num_workers=fun_control["num_workers"],
-    #     data_dir=fun_control["DATASET_PATH"],
-    # )
-
-    print(fun_control["data_set"].data.shape)
-    print(fun_control["data_set"].targets.shape)
     dm = LightDataModule(
         dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
     )
     dm.setup()
-    print(f"train_model(): Test set size: {len(dm.data_test)}")
+    print(f"Train_model(): Test set size: {len(dm.data_test)}")
 
     # Init trainer
     trainer = L.Trainer(
@@ -153,7 +141,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         num_workers=fun_control["num_workers"],
     )
     dm.setup()
-    print(f"Test set size: {len(dm.data_test)}")
+    print(f"Test Model: Test set size: {len(dm.data_test)}")
 
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
@@ -244,10 +232,12 @@ def cv_model(config: dict, fun_control: dict) -> float:
             pass
         # print(f"model: {model}")
 
-        dm = CrossValidationDataModule(
+        dm = LightCrossValidationDataModule(
             k=k,
             num_splits=num_folds,
             split_seed=split_seed,
+            dataset=fun_control["data_set"],
+            num_workers=fun_control["num_workers"],
             batch_size=config["batch_size"],
             data_dir=fun_control["DATASET_PATH"],
         )
@@ -278,11 +268,11 @@ def cv_model(config: dict, fun_control: dict) -> float:
         score = score[0]
         print(f"train_model result: {score}")
 
-        results.append(score["valid_mapk"])
+        results.append(score["val_loss"])
 
-    mapk_score = sum(results) / num_folds
+    score = sum(results) / num_folds
     # print(f"cv_model mapk result: {mapk_score}")
-    return mapk_score
+    return score
 
 
 def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "_TEST") -> Any:
