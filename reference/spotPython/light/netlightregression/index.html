@@ -3559,7 +3559,14 @@
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningModule class for a regresssion neural network model.</span>
 
@@ -3796,6 +3803,13 @@
     <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configures the optimizer for the model.</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            The default Lightning way is to define an optimizer as</span>
+<span class="sd">            `optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)`.</span>
+<span class="sd">            spotPython uses an optimizer handler to create the optimizer, which</span>
+<span class="sd">            adapts the learning rate according to the lr_mult hyperparameter as</span>
+<span class="sd">            well as other hyperparameters. See `optimizer_handler.py` for details.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            torch.optim.Optimizer: The optimizer to use during training.</span>
@@ -4216,6 +4230,14 @@
   
       <p>Configures the optimizer for the model.</p>
 
+<details class="notes" open>
+  <summary>Notes</summary>
+  <p>The default Lightning way is to define an optimizer as
+<code>optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)</code>.
+spotPython uses an optimizer handler to create the optimizer, which
+adapts the learning rate according to the lr_mult hyperparameter as
+well as other hyperparameters. See <code>optimizer_handler.py</code> for details.</p>
+</details>
 
 
   <p><strong>Returns:</strong></p>
@@ -4254,9 +4276,23 @@
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configures the optimizer for the model.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The default Lightning way is to define an optimizer as</span>
+<span class="sd">        `optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)`.</span>
+<span class="sd">        spotPython uses an optimizer handler to create the optimizer, which</span>
+<span class="sd">        adapts the learning rate according to the lr_mult hyperparameter as</span>
+<span class="sd">        well as other hyperparameters. See `optimizer_handler.py` for details.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        torch.optim.Optimizer: The optimizer to use during training.</span>
