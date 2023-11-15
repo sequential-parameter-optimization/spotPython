@@ -1,5 +1,6 @@
 import json
 from spotPython.data import base
+import pathlib
 
 
 class SklearnHyperDict(base.FileConfig):
@@ -11,15 +12,21 @@ class SklearnHyperDict(base.FileConfig):
         filename (str): The name of the file where the hyperparameters are stored.
     """
 
-    def __init__(self):
-        """Initialize the SklearnHyperDict object.
+    def __init__(
+        self,
+        filename: str = "sklearn_hyper_dict.json",
+        directory: None = None,
+    ) -> None:
+        super().__init__(filename=filename, directory=directory)
+        self.filename = filename
+        self.directory = directory
+        self.hyper_dict = self.load()
 
-        Examples:
-            >>> shd = SklearnHyperDict()
-        """
-        super().__init__(
-            filename="sklearn_hyper_dict.json",
-        )
+    @property
+    def path(self):
+        if self.directory:
+            return pathlib.Path(self.directory).joinpath(self.filename)
+        return pathlib.Path(__file__).parent.joinpath(self.filename)
 
     def load(self) -> dict:
         """Load the hyperparameters from the file.

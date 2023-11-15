@@ -1,5 +1,6 @@
 import json
 from spotPython.data import base
+import pathlib
 
 
 class TorchHyperDict(base.FileConfig):
@@ -11,14 +12,21 @@ class TorchHyperDict(base.FileConfig):
         filename (str): The name of the file where the hyperparameters are stored.
     """
 
-    def __init__(self):
-        """Initialize the TorchHyperDict object.
-        Examples:
-            >>> thd = TorchHyperDict()
-        """
-        super().__init__(
-            filename="torch_hyper_dict.json",
-        )
+    def __init__(
+        self,
+        filename: str = "torch_hyper_dict.json",
+        directory: None = None,
+    ) -> None:
+        super().__init__(filename=filename, directory=directory)
+        self.filename = filename
+        self.directory = directory
+        self.hyper_dict = self.load()
+
+    @property
+    def path(self):
+        if self.directory:
+            return pathlib.Path(self.directory).joinpath(self.filename)
+        return pathlib.Path(__file__).parent.joinpath(self.filename)
 
     def load(self) -> dict:
         """Load the hyperparameters from the file.
