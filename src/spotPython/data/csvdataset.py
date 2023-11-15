@@ -3,7 +3,6 @@ import pandas as pd
 from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
 import pathlib
-from typing import Any
 
 
 class CSVDataset(Dataset):

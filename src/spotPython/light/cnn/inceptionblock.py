@@ -27,7 +27,7 @@ class InceptionBlock(nn.Module):
             Dictionary with keys "1x1", "3x3", "5x5", and "max"
         act_fn (nn.Module):
             Activation class constructor (e.g. nn.ReLU)
-            
+
 
     Examples:
         >>> from spotPython.light.cnn.googlenet import InceptionBlock
@@ -43,6 +43,7 @@ class InceptionBlock(nn.Module):
             torch.Size([1, 64, 32, 32])
 
     """
+
     def __init__(self, c_in, c_red: dict, c_out: dict, act_fn):
         super().__init__()
 
@@ -79,7 +80,7 @@ class InceptionBlock(nn.Module):
             act_fn(),
         )
 
-    def forward(self, x)->torch.Tensor:
+    def forward(self, x) -> torch.Tensor:
         x_1x1 = self.conv_1x1(x)
         x_3x3 = self.conv_3x3(x)
         x_5x5 = self.conv_5x5(x)

@@ -6,10 +6,10 @@ from spotPython.hyperparameters.values import add_core_model_to_fun_control, get
 from spotPython.data.diabetes import Diabetes
 from spotPython.hyperparameters.values import set_data_set
 from spotPython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict
-from spotPython.light.traintest import train_model
+from spotPython.light.trainmodel import train_model
 
 
-def test_traintest_train_model():
+def test_trainmodel():
     fun_control = fun_control_init(
         _L_in=10,
         _L_out=1,)
@@ -28,7 +28,7 @@ def test_traintest_train_model():
         break
     # check if y is a float
     assert isinstance(y_train, float)
-
+    
 
 if __name__ == "__main__":
     pytest.main(["-v", __file__])

@@ -677,16 +677,16 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, file
             The updated fun_control dictionary.
 
     Examples:
-        >>> from spotPython.light.netlightbase import NetLightBase
+        >>> from spotPython.light.netlightregressione import NetLightRegression
             from spotPython.hyperdict.light_hyper_dict import LightHyperDict
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            add_core_model_to_fun_control(core_model=NetLightBase,
+            add_core_model_to_fun_control(core_model=NetLightRegression,
                               fun_control=fun_control,
                               hyper_dict=LightHyperDict)
         # or, if a user wants to use a custom hyper_dict:
-        >>> from spotPython.light.netlightbase import NetLightBase
+        >>> from spotPython.light.netlightregression import NetLightRegression
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            add_core_model_to_fun_control(core_model=NetLightBase,
+            add_core_model_to_fun_control(core_model=NetLightRegression,
                                         fun_control=fun_control,
                                         filename="./hyperdict/user_hyper_dict.json")
 

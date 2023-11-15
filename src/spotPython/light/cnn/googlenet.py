@@ -1,7 +1,6 @@
 from types import SimpleNamespace
 import torch.nn as nn
 from spotPython.light.cnn.inceptionblock import InceptionBlock
-from typing import Any
 
 
 class GoogleNet(nn.Module):

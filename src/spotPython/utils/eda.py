@@ -178,9 +178,9 @@ def generate_config_id(config):
     return config_id[:-1]
 
 
-def visualize_activations(net, device="cpu", color="C0")-> None:
+def visualize_activations(net, device="cpu", color="C0") -> None:
     """Visualize the activations of a neural network.
-  
+
     Args:
         net (object):
             A neural network.
@@ -189,9 +189,9 @@ def visualize_activations(net, device="cpu", color="C0")-> None:
         color (str, optional):
             The color to use. Defaults to "C0".
 
-    Notes: 
+    Notes:
         Code is based on: PyTorch Lightning TUTORIAL 2: ACTIVATION FUNCTIONS, Author: Phillip Lippe,  License: CC BY-SA.
-              
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_one_config_from_X
             X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))

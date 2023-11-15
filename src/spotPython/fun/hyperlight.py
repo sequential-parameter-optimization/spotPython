@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 from numpy.random import default_rng
-from spotPython.light.traintest import train_model
+from spotPython.light.trainmodel import train_model
 from spotPython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
 
 logger = logging.getLogger(__name__)

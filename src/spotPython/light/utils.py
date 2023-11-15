@@ -1,5 +1,4 @@
 from spotPython.hyperparameters.values import get_one_config_from_X
-from typing import Any
 
 
 def get_tuned_architecture(spot_tuner, fun_control) -> dict:
