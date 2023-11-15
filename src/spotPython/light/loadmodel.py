@@ -7,10 +7,20 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
     """
     Loads a model from a checkpoint using the given configuration and function control parameters.
 
+    Notes:
+        * `load_light_from_checkpoint` loads the last checkpoint of the model
+        * Randomness, dropout, etc... are disabled.
+
+    References:
+        * https://pytorch-lightning.readthedocs.io/en/0.8.5/weights_loading.html
+
     Args:
-        config (dict): A dictionary containing the configuration parameters for the model.
-        fun_control (dict): A dictionary containing the function control parameters.
-        postfix (str): The postfix to append to the configuration ID when generating the checkpoint path.
+        config (dict):
+            A dictionary containing the configuration parameters for the model.
+        fun_control (dict):
+            A dictionary containing the function control parameters.
+        postfix (str):
+            The postfix to append to the configuration ID when generating the checkpoint path.
 
     Returns:
         Any: The loaded model.
@@ -29,14 +39,14 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
         ... }
         >>> model = load_light_from_checkpoint(config, fun_control)
     """
+    print(f"config: {config}")
     config_id = generate_config_id(config) + postfix
-    # default_root_dir = fun_control["TENSORBOARD_PATH"] + "lightning_logs/" + config_id + "/checkpoints/last.ckpt"
     default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id, "last.ckpt")
-    # default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
-    print(f"Loading model from {default_root_dir}")
+    print(f"Loading model with {config_id} from {default_root_dir}")
     model = fun_control["core_model"].load_from_checkpoint(
         default_root_dir, _L_in=fun_control["_L_in"], _L_out=fun_control["_L_out"]
     )
     # disable randomness, dropout, etc...
+    print(f"Model: {model}")
     model.eval()
     return model

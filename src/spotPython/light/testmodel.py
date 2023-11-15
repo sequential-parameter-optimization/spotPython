@@ -19,6 +19,37 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
 
     Returns:
         Tuple[float, float]: The validation loss and the hyperparameter metric of the tested model.
+
+    Notes:
+        * `test_model` saves the last checkpoint of the model from the training phase, which is called as follows:
+            `trainer.fit(model=model, datamodule=dm)`.
+        * The test result is evaluated with the following function call:
+        `trainer.test(datamodule=dm, ckpt_path="last")`.
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+             from spotPython.light.netlightregression import NetLightRegression
+            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotPython.hyperparameters.values import (add_core_model_to_fun_control,
+              get_default_hyperparameters_as_array)
+            from spotPython.data.diabetes import Diabetes
+            from spotPython.hyperparameters.values import set_data_set
+            from spotPython.hyperparameters.values import (get_var_name, assign_values,
+                generate_one_config_from_var_dict)
+            import spotPython.light.testmodel as tm
+            fun_control = fun_control_init(
+                _L_in=10,
+                _L_out=1,)
+            dataset = Diabetes()
+            set_data_set(fun_control=fun_control,
+                            data_set=dataset)
+            add_core_model_to_fun_control(core_model=NetLightRegression,
+                                        fun_control=fun_control,
+                                        hyper_dict=LightHyperDict)
+            X = get_default_hyperparameters_as_array(fun_control)
+            var_dict = assign_values(X, get_var_name(fun_control))
+            for config in generate_one_config_from_var_dict(var_dict, fun_control):
+                y_test = tm.test_model(config, fun_control)
     """
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
@@ -64,6 +95,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
+    # Load the last checkpoint
     test_result = trainer.test(datamodule=dm, ckpt_path="last")
     test_result = test_result[0]
     print(f"test_model result: {test_result}")

@@ -7,7 +7,7 @@ from spotPython.hyperparameters.values import (
     get_transform,
 )
 import torch
-from spotPython.light.vbdpdataset import CSVDataset
+from spotPython.data.csvdataset import CSVDataset
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import math
@@ -202,7 +202,9 @@ def visualize_activations(net, device="cpu", color="C0") -> None:
     activations = {}
     net.eval()
     # Create an instance of CSVDataset
-    dataset = CSVDataset(csv_file="./data/VBDP/train.csv", train=True)
+    dataset = CSVDataset(
+        csv_file="./data/VBDP/train.csv", train=True, target_column="prognosis", feature_type=torch.long
+    )
     # Set batch size for DataLoader
     batch_size = 128
     # Create DataLoader

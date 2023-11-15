@@ -39,7 +39,7 @@ class LightHyperDict(base.FileConfig):
             >>> from spotPython.hyperdict.light_hyper_dict import LightHyperDict
                 lhd = LightHyperDict()
                 lhd.hyper_dict
-                {'NetLinearBase': {'l1': {'type': 'int',
+                {'NetLightRegression': {'l1': {'type': 'int',
                 'default': 3,
                 'transform': 'transform_power_2_int',
                 'lower': 3,

@@ -1,13 +1,8 @@
 import lightning as L
 import torch
 from torch import nn
-
-# from spotPython.light.utils import create_model
 import torch.optim as optim
-
 from spotPython.light.cnn.googlenet import GoogleNet
-
-# import spotPython.light.cnn.googlenet
 
 
 class NetCNNBase(L.LightningModule):
