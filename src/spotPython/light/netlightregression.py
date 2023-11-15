@@ -243,6 +243,13 @@ class NetLightRegression(L.LightningModule):
         """
         Configures the optimizer for the model.
 
+        Notes:
+            The default Lightning way is to define an optimizer as
+            `optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)`.
+            spotPython uses an optimizer handler to create the optimizer, which
+            adapts the learning rate according to the lr_mult hyperparameter as
+            well as other hyperparameters. See `spotPython.hyperparameters.optimizer.py` for details.
+
         Returns:
             torch.optim.Optimizer: The optimizer to use during training.
 

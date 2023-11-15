@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 import torch.nn as nn
 from spotPython.light.cnn.inceptionblock import InceptionBlock
+from typing import Any
 
 
 class GoogleNet(nn.Module):
@@ -11,7 +12,7 @@ class GoogleNet(nn.Module):
             Number of classes for the classification task. Defaults to 10.
         act_fn_name (str):
             Name of the activation function. Defaults to "relu".
-        **kwargs:
+        **kwargs (Any):
             Additional keyword arguments.
 
     Attributes:

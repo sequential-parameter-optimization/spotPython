@@ -20,7 +20,8 @@ def stop_tensorboard(process) -> None:
     """Stops a tensorboard server.
 
     Args:
-        process: The process of the tensorboard server.
+        process (subprocess.Popen):
+            The process of the tensorboard server.
 
     Returns:
         None

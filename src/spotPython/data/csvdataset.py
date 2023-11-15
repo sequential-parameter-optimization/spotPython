@@ -3,6 +3,7 @@ import pandas as pd
 from torch.utils.data import Dataset
 from sklearn.preprocessing import LabelEncoder
 import pathlib
+from typing import Any
 
 
 class CSVDataset(Dataset):
@@ -18,7 +19,7 @@ class CSVDataset(Dataset):
         train (bool): Whether the dataset is for training or not. Defaults to True.
         rmNA (bool): Whether to remove rows with NA values or not. Defaults to True.
         dropId (bool): Whether to drop the "id" column or not. Defaults to False.
-        **desc: Additional keyword arguments.
+        **desc (Any): Additional keyword arguments.
 
     Attributes:
         data (Tensor): The data features.

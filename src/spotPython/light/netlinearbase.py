@@ -109,10 +109,6 @@ class NetLinearBase(L.LightningModule):
                 The number of input features. Not a hyperparameter, but needed to create the network.
             _L_out (int):
                 The number of output classes. Not a hyperparameter, but needed to create the network.
-            _metric (torchmetrics.functional.accuracy):
-                The metric to use for evaluation. Not a hyperparameter, but needed to create the network.
-            _loss (torch.nn.functional.cross_entropy):
-                The loss function to use for training. Not a hyperparameter, but needed to create the network.
 
         Returns:
             (NoneType): None

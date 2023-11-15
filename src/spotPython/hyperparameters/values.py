@@ -28,7 +28,7 @@ def generate_one_config_from_var_dict(
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.utils.prepare import generate_one_config_from_var_dict
+        >>> from spotPython.hyperparameters.values import generate_one_config_from_var_dict
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {"var_type": ["int", "num"]}
         >>> list(generate_one_config_from_var_dict(var_dict, fun_control))
@@ -61,7 +61,7 @@ def return_conf_list_from_var_dict(
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.utils.prepare import return_conf_list_from_var_dict
+        >>> from spotPython.hyperparameters.values import return_conf_list_from_var_dict
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {'var_type': ['int', 'int']}
         >>> return_conf_list_from_var_dict(var_dict, fun_control)
@@ -88,7 +88,7 @@ def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, 
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.utils.prepare import iterate_dict_values
+        >>> from spotPython.hyperparameters.values import iterate_dict_values
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> list(iterate_dict_values(var_dict))
         [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
@@ -116,7 +116,7 @@ def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> D
         dict: The modified dictionary with values converted to integers based on `var_type`.
 
     Examples:
-        >>> from spotPython.utils.prepare import convert_keys
+        >>> from spotPython.hyperparameters.values import convert_keys
         >>> d = {'a': '1.1', 'b': '2', 'c': '3.1'}
         >>> var_type = ["int", "num", "int"]
         >>> convert_keys(d, var_type)
@@ -255,7 +255,7 @@ def assign_values(X: np.array, var_list: list) -> dict:
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.utils.prepare import assign_values
+        >>> from spotPython.hyperparameters.values import assign_values
         >>> X = np.array([[1, 2], [3, 4], [5, 6]])
         >>> var_list = ['a', 'b']
         >>> result = assign_values(X, var_list)
@@ -285,7 +285,7 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
             updated fun_control
     Examples:
         >>> fun_control = {}
-            from spotPython.utils.prepare import modify_hyper_parameter_levels
+            from spotPython.hyperparameters.values import modify_hyper_parameter_levels
             core_model  = HoeffdingTreeRegressor
             fun_control.update({"core_model": core_model})
             fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
@@ -313,7 +313,7 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
         fun_control (dict):
             updated fun_control
     Examples:
-        >>> from spotPython.utils.prepare import modify_hyper_parameter_levels
+        >>> from spotPython.hyperparameters.values import modify_hyper_parameter_levels
             fun_control = {}
             core_model  = HoeffdingTreeRegressor
             fun_control.update({"core_model": core_model})
@@ -335,7 +335,7 @@ def get_default_values(fun_control) -> dict:
         new_dict (dict):
             dictionary with default values
     Examples:
-        >>> from spotPython.utils.prepare import get_default_values
+        >>> from spotPython.hyperparameters.values import get_default_values
             d = {"core_model_hyper_dict":{
                 "leaf_prediction": {
                     "levels": ["mean", "model", "adaptive"],
@@ -362,7 +362,7 @@ def get_default_values(fun_control) -> dict:
                     "type": "factor",
                     "default": 0,
                     "core_model_parameter_type": "bool"}}}
-            get_default_values_from_dict(d)
+            get_default_values(d)
             {'leaf_prediction': 'mean',
             'leaf_model': 'linear_model.LinearRegression',
             'splitter': 'EBSTSplitter',
@@ -390,7 +390,7 @@ def get_var_type(fun_control) -> list:
         (list):
             list with types
     Examples:
-        >>> from spotPython.utils.prepare import get_var_type
+        >>> from spotPython.hyperparameters.values import get_var_type
             d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
@@ -434,7 +434,7 @@ def get_transform(fun_control) -> list:
         (list):
             list with transformations
     Examples:
-        >>> from spotPython.utils.prepare import get_transform
+        >>> from spotPython.hyperparameters.values import get_transform
             d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
@@ -549,7 +549,7 @@ def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Un
             If bound is not "upper" or "lower".
 
     Examples:
-        >>> from spotPython.utils.prepare import get_bound_values
+        >>> from spotPython.hyperparameters.values import get_bound_values
         >>> fun_control = {"core_model_hyper_dict": {"a": {"upper": 1}, "b": {"upper": 2}}}
         >>> get_bound_values(fun_control, "upper", as_list=True)
         [1, 2]
@@ -591,7 +591,7 @@ def replace_levels_with_positions(hyper_dict, hyper_dict_values) -> dict:
         (dict):
             dictionary with values
     Examples:
-        >>> from spotPython.utils.prepare import replace_levels_with_positions
+        >>> from spotPython.hyperparameters.values import replace_levels_with_positions
             hyper_dict = {"leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
                 "type": "factor",
@@ -648,7 +648,7 @@ def get_values_from_dict(dictionary) -> np.array:
         (np.array):
             array with values
     Examples:
-        >>> from spotPython.utils.prepare import get_values_from_dict
+        >>> from spotPython.hyperparameters.values import get_values_from_dict
         >>> d = {"a": 1, "b": 2, "c": 3}
         >>> get_values_from_dict(d)
         array([1, 2, 3])
@@ -904,7 +904,7 @@ def set_data_set(fun_control, data_set) -> dict:
 
     Examples:
         >>> from spotPython.utils.init import fun_control_init
-            from spotPython.utils.prepare import set_data_module
+            from spotPython.hyperparameters.values import set_data_module
             from spotPython.data.lightdatamodule import LightDataModule
             from spotPython.data.csvdataset import CSVDataset
             from spotPython.data.pkldataset import PKLDataset
@@ -933,7 +933,7 @@ def set_data_module(fun_control, data_module) -> dict:
 
     Examples:
         >>> from spotPython.utils.init import fun_control_init
-            from spotPython.utils.prepare import set_data_module
+            from spotPython.hyperparameters.values import set_data_module
             from spotPython.data.lightdatamodule import LightDataModule
             from spotPython.data.csvdataset import CSVDataset
             from spotPython.data.pkldataset import PKLDataset

@@ -1,4 +1,5 @@
 from spotPython.hyperparameters.values import get_one_config_from_X
+from typing import Any
 
 
 def get_tuned_architecture(spot_tuner, fun_control) -> dict:
@@ -29,7 +30,7 @@ def create_model(config, fun_control, **kwargs) -> object:
             dictionary containing the configuration for the hyperparameter tuning.
         fun_control (dict):
             dictionary containing control parameters for the hyperparameter tuning.
-        **kwargs:
+        **kwargs (Any):
             additional keyword arguments.
 
     Returns:

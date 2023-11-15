@@ -3,10 +3,10 @@ import torch.nn as nn
 
 
 class InceptionBlock(nn.Module):
-    def __init__(self, c_in, c_red: dict, c_out: dict, act_fn):
-        """
-        Inception block as used in GoogLeNet.
+    """
+    Inception block as used in GoogLeNet.
 
+    Notes:
         Description from
         [P. Lippe:INCEPTION, RESNET AND DENSENET](https://lightning.ai/docs/pytorch/stable/)
         An Inception block applies four convolution blocks separately on the same feature map:
@@ -17,35 +17,33 @@ class InceptionBlock(nn.Module):
         The 1x1 convolutions are used to reduce the number of input channels to the 3x3 and 5x5 convolutions,
         which reduces the number of parameters and computation.
 
-        Args:
-            c_in:
-                Number of input feature maps from the previous layers
-            c_red:
-                Dictionary with keys "3x3" and "5x5" specifying
-                the output of the dimensionality reducing 1x1 convolutions
-            c_out:
-                Dictionary with keys "1x1", "3x3", "5x5", and "max"
-            act_fn:
-                Activation class constructor (e.g. nn.ReLU)
+    Args:
+        c_in (int):
+            Number of input feature maps from the previous layers
+        c_red (dict):
+            Dictionary with keys "3x3" and "5x5" specifying
+            the output of the dimensionality reducing 1x1 convolutions
+        c_out (dict):
+            Dictionary with keys "1x1", "3x3", "5x5", and "max"
+        act_fn (nn.Module):
+            Activation class constructor (e.g. nn.ReLU)
+            
 
-        Returns:
-            torch.Tensor:
-                Output tensor of the inception block
+    Examples:
+        >>> from spotPython.light.cnn.googlenet import InceptionBlock
+            import torch
+            import torch.nn as nn
+            block = InceptionBlock(3,
+                        {"3x3": 32, "5x5": 16},
+                        {"1x1": 16, "3x3": 32, "5x5": 8, "max": 8},
+                        nn.ReLU)
+            x = torch.randn(1, 3, 32, 32)
+            y = block(x)
+            y.shape
+            torch.Size([1, 64, 32, 32])
 
-        Examples:
-            >>> from spotPython.light.cnn.googlenet import InceptionBlock
-                import torch
-                import torch.nn as nn
-                block = InceptionBlock(3,
-                            {"3x3": 32, "5x5": 16},
-                            {"1x1": 16, "3x3": 32, "5x5": 8, "max": 8},
-                            nn.ReLU)
-                x = torch.randn(1, 3, 32, 32)
-                y = block(x)
-                y.shape
-                torch.Size([1, 64, 32, 32])
-
-        """
+    """
+    def __init__(self, c_in, c_red: dict, c_out: dict, act_fn):
         super().__init__()
 
         # 1x1 convolution branch
@@ -81,7 +79,7 @@ class InceptionBlock(nn.Module):
             act_fn(),
         )
 
-    def forward(self, x):
+    def forward(self, x)->torch.Tensor:
         x_1x1 = self.conv_1x1(x)
         x_3x3 = self.conv_3x3(x)
         x_5x5 = self.conv_5x5(x)
