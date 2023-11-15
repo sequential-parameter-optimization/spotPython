@@ -3542,7 +3542,10 @@
 <span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
-<span class="normal">270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningModule class for a regresssion neural network model.</span>
 
@@ -3654,6 +3657,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_L_out</span> <span class="o">=</span> <span class="n">_L_out</span>
         <span class="c1"># _L_in and _L_out are not hyperparameters, but are needed to create the network</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">,</span> <span class="s2">&quot;_L_out&quot;</span><span class="p">])</span>
+        <span class="c1"># set dummy input array for Tensorboard Graphs</span>
+        <span class="c1"># set log_graph=True in Trainer to see the graph (in traintest.py)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_input_array</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L_in</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">l1</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;l1 must be at least 4&quot;</span><span class="p">)</span>
 
@@ -4145,7 +4151,10 @@
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">l1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -4204,6 +4213,9 @@
     <span class="bp">self</span><span class="o">.</span><span class="n">_L_out</span> <span class="o">=</span> <span class="n">_L_out</span>
     <span class="c1"># _L_in and _L_out are not hyperparameters, but are needed to create the network</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">,</span> <span class="s2">&quot;_L_out&quot;</span><span class="p">])</span>
+    <span class="c1"># set dummy input array for Tensorboard Graphs</span>
+    <span class="c1"># set log_graph=True in Trainer to see the graph (in traintest.py)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">example_input_array</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L_in</span><span class="p">))</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">l1</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;l1 must be at least 4&quot;</span><span class="p">)</span>
 
@@ -4271,10 +4283,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
@@ -4283,7 +4292,10 @@
 <span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
-<span class="normal">270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configures the optimizer for the model.</span>
 
@@ -4386,10 +4398,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
@@ -4410,7 +4419,10 @@
 <span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
-<span class="normal">164</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a forward pass through the model.</span>
 
@@ -4541,10 +4553,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
 <span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
@@ -4560,7 +4569,10 @@
 <span class="normal">253</span>
 <span class="normal">254</span>
 <span class="normal">255</span>
-<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single test step.</span>
 
@@ -4672,10 +4684,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
@@ -4704,7 +4713,10 @@
 <span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
-<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single training step.</span>
 
@@ -4857,10 +4869,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
 <span class="normal">206</span>
@@ -4892,7 +4901,10 @@
 <span class="normal">232</span>
 <span class="normal">233</span>
 <span class="normal">234</span>
-<span class="normal">235</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single validation step.</span>
 
