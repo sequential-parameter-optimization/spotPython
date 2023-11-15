@@ -3006,7 +3006,7 @@
 
   <div class="doc doc-contents ">
   
-      <p>Returns an instance of the specified optimizer.</p>
+      <p>Returns an instance of the specified optimizer. See Notes below for supported optimizers.</p>
 
 
 
@@ -3083,7 +3083,7 @@
 <details class="notes" open>
   <summary>Notes</summary>
   <p>The following optimizers are supported (see also: https://pytorch.org/docs/stable/optim.html#base-class):</p>
-<pre><code>* Adadelta 
+<pre><code>* Adadelta
 * Adagrad
 * Adam
 * AdamW
@@ -3124,7 +3124,8 @@
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimizer_handler</span><span class="p">(</span><span class="s2">&quot;Adadelta&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr_mult</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
 <span class="go">Adadelta (</span>
@@ -3330,10 +3331,11 @@
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">optimizer_handler</span><span class="p">(</span>
+<span class="normal">197</span>
+<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">optimizer_handler</span><span class="p">(</span>
     <span class="n">optimizer_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">lr_mult</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an instance of the specified optimizer.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns an instance of the specified optimizer. See Notes below for supported optimizers.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        optimizer_name (str):</span>
@@ -3348,7 +3350,7 @@
 <span class="sd">    Notes:</span>
 <span class="sd">        The following optimizers are supported (see also: https://pytorch.org/docs/stable/optim.html#base-class):</span>
 
-<span class="sd">            * Adadelta </span>
+<span class="sd">            * Adadelta</span>
 <span class="sd">            * Adagrad</span>
 <span class="sd">            * Adam</span>
 <span class="sd">            * AdamW</span>
@@ -3367,6 +3369,7 @@
 <span class="sd">            An instance of the specified optimizer.</span>
 
 <span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">        &gt;&gt;&gt; model = torch.nn.Linear(10, 1)</span>
 <span class="sd">        &gt;&gt;&gt; optimizer = optimizer_handler(&quot;Adadelta&quot;, model.parameters(), lr_mult=0.5)</span>
 <span class="sd">        &gt;&gt;&gt; print(optimizer)</span>
