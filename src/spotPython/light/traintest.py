@@ -1,6 +1,5 @@
 import lightning as L
 
-# from spotPython.light.csvdatamodule import CSVDataModule
 from spotPython.data.lightdatamodule import LightDataModule
 from spotPython.data.lightcrossvalidationdatamodule import LightCrossValidationDataModule
 from spotPython.utils.eda import generate_config_id
