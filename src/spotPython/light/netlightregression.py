@@ -37,25 +37,58 @@ class NetLightRegression(L.LightningModule):
 
     Examples:
         >>> from torch.utils.data import DataLoader
-        >>> from torchvision.datasets import MNIST
-        >>> from torchvision.transforms import ToTensor
-        >>> train_data = MNIST(PATH_DATASETS,
-                               train=True,
-                               download=True,
-                               transform=ToTensor())
-        >>> train_loader = DataLoader(train_data,
-                                      batch_size=BATCH_SIZE)
-        >>> net_light_base = NetLightRegression(l1=128,
-                                          epochs=10,
-                                          batch_size=BATCH_SIZE,
-                                          initialization='xavier',
-                                          act_fn=nn.ReLU(),
-                                          optimizer='Adam',
-                                          dropout_prob=0.1,
-                                          lr_mult=0.1,
-                                          patience=5)
-        >>> trainer = L.Trainer(max_epochs=10)
-        >>> trainer.fit(net_light_base, train_loader)
+            from spotPython.data.diabetes import Diabetes
+            from spotPython.light.netlightregression import NetLightRegression
+            from torch import nn
+            import lightning as L
+            PATH_DATASETS = './data'
+            BATCH_SIZE = 8
+            dataset = Diabetes()
+            train_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
+            test_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
+            val_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
+            batch_x, batch_y = next(iter(train_loader))
+            print(batch_x.shape)
+            print(batch_y.shape)
+            net_light_base = NetLightRegression(l1=128,
+                                                epochs=10,
+                                                batch_size=BATCH_SIZE,
+                                                initialization='xavier',
+                                                act_fn=nn.ReLU(),
+                                                optimizer='Adam',
+                                                dropout_prob=0.1,
+                                                lr_mult=0.1,
+                                                patience=5,
+                                                _L_in=10,
+                                                _L_out=1)
+            trainer = L.Trainer(max_epochs=2,  enable_progress_bar=True)
+            trainer.fit(net_light_base, train_loader)
+            trainer.validate(net_light_base, val_loader)
+            trainer.test(net_light_base, test_loader)
+
+              | Name   | Type       | Params | In sizes | Out sizes
+            -------------------------------------------------------------
+            0 | layers | Sequential | 15.9 K | [8, 10]  | [8, 1]
+            -------------------------------------------------------------
+            15.9 K    Trainable params
+            0         Non-trainable params
+            15.9 K    Total params
+            0.064     Total estimated model params size (MB)
+
+            ─────────────────────────────────────────────────────────────
+                Validate metric           DataLoader 0
+            ─────────────────────────────────────────────────────────────
+                    hp_metric              29010.7734375
+                    val_loss               29010.7734375
+            ─────────────────────────────────────────────────────────────
+            ─────────────────────────────────────────────────────────────
+                Test metric             DataLoader 0
+            ─────────────────────────────────────────────────────────────
+                    hp_metric              29010.7734375
+                    val_loss               29010.7734375
+            ─────────────────────────────────────────────────────────────
+
+            [{'val_loss': 28981.529296875, 'hp_metric': 28981.529296875}]
     """
 
     def __init__(
@@ -93,18 +126,6 @@ class NetLightRegression(L.LightningModule):
 
         Raises:
             ValueError: If l1 is less than 4.
-        Examples:
-            >>> from torch.utils.data import DataLoader
-            >>> from torchvision.datasets import MNIST
-            >>> from torchvision.transforms import ToTensor
-            >>> train_data = MNIST(PATH_DATASETS, train=True, download=True, transform=ToTensor())
-            >>> train_loader = DataLoader(train_data, batch_size=BATCH_SIZE)
-            >>> net_light_base = NetLightRegression(l1=128, epochs=10, batch_size=BATCH_SIZE,
-                                                initialization='xavier', act_fn=nn.ReLU(),
-                                                optimizer='Adam', dropout_prob=0.1, lr_mult=0.1,
-                                                patience=5)
-            >>> trainer = L.Trainer(max_epochs=10)
-            >>> trainer.fit(net_light_base, train_loader)
 
         """
         super().__init__()
@@ -148,19 +169,7 @@ class NetLightRegression(L.LightningModule):
             x (torch.Tensor): A tensor containing a batch of input data.
 
         Returns:
-            torch.Tensor: A tensor containing the probabilities for each class.
-        Examples:
-            >>> from torch.utils.data import DataLoader
-            >>> from torchvision.datasets import MNIST
-            >>> from torchvision.transforms import ToTensor
-            >>> train_data = MNIST(PATH_DATASETS, train=True, download=True, transform=ToTensor())
-            >>> train_loader = DataLoader(train_data, batch_size=BATCH_SIZE)
-            >>> net_light_base = NetLightRegression(l1=128,
-                                              epochs=10,
-                                              batch_size=BATCH_SIZE,
-                                              initialization='xavier', act_fn=nn.ReLU(),
-                                              optimizer='Adam', dropout_prob=0.1, lr_mult=0.1,
-                                              patience=5)
+            torch.Tensor: A tensor containing the output of the model.
 
         """
         x = self.layers(x)
@@ -175,20 +184,6 @@ class NetLightRegression(L.LightningModule):
 
         Returns:
             torch.Tensor: A tensor containing the loss for this batch.
-        Examples:
-            >>> from torch.utils.data import DataLoader
-            >>> from torchvision.datasets import MNIST
-            >>> from torchvision.transforms import ToTensor
-            >>> train_data = MNIST(PATH_DATASETS, train=True, download=True, transform=ToTensor())
-            >>> train_loader = DataLoader(train_data, batch_size=BATCH_SIZE)
-            >>> net_light_base = NetLightRegression(l1=128,
-                                                epochs=10,
-                                                batch_size=BATCH_SIZE,
-                                                initialization='xavier', act_fn=nn.ReLU(),
-                                                optimizer='Adam', dropout_prob=0.1, lr_mult=0.1,
-                                                patience=5)
-            >>> trainer = L.Trainer(max_epochs=10)
-            >>> trainer.fit(net_light_base, train_loader)
 
         """
         x, y = batch
@@ -200,7 +195,7 @@ class NetLightRegression(L.LightningModule):
         # self.log("train_mae_loss", mae_loss, on_step=True, on_epoch=True, prog_bar=True)
         return val_loss
 
-    def validation_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False):
+    def validation_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
         Performs a single validation step.
 
@@ -210,21 +205,7 @@ class NetLightRegression(L.LightningModule):
             prog_bar (bool, optional): Whether to display the progress bar. Defaults to False.
 
         Returns:
-            (NoneType): None
-        Examples:
-            >>> from torch.utils.data import DataLoader
-            >>> from torchvision.datasets import MNIST
-            >>> from torchvision.transforms import ToTensor
-            >>> val_data = MNIST(PATH_DATASETS, train=False, download=True, transform=ToTensor())
-            >>> val_loader = DataLoader(val_data, batch_size=BATCH_SIZE)
-            >>> net_light_base = NetLightRegression(l1=128,
-                                                epochs=10,
-                                                batch_size=BATCH_SIZE,
-                                                initialization='xavier', act_fn=nn.ReLU(),
-                                                optimizer='Adam', dropout_prob=0.1, lr_mult=0.1,
-                                                patience=5)
-            >>> trainer = L.Trainer(max_epochs=10)
-            >>> trainer.fit(net_light_base, val_loader)
+            torch.Tensor: A tensor containing the loss for this batch.
 
         """
         x, y = batch
@@ -237,7 +218,7 @@ class NetLightRegression(L.LightningModule):
         self.log("hp_metric", val_loss, prog_bar=prog_bar)
         return val_loss
 
-    def test_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> tuple:
+    def test_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
         Performs a single test step.
 
@@ -247,7 +228,7 @@ class NetLightRegression(L.LightningModule):
             prog_bar (bool, optional): Whether to display the progress bar. Defaults to False.
 
         Returns:
-            tuple: A tuple containing the loss and accuracy for this batch.
+            torch.Tensor: A tensor containing the loss for this batch.
         """
         x, y = batch
         y_hat = self(x)

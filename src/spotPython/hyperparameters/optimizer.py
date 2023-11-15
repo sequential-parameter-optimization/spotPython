@@ -5,19 +5,41 @@ from typing import Any, Union
 def optimizer_handler(
     optimizer_name: str, params: Union[list, torch.Tensor], lr_mult: float = 1.0, **kwargs: Any
 ) -> torch.optim.Optimizer:
-    """Returns an instance of the specified optimizer.
+    """Returns an instance of the specified optimizer. See Notes below for supported optimizers.
 
     Args:
-        optimizer_name (str): The name of the optimizer to use.
-        params (list or torch.Tensor): The parameters to optimize.
-        lr_mult (float, optional): A multiplier for the learning rate. Defaults to 1.0.
-        **kwargs: Additional keyword arguments for the optimizer.
+        optimizer_name (str):
+            The name of the optimizer to use.
+        params (list or torch.Tensor):
+            The parameters to optimize.
+        lr_mult (float, optional):
+            A multiplier for the learning rate. Defaults to 1.0.
+        **kwargs:
+            Additional keyword arguments for the optimizer.
+
+    Notes:
+        The following optimizers are supported (see also: https://pytorch.org/docs/stable/optim.html#base-class):
+
+            * Adadelta
+            * Adagrad
+            * Adam
+            * AdamW
+            * SparseAdam
+            * ASGD
+            * LBFGS
+            * NAdam
+            * RAdam
+            * RMSprop
+            * Rprop
+            * SGD
+
 
     Returns:
         (torch.optim.Optimizer):
             An instance of the specified optimizer.
 
     Examples:
+        >>>
         >>> model = torch.nn.Linear(10, 1)
         >>> optimizer = optimizer_handler("Adadelta", model.parameters(), lr_mult=0.5)
         >>> print(optimizer)
