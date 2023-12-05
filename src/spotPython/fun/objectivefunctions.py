@@ -15,7 +15,8 @@ class analytical:
             Horizontal value. Defaults to 0.
         seed (int):
             Seed value for random number generation. Defaults to 126.
-    Note:
+
+    Notes:
         See [Numpy Random Sampling](https://numpy.org/doc/stable/reference/random/index.html#random-quick-start)
 
     Attributes:
@@ -23,6 +24,8 @@ class analytical:
             Offset value.
         hz (float):
             Horizontal value.
+        sigma (float):
+            Noise level.
         seed (int):
             Seed value for random number generation.
         rng (Generator):
@@ -31,12 +34,13 @@ class analytical:
             Dictionary containing control parameters for the function.
     """
 
-    def __init__(self, offset: float = 0.0, hz: float = 0, seed: int = 126) -> None:
+    def __init__(self, offset: float = 0.0, hz: float = 0, sigma=0.0, seed: int = 126) -> None:
         self.offset = offset
         self.hz = hz
+        self.sigma = sigma
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
-        self.fun_control = {"sigma": 0, "seed": None, "sel_var": None}
+        self.fun_control = {"sigma": sigma, "seed": None, "sel_var": None}
 
     def __repr__(self) -> str:
         return f"analytical(offset={self.offset}, hz={self.hz}, seed={self.seed})"
@@ -57,11 +61,11 @@ class analytical:
 
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical
-            >>> import numpy as np
-            >>> y = np.array([1, 2, 3, 4, 5])
-            >>> fun = analytical()
-            >>> fun.add_noise(y)
-            array([1.        , 2.        , 3.        , 4.        , 5.        ])
+                import numpy as np
+                y = np.array([1, 2, 3, 4, 5])
+                fun = analytical(sigma=1.0, seed=123)
+                fun.add_noise(y)
+            array([0.01087865, 1.63221335, 4.28792526, 4.19397442, 5.9202309 ])
 
         """
         # Use own rng:
@@ -274,6 +278,7 @@ class analytical:
                 input
             fun_control (dict):
                 dict with entries `sigma` (noise level) and `seed` (random seed).
+
         Returns:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
@@ -315,14 +320,24 @@ class analytical:
             return y
 
     def fun_branin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
-        """Branin function. The 2-dim Branin function is defined as
-            y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s,
-            where values of a, b, c, r, s and t are: a = 1, b = 5.1 / (4*pi**2),
-            c = 5 / pi, r = 6, s = 10 and t = 1 / (8*pi).
-
-            It has three global minima:
-            f(x) = 0.397887 at (-pi, 12.275), (pi, 2.275), and (9.42478, 2.475).
-            Input domain: This function is usually evaluated on the square  x1 in  [-5, 10] x x2 in [0, 15].
+        r"""Branin function. The 2-dim Branin function is defined as
+            $$
+            y = a (x_2 - b x_1^2 + c x_1 - r) ^2 + s (1 - t) \cos(x_1) + s,
+            $$
+            where values of $a, b, c, r, s$ and $t$ are:
+            $a = 1$, $b = 5.1 / (4\pi^2)$, $c = 5 / \pi$, $r = 6$, $s = 10$ and $t = 1 / (8\pi)$.
+            It has three global minima with $f(x) = 0.397887$ at
+            $$
+            (-\pi, 12.275),
+            $$
+            $$
+            (\pi, 2.275),
+            $$
+            and
+            $$
+            (9.42478, 2.475).
+            $$
+            Input domain: This function is usually evaluated on the square $x_1 \in [-5, 10] \times x_2 \in [0, 15]$.
 
         Args:
             X (array):
@@ -592,19 +607,19 @@ class analytical:
             return y
 
     def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
-        """Wing weight function. Example from Forrester et al. to understand the weight
+        r"""Wing weight function. Example from Forrester et al. to understand the weight
             of an unpainted light aircraft wing as a function of nine design and operational parameters:
-            W = 0.036 S_W**0.758 * Wfw**0.0035 ( A / (cos**2 Lambda))**0.6 *
-            q**0.006  * lambda**0.04 * ( (100 Rtc)/(cos Lambda) ))**-0.3*(Nz Wdg)**0.49
+            $W=0.036 S_W^{0.758}  Wfw^{0.0035} ( A / (\cos^2 \Lambda))^{0.6} q^{0.006}  \lambda^{0.04} ( (100 Rtc)/(\cos
+              \Lambda) ))^{-0.3} (Nz Wdg)^{0.49}$
 
         | Symbol    | Parameter                              | Baseline | Minimum | Maximum |
         |-----------|----------------------------------------|----------|---------|---------|
         | $S_W$     | Wing area ($ft^2$)                     | 174      | 150     | 200     |
         | $W_{fw}$  | Weight of fuel in wing (lb)            | 252      | 220     | 300     |
         | $A$       | Aspect ratio                          | 7.52     | 6       | 10      |
-        | $Lambda$ | Quarter-chord sweep (deg)              | 0        | -10     | 10      |
+        | $\Lambda$ | Quarter-chord sweep (deg)              | 0        | -10     | 10      |
         | $q$       | Dynamic pressure at cruise ($lb/ft^2$) | 34       | 16      | 45      |
-        | $lambda$ | Taper ratio                            | 0.672    | 0.5     | 1       |
+        | $\lambda$ | Taper ratio                            | 0.672    | 0.5     | 1       |
         | $R_{tc}$  | Aerofoil thickness to chord ratio      | 0.12     | 0.08    | 0.18    |
         | $N_z$     | Ultimate load factor                   | 3.8      | 2.5     | 6       |
         | $W_{dg}$  | Flight design gross weight (lb)         | 2000     | 1700    | 2500    |
@@ -691,8 +706,10 @@ class analytical:
         Args:
             X (array): input
             fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
+
         Returns:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical
             >>> import numpy as np
@@ -724,8 +741,10 @@ class analytical:
         Args:
             X (array): input
             fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
+
         Returns:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical
             >>> import numpy as np
