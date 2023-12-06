@@ -84,7 +84,10 @@ class analytical:
 
     def fun_branin_factor(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """
-        Calculates the Branin function with an additional factor based on the value of x3.
+        Calculates the Branin function of (x1, x2) with an additional factor based on the value of x3.
+        If x3 = 1, the value of the Branin function is increased by 10.
+        If x3 = 2, the value of the Branin function is decreased by 10.
+        Otherwise, the value of the Branin function is not changed.
 
         Args:
             X (np.ndarray):
@@ -98,10 +101,11 @@ class analytical:
 
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical
-            >>> import numpy as np
-            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
-            >>> fun.fun_branin_factor(X)
+                import numpy as np
+                X = np.array([[0, 0, 0], [0, 0, 1], [0, 0, 2]])
+                fun = analytical()
+                fun.fun_branin_factor(X)
+                array([55.60211264, 65.60211264, 45.60211264])
         """
         if fun_control is None:
             fun_control = self.fun_control
@@ -241,20 +245,8 @@ class analytical:
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, np.sum((X[i] - offset) ** 3))
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                # noise_y = np.append(
-                #     noise_y, i + np.random.normal(loc=0, scale=self.sigma, size=1)
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
@@ -292,20 +284,8 @@ class analytical:
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, (6.0 * X[i] - 2) ** 2 * np.sin(12 * X[i] - 4))
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                # noise_y = np.append(
-                #     noise_y, i + np.random.normal(loc=0, scale=self.sigma, size=1)
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
@@ -316,7 +296,7 @@ class analytical:
             $$
             where values of $a, b, c, r, s$ and $t$ are:
             $a = 1$, $b = 5.1 / (4\pi^2)$, $c = 5 / \pi$, $r = 6$, $s = 10$ and $t = 1 / (8\pi)$.
-            It has three global minima with $f(x) = 0.397887$ at
+            It has three global minima with $f(x) = 0.39788736$ at
             $$
             (-\pi, 12.275),
             $$
@@ -340,11 +320,14 @@ class analytical:
 
         Examples:
             >>> from spotPython.fun.objectivefunctions import analytical
-            >>> import numpy as np
-            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
-            >>> fun.fun_branin(X)
-            array([  0.        ,  11.99999999])
+                pi = np.pi
+                X = np.array([[0,0],
+                    [-pi, 12.275],
+                    [pi, 2.275],
+                    [9.42478, 2.475]])
+                fun = analytical()
+                fun.fun_branin(X)
+                array([55.60211264,  0.39788736,  0.39788736,  0.39788736])
 
         """
         if fun_control is None:
@@ -364,20 +347,8 @@ class analytical:
         s = 10
         t = 1 / (8 * np.pi)
         y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                # noise_y = np.append(
-                #     noise_y, i + np.random.normal(loc=0, scale=self.sigma, size=1)
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
@@ -422,18 +393,8 @@ class analytical:
         e = 10
         ff = 1 / (8 * np.pi)
         y = (a * (X2 - b * X1**2 + c * X1 - d) ** 2 + e * (1 - ff) * np.cos(X1) + e) + 5 * x
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
@@ -512,18 +473,8 @@ class analytical:
         x0 = X[:, 0]
         x1 = X[:, 1]
         y = 2.0 * np.sin(x0 + self.hz) + 0.5 * np.cos(x1 + self.hz)
-        # TODO: move to a separate function:
-        if fun_control["sigma"] > 0:
-            # Use own rng:
-            if fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for i in y:
-                noise_y = np.append(noise_y, i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
         else:
             return y
 
@@ -638,7 +589,7 @@ class analytical:
         except ValueError:
             X = np.array(X)
         #
-        W_res = np.array([], dtype=float)
+        y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             Sw = X[i, 0] * (200 - 150) + 150
             Wfw = X[i, 1] * (300 - 220) + 220
@@ -653,8 +604,11 @@ class analytical:
             # calculation on natural scale
             W = 0.036 * Sw**0.758 * Wfw**0.0035 * (A / np.cos(L) ** 2) ** 0.6 * q**0.006
             W = W * la**0.04 * (100 * Rtc / np.cos(L)) ** (-0.3) * (Nz * Wdg) ** (0.49) + Sw * Wp
-            W_res = np.append(W_res, W)
-        return W_res
+            y = np.append(y, W)
+        if self.fun_control["sigma"] > 0:
+            return self.add_noise(y)
+        else:
+            return y
 
     def fun_xsin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Example function.
