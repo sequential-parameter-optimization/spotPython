@@ -35,14 +35,17 @@ def fun_control_init(
             The number of workers to use for the data loading.
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
+
     Returns:
         fun_control (dict):
             A dictionary containing the information about the core model,
             loss function, metrics, and the hyperparameters.
+
     Examples:
-        >>> fun_control = fun_control_init(_L_in=64, _L_out=11, num_workers=0, device=None)
-        >>> fun_control
-        >>> {'CHECKPOINT_PATH': 'saved_models/',
+        >>> from spotPy.utils.init import fun_control_init
+            fun_control = fun_control_init(_L_in=64, _L_out=11, num_workers=0, device=None)
+            fun_control
+            {'CHECKPOINT_PATH': 'saved_models/',
                 'DATASET_PATH': 'data/',
                 'RESULTS_PATH': 'results/',
                 'TENSORBOARD_PATH': 'runs/',

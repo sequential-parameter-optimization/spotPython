@@ -202,18 +202,8 @@ class analytical:
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, np.sum((X[i] - offset) ** 2))
-        # TODO: move to a separate function:
         if self.fun_control["sigma"] > 0:
-            # Use own rng:
-            if self.fun_control["seed"] is not None:
-                rng = default_rng(seed=fun_control["seed"])
-            # Use class rng:
-            else:
-                rng = self.rng
-            noise_y = np.array([], dtype=float)
-            for y_i in y:
-                noise_y = np.append(noise_y, y_i + rng.normal(loc=0, scale=fun_control["sigma"], size=1))
-            return noise_y
+            return self.add_noise(y)
         else:
             return y
 

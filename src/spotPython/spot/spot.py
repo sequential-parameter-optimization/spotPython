@@ -319,6 +319,9 @@ class Spot:
         self.optimizer_control.update(optimizer_control)
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
+        logger.debug("In Spot() init(): fun_control: %s", self.fun_control)
+        logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
+        logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
 
     def get_spot_attributes_as_df(self):
         """Get all attributes of the spot object as a pandas dataframe.
@@ -547,6 +550,11 @@ class Spot:
         # (S-18): Evaluating New Solutions:
         X0 = self.append_X_ocba(X_ocba, X0)
         X_all = self.to_all_dim_if_needed(X0)
+        logger.debug(
+            "In update_design(): self.fun_control sigma and seed passed to fun(): %s %s",
+            self.fun_control["sigma"],
+            self.fun_control["seed"],
+        )
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
         X0, y0 = remove_nan(X0, y0)
         # Append New Solutions:
