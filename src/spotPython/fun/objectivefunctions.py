@@ -156,14 +156,9 @@ class analytical:
         """
         if fun_control is not None:
             self.fun_control = fun_control
-        try:
-            X.shape[1]
-        except ValueError as err:
-            print("error message:", err)
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
-
-        if len(X.shape) < 2:
-            X = np.array([X])
+        X = np.atleast_2d(X)
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, np.sum(X[i]))
@@ -195,13 +190,9 @@ class analytical:
         """
         if fun_control is not None:
             self.fun_control = fun_control
-        try:
-            X.shape[1]
-        except ValueError:
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
-
-        if len(X.shape) < 2:
-            X = np.array([X])
+        X = np.atleast_2d(X)
         offset = np.ones(X.shape[1]) * self.offset
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
@@ -234,13 +225,10 @@ class analytical:
 
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
 
-        if len(X.shape) < 2:
-            X = np.array([X])
+        X = np.atleast_2d(X)
         offset = np.ones(X.shape[1]) * self.offset
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
@@ -274,13 +262,10 @@ class analytical:
         """
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
 
-        if len(X.shape) < 2:
-            X = np.array([X])
+        X = np.atleast_2d(X)
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, (6.0 * X[i] - 2) ** 2 * np.sin(12 * X[i] - 4))
@@ -332,10 +317,8 @@ class analytical:
         """
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
-            X = np.array([X])
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
         if X.shape[1] != 2:
             raise Exception
         x1 = X[:, 0]
@@ -375,10 +358,8 @@ class analytical:
         """
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
-            X = np.array([X])
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
 
         if X.shape[1] != 2:
             raise Exception
@@ -419,10 +400,8 @@ class analytical:
             array([  0.        ,  11.99999999])
 
         """
-        try:
-            X.shape[1]
-        except ValueError:
-            X = np.array([X])
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
 
         if X.shape[1] != 2:
             raise Exception
@@ -464,10 +443,8 @@ class analytical:
 
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
-            X = np.array([X])
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
         if X.shape[1] != 2:
             raise Exception
         x0 = X[:, 0]
@@ -495,8 +472,7 @@ class analytical:
     #     except ValueError:
     #         X = np.array(X)
 
-    #     if len(X.shape) < 2:
-    #         X = np.array([X])
+    # X = np.atleast_2d(X)
     #     # y = X[:, 1]
     #     y = (6.0 * X - 2) ** 2 * np.sin(12 * X - 4)
     #     if self.sigma != 0:
@@ -531,13 +507,11 @@ class analytical:
         """
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
 
-        if len(X.shape) < 2:
-            X = np.array([X])
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
         offset = np.ones(X.shape[1]) * self.offset
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
@@ -584,9 +558,7 @@ class analytical:
         """
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
         #
         y = np.array([], dtype=float)
@@ -630,13 +602,9 @@ class analytical:
         """
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
-
-        if len(X.shape) < 2:
-            X = np.array([X])
+        X = np.atleast_2d(X)
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, X[i] * np.sin(1.0 / X[i]))
@@ -665,10 +633,8 @@ class analytical:
 
         if fun_control is None:
             fun_control = self.fun_control
-        try:
-            X.shape[1]
-        except ValueError:
-            X = np.array([X])
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
         if X.shape[1] != 2:
             raise Exception
         x0 = X[:, 0]
@@ -700,13 +666,11 @@ class analytical:
         """
         if fun_control is not None:
             self.fun_control = fun_control
-        try:
-            X.shape[1]
-        except ValueError as err:
-            print("error message:", err)
+        if not isinstance(X, np.ndarray):
             X = np.array(X)
-        if len(X.shape) < 2:
-            X = np.array([X])
+
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             # provoke error:
@@ -719,3 +683,21 @@ class analytical:
         else:
             print(y)
             return y
+
+    def fun_hcf(X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        def oneMass(params, Oerr) -> np.ndarray:
+            Oeig, D, F = params
+            nue = Oerr / Oeig
+            V = F / (np.sqrt((1 - nue**2) ** 2 + (4 * D**2 * nue**2)))
+            return V
+
+        def objective_function(params, Oerr, amplitudes) -> np.ndarray:
+            return np.sum((amplitudes - oneMass(params, Oerr)) ** 2)
+
+        frequencies_filtered = fun_control["frequency_filtered"]
+        amplitudes_filtered = fun_control["amplitude_filtered"]
+        X = np.atleast_2d(X)
+        y = np.array([], dtype=float)
+        for i in range(X.shape[0]):
+            y = np.append(y, objective_function(X[i], frequencies_filtered, amplitudes_filtered))
+        return y
