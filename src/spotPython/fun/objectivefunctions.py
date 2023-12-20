@@ -683,21 +683,3 @@ class analytical:
         else:
             print(y)
             return y
-
-    def fun_hcf(X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
-        def oneMass(params, Oerr) -> np.ndarray:
-            Oeig, D, F = params
-            nue = Oerr / Oeig
-            V = F / (np.sqrt((1 - nue**2) ** 2 + (4 * D**2 * nue**2)))
-            return V
-
-        def objective_function(params, Oerr, amplitudes) -> np.ndarray:
-            return np.sum((amplitudes - oneMass(params, Oerr)) ** 2)
-
-        frequencies_filtered = fun_control["frequency_filtered"]
-        amplitudes_filtered = fun_control["amplitude_filtered"]
-        X = np.atleast_2d(X)
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, objective_function(X[i], frequencies_filtered, amplitudes_filtered))
-        return y

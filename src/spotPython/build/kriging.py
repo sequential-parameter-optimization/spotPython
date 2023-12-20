@@ -127,11 +127,10 @@ class Kriging(surrogates):
             counter : Counter.
 
         Examples:
-            Surrogate of the x*sin(x) function, see [1].
-
             >>> from spotPython.build.kriging import Kriging
                 import numpy as np
                 import matplotlib.pyplot as plt
+                from numpy import linspace, arange
                 rng = np.random.RandomState(1)
                 X = linspace(start=0, stop=10, num=1_000).reshape(-1, 1)
                 y = np.squeeze(X * np.sin(X))
@@ -139,7 +138,7 @@ class Kriging(surrogates):
                 X_train, y_train = X[training_indices], y[training_indices]
                 S = Kriging(name='kriging', seed=124)
                 S.fit(X_train, y_train)
-                mean_prediction, std_prediction = S.predict(X)
+                mean_prediction, std_prediction, s_ei = S.predict(X, return_val="all")
                 plt.plot(X, y, label=r"$f(x)$", linestyle="dotted")
                 plt.scatter(X_train, y_train, label="Observations")
                 plt.plot(X, mean_prediction, label="Mean prediction")
@@ -225,14 +224,18 @@ class Kriging(surrogates):
             float: The expected improvement value.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> S = Kriging(name='kriging', seed=124)
-            >>> S.cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
-            >>> S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
-            >>> S.exp_imp(1.0, 2.0)
-            0.0
-
+                S = Kriging(name='kriging', seed=124)
+                S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+                S.exp_imp(1.0, 0.0)
+                0.0
+            >>> from spotPython.build.kriging import Kriging
+                S = Kriging(name='kriging', seed=124)
+                S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+                # assert S.exp_imp(0.0, 1.0) == 1/np.sqrt(2*np.pi)
+                # which is approx. 0.3989422804014327
+                S.exp_imp(0.0, 1.0)
+                0.3989422804014327
         """
         # y_min = min(self.cod_y)
         y_min = min(self.mean_cod_y)
@@ -262,13 +265,10 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> MyClass = Kriging(name='kriging', seed=124)
-            >>> obj = MyClass()
-            >>> obj.set_de_bounds()
-            >>> print(obj.de_bounds)
-            [[min_theta, max_theta], [min_theta, max_theta], ..., [min_p, max_p], [min_Lambda, max_Lambda]]
+                S = Kriging(name='kriging', seed=124)
+                S.set_de_bounds()
+                print(S.de_bounds)
 
         Returns:
             None
