@@ -58,3 +58,35 @@ def test_de_bounds():
     S = Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=False)
     S.set_de_bounds()
     assert len(S.de_bounds) == n
+
+def test_extract_from_bounds():
+    n=2
+    p=2
+    S = Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+    S.extract_from_bounds(np.array([1, 2, 3]))
+    assert len(S.theta) == n
+
+def test_optimize_model():
+    nat_X = np.array([[1, 2], [3, 4]])
+    nat_y = np.array([1, 2])
+    n=2
+    p=2
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    S.set_de_bounds()
+    new_theta_p_Lambda = S.optimize_model()
+    assert len(new_theta_p_Lambda) == n+p+1
+    # no noise, so Lambda is not considered
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    S.set_de_bounds()
+    new_theta_p_Lambda = S.optimize_model()
+    assert len(new_theta_p_Lambda) == n+p

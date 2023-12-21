@@ -294,17 +294,16 @@ class Kriging(surrogates):
                 1d-array with theta, p, and Lambda values. Order is important.
 
         Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> MyClass = Kriging(name='kriging', seed=124)
-            >>> obj = MyClass()
-            >>> obj.extract_from_bounds(np.array([1, 2, 3]))
-            >>> print(obj.theta)
-            [1]
-            >>> print(obj.p)
-            [2]
-            >>> print(obj.Lambda)
-            3
+            >>> import numpy as np
+                from spotPython.build.kriging import Kriging
+                n=2
+                p=4
+                S = Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S.extract_from_bounds(np.array([1, 2, 3]))
+                print(S.theta)
+                print(S.p)
+                [1 2]
+                [3]             
 
         Returns:
             None
@@ -332,13 +331,21 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> MyClass = Kriging(name='kriging', seed=124)
-            >>> obj = MyClass()
-            >>> result = obj.optimize_model()
-            >>> print(result)
-            [optimized_theta, optimized_p, optimized_Lambda]
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n=2
+                p=2
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                S.nat_to_cod_init()
+                S.set_theta_values()
+                S.initialize_matrices()
+                S.set_de_bounds()
+                new_theta_p_Lambda = S.optimize_model()
+                print(new_theta_p_Lambda)
 
         Returns:
             result["x"] (Union[List[float], Tuple[float]]):
