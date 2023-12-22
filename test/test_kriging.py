@@ -1,6 +1,7 @@
 from spotPython.build.kriging import Kriging
 import numpy as np
 from math import erf
+from numpy import log, var
 
 def test_interpolation_property():
     """
@@ -92,8 +93,6 @@ def test_optimize_model():
     assert len(new_theta_p_Lambda) == n+p
 
 def test_update_log():
-    from spotPython.build.kriging import Kriging
-    import numpy as np
     nat_X = np.array([[1, 2], [3, 4]])
     nat_y = np.array([1, 2])
     n=2
@@ -119,11 +118,95 @@ def test_update_log():
     assert len(S.log["Lambda"]) == 2
 
 def test_fit():
-    from spotPython.build.kriging import Kriging
-    import numpy as np
     nat_X = np.array([[1, 0], [1, 0]])
     nat_y = np.array([1, 2])
     S = Kriging()
     S.fit(nat_X, nat_y)
     assert S.Psi.shape == (2, 2)
     assert len(S.log["negLnLike"]) == 1
+
+def test_initialize_variables():
+    nat_X = np.array([[1, 2], [3, 4]])
+    nat_y = np.array([1, 2])
+    S = Kriging()
+    S.initialize_variables(nat_X, nat_y)
+    assert S.nat_X.all() == nat_X.all()
+    assert S.nat_y.all() == nat_y.all()
+    assert S.cod_X.shape == (2, 2)
+    assert S.cod_y.shape == (2,)
+
+def test_set_variable_types():
+    nat_X = np.array([[1, 2], [3, 4]])
+    nat_y = np.array([1, 2])
+    n=2
+    p=2
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    assert S.var_type == ['num', 'num']
+    nat_X = np.array([[1, 2, 3], [4, 5, 6]])
+    nat_y = np.array([1, 2])
+    n=3
+    p=1
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.var_type
+    assert S.var_type == ['num', 'num', 'num']
+
+def set_theta_values():
+    nat_X = np.array([[1, 2], [3, 4]])
+    nat_y = np.array([1, 2])
+    n=2
+    p=2
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    assert S.theta.all() == array([0., 0.]).all()
+    nat_X = np.array([[1, 2], [3, 4]])
+    nat_y = np.array([1, 2])
+    # n is set to 3, but the number of columns of nat_X is 2
+    n=3
+    p=2
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    snt = S.n_theta
+    S.set_theta_values()
+    # since snt == 3, it is not equal to S.n_theta, which is 2 because 
+    # of the correction in the set_theta_values method
+    assert S.n_theta != snt
+
+def test_initialize_matrices():
+    nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+    nat_y = np.array([1, 2, 3])
+    n=3
+    p=1
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+    # else self.pen_val = self.n * var(self.nat_y) + 1e4
+    assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4
+    assert S.Psi.shape == (n, n)
+    #
+    # use a zero variance, then the penalty should be computed without log()
+    nat_y = np.array([1, 1, 1])
+    n=3
+    p=1
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+    # else self.pen_val = self.n * var(self.nat_y) + 1e4
+    assert S.pen_val == nat_X.shape[0] * (var(S.nat_y)) + 1e4
+    assert S.Psi.shape == (n, n)

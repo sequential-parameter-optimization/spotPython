@@ -555,16 +555,15 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> class MyClass(Kriging):
-            >>>     def __init__(self):
-            >>>         super().__init__()
-            >>>         self.var_type = ["num", "factor"]
-            >>> instance = MyClass()
-            >>> instance.set_variable_types()
-            >>> instance.num_mask
-            array([ True, False])
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n=2
+                p=2
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                assert S.var_type == ['num', 'num']
 
         Returns:
             None
@@ -597,17 +596,19 @@ class Kriging(surrogates):
             None
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> class MyClass(Kriging):
-            >>>     def __init__(self):
-            >>>         super().__init__()
-            >>>         self.n_theta = 3
-            >>>         self.k = 2
-            >>> instance = MyClass()
-            >>> instance.set_theta_values()
-            >>> instance.theta
-            array([0., 0., 0.])
+                import numpy as np
+                from numpy import array
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n=2
+                p=2
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                S.nat_to_cod_init()
+                S.set_theta_values()
+                assert S.theta.all() == array([0., 0.]).all()
         """
         if self.n_theta > self.k:
             self.n_theta = self.k
@@ -634,18 +635,23 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> class MyClass(Kriging):
-            >>>     def __init__(self):
-            >>>         super().__init__()
-            >>>         self.n_p = 2
-            >>>         self.n = 3
-            >>>         self.nat_y = np.array([1, 2, 3])
-            >>>         self.k = 2
-            >>>         self.seed = 1
-            >>> instance = MyClass()
-            >>> instance.initialize_matrices()
+                import numpy as np
+                from numpy import log, var
+                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+                nat_y = np.array([1, 2, 3])
+                n=3
+                p=1
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                S.nat_to_cod_init()
+                S.set_theta_values()
+                S.initialize_matrices()
+                # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+                # else self.pen_val = self.n * var(self.nat_y) + 1e4
+                assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4
+                assert S.Psi.shape == (n, n)
 
         Returns:
             None
