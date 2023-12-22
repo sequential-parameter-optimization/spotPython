@@ -5062,7 +5062,13 @@ Set of veriables which an order relation, i.e., they are either num (float) or i
 <span class="normal">1462</span>
 <span class="normal">1463</span>
 <span class="normal">1464</span>
-<span class="normal">1465</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Kriging</span><span class="p">(</span><span class="n">surrogates</span><span class="p">):</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span>
+<span class="normal">1471</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Kriging</span><span class="p">(</span><span class="n">surrogates</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Kriging surrogate.</span>
 
 <span class="sd">    Attributes:</span>
@@ -5576,16 +5582,15 @@ Set of veriables which an order relation, i.e., they are either num (float) or i
 <span class="sd">            self (object): The Kriging object.</span>
 
 <span class="sd">        Examples:</span>
-
 <span class="sd">            &gt;&gt;&gt; from spotPython.build.kriging import Kriging</span>
-<span class="sd">            &gt;&gt;&gt; class MyClass(Kriging):</span>
-<span class="sd">            &gt;&gt;&gt;     def __init__(self):</span>
-<span class="sd">            &gt;&gt;&gt;         super().__init__()</span>
-<span class="sd">            &gt;&gt;&gt;         self.var_type = [&quot;num&quot;, &quot;factor&quot;]</span>
-<span class="sd">            &gt;&gt;&gt; instance = MyClass()</span>
-<span class="sd">            &gt;&gt;&gt; instance.set_variable_types()</span>
-<span class="sd">            &gt;&gt;&gt; instance.num_mask</span>
-<span class="sd">            array([ True, False])</span>
+<span class="sd">                nat_X = np.array([[1, 2], [3, 4]])</span>
+<span class="sd">                nat_y = np.array([1, 2])</span>
+<span class="sd">                n=2</span>
+<span class="sd">                p=2</span>
+<span class="sd">                S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="sd">                S.initialize_variables(nat_X, nat_y)</span>
+<span class="sd">                S.set_variable_types()</span>
+<span class="sd">                assert S.var_type == [&#39;num&#39;, &#39;num&#39;]</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -5618,17 +5623,19 @@ Set of veriables which an order relation, i.e., they are either num (float) or i
 <span class="sd">            None</span>
 
 <span class="sd">        Examples:</span>
-
 <span class="sd">            &gt;&gt;&gt; from spotPython.build.kriging import Kriging</span>
-<span class="sd">            &gt;&gt;&gt; class MyClass(Kriging):</span>
-<span class="sd">            &gt;&gt;&gt;     def __init__(self):</span>
-<span class="sd">            &gt;&gt;&gt;         super().__init__()</span>
-<span class="sd">            &gt;&gt;&gt;         self.n_theta = 3</span>
-<span class="sd">            &gt;&gt;&gt;         self.k = 2</span>
-<span class="sd">            &gt;&gt;&gt; instance = MyClass()</span>
-<span class="sd">            &gt;&gt;&gt; instance.set_theta_values()</span>
-<span class="sd">            &gt;&gt;&gt; instance.theta</span>
-<span class="sd">            array([0., 0., 0.])</span>
+<span class="sd">                import numpy as np</span>
+<span class="sd">                from numpy import array</span>
+<span class="sd">                nat_X = np.array([[1, 2], [3, 4]])</span>
+<span class="sd">                nat_y = np.array([1, 2])</span>
+<span class="sd">                n=2</span>
+<span class="sd">                p=2</span>
+<span class="sd">                S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="sd">                S.initialize_variables(nat_X, nat_y)</span>
+<span class="sd">                S.set_variable_types()</span>
+<span class="sd">                S.nat_to_cod_init()</span>
+<span class="sd">                S.set_theta_values()</span>
+<span class="sd">                assert S.theta.all() == array([0., 0.]).all()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
@@ -5655,18 +5662,23 @@ Set of veriables which an order relation, i.e., they are either num (float) or i
 <span class="sd">            self (object): The Kriging object.</span>
 
 <span class="sd">        Examples:</span>
-
 <span class="sd">            &gt;&gt;&gt; from spotPython.build.kriging import Kriging</span>
-<span class="sd">            &gt;&gt;&gt; class MyClass(Kriging):</span>
-<span class="sd">            &gt;&gt;&gt;     def __init__(self):</span>
-<span class="sd">            &gt;&gt;&gt;         super().__init__()</span>
-<span class="sd">            &gt;&gt;&gt;         self.n_p = 2</span>
-<span class="sd">            &gt;&gt;&gt;         self.n = 3</span>
-<span class="sd">            &gt;&gt;&gt;         self.nat_y = np.array([1, 2, 3])</span>
-<span class="sd">            &gt;&gt;&gt;         self.k = 2</span>
-<span class="sd">            &gt;&gt;&gt;         self.seed = 1</span>
-<span class="sd">            &gt;&gt;&gt; instance = MyClass()</span>
-<span class="sd">            &gt;&gt;&gt; instance.initialize_matrices()</span>
+<span class="sd">                import numpy as np</span>
+<span class="sd">                from numpy import log, var</span>
+<span class="sd">                nat_X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="sd">                nat_y = np.array([1, 2, 3])</span>
+<span class="sd">                n=3</span>
+<span class="sd">                p=1</span>
+<span class="sd">                S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="sd">                S.initialize_variables(nat_X, nat_y)</span>
+<span class="sd">                S.set_variable_types()</span>
+<span class="sd">                S.nat_to_cod_init()</span>
+<span class="sd">                S.set_theta_values()</span>
+<span class="sd">                S.initialize_matrices()</span>
+<span class="sd">                # if var(self.nat_y) is &gt; 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4</span>
+<span class="sd">                # else self.pen_val = self.n * var(self.nat_y) + 1e4</span>
+<span class="sd">                assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4</span>
+<span class="sd">                assert S.Psi.shape == (n, n)</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -7173,13 +7185,7 @@ the <code>array()</code> function.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">734</span>
-<span class="normal">735</span>
-<span class="normal">736</span>
-<span class="normal">737</span>
-<span class="normal">738</span>
-<span class="normal">739</span>
-<span class="normal">740</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">740</span>
 <span class="normal">741</span>
 <span class="normal">742</span>
 <span class="normal">743</span>
@@ -7211,7 +7217,13 @@ the <code>array()</code> function.</p>
 <span class="normal">769</span>
 <span class="normal">770</span>
 <span class="normal">771</span>
-<span class="normal">772</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__is_any__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">__is_any__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if any element in `x` is equal to `v`.</span>
 
@@ -7369,13 +7381,7 @@ correlation matrix as described in [Forr08a, p.57].</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span>
-<span class="normal">778</span>
-<span class="normal">779</span>
-<span class="normal">780</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">780</span>
 <span class="normal">781</span>
 <span class="normal">782</span>
 <span class="normal">783</span>
@@ -7429,7 +7435,13 @@ correlation matrix as described in [Forr08a, p.57].</p>
 <span class="normal">831</span>
 <span class="normal">832</span>
 <span class="normal">833</span>
-<span class="normal">834</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a new (n x n) correlation matrix Psi to reflect new data</span>
 <span class="sd">    or a change in hyperparameters.</span>
@@ -7623,13 +7635,7 @@ Defaults to True.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span>
-<span class="normal">839</span>
-<span class="normal">840</span>
-<span class="normal">841</span>
-<span class="normal">842</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">842</span>
 <span class="normal">843</span>
 <span class="normal">844</span>
 <span class="normal">845</span>
@@ -7663,7 +7669,13 @@ Defaults to True.</p>
 <span class="normal">873</span>
 <span class="normal">874</span>
 <span class="normal">875</span>
-<span class="normal">876</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_U</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scipy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_U</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scipy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs Cholesky factorization of Psi as U as described in [Forr08a, p.57].</span>
 
@@ -7806,13 +7818,7 @@ Defaults to True.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1103</span>
-<span class="normal">1104</span>
-<span class="normal">1105</span>
-<span class="normal">1106</span>
-<span class="normal">1107</span>
-<span class="normal">1108</span>
-<span class="normal">1109</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1109</span>
 <span class="normal">1110</span>
 <span class="normal">1111</span>
 <span class="normal">1112</span>
@@ -7856,7 +7862,13 @@ Defaults to True.</p>
 <span class="normal">1150</span>
 <span class="normal">1151</span>
 <span class="normal">1152</span>
-<span class="normal">1153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1153</span>
+<span class="normal">1154</span>
+<span class="normal">1155</span>
+<span class="normal">1156</span>
+<span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,</span>
 <span class="sd">    `regression_predict_coded`. Modifies `self.psi`.</span>
@@ -8034,13 +8046,7 @@ Ignored if the points argument is specified.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1245</span>
-<span class="normal">1246</span>
-<span class="normal">1247</span>
-<span class="normal">1248</span>
-<span class="normal">1249</span>
-<span class="normal">1250</span>
-<span class="normal">1251</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1251</span>
 <span class="normal">1252</span>
 <span class="normal">1253</span>
 <span class="normal">1254</span>
@@ -8066,7 +8072,13 @@ Ignored if the points argument is specified.</p>
 <span class="normal">1274</span>
 <span class="normal">1275</span>
 <span class="normal">1276</span>
-<span class="normal">1277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_mean_MSE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">1277</span>
+<span class="normal">1278</span>
+<span class="normal">1279</span>
+<span class="normal">1280</span>
+<span class="normal">1281</span>
+<span class="normal">1282</span>
+<span class="normal">1283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_mean_MSE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the mean MSE metric of the model by evaluating MSE at a number of points.</span>
 
@@ -8201,13 +8213,7 @@ Ignored if the points argument is specified.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1279</span>
-<span class="normal">1280</span>
-<span class="normal">1281</span>
-<span class="normal">1282</span>
-<span class="normal">1283</span>
-<span class="normal">1284</span>
-<span class="normal">1285</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1285</span>
 <span class="normal">1286</span>
 <span class="normal">1287</span>
 <span class="normal">1288</span>
@@ -8237,7 +8243,13 @@ Ignored if the points argument is specified.</p>
 <span class="normal">1312</span>
 <span class="normal">1313</span>
 <span class="normal">1314</span>
-<span class="normal">1315</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cod_to_nat_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">1315</span>
+<span class="normal">1316</span>
+<span class="normal">1317</span>
+<span class="normal">1318</span>
+<span class="normal">1319</span>
+<span class="normal">1320</span>
+<span class="normal">1321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cod_to_nat_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts an array representing one point in normalized (coded) units to natural (physical or real world) units.</span>
 
@@ -8377,13 +8389,7 @@ to an array of observed values in real-world units.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1317</span>
-<span class="normal">1318</span>
-<span class="normal">1319</span>
-<span class="normal">1320</span>
-<span class="normal">1321</span>
-<span class="normal">1322</span>
-<span class="normal">1323</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1323</span>
 <span class="normal">1324</span>
 <span class="normal">1325</span>
 <span class="normal">1326</span>
@@ -8408,7 +8414,13 @@ to an array of observed values in real-world units.</p>
 <span class="normal">1345</span>
 <span class="normal">1346</span>
 <span class="normal">1347</span>
-<span class="normal">1348</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cod_to_nat_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">1348</span>
+<span class="normal">1349</span>
+<span class="normal">1350</span>
+<span class="normal">1351</span>
+<span class="normal">1352</span>
+<span class="normal">1353</span>
+<span class="normal">1354</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cod_to_nat_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts a normalized array of coded (model) units in the range of [0,1]</span>
 <span class="sd">    to an array of observed values in real-world units.</span>
@@ -9290,13 +9302,7 @@ returns the penalty value (<code>pen_val</code>).
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">671</span>
-<span class="normal">672</span>
-<span class="normal">673</span>
-<span class="normal">674</span>
-<span class="normal">675</span>
-<span class="normal">676</span>
-<span class="normal">677</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">677</span>
 <span class="normal">678</span>
 <span class="normal">679</span>
 <span class="normal">680</span>
@@ -9351,7 +9357,13 @@ returns the penalty value (<code>pen_val</code>).
 <span class="normal">729</span>
 <span class="normal">730</span>
 <span class="normal">731</span>
-<span class="normal">732</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_theta_p_Lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_theta_p_Lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute log likelihood for a set of hyperparameters (theta, p, Lambda).</span>
 
@@ -9473,19 +9485,28 @@ The <code>one</code> attribute is initialized as a list of ones with length <cod
         </tr>
     </tbody>
   </table>
-      <p>Examples:</p>
-<pre><code>&gt;&gt;&gt; from spotPython.build.kriging import Kriging
-&gt;&gt;&gt; class MyClass(Kriging):
-&gt;&gt;&gt;     def __init__(self):
-&gt;&gt;&gt;         super().__init__()
-&gt;&gt;&gt;         self.n_p = 2
-&gt;&gt;&gt;         self.n = 3
-&gt;&gt;&gt;         self.nat_y = np.array([1, 2, 3])
-&gt;&gt;&gt;         self.k = 2
-&gt;&gt;&gt;         self.seed = 1
-&gt;&gt;&gt; instance = MyClass()
-&gt;&gt;&gt; instance.initialize_matrices()
-</code></pre>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.build.kriging</span> <span class="kn">import</span> <span class="n">Kriging</span>
+<span class="go">    import numpy as np</span>
+<span class="go">    from numpy import log, var</span>
+<span class="go">    nat_X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="go">    nat_y = np.array([1, 2, 3])</span>
+<span class="go">    n=3</span>
+<span class="go">    p=1</span>
+<span class="go">    S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="go">    S.initialize_variables(nat_X, nat_y)</span>
+<span class="go">    S.set_variable_types()</span>
+<span class="go">    S.nat_to_cod_init()</span>
+<span class="go">    S.set_theta_values()</span>
+<span class="go">    S.initialize_matrices()</span>
+<span class="go">    # if var(self.nat_y) is &gt; 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4</span>
+<span class="go">    # else self.pen_val = self.n * var(self.nat_y) + 1e4</span>
+<span class="go">    assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4</span>
+<span class="go">    assert S.Psi.shape == (n, n)</span>
+</code></pre></div>
 
 
 
@@ -9513,8 +9534,7 @@ The <code>one</code> attribute is initialized as a list of ones with length <cod
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">619</span>
-<span class="normal">620</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">620</span>
 <span class="normal">621</span>
 <span class="normal">622</span>
 <span class="normal">623</span>
@@ -9563,7 +9583,13 @@ The <code>one</code> attribute is initialized as a list of ones with length <cod
 <span class="normal">666</span>
 <span class="normal">667</span>
 <span class="normal">668</span>
-<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize the matrices for the class instance.</span>
 
@@ -9581,18 +9607,23 @@ The <code>one</code> attribute is initialized as a list of ones with length <cod
 <span class="sd">        self (object): The Kriging object.</span>
 
 <span class="sd">    Examples:</span>
-
 <span class="sd">        &gt;&gt;&gt; from spotPython.build.kriging import Kriging</span>
-<span class="sd">        &gt;&gt;&gt; class MyClass(Kriging):</span>
-<span class="sd">        &gt;&gt;&gt;     def __init__(self):</span>
-<span class="sd">        &gt;&gt;&gt;         super().__init__()</span>
-<span class="sd">        &gt;&gt;&gt;         self.n_p = 2</span>
-<span class="sd">        &gt;&gt;&gt;         self.n = 3</span>
-<span class="sd">        &gt;&gt;&gt;         self.nat_y = np.array([1, 2, 3])</span>
-<span class="sd">        &gt;&gt;&gt;         self.k = 2</span>
-<span class="sd">        &gt;&gt;&gt;         self.seed = 1</span>
-<span class="sd">        &gt;&gt;&gt; instance = MyClass()</span>
-<span class="sd">        &gt;&gt;&gt; instance.initialize_matrices()</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from numpy import log, var</span>
+<span class="sd">            nat_X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="sd">            nat_y = np.array([1, 2, 3])</span>
+<span class="sd">            n=3</span>
+<span class="sd">            p=1</span>
+<span class="sd">            S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="sd">            S.initialize_variables(nat_X, nat_y)</span>
+<span class="sd">            S.set_variable_types()</span>
+<span class="sd">            S.nat_to_cod_init()</span>
+<span class="sd">            S.set_theta_values()</span>
+<span class="sd">            S.initialize_matrices()</span>
+<span class="sd">            # if var(self.nat_y) is &gt; 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4</span>
+<span class="sd">            # else self.pen_val = self.n * var(self.nat_y) + 1e4</span>
+<span class="sd">            assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4</span>
+<span class="sd">            assert S.Psi.shape == (n, n)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
@@ -9922,13 +9953,7 @@ the negative of the concentrated log-likelihood. It also modifies <code>mu</code
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">878</span>
-<span class="normal">879</span>
-<span class="normal">880</span>
-<span class="normal">881</span>
-<span class="normal">882</span>
-<span class="normal">883</span>
-<span class="normal">884</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">884</span>
 <span class="normal">885</span>
 <span class="normal">886</span>
 <span class="normal">887</span>
@@ -9967,7 +9992,13 @@ the negative of the concentrated log-likelihood. It also modifies <code>mu</code
 <span class="normal">920</span>
 <span class="normal">921</span>
 <span class="normal">922</span>
-<span class="normal">923</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span>
+<span class="normal">929</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the negative of the concentrated log-likelihood.</span>
 
@@ -10075,13 +10106,7 @@ This method calls <code>nat_to_cod_x</code> and <code>nat_to_cod_y</code> and up
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1430</span>
-<span class="normal">1431</span>
-<span class="normal">1432</span>
-<span class="normal">1433</span>
-<span class="normal">1434</span>
-<span class="normal">1435</span>
-<span class="normal">1436</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1436</span>
 <span class="normal">1437</span>
 <span class="normal">1438</span>
 <span class="normal">1439</span>
@@ -10110,7 +10135,13 @@ This method calls <code>nat_to_cod_x</code> and <code>nat_to_cod_y</code> and up
 <span class="normal">1462</span>
 <span class="normal">1463</span>
 <span class="normal">1464</span>
-<span class="normal">1465</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">nat_to_cod_init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span>
+<span class="normal">1471</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">nat_to_cod_init</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determines max and min of each dimension and normalizes that axis to a range of [0,1].</span>
 <span class="sd">    Called when 1) surrogate is initialized and 2) new points arrive, i.e.,</span>
@@ -10248,13 +10279,7 @@ This method calls <code>nat_to_cod_x</code> and <code>nat_to_cod_y</code> and up
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1350</span>
-<span class="normal">1351</span>
-<span class="normal">1352</span>
-<span class="normal">1353</span>
-<span class="normal">1354</span>
-<span class="normal">1355</span>
-<span class="normal">1356</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1356</span>
 <span class="normal">1357</span>
 <span class="normal">1358</span>
 <span class="normal">1359</span>
@@ -10296,7 +10321,13 @@ This method calls <code>nat_to_cod_x</code> and <code>nat_to_cod_y</code> and up
 <span class="normal">1395</span>
 <span class="normal">1396</span>
 <span class="normal">1397</span>
-<span class="normal">1398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">nat_to_cod_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">1398</span>
+<span class="normal">1399</span>
+<span class="normal">1400</span>
+<span class="normal">1401</span>
+<span class="normal">1402</span>
+<span class="normal">1403</span>
+<span class="normal">1404</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">nat_to_cod_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Normalizes one point (row) of nat_X array to [0,1]. The internal nat_range_X values are not updated.</span>
 
@@ -10445,13 +10476,7 @@ This method calls <code>nat_to_cod_x</code> and <code>nat_to_cod_y</code> and up
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1400</span>
-<span class="normal">1401</span>
-<span class="normal">1402</span>
-<span class="normal">1403</span>
-<span class="normal">1404</span>
-<span class="normal">1405</span>
-<span class="normal">1406</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1406</span>
 <span class="normal">1407</span>
 <span class="normal">1408</span>
 <span class="normal">1409</span>
@@ -10473,7 +10498,13 @@ This method calls <code>nat_to_cod_x</code> and <code>nat_to_cod_y</code> and up
 <span class="normal">1425</span>
 <span class="normal">1426</span>
 <span class="normal">1427</span>
-<span class="normal">1428</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">nat_to_cod_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">1428</span>
+<span class="normal">1429</span>
+<span class="normal">1430</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">nat_to_cod_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Normalizes natural y values to [0,1].</span>
 
@@ -10823,13 +10854,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 925</span>
-<span class="normal"> 926</span>
-<span class="normal"> 927</span>
-<span class="normal"> 928</span>
-<span class="normal"> 929</span>
-<span class="normal"> 930</span>
-<span class="normal"> 931</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 931</span>
 <span class="normal"> 932</span>
 <span class="normal"> 933</span>
 <span class="normal"> 934</span>
@@ -10926,7 +10951,13 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="normal">1025</span>
 <span class="normal">1026</span>
 <span class="normal">1027</span>
-<span class="normal">1028</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span>
+<span class="normal">1030</span>
+<span class="normal">1031</span>
+<span class="normal">1032</span>
+<span class="normal">1033</span>
+<span class="normal">1034</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function plots 1D and 2D surrogates.</span>
 
@@ -11197,13 +11228,7 @@ array([0.09])
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1030</span>
-<span class="normal">1031</span>
-<span class="normal">1032</span>
-<span class="normal">1033</span>
-<span class="normal">1034</span>
-<span class="normal">1035</span>
-<span class="normal">1036</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1036</span>
 <span class="normal">1037</span>
 <span class="normal">1038</span>
 <span class="normal">1039</span>
@@ -11268,7 +11293,13 @@ array([0.09])
 <span class="normal">1098</span>
 <span class="normal">1099</span>
 <span class="normal">1100</span>
-<span class="normal">1101</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">nat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span>
+<span class="normal">1101</span>
+<span class="normal">1102</span>
+<span class="normal">1103</span>
+<span class="normal">1104</span>
+<span class="normal">1105</span>
+<span class="normal">1106</span>
+<span class="normal">1107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">nat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span>
                                                                                     <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span>
                                                                                           <span class="nb">float</span><span class="p">,</span>
                                                                                           <span class="nb">float</span><span class="p">]]:</span>
@@ -11468,13 +11499,7 @@ See also [Forr08a, p.60].</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1155</span>
-<span class="normal">1156</span>
-<span class="normal">1157</span>
-<span class="normal">1158</span>
-<span class="normal">1159</span>
-<span class="normal">1160</span>
-<span class="normal">1161</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1161</span>
 <span class="normal">1162</span>
 <span class="normal">1163</span>
 <span class="normal">1164</span>
@@ -11510,7 +11535,13 @@ See also [Forr08a, p.60].</p>
 <span class="normal">1194</span>
 <span class="normal">1195</span>
 <span class="normal">1196</span>
-<span class="normal">1197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_coded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">1197</span>
+<span class="normal">1198</span>
+<span class="normal">1199</span>
+<span class="normal">1200</span>
+<span class="normal">1201</span>
+<span class="normal">1202</span>
+<span class="normal">1203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_coded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].</span>
 <span class="sd">    The error is returned as well.</span>
@@ -11766,22 +11797,29 @@ with length <code>n_theta</code>, multiplied by <code>n / (100 * k)</code>.</p>
   </table>
       <p>Returns:
     None</p>
-<p>Examples:</p>
-<pre><code>&gt;&gt;&gt; from spotPython.build.kriging import Kriging
-&gt;&gt;&gt; class MyClass(Kriging):
-&gt;&gt;&gt;     def __init__(self):
-&gt;&gt;&gt;         super().__init__()
-&gt;&gt;&gt;         self.n_theta = 3
-&gt;&gt;&gt;         self.k = 2
-&gt;&gt;&gt; instance = MyClass()
-&gt;&gt;&gt; instance.set_theta_values()
-&gt;&gt;&gt; instance.theta
-array([0., 0., 0.])
-</code></pre>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.build.kriging</span> <span class="kn">import</span> <span class="n">Kriging</span>
+<span class="go">    import numpy as np</span>
+<span class="go">    from numpy import array</span>
+<span class="go">    nat_X = np.array([[1, 2], [3, 4]])</span>
+<span class="go">    nat_y = np.array([1, 2])</span>
+<span class="go">    n=2</span>
+<span class="go">    p=2</span>
+<span class="go">    S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="go">    S.initialize_variables(nat_X, nat_y)</span>
+<span class="go">    S.set_variable_types()</span>
+<span class="go">    S.nat_to_cod_init()</span>
+<span class="go">    S.set_theta_values()</span>
+<span class="go">    assert S.theta.all() == array([0., 0.]).all()</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">582</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">581</span>
+<span class="normal">582</span>
 <span class="normal">583</span>
 <span class="normal">584</span>
 <span class="normal">585</span>
@@ -11816,7 +11854,8 @@ array([0., 0., 0.])
 <span class="normal">614</span>
 <span class="normal">615</span>
 <span class="normal">616</span>
-<span class="normal">617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_theta_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">617</span>
+<span class="normal">618</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_theta_values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the theta values for the class instance.</span>
 
@@ -11834,17 +11873,19 @@ array([0., 0., 0.])
 <span class="sd">        None</span>
 
 <span class="sd">    Examples:</span>
-
 <span class="sd">        &gt;&gt;&gt; from spotPython.build.kriging import Kriging</span>
-<span class="sd">        &gt;&gt;&gt; class MyClass(Kriging):</span>
-<span class="sd">        &gt;&gt;&gt;     def __init__(self):</span>
-<span class="sd">        &gt;&gt;&gt;         super().__init__()</span>
-<span class="sd">        &gt;&gt;&gt;         self.n_theta = 3</span>
-<span class="sd">        &gt;&gt;&gt;         self.k = 2</span>
-<span class="sd">        &gt;&gt;&gt; instance = MyClass()</span>
-<span class="sd">        &gt;&gt;&gt; instance.set_theta_values()</span>
-<span class="sd">        &gt;&gt;&gt; instance.theta</span>
-<span class="sd">        array([0., 0., 0.])</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from numpy import array</span>
+<span class="sd">            nat_X = np.array([[1, 2], [3, 4]])</span>
+<span class="sd">            nat_y = np.array([1, 2])</span>
+<span class="sd">            n=2</span>
+<span class="sd">            p=2</span>
+<span class="sd">            S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="sd">            S.initialize_variables(nat_X, nat_y)</span>
+<span class="sd">            S.set_variable_types()</span>
+<span class="sd">            S.nat_to_cod_init()</span>
+<span class="sd">            S.set_theta_values()</span>
+<span class="sd">            assert S.theta.all() == array([0., 0.]).all()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
@@ -11908,17 +11949,20 @@ type (&lsquo;num&rsquo;, &lsquo;factor&rsquo;, &lsquo;int&rsquo;, &lsquo;float&r
         </tr>
     </tbody>
   </table>
-      <p>Examples:</p>
-<pre><code>&gt;&gt;&gt; from spotPython.build.kriging import Kriging
-&gt;&gt;&gt; class MyClass(Kriging):
-&gt;&gt;&gt;     def __init__(self):
-&gt;&gt;&gt;         super().__init__()
-&gt;&gt;&gt;         self.var_type = ["num", "factor"]
-&gt;&gt;&gt; instance = MyClass()
-&gt;&gt;&gt; instance.set_variable_types()
-&gt;&gt;&gt; instance.num_mask
-array([ True, False])
-</code></pre>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.build.kriging</span> <span class="kn">import</span> <span class="n">Kriging</span>
+<span class="go">    nat_X = np.array([[1, 2], [3, 4]])</span>
+<span class="go">    nat_y = np.array([1, 2])</span>
+<span class="go">    n=2</span>
+<span class="go">    p=2</span>
+<span class="go">    S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="go">    S.initialize_variables(nat_X, nat_y)</span>
+<span class="go">    S.set_variable_types()</span>
+<span class="go">    assert S.var_type == [&#39;num&#39;, &#39;num&#39;]</span>
+</code></pre></div>
 
 
 
@@ -11981,8 +12025,7 @@ array([ True, False])
 <span class="normal">576</span>
 <span class="normal">577</span>
 <span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_variable_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">579</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_variable_types</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the variable types for the class instance.</span>
 
@@ -11996,16 +12039,15 @@ array([ True, False])
 <span class="sd">        self (object): The Kriging object.</span>
 
 <span class="sd">    Examples:</span>
-
 <span class="sd">        &gt;&gt;&gt; from spotPython.build.kriging import Kriging</span>
-<span class="sd">        &gt;&gt;&gt; class MyClass(Kriging):</span>
-<span class="sd">        &gt;&gt;&gt;     def __init__(self):</span>
-<span class="sd">        &gt;&gt;&gt;         super().__init__()</span>
-<span class="sd">        &gt;&gt;&gt;         self.var_type = [&quot;num&quot;, &quot;factor&quot;]</span>
-<span class="sd">        &gt;&gt;&gt; instance = MyClass()</span>
-<span class="sd">        &gt;&gt;&gt; instance.set_variable_types()</span>
-<span class="sd">        &gt;&gt;&gt; instance.num_mask</span>
-<span class="sd">        array([ True, False])</span>
+<span class="sd">            nat_X = np.array([[1, 2], [3, 4]])</span>
+<span class="sd">            nat_y = np.array([1, 2])</span>
+<span class="sd">            n=2</span>
+<span class="sd">            p=2</span>
+<span class="sd">            S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)</span>
+<span class="sd">            S.initialize_variables(nat_X, nat_y)</span>
+<span class="sd">            S.set_variable_types()</span>
+<span class="sd">            assert S.var_type == [&#39;num&#39;, &#39;num&#39;]</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
@@ -12383,13 +12425,7 @@ and Lambda (if noise is True) to the spot_writer object.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/build/kriging.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1199</span>
-<span class="normal">1200</span>
-<span class="normal">1201</span>
-<span class="normal">1202</span>
-<span class="normal">1203</span>
-<span class="normal">1204</span>
-<span class="normal">1205</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1205</span>
 <span class="normal">1206</span>
 <span class="normal">1207</span>
 <span class="normal">1208</span>
@@ -12427,7 +12463,13 @@ and Lambda (if noise is True) to the spot_writer object.</p>
 <span class="normal">1240</span>
 <span class="normal">1241</span>
 <span class="normal">1242</span>
-<span class="normal">1243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">weighted_exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">1243</span>
+<span class="normal">1244</span>
+<span class="normal">1245</span>
+<span class="normal">1246</span>
+<span class="normal">1247</span>
+<span class="normal">1248</span>
+<span class="normal">1249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">weighted_exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Weighted expected improvement.</span>
 
