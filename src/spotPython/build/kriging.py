@@ -303,7 +303,7 @@ class Kriging(surrogates):
                 print(S.theta)
                 print(S.p)
                 [1 2]
-                [3]             
+                [3]
 
         Returns:
             None
@@ -395,13 +395,27 @@ class Kriging(surrogates):
             None
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> MyClass = Kriging(name='kriging', seed=124)
-            >>> obj = MyClass()
-            >>> obj.update_log()
-            >>> print(obj.log)
-            {'negLnLike': [0.5], 'theta': [0.1], 'p': [0.2], 'Lambda': [0.3]}
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n=2
+                p=2
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                S.nat_to_cod_init()
+                S.set_theta_values()
+                S.initialize_matrices()
+                S.set_de_bounds()
+                new_theta_p_Lambda = S.optimize_model()
+                S.update_log()
+                print(S.log)
+                {'negLnLike': array([-1.38629436]),
+                 'theta': array([-1.14525993,  1.6123372 ]),
+                  'p': array([1.84444406, 1.74590865]),
+                  'Lambda': array([0.44268472])}
+
         """
         self.log["negLnLike"] = append(self.log["negLnLike"], self.negLnLike)
         self.log["theta"] = append(self.log["theta"], self.theta)
@@ -457,12 +471,16 @@ class Kriging(surrogates):
             Lambda (float): lambda noise value.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> nat_X = np.array([[1, 2], [3, 4]])
-            >>> nat_y = np.array([1, 2])
-            >>> surrogate = Kriging()
-            >>> surrogate.fit(nat_X, nat_y)
+                import numpy as np
+                nat_X = np.array([[1, 0], [1, 0]])
+                nat_y = np.array([1, 2])
+                S = Kriging()
+                S.fit(nat_X, nat_y)
+                print(S.Psi)
+                [[1.00000001 1.        ]
+                [1.         1.00000001]]
+                
         """
         self.initialize_variables(nat_X, nat_y)
         self.set_variable_types()

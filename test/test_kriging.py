@@ -90,3 +90,40 @@ def test_optimize_model():
     S.set_de_bounds()
     new_theta_p_Lambda = S.optimize_model()
     assert len(new_theta_p_Lambda) == n+p
+
+def test_update_log():
+    from spotPython.build.kriging import Kriging
+    import numpy as np
+    nat_X = np.array([[1, 2], [3, 4]])
+    nat_y = np.array([1, 2])
+    n=2
+    p=2
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    S.set_de_bounds()
+    new_theta_p_Lambda = S.optimize_model()
+    S.update_log()
+    assert len(S.log["negLnLike"]) == 1
+    assert len(S.log["theta"]) == n
+    assert len(S.log["p"]) == p
+    assert len(S.log["Lambda"]) == 1
+    S.update_log()
+    # now that we have log iterations two, there should be two entries in the log
+    assert len(S.log["negLnLike"]) == 2
+    assert len(S.log["theta"]) == 2*n
+    assert len(S.log["p"]) == 2*p
+    assert len(S.log["Lambda"]) == 2
+
+def test_fit():
+    from spotPython.build.kriging import Kriging
+    import numpy as np
+    nat_X = np.array([[1, 0], [1, 0]])
+    nat_y = np.array([1, 2])
+    S = Kriging()
+    S.fit(nat_X, nat_y)
+    assert S.Psi.shape == (2, 2)
+    assert len(S.log["negLnLike"]) == 1
