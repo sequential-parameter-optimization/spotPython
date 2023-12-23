@@ -210,3 +210,24 @@ def test_initialize_matrices():
     # else self.pen_val = self.n * var(self.nat_y) + 1e4
     assert S.pen_val == nat_X.shape[0] * (var(S.nat_y)) + 1e4
     assert S.Psi.shape == (n, n)
+
+def test_fun_likelihood():
+    from spotPython.build.kriging import Kriging
+    import numpy as np
+    nat_X = np.array([[0], [1]])
+    nat_y = np.array([0, 1])
+    n=1
+    p=1
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    S.set_de_bounds()
+    new_theta_p_Lambda = S.optimize_model()
+    S.extract_from_bounds(new_theta_p_Lambda)
+    S.build_Psi()
+    S.build_U()
+    assert S.negLnLike < 0
+    

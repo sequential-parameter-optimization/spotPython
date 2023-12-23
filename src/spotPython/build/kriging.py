@@ -701,19 +701,31 @@ class Kriging(surrogates):
                 The negative log likelihood of the surface at the specified hyperparameters.
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> class MyClass(Kriging):
-            >>>     def __init__(self):
-            >>>         super().__init__()
-            >>>         self.n_p = 2
-            >>>         self.n = 3
-            >>>         self.nat_y = np.array([1, 2, 3])
-            >>>         self.k = 2
-            >>>         self.seed = 1
-            >>> instance = MyClass()
-            >>> negLnLike = instance.fun_likelihood(new_theta_p_Lambda)
-            >>> print(negLnLike)
+                import numpy as np
+                nat_X = np.array([[0], [1]])
+                nat_y = np.array([0, 1])
+                n=1
+                p=1
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                S.nat_to_cod_init()
+                print(S.cod_X)
+                print(S.cod_y)
+                S.set_theta_values()
+                print(f"S.theta: {S.theta}")
+                S.initialize_matrices()
+                S.set_de_bounds()
+                new_theta_p_Lambda = S.optimize_model()
+                S.extract_from_bounds(new_theta_p_Lambda)
+                print(f"S.theta: {S.theta}")
+                S.build_Psi()
+                print(f"S.Psi: {S.Psi}")
+                S.build_U()
+                print(f"S.U:{S.U}")
+                S.likelihood()
+                S.negLnLike
 
         """
         self.extract_from_bounds(new_theta_p_Lambda)
