@@ -144,6 +144,11 @@ def test_set_variable_types():
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     assert S.var_type == ['num', 'num']
+    assert S.var_type == ['num', 'num']
+    assert S.num_mask.all() == True
+    assert S.factor_mask.all() == False
+    assert S.int_mask.all() == False
+    assert S.ordered_mask.all() == True
     nat_X = np.array([[1, 2, 3], [4, 5, 6]])
     nat_y = np.array([1, 2])
     n=3
@@ -230,4 +235,26 @@ def test_fun_likelihood():
     S.build_Psi()
     S.build_U()
     assert S.negLnLike < 0
+
+def test_likelihood():
+    nat_X = np.array([[1], [2]])
+    nat_y = np.array([5, 10])
+    n=2
+    p=1
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+    S.initialize_variables(nat_X, nat_y)
+    S.set_variable_types()
+    S.nat_to_cod_init()
+    S.set_theta_values()
+    S.initialize_matrices()
+    S.build_Psi()
+    S.build_U()
+    S.likelihood()
+    # assert S.mu is close to 7.5 with a tolerance of 1e-6
+    assert np.allclose(S.mu, 7.5, atol=1e-6)
+    E = np.exp(1)
+    sigma2 = E/(E**2 -1) * (25/4 + 25/4*E)
+    # asssert S.SigmaSqr is close to sigma2 with a tolerance of 1e-6
+    assert np.allclose(S.SigmaSqr, sigma2, atol=1e-6)
+
     

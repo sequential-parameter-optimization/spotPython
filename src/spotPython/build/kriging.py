@@ -480,7 +480,7 @@ class Kriging(surrogates):
                 print(S.Psi)
                 [[1.00000001 1.        ]
                 [1.         1.00000001]]
-                
+
         """
         self.initialize_variables(nat_X, nat_y)
         self.set_variable_types()
@@ -548,8 +548,9 @@ class Kriging(surrogates):
         This method sets the variable types for the class instance based
         on the `var_type` attribute. If the length of `var_type` is less
         than `k`, all variable types are forced to 'num' and a warning is logged.
-        The method then creates masks for each variable
-        type ('num', 'factor', 'int', 'float') using numpy arrays.
+        The method then creates Boolean masks for each variable
+        type ('num', 'factor', 'int', 'ordered') using numpy arrays, e.g.,
+        `num_mask = array([ True,  True])` if two numerical variables are present.
 
         Args:
             self (object): The Kriging object.
@@ -564,6 +565,11 @@ class Kriging(surrogates):
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 assert S.var_type == ['num', 'num']
+                assert S.var_type == ['num', 'num']
+                assert S.num_mask.all() == True
+                assert S.factor_mask.all() == False
+                assert S.int_mask.all() == False
+                assert S.ordered_mask.all() == True
 
         Returns:
             None
@@ -912,21 +918,29 @@ class Kriging(surrogates):
             None
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
-            >>> class MyClass(Kriging):
-            >>>     def __init__(self):
-            >>>         super().__init__()
-            >>>         self.n_p = 2
-            >>>         self.n = 3
-            >>>         self.nat_y = np.array([1, 2, 3])
-            >>>         self.k = 2
-            >>>         self.seed = 1
-
-            >>> obj = MyClass()
-            >>> obj.build_Psi()
-            >>> obj.build_U()
-            >>> obj.likelihood()
+                import numpy as np
+                nat_X = np.array([[1], [2]])
+                nat_y = np.array([5, 10])
+                n=2
+                p=1
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S.initialize_variables(nat_X, nat_y)
+                S.set_variable_types()
+                S.nat_to_cod_init()
+                S.set_theta_values()
+                S.initialize_matrices()
+                S.build_Psi()
+                S.build_U()
+                S.likelihood()
+                # assert S.mu is close to 7.5 with a tolerance of 1e-6
+                assert np.allclose(S.mu, 7.5, atol=1e-6)
+                E = np.exp(1)
+                sigma2 = E/(E**2 -1) * (25/4 + 25/4*E)
+                # asssert S.SigmaSqr is close to sigma2 with a tolerance of 1e-6
+                assert np.allclose(S.SigmaSqr, sigma2, atol=1e-6)
+                print(f"S.LnDetPsi:{S.LnDetPsi}")
+                print(f"S.self.negLnLike:{S.negLnLike}")
         """
         # (2.20) in [Forr08a]:
         U_T_inv_one = solve(self.U.T, self.one)
@@ -1367,7 +1381,10 @@ class Kriging(surrogates):
 
     def nat_to_cod_x(self, nat_X: np.ndarray) -> np.ndarray:
         """
-        Normalizes one point (row) of nat_X array to [0,1]. The internal nat_range_X values are not updated.
+        Compute coded X-values from natural (physical or real world) units based on the
+        setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+        normalized to [0,1]. If `cod_type` is "std", the values are standardized.
+        Otherwise, the values are not modified.
 
         Args:
             self (object): The Kriging object.
@@ -1375,7 +1392,7 @@ class Kriging(surrogates):
                 An array representing one point (self.k long) in natural (physical or real world) units.
 
         Returns:
-            X (np.ndarray): An array of coded values in the range of [0,1] for each dimension.
+            X (np.ndarray): An array of coded values for each dimension.
 
         Examples:
 
@@ -1417,7 +1434,10 @@ class Kriging(surrogates):
 
     def nat_to_cod_y(self, nat_y: np.ndarray) -> np.ndarray:
         """
-        Normalizes natural y values to [0,1].
+        Compute coded y-values from natural (physical or real world) units based on the
+        setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+        normalized to [0,1]. If `cod_type` is "std", the values are standardized.
+        Otherwise, the values are not modified.
 
         Args:
             self (object): The Kriging object.
@@ -1447,10 +1467,17 @@ class Kriging(surrogates):
 
     def nat_to_cod_init(self) -> None:
         """
-        Determines max and min of each dimension and normalizes that axis to a range of [0,1].
+        Compute coded X- and y-values from natural (physical or real world) units based on the
+        setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+        normalized to [0,1]. If `cod_type` is "std", the values are standardized.
+        Otherwise, the values are not modified.
         Called when 1) surrogate is initialized and 2) new points arrive, i.e.,
         suggested by the surrogate as infill points.
         This method calls `nat_to_cod_x` and `nat_to_cod_y` and updates the ranges `nat_range_X` and `nat_range_y`.
+        Furthermore, the following statistics are computed:
+        - `nat_mean_X` and `nat_std_X`
+        - `nat_mean_y` and `nat_std_y`
+        - `mean_cod_y`
 
         Args:
             self (object): The Kriging object.
