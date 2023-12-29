@@ -201,7 +201,7 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     return hyper_parameter_values
 
 
-def nat_to_cod_x(X, cod_type):
+def nat_to_cod_X(X, cod_type):
     """
     Compute coded X-values from natural (physical or real world) units based on the
     setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
@@ -222,7 +222,8 @@ def nat_to_cod_x(X, cod_type):
     min_X = np.min(X, axis=0)
     max_X = np.max(X, axis=0)
     mean_X = np.mean(X, axis=0)
-    std_X = np.std(X, axis=0, ddof=1)
+    # make std_X array similar to mean_X array
+    std_X = np.zeros_like(mean_X)
     X_copy = copy.deepcopy(X)
     # k is the number of columns in X, i.e., the dimension of the input space.
     k = X.shape[1]
@@ -237,9 +238,10 @@ def nat_to_cod_x(X, cod_type):
     elif cod_type == "std":
         # Standardize X column-wise. If the standard deviation is zero, do not divide.
         for i in range(k):
-            if std_X[i] == 0:
+            if max_X[i] - min_X[i] == 0:
                 X_copy[:, i] = 0
             else:
+                std_X[i] = np.std(X_copy[:, i], ddof=1)
                 X_copy[:, i] = (X_copy[:, i] - mean_X[i]) / std_X[i]
         cod_X = X_copy
     else:
@@ -271,9 +273,9 @@ def nat_to_cod_y(y, cod_type) -> np.ndarray:
             The standard deviation of y.
     """
     mean_y = np.mean(y)
-    std_y = np.std(y, ddof=1)
-    min_y = np.min(y)
-    max_y = np.max(y)
+    std_y = None
+    min_y = min(y)
+    max_y = max(y)
     y_copy = copy.deepcopy(y)
     if cod_type == "norm":
         if (max_y - min_y) != 0:
@@ -282,6 +284,7 @@ def nat_to_cod_y(y, cod_type) -> np.ndarray:
             cod_y = 0.5 * np.ones_like(y_copy)
     elif cod_type == "std":
         if (max_y - min_y) != 0:
+            std_y = np.std(y, ddof=1)
             cod_y = (y_copy - mean_y) / std_y
         else:
             cod_y = np.zeros_like(y_copy)
@@ -290,7 +293,7 @@ def nat_to_cod_y(y, cod_type) -> np.ndarray:
     return cod_y, min_y, max_y, mean_y, std_y
 
 
-def cod_to_nat_x(cod_X, cod_type, min_X=None, max_X=None, mean_X=None, std_X=None) -> np.ndarray:
+def cod_to_nat_X(cod_X, cod_type, min_X=None, max_X=None, mean_X=None, std_X=None) -> np.ndarray:
     """
     Compute natural X-values from coded units based on the
     setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
