@@ -193,7 +193,7 @@ class Spot:
         max_time: int = inf,
         noise: bool = False,
         tolerance_x: float = 0,
-        cod_type: Optional[str] = "norm",
+        cod_type: Optional[str] = "id",
         var_type: List[str] = ["num"],
         var_name: List[str] = None,
         all_var_name: List[str] = None,
@@ -587,14 +587,14 @@ class Spot:
     def generate_design(self, size, repeats, lower, upper):
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)
 
-    def update_stats(self):
+    def update_stats(self) -> None:
         """
         Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`
         If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`
         2. `mean_y` 3. `min_mean_y` 4. `min_mean_X`.
 
         Args:
-            None
+            self (object): Spot object
 
         Returns:
             (NoneType): None
@@ -712,11 +712,12 @@ class Spot:
             This is step (S-12) in [bart21i].
         """
         # Reshape x to have shape (1, -1) because the predict method expects a 2D array
-        x_reshaped = x.reshape(1, -1)
+        X = x.reshape(1, -1)
         if isinstance(self.surrogate, Kriging):
-            return self.surrogate.predict(x_reshaped, return_val=self.infill_criterion)
+            res = self.surrogate.predict(X, return_val=self.infill_criterion)
         else:
-            return self.surrogate.predict(x_reshaped)
+            res = self.surrogate.predict(X)
+        return res
 
     def plot_progress(
         self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300
