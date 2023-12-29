@@ -6,14 +6,8 @@ def test_ocba():
 
 import copy
 import numpy as np
-from math import inf
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
-from scipy.optimize import shgo
-from scipy.optimize import direct
-from scipy.optimize import differential_evolution
-import matplotlib.pyplot as plt
-from numpy import float64
 from spotPython.budget.ocba import get_ocba
 
 # Test based on the example from the book:

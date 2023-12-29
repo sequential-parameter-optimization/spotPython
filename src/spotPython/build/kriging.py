@@ -84,7 +84,6 @@ class Kriging(surrogates):
     def __init__(
             self: object,
             noise: bool = False,
-            cod_type: Optional[str] = "norm",
             var_type: List[str] = ["num"],
             use_cod_y: bool = False,
             name: str = "kriging",
@@ -106,9 +105,6 @@ class Kriging(surrogates):
 
         Args:
             noise (bool): Use regression instead of interpolation kriging. Defaults to False.
-            cod_type (Optional[str]):
-                Normalize or standardize X and values.
-                Can be None, "norm", or "std". Defaults to "norm".
             var_type (List[str]):
                 Variable type. Can be either "num" (numerical) or "factor" (factor).
                 Defaults to ["num"].
@@ -165,7 +161,6 @@ class Kriging(surrogates):
 
         self.noise = noise
         self.var_type = var_type
-        self.cod_type = cod_type
         self.use_cod_y = use_cod_y
         self.name = name
         self.seed = seed
@@ -1021,19 +1016,8 @@ class Kriging(surrogates):
             Z = zs.reshape(X.shape)
             Ze = zse.reshape(X.shape)
 
-            if self.cod_type == "norm":
-                nat_point_X = (
-                                      self.cod_X[:, 0] * (self.nat_range_X[0][1] - self.nat_range_X[0][0])
-                              ) + self.nat_range_X[0][0]
-                nat_point_Y = (
-                                      self.cod_X[:, 1] * (self.nat_range_X[1][1] - self.nat_range_X[1][0])
-                              ) + self.nat_range_X[1][0]
-            elif self.cod_type == "std":
-                nat_point_X = self.cod_X[:, 0] * self.nat_std_X[0] + self.nat_mean_X[0]
-                nat_point_Y = self.cod_X[:, 1] * self.nat_std_X[1] + self.nat_mean_X[1]
-            else:
-                nat_point_X = self.cod_X[:, 0]
-                nat_point_Y = self.cod_X[:, 1]
+            nat_point_X = self.cod_X[:, 0]
+            nat_point_Y = self.cod_X[:, 1]
             contour_levels = 30
             ax = fig.add_subplot(224)
             # plot predicted values:
@@ -1059,10 +1043,8 @@ class Kriging(surrogates):
             #
             pylab.show()
 
-    def predict(self, nat_X: ndarray, nat: bool = True, return_val: str = "y") -> Union[float,
-                                                                                        Tuple[float,
-                                                                                              float,
-                                                                                              float]]:
+    def predict(self, nat_X: ndarray, return_val: str = "y") -> Union[float,
+                                                                      Tuple[float, float]]:
         """
         This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.
 
@@ -1071,10 +1053,6 @@ class Kriging(surrogates):
                 The Kriging object.
             nat_X (ndarray):
                 Design variable to evaluate in natural units.
-            nat (bool):
-                argument `nat_X` is in natural range. Default: `True`.
-                If set to `False`, `nat_X` will not be normalized (which might be useful
-                if already normalized y values are used).
             return_val (str):
                 whether `y`, `s`, neg. `ei` (negative expected improvement),
                 or all three values are returned.
@@ -1118,10 +1096,7 @@ class Kriging(surrogates):
         s = empty(n, dtype=float)
         ei = empty(n, dtype=float)
         for i in range(n):
-            if nat:
-                x = self.nat_to_cod_x(X[i, :])
-            else:
-                x = X[i, :]
+            x = X[i, :]
             y[i], s[i], ei[i] = self.predict_coded(x)
         if return_val == "y":
             return y
@@ -1308,172 +1283,11 @@ class Kriging(surrogates):
         values = [self.predict(cod_X=point, nat=True, return_val="s") for point in points]
         return mean(values), std(values)
 
-    def cod_to_nat_x(self, cod_X: np.ndarray) -> np.ndarray:
-        """
-        Converts an array representing one point in normalized (coded) units to natural (physical or real world) units.
-
-        Args:
-            self (object): The Kriging object.
-            cod_X (np.ndarray):
-                An array representing one point (self.k long) in normalized (coded) units.
-
-        Returns:
-            X (np.ndarray): An array of natural (physical or real world) units.
-
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> from numpy import array
-            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
-            >>> y = array([0.0, 0.01, 0.04])
-            >>> k = Kriging(X, y)
-            >>> cod_X = array([0.3, 0.3])
-            >>> nat_X = k.cod_to_nat_x(cod_X)
-            >>> print(f"Natural units: {nat_X}")
-
-        """
-        X = copy.deepcopy(cod_X)
-        if self.cod_type == "norm":
-            for i in range(self.k):
-                X[i] = (
-                    X[i] * float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
-                ) + self.nat_range_X[i][0]
-            return X
-        elif self.cod_type == "std":
-            for i in range(self.k):
-                X[i] = X[i] * self.nat_std_X[i] + self.nat_mean_X[i]
-            return X
-        else:
-            return cod_X
-
-    def cod_to_nat_y(self, cod_y: np.ndarray) -> np.ndarray:
-        """
-        Converts a normalized array of coded (model) units in the range of [0,1]
-        to an array of observed values in real-world units.
-
-        Args:
-            self (object): The Kriging object.
-            cod_y (np.ndarray):
-                A normalized array of coded (model) units in the range of [0,1].
-
-        Returns:
-            y (np.ndarray): An array of observed values in real-world units.
-
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> from numpy import array
-            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
-            >>> y = array([0.0, 0.01, 0.04])
-            >>> k = Kriging(X, y)
-            >>> cod_y = array([0.5, 0.5])
-            >>> nat_y = k.cod_to_nat_y(cod_y)
-            >>> print(f"Real-world units: {nat_y}")
-
-        """
-        return (
-            cod_y * (self.nat_range_y[1] - self.nat_range_y[0]) + self.nat_range_y[0]
-            if self.cod_type == "norm"
-            else cod_y * self.nat_std_y + self.nat_mean_y
-            if self.cod_type == "std"
-            else cod_y
-        )
-
-    def nat_to_cod_x(self, nat_X: np.ndarray) -> np.ndarray:
-        """
-        Compute coded X-values from natural (physical or real world) units based on the
-        setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
-        normalized to [0,1]. If `cod_type` is "std", the values are standardized.
-        Otherwise, the values are not modified.
-
-        Args:
-            self (object): The Kriging object.
-            nat_X (np.ndarray):
-                An array representing one point (self.k long) in natural (physical or real world) units.
-
-        Returns:
-            X (np.ndarray): An array of coded values for each dimension.
-
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> from numpy import array
-            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
-            >>> y = array([0.0, 0.01, 0.04])
-            >>> k = Kriging(X, y)
-            >>> nat_X = array([5.0, 5.0])
-            >>> cod_X = k.nat_to_cod_x(nat_X)
-            >>> print(f"Coded values: {cod_X}")
-
-        """
-        X = copy.deepcopy(nat_X)
-        if self.cod_type == "norm":
-            for i in range(self.k):
-                # TODO: Check Implementation of range correction if range == 0:
-                # rangex <- xmax - xmin
-                # rangey <- ymax - ymin
-                # xmin[rangex == 0] <- xmin[rangex == 0] - 0.5
-                # xmax[rangex == 0] <- xmax[rangex == 0] + 0.5
-                # rangex[rangex == 0] <- 1
-                # logger.debug(f"self.nat_range_X[{i}]:\n {self.nat_range_X[i]}")
-                # logger.debug(f"X[{i}]:\n {X[i]}")
-                rangex = float(self.nat_range_X[i][1] - self.nat_range_X[i][0])
-                if rangex == 0:
-                    self.nat_range_X[i][0] = self.nat_range_X[i][0] - 0.5
-                    self.nat_range_X[i][1] = self.nat_range_X[i][1] + 0.5
-                X[i] = (X[i] - self.nat_range_X[i][0]) / float(
-                    self.nat_range_X[i][1] - self.nat_range_X[i][0]
-                )
-            return X
-        elif self.cod_type == "std":
-            for i in range(self.k):
-                X[i] = (X[i] - self.nat_mean_X[i]) / self.nat_std_X[i]
-            return X
-        else:
-            return nat_X
-
-    def nat_to_cod_y(self, nat_y: np.ndarray) -> np.ndarray:
-        """
-        Compute coded y-values from natural (physical or real world) units based on the
-        setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
-        normalized to [0,1]. If `cod_type` is "std", the values are standardized.
-        Otherwise, the values are not modified.
-
-        Args:
-            self (object): The Kriging object.
-            nat_y (np.ndarray):
-                An array of observed values in natural (real-world) units.
-
-        Returns:
-            y (np.ndarray):
-                A normalized array of coded (model) units in the range of [0,1].
-
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> import numpy as np
-            >>> kriging = Kriging()
-            >>> nat_y = np.array([5.0, 5.0])
-            >>> cod_y = kriging.nat_to_cod_y(nat_y)
-            >>> print(f"Coded values: {cod_y}")
-        """
-        return (
-            (nat_y - self.nat_range_y[0]) / (self.nat_range_y[1] - self.nat_range_y[0])
-            if self.use_cod_y and self.cod_type == "norm"
-            else (nat_y - self.nat_mean_y) / self.nat_std_y
-            if self.use_cod_y and self.cod_type == "std"
-            else nat_y
-        )
-
     def nat_to_cod_init(self) -> None:
         """
-        Compute coded X- and y-values from natural (physical or real world) units based on the
-        setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
-        normalized to [0,1]. If `cod_type` is "std", the values are standardized.
-        Otherwise, the values are not modified.
         Called when 1) surrogate is initialized and 2) new points arrive, i.e.,
         suggested by the surrogate as infill points.
-        This method calls `nat_to_cod_x` and `nat_to_cod_y` and updates the ranges `nat_range_X` and `nat_range_y`.
+        This method updates the ranges `nat_range_X` and `nat_range_y`.
         Furthermore, the following statistics are computed:
         - `nat_mean_X` and `nat_std_X`
         - `nat_mean_y` and `nat_std_y`
@@ -1502,9 +1316,12 @@ class Kriging(surrogates):
         mu = Z[1]
         self.mean_cod_y = empty_like(mu)
 
+        # Since 0.8.0,  coding is handled by spot() already:
+        # do not use nat_to_cod_x and nat_to_cod_y() here, since it would be called twice.
+        # Only map the values to cod_X and cod_y for compatibility with previous versions.
         for i in range(self.n):
-            self.cod_X[i] = self.nat_to_cod_x(self.nat_X[i])
+            self.cod_X[i] = self.nat_X[i]
         for i in range(self.n):
-            self.cod_y[i] = self.nat_to_cod_y(self.nat_y[i])
+            self.cod_y[i] = self.nat_y[i]
         for i in range(mu.shape[0]):
-            self.mean_cod_y[i] = self.nat_to_cod_y(mu[i])
+            self.mean_cod_y[i] = mu[i]

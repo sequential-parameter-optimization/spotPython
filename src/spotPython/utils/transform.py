@@ -199,3 +199,168 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
         ):
             hyper_parameter_values[key] = eval(fun_control["core_model_hyper_dict"][key]["transform"])(value)
     return hyper_parameter_values
+
+
+def nat_to_cod_x(X, cod_type):
+    """
+    Compute coded X-values from natural (physical or real world) units based on the
+    setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+    normalized to [0,1]. If `cod_type` is "std", the values are standardized.
+    Otherwise, the values are not modified.
+
+    Args:
+        X (np.array): The input array.
+        cod_type (str): The type of coding ("norm", "std", or other).
+
+    Returns:
+        cod_X (np.array): The coded X-values.
+        min_X (np.array): The minimum values of X.
+        max_X (np.array): The maximum values of X.
+        mean_X (np.array): The mean values of X.
+        std_X (np.array): The standard deviation of X.
+    """
+    min_X = np.min(X, axis=0)
+    max_X = np.max(X, axis=0)
+    mean_X = np.mean(X, axis=0)
+    std_X = np.std(X, axis=0, ddof=1)
+    X_copy = copy.deepcopy(X)
+    # k is the number of columns in X, i.e., the dimension of the input space.
+    k = X.shape[1]
+    if cod_type == "norm":
+        # Normalize X to [0,1] column-wise. If the range is zero, set the value to 0.5.
+        for i in range(k):
+            if max_X[i] - min_X[i] == 0:
+                X_copy[:, i] = 0.5
+            else:
+                X_copy[:, i] = (X_copy[:, i] - min_X[i]) / (max_X[i] - min_X[i])
+        cod_X = X_copy
+    elif cod_type == "std":
+        # Standardize X column-wise. If the standard deviation is zero, do not divide.
+        for i in range(k):
+            if std_X[i] == 0:
+                X_copy[:, i] = 0
+            else:
+                X_copy[:, i] = (X_copy[:, i] - mean_X[i]) / std_X[i]
+        cod_X = X_copy
+    else:
+        cod_X = X_copy
+    return cod_X, min_X, max_X, mean_X, std_X
+
+
+def nat_to_cod_y(y, cod_type) -> np.ndarray:
+    """
+    Compute coded y-values from natural (physical or real world) units based on the
+    setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+    normalized to [0,1]. If `cod_type` is "std", the values are standardized.
+    Otherwise, the values are not modified.
+
+    Args:
+        y (np.array): The input array.
+        cod_type (str): The type of coding ("norm", "std", or other).
+
+    Returns:
+        cod_y (np.array):
+            The coded y-values.
+        min_y (np.array):
+            The minimum values of y.
+        max_y (np.array):
+            The maximum values of y.
+        mean_y (np.array):
+            The mean values of y.
+        std_y (np.array):
+            The standard deviation of y.
+    """
+    mean_y = np.mean(y)
+    std_y = np.std(y, ddof=1)
+    min_y = np.min(y)
+    max_y = np.max(y)
+    y_copy = copy.deepcopy(y)
+    if cod_type == "norm":
+        if (max_y - min_y) != 0:
+            cod_y = (y_copy - min_y) / (max_y - min_y)
+        else:
+            cod_y = 0.5 * np.ones_like(y_copy)
+    elif cod_type == "std":
+        if (max_y - min_y) != 0:
+            cod_y = (y_copy - mean_y) / std_y
+        else:
+            cod_y = np.zeros_like(y_copy)
+    else:
+        cod_y = y_copy
+    return cod_y, min_y, max_y, mean_y, std_y
+
+
+def cod_to_nat_x(cod_X, cod_type, min_X=None, max_X=None, mean_X=None, std_X=None) -> np.ndarray:
+    """
+    Compute natural X-values from coded units based on the
+    setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+    de-normalized from [0,1]. If `cod_type` is "std", the values are de-standardized.
+    Otherwise, the values are not modified.
+
+    Args:
+        cod_X (np.array):
+            The coded X-values.
+        cod_type (str):
+            The type of coding ("norm", "std", or other).
+        min_X (np.array):
+            The minimum values of X. Defaults to None.
+        max_X (np.array):
+            The maximum values of X. Defaults to None.
+        mean_X (np.array):
+            The mean values of X. Defaults to None.
+        std_X (np.array):
+            The standard deviation of X. Defaults to None.
+
+    Returns:
+        X (np.array): The natural (physical or real world) X-values.
+    """
+    X_copy = copy.deepcopy(cod_X)
+    # k is the number of columns in X, i.e., the dimension of the input space.
+    k = cod_X.shape[1]
+    if cod_type == "norm":
+        # De-normalize X from [0,1] column-wise.
+        for i in range(k):
+            X_copy[:, i] = X_copy[:, i] * (max_X[i] - min_X[i]) + min_X[i]
+        X = X_copy
+    elif cod_type == "std":
+        # De-standardize X column-wise.
+        for i in range(k):
+            X_copy[:, i] = X_copy[:, i] * std_X[i] + mean_X[i]
+        X = X_copy
+    else:
+        X = X_copy
+    return X
+
+
+def cod_to_nat_y(cod_y, cod_type, min_y=None, max_y=None, mean_y=None, std_y=None) -> np.ndarray:
+    """
+    Compute natural y-values from coded units based on the
+    setting of the `cod_type` attribute. If `cod_type` is "norm", the values are
+    de-normalized from [0,1]. If `cod_type` is "std", the values are de-standardized.
+    Otherwise, the values are not modified.
+
+    Args:
+        cod_y (np.array):
+            The coded y-values.
+        cod_type (str):
+            The type of coding ("norm", "std", or other).
+        min_y (np.array):
+            The minimum values of y. Defaults to None.
+        max_y (np.array):
+            The maximum values of y. Defaults to None.
+        mean_y (np.array):
+            The mean values of y. Defaults to None.
+        std_y (np.array):
+            The standard deviation of y. Defaults to None.
+
+    Returns:
+        y (np.array): The natural (physical or real world) y-values.
+    """
+    y_copy = copy.deepcopy(cod_y)
+    if cod_type == "norm":
+        y = y_copy * (max_y - min_y) + min_y
+    elif cod_type == "std":
+        y = y_copy * std_y + mean_y
+    else:
+        y = y_copy
+    return y

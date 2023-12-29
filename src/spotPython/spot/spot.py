@@ -20,6 +20,7 @@ from numpy import meshgrid
 from numpy import ravel
 from numpy import array
 from numpy import append
+from numpy import min, max
 from spotPython.utils.compare import selectNew
 from spotPython.utils.aggregate import aggregate_mean_var
 from spotPython.utils.repair import remove_nan
@@ -29,7 +30,7 @@ import time
 from spotPython.utils.progress import progress_bar
 from spotPython.utils.convert import find_indices
 import plotly.graph_objects as go
-from typing import List, Union, Callable, Dict
+from typing import List, Union, Callable, Dict, Optional
 
 
 logger = logging.getLogger(__name__)
@@ -192,6 +193,7 @@ class Spot:
         max_time: int = inf,
         noise: bool = False,
         tolerance_x: float = 0,
+        cod_type: Optional[str] = "norm",
         var_type: List[str] = ["num"],
         var_name: List[str] = None,
         all_var_name: List[str] = None,
@@ -212,6 +214,10 @@ class Spot:
         # use x0, x1, ... as default variable names:
         if var_name is None:
             var_name = ["x" + str(i) for i in range(len(lower))]
+        self.X = None
+        self.y = None
+        self.cod_X = None
+        self.cod_y = None
         # small value:
         self.eps = sqrt(spacing(1))
         self.fun = fun
@@ -229,6 +235,7 @@ class Spot:
         self.max_time = max_time
         self.noise = noise
         self.tolerance_x = tolerance_x
+        self.cod_type = cod_type
         self.ocba_delta = ocba_delta
         self.log_level = log_level
         self.show_models = show_models
@@ -243,6 +250,9 @@ class Spot:
             self.var_type = self.var_type * self.k
             logger.warning("Warning: All variable types forced to 'num'.")
         self.infill_criterion = infill_criterion
+        # ranges:
+        self.range_X = []
+        self.range_y = []
         # Bounds
         de_bounds = []
         for j in range(self.k):
@@ -475,6 +485,8 @@ class Spot:
         self.initialize_design(X_start)
         # New: self.update_stats() moved here:
         # self.update_stats()
+        # (S-11) Surrogate Fit:
+        self.fit_surrogate()
         # (S-5) Calling the spotLoop Function
         # and
         # (S-9) Termination Criteria, Conditions:
@@ -536,8 +548,6 @@ class Spot:
         self.update_stats()
         # (S-4): Imputation:
         # Not implemented yet.
-        # (S-11) Surrogate Fit:
-        self.fit_surrogate()
 
     def should_continue(self, timeout_start):
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
@@ -639,45 +649,6 @@ class Spot:
             # hyperparameters X and value y of the last configuration:
             writer.add_hparams(config, {"spot_y": y_last})
             writer.flush()
-
-    def suggest_new_X_old(self):
-        """
-        Compute `n_points` new infill points in natural units.
-        The optimizer searches in the ranges from `lower_j` to `upper_j`.
-        The method `infill()` is used as the objective function.
-
-        Returns:
-            (numpy.ndarray): `n_points` infill points in natural units, each of dim k
-
-        Note:
-            This is step (S-14a) in [bart21i].
-        """
-        # (S-14a) Optimization on the surrogate:
-        new_X = np.zeros([self.n_points, self.k], dtype=float)
-
-        optimizer_name = self.optimizer.__name__
-        for i in range(self.n_points):
-            if optimizer_name == "dual_annealing":
-                result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            elif optimizer_name == "differential_evolution":
-                result = self.optimizer(
-                    func=self.infill,
-                    bounds=self.de_bounds,
-                    maxiter=self.optimizer_control["max_iter"],
-                    seed=self.optimizer_control["seed"],
-                    # popsize=10,
-                    # updating="deferred"
-                )
-            elif optimizer_name == "direct":
-                result = self.optimizer(func=self.infill, bounds=self.de_bounds, eps=1e-2)
-            elif optimizer_name == "shgo":
-                result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            elif optimizer_name == "basinhopping":
-                result = self.optimizer(func=self.infill, x0=self.min_X)
-            else:
-                result = self.optimizer(func=self.infill, bounds=self.de_bounds)
-            new_X[i][:] = result.x
-        return new_X
 
     def suggest_new_X(self):
         """

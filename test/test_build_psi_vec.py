@@ -1,9 +1,8 @@
 def test_build_psi_vec():
     """
-    Test build_psi_vec
+    Test build_psi_vec, based on (2.34) in [Forrester et al. (2008)]
     """
     import numpy as np
-    from spotPython.spot import spot
     from spotPython.build.kriging import Kriging
 
     X_train = np.array([[1., 2.],
@@ -24,8 +23,8 @@ def test_build_psi_vec():
     cod_x = np.array([1., 0.])
     S.psi = np.zeros((S.n, 1))
     S.build_psi_vec(cod_x)
-    res = np.array([[np.exp(-1)],
-        [np.exp(-1/2)],
-        [np.exp(-1)]])
+    res = np.array([[np.exp(-4)],
+        [np.exp(-17)],
+        [np.exp(-40)]])
 
     assert np.array_equal(S.psi, res)
