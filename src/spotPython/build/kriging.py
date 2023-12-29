@@ -1,7 +1,7 @@
 import copy
 from math import erf
 import matplotlib.pyplot as plt
-from numpy import min, std, var, mean
+from numpy import max, min, std, var, mean
 from numpy import sqrt
 from numpy import exp
 from numpy import array
@@ -232,7 +232,7 @@ class Kriging(surrogates):
                 S.exp_imp(0.0, 1.0)
                 0.3989422804014327
         """
-        # y_min = min(self.cod_y)
+        # y_min = min(self.nat_y)
         y_min = min(self.mean_cod_y)
         if s0 <= 0.0:
             EI = 0.0
@@ -533,8 +533,6 @@ class Kriging(surrogates):
         self.nat_y = copy.deepcopy(nat_y)
         self.n = self.nat_X.shape[0]
         self.k = self.nat_X.shape[1]
-        self.cod_X = np.empty_like(self.nat_X)
-        self.cod_y = np.empty_like(self.nat_y)
 
     def set_variable_types(self) -> None:
         """
@@ -830,12 +828,12 @@ class Kriging(surrogates):
         try:
             D = zeros((self.n, self.n))
             if self.ordered_mask.any():
-                X_ordered = self.cod_X[:, self.ordered_mask]
+                X_ordered = self.nat_X[:, self.ordered_mask]
                 D = squareform(
                     pdist(
                         X_ordered, metric='sqeuclidean', out=None, w=theta[self.ordered_mask]))
             if self.factor_mask.any():
-                X_factor = self.cod_X[:, self.factor_mask]
+                X_factor = self.nat_X[:, self.factor_mask]
                 D = (D + squareform(
                     pdist(X_factor,
                           metric='hamming',
@@ -939,11 +937,11 @@ class Kriging(surrogates):
         """
         # (2.20) in [Forr08a]:
         U_T_inv_one = solve(self.U.T, self.one)
-        U_T_inv_cod_y = solve(self.U.T, self.cod_y)
+        U_T_inv_cod_y = solve(self.U.T, self.nat_y)
         mu = self.one.T.dot(solve(self.U, U_T_inv_cod_y)) / self.one.T.dot(solve(self.U, U_T_inv_one))
         self.mu = mu
         # (2.31) in [Forr08a]
-        cod_y_minus_mu = self.cod_y - self.one.dot(self.mu)
+        cod_y_minus_mu = self.nat_y - self.one.dot(self.mu)
         self.SigmaSqr = cod_y_minus_mu.T.dot(solve(self.U, solve(self.U.T, cod_y_minus_mu))) / self.n
         # (2.32) in [Forr08a]
         self.LnDetPsi = 2.0 * sum(log(abs(diag(self.U))))
@@ -989,7 +987,7 @@ class Kriging(surrogates):
             #
             n_grid = 100
             x = linspace(
-                self.nat_range_X[0][0], self.nat_range_X[0][1], num=n_grid
+                self.min_X[0], self.max_X[0], num=n_grid
             )
             y = self.predict(x)
             plt.figure()
@@ -1001,10 +999,10 @@ class Kriging(surrogates):
             fig = pylab.figure(figsize=(9, 6))
             n_grid = 100
             x = linspace(
-                self.nat_range_X[0][0], self.nat_range_X[0][1], num=n_grid
+                self.min_X[0], self.max_X[0], num=n_grid
             )
             y = linspace(
-                self.nat_range_X[1][0], self.nat_range_X[1][1], num=n_grid
+                self.min_X[1], self.max_X[1], num=n_grid
             )
             X, Y = meshgrid(x, y)
             # Predict based on the optimized results
@@ -1016,8 +1014,8 @@ class Kriging(surrogates):
             Z = zs.reshape(X.shape)
             Ze = zse.reshape(X.shape)
 
-            nat_point_X = self.cod_X[:, 0]
-            nat_point_Y = self.cod_X[:, 1]
+            nat_point_X = self.nat_X[:, 0]
+            nat_point_Y = self.nat_X[:, 1]
             contour_levels = 30
             ax = fig.add_subplot(224)
             # plot predicted values:
@@ -1140,7 +1138,7 @@ class Kriging(surrogates):
         try:
             D = zeros((self.n))
             if self.ordered_mask.any():
-                X_ordered = self.cod_X[:, self.ordered_mask]
+                X_ordered = self.nat_X[:, self.ordered_mask]
                 x_ordered = cod_x[self.ordered_mask]
                 D = cdist(x_ordered.reshape(-1, sum(self.ordered_mask)),
                           X_ordered.reshape(-1, sum(self.ordered_mask)),
@@ -1148,7 +1146,7 @@ class Kriging(surrogates):
                           out=None,
                           w=theta[self.ordered_mask])
             if self.factor_mask.any():
-                X_factor = self.cod_X[:, self.factor_mask]
+                X_factor = self.nat_X[:, self.factor_mask]
                 x_factor = cod_x[self.factor_mask]
                 D = (D + cdist(x_factor.reshape(-1, sum(self.factor_mask)),
                                X_factor.reshape(-1, sum(self.factor_mask)),
@@ -1191,7 +1189,7 @@ class Kriging(surrogates):
             See also [Forr08a, p.60].
         """
         self.build_psi_vec(cod_x)
-        U_T_inv = solve(self.U.T, self.cod_y - self.one.dot(self.mu))
+        U_T_inv = solve(self.U.T, self.nat_y - self.one.dot(self.mu))
         f = self.mu + self.psi.T.dot(solve(self.U, U_T_inv))
         if self.noise:
             Lambda = self.Lambda
@@ -1232,7 +1230,7 @@ class Kriging(surrogates):
             [Sobester et al. 2005].
         """
         y0, s0 = self.predict_coded(cod_x)
-        y_min = min(self.cod_y)
+        y_min = min(self.nat_y)
         if s0 <= 0.0:
             EI = 0.0
         else:
@@ -1296,32 +1294,22 @@ class Kriging(surrogates):
         Args:
             self (object): The Kriging object.
 
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> kriging = Kriging()
-            >>> kriging.nat_to_cod_init()
         """
-        self.nat_range_X = []
-        self.nat_range_y = []
-        for i in range(self.k):
-            self.nat_range_X.append([min(self.nat_X[:, i]), max(self.nat_X[:, i])])
-        self.nat_range_y.append(min(self.nat_y))
-        self.nat_range_y.append(max(self.nat_y))
         self.nat_mean_X = mean(self.nat_X, axis=0)
         self.nat_std_X = std(self.nat_X, axis=0)
         self.nat_mean_y = mean(self.nat_y)
         self.nat_std_y = std(self.nat_y)
-        Z = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
-        mu = Z[1]
-        self.mean_cod_y = empty_like(mu)
+
+        self.min_X = min(self.nat_X, axis=0)
+        self.max_X = max(self.nat_X, axis=0)
+        self.min_y = min(self.nat_y)
+        self.max_y = max(self.nat_y)
 
         # Since 0.8.0,  coding is handled by spot() already:
         # do not use nat_to_cod_x and nat_to_cod_y() here, since it would be called twice.
-        # Only map the values to cod_X and cod_y for compatibility with previous versions.
-        for i in range(self.n):
-            self.cod_X[i] = self.nat_X[i]
-        for i in range(self.n):
-            self.cod_y[i] = self.nat_y[i]
+
+        Z = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
+        mu = Z[1]
+        self.mean_cod_y = empty_like(mu)
         for i in range(mu.shape[0]):
             self.mean_cod_y[i] = mu[i]

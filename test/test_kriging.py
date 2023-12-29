@@ -132,8 +132,8 @@ def test_initialize_variables():
     S.initialize_variables(nat_X, nat_y)
     assert S.nat_X.all() == nat_X.all()
     assert S.nat_y.all() == nat_y.all()
-    assert S.cod_X.shape == (2, 2)
-    assert S.cod_y.shape == (2,)
+    assert S.nat_X.shape == (2, 2)
+    assert S.nat_y.shape == (2,)
 
 def test_set_variable_types():
     nat_X = np.array([[1, 2], [3, 4]])

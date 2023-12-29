@@ -783,9 +783,9 @@ class Spot:
             plt.ylabel("y")
             plt.xlim((self.lower[0], self.upper[0]))
             if y_min is None:
-                y_min = min(min(self.y), min(y_test))
+                y_min = min([min(self.y), min(y_test)])
             if y_max is None:
-                y_max = max(max(self.y), max(y_test))
+                y_max = max([max(self.y), max(y_test)])
             plt.ylim((y_min, y_max))
             plt.legend(loc="best")
             # plt.title(self.surrogate.__class__.__name__ + ". " + str(self.counter) + ": " + str(self.min_y))
