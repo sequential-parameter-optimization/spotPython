@@ -1,7 +1,7 @@
 import copy
 from math import erf
 import matplotlib.pyplot as plt
-from numpy import max, min, std, var, mean
+from numpy import max, min, var, mean
 from numpy import sqrt
 from numpy import exp
 from numpy import array
@@ -12,7 +12,7 @@ from numpy import sum
 from numpy import diag
 from numpy import pi
 from numpy import ones, zeros
-from numpy import spacing, empty_like
+from numpy import spacing
 from numpy import float64
 from numpy import append, ndarray, isinf, linspace, meshgrid, ravel, diag_indices_from, empty
 from numpy.linalg import cholesky, solve, LinAlgError, cond
@@ -221,19 +221,20 @@ class Kriging(surrogates):
         Examples:
             >>> from spotPython.build.kriging import Kriging
                 S = Kriging(name='kriging', seed=124)
-                S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+                S.aggregated_mean_y = [0.0, 0.0, 0.0, 0.0, 0.0]
                 S.exp_imp(1.0, 0.0)
                 0.0
             >>> from spotPython.build.kriging import Kriging
                 S = Kriging(name='kriging', seed=124)
-                S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+                S.aggregated_mean_y = [0.0, 0.0, 0.0, 0.0, 0.0]
                 # assert S.exp_imp(0.0, 1.0) == 1/np.sqrt(2*np.pi)
                 # which is approx. 0.3989422804014327
                 S.exp_imp(0.0, 1.0)
                 0.3989422804014327
         """
+        # We do not use the min y values, but the aggragated mean values
         # y_min = min(self.nat_y)
-        y_min = min(self.mean_cod_y)
+        y_min = min(self.aggregated_mean_y)
         if s0 <= 0.0:
             EI = 0.0
         elif s0 > 0.0:
@@ -335,7 +336,6 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                S.nat_to_cod_init()
                 S.set_theta_values()
                 S.initialize_matrices()
                 S.set_de_bounds()
@@ -399,7 +399,6 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                S.nat_to_cod_init()
                 S.set_theta_values()
                 S.initialize_matrices()
                 S.set_de_bounds()
@@ -479,7 +478,6 @@ class Kriging(surrogates):
         """
         self.initialize_variables(nat_X, nat_y)
         self.set_variable_types()
-        self.nat_to_cod_init()
         self.set_theta_values()
         self.initialize_matrices()
         # build_Psi() and build_U() are called in fun_likelihood
@@ -529,10 +527,21 @@ class Kriging(surrogates):
             array([1, 2])
 
         """
+        # Since 0.8.0,  coding is handled by spot()
         self.nat_X = copy.deepcopy(nat_X)
         self.nat_y = copy.deepcopy(nat_y)
         self.n = self.nat_X.shape[0]
         self.k = self.nat_X.shape[1]
+
+        self.min_X = min(self.nat_X, axis=0)
+        self.max_X = max(self.nat_X, axis=0)
+        self.min_y = min(self.nat_y)
+        self.max_y = max(self.nat_y)
+
+        Z = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
+        # aggregated y values:
+        mu = Z[1]
+        self.aggregated_mean_y = np.copy(mu)
 
     def set_variable_types(self) -> None:
         """
@@ -605,7 +614,6 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                S.nat_to_cod_init()
                 S.set_theta_values()
                 assert S.theta.all() == array([0., 0.]).all()
         """
@@ -644,7 +652,6 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                S.nat_to_cod_init()
                 S.set_theta_values()
                 S.initialize_matrices()
                 # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
@@ -709,7 +716,6 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                S.nat_to_cod_init()
                 print(S.cod_X)
                 print(S.cod_y)
                 S.set_theta_values()
@@ -920,7 +926,6 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                S.nat_to_cod_init()
                 S.set_theta_values()
                 S.initialize_matrices()
                 S.build_Psi()
@@ -1246,70 +1251,3 @@ class Kriging(surrogates):
             )
             EI = EI_one + EI_two
         return EI
-
-    def calculate_mean_MSE(self, n_samples: int = 200, points: Optional[np.ndarray] = None) -> Tuple[float, float]:
-        """
-        Calculates the mean MSE metric of the model by evaluating MSE at a number of points.
-
-        Args:
-            self (object):
-                The Kriging object.
-            n_samples (int):
-                Number of points to sample the mean squared error at.
-                Ignored if the points argument is specified.
-            points (np.ndarray):
-                An array of points to sample the model at.
-
-        Returns:
-            mean_MSE (float): The mean value of MSE.
-            std_MSE (float): The standard deviation of the MSE points.
-
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> from numpy import array
-            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
-            >>> y = array([0.0, 0.01, 0.04])
-            >>> k = Kriging(X, y)
-            >>> n_samples = 200
-            >>> mean_MSE, std_MSE = k.calculate_mean_MSE(n_samples)
-            >>> print(f"Mean MSE: {mean_MSE}, Standard deviation of MSE: {std_MSE}")
-
-        """
-        if points is None:
-            points = self.gen.lhd(n_samples)
-        values = [self.predict(cod_X=point, nat=True, return_val="s") for point in points]
-        return mean(values), std(values)
-
-    def nat_to_cod_init(self) -> None:
-        """
-        Called when 1) surrogate is initialized and 2) new points arrive, i.e.,
-        suggested by the surrogate as infill points.
-        This method updates the ranges `nat_range_X` and `nat_range_y`.
-        Furthermore, the following statistics are computed:
-        - `nat_mean_X` and `nat_std_X`
-        - `nat_mean_y` and `nat_std_y`
-        - `mean_cod_y`
-
-        Args:
-            self (object): The Kriging object.
-
-        """
-        self.nat_mean_X = mean(self.nat_X, axis=0)
-        self.nat_std_X = std(self.nat_X, axis=0)
-        self.nat_mean_y = mean(self.nat_y)
-        self.nat_std_y = std(self.nat_y)
-
-        self.min_X = min(self.nat_X, axis=0)
-        self.max_X = max(self.nat_X, axis=0)
-        self.min_y = min(self.nat_y)
-        self.max_y = max(self.nat_y)
-
-        # Since 0.8.0,  coding is handled by spot() already:
-        # do not use nat_to_cod_x and nat_to_cod_y() here, since it would be called twice.
-
-        Z = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
-        mu = Z[1]
-        self.mean_cod_y = empty_like(mu)
-        for i in range(mu.shape[0]):
-            self.mean_cod_y[i] = mu[i]

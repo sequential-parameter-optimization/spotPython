@@ -593,6 +593,12 @@ class Spot:
         If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`
         2. `mean_y` 3. `min_mean_y` 4. `min_mean_X`.
 
+        Args:
+            None
+
+        Returns:
+            (NoneType): None
+
         """
         self.min_y = min(self.y)
         self.min_X = self.X[argmin(self.y)]
@@ -716,6 +722,7 @@ class Spot:
         self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300
     ) -> None:
         """Plot the progress of the hyperparameter tuning (optimization).
+
         Args:
             show (bool):
                 Show the plot.
@@ -728,6 +735,7 @@ class Spot:
             style (list):
                 Style of the plot. Default: ['k', 'ro-'], i.e., the initial points are plotted as a black line
                 and the subsequent points as red dots connected by a line.
+
         Returns:
             None
         """
@@ -761,8 +769,12 @@ class Spot:
         Plot the model fit for 1-dim objective functions.
 
         Args:
-            y_min (float, optional): y range, lower bound.
-            y_max (float, optional): y range, upper bound.
+            self (object):
+                spot object
+            y_min (float, optional):
+                y range, lower bound.
+            y_max (float, optional):
+                y range, upper bound.
         """
         if self.k == 1:
             X_test = np.linspace(self.lower[0], self.upper[0], 100)
@@ -808,10 +820,14 @@ class Spot:
             If `noise == True`, additionally the following values are printed:
             3. min mean y
             4. min mean X
+
         Args:
-            print_screen (bool, optional): print results to screen
+            print_screen (bool, optional):
+                print results to screen
+
         Returns:
-            output (list): list of results
+            output (list):
+                list of results
         """
         output = []
         if print_screen:
@@ -838,11 +854,16 @@ class Spot:
         Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.
 
         Args:
-            x (int or float): The new value for the element at index `i`.
-            y (int or float): The new value for the element at index `j`.
-            z0 (list or numpy.ndarray): The array to be modified.
-            i (int): The index of the element to be changed to `x`.
-            j (int): The index of the element to be changed to `y`.
+            x (int or float):
+                The new value for the element at index `i`.
+            y (int or float):
+                The new value for the element at index `j`.
+            z0 (list or numpy.ndarray):
+                The array to be modified.
+            i (int):
+                The index of the element to be changed to `x`.
+            j (int):
+                The index of the element to be changed to `y`.
 
         Returns:
             (list) or (numpy.ndarray): The modified array.
@@ -860,15 +881,27 @@ class Spot:
         self, i=0, j=1, min_z=None, max_z=None, show=True, filename=None, n_grid=25, contour_levels=10, dpi=200
     ) -> None:
         """Plot the contour of any dimension.
+
         Args:
-            i (int): the first dimension
-            j (int): the second dimension
-            min_z (float): the minimum value of z
-            max_z (float): the maximum value of z
-            show (bool): show the plot
-            filename (str): save the plot to a file
-            n_grid (int): number of grid points
-            contour_levels (int): number of contour levels
+            i (int):
+                the first dimension
+            j (int):
+                the second dimension
+            min_z (float):
+                the minimum value of z
+            max_z (float):
+                the maximum value of z
+            show (bool):
+                show the plot
+            filename (str):
+                save the plot to a file
+            n_grid (int):
+                number of grid points
+            contour_levels (int):
+                number of contour levels
+            dpi (int):
+                dpi of the plot. Default is 200.
+
         Returns:
             None
         """
@@ -926,8 +959,11 @@ class Spot:
 
     def get_importance(self) -> list:
         """Get importance of each variable and return the results as a list.
+
         Returns:
-            output (list): list of results
+            output (list):
+                list of results
+
         """
         if self.surrogate.n_theta > 1 and self.var_name is not None:
             output = [0] * len(self.all_var_name)
@@ -944,11 +980,16 @@ class Spot:
 
     def print_importance(self, threshold=0.1, print_screen=True) -> list:
         """Print importance of each variable and return the results as a list.
+
         Args:
-            threshold (float): threshold for printing
-            print_screen (boolean): if `True`, values are also printed on the screen. Default is `True`.
+            threshold (float):
+                threshold for printing
+            print_screen (boolean):
+                if `True`, values are also printed on the screen. Default is `True`.
+
         Returns:
-            output (list): list of results
+            output (list):
+                list of results
         """
         output = []
         if self.surrogate.n_theta > 1:
@@ -974,11 +1015,17 @@ class Spot:
 
     def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True) -> None:
         """Plot the importance of each variable.
+
         Args:
-            threshold (float):  The threshold of the importance.
-            filename (str): The filename of the plot.
-            dpi (int): The dpi of the plot.
-            show (bool): Show the plot. Default is `True`.
+            threshold (float):
+                The threshold of the importance.
+            filename (str):
+                The filename of the plot.
+            dpi (int):
+                The dpi of the plot.
+            show (bool):
+                Show the plot. Default is `True`.
+
         Returns:
             None
         """

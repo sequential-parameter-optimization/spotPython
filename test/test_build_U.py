@@ -66,7 +66,7 @@ def test_build_U():
     S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
     S.int_mask = array(list(map(lambda x: x == "int", S.var_type)))
     S.ordered_mask = array(list(map(lambda x: x == "num" or x == "int" or x == "float", S.var_type)))
-    S.nat_to_cod_init()
+    S.initialize_variables(S.nat_X, S.nat_y)
     S.theta = zeros(S.n_theta)
     # TODO: Currently not used:
     S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)

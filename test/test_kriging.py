@@ -29,7 +29,7 @@ def test_ei():
     Test computation of expected improvement based on (3.8) in Forrester et al. (2008).
     """
     S = Kriging(name='kriging', seed=124)
-    S.mean_cod_y = [0.0, 0.0, 0.0, 0.0, 0.0]
+    S.aggregated_mean_y = [0.0, 0.0, 0.0, 0.0, 0.0]
     # assert that the S.exp_imp(1.0, 0.0) is equal to 0.0,
     # because EI is zero when the std is zero
     assert 0.0 == S.exp_imp(1.0, 0.0)
@@ -75,7 +75,6 @@ def test_optimize_model():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     S.set_de_bounds()
@@ -85,7 +84,6 @@ def test_optimize_model():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     S.set_de_bounds()
@@ -100,7 +98,6 @@ def test_update_log():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     S.set_de_bounds()
@@ -167,7 +164,6 @@ def set_theta_values():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     assert S.theta.all() == array([0., 0.]).all()
     nat_X = np.array([[1, 2], [3, 4]])
@@ -178,7 +174,6 @@ def set_theta_values():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     snt = S.n_theta
     S.set_theta_values()
     # since snt == 3, it is not equal to S.n_theta, which is 2 because 
@@ -193,7 +188,6 @@ def test_initialize_matrices():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
@@ -208,7 +202,6 @@ def test_initialize_matrices():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
@@ -226,7 +219,6 @@ def test_fun_likelihood():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     S.set_de_bounds()
@@ -244,7 +236,6 @@ def test_likelihood():
     S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
-    S.nat_to_cod_init()
     S.set_theta_values()
     S.initialize_matrices()
     S.build_Psi()

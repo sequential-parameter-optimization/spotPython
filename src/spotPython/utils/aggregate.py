@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def aggregate_mean_var(X, y, sort=False):
+def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray):
     """
     Aggregate array to mean.
 
@@ -12,9 +12,12 @@ def aggregate_mean_var(X, y, sort=False):
         sort (bool): Whether to sort the resulting DataFrame by the group keys.
 
     Returns:
-        (numpy.ndarray): aggregated `X` values, shape `(n-m, k)`, if `m` duplicates in `X`.
-        (numpy.ndarray): aggregated (mean per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
-        (numpy.ndarray): aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
+        (numpy.ndarray):
+            aggregated `X` values, shape `(n-m, k)`, if `m` duplicates in `X`.
+        (numpy.ndarray):
+            aggregated (mean per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
+        (numpy.ndarray):
+            aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
 
     Examples:
         >>> X = np.array([[1, 2], [3, 4], [1, 2]])
@@ -51,15 +54,7 @@ def aggregate_mean_var(X, y, sort=False):
 
 def get_ranks(x):
     """
-    Returns a numpy array containing ranks of numbers within an input numpy array x:
-
-    Examples:
-
-    get_ranks([2, 1])
-    [1, 0]
-
-    get_ranks([20, 10, 100])
-    [1, 0, 2]
+    Returns a numpy array containing ranks of numbers within an input numpy array x.
 
     Args:
         x (numpy.ndarray): numpy array
@@ -67,6 +62,11 @@ def get_ranks(x):
     Returns:
         (numpy.ndarray): ranks
 
+    Examples:
+        >>> get_ranks([2, 1])
+            [1, 0]
+        >>> get_ranks([20, 10, 100])
+            [1, 0, 2]
     """
     ts = x.argsort()
     ranks = np.empty_like(ts)

@@ -99,7 +99,7 @@ def test_set_de_bounds():
     S.num_mask = array(list(map(lambda x: x == "num", S.var_type)))
     S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
 
-    S.nat_to_cod_init()
+    S.initialize_variables(nat_X, nat_y)
     S.theta = zeros(S.n_theta)
     # TODO: Currently not used:
     S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)
