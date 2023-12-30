@@ -233,7 +233,7 @@ def test_likelihood():
     nat_y = np.array([5, 10])
     n=2
     p=1
-    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+    S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
     S.initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()

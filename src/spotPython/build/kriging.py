@@ -66,8 +66,6 @@ class Kriging(surrogates):
             Surrogate name
         seed (int):
             Random seed.
-        use_cod_y (bool):
-            Use coded y values.
         sigma (float):
             Kriging sigma.
         gen (method):
@@ -80,12 +78,13 @@ class Kriging(surrogates):
             min p value. Default: 1.
         max_p (float):
             max p value. Default: 2.
+        theta_init_zero (bool):
+            Initialize theta with zero. Default: True.
     """
     def __init__(
             self: object,
             noise: bool = False,
             var_type: List[str] = ["num"],
-            use_cod_y: bool = False,
             name: str = "kriging",
             seed: int = 124,
             model_optimizer=None,
@@ -94,6 +93,7 @@ class Kriging(surrogates):
             max_theta: float = 2,
             n_theta: int = 1,
             n_p: int = 1,
+            theta_init_zero: bool = True,
             optim_p: bool = False,
             log_level: int = 50,
             spot_writer=None,
@@ -108,7 +108,6 @@ class Kriging(surrogates):
             var_type (List[str]):
                 Variable type. Can be either "num" (numerical) or "factor" (factor).
                 Defaults to ["num"].
-            use_cod_y (bool): Use coded y values (instead of natural one). Defaults to False.
             name (str): Surrogate name. Defaults to "kriging".
             seed (int): Random seed. Defaults to 124.
             model_optimizer : Optimizer on the surrogate. If None, differential_evolution is selected.
@@ -116,6 +115,7 @@ class Kriging(surrogates):
             min_theta (float): Min log10 theta value. Defaults to -3.
             max_theta (float): Max log10 theta value. Defaults to 2.
             n_theta (int): Number of theta values. Defaults to 1.
+            theta_init_zero (bool): Initialize theta with zero. Defaults to True.
             n_p (int): Number of p values. Defaults to 1.
             optim_p (bool): Determines whether p should be optimized.
             log_level (int): Logging level, e.g., 20 is "INFO". Defaults to 50 ("CRITICAL").
@@ -161,7 +161,6 @@ class Kriging(surrogates):
 
         self.noise = noise
         self.var_type = var_type
-        self.use_cod_y = use_cod_y
         self.name = name
         self.seed = seed
         self.log_level = log_level
@@ -179,6 +178,7 @@ class Kriging(surrogates):
         self.n_theta = n_theta
         self.n_p = n_p
         self.optim_p = optim_p
+        self.theta_init_zero = theta_init_zero
         # Psi matrix condition:
         self.cnd_Psi = 0
         self.inf_Psi = False
@@ -527,7 +527,6 @@ class Kriging(surrogates):
             array([1, 2])
 
         """
-        # Since 0.8.0,  coding is handled by spot()
         self.nat_X = copy.deepcopy(nat_X)
         self.nat_y = copy.deepcopy(nat_y)
         self.n = self.nat_X.shape[0]
@@ -535,8 +534,6 @@ class Kriging(surrogates):
 
         self.min_X = min(self.nat_X, axis=0)
         self.max_X = max(self.nat_X, axis=0)
-        self.min_y = min(self.nat_y)
-        self.max_y = max(self.nat_y)
 
         Z = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
         # aggregated y values:
@@ -620,9 +617,10 @@ class Kriging(surrogates):
         if self.n_theta > self.k:
             self.n_theta = self.k
             logger.warning("More theta values than dimensions. `n_theta` set to `k`.")
-        self.theta: List[float] = zeros(self.n_theta)
-        # TODO: Currently not used:
-        self.x0_theta: List[float] = ones((self.n_theta,)) * self.n / (100 * self.k)
+        if self.theta_init_zero:
+            self.theta: List[float] = zeros(self.n_theta)
+        else:
+            self.theta: List[float] = ones((self.n_theta,)) * self.n / (100 * self.k)
 
     def initialize_matrices(self) -> None:
         """
@@ -923,7 +921,7 @@ class Kriging(surrogates):
                 nat_y = np.array([5, 10])
                 n=2
                 p=1
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
@@ -983,13 +981,6 @@ class Kriging(surrogates):
         if self.k == 1:
             # TODO: Improve plot (add conf. interval etc.)
             fig = pylab.figure(figsize=(9, 6))
-            # t1 = array(arange(0.0, 1.0, 0.01))
-            # y1 = array([self.predict(array([x]), return_val="y") for x in t1])
-            # plt.figure()
-            # plt.plot(t1, y1, "k")
-            # if show:
-            #     plt.show()
-            #
             n_grid = 100
             x = linspace(
                 self.min_X[0], self.max_X[0], num=n_grid
@@ -1075,7 +1066,6 @@ class Kriging(surrogates):
                 and expected improvement if return_val is "all".
 
         Examples:
-
             >>> from spotPython.build.kriging import Kriging
             >>> from numpy import array
             >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
@@ -1109,58 +1099,6 @@ class Kriging(surrogates):
             return -1.0 * ei
         else:
             return y, s, -1.0 * ei
-
-    def build_psi_vec(self, cod_x: ndarray) -> None:
-        """
-        Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,
-        `regression_predict_coded`. Modifies `self.psi`.
-
-        Args:
-            self (object):
-                The Kriging object.
-            cod_x (ndarray):
-                point to calculate psi
-
-        Returns:
-            None
-
-        Examples:
-
-            >>> from spotPython.build.kriging import Kriging
-            >>> from numpy import array
-            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
-            >>> y = array([0.0, 0.01, 0.04])
-            >>> k = Kriging(X, y)
-            >>> cod_x = array([0.3, 0.3])
-            >>> build_psi_vec(cod_x)
-
-        """
-        self.psi = zeros((self.n))
-        # theta = self.theta  # TODO:
-        theta = power(10.0, self.theta)
-        if self.n_theta == 1:
-            theta = theta * ones(self.k)
-        try:
-            D = zeros((self.n))
-            if self.ordered_mask.any():
-                X_ordered = self.nat_X[:, self.ordered_mask]
-                x_ordered = cod_x[self.ordered_mask]
-                D = cdist(x_ordered.reshape(-1, sum(self.ordered_mask)),
-                          X_ordered.reshape(-1, sum(self.ordered_mask)),
-                          metric='sqeuclidean',
-                          out=None,
-                          w=theta[self.ordered_mask])
-            if self.factor_mask.any():
-                X_factor = self.nat_X[:, self.factor_mask]
-                x_factor = cod_x[self.factor_mask]
-                D = (D + cdist(x_factor.reshape(-1, sum(self.factor_mask)),
-                               X_factor.reshape(-1, sum(self.factor_mask)),
-                               metric='hamming',
-                               out=None,
-                               w=theta[self.factor_mask]))
-            self.psi = exp(-D).T
-        except LinAlgError as err:
-            print(f"Building psi failed:\n {self.psi}. {err=}, {type(err)=}")
 
     def predict_coded(self, cod_x: np.ndarray) -> Tuple[float, float, float]:
         """
@@ -1205,6 +1143,57 @@ class Kriging(surrogates):
         SSqr = power(abs(SSqr[0]), 0.5)[0]
         EI = self.exp_imp(y0=f[0], s0=SSqr)
         return f[0], SSqr, EI
+
+    def build_psi_vec(self, cod_x: ndarray) -> None:
+        """
+        Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,
+        `regression_predict_coded`. Modifies `self.psi`.
+
+        Args:
+            self (object):
+                The Kriging object.
+            cod_x (ndarray):
+                point to calculate psi
+
+        Returns:
+            None
+
+        Examples:
+
+            >>> from spotPython.build.kriging import Kriging
+            >>> from numpy import array
+            >>> X = array([[0.0, 0.0], [0.1, 0.1], [0.2, 0.2]])
+            >>> y = array([0.0, 0.01, 0.04])
+            >>> k = Kriging(X, y)
+            >>> cod_x = array([0.3, 0.3])
+            >>> build_psi_vec(cod_x)
+
+        """
+        self.psi = zeros((self.n))
+        theta = power(10.0, self.theta)
+        if self.n_theta == 1:
+            theta = theta * ones(self.k)
+        try:
+            D = zeros((self.n))
+            if self.ordered_mask.any():
+                X_ordered = self.nat_X[:, self.ordered_mask]
+                x_ordered = cod_x[self.ordered_mask]
+                D = cdist(x_ordered.reshape(-1, sum(self.ordered_mask)),
+                          X_ordered.reshape(-1, sum(self.ordered_mask)),
+                          metric='sqeuclidean',
+                          out=None,
+                          w=theta[self.ordered_mask])
+            if self.factor_mask.any():
+                X_factor = self.nat_X[:, self.factor_mask]
+                x_factor = cod_x[self.factor_mask]
+                D = (D + cdist(x_factor.reshape(-1, sum(self.factor_mask)),
+                               X_factor.reshape(-1, sum(self.factor_mask)),
+                               metric='hamming',
+                               out=None,
+                               w=theta[self.factor_mask]))
+            self.psi = exp(-D).T
+        except LinAlgError as err:
+            print(f"Building psi failed:\n {self.psi}. {err=}, {type(err)=}")
 
     def weighted_exp_imp(self, cod_x: np.ndarray, w: float) -> float:
         """
