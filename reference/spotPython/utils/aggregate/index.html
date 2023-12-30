@@ -3117,7 +3117,10 @@
 <span class="normal">46</span>
 <span class="normal">47</span>
 <span class="normal">48</span>
-<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aggregate_mean_var</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aggregate_mean_var</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Aggregate array to mean.</span>
 
@@ -3127,9 +3130,12 @@
 <span class="sd">        sort (bool): Whether to sort the resulting DataFrame by the group keys.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (numpy.ndarray): aggregated `X` values, shape `(n-m, k)`, if `m` duplicates in `X`.</span>
-<span class="sd">        (numpy.ndarray): aggregated (mean per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.</span>
-<span class="sd">        (numpy.ndarray): aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.</span>
+<span class="sd">        (numpy.ndarray):</span>
+<span class="sd">            aggregated `X` values, shape `(n-m, k)`, if `m` duplicates in `X`.</span>
+<span class="sd">        (numpy.ndarray):</span>
+<span class="sd">            aggregated (mean per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.</span>
+<span class="sd">        (numpy.ndarray):</span>
+<span class="sd">            aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; X = np.array([[1, 2], [3, 4], [1, 2]])</span>
@@ -3182,12 +3188,7 @@
 
   <div class="doc doc-contents ">
   
-      <p>Returns a numpy array containing ranks of numbers within an input numpy array x:</p>
-<p>Examples:</p>
-<p>get_ranks([2, 1])
-[1, 0]</p>
-<p>get_ranks([20, 10, 100])
-[1, 0, 2]</p>
+      <p>Returns a numpy array containing ranks of numbers within an input numpy array x.</p>
 
 
 
@@ -3243,12 +3244,18 @@
     </tbody>
   </table>
 
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">get_ranks</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="go">    [1, 0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_ranks</span><span class="p">([</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+<span class="go">    [1, 0, 2]</span>
+</code></pre></div>
+
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/aggregate.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">55</span>
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
@@ -3269,15 +3276,7 @@
 <span class="normal">73</span>
 <span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ranks</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns a numpy array containing ranks of numbers within an input numpy array x:</span>
-
-<span class="sd">    Examples:</span>
-
-<span class="sd">    get_ranks([2, 1])</span>
-<span class="sd">    [1, 0]</span>
-
-<span class="sd">    get_ranks([20, 10, 100])</span>
-<span class="sd">    [1, 0, 2]</span>
+<span class="sd">    Returns a numpy array containing ranks of numbers within an input numpy array x.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (numpy.ndarray): numpy array</span>
@@ -3285,6 +3284,11 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        (numpy.ndarray): ranks</span>
 
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; get_ranks([2, 1])</span>
+<span class="sd">            [1, 0]</span>
+<span class="sd">        &gt;&gt;&gt; get_ranks([20, 10, 100])</span>
+<span class="sd">            [1, 0, 2]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ts</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
     <span class="n">ranks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
