@@ -3588,44 +3588,50 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">inf</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpy.spot_setup</span> <span class="kn">import</span> <span class="n">Spot</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">objective_function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">spot</span> <span class="o">=</span> <span class="n">Spot</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">objective_function</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">fun_evals</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">fun_repeats</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">max_time</span><span class="o">=</span><span class="n">inf</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">tolerance_x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">ocba_delta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">var_type</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">,</span> <span class="s2">&quot;num&quot;</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">var_name</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">infill_criterion</span><span class="o">=</span><span class="s2">&quot;ei&quot;</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">n_points</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">log_level</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">show_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">show_progress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">design</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">design_control</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;init_size&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;repeats&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">surrogate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">surrogate_control</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;model_optimizer&quot;</span><span class="p">:</span> <span class="s2">&quot;differential_evolution&quot;</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;model_fun_evals&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;min_theta&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">3.</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;max_theta&quot;</span><span class="p">:</span> <span class="mf">3.</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;n_theta&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;theta_init_zero&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;n_p&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;optim_p&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;var_type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">,</span> <span class="s2">&quot;num&quot;</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>                               <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="mi">124</span><span class="p">,},</span>
-<span class="gp">&gt;&gt;&gt; </span>            <span class="n">optimizer_control</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;max_iter&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">spot</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="go">    from math import inf</span>
+<span class="go">    from spotPython.spot import spot</span>
+<span class="go">    def objective_function(X, fun_control=None):</span>
+<span class="go">        if not isinstance(X, np.ndarray):</span>
+<span class="go">            X = np.array(X)</span>
+<span class="go">        if X.shape[1] != 2:</span>
+<span class="go">            raise Exception</span>
+<span class="go">        x0 = X[:, 0]</span>
+<span class="go">        x1 = X[:, 1]</span>
+<span class="go">        y = x0**2 + 10*x1**2</span>
+<span class="go">        return y</span>
+<span class="go">    lower = np.array([0, 0])</span>
+<span class="go">    upper = np.array([10, 10])</span>
+<span class="go">    spot = spot.Spot(fun=objective_function,</span>
+<span class="go">                lower=lower,</span>
+<span class="go">                upper=upper,</span>
+<span class="go">                fun_evals=8,</span>
+<span class="go">                fun_repeats=1,</span>
+<span class="go">                max_time=inf,</span>
+<span class="go">                noise=False,</span>
+<span class="go">                tolerance_x=0,</span>
+<span class="go">                ocba_delta=0,</span>
+<span class="go">                var_type=[&quot;num&quot;, &quot;num&quot;],</span>
+<span class="go">                infill_criterion=&quot;ei&quot;,</span>
+<span class="go">                n_points=1,</span>
+<span class="go">                seed=123,</span>
+<span class="go">                log_level=20,</span>
+<span class="go">                show_models=False,</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control={&quot;init_size&quot;: 5, &quot;repeats&quot;: 1},</span>
+<span class="go">                surrogate_control={&quot;model_fun_evals&quot;: 1000,</span>
+<span class="go">                                &quot;min_theta&quot;: -3.,</span>
+<span class="go">                                &quot;max_theta&quot;: 3.,</span>
+<span class="go">                                &quot;n_theta&quot;: 2,</span>
+<span class="go">                                &quot;theta_init_zero&quot;: True,</span>
+<span class="go">                                &quot;n_p&quot;: 1,</span>
+<span class="go">                                &quot;optim_p&quot;: False,</span>
+<span class="go">                                &quot;var_type&quot;: [&quot;num&quot;, &quot;num&quot;],</span>
+<span class="go">                                &quot;seed&quot;: 124,},</span>
+<span class="go">                optimizer_control={&quot;max_iter&quot;: 1000})</span>
+<span class="go">    spot.run()</span>
+<span class="go">    spot.plot_progress()</span>
+<span class="go">    spot.plot_contour(i=0, j=1)</span>
+<span class="go">    spot.plot_importance()</span>
 </code></pre></div>
 
             <details class="quote">
@@ -4648,7 +4654,13 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1061</span>
 <span class="normal">1062</span>
 <span class="normal">1063</span>
-<span class="normal">1064</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -4742,44 +4754,50 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        &gt;&gt;&gt; from math import inf</span>
-<span class="sd">        &gt;&gt;&gt; from spotpy.spot_setup import Spot</span>
-<span class="sd">        &gt;&gt;&gt; def objective_function(x):</span>
-<span class="sd">        &gt;&gt;&gt;     return x[0]**2 + x[1]**2</span>
-<span class="sd">        &gt;&gt;&gt; lower = np.array([0, 0])</span>
-<span class="sd">        &gt;&gt;&gt; upper = np.array([10, 10])</span>
-<span class="sd">        &gt;&gt;&gt; spot = Spot(fun=objective_function,</span>
-<span class="sd">        &gt;&gt;&gt;             lower=lower,</span>
-<span class="sd">        &gt;&gt;&gt;             upper=upper,</span>
-<span class="sd">        &gt;&gt;&gt;             fun_evals=100,</span>
-<span class="sd">        &gt;&gt;&gt;             fun_repeats=1,</span>
-<span class="sd">        &gt;&gt;&gt;             max_time=inf,</span>
-<span class="sd">        &gt;&gt;&gt;             noise=False,</span>
-<span class="sd">        &gt;&gt;&gt;             tolerance_x=0,</span>
-<span class="sd">        &gt;&gt;&gt;             ocba_delta=0,</span>
-<span class="sd">        &gt;&gt;&gt;             var_type=[&quot;num&quot;, &quot;num&quot;],</span>
-<span class="sd">        &gt;&gt;&gt;             var_name=[&quot;x1&quot;, &quot;x2&quot;],</span>
-<span class="sd">        &gt;&gt;&gt;             infill_criterion=&quot;ei&quot;,</span>
-<span class="sd">        &gt;&gt;&gt;             n_points=10,</span>
-<span class="sd">        &gt;&gt;&gt;             seed=123,</span>
-<span class="sd">        &gt;&gt;&gt;             log_level=20,</span>
-<span class="sd">        &gt;&gt;&gt;             show_models=False,</span>
-<span class="sd">        &gt;&gt;&gt;             show_progress=True,</span>
-<span class="sd">        &gt;&gt;&gt;             design=None,</span>
-<span class="sd">        &gt;&gt;&gt;             design_control={&quot;init_size&quot;: 10, &quot;repeats&quot;: 1},</span>
-<span class="sd">        &gt;&gt;&gt;             surrogate=None,</span>
-<span class="sd">        &gt;&gt;&gt;             surrogate_control={&quot;model_optimizer&quot;: &quot;differential_evolution&quot;,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;model_fun_evals&quot;: None,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;min_theta&quot;: -3.,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;max_theta&quot;: 3.,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;n_theta&quot;: 1,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;theta_init_zero&quot;: True,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;n_p&quot;: 1,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;optim_p&quot;: False,</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;var_type&quot;: [&quot;num&quot;, &quot;num&quot;],</span>
-<span class="sd">        &gt;&gt;&gt;                                &quot;seed&quot;: 124,},</span>
-<span class="sd">        &gt;&gt;&gt;             optimizer_control={&quot;max_iter&quot;: 1000})</span>
-<span class="sd">        &gt;&gt;&gt; spot.run()</span>
+<span class="sd">            from math import inf</span>
+<span class="sd">            from spotPython.spot import spot</span>
+<span class="sd">            def objective_function(X, fun_control=None):</span>
+<span class="sd">                if not isinstance(X, np.ndarray):</span>
+<span class="sd">                    X = np.array(X)</span>
+<span class="sd">                if X.shape[1] != 2:</span>
+<span class="sd">                    raise Exception</span>
+<span class="sd">                x0 = X[:, 0]</span>
+<span class="sd">                x1 = X[:, 1]</span>
+<span class="sd">                y = x0**2 + 10*x1**2</span>
+<span class="sd">                return y</span>
+<span class="sd">            lower = np.array([0, 0])</span>
+<span class="sd">            upper = np.array([10, 10])</span>
+<span class="sd">            spot = spot.Spot(fun=objective_function,</span>
+<span class="sd">                        lower=lower,</span>
+<span class="sd">                        upper=upper,</span>
+<span class="sd">                        fun_evals=8,</span>
+<span class="sd">                        fun_repeats=1,</span>
+<span class="sd">                        max_time=inf,</span>
+<span class="sd">                        noise=False,</span>
+<span class="sd">                        tolerance_x=0,</span>
+<span class="sd">                        ocba_delta=0,</span>
+<span class="sd">                        var_type=[&quot;num&quot;, &quot;num&quot;],</span>
+<span class="sd">                        infill_criterion=&quot;ei&quot;,</span>
+<span class="sd">                        n_points=1,</span>
+<span class="sd">                        seed=123,</span>
+<span class="sd">                        log_level=20,</span>
+<span class="sd">                        show_models=False,</span>
+<span class="sd">                        show_progress=True,</span>
+<span class="sd">                        design_control={&quot;init_size&quot;: 5, &quot;repeats&quot;: 1},</span>
+<span class="sd">                        surrogate_control={&quot;model_fun_evals&quot;: 1000,</span>
+<span class="sd">                                        &quot;min_theta&quot;: -3.,</span>
+<span class="sd">                                        &quot;max_theta&quot;: 3.,</span>
+<span class="sd">                                        &quot;n_theta&quot;: 2,</span>
+<span class="sd">                                        &quot;theta_init_zero&quot;: True,</span>
+<span class="sd">                                        &quot;n_p&quot;: 1,</span>
+<span class="sd">                                        &quot;optim_p&quot;: False,</span>
+<span class="sd">                                        &quot;var_type&quot;: [&quot;num&quot;, &quot;num&quot;],</span>
+<span class="sd">                                        &quot;seed&quot;: 124,},</span>
+<span class="sd">                        optimizer_control={&quot;max_iter&quot;: 1000})</span>
+<span class="sd">            spot.run()</span>
+<span class="sd">            spot.plot_progress()</span>
+<span class="sd">            spot.plot_contour(i=0, j=1)</span>
+<span class="sd">            spot.plot_importance()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -5818,13 +5836,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">839</span>
-<span class="normal">840</span>
-<span class="normal">841</span>
-<span class="normal">842</span>
-<span class="normal">843</span>
-<span class="normal">844</span>
-<span class="normal">845</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">845</span>
 <span class="normal">846</span>
 <span class="normal">847</span>
 <span class="normal">848</span>
@@ -5844,7 +5856,13 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">862</span>
 <span class="normal">863</span>
 <span class="normal">864</span>
-<span class="normal">865</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.</span>
 
@@ -5919,13 +5937,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">948</span>
-<span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span>
-<span class="normal">952</span>
-<span class="normal">953</span>
-<span class="normal">954</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">954</span>
 <span class="normal">955</span>
 <span class="normal">956</span>
 <span class="normal">957</span>
@@ -5938,7 +5950,13 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">964</span>
 <span class="normal">965</span>
 <span class="normal">966</span>
-<span class="normal">967</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">967</span>
+<span class="normal">968</span>
+<span class="normal">969</span>
+<span class="normal">970</span>
+<span class="normal">971</span>
+<span class="normal">972</span>
+<span class="normal">973</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Returns:</span>
@@ -6078,13 +6096,7 @@ df
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">331</span>
 <span class="normal">332</span>
 <span class="normal">333</span>
 <span class="normal">334</span>
@@ -6158,7 +6170,13 @@ df
 <span class="normal">402</span>
 <span class="normal">403</span>
 <span class="normal">404</span>
-<span class="normal">405</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_spot_attributes_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_spot_attributes_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all attributes of the spot object as a pandas dataframe.</span>
 
 <span class="sd">    Returns:</span>
@@ -6327,13 +6345,7 @@ infill criterion is calculated in natural units.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">682</span>
-<span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span>
-<span class="normal">686</span>
-<span class="normal">687</span>
-<span class="normal">688</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">688</span>
 <span class="normal">689</span>
 <span class="normal">690</span>
 <span class="normal">691</span>
@@ -6351,7 +6363,13 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">703</span>
 <span class="normal">704</span>
 <span class="normal">705</span>
-<span class="normal">706</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,</span>
 <span class="sd">    if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`</span>
@@ -6454,13 +6472,7 @@ infill criterion is calculated in natural units.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1036</span>
-<span class="normal">1037</span>
-<span class="normal">1038</span>
-<span class="normal">1039</span>
-<span class="normal">1040</span>
-<span class="normal">1041</span>
-<span class="normal">1042</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1042</span>
 <span class="normal">1043</span>
 <span class="normal">1044</span>
 <span class="normal">1045</span>
@@ -6482,7 +6494,13 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">1061</span>
 <span class="normal">1062</span>
 <span class="normal">1063</span>
-<span class="normal">1064</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallel plot.</span>
 
@@ -6701,13 +6719,7 @@ infill criterion is calculated in natural units.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">867</span>
-<span class="normal">868</span>
-<span class="normal">869</span>
-<span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">873</span>
 <span class="normal">874</span>
 <span class="normal">875</span>
 <span class="normal">876</span>
@@ -6766,7 +6778,13 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">929</span>
 <span class="normal">930</span>
 <span class="normal">931</span>
-<span class="normal">932</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
+<span class="normal">932</span>
+<span class="normal">933</span>
+<span class="normal">934</span>
+<span class="normal">935</span>
+<span class="normal">936</span>
+<span class="normal">937</span>
+<span class="normal">938</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the contour of any dimension.</span>
@@ -6952,13 +6970,7 @@ infill criterion is calculated in natural units.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1004</span>
-<span class="normal">1005</span>
-<span class="normal">1006</span>
-<span class="normal">1007</span>
-<span class="normal">1008</span>
-<span class="normal">1009</span>
-<span class="normal">1010</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1010</span>
 <span class="normal">1011</span>
 <span class="normal">1012</span>
 <span class="normal">1013</span>
@@ -6982,7 +6994,13 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">1031</span>
 <span class="normal">1032</span>
 <span class="normal">1033</span>
-<span class="normal">1034</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1034</span>
+<span class="normal">1035</span>
+<span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the importance of each variable.</span>
 
 <span class="sd">    Args:</span>
@@ -7095,13 +7113,7 @@ infill criterion is calculated in natural units.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">754</span>
-<span class="normal">755</span>
-<span class="normal">756</span>
-<span class="normal">757</span>
-<span class="normal">758</span>
-<span class="normal">759</span>
-<span class="normal">760</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">760</span>
 <span class="normal">761</span>
 <span class="normal">762</span>
 <span class="normal">763</span>
@@ -7142,7 +7154,13 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">798</span>
 <span class="normal">799</span>
 <span class="normal">800</span>
-<span class="normal">801</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the model fit for 1-dim objective functions.</span>
 
@@ -7325,13 +7343,7 @@ and the subsequent points as red dots connected by a line.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">708</span>
-<span class="normal">709</span>
-<span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
-<span class="normal">713</span>
-<span class="normal">714</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">714</span>
 <span class="normal">715</span>
 <span class="normal">716</span>
 <span class="normal">717</span>
@@ -7369,7 +7381,13 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">749</span>
 <span class="normal">750</span>
 <span class="normal">751</span>
-<span class="normal">752</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;plot.png&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ko&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;ro-&quot;</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the progress of the hyperparameter tuning (optimization).</span>
@@ -7506,13 +7524,7 @@ and the subsequent points as red dots connected by a line.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 969</span>
-<span class="normal"> 970</span>
-<span class="normal"> 971</span>
-<span class="normal"> 972</span>
-<span class="normal"> 973</span>
-<span class="normal"> 974</span>
-<span class="normal"> 975</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 975</span>
 <span class="normal"> 976</span>
 <span class="normal"> 977</span>
 <span class="normal"> 978</span>
@@ -7539,7 +7551,13 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal"> 999</span>
 <span class="normal">1000</span>
 <span class="normal">1001</span>
-<span class="normal">1002</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
+<span class="normal">1007</span>
+<span class="normal">1008</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Args:</span>
@@ -7660,13 +7678,7 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">803</span>
-<span class="normal">804</span>
-<span class="normal">805</span>
-<span class="normal">806</span>
-<span class="normal">807</span>
-<span class="normal">808</span>
-<span class="normal">809</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">809</span>
 <span class="normal">810</span>
 <span class="normal">811</span>
 <span class="normal">812</span>
@@ -7694,7 +7706,13 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 <span class="normal">834</span>
 <span class="normal">835</span>
 <span class="normal">836</span>
-<span class="normal">837</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print results from the run:</span>
 <span class="sd">        1. min y</span>
 <span class="sd">        2. min X</span>
@@ -7783,13 +7801,7 @@ The method <code>infill()</code> is used as the objective function.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span>
-<span class="normal">654</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">654</span>
 <span class="normal">655</span>
 <span class="normal">656</span>
 <span class="normal">657</span>
@@ -7815,7 +7827,13 @@ The method <code>infill()</code> is used as the objective function.</p>
 <span class="normal">677</span>
 <span class="normal">678</span>
 <span class="normal">679</span>
-<span class="normal">680</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute `n_points` new infill points in natural units.</span>
 <span class="sd">    The optimizer searches in the ranges from `lower_j` to `upper_j`.</span>
@@ -7928,13 +7946,7 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">585</span>
 <span class="normal">586</span>
 <span class="normal">587</span>
 <span class="normal">588</span>
@@ -7955,7 +7967,13 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 <span class="normal">603</span>
 <span class="normal">604</span>
 <span class="normal">605</span>
-<span class="normal">606</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`</span>
 <span class="sd">    If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`</span>
