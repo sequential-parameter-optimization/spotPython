@@ -137,44 +137,50 @@ class Spot:
 
     Examples:
         >>> import numpy as np
-        >>> from math import inf
-        >>> from spotpy.spot_setup import Spot
-        >>> def objective_function(x):
-        >>>     return x[0]**2 + x[1]**2
-        >>> lower = np.array([0, 0])
-        >>> upper = np.array([10, 10])
-        >>> spot = Spot(fun=objective_function,
-        >>>             lower=lower,
-        >>>             upper=upper,
-        >>>             fun_evals=100,
-        >>>             fun_repeats=1,
-        >>>             max_time=inf,
-        >>>             noise=False,
-        >>>             tolerance_x=0,
-        >>>             ocba_delta=0,
-        >>>             var_type=["num", "num"],
-        >>>             var_name=["x1", "x2"],
-        >>>             infill_criterion="ei",
-        >>>             n_points=10,
-        >>>             seed=123,
-        >>>             log_level=20,
-        >>>             show_models=False,
-        >>>             show_progress=True,
-        >>>             design=None,
-        >>>             design_control={"init_size": 10, "repeats": 1},
-        >>>             surrogate=None,
-        >>>             surrogate_control={"model_optimizer": "differential_evolution",
-        >>>                                "model_fun_evals": None,
-        >>>                                "min_theta": -3.,
-        >>>                                "max_theta": 3.,
-        >>>                                "n_theta": 1,
-        >>>                                "theta_init_zero": True,
-        >>>                                "n_p": 1,
-        >>>                                "optim_p": False,
-        >>>                                "var_type": ["num", "num"],
-        >>>                                "seed": 124,},
-        >>>             optimizer_control={"max_iter": 1000})
-        >>> spot.run()
+            from math import inf
+            from spotPython.spot import spot
+            def objective_function(X, fun_control=None):
+                if not isinstance(X, np.ndarray):
+                    X = np.array(X)
+                if X.shape[1] != 2:
+                    raise Exception
+                x0 = X[:, 0]
+                x1 = X[:, 1]
+                y = x0**2 + 10*x1**2
+                return y
+            lower = np.array([0, 0])
+            upper = np.array([10, 10])
+            spot = spot.Spot(fun=objective_function,
+                        lower=lower,
+                        upper=upper,
+                        fun_evals=8,
+                        fun_repeats=1,
+                        max_time=inf,
+                        noise=False,
+                        tolerance_x=0,
+                        ocba_delta=0,
+                        var_type=["num", "num"],
+                        infill_criterion="ei",
+                        n_points=1,
+                        seed=123,
+                        log_level=20,
+                        show_models=False,
+                        show_progress=True,
+                        design_control={"init_size": 5, "repeats": 1},
+                        surrogate_control={"model_fun_evals": 1000,
+                                        "min_theta": -3.,
+                                        "max_theta": 3.,
+                                        "n_theta": 2,
+                                        "theta_init_zero": True,
+                                        "n_p": 1,
+                                        "optim_p": False,
+                                        "var_type": ["num", "num"],
+                                        "seed": 124,},
+                        optimizer_control={"max_iter": 1000})
+            spot.run()
+            spot.plot_progress()
+            spot.plot_contour(i=0, j=1)
+            spot.plot_importance()
     """
 
     def __str__(self):
