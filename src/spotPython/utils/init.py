@@ -82,7 +82,7 @@ def fun_control_init(
                 'writer': None}
     """
     # Setting the seed
-    L.seed_everything(42)
+    L.seed_everything(seed)
 
     # Path to the folder where the pretrained models are saved
     CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "runs/saved_models/")

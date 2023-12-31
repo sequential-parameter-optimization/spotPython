@@ -443,6 +443,63 @@ class Spot:
             return X
 
     def get_new_X0(self) -> np.array:
+        """
+        Get new design points.
+        Calls `suggest_new_X()` and repairs the new design points, e.g.,
+        by `repair_non_numeric()` and `selectNew()`.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (numpy.ndarray): new design points
+
+        Notes:
+            * self.design (object): an experimental design is used to generate new design points
+            if no new design points are found, a new experimental design is generated.
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                from spotPython.utils.init import fun_control_init
+                # number of initial points:
+                ni = 3
+                X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
+                fun = analytical().fun_sphere
+                fun_control = fun_control_init(
+                        sigma=0.0,
+                        seed=123,)
+                lower = np.array([-1, -1])
+                upper = np.array([1, 1])
+                design_control={"init_size": ni,
+                                "repeats": 1}
+                S = spot.Spot(fun=fun,
+                            noise=False,
+                            fun_repeats=1,
+                            n_points=10,
+                            ocba_delta=0,
+                            lower = lower,
+                            upper= upper,
+                            show_progress=True,
+                            design_control=design_control,
+                            fun_control=fun_control
+                )
+                S.initialize_design(X_start=X_start)
+                S.update_stats()
+                S.fit_surrogate()
+                X_ocba = None
+                X0 = S.get_new_X0()
+                assert X0.shape[0] == S.n_points
+                assert X0.shape[1] == S.lower.size
+                # assert new points are in the interval [lower, upper]
+                assert np.all(X0 >= S.lower)
+                assert np.all(X0 <= S.upper)
+                # print using 20 digits precision
+                np.set_printoptions(precision=20)
+                print(f"X0: {X0}")
+
+        """
         X0 = self.suggest_new_X()
         X0 = repair_non_numeric(X0, self.var_type)
         # (S-16) Duplicate Handling:
@@ -851,6 +908,7 @@ class Spot:
     def suggest_new_X(self) -> np.array:
         """
         Compute `n_points` new infill points in natural units.
+        These diffrent points are computed by the optimizer using increasing seed.
         The optimizer searches in the ranges from `lower_j` to `upper_j`.
         The method `infill()` is used as the objective function.
 
@@ -876,11 +934,11 @@ class Spot:
             "basinhopping": lambda: self.optimizer(func=self.infill, x0=self.min_X),
             "default": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds),
         }
-
         for i in range(self.n_points):
+            self.optimizer_control["seed"] = self.optimizer_control["seed"] + i
             result = optimizers.get(optimizer_name, optimizers["default"])()
             new_X[i][:] = result.x
-        return new_X
+        return np.unique(new_X, axis=0)
 
     def infill(self, x) -> float:
         """

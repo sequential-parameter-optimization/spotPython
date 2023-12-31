@@ -18,12 +18,19 @@ def selectNew(A: np.ndarray, X: np.ndarray, tolerance: float = 0) -> Tuple[np.nd
         (numpy.ndarray): array with `True` if value is new, otherwise `False`.
 
     Examples:
-        >>> from spotPython.utils.compare import selectNew
-            A = np.array([[1,2,3],[4,5,6]])
-            X = np.array([[1,2,3],[4,5,6]])
-            selectNew(A, X)
-            (array([], shape=(0, 3), dtype=int64), array([], dtype=bool))
-
+    >>> from spotPython.utils.compare import selectNew
+        import numpy as np
+        A = np.array([[1,2,3],[4,5,6]])
+        X = np.array([[1,2,3],[4,5,6]])
+        B, ind  = selectNew(A, X)
+        assert B.shape[0] == 0
+        assert np.equal(ind, np.array([False, False])).all()
+    >>> from spotPython.utils.compare import selectNew
+        A = np.array([[1,2,3],[4,5,7]])
+        X = np.array([[1,2,3],[4,5,6]])
+        B, ind  = selectNew(A, X)
+        assert B.shape[0] == 1
+        assert np.equal(ind, np.array([False, True])).all()
     """
     B = np.abs(A[:, None] - X)
     ind = np.any(np.all(B <= tolerance, axis=2), axis=1)
