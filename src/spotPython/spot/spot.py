@@ -13,6 +13,7 @@ from math import inf
 from math import isfinite
 import matplotlib.pyplot as plt
 from numpy import argmin
+
 from numpy import repeat
 from numpy import sqrt
 from numpy import spacing
@@ -500,17 +501,19 @@ class Spot:
                 print(f"X0: {X0}")
 
         """
+        # Try to generate self.fun_repeats new X0 points:
         X0 = self.suggest_new_X()
         X0 = repair_non_numeric(X0, self.var_type)
         # (S-16) Duplicate Handling:
         # Condition: select only X= that have min distance
         # to existing solutions
         X0, X0_ind = selectNew(A=X0, X=self.X, tolerance=self.tolerance_x)
-        logger.debug("XO values are new: %s %s", X0_ind, X0)
-        # 1. There are X0 that fullfil the condition.
-        # Note: The number of new X0 can be smaller than self.n_points!
         if X0.shape[0] > 0:
+            # 1. There are X0 that fullfil the condition.
+            # Note: The number of new X0 can be smaller than self.n_points!
+            logger.debug("XO values are new: %s %s", X0_ind, X0)
             return repeat(X0, self.fun_repeats, axis=0)
+            return X0
         # 2. No X0 found. Then generate self.n_points new solutions:
         else:
             self.design = spacefilling(k=self.k, seed=self.seed + self.counter)
