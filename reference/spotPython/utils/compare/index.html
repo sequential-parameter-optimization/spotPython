@@ -3030,14 +3030,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/compare.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
@@ -3047,7 +3040,14 @@
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_equal_in_lists</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_equal_in_lists</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">b</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Find equal values in two lists.</span>
 
 <span class="sd">    Args:</span>
@@ -3182,12 +3182,26 @@
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.compare</span> <span class="kn">import</span> <span class="n">selectNew</span>
-<span class="go">    A = np.array([[1,2,3],[4,5,6]])</span>
-<span class="go">    X = np.array([[1,2,3],[4,5,6]])</span>
-<span class="go">    selectNew(A, X)</span>
-<span class="go">    (array([], shape=(0, 3), dtype=int64), array([], dtype=bool))</span>
-</code></pre></div>
+    
+      <blockquote>
+<blockquote>
+<blockquote>
+<p>from spotPython.utils.compare import selectNew
+    import numpy as np
+    A = np.array([[1,2,3],[4,5,6]])
+    X = np.array([[1,2,3],[4,5,6]])
+    B, ind  = selectNew(A, X)
+    assert B.shape[0] == 0
+    assert np.equal(ind, np.array([False, False])).all()
+from spotPython.utils.compare import selectNew
+    A = np.array([[1,2,3],[4,5,7]])
+    X = np.array([[1,2,3],[4,5,6]])
+    B, ind  = selectNew(A, X)
+    assert B.shape[0] == 1
+    assert np.equal(ind, np.array([False, True])).all()</p>
+</blockquote>
+</blockquote>
+</blockquote>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/compare.py</code></summary>
@@ -3214,7 +3228,14 @@
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">selectNew</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">selectNew</span><span class="p">(</span><span class="n">A</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Select rows from A that are not in X.</span>
 
@@ -3228,12 +3249,19 @@
 <span class="sd">        (numpy.ndarray): array with `True` if value is new, otherwise `False`.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from spotPython.utils.compare import selectNew</span>
-<span class="sd">            A = np.array([[1,2,3],[4,5,6]])</span>
-<span class="sd">            X = np.array([[1,2,3],[4,5,6]])</span>
-<span class="sd">            selectNew(A, X)</span>
-<span class="sd">            (array([], shape=(0, 3), dtype=int64), array([], dtype=bool))</span>
-
+<span class="sd">    &gt;&gt;&gt; from spotPython.utils.compare import selectNew</span>
+<span class="sd">        import numpy as np</span>
+<span class="sd">        A = np.array([[1,2,3],[4,5,6]])</span>
+<span class="sd">        X = np.array([[1,2,3],[4,5,6]])</span>
+<span class="sd">        B, ind  = selectNew(A, X)</span>
+<span class="sd">        assert B.shape[0] == 0</span>
+<span class="sd">        assert np.equal(ind, np.array([False, False])).all()</span>
+<span class="sd">    &gt;&gt;&gt; from spotPython.utils.compare import selectNew</span>
+<span class="sd">        A = np.array([[1,2,3],[4,5,7]])</span>
+<span class="sd">        X = np.array([[1,2,3],[4,5,6]])</span>
+<span class="sd">        B, ind  = selectNew(A, X)</span>
+<span class="sd">        assert B.shape[0] == 1</span>
+<span class="sd">        assert np.equal(ind, np.array([False, True])).all()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">A</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">X</span><span class="p">)</span>
     <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">B</span> <span class="o">&lt;=</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
