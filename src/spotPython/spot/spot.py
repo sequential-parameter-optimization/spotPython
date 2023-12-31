@@ -479,7 +479,10 @@ class Spot:
     def run(self, X_start=None) -> Spot:
         self.initialize_design(X_start)
         # New: self.update_stats() moved here:
-        # self.update_stats()
+        # changed in 0.5.9:
+        self.update_stats()
+        # (S-4): Imputation:
+        # Not implemented yet.
         # (S-11) Surrogate Fit:
         self.fit_surrogate()
         # (S-5) Calling the spotLoop Function
@@ -504,18 +507,69 @@ class Spot:
         return self
 
     def initialize_design(self, X_start=None) -> None:
-        # (S-2) Initial Design:
-        X0 = self.generate_design(
-            size=self.design_control["init_size"],
-            repeats=self.design_control["repeats"],
-            lower=self.lower,
-            upper=self.upper,
-        )
+        """
+        Initialize design. Generate and evaluate initial design.
+        If `X_start` is not `None`, append it to the initial design.
+        Therefore, the design size is `init_size` + `X_start.shape[0]`.
+
+        Args:
+            self (object): Spot object
+            X_start (numpy.ndarray, optional): initial design. Defaults to None.
+
+        Returns:
+            (NoneType): None
+
+        Attributes:
+            self.X (numpy.ndarray): initial design
+            self.y (numpy.ndarray): initial design values
+
+        Note:
+            * If `X_start` is has the wrong shape, it is ignored.
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 7
+                # start point X_0
+                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+
+
+                fun = analytical().fun_sphere
+                lower = np.array([-1, -1])
+                upper = np.array([1, 1])
+                design_control={"init_size": ni}
+
+                S = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            show_progress=True,
+                            design_control=design_control,)
+                S.initialize_design(X_start=X_start)
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+        """
+        if self.design_control["init_size"] > 0:
+            X0 = self.generate_design(
+                size=self.design_control["init_size"],
+                repeats=self.design_control["repeats"],
+                lower=self.lower,
+                upper=self.upper,
+            )
         if X_start is not None:
+            if not isinstance(X_start, np.ndarray):
+                X_start = np.array(X_start)
+            X_start = np.atleast_2d(X_start)
             try:
-                X0 = append(X_start, X0, axis=0)
+                if self.design_control["init_size"] > 0:
+                    X0 = append(X_start, X0, axis=0)
+                else:
+                    X0 = X_start
             except ValueError:
                 logger.warning("X_start has wrong shape. Ignoring it.")
+        if X0.shape[0] == 0:
+            raise Exception("X0 has zero rows. Check design_control['init_size'] or X_start.")
         X0 = repair_non_numeric(X0, self.var_type)
         self.X = X0
         # (S-3): Eval initial design:
@@ -538,11 +592,6 @@ class Spot:
                 writer.flush()
         #
         self.X, self.y = remove_nan(self.X, self.y)
-        # self.update_stats() moved to run()!
-        # changed in 0.5.9:
-        self.update_stats()
-        # (S-4): Imputation:
-        # Not implemented yet.
 
     def should_continue(self, timeout_start) -> bool:
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
@@ -593,6 +642,16 @@ class Spot:
 
         Returns:
             (NoneType): None
+
+        Attributes:
+            self.min_y (float): minimum y value
+            self.min_X (numpy.ndarray): X value of the minimum y value
+            self.counter (int): number of function evaluations
+            self.mean_X (numpy.ndarray): mean X values
+            self.mean_y (numpy.ndarray): mean y values
+            self.var_y (numpy.ndarray): variance of y values
+            self.min_mean_y (float): minimum mean y value
+            self.min_mean_X (numpy.ndarray): X value of the minimum mean y value
 
         """
         self.min_y = min(self.y)
