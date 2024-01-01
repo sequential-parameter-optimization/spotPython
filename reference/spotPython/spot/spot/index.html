@@ -4989,7 +4989,12 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1325</span>
 <span class="normal">1326</span>
 <span class="normal">1327</span>
-<span class="normal">1328</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">1328</span>
+<span class="normal">1329</span>
+<span class="normal">1330</span>
+<span class="normal">1331</span>
+<span class="normal">1332</span>
+<span class="normal">1333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -5194,7 +5199,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="c1"># specified once:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Warning: All variable types forced to &#39;num&#39;.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;All variable types forced to &#39;num&#39;.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">infill_criterion</span> <span class="o">=</span> <span class="n">infill_criterion</span>
         <span class="c1"># Bounds</span>
         <span class="n">de_bounds</span> <span class="o">=</span> <span class="p">[]</span>
@@ -5694,14 +5699,19 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># OCBA (only if noise). Determination of the OCBA points depends on the</span>
         <span class="c1"># old X and y values.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;self.var_y &lt;= 0. OCBA points are not generated, because there are points with no variance information.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In update_design(): self.var_y: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">X_ocba</span> <span class="o">=</span> <span class="n">get_ocba_X</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">X_ocba</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Determine the new X0 values based on the old X and y values:</span>
         <span class="n">X0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_new_X0</span><span class="p">()</span>
         <span class="c1"># Append OCBA points to the new design points:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">X0</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">X_ocba</span><span class="p">,</span> <span class="n">X0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">X_all</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_all_dim_if_needed</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -6422,12 +6432,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1103</span>
-<span class="normal">1104</span>
-<span class="normal">1105</span>
-<span class="normal">1106</span>
-<span class="normal">1107</span>
-<span class="normal">1108</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1108</span>
 <span class="normal">1109</span>
 <span class="normal">1110</span>
 <span class="normal">1111</span>
@@ -6448,7 +6453,12 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1126</span>
 <span class="normal">1127</span>
 <span class="normal">1128</span>
-<span class="normal">1129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1129</span>
+<span class="normal">1130</span>
+<span class="normal">1131</span>
+<span class="normal">1132</span>
+<span class="normal">1133</span>
+<span class="normal">1134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.</span>
 
@@ -6587,12 +6597,7 @@ S.fit_surrogate()
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span>
-<span class="normal">778</span>
-<span class="normal">779</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">779</span>
 <span class="normal">780</span>
 <span class="normal">781</span>
 <span class="normal">782</span>
@@ -6632,7 +6637,12 @@ S.fit_surrogate()
 <span class="normal">816</span>
 <span class="normal">817</span>
 <span class="normal">818</span>
-<span class="normal">819</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_surrogate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_surrogate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit surrogate model. The surrogate model</span>
 <span class="sd">    is fitted to the data stored in `self.X` and `self.y`.</span>
@@ -6726,12 +6736,7 @@ S.fit_surrogate()
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1212</span>
-<span class="normal">1213</span>
-<span class="normal">1214</span>
-<span class="normal">1215</span>
-<span class="normal">1216</span>
-<span class="normal">1217</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1217</span>
 <span class="normal">1218</span>
 <span class="normal">1219</span>
 <span class="normal">1220</span>
@@ -6745,7 +6750,12 @@ S.fit_surrogate()
 <span class="normal">1228</span>
 <span class="normal">1229</span>
 <span class="normal">1230</span>
-<span class="normal">1231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1231</span>
+<span class="normal">1232</span>
+<span class="normal">1233</span>
+<span class="normal">1234</span>
+<span class="normal">1235</span>
+<span class="normal">1236</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Returns:</span>
@@ -7424,12 +7434,7 @@ infill criterion is calculated in natural units.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">946</span>
-<span class="normal">947</span>
-<span class="normal">948</span>
-<span class="normal">949</span>
-<span class="normal">950</span>
-<span class="normal">951</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">951</span>
 <span class="normal">952</span>
 <span class="normal">953</span>
 <span class="normal">954</span>
@@ -7448,7 +7453,12 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">967</span>
 <span class="normal">968</span>
 <span class="normal">969</span>
-<span class="normal">970</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">970</span>
+<span class="normal">971</span>
+<span class="normal">972</span>
+<span class="normal">973</span>
+<span class="normal">974</span>
+<span class="normal">975</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,</span>
 <span class="sd">    if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`</span>
@@ -7885,12 +7895,7 @@ print(f"S.y: {S.y}")
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1300</span>
-<span class="normal">1301</span>
-<span class="normal">1302</span>
-<span class="normal">1303</span>
-<span class="normal">1304</span>
-<span class="normal">1305</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1305</span>
 <span class="normal">1306</span>
 <span class="normal">1307</span>
 <span class="normal">1308</span>
@@ -7913,7 +7918,12 @@ print(f"S.y: {S.y}")
 <span class="normal">1325</span>
 <span class="normal">1326</span>
 <span class="normal">1327</span>
-<span class="normal">1328</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="normal">1328</span>
+<span class="normal">1329</span>
+<span class="normal">1330</span>
+<span class="normal">1331</span>
+<span class="normal">1332</span>
+<span class="normal">1333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallel plot.</span>
 
@@ -8132,12 +8142,7 @@ print(f"S.y: {S.y}")
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1131</span>
-<span class="normal">1132</span>
-<span class="normal">1133</span>
-<span class="normal">1134</span>
-<span class="normal">1135</span>
-<span class="normal">1136</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1136</span>
 <span class="normal">1137</span>
 <span class="normal">1138</span>
 <span class="normal">1139</span>
@@ -8197,7 +8202,12 @@ print(f"S.y: {S.y}")
 <span class="normal">1193</span>
 <span class="normal">1194</span>
 <span class="normal">1195</span>
-<span class="normal">1196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
+<span class="normal">1196</span>
+<span class="normal">1197</span>
+<span class="normal">1198</span>
+<span class="normal">1199</span>
+<span class="normal">1200</span>
+<span class="normal">1201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the contour of any dimension.</span>
@@ -8383,12 +8393,7 @@ print(f"S.y: {S.y}")
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1268</span>
-<span class="normal">1269</span>
-<span class="normal">1270</span>
-<span class="normal">1271</span>
-<span class="normal">1272</span>
-<span class="normal">1273</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1273</span>
 <span class="normal">1274</span>
 <span class="normal">1275</span>
 <span class="normal">1276</span>
@@ -8413,7 +8418,12 @@ print(f"S.y: {S.y}")
 <span class="normal">1295</span>
 <span class="normal">1296</span>
 <span class="normal">1297</span>
-<span class="normal">1298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1298</span>
+<span class="normal">1299</span>
+<span class="normal">1300</span>
+<span class="normal">1301</span>
+<span class="normal">1302</span>
+<span class="normal">1303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the importance of each variable.</span>
 
 <span class="sd">    Args:</span>
@@ -8526,12 +8536,7 @@ print(f"S.y: {S.y}")
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1018</span>
-<span class="normal">1019</span>
-<span class="normal">1020</span>
-<span class="normal">1021</span>
-<span class="normal">1022</span>
-<span class="normal">1023</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1023</span>
 <span class="normal">1024</span>
 <span class="normal">1025</span>
 <span class="normal">1026</span>
@@ -8573,7 +8578,12 @@ print(f"S.y: {S.y}")
 <span class="normal">1062</span>
 <span class="normal">1063</span>
 <span class="normal">1064</span>
-<span class="normal">1065</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
+<span class="normal">1067</span>
+<span class="normal">1068</span>
+<span class="normal">1069</span>
+<span class="normal">1070</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the model fit for 1-dim objective functions.</span>
 
@@ -8756,12 +8766,7 @@ and the subsequent points as red dots connected by a line.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 972</span>
-<span class="normal"> 973</span>
-<span class="normal"> 974</span>
-<span class="normal"> 975</span>
-<span class="normal"> 976</span>
-<span class="normal"> 977</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 977</span>
 <span class="normal"> 978</span>
 <span class="normal"> 979</span>
 <span class="normal"> 980</span>
@@ -8800,7 +8805,12 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">1013</span>
 <span class="normal">1014</span>
 <span class="normal">1015</span>
-<span class="normal">1016</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span>
+<span class="normal">1020</span>
+<span class="normal">1021</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;plot.png&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ko&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;ro-&quot;</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the progress of the hyperparameter tuning (optimization).</span>
@@ -8937,12 +8947,7 @@ and the subsequent points as red dots connected by a line.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1233</span>
-<span class="normal">1234</span>
-<span class="normal">1235</span>
-<span class="normal">1236</span>
-<span class="normal">1237</span>
-<span class="normal">1238</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1238</span>
 <span class="normal">1239</span>
 <span class="normal">1240</span>
 <span class="normal">1241</span>
@@ -8970,7 +8975,12 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">1263</span>
 <span class="normal">1264</span>
 <span class="normal">1265</span>
-<span class="normal">1266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1266</span>
+<span class="normal">1267</span>
+<span class="normal">1268</span>
+<span class="normal">1269</span>
+<span class="normal">1270</span>
+<span class="normal">1271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Args:</span>
@@ -9091,12 +9101,7 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1067</span>
-<span class="normal">1068</span>
-<span class="normal">1069</span>
-<span class="normal">1070</span>
-<span class="normal">1071</span>
-<span class="normal">1072</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1072</span>
 <span class="normal">1073</span>
 <span class="normal">1074</span>
 <span class="normal">1075</span>
@@ -9125,7 +9130,12 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 <span class="normal">1098</span>
 <span class="normal">1099</span>
 <span class="normal">1100</span>
-<span class="normal">1101</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">1101</span>
+<span class="normal">1102</span>
+<span class="normal">1103</span>
+<span class="normal">1104</span>
+<span class="normal">1105</span>
+<span class="normal">1106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print results from the run:</span>
 <span class="sd">        1. min y</span>
 <span class="sd">        2. min X</span>
@@ -9215,12 +9225,7 @@ The method <code>infill()</code> is used as the objective function.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">911</span>
-<span class="normal">912</span>
-<span class="normal">913</span>
-<span class="normal">914</span>
-<span class="normal">915</span>
-<span class="normal">916</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">916</span>
 <span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span>
@@ -9248,7 +9253,12 @@ The method <code>infill()</code> is used as the objective function.</p>
 <span class="normal">941</span>
 <span class="normal">942</span>
 <span class="normal">943</span>
-<span class="normal">944</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">944</span>
+<span class="normal">945</span>
+<span class="normal">946</span>
+<span class="normal">947</span>
+<span class="normal">948</span>
+<span class="normal">949</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute `n_points` new infill points in natural units.</span>
 <span class="sd">    These diffrent points are computed by the optimizer using increasing seed.</span>
@@ -9613,7 +9623,12 @@ If <code>noise</code> is <code>True</code>, additionally the following steps
 <span class="normal">769</span>
 <span class="normal">770</span>
 <span class="normal">771</span>
-<span class="normal">772</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update design. Generate and evaluate new design points.</span>
 <span class="sd">    It is basically a call to the method `get_new_X0()`.</span>
@@ -9718,14 +9733,19 @@ If <code>noise</code> is <code>True</code>, additionally the following steps
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># OCBA (only if noise). Determination of the OCBA points depends on the</span>
     <span class="c1"># old X and y values.</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;self.var_y &lt;= 0. OCBA points are not generated, because there are points with no variance information.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In update_design(): self.var_y: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_y</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
         <span class="n">X_ocba</span> <span class="o">=</span> <span class="n">get_ocba_X</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">X_ocba</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># Determine the new X0 values based on the old X and y values:</span>
     <span class="n">X0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_new_X0</span><span class="p">()</span>
     <span class="c1"># Append OCBA points to the new design points:</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocba_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
         <span class="n">X0</span> <span class="o">=</span> <span class="n">append</span><span class="p">(</span><span class="n">X_ocba</span><span class="p">,</span> <span class="n">X0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">X_all</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_all_dim_if_needed</span><span class="p">(</span><span class="n">X0</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -9922,12 +9942,7 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">837</span>
 <span class="normal">838</span>
 <span class="normal">839</span>
 <span class="normal">840</span>
@@ -9959,7 +9974,12 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 <span class="normal">866</span>
 <span class="normal">867</span>
 <span class="normal">868</span>
-<span class="normal">869</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`</span>
 <span class="sd">    If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`</span>
