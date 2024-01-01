@@ -249,7 +249,7 @@ class Spot:
         # specified once:
         if len(self.var_type) < self.k:
             self.var_type = self.var_type * self.k
-            logger.warning("Warning: All variable types forced to 'num'.")
+            logger.warning("All variable types forced to 'num'.")
         self.infill_criterion = infill_criterion
         # Bounds
         de_bounds = []
@@ -749,14 +749,19 @@ class Spot:
         """
         # OCBA (only if noise). Determination of the OCBA points depends on the
         # old X and y values.
-        if self.noise and self.ocba_delta > 0:
+        if self.noise and self.ocba_delta > 0 and not np.all(self.var_y > 0):
+            logger.warning(
+                "self.var_y <= 0. OCBA points are not generated, because there are points with no variance information."
+            )
+            logger.debug("In update_design(): self.var_y: %s", self.var_y)
+        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0):
             X_ocba = get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
         else:
             X_ocba = None
         # Determine the new X0 values based on the old X and y values:
         X0 = self.get_new_X0()
         # Append OCBA points to the new design points:
-        if self.noise and self.ocba_delta > 0:
+        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0):
             X0 = append(X_ocba, X0, axis=0)
         X_all = self.to_all_dim_if_needed(X0)
         logger.debug(
