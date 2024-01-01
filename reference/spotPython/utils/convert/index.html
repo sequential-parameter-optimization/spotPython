@@ -3047,24 +3047,45 @@
         </tr>
     </tbody>
   </table>
-      <p>Returns:
-    X (pd.DataFrame): dataframe with new features
-Examples:
-    &gt;&gt;&gt; X = pd.DataFrame({&ldquo;a&rdquo;: [True, False, True], &ldquo;b&rdquo;: [True, True, False], &ldquo;c&rdquo;: [False, False, True]})
-    &gt;&gt;&gt; add_logical_columns(X)
-        a      b      c  a_and_b  a_and_c  b_and_c  a_or_b  a_or_c  b_or_c  a_xor_b  a_xor_c  b_xor_c
-    0  True   True  False     True    False    False    True    True    True    False     True     True
-    1 False   True  False    False    False    False    True   False    True     True     True    False
-    2  True  False   True    False     True    False    True    True    True     True    False     True</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>X</code></td>          <td>
+                <code><span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dataframe with new features</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">],</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">add_logical_columns</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="go">    a      b      c  a_and_b  a_and_c  b_and_c  a_or_b  a_or_c  b_or_c  a_xor_b  a_xor_c  b_xor_c</span>
+<span class="go">0  True   True  False     True    False    False    True    True    True    False     True     True</span>
+<span class="go">1 False   True  False    False    False    False    True   False    True     True     True    False</span>
+<span class="go">2  True  False   True    False     True    False    True    True    True     True    False     True</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/convert.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 77</span>
-<span class="normal"> 78</span>
-<span class="normal"> 79</span>
-<span class="normal"> 80</span>
-<span class="normal"> 81</span>
-<span class="normal"> 82</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 82</span>
 <span class="normal"> 83</span>
 <span class="normal"> 84</span>
 <span class="normal"> 85</span>
@@ -3092,15 +3113,24 @@ Examples:
 <span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
-<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_logical_columns</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">arity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">operations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">,</span> <span class="s2">&quot;xor&quot;</span><span class="p">]):</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_logical_columns</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">arity</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">operations</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;and&quot;</span><span class="p">,</span> <span class="s2">&quot;or&quot;</span><span class="p">,</span> <span class="s2">&quot;xor&quot;</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Combines all features in a dataframe with each other using bitwise operations</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        X (pd.DataFrame): dataframe with features</span>
 <span class="sd">        arity (int): the number of columns to combine at once</span>
 <span class="sd">        operations (list of str): the operations to apply. Possible values are &#39;and&#39;, &#39;or&#39; and &#39;xor&#39;</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        X (pd.DataFrame): dataframe with new features</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; X = pd.DataFrame({&quot;a&quot;: [True, False, True], &quot;b&quot;: [True, True, False], &quot;c&quot;: [False, False, True]})</span>
 <span class="sd">        &gt;&gt;&gt; add_logical_columns(X)</span>
@@ -3250,7 +3280,7 @@ Examples:
 <span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">class_for_name</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">class_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a class for a given module and class name.</span>
 
-<span class="sd">    Parameters:</span>
+<span class="sd">    Args:</span>
 <span class="sd">        module_name (str): The name of the module.</span>
 <span class="sd">        class_name (str): The name of the class.</span>
 
@@ -3287,17 +3317,84 @@ Examples:
 
   <div class="doc doc-contents ">
   
-      <p>Get X and y from a dataframe.
-Parameters:
-    df (pandas.DataFrame): The input dataframe.
-    target_column (str): The name of the target column.
-Returns:
-    tuple: The tuple (X, y).
-Examples:
-    &gt;&gt;&gt; from spotPython.utils.convert import get_Xy_from_df
-    &gt;&gt;&gt; import pandas as pd
-    &gt;&gt;&gt; df = pd.DataFrame({&ldquo;a&rdquo;: [1, 2, 3], &ldquo;b&rdquo;: [4, 5, 6], &ldquo;c&rdquo;: [7, 8, 9]})
-    &gt;&gt;&gt; X, y = get_Xy_from_df(df, &ldquo;c&rdquo;)</p>
+      <p>Get X and y from a dataframe.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>df</code></td>
+          <td>
+                <code><span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The input dataframe.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>target_column</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The name of the target column.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>tuple</code></td>          <td>
+                <code>tuple</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The tuple (X, y).</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.convert</span> <span class="kn">import</span> <span class="n">get_Xy_from_df</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">get_Xy_from_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">)</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/convert.py</code></summary>
@@ -3319,13 +3416,19 @@ Examples:
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_Xy_from_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">target_column</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_Xy_from_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">target_column</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get X and y from a dataframe.</span>
-<span class="sd">    Parameters:</span>
+
+<span class="sd">    Args:</span>
 <span class="sd">        df (pandas.DataFrame): The input dataframe.</span>
 <span class="sd">        target_column (str): The name of the target column.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: The tuple (X, y).</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.convert import get_Xy_from_df</span>
 <span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
@@ -3360,22 +3463,45 @@ Examples:
   
       <p>Converts a pandas series to a numpy array.
 Args:
-    series (pandas.Series): The input series.
-Returns:
-    (numpy.ndarray): The output array.
-Examples:
-    &gt;&gt;&gt; from spotPython.utils.convert import series_to_array
-    &gt;&gt;&gt; import pandas as pd
-    &gt;&gt;&gt; series = pd.Series([1, 2, 3])
-    &gt;&gt;&gt; series_to_array(series)
-    array([1, 2, 3])</p>
+    series (pandas.Series): The input series.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The output array.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.convert</span> <span class="kn">import</span> <span class="n">series_to_array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">series_to_array</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+<span class="go">array([1, 2, 3])</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/convert.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
 <span class="normal">62</span>
 <span class="normal">63</span>
 <span class="normal">64</span>
@@ -3388,12 +3514,19 @@ Examples:
 <span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
-<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">series_to_array</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">series_to_array</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a pandas series to a numpy array.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        series (pandas.Series): The input series.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        (numpy.ndarray): The output array.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.convert import series_to_array</span>
 <span class="sd">        &gt;&gt;&gt; import pandas as pd</span>

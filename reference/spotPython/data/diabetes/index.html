@@ -3114,15 +3114,14 @@ a quantitative measure of disease progression one year after baseline.</p>
 <span class="go">    batch_size = 5</span>
 <span class="go">    # Create DataLoader</span>
 <span class="go">    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)</span>
+<span class="go">    # Iterate over the data in the DataLoader</span>
+<span class="go">    for batch in dataloader:</span>
+<span class="go">        inputs, targets = batch</span>
+<span class="go">        print(f&quot;Batch Size: {inputs.size(0)}&quot;)</span>
+<span class="go">        print(&quot;---------------&quot;)</span>
+<span class="go">        print(f&quot;Inputs: {inputs}&quot;)</span>
+<span class="go">        print(f&quot;Targets: {targets}&quot;)</span>
 </code></pre></div>
-    <pre><code># Iterate over the data in the DataLoader
-for batch in dataloader:
-    inputs, targets = batch
-    print(f"Batch Size: {inputs.size(0)}")
-    print("---------------")
-    print(f"Inputs: {inputs}")
-    print(f"Targets: {targets}")
-</code></pre>
 
             <details class="quote">
               <summary>Source code in <code>spotPython/data/diabetes.py</code></summary>
@@ -3244,8 +3243,7 @@ for batch in dataloader:
 <span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Diabetes</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Diabetes</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A PyTorch Dataset for regression. A toy data set from scikit-learn.</span>
 <span class="sd">    Ten baseline variables, age, sex, body mass index, average blood pressure,</span>
@@ -3271,7 +3269,6 @@ for batch in dataloader:
 <span class="sd">            batch_size = 5</span>
 <span class="sd">            # Create DataLoader</span>
 <span class="sd">            dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)</span>
-
 <span class="sd">            # Iterate over the data in the DataLoader</span>
 <span class="sd">            for batch in dataloader:</span>
 <span class="sd">                inputs, targets = batch</span>
@@ -3463,7 +3460,8 @@ for batch in dataloader:
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/diabetes.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">72</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
+<span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
 <span class="normal">75</span>
@@ -3482,8 +3480,7 @@ for batch in dataloader:
 <span class="normal">88</span>
 <span class="normal">89</span>
 <span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the feature and target at the given index.</span>
 
@@ -3561,7 +3558,8 @@ for batch in dataloader:
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/diabetes.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 93</span>
+<span class="normal"> 94</span>
 <span class="normal"> 95</span>
 <span class="normal"> 96</span>
 <span class="normal"> 97</span>
@@ -3574,8 +3572,7 @@ for batch in dataloader:
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the length of the dataset.</span>
 
@@ -3647,7 +3644,8 @@ for batch in dataloader:
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/diabetes.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">110</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
+<span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
@@ -3661,8 +3659,7 @@ for batch in dataloader:
 <span class="normal">121</span>
 <span class="normal">122</span>
 <span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">124</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a string representation of the dataset.</span>
 

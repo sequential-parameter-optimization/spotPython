@@ -3194,15 +3194,14 @@
 <span class="go">    batch_size = 5</span>
 <span class="go">    # Create DataLoader</span>
 <span class="go">    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)</span>
+<span class="go">    # Iterate over the data in the DataLoader</span>
+<span class="go">    for batch in dataloader:</span>
+<span class="go">        inputs, targets = batch</span>
+<span class="go">        print(f&quot;Batch Size: {inputs.size(0)}&quot;)</span>
+<span class="go">        print(&quot;---------------&quot;)</span>
+<span class="go">        print(f&quot;Inputs: {inputs}&quot;)</span>
+<span class="go">        print(f&quot;Targets: {targets}&quot;)</span>
 </code></pre></div>
-    <pre><code># Iterate over the data in the DataLoader
-for batch in dataloader:
-    inputs, targets = batch
-    print(f"Batch Size: {inputs.size(0)}")
-    print("---------------")
-    print(f"Inputs: {inputs}")
-    print(f"Targets: {targets}")
-</code></pre>
 
             <details class="quote">
               <summary>Source code in <code>spotPython/data/csvdataset.py</code></summary>
@@ -3353,8 +3352,7 @@ for batch in dataloader:
 <span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CSVDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">CSVDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A PyTorch Dataset for handling CSV data.</span>
 
@@ -3382,7 +3380,6 @@ for batch in dataloader:
 <span class="sd">            batch_size = 5</span>
 <span class="sd">            # Create DataLoader</span>
 <span class="sd">            dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)</span>
-
 <span class="sd">            # Iterate over the data in the DataLoader</span>
 <span class="sd">            for batch in dataloader:</span>
 <span class="sd">                inputs, targets = batch</span>
@@ -3601,7 +3598,8 @@ for batch in dataloader:
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/csvdataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">102</span>
+<span class="normal">103</span>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
@@ -3620,8 +3618,7 @@ for batch in dataloader:
 <span class="normal">119</span>
 <span class="normal">120</span>
 <span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">122</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the feature and target at the given index.</span>
 
@@ -3699,7 +3696,8 @@ for batch in dataloader:
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/csvdataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">125</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">124</span>
+<span class="normal">125</span>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
@@ -3712,8 +3710,7 @@ for batch in dataloader:
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the length of the dataset.</span>
 
@@ -3785,7 +3782,8 @@ for batch in dataloader:
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/csvdataset.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">141</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
+<span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
@@ -3799,8 +3797,7 @@ for batch in dataloader:
 <span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
-<span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">extra_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a string representation of the dataset.</span>
 

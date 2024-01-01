@@ -3172,16 +3172,20 @@
         </tr>
     </tbody>
   </table>
-      <p>Examples:
-    &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule
-    &gt;&gt;&gt; data_module = LightCrossValidationDataModule()
-    &gt;&gt;&gt; data_module.setup()
-    &gt;&gt;&gt; print(f&rdquo;Training set size: {len(data_module.data_train)}&rdquo;)
-    Training set size: 45000
-    &gt;&gt;&gt; print(f&rdquo;Validation set size: {len(data_module.data_val)}&rdquo;)
-    Validation set size: 5000
-    &gt;&gt;&gt; print(f&rdquo;Test set size: {len(data_module.data_test)}&rdquo;)
-    Test set size: 10000</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.light</span> <span class="kn">import</span> <span class="n">LightCrossValidationDataModule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_module</span> <span class="o">=</span> <span class="n">LightCrossValidationDataModule</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_module</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_module</span><span class="o">.</span><span class="n">data_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Training set size: 45000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_module</span><span class="o">.</span><span class="n">data_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Validation set size: 5000</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data_module</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Test set size: 10000</span>
+</code></pre></div>
 
             <details class="quote">
               <summary>Source code in <code>spotPython/data/lightcrossvalidationdatamodule.py</code></summary>
@@ -3307,7 +3311,10 @@
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
-<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightCrossValidationDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightCrossValidationDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningDataModule for handling cross-validation data splits.</span>
 
@@ -3323,6 +3330,7 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        data_train (Optional[Dataset]): The training dataset.</span>
 <span class="sd">        data_val (Optional[Dataset]): The validation dataset.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule</span>
 <span class="sd">        &gt;&gt;&gt; data_module = LightCrossValidationDataModule()</span>
@@ -3393,6 +3401,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            DataLoader: The training dataloader.</span>
+
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule</span>
 <span class="sd">            &gt;&gt;&gt; data_module = LightCrossValidationDataModule()</span>
@@ -3416,6 +3425,7 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            DataLoader: The validation dataloader.</span>
+
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule</span>
 <span class="sd">            &gt;&gt;&gt; data_module = LightCrossValidationDataModule()</span>
@@ -3463,10 +3473,10 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightcrossvalidationdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
-<span class="normal">66</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
 <span class="normal">67</span>
-<span class="normal">68</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepares the data for use.&quot;&quot;&quot;</span>
     <span class="c1"># download</span>
     <span class="k">pass</span>
@@ -3524,8 +3534,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightcrossvalidationdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
-<span class="normal">71</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
 <span class="normal">74</span>
@@ -3540,7 +3549,8 @@
 <span class="normal">83</span>
 <span class="normal">84</span>
 <span class="normal">85</span>
-<span class="normal">86</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">86</span>
+<span class="normal">87</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets up the data for use.</span>
 
@@ -3602,18 +3612,21 @@
         </tr>
     </tbody>
   </table>
-      <p>Examples:
-    &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule
-    &gt;&gt;&gt; data_module = LightCrossValidationDataModule()
-    &gt;&gt;&gt; data_module.setup()
-    &gt;&gt;&gt; train_dataloader = data_module.train_dataloader()
-    &gt;&gt;&gt; print(f&rdquo;Training set size: {len(train_dataloader.dataset)}&rdquo;)
-    Training set size: 45000</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.light</span> <span class="kn">import</span> <span class="n">LightCrossValidationDataModule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_module</span> <span class="o">=</span> <span class="n">LightCrossValidationDataModule</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_module</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">data_module</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Training set size: 45000</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightcrossvalidationdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 88</span>
-<span class="normal"> 89</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
 <span class="normal"> 90</span>
 <span class="normal"> 91</span>
 <span class="normal"> 92</span>
@@ -3633,12 +3646,15 @@
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the training dataloader.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        DataLoader: The training dataloader.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule</span>
 <span class="sd">        &gt;&gt;&gt; data_module = LightCrossValidationDataModule()</span>
@@ -3700,19 +3716,21 @@
         </tr>
     </tbody>
   </table>
-      <p>Examples:
-    &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule
-    &gt;&gt;&gt; data_module = LightCrossValidationDataModule()
-    &gt;&gt;&gt; data_module.setup()
-    &gt;&gt;&gt; val_dataloader = data_module.val_dataloader()
-    &gt;&gt;&gt; print(f&rdquo;Validation set size: {len(val_dataloader.dataset)}&rdquo;)
-    Validation set size: 5000</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.light</span> <span class="kn">import</span> <span class="n">LightCrossValidationDataModule</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_module</span> <span class="o">=</span> <span class="n">LightCrossValidationDataModule</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_module</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val_dataloader</span> <span class="o">=</span> <span class="n">data_module</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Validation set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">val_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Validation set size: 5000</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightcrossvalidationdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
@@ -3729,12 +3747,16 @@
 <span class="normal">127</span>
 <span class="normal">128</span>
 <span class="normal">129</span>
-<span class="normal">130</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the validation dataloader.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        DataLoader: The validation dataloader.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.light import LightCrossValidationDataModule</span>
 <span class="sd">        &gt;&gt;&gt; data_module = LightCrossValidationDataModule()</span>

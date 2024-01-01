@@ -3231,9 +3231,7 @@
 <span class="normal">145</span>
 <span class="normal">146</span>
 <span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Lightning.</span>
 
@@ -3335,11 +3333,9 @@
 <span class="sd">                fun_control = fun_control_init(</span>
 <span class="sd">                    _L_in=10,</span>
 <span class="sd">                    _L_out=1,)</span>
-
 <span class="sd">                dataset = Diabetes()</span>
 <span class="sd">                set_data_set(fun_control=fun_control,</span>
 <span class="sd">                                data_set=dataset)</span>
-
 <span class="sd">                add_core_model_to_fun_control(core_model=NetLightRegression,</span>
 <span class="sd">                                            fun_control=fun_control,</span>
 <span class="sd">                                            hyper_dict=LightHyperDict)</span>
@@ -3716,22 +3712,20 @@ input array with valid shape.</p>
 <span class="go">    fun_control = fun_control_init(</span>
 <span class="go">        _L_in=10,</span>
 <span class="go">        _L_out=1,)</span>
+<span class="go">    dataset = Diabetes()</span>
+<span class="go">    set_data_set(fun_control=fun_control,</span>
+<span class="go">                    data_set=dataset)</span>
+<span class="go">    add_core_model_to_fun_control(core_model=NetLightRegression,</span>
+<span class="go">                                fun_control=fun_control,</span>
+<span class="go">                                hyper_dict=LightHyperDict)</span>
+<span class="go">    hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="go">    X = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="go">    # combine X and X to a np.array with shape (2, n_hyperparams)</span>
+<span class="go">    # so that two values are returned</span>
+<span class="go">    X = np.vstack((X, X))</span>
+<span class="go">    hyper_light.fun(X, fun_control)</span>
+<span class="go">    array([27462.84179688, 20990.08007812])</span>
 </code></pre></div>
-    <pre><code>dataset = Diabetes()
-set_data_set(fun_control=fun_control,
-                data_set=dataset)
-
-add_core_model_to_fun_control(core_model=NetLightRegression,
-                            fun_control=fun_control,
-                            hyper_dict=LightHyperDict)
-hyper_light = HyperLight(seed=126, log_level=50)
-X = get_default_hyperparameters_as_array(fun_control)
-# combine X and X to a np.array with shape (2, n_hyperparams)
-# so that two values are returned
-X = np.vstack((X, X))
-hyper_light.fun(X, fun_control)
-array([27462.84179688, 20990.08007812])
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/fun/hyperlight.py</code></summary>
@@ -3795,9 +3789,7 @@ array([27462.84179688, 20990.08007812])
 <span class="normal">145</span>
 <span class="normal">146</span>
 <span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates the function for the given input array X and control parameters.</span>
 
@@ -3825,11 +3817,9 @@ array([27462.84179688, 20990.08007812])
 <span class="sd">            fun_control = fun_control_init(</span>
 <span class="sd">                _L_in=10,</span>
 <span class="sd">                _L_out=1,)</span>
-
 <span class="sd">            dataset = Diabetes()</span>
 <span class="sd">            set_data_set(fun_control=fun_control,</span>
 <span class="sd">                            data_set=dataset)</span>
-
 <span class="sd">            add_core_model_to_fun_control(core_model=NetLightRegression,</span>
 <span class="sd">                                        fun_control=fun_control,</span>
 <span class="sd">                                        hyper_dict=LightHyperDict)</span>

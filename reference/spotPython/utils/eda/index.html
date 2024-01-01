@@ -3085,37 +3085,58 @@ Args:
     model2 (object):
         A tree model.
     headers (list):
-        A list with the headers of the table.
-Returns:
-    (str):
-        A table with the comparison of the two models.
-Examples:
-    &gt;&gt;&gt; from spotPython.utils.eda import compare_two_tree_models
-    &gt;&gt;&gt; from spotPython.hyperparameters.values import get_default_values
-    &gt;&gt;&gt; fun_control = {
-    &hellip;     &ldquo;x1&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x2&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x3&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x4&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x5&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x6&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x7&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x8&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x9&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x10&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip; }
-    &gt;&gt;&gt; default_values = get_default_values(fun_control)
-    &gt;&gt;&gt; model1 = spot_tuner.get_model(&ldquo;rf&rdquo;, default_values)
-    &gt;&gt;&gt; model2 = spot_tuner.get_model(&ldquo;rf&rdquo;, default_values)
-    &gt;&gt;&gt; compare_two_tree_models(model1, model2)</p>
+        A list with the headers of the table.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A table with the comparison of the two models.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.eda</span> <span class="kn">import</span> <span class="n">compare_two_tree_models</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.hyperparameters.values</span> <span class="kn">import</span> <span class="n">get_default_values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fun_control</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x4&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x5&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x6&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x7&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x8&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x9&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x10&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">default_values</span> <span class="o">=</span> <span class="n">get_default_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model1</span> <span class="o">=</span> <span class="n">spot_tuner</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;rf&quot;</span><span class="p">,</span> <span class="n">default_values</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model2</span> <span class="o">=</span> <span class="n">spot_tuner</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;rf&quot;</span><span class="p">,</span> <span class="n">default_values</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">compare_two_tree_models</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">model2</span><span class="p">)</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">122</span>
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
@@ -3149,7 +3170,13 @@ Examples:
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compare_two_tree_models</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">model2</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Spot&quot;</span><span class="p">]):</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">compare_two_tree_models</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">model2</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Parameter&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Spot&quot;</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compares two tree models.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        model1 (object):</span>
@@ -3158,9 +3185,11 @@ Examples:
 <span class="sd">            A tree model.</span>
 <span class="sd">        headers (list):</span>
 <span class="sd">            A list with the headers of the table.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        (str):</span>
 <span class="sd">            A table with the comparison of the two models.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.eda import compare_two_tree_models</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.hyperparameters.values import get_default_values</span>
@@ -3281,16 +3310,7 @@ count_missing_data(df)
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">336</span>
 <span class="normal">337</span>
 <span class="normal">338</span>
 <span class="normal">339</span>
@@ -3304,7 +3324,16 @@ count_missing_data(df)
 <span class="normal">347</span>
 <span class="normal">348</span>
 <span class="normal">349</span>
-<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">count_missing_data</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">count_missing_data</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Counts the number of missing values in each column of the given DataFrame.</span>
 
@@ -3349,38 +3378,99 @@ count_missing_data(df)
   <div class="doc doc-contents ">
   
       <p>Return a new DataFrame with only those columns that are highly correlated.</p>
-<p>Args:
-df (DataFrame): The input DataFrame.
-threshold (float): The correlation threshold.
-sorted (bool): If True, the columns are sorted by name.</p>
-<p>Returns:
-DataFrame: A new DataFrame with only highly correlated columns.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>df</code></td>
+          <td>
+                <code>DataFrame</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The input DataFrame.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>threshold</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The correlation threshold.</p>
+            </div>
+          </td>
+          <td>
+                <code>1 - 1e-05</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>sorted</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If True, the columns are sorted by name.</p>
+            </div>
+          </td>
+          <td>
+                <code>True</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>DataFrame</code></td>          <td>
+                <code><span title="pandas.DataFrame">DataFrame</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A new DataFrame with only highly correlated columns.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
 
 
 <p><strong>Examples:</strong></p>
-    
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list(&lsquo;ABCD&rsquo;))
-    df = filter_highly_correlated(df, sorted=True, threshold=0.99)</p>
-</blockquote>
-</blockquote>
-</blockquote>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="s1">&#39;ABCD&#39;</span><span class="p">))</span>
+<span class="go">    df = filter_highly_correlated(df, sorted=True, threshold=0.99)</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
@@ -3404,21 +3494,30 @@ DataFrame: A new DataFrame with only highly correlated columns.</p>
 <span class="normal">271</span>
 <span class="normal">272</span>
 <span class="normal">273</span>
-<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">filter_highly_correlated</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">filter_highly_correlated</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">sorted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mf">1e-5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return a new DataFrame with only those columns that are highly correlated.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">    df (DataFrame): The input DataFrame.</span>
-<span class="sd">    threshold (float): The correlation threshold.</span>
-<span class="sd">    sorted (bool): If True, the columns are sorted by name.</span>
+<span class="sd">        df (DataFrame): The input DataFrame.</span>
+<span class="sd">        threshold (float): The correlation threshold.</span>
+<span class="sd">        sorted (bool): If True, the columns are sorted by name.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">    DataFrame: A new DataFrame with only highly correlated columns.</span>
+<span class="sd">        DataFrame: A new DataFrame with only highly correlated columns.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list(&#39;ABCD&#39;))</span>
-<span class="sd">        df = filter_highly_correlated(df, sorted=True, threshold=0.99)</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list(&#39;ABCD&#39;))</span>
+<span class="sd">            df = filter_highly_correlated(df, sorted=True, threshold=0.99)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
@@ -3469,29 +3568,30 @@ Returns:
         a table with the design variables, their default values, and their bounds.
         If a spot object is provided,
         the table will also include the value and the importance of each hyperparameter.
-        Use the <code>print</code> function to display the table.
-Examples:
-    &gt;&gt;&gt; from spotPython.utils.eda import gen_design_table
-    &gt;&gt;&gt; from spotPython.hyperparameters.values import get_default_values
-    &gt;&gt;&gt; fun_control = {
-    &hellip;     &ldquo;x1&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x2&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x3&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x4&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x5&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x6&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x7&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x8&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x9&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip;     &ldquo;x10&rdquo;: {&ldquo;type&rdquo;: &ldquo;int&rdquo;, &ldquo;default&rdquo;: 1, &ldquo;lower&rdquo;: 1, &ldquo;upper&rdquo;: 10},
-    &hellip; }</p>
+        Use the <code>print</code> function to display the table.</p>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.eda</span> <span class="kn">import</span> <span class="n">gen_design_table</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.hyperparameters.values</span> <span class="kn">import</span> <span class="n">get_default_values</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fun_control</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x3&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x4&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x5&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x6&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x7&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x8&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x9&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s2">&quot;x10&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">}</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 47</span>
-<span class="normal"> 48</span>
-<span class="normal"> 49</span>
-<span class="normal"> 50</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 50</span>
 <span class="normal"> 51</span>
 <span class="normal"> 52</span>
 <span class="normal"> 53</span>
@@ -3556,7 +3656,11 @@ Examples:
 <span class="normal">112</span>
 <span class="normal">113</span>
 <span class="normal">114</span>
-<span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">gen_design_table</span><span class="p">(</span><span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">spot</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;github&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">gen_design_table</span><span class="p">(</span><span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">spot</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;github&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates a table with the design variables and their bounds.</span>
 <span class="sd">    Args:</span>
 <span class="sd">        fun_control (dict):</span>
@@ -3569,6 +3673,7 @@ Examples:
 <span class="sd">            If a spot object is provided,</span>
 <span class="sd">            the table will also include the value and the importance of each hyperparameter.</span>
 <span class="sd">            Use the `print` function to display the table.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.eda import gen_design_table</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.hyperparameters.values import get_default_values</span>
@@ -3645,28 +3750,74 @@ Examples:
 
   <div class="doc doc-contents ">
   
-      <p>Generates a unique id for a configuration.
-Args:
-    config (dict):
-        A dictionary with the configuration.
-Returns:
-    (str):
-        A unique id for the configuration.
-Examples:
-    &gt;&gt;&gt; from spotPython.hyperparameters.values import get_one_config_from_X
-    &gt;&gt;&gt; X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))
-    &gt;&gt;&gt; config = get_one_config_from_X(X, fun_control)
-    &gt;&gt;&gt; generate_config_id(config)</p>
+      <p>Generates a unique id for a configuration.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>config</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A dictionary with the configuration.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A unique id for the configuration.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.hyperparameters.values</span> <span class="kn">import</span> <span class="n">get_one_config_from_X</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">spot_tuner</span><span class="o">.</span><span class="n">to_all_dim</span><span class="p">(</span><span class="n">spot_tuner</span><span class="o">.</span><span class="n">min_X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">get_one_config_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">165</span>
 <span class="normal">166</span>
 <span class="normal">167</span>
 <span class="normal">168</span>
@@ -3679,14 +3830,26 @@ Examples:
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
-<span class="normal">178</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates a unique id for a configuration.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        config (dict):</span>
 <span class="sd">            A dictionary with the configuration.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        (str):</span>
 <span class="sd">            A unique id for the configuration.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.hyperparameters.values import get_one_config_from_X</span>
 <span class="sd">        &gt;&gt;&gt; X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))</span>
@@ -3720,16 +3883,69 @@ Examples:
   <div class="doc doc-contents ">
   
       <p>Converts a list of values to a list of stars, which can be used to
-    visualize the importance of a variable.
-Args:
-    input_list (list): A list of values.
-Returns:
-    (list):
-        A list of strings.
-Examples:
-    &gt;&gt;&gt; from spotPython.utils.eda import convert_list
-    &gt;&gt;&gt; get_stars([100, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
-    [***, &lsquo;&rsquo;, &lsquo;&rsquo;, &lsquo;&rsquo;, &lsquo;&rsquo;, &lsquo;&rsquo;, &lsquo;&rsquo;, &lsquo;&rsquo;, &lsquo;&rsquo;]</p>
+    visualize the importance of a variable.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>input_list</code></td>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A list of values.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>list</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A list of strings.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.eda</span> <span class="kn">import</span> <span class="n">convert_list</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_stars</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">])</span>
+<span class="go">[***, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;]</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
@@ -3758,14 +3974,20 @@ Examples:
 <span class="normal">41</span>
 <span class="normal">42</span>
 <span class="normal">43</span>
-<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_stars</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_stars</span><span class="p">(</span><span class="n">input_list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a list of values to a list of stars, which can be used to</span>
 <span class="sd">        visualize the importance of a variable.</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        input_list (list): A list of values.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        (list):</span>
 <span class="sd">            A list of strings.</span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.eda import convert_list</span>
 <span class="sd">        &gt;&gt;&gt; get_stars([100, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])</span>
@@ -3944,16 +4166,7 @@ plot_missing_data(df)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
 <span class="normal">365</span>
@@ -3983,7 +4196,16 @@ plot_missing_data(df)</p>
 <span class="normal">389</span>
 <span class="normal">390</span>
 <span class="normal">391</span>
-<span class="normal">392</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_missing_data</span><span class="p">(</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_missing_data</span><span class="p">(</span>
     <span class="n">df</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">xlabel</span><span class="o">=</span><span class="s2">&quot;Missing Data&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Missing Data&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4225,16 +4447,7 @@ plot_heatmap(df)</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">286</span>
 <span class="normal">287</span>
 <span class="normal">288</span>
 <span class="normal">289</span>
@@ -4272,7 +4485,16 @@ plot_heatmap(df)</p>
 <span class="normal">321</span>
 <span class="normal">322</span>
 <span class="normal">323</span>
-<span class="normal">324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_sns_heatmap</span><span class="p">(</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_sns_heatmap</span><span class="p">(</span>
     <span class="n">df_heat</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
     <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;vlag&quot;</span><span class="p">,</span>
@@ -4416,16 +4638,7 @@ plot_heatmap(df)</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/eda.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
@@ -4473,7 +4686,16 @@ plot_heatmap(df)</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">visualize_activations</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">visualize_activations</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C0&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Visualize the activations of a neural network.</span>
 
 <span class="sd">    Args:</span>
