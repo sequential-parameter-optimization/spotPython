@@ -3080,8 +3080,7 @@ https://github.com/TomMonks/sim-tools</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/budget/ocba.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 11</span>
-<span class="normal"> 12</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
 <span class="normal"> 15</span>
@@ -3172,7 +3171,11 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="normal">100</span>
 <span class="normal">101</span>
 <span class="normal">102</span>
-<span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array</span><span class="p">:</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimal Computer Budget Allocation (OCBA)</span>
 
@@ -3211,60 +3214,63 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">            get_ocba(mean_y, var_y, 50)</span>
 <span class="sd">            array([11,  9, 19,  9,  2])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n_designs</span> <span class="o">=</span> <span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">allocations</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="n">int32</span><span class="p">)</span>
-    <span class="n">ratios</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="n">float64</span><span class="p">)</span>
-    <span class="n">budget</span> <span class="o">=</span> <span class="n">delta</span>
-    <span class="n">ranks</span> <span class="o">=</span> <span class="n">get_ranks</span><span class="p">(</span><span class="n">means</span><span class="p">)</span>
-    <span class="n">best</span><span class="p">,</span> <span class="n">second_best</span> <span class="o">=</span> <span class="n">argpartition</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">ratios</span><span class="p">[</span><span class="n">second_best</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="n">select</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_designs</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">best</span><span class="p">,</span> <span class="n">second_best</span><span class="p">]]</span>
-    <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="n">second_best</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="n">select</span><span class="p">])</span>
-    <span class="n">ratios</span><span class="p">[</span><span class="n">select</span><span class="p">]</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">vars</span><span class="p">[</span><span class="n">select</span><span class="p">]</span> <span class="o">/</span> <span class="nb">vars</span><span class="p">[</span><span class="n">second_best</span><span class="p">])</span>
-    <span class="n">select</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_designs</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">best</span><span class="p">]]</span>
-    <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">square</span><span class="p">(</span><span class="n">ratios</span><span class="p">[</span><span class="n">select</span><span class="p">])</span> <span class="o">/</span> <span class="nb">vars</span><span class="p">[</span><span class="n">select</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">ratios</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">vars</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">*</span> <span class="n">temp</span><span class="p">)</span>
-    <span class="n">more_runs</span> <span class="o">=</span> <span class="n">full</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
-    <span class="n">add_budget</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">more_alloc</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">In get_ocba():&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;means: </span><span class="si">{</span><span class="n">means</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vars: </span><span class="si">{</span><span class="nb">vars</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;delta: </span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_designs: </span><span class="si">{</span><span class="n">n_designs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Allocations: </span><span class="si">{</span><span class="n">allocations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ratios: </span><span class="si">{</span><span class="n">ratios</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Budget: </span><span class="si">{</span><span class="n">budget</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ranks: </span><span class="si">{</span><span class="n">ranks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best: </span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Second best: </span><span class="si">{</span><span class="n">second_best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Select: </span><span class="si">{</span><span class="n">select</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Temp: </span><span class="si">{</span><span class="n">temp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;More runs: </span><span class="si">{</span><span class="n">more_runs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Add budget: </span><span class="si">{</span><span class="n">add_budget</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;More allocations: </span><span class="si">{</span><span class="n">more_alloc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">while</span> <span class="n">more_alloc</span><span class="p">:</span>
-        <span class="n">more_alloc</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">ratio_s</span> <span class="o">=</span> <span class="p">(</span><span class="n">more_runs</span> <span class="o">*</span> <span class="n">ratios</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="n">add_budget</span><span class="p">[</span><span class="n">more_runs</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">budget</span> <span class="o">/</span> <span class="n">ratio_s</span><span class="p">)</span> <span class="o">*</span> <span class="n">ratios</span><span class="p">[</span><span class="n">more_runs</span><span class="p">]</span>
-        <span class="n">add_budget</span> <span class="o">=</span> <span class="n">around</span><span class="p">(</span><span class="n">add_budget</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">add_budget</span> <span class="o">&lt;</span> <span class="n">allocations</span>
-        <span class="n">add_budget</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">allocations</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-        <span class="n">more_runs</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">vars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">n_designs</span> <span class="o">=</span> <span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">allocations</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="n">int32</span><span class="p">)</span>
+        <span class="n">ratios</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="n">float64</span><span class="p">)</span>
+        <span class="n">budget</span> <span class="o">=</span> <span class="n">delta</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="n">get_ranks</span><span class="p">(</span><span class="n">means</span><span class="p">)</span>
+        <span class="n">best</span><span class="p">,</span> <span class="n">second_best</span> <span class="o">=</span> <span class="n">argpartition</span><span class="p">(</span><span class="n">ranks</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">ratios</span><span class="p">[</span><span class="n">second_best</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_designs</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">best</span><span class="p">,</span> <span class="n">second_best</span><span class="p">]]</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="n">second_best</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">-</span> <span class="n">means</span><span class="p">[</span><span class="n">select</span><span class="p">])</span>
+        <span class="n">ratios</span><span class="p">[</span><span class="n">select</span><span class="p">]</span> <span class="o">=</span> <span class="n">square</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">vars</span><span class="p">[</span><span class="n">select</span><span class="p">]</span> <span class="o">/</span> <span class="nb">vars</span><span class="p">[</span><span class="n">second_best</span><span class="p">])</span>
+        <span class="n">select</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_designs</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">best</span><span class="p">]]</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="n">square</span><span class="p">(</span><span class="n">ratios</span><span class="p">[</span><span class="n">select</span><span class="p">])</span> <span class="o">/</span> <span class="nb">vars</span><span class="p">[</span><span class="n">select</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">ratios</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="nb">vars</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">*</span> <span class="n">temp</span><span class="p">)</span>
+        <span class="n">more_runs</span> <span class="o">=</span> <span class="n">full</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="n">add_budget</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">n_designs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">more_alloc</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">In more_alloc:&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ratio_s: </span><span class="si">{</span><span class="n">ratio_s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;more_runs: </span><span class="si">{</span><span class="n">more_runs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;add_budget: </span><span class="si">{</span><span class="n">add_budget</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">more_alloc</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">more_alloc</span><span class="p">:</span>
-            <span class="n">budget</span> <span class="o">=</span> <span class="n">allocations</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">delta</span>
-            <span class="n">budget</span> <span class="o">-=</span> <span class="p">(</span><span class="n">add_budget</span> <span class="o">*</span> <span class="o">~</span><span class="n">more_runs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">t_budget</span> <span class="o">=</span> <span class="n">add_budget</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">add_budget</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">+=</span> <span class="n">allocations</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">-</span> <span class="n">t_budget</span>
-    <span class="k">return</span> <span class="n">add_budget</span> <span class="o">-</span> <span class="n">allocations</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">In get_ocba():&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;means: </span><span class="si">{</span><span class="n">means</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vars: </span><span class="si">{</span><span class="nb">vars</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;delta: </span><span class="si">{</span><span class="n">delta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_designs: </span><span class="si">{</span><span class="n">n_designs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Allocations: </span><span class="si">{</span><span class="n">allocations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ratios: </span><span class="si">{</span><span class="n">ratios</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Budget: </span><span class="si">{</span><span class="n">budget</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ranks: </span><span class="si">{</span><span class="n">ranks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best: </span><span class="si">{</span><span class="n">best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Second best: </span><span class="si">{</span><span class="n">second_best</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Select: </span><span class="si">{</span><span class="n">select</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Temp: </span><span class="si">{</span><span class="n">temp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;More runs: </span><span class="si">{</span><span class="n">more_runs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Add budget: </span><span class="si">{</span><span class="n">add_budget</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;More allocations: </span><span class="si">{</span><span class="n">more_alloc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">more_alloc</span><span class="p">:</span>
+            <span class="n">more_alloc</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">ratio_s</span> <span class="o">=</span> <span class="p">(</span><span class="n">more_runs</span> <span class="o">*</span> <span class="n">ratios</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">add_budget</span><span class="p">[</span><span class="n">more_runs</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">budget</span> <span class="o">/</span> <span class="n">ratio_s</span><span class="p">)</span> <span class="o">*</span> <span class="n">ratios</span><span class="p">[</span><span class="n">more_runs</span><span class="p">]</span>
+            <span class="n">add_budget</span> <span class="o">=</span> <span class="n">around</span><span class="p">(</span><span class="n">add_budget</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">add_budget</span> <span class="o">&lt;</span> <span class="n">allocations</span>
+            <span class="n">add_budget</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">allocations</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+            <span class="n">more_runs</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">In more_alloc:&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ratio_s: </span><span class="si">{</span><span class="n">ratio_s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;more_runs: </span><span class="si">{</span><span class="n">more_runs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;add_budget: </span><span class="si">{</span><span class="n">add_budget</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">more_alloc</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">more_alloc</span><span class="p">:</span>
+                <span class="n">budget</span> <span class="o">=</span> <span class="n">allocations</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">delta</span>
+                <span class="n">budget</span> <span class="o">-=</span> <span class="p">(</span><span class="n">add_budget</span> <span class="o">*</span> <span class="o">~</span><span class="n">more_runs</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">t_budget</span> <span class="o">=</span> <span class="n">add_budget</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">add_budget</span><span class="p">[</span><span class="n">best</span><span class="p">]</span> <span class="o">+=</span> <span class="n">allocations</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="n">delta</span> <span class="o">-</span> <span class="n">t_budget</span>
+        <span class="k">return</span> <span class="n">add_budget</span> <span class="o">-</span> <span class="n">allocations</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3278,7 +3284,7 @@ https://github.com/TomMonks/sim-tools</p>
 
 
 <h2 id="spotPython.budget.ocba.get_ocba_X" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_ocba_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_ocba_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#spotPython.budget.ocba.get_ocba_X" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -3356,6 +3362,20 @@ https://github.com/TomMonks/sim-tools</p>
               <em>required</em>
           </td>
         </tr>
+        <tr>
+          <td><code>verbose</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If True, print the results.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
     </tbody>
   </table>
 
@@ -3401,11 +3421,7 @@ https://github.com/TomMonks/sim-tools</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/budget/ocba.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">110</span>
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
@@ -3429,7 +3445,15 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
-<span class="normal">134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function calculates the OCBA allocation and repeats the input array X along the specified axis.</span>
 
@@ -3438,6 +3462,7 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">        means (list): List of means for each alternative.</span>
 <span class="sd">        vars (list): List of variances for each alternative.</span>
 <span class="sd">        delta (float): Indifference zone parameter.</span>
+<span class="sd">        verbose (bool): If True, print the results.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (numpy.ndarray): Repeated array of X along the specified axis based on the OCBA allocation.</span>
@@ -3456,8 +3481,11 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">                        [4, 5, 6]])</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">o</span> <span class="o">=</span> <span class="n">get_ocba</span><span class="p">(</span><span class="n">means</span><span class="o">=</span><span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">repeat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">vars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="n">get_ocba</span><span class="p">(</span><span class="n">means</span><span class="o">=</span><span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">repeat</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
