@@ -42,10 +42,50 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
         The implementation is based on the pseudo-code in the Chen et al. (p. 49), see [1].
 
     Examples:
-        >>> # From the Chen et al. book (p. 49):
-        >>> mean_y = np.array([1,2,3,4,5])
-            var_y = np.array([1,1,9,9,4])
-            get_ocba(mean_y, var_y, 50)
+        >>> import copy
+            import numpy as np
+            from spotPython.fun.objectivefunctions import analytical
+            from spotPython.spot import spot
+            from spotPython.budget.ocba import get_ocba
+            # Example is based on the example from the book:
+            # Chun-Hung Chen and Loo Hay Lee:
+            #     Stochastic Simulation Optimization: An Optimal Computer Budget Allocation,
+            #     pp. 49 and pp. 215
+            #     p. 49:
+            #     mean_y = np.array([1,2,3,4,5])
+            #     var_y = np.array([1,1,9,9,4])
+            #     get_ocba(mean_y, var_y, 50)
+            #     [11  9 19  9  2]
+            fun = analytical().fun_linear
+            fun_control = {"sigma": 0.001,
+                        "seed": 123}
+            spot_1_noisy = spot.Spot(fun=fun,
+                            lower = np.array([-1]),
+                            upper = np.array([1]),
+                            fun_evals = 20,
+                            fun_repeats = 2,
+                            noise = True,
+                            ocba_delta=1,
+                            seed=123,
+                            show_models=False,
+                            fun_control = fun_control,
+                            design_control={"init_size": 3,
+                                            "repeats": 2},
+                            surrogate_control={"noise": True})
+            spot_1_noisy.run()
+            spot_2 = copy.deepcopy(spot_1_noisy)
+            spot_2.mean_y = np.array([1,2,3,4,5])
+            spot_2.var_y = np.array([1,1,9,9,4])
+            n = 50
+            o = get_ocba(spot_2.mean_y, spot_2.var_y, n)
+            assert sum(o) == 50
+            assert (o == np.array([[11, 9, 19, 9, 2]])).all()
+            o
+            spotPython tuning: -1.000367786651468 [####------] 45.00%
+            spotPython tuning: -1.000989121350348 [######----] 60.00%
+            spotPython tuning: -1.000989121350348 [########--] 75.00%
+            spotPython tuning: -1.000989121350348 [#########-] 90.00%
+            spotPython tuning: -1.000989121350348 [##########] 100.00% Done...
             array([11,  9, 19,  9,  2])
     """
     if np.all(vars > 0) and (means.shape[0] > 2):
@@ -122,17 +162,34 @@ def get_ocba_X(X, means, vars, delta, verbose=False) -> float64:
         (numpy.ndarray): Repeated array of X along the specified axis based on the OCBA allocation.
 
     Examples:
-        >>> X = np.array([[1,2,3],[4,5,6]])
-            means = [1,2,3]
-            vars = [1,1,1]
-            delta = 50
-            get_ocba_X(X, means, vars, delta)
-            array([[1, 2, 3],
-                     [1, 2, 3],
-                        [1, 2, 3],
-                        [4, 5, 6],
-                        [4, 5, 6],
-                        [4, 5, 6]])
+        >>> from spotPython.budget.ocba import get_ocba_X
+            from spotPython.utils.aggregate import aggregate_mean_var
+            import numpy as np
+            X = np.array([[1,2,3],
+                        [1,2,3],
+                        [4,5,6],
+                        [4,5,6],
+                        [4,5,6],
+                        [7,8,9],
+                        [7,8,9],])
+            y = np.array([1,2,30,40, 40, 500, 600  ])
+            Z = aggregate_mean_var(X=X, y=y)
+            mean_X = Z[0]
+            mean_y = Z[1]
+            var_y = Z[2]
+            print(f"X: {X}")
+            print(f"y: {y}")
+            print(f"mean_X: {mean_X}")
+            print(f"mean_y: {mean_y}")
+            print(f"var_y: {var_y}")
+            delta = 5
+            X_new = get_ocba_X(X=mean_X, means=mean_y, vars=var_y, delta=delta,verbose=True)
+            X_new
+            array([[4., 5., 6.],
+                   [4., 5., 6.],
+                   [4., 5., 6.],
+                   [7., 8., 9.],
+                   [7., 8., 9.]])
 
     """
     if np.all(vars > 0) and (means.shape[0] > 2):

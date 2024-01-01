@@ -344,12 +344,10 @@ class Spot:
                 ni = 7
                 # number of points
                 n = 10
-
                 fun = analytical().fun_sphere
                 lower = np.array([-1])
                 upper = np.array([1])
                 design_control={"init_size": ni}
-
                 spot_1 = spot.Spot(fun=fun,
                             lower = lower,
                             upper= upper,
@@ -582,13 +580,10 @@ class Spot:
                 ni = 7
                 # start point X_0
                 X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-
-
                 fun = analytical().fun_sphere
                 lower = np.array([-1, -1])
                 upper = np.array([1, 1])
                 design_control={"init_size": ni}
-
                 S = spot.Spot(fun=fun,
                             lower = lower,
                             upper= upper,
@@ -807,7 +802,6 @@ class Spot:
                     lower = np.array([-1, -1])
                     upper = np.array([1, 1])
                     design_control={"init_size": ni}
-
                     S = spot.Spot(fun=fun,
                                 noise=False,
                                 lower = lower,
@@ -994,6 +988,32 @@ class Spot:
 
         Returns:
             None
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 7
+                # number of points
+                fun_evals = 10
+                fun = analytical().fun_sphere
+                lower = np.array([-1, -1])
+                upper = np.array([1, 1])
+                design_control={"init_size": ni}
+                surrogate_control={"n_theta": 3}
+                S = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            log_level = 50,
+                            fun_evals = fun_evals,
+                            tolerance_x = np.sqrt(np.spacing(1)),
+                            show_progress=True,
+                            design_control=design_control,
+                            surrogate_control=surrogate_control,)
+                S.run()
+                S.plot_progress(log_y=True)
+
         """
         fig = pylab.figure(figsize=(9, 6))
         s_y = pd.Series(self.y)
@@ -1031,6 +1051,34 @@ class Spot:
                 y range, lower bound.
             y_max (float, optional):
                 y range, upper bound.
+
+        Returns:
+            None
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 3
+                # number of points
+                fun_evals = 7
+                fun = analytical().fun_sphere
+                lower = np.array([-1])
+                upper = np.array([1])
+                design_control={"init_size": ni}
+                surrogate_control={"n_theta": 1}
+                S = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            log_level = 50,
+                            fun_evals = fun_evals,
+                            tolerance_x = np.sqrt(np.spacing(1)),
+                            show_progress=True,
+                            design_control=design_control,
+                            surrogate_control=surrogate_control,)
+                S.run()
+                S.plot_model()
         """
         if self.k == 1:
             X_test = np.linspace(self.lower[0], self.upper[0], 100)
@@ -1059,14 +1107,15 @@ class Spot:
             # plt.title(self.surrogate.__class__.__name__ + ". " + str(self.counter) + ": " + str(self.min_y))
             if self.noise:
                 plt.title(
-                    str(self.counter)
-                    + ". y (noise): "
+                    "fun_evals: "
+                    + str(self.counter)
+                    + ". min_y (noise): "
                     + str(np.round(self.min_y, 6))
-                    + " y mean: "
+                    + " min_mean_y: "
                     + str(np.round(self.min_mean_y, 6))
                 )
             else:
-                plt.title(str(self.counter) + ". y: " + str(np.round(self.min_y, 6)))
+                plt.title("fun_evals: " + str(self.counter) + ". min_y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
     def print_results(self, print_screen=True) -> list[str]:
@@ -1125,9 +1174,26 @@ class Spot:
             (list) or (numpy.ndarray): The modified array.
 
         Examples:
-            >>> z0 = [1, 2, 3]
-            >>> chg(4, 5, z0, 0, 2)
-            [4, 2, 5]
+                >>> import numpy as np
+                    from spotPython.fun.objectivefunctions import analytical
+                    from spotPython.spot import spot
+                    fun = analytical().fun_sphere
+                    lower = np.array([-1, -1])
+                    upper = np.array([1, 1])
+                    S = spot.Spot(fun=fun,
+                                lower = lower,
+                                upper= upper,
+                    )
+                    z0 = [1, 2, 3]
+                    print(f"Before: {z0}")
+                    new_val_1 = 4
+                    new_val_2 = 5
+                    index_1 = 0
+                    index_2 = 2
+                    S.chg(x=new_val_1, y=new_val_2, z0=z0, i=index_1, j=index_2)
+                    print(f"After: {z0}")
+                    Before: [1, 2, 3]
+                    After: [4, 2, 5]
         """
         z0[i] = x
         z0[j] = y
@@ -1160,6 +1226,31 @@ class Spot:
 
         Returns:
             None
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 5
+                # number of points
+                fun_evals = 10
+                fun = analytical().fun_sphere
+                lower = np.array([-1, -1, -1])
+                upper = np.array([1, 1, 1])
+                design_control={"init_size": ni}
+                surrogate_control={"n_theta": 3}
+                S = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            log_level = 50,
+                            fun_evals = fun_evals,
+                            tolerance_x = np.sqrt(np.spacing(1)),
+                            show_progress=True,
+                            design_control=design_control,
+                            surrogate_control=surrogate_control,)
+                S.run()
+                S.plot_important_hyperparameter_contour()
         """
         fig = pylab.figure(figsize=(9, 6))
         # lower and upper
@@ -1201,6 +1292,48 @@ class Spot:
             pylab.show()
 
     def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None, show=True) -> None:
+        """
+        Plot the contour of important hyperparameters.
+        Calls `plot_contour` for each pair of important hyperparameters.
+        Importance can be specified by the threshold.
+
+        Args:
+            threshold (float):
+                threshold for the importance
+            filename (str):
+                filename of the plot
+            show (bool):
+                show the plot. Default is `True`.
+
+        Returns:
+            None.
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 5
+                # number of points
+                fun_evals = 10
+                fun = analytical().fun_sphere
+                lower = np.array([-1, -1, -1])
+                upper = np.array([1, 1, 1])
+                design_control={"init_size": ni}
+                surrogate_control={"n_theta": 3}
+                S = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            log_level = 50,
+                            fun_evals = fun_evals,
+                            tolerance_x = np.sqrt(np.spacing(1)),
+                            show_progress=True,
+                            design_control=design_control,
+                            surrogate_control=surrogate_control,)
+                S.run()
+                S.plot_important_hyperparameter_contour()
+
+        """
         impo = self.print_importance(threshold=threshold, print_screen=True)
         var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
         min_z = min(self.y)
@@ -1307,10 +1440,38 @@ class Spot:
         Parallel plot.
 
         Args:
-            show (bool): show the plot. Default is `False`.
+            self (object):
+                Spot object
+            show (bool):
+                show the plot. Default is `False`.
 
         Returns:
                 fig (plotly.graph_objects.Figure): figure object
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 5
+                # number of points
+                fun_evals = 10
+                fun = analytical().fun_sphere
+                lower = np.array([-1, -1, -1])
+                upper = np.array([1, 1, 1])
+                design_control={"init_size": ni}
+                surrogate_control={"n_theta": 3}
+                S = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            log_level = 50,
+                            fun_evals = fun_evals,
+                            tolerance_x = np.sqrt(np.spacing(1)),
+                            show_progress=True,
+                            design_control=design_control,
+                            surrogate_control=surrogate_control,)
+                S.run()
+                S.parallel_plot()
 
         """
         X = self.X
