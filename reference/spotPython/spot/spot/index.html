@@ -5139,7 +5139,41 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1457</span>
 <span class="normal">1458</span>
 <span class="normal">1459</span>
-<span class="normal">1460</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">1460</span>
+<span class="normal">1461</span>
+<span class="normal">1462</span>
+<span class="normal">1463</span>
+<span class="normal">1464</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span>
+<span class="normal">1471</span>
+<span class="normal">1472</span>
+<span class="normal">1473</span>
+<span class="normal">1474</span>
+<span class="normal">1475</span>
+<span class="normal">1476</span>
+<span class="normal">1477</span>
+<span class="normal">1478</span>
+<span class="normal">1479</span>
+<span class="normal">1480</span>
+<span class="normal">1481</span>
+<span class="normal">1482</span>
+<span class="normal">1483</span>
+<span class="normal">1484</span>
+<span class="normal">1485</span>
+<span class="normal">1486</span>
+<span class="normal">1487</span>
+<span class="normal">1488</span>
+<span class="normal">1489</span>
+<span class="normal">1490</span>
+<span class="normal">1491</span>
+<span class="normal">1492</span>
+<span class="normal">1493</span>
+<span class="normal">1494</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -5439,12 +5473,10 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                ni = 7</span>
 <span class="sd">                # number of points</span>
 <span class="sd">                n = 10</span>
-
 <span class="sd">                fun = analytical().fun_sphere</span>
 <span class="sd">                lower = np.array([-1])</span>
 <span class="sd">                upper = np.array([1])</span>
 <span class="sd">                design_control={&quot;init_size&quot;: ni}</span>
-
 <span class="sd">                spot_1 = spot.Spot(fun=fun,</span>
 <span class="sd">                            lower = lower,</span>
 <span class="sd">                            upper= upper,</span>
@@ -5677,13 +5709,10 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                ni = 7</span>
 <span class="sd">                # start point X_0</span>
 <span class="sd">                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])</span>
-
-
 <span class="sd">                fun = analytical().fun_sphere</span>
 <span class="sd">                lower = np.array([-1, -1])</span>
 <span class="sd">                upper = np.array([1, 1])</span>
 <span class="sd">                design_control={&quot;init_size&quot;: ni}</span>
-
 <span class="sd">                S = spot.Spot(fun=fun,</span>
 <span class="sd">                            lower = lower,</span>
 <span class="sd">                            upper= upper,</span>
@@ -5902,7 +5931,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                    lower = np.array([-1, -1])</span>
 <span class="sd">                    upper = np.array([1, 1])</span>
 <span class="sd">                    design_control={&quot;init_size&quot;: ni}</span>
-
 <span class="sd">                    S = spot.Spot(fun=fun,</span>
 <span class="sd">                                noise=False,</span>
 <span class="sd">                                lower = lower,</span>
@@ -6098,7 +6126,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                ni = 7</span>
 <span class="sd">                # number of points</span>
 <span class="sd">                fun_evals = 10</span>
-
 <span class="sd">                fun = analytical().fun_sphere</span>
 <span class="sd">                lower = np.array([-1, -1])</span>
 <span class="sd">                upper = np.array([1, 1])</span>
@@ -6158,30 +6185,29 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            None</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">            from spotPython.fun.objectivefunctions import analytical</span>
-<span class="sd">            from spotPython.spot import spot</span>
-<span class="sd">            # number of initial points:</span>
-<span class="sd">            ni = 3</span>
-<span class="sd">            # number of points</span>
-<span class="sd">            fun_evals = 7</span>
-
-<span class="sd">            fun = analytical().fun_sphere</span>
-<span class="sd">            lower = np.array([-1])</span>
-<span class="sd">            upper = np.array([1])</span>
-<span class="sd">            design_control={&quot;init_size&quot;: ni}</span>
-<span class="sd">            surrogate_control={&quot;n_theta&quot;: 1}</span>
-<span class="sd">            S = spot.Spot(fun=fun,</span>
-<span class="sd">                        lower = lower,</span>
-<span class="sd">                        upper= upper,</span>
-<span class="sd">                        log_level = 50,</span>
-<span class="sd">                        fun_evals = fun_evals,</span>
-<span class="sd">                        tolerance_x = np.sqrt(np.spacing(1)),</span>
-<span class="sd">                        show_progress=True,</span>
-<span class="sd">                        design_control=design_control,</span>
-<span class="sd">                        surrogate_control=surrogate_control,)</span>
-<span class="sd">            S.run()</span>
-<span class="sd">            S.plot_model()</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                from spotPython.fun.objectivefunctions import analytical</span>
+<span class="sd">                from spotPython.spot import spot</span>
+<span class="sd">                # number of initial points:</span>
+<span class="sd">                ni = 3</span>
+<span class="sd">                # number of points</span>
+<span class="sd">                fun_evals = 7</span>
+<span class="sd">                fun = analytical().fun_sphere</span>
+<span class="sd">                lower = np.array([-1])</span>
+<span class="sd">                upper = np.array([1])</span>
+<span class="sd">                design_control={&quot;init_size&quot;: ni}</span>
+<span class="sd">                surrogate_control={&quot;n_theta&quot;: 1}</span>
+<span class="sd">                S = spot.Spot(fun=fun,</span>
+<span class="sd">                            lower = lower,</span>
+<span class="sd">                            upper= upper,</span>
+<span class="sd">                            log_level = 50,</span>
+<span class="sd">                            fun_evals = fun_evals,</span>
+<span class="sd">                            tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="sd">                            show_progress=True,</span>
+<span class="sd">                            design_control=design_control,</span>
+<span class="sd">                            surrogate_control=surrogate_control,)</span>
+<span class="sd">                S.run()</span>
+<span class="sd">                S.plot_model()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
@@ -6277,9 +6303,26 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            (list) or (numpy.ndarray): The modified array.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; z0 = [1, 2, 3]</span>
-<span class="sd">            &gt;&gt;&gt; chg(4, 5, z0, 0, 2)</span>
-<span class="sd">            [4, 2, 5]</span>
+<span class="sd">                &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                    from spotPython.fun.objectivefunctions import analytical</span>
+<span class="sd">                    from spotPython.spot import spot</span>
+<span class="sd">                    fun = analytical().fun_sphere</span>
+<span class="sd">                    lower = np.array([-1, -1])</span>
+<span class="sd">                    upper = np.array([1, 1])</span>
+<span class="sd">                    S = spot.Spot(fun=fun,</span>
+<span class="sd">                                lower = lower,</span>
+<span class="sd">                                upper= upper,</span>
+<span class="sd">                    )</span>
+<span class="sd">                    z0 = [1, 2, 3]</span>
+<span class="sd">                    print(f&quot;Before: {z0}&quot;)</span>
+<span class="sd">                    new_val_1 = 4</span>
+<span class="sd">                    new_val_2 = 5</span>
+<span class="sd">                    index_1 = 0</span>
+<span class="sd">                    index_2 = 2</span>
+<span class="sd">                    S.chg(x=new_val_1, y=new_val_2, z0=z0, i=index_1, j=index_2)</span>
+<span class="sd">                    print(f&quot;After: {z0}&quot;)</span>
+<span class="sd">                    Before: [1, 2, 3]</span>
+<span class="sd">                    After: [4, 2, 5]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">z0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
         <span class="n">z0</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
@@ -6321,7 +6364,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                ni = 5</span>
 <span class="sd">                # number of points</span>
 <span class="sd">                fun_evals = 10</span>
-
 <span class="sd">                fun = analytical().fun_sphere</span>
 <span class="sd">                lower = np.array([-1, -1, -1])</span>
 <span class="sd">                upper = np.array([1, 1, 1])</span>
@@ -6403,7 +6445,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                ni = 5</span>
 <span class="sd">                # number of points</span>
 <span class="sd">                fun_evals = 10</span>
-
 <span class="sd">                fun = analytical().fun_sphere</span>
 <span class="sd">                lower = np.array([-1, -1, -1])</span>
 <span class="sd">                upper = np.array([1, 1, 1])</span>
@@ -6420,7 +6461,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                            surrogate_control=surrogate_control,)</span>
 <span class="sd">                S.run()</span>
 <span class="sd">                S.plot_important_hyperparameter_contour()</span>
-
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">impo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_importance</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -6529,10 +6569,38 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">        Parallel plot.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            show (bool): show the plot. Default is `False`.</span>
+<span class="sd">            self (object):</span>
+<span class="sd">                Spot object</span>
+<span class="sd">            show (bool):</span>
+<span class="sd">                show the plot. Default is `False`.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">                fig (plotly.graph_objects.Figure): figure object</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                from spotPython.fun.objectivefunctions import analytical</span>
+<span class="sd">                from spotPython.spot import spot</span>
+<span class="sd">                # number of initial points:</span>
+<span class="sd">                ni = 5</span>
+<span class="sd">                # number of points</span>
+<span class="sd">                fun_evals = 10</span>
+<span class="sd">                fun = analytical().fun_sphere</span>
+<span class="sd">                lower = np.array([-1, -1, -1])</span>
+<span class="sd">                upper = np.array([1, 1, 1])</span>
+<span class="sd">                design_control={&quot;init_size&quot;: ni}</span>
+<span class="sd">                surrogate_control={&quot;n_theta&quot;: 3}</span>
+<span class="sd">                S = spot.Spot(fun=fun,</span>
+<span class="sd">                            lower = lower,</span>
+<span class="sd">                            upper= upper,</span>
+<span class="sd">                            log_level = 50,</span>
+<span class="sd">                            fun_evals = fun_evals,</span>
+<span class="sd">                            tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="sd">                            show_progress=True,</span>
+<span class="sd">                            design_control=design_control,</span>
+<span class="sd">                            surrogate_control=surrogate_control,)</span>
+<span class="sd">                S.run()</span>
+<span class="sd">                S.parallel_plot()</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
@@ -6697,14 +6765,39 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">z0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">chg</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="go">[4, 2, 5]</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="go">    from spotPython.fun.objectivefunctions import analytical</span>
+<span class="go">    from spotPython.spot import spot</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1, -1])</span>
+<span class="go">    upper = np.array([1, 1])</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">    )</span>
+<span class="go">    z0 = [1, 2, 3]</span>
+<span class="go">    print(f&quot;Before: {z0}&quot;)</span>
+<span class="go">    new_val_1 = 4</span>
+<span class="go">    new_val_2 = 5</span>
+<span class="go">    index_1 = 0</span>
+<span class="go">    index_2 = 2</span>
+<span class="go">    S.chg(x=new_val_1, y=new_val_2, z0=z0, i=index_1, j=index_2)</span>
+<span class="go">    print(f&quot;After: {z0}&quot;)</span>
+<span class="go">    Before: [1, 2, 3]</span>
+<span class="go">    After: [4, 2, 5]</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1165</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span>
+<span class="normal">1162</span>
+<span class="normal">1163</span>
+<span class="normal">1164</span>
+<span class="normal">1165</span>
 <span class="normal">1166</span>
 <span class="normal">1167</span>
 <span class="normal">1168</span>
@@ -6730,7 +6823,16 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1188</span>
 <span class="normal">1189</span>
 <span class="normal">1190</span>
-<span class="normal">1191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1191</span>
+<span class="normal">1192</span>
+<span class="normal">1193</span>
+<span class="normal">1194</span>
+<span class="normal">1195</span>
+<span class="normal">1196</span>
+<span class="normal">1197</span>
+<span class="normal">1198</span>
+<span class="normal">1199</span>
+<span class="normal">1200</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.</span>
 
@@ -6750,9 +6852,26 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">        (list) or (numpy.ndarray): The modified array.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; z0 = [1, 2, 3]</span>
-<span class="sd">        &gt;&gt;&gt; chg(4, 5, z0, 0, 2)</span>
-<span class="sd">        [4, 2, 5]</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                from spotPython.fun.objectivefunctions import analytical</span>
+<span class="sd">                from spotPython.spot import spot</span>
+<span class="sd">                fun = analytical().fun_sphere</span>
+<span class="sd">                lower = np.array([-1, -1])</span>
+<span class="sd">                upper = np.array([1, 1])</span>
+<span class="sd">                S = spot.Spot(fun=fun,</span>
+<span class="sd">                            lower = lower,</span>
+<span class="sd">                            upper= upper,</span>
+<span class="sd">                )</span>
+<span class="sd">                z0 = [1, 2, 3]</span>
+<span class="sd">                print(f&quot;Before: {z0}&quot;)</span>
+<span class="sd">                new_val_1 = 4</span>
+<span class="sd">                new_val_2 = 5</span>
+<span class="sd">                index_1 = 0</span>
+<span class="sd">                index_2 = 2</span>
+<span class="sd">                S.chg(x=new_val_1, y=new_val_2, z0=z0, i=index_1, j=index_2)</span>
+<span class="sd">                print(f&quot;After: {z0}&quot;)</span>
+<span class="sd">                Before: [1, 2, 3]</span>
+<span class="sd">                After: [4, 2, 5]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">z0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
     <span class="n">z0</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
@@ -6855,21 +6974,25 @@ other surrogate models can be used as well.</li>
 <span class="go">    lower = np.array([-1, -1])</span>
 <span class="go">    upper = np.array([1, 1])</span>
 <span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                noise=False,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,)</span>
+<span class="go">    S.initialize_design(X_start=X_start)</span>
+<span class="go">    S.update_stats()</span>
+<span class="go">    S.fit_surrogate()</span>
 </code></pre></div>
-    <pre><code>S = spot.Spot(fun=fun,
-            noise=False,
-            lower = lower,
-            upper= upper,
-            show_progress=True,
-            design_control=design_control,)
-S.initialize_design(X_start=X_start)
-S.update_stats()
-S.fit_surrogate()
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">779</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
 <span class="normal">780</span>
 <span class="normal">781</span>
 <span class="normal">782</span>
@@ -6908,13 +7031,7 @@ S.fit_surrogate()
 <span class="normal">815</span>
 <span class="normal">816</span>
 <span class="normal">817</span>
-<span class="normal">818</span>
-<span class="normal">819</span>
-<span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span>
-<span class="normal">823</span>
-<span class="normal">824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_surrogate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">818</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_surrogate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit surrogate model. The surrogate model</span>
 <span class="sd">    is fitted to the data stored in `self.X` and `self.y`.</span>
@@ -6945,7 +7062,6 @@ S.fit_surrogate()
 <span class="sd">                lower = np.array([-1, -1])</span>
 <span class="sd">                upper = np.array([1, 1])</span>
 <span class="sd">                design_control={&quot;init_size&quot;: ni}</span>
-
 <span class="sd">                S = spot.Spot(fun=fun,</span>
 <span class="sd">                            noise=False,</span>
 <span class="sd">                            lower = lower,</span>
@@ -7008,13 +7124,7 @@ S.fit_surrogate()
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1344</span>
-<span class="normal">1345</span>
-<span class="normal">1346</span>
-<span class="normal">1347</span>
-<span class="normal">1348</span>
-<span class="normal">1349</span>
-<span class="normal">1350</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1350</span>
 <span class="normal">1351</span>
 <span class="normal">1352</span>
 <span class="normal">1353</span>
@@ -7027,7 +7137,13 @@ S.fit_surrogate()
 <span class="normal">1360</span>
 <span class="normal">1361</span>
 <span class="normal">1362</span>
-<span class="normal">1363</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1363</span>
+<span class="normal">1364</span>
+<span class="normal">1365</span>
+<span class="normal">1366</span>
+<span class="normal">1367</span>
+<span class="normal">1368</span>
+<span class="normal">1369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Returns:</span>
@@ -7178,7 +7294,9 @@ if no new design points are found, a new experimental design is generated.</li>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
 <span class="normal">447</span>
 <span class="normal">448</span>
 <span class="normal">449</span>
@@ -7255,9 +7373,7 @@ if no new design points are found, a new experimental design is generated.</li>
 <span class="normal">520</span>
 <span class="normal">521</span>
 <span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_new_X0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">523</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_new_X0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get new design points.</span>
 <span class="sd">    Calls `suggest_new_X()` and repairs the new design points, e.g.,</span>
@@ -7394,66 +7510,64 @@ if no new design points are found, a new experimental design is generated.</li>
 <span class="go">    ni = 7</span>
 <span class="go">    # number of points</span>
 <span class="go">    n = 10</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1])</span>
+<span class="go">    upper = np.array([1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    spot_1 = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                fun_evals = n,</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,)</span>
+<span class="go">    spot_1.run()</span>
+<span class="go">    df = spot_1.get_spot_attributes_as_df()</span>
+<span class="go">    df</span>
+<span class="go">        Attribute Name                                    Attribute Value</span>
+<span class="go">    0                   X  [[-0.3378148180708981], [0.698908280342222], [...</span>
+<span class="go">    1           all_lower                                               [-1]</span>
+<span class="go">    2           all_upper                                                [1]</span>
+<span class="go">    3        all_var_name                                               [x0]</span>
+<span class="go">    4        all_var_type                                              [num]</span>
+<span class="go">    5             counter                                                 10</span>
+<span class="go">    6           de_bounds                                          [[-1, 1]]</span>
+<span class="go">    7              design  &lt;spotPython.design.spacefilling.spacefilling o...</span>
+<span class="go">    8      design_control                     {&#39;init_size&#39;: 7, &#39;repeats&#39;: 1}</span>
+<span class="go">    9                 eps                                                0.0</span>
+<span class="go">    10        fun_control                         {&#39;sigma&#39;: 0, &#39;seed&#39;: None}</span>
+<span class="go">    11          fun_evals                                                 10</span>
+<span class="go">    12        fun_repeats                                                  1</span>
+<span class="go">    13              ident                                            [False]</span>
+<span class="go">    14   infill_criterion                                                  y</span>
+<span class="go">    15                  k                                                  1</span>
+<span class="go">    16          log_level                                                 50</span>
+<span class="go">    17              lower                                               [-1]</span>
+<span class="go">    18           max_time                                                inf</span>
+<span class="go">    19             mean_X                                               None</span>
+<span class="go">    20             mean_y                                               None</span>
+<span class="go">    21              min_X                           [1.5392206722432657e-05]</span>
+<span class="go">    22         min_mean_X                                               None</span>
+<span class="go">    23         min_mean_y                                               None</span>
+<span class="go">    24              min_y                                                0.0</span>
+<span class="go">    25           n_points                                                  1</span>
+<span class="go">    26              noise                                              False</span>
+<span class="go">    27         ocba_delta                                                  0</span>
+<span class="go">    28  optimizer_control                    {&#39;max_iter&#39;: 1000, &#39;seed&#39;: 125}</span>
+<span class="go">    29            red_dim                                              False</span>
+<span class="go">    30                rng                                   Generator(PCG64)</span>
+<span class="go">    31               seed                                                123</span>
+<span class="go">    32        show_models                                              False</span>
+<span class="go">    33      show_progress                                               True</span>
+<span class="go">    34        spot_writer                                               None</span>
+<span class="go">    35          surrogate  &lt;spotPython.build.kriging.Kriging object at 0x...</span>
+<span class="go">    36  surrogate_control  {&#39;noise&#39;: False, &#39;model_optimizer&#39;: &lt;function ...</span>
+<span class="go">    37        tolerance_x                                                  0</span>
+<span class="go">    38              upper                                                [1]</span>
+<span class="go">    39           var_name                                               [x0]</span>
+<span class="go">    40           var_type                                              [num]</span>
+<span class="go">    41              var_y                                               None</span>
+<span class="go">    42                  y  [0.11411885130827397, 0.48847278433092195, 0.0...</span>
 </code></pre></div>
-    <pre><code>fun = analytical().fun_sphere
-lower = np.array([-1])
-upper = np.array([1])
-design_control={"init_size": ni}
-
-spot_1 = spot.Spot(fun=fun,
-            lower = lower,
-            upper= upper,
-            fun_evals = n,
-            show_progress=True,
-            design_control=design_control,)
-spot_1.run()
-df = spot_1.get_spot_attributes_as_df()
-df
-    Attribute Name                                    Attribute Value
-0                   X  [[-0.3378148180708981], [0.698908280342222], [...
-1           all_lower                                               [-1]
-2           all_upper                                                [1]
-3        all_var_name                                               [x0]
-4        all_var_type                                              [num]
-5             counter                                                 10
-6           de_bounds                                          [[-1, 1]]
-7              design  &lt;spotPython.design.spacefilling.spacefilling o...
-8      design_control                     {'init_size': 7, 'repeats': 1}
-9                 eps                                                0.0
-10        fun_control                         {'sigma': 0, 'seed': None}
-11          fun_evals                                                 10
-12        fun_repeats                                                  1
-13              ident                                            [False]
-14   infill_criterion                                                  y
-15                  k                                                  1
-16          log_level                                                 50
-17              lower                                               [-1]
-18           max_time                                                inf
-19             mean_X                                               None
-20             mean_y                                               None
-21              min_X                           [1.5392206722432657e-05]
-22         min_mean_X                                               None
-23         min_mean_y                                               None
-24              min_y                                                0.0
-25           n_points                                                  1
-26              noise                                              False
-27         ocba_delta                                                  0
-28  optimizer_control                    {'max_iter': 1000, 'seed': 125}
-29            red_dim                                              False
-30                rng                                   Generator(PCG64)
-31               seed                                                123
-32        show_models                                              False
-33      show_progress                                               True
-34        spot_writer                                               None
-35          surrogate  &lt;spotPython.build.kriging.Kriging object at 0x...
-36  surrogate_control  {'noise': False, 'model_optimizer': &lt;function ...
-37        tolerance_x                                                  0
-38              upper                                                [1]
-39           var_name                                               [x0]
-40           var_type                                              [num]
-41              var_y                                               None
-42                  y  [0.11411885130827397, 0.48847278433092195, 0.0...
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
@@ -7535,9 +7649,7 @@ df
 <span class="normal">407</span>
 <span class="normal">408</span>
 <span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_spot_attributes_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">410</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_spot_attributes_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all attributes of the spot object as a pandas dataframe.</span>
 
 <span class="sd">    Returns:</span>
@@ -7552,12 +7664,10 @@ df
 <span class="sd">            ni = 7</span>
 <span class="sd">            # number of points</span>
 <span class="sd">            n = 10</span>
-
 <span class="sd">            fun = analytical().fun_sphere</span>
 <span class="sd">            lower = np.array([-1])</span>
 <span class="sd">            upper = np.array([1])</span>
 <span class="sd">            design_control={&quot;init_size&quot;: ni}</span>
-
 <span class="sd">            spot_1 = spot.Spot(fun=fun,</span>
 <span class="sd">                        lower = lower,</span>
 <span class="sd">                        upper= upper,</span>
@@ -7706,7 +7816,13 @@ infill criterion is calculated in natural units.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">951</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">945</span>
+<span class="normal">946</span>
+<span class="normal">947</span>
+<span class="normal">948</span>
+<span class="normal">949</span>
+<span class="normal">950</span>
+<span class="normal">951</span>
 <span class="normal">952</span>
 <span class="normal">953</span>
 <span class="normal">954</span>
@@ -7724,13 +7840,7 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">966</span>
 <span class="normal">967</span>
 <span class="normal">968</span>
-<span class="normal">969</span>
-<span class="normal">970</span>
-<span class="normal">971</span>
-<span class="normal">972</span>
-<span class="normal">973</span>
-<span class="normal">974</span>
-<span class="normal">975</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">969</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,</span>
 <span class="sd">    if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`</span>
@@ -7900,25 +8010,25 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="go">    ni = 7</span>
 <span class="go">    # start point X_0</span>
 <span class="go">    X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1, -1])</span>
+<span class="go">    upper = np.array([1, 1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,)</span>
+<span class="go">    S.initialize_design(X_start=X_start)</span>
+<span class="go">    print(f&quot;S.X: {S.X}&quot;)</span>
+<span class="go">    print(f&quot;S.y: {S.y}&quot;)</span>
 </code></pre></div>
-    <pre><code>fun = analytical().fun_sphere
-lower = np.array([-1, -1])
-upper = np.array([1, 1])
-design_control={"init_size": ni}
-
-S = spot.Spot(fun=fun,
-            lower = lower,
-            upper= upper,
-            show_progress=True,
-            design_control=design_control,)
-S.initialize_design(X_start=X_start)
-print(f"S.X: {S.X}")
-print(f"S.y: {S.y}")
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">557</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
 <span class="normal">558</span>
 <span class="normal">559</span>
 <span class="normal">560</span>
@@ -7998,12 +8108,7 @@ print(f"S.y: {S.y}")
 <span class="normal">634</span>
 <span class="normal">635</span>
 <span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_design</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">637</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_design</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize design. Generate and evaluate initial design.</span>
 <span class="sd">    If `X_start` is not `None`, append it to the initial design.</span>
@@ -8031,13 +8136,10 @@ print(f"S.y: {S.y}")
 <span class="sd">            ni = 7</span>
 <span class="sd">            # start point X_0</span>
 <span class="sd">            X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])</span>
-
-
 <span class="sd">            fun = analytical().fun_sphere</span>
 <span class="sd">            lower = np.array([-1, -1])</span>
 <span class="sd">            upper = np.array([1, 1])</span>
 <span class="sd">            design_control={&quot;init_size&quot;: ni}</span>
-
 <span class="sd">            S = spot.Spot(fun=fun,</span>
 <span class="sd">                        lower = lower,</span>
 <span class="sd">                        upper= upper,</span>
@@ -8125,6 +8227,20 @@ print(f"S.y: {S.y}")
     </thead>
     <tbody>
         <tr>
+          <td><code>self</code></td>
+          <td>
+                <code>object</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Spot object</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
           <td><code>show</code></td>
           <td>
                 <code>bool</code>
@@ -8165,15 +8281,37 @@ print(f"S.y: {S.y}")
     </tbody>
   </table>
 
+
+
+<p><strong>Examples:</strong></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="go">    from spotPython.fun.objectivefunctions import analytical</span>
+<span class="go">    from spotPython.spot import spot</span>
+<span class="go">    # number of initial points:</span>
+<span class="go">    ni = 5</span>
+<span class="go">    # number of points</span>
+<span class="go">    fun_evals = 10</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1, -1, -1])</span>
+<span class="go">    upper = np.array([1, 1, 1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    surrogate_control={&quot;n_theta&quot;: 3}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                log_level = 50,</span>
+<span class="go">                fun_evals = fun_evals,</span>
+<span class="go">                tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,</span>
+<span class="go">                surrogate_control=surrogate_control,)</span>
+<span class="go">    S.run()</span>
+<span class="go">    S.parallel_plot()</span>
+</code></pre></div>
+
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1432</span>
-<span class="normal">1433</span>
-<span class="normal">1434</span>
-<span class="normal">1435</span>
-<span class="normal">1436</span>
-<span class="normal">1437</span>
-<span class="normal">1438</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1438</span>
 <span class="normal">1439</span>
 <span class="normal">1440</span>
 <span class="normal">1441</span>
@@ -8195,15 +8333,77 @@ print(f"S.y: {S.y}")
 <span class="normal">1457</span>
 <span class="normal">1458</span>
 <span class="normal">1459</span>
-<span class="normal">1460</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="normal">1460</span>
+<span class="normal">1461</span>
+<span class="normal">1462</span>
+<span class="normal">1463</span>
+<span class="normal">1464</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span>
+<span class="normal">1471</span>
+<span class="normal">1472</span>
+<span class="normal">1473</span>
+<span class="normal">1474</span>
+<span class="normal">1475</span>
+<span class="normal">1476</span>
+<span class="normal">1477</span>
+<span class="normal">1478</span>
+<span class="normal">1479</span>
+<span class="normal">1480</span>
+<span class="normal">1481</span>
+<span class="normal">1482</span>
+<span class="normal">1483</span>
+<span class="normal">1484</span>
+<span class="normal">1485</span>
+<span class="normal">1486</span>
+<span class="normal">1487</span>
+<span class="normal">1488</span>
+<span class="normal">1489</span>
+<span class="normal">1490</span>
+<span class="normal">1491</span>
+<span class="normal">1492</span>
+<span class="normal">1493</span>
+<span class="normal">1494</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallel plot.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        show (bool): show the plot. Default is `False`.</span>
+<span class="sd">        self (object):</span>
+<span class="sd">            Spot object</span>
+<span class="sd">        show (bool):</span>
+<span class="sd">            show the plot. Default is `False`.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">            fig (plotly.graph_objects.Figure): figure object</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            from spotPython.fun.objectivefunctions import analytical</span>
+<span class="sd">            from spotPython.spot import spot</span>
+<span class="sd">            # number of initial points:</span>
+<span class="sd">            ni = 5</span>
+<span class="sd">            # number of points</span>
+<span class="sd">            fun_evals = 10</span>
+<span class="sd">            fun = analytical().fun_sphere</span>
+<span class="sd">            lower = np.array([-1, -1, -1])</span>
+<span class="sd">            upper = np.array([1, 1, 1])</span>
+<span class="sd">            design_control={&quot;init_size&quot;: ni}</span>
+<span class="sd">            surrogate_control={&quot;n_theta&quot;: 3}</span>
+<span class="sd">            S = spot.Spot(fun=fun,</span>
+<span class="sd">                        lower = lower,</span>
+<span class="sd">                        upper= upper,</span>
+<span class="sd">                        log_level = 50,</span>
+<span class="sd">                        fun_evals = fun_evals,</span>
+<span class="sd">                        tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="sd">                        show_progress=True,</span>
+<span class="sd">                        design_control=design_control,</span>
+<span class="sd">                        surrogate_control=surrogate_control,)</span>
+<span class="sd">            S.run()</span>
+<span class="sd">            S.parallel_plot()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span>
@@ -8422,37 +8622,27 @@ print(f"S.y: {S.y}")
 <span class="go">    ni = 5</span>
 <span class="go">    # number of points</span>
 <span class="go">    fun_evals = 10</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1, -1, -1])</span>
+<span class="go">    upper = np.array([1, 1, 1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    surrogate_control={&quot;n_theta&quot;: 3}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                log_level = 50,</span>
+<span class="go">                fun_evals = fun_evals,</span>
+<span class="go">                tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,</span>
+<span class="go">                surrogate_control=surrogate_control,)</span>
+<span class="go">    S.run()</span>
+<span class="go">    S.plot_important_hyperparameter_contour()</span>
 </code></pre></div>
-    <pre><code>fun = analytical().fun_sphere
-lower = np.array([-1, -1, -1])
-upper = np.array([1, 1, 1])
-design_control={"init_size": ni}
-surrogate_control={"n_theta": 3}
-S = spot.Spot(fun=fun,
-            lower = lower,
-            upper= upper,
-            log_level = 50,
-            fun_evals = fun_evals,
-            tolerance_x = np.sqrt(np.spacing(1)),
-            show_progress=True,
-            design_control=design_control,
-            surrogate_control=surrogate_control,)
-S.run()
-S.plot_important_hyperparameter_contour()
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1193</span>
-<span class="normal">1194</span>
-<span class="normal">1195</span>
-<span class="normal">1196</span>
-<span class="normal">1197</span>
-<span class="normal">1198</span>
-<span class="normal">1199</span>
-<span class="normal">1200</span>
-<span class="normal">1201</span>
-<span class="normal">1202</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1202</span>
 <span class="normal">1203</span>
 <span class="normal">1204</span>
 <span class="normal">1205</span>
@@ -8534,7 +8724,15 @@ S.plot_important_hyperparameter_contour()
 <span class="normal">1281</span>
 <span class="normal">1282</span>
 <span class="normal">1283</span>
-<span class="normal">1284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
+<span class="normal">1284</span>
+<span class="normal">1285</span>
+<span class="normal">1286</span>
+<span class="normal">1287</span>
+<span class="normal">1288</span>
+<span class="normal">1289</span>
+<span class="normal">1290</span>
+<span class="normal">1291</span>
+<span class="normal">1292</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the contour of any dimension.</span>
@@ -8570,7 +8768,6 @@ S.plot_important_hyperparameter_contour()
 <span class="sd">            ni = 5</span>
 <span class="sd">            # number of points</span>
 <span class="sd">            fun_evals = 10</span>
-
 <span class="sd">            fun = analytical().fun_sphere</span>
 <span class="sd">            lower = np.array([-1, -1, -1])</span>
 <span class="sd">            upper = np.array([1, 1, 1])</span>
@@ -8746,13 +8943,7 @@ S.plot_important_hyperparameter_contour()
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1400</span>
-<span class="normal">1401</span>
-<span class="normal">1402</span>
-<span class="normal">1403</span>
-<span class="normal">1404</span>
-<span class="normal">1405</span>
-<span class="normal">1406</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1406</span>
 <span class="normal">1407</span>
 <span class="normal">1408</span>
 <span class="normal">1409</span>
@@ -8776,7 +8967,13 @@ S.plot_important_hyperparameter_contour()
 <span class="normal">1427</span>
 <span class="normal">1428</span>
 <span class="normal">1429</span>
-<span class="normal">1430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1430</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span>
+<span class="normal">1435</span>
+<span class="normal">1436</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the importance of each variable.</span>
 
 <span class="sd">    Args:</span>
@@ -8923,36 +9120,27 @@ Importance can be specified by the threshold.</p>
 <span class="go">    ni = 5</span>
 <span class="go">    # number of points</span>
 <span class="go">    fun_evals = 10</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1, -1, -1])</span>
+<span class="go">    upper = np.array([1, 1, 1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    surrogate_control={&quot;n_theta&quot;: 3}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                log_level = 50,</span>
+<span class="go">                fun_evals = fun_evals,</span>
+<span class="go">                tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,</span>
+<span class="go">                surrogate_control=surrogate_control,)</span>
+<span class="go">    S.run()</span>
+<span class="go">    S.plot_important_hyperparameter_contour()</span>
 </code></pre></div>
-    <pre><code>fun = analytical().fun_sphere
-lower = np.array([-1, -1, -1])
-upper = np.array([1, 1, 1])
-design_control={"init_size": ni}
-surrogate_control={"n_theta": 3}
-S = spot.Spot(fun=fun,
-            lower = lower,
-            upper= upper,
-            log_level = 50,
-            fun_evals = fun_evals,
-            tolerance_x = np.sqrt(np.spacing(1)),
-            show_progress=True,
-            design_control=design_control,
-            surrogate_control=surrogate_control,)
-S.run()
-S.plot_important_hyperparameter_contour()
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1286</span>
-<span class="normal">1287</span>
-<span class="normal">1288</span>
-<span class="normal">1289</span>
-<span class="normal">1290</span>
-<span class="normal">1291</span>
-<span class="normal">1292</span>
-<span class="normal">1293</span>
-<span class="normal">1294</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1294</span>
 <span class="normal">1295</span>
 <span class="normal">1296</span>
 <span class="normal">1297</span>
@@ -9000,7 +9188,13 @@ S.plot_important_hyperparameter_contour()
 <span class="normal">1339</span>
 <span class="normal">1340</span>
 <span class="normal">1341</span>
-<span class="normal">1342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span>
+<span class="normal">1348</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the contour of important hyperparameters.</span>
 <span class="sd">    Calls `plot_contour` for each pair of important hyperparameters.</span>
@@ -9025,7 +9219,6 @@ S.plot_important_hyperparameter_contour()
 <span class="sd">            ni = 5</span>
 <span class="sd">            # number of points</span>
 <span class="sd">            fun_evals = 10</span>
-
 <span class="sd">            fun = analytical().fun_sphere</span>
 <span class="sd">            lower = np.array([-1, -1, -1])</span>
 <span class="sd">            upper = np.array([1, 1, 1])</span>
@@ -9042,7 +9235,6 @@ S.plot_important_hyperparameter_contour()
 <span class="sd">                        surrogate_control=surrogate_control,)</span>
 <span class="sd">            S.run()</span>
 <span class="sd">            S.plot_important_hyperparameter_contour()</span>
-
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">impo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_importance</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -9164,41 +9356,41 @@ S.plot_important_hyperparameter_contour()
 
 
 <p><strong>Examples:</strong></p>
-    
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>import numpy as np
-    from spotPython.fun.objectivefunctions import analytical
-    from spotPython.spot import spot
-    # number of initial points:
-    ni = 3
-    # number of points
-    fun_evals = 7</p>
-</blockquote>
-</blockquote>
-</blockquote>
-<pre><code>fun = analytical().fun_sphere
-lower = np.array([-1])
-upper = np.array([1])
-design_control={"init_size": ni}
-surrogate_control={"n_theta": 1}
-S = spot.Spot(fun=fun,
-            lower = lower,
-            upper= upper,
-            log_level = 50,
-            fun_evals = fun_evals,
-            tolerance_x = np.sqrt(np.spacing(1)),
-            show_progress=True,
-            design_control=design_control,
-            surrogate_control=surrogate_control,)
-S.run()
-S.plot_model()
-</code></pre>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="go">    from spotPython.fun.objectivefunctions import analytical</span>
+<span class="go">    from spotPython.spot import spot</span>
+<span class="go">    # number of initial points:</span>
+<span class="go">    ni = 3</span>
+<span class="go">    # number of points</span>
+<span class="go">    fun_evals = 7</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1])</span>
+<span class="go">    upper = np.array([1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    surrogate_control={&quot;n_theta&quot;: 1}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                log_level = 50,</span>
+<span class="go">                fun_evals = fun_evals,</span>
+<span class="go">                tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,</span>
+<span class="go">                surrogate_control=surrogate_control,)</span>
+<span class="go">    S.run()</span>
+<span class="go">    S.plot_model()</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1050</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1043</span>
+<span class="normal">1044</span>
+<span class="normal">1045</span>
+<span class="normal">1046</span>
+<span class="normal">1047</span>
+<span class="normal">1048</span>
+<span class="normal">1049</span>
+<span class="normal">1050</span>
 <span class="normal">1051</span>
 <span class="normal">1052</span>
 <span class="normal">1053</span>
@@ -9267,15 +9459,7 @@ S.plot_model()
 <span class="normal">1116</span>
 <span class="normal">1117</span>
 <span class="normal">1118</span>
-<span class="normal">1119</span>
-<span class="normal">1120</span>
-<span class="normal">1121</span>
-<span class="normal">1122</span>
-<span class="normal">1123</span>
-<span class="normal">1124</span>
-<span class="normal">1125</span>
-<span class="normal">1126</span>
-<span class="normal">1127</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the model fit for 1-dim objective functions.</span>
 
@@ -9291,30 +9475,29 @@ S.plot_model()
 <span class="sd">        None</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        from spotPython.fun.objectivefunctions import analytical</span>
-<span class="sd">        from spotPython.spot import spot</span>
-<span class="sd">        # number of initial points:</span>
-<span class="sd">        ni = 3</span>
-<span class="sd">        # number of points</span>
-<span class="sd">        fun_evals = 7</span>
-
-<span class="sd">        fun = analytical().fun_sphere</span>
-<span class="sd">        lower = np.array([-1])</span>
-<span class="sd">        upper = np.array([1])</span>
-<span class="sd">        design_control={&quot;init_size&quot;: ni}</span>
-<span class="sd">        surrogate_control={&quot;n_theta&quot;: 1}</span>
-<span class="sd">        S = spot.Spot(fun=fun,</span>
-<span class="sd">                    lower = lower,</span>
-<span class="sd">                    upper= upper,</span>
-<span class="sd">                    log_level = 50,</span>
-<span class="sd">                    fun_evals = fun_evals,</span>
-<span class="sd">                    tolerance_x = np.sqrt(np.spacing(1)),</span>
-<span class="sd">                    show_progress=True,</span>
-<span class="sd">                    design_control=design_control,</span>
-<span class="sd">                    surrogate_control=surrogate_control,)</span>
-<span class="sd">        S.run()</span>
-<span class="sd">        S.plot_model()</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            from spotPython.fun.objectivefunctions import analytical</span>
+<span class="sd">            from spotPython.spot import spot</span>
+<span class="sd">            # number of initial points:</span>
+<span class="sd">            ni = 3</span>
+<span class="sd">            # number of points</span>
+<span class="sd">            fun_evals = 7</span>
+<span class="sd">            fun = analytical().fun_sphere</span>
+<span class="sd">            lower = np.array([-1])</span>
+<span class="sd">            upper = np.array([1])</span>
+<span class="sd">            design_control={&quot;init_size&quot;: ni}</span>
+<span class="sd">            surrogate_control={&quot;n_theta&quot;: 1}</span>
+<span class="sd">            S = spot.Spot(fun=fun,</span>
+<span class="sd">                        lower = lower,</span>
+<span class="sd">                        upper= upper,</span>
+<span class="sd">                        log_level = 50,</span>
+<span class="sd">                        fun_evals = fun_evals,</span>
+<span class="sd">                        tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="sd">                        show_progress=True,</span>
+<span class="sd">                        design_control=design_control,</span>
+<span class="sd">                        surrogate_control=surrogate_control,)</span>
+<span class="sd">            S.run()</span>
+<span class="sd">            S.plot_model()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lower</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">upper</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">100</span><span class="p">)</span>
@@ -9496,28 +9679,33 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="go">    ni = 7</span>
 <span class="go">    # number of points</span>
 <span class="go">    fun_evals = 10</span>
+<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    lower = np.array([-1, -1])</span>
+<span class="go">    upper = np.array([1, 1])</span>
+<span class="go">    design_control={&quot;init_size&quot;: ni}</span>
+<span class="go">    surrogate_control={&quot;n_theta&quot;: 3}</span>
+<span class="go">    S = spot.Spot(fun=fun,</span>
+<span class="go">                lower = lower,</span>
+<span class="go">                upper= upper,</span>
+<span class="go">                log_level = 50,</span>
+<span class="go">                fun_evals = fun_evals,</span>
+<span class="go">                tolerance_x = np.sqrt(np.spacing(1)),</span>
+<span class="go">                show_progress=True,</span>
+<span class="go">                design_control=design_control,</span>
+<span class="go">                surrogate_control=surrogate_control,)</span>
+<span class="go">    S.run()</span>
+<span class="go">    S.plot_progress(log_y=True)</span>
 </code></pre></div>
-    <pre><code>fun = analytical().fun_sphere
-lower = np.array([-1, -1])
-upper = np.array([1, 1])
-design_control={"init_size": ni}
-surrogate_control={"n_theta": 3}
-S = spot.Spot(fun=fun,
-            lower = lower,
-            upper= upper,
-            log_level = 50,
-            fun_evals = fun_evals,
-            tolerance_x = np.sqrt(np.spacing(1)),
-            show_progress=True,
-            design_control=design_control,
-            surrogate_control=surrogate_control,)
-S.run()
-S.plot_progress(log_y=True)
-</code></pre>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 977</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 971</span>
+<span class="normal"> 972</span>
+<span class="normal"> 973</span>
+<span class="normal"> 974</span>
+<span class="normal"> 975</span>
+<span class="normal"> 976</span>
+<span class="normal"> 977</span>
 <span class="normal"> 978</span>
 <span class="normal"> 979</span>
 <span class="normal"> 980</span>
@@ -9581,14 +9769,7 @@ S.plot_progress(log_y=True)
 <span class="normal">1038</span>
 <span class="normal">1039</span>
 <span class="normal">1040</span>
-<span class="normal">1041</span>
-<span class="normal">1042</span>
-<span class="normal">1043</span>
-<span class="normal">1044</span>
-<span class="normal">1045</span>
-<span class="normal">1046</span>
-<span class="normal">1047</span>
-<span class="normal">1048</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
+<span class="normal">1041</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;plot.png&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ko&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;ro-&quot;</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the progress of the hyperparameter tuning (optimization).</span>
@@ -9617,7 +9798,6 @@ S.plot_progress(log_y=True)
 <span class="sd">            ni = 7</span>
 <span class="sd">            # number of points</span>
 <span class="sd">            fun_evals = 10</span>
-
 <span class="sd">            fun = analytical().fun_sphere</span>
 <span class="sd">            lower = np.array([-1, -1])</span>
 <span class="sd">            upper = np.array([1, 1])</span>
@@ -9752,13 +9932,7 @@ S.plot_progress(log_y=True)
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1365</span>
-<span class="normal">1366</span>
-<span class="normal">1367</span>
-<span class="normal">1368</span>
-<span class="normal">1369</span>
-<span class="normal">1370</span>
-<span class="normal">1371</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1371</span>
 <span class="normal">1372</span>
 <span class="normal">1373</span>
 <span class="normal">1374</span>
@@ -9785,7 +9959,13 @@ S.plot_progress(log_y=True)
 <span class="normal">1395</span>
 <span class="normal">1396</span>
 <span class="normal">1397</span>
-<span class="normal">1398</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1398</span>
+<span class="normal">1399</span>
+<span class="normal">1400</span>
+<span class="normal">1401</span>
+<span class="normal">1402</span>
+<span class="normal">1403</span>
+<span class="normal">1404</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Args:</span>
@@ -9906,7 +10086,15 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1129</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1121</span>
+<span class="normal">1122</span>
+<span class="normal">1123</span>
+<span class="normal">1124</span>
+<span class="normal">1125</span>
+<span class="normal">1126</span>
+<span class="normal">1127</span>
+<span class="normal">1128</span>
+<span class="normal">1129</span>
 <span class="normal">1130</span>
 <span class="normal">1131</span>
 <span class="normal">1132</span>
@@ -9932,15 +10120,7 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 <span class="normal">1152</span>
 <span class="normal">1153</span>
 <span class="normal">1154</span>
-<span class="normal">1155</span>
-<span class="normal">1156</span>
-<span class="normal">1157</span>
-<span class="normal">1158</span>
-<span class="normal">1159</span>
-<span class="normal">1160</span>
-<span class="normal">1161</span>
-<span class="normal">1162</span>
-<span class="normal">1163</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">1155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print results from the run:</span>
 <span class="sd">        1. min y</span>
 <span class="sd">        2. min X</span>
@@ -10030,7 +10210,13 @@ The method <code>infill()</code> is used as the objective function.</p>
 </details>
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">916</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span>
+<span class="normal">915</span>
+<span class="normal">916</span>
 <span class="normal">917</span>
 <span class="normal">918</span>
 <span class="normal">919</span>
@@ -10057,13 +10243,7 @@ The method <code>infill()</code> is used as the objective function.</p>
 <span class="normal">940</span>
 <span class="normal">941</span>
 <span class="normal">942</span>
-<span class="normal">943</span>
-<span class="normal">944</span>
-<span class="normal">945</span>
-<span class="normal">946</span>
-<span class="normal">947</span>
-<span class="normal">948</span>
-<span class="normal">949</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">943</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute `n_points` new infill points in natural units.</span>
 <span class="sd">    These diffrent points are computed by the optimizer using increasing seed.</span>
@@ -10303,7 +10483,12 @@ If <code>noise</code> is <code>True</code>, additionally the following steps
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">647</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
 <span class="normal">648</span>
 <span class="normal">649</span>
 <span class="normal">650</span>
@@ -10428,12 +10613,7 @@ If <code>noise</code> is <code>True</code>, additionally the following steps
 <span class="normal">769</span>
 <span class="normal">770</span>
 <span class="normal">771</span>
-<span class="normal">772</span>
-<span class="normal">773</span>
-<span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">772</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update design. Generate and evaluate new design points.</span>
 <span class="sd">    It is basically a call to the method `get_new_X0()`.</span>
@@ -10747,7 +10927,13 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">837</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
 <span class="normal">838</span>
 <span class="normal">839</span>
 <span class="normal">840</span>
@@ -10778,13 +10964,7 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 <span class="normal">865</span>
 <span class="normal">866</span>
 <span class="normal">867</span>
-<span class="normal">868</span>
-<span class="normal">869</span>
-<span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">868</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`</span>
 <span class="sd">    If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`</span>
