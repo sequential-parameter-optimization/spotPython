@@ -116,7 +116,6 @@ class HyperLight:
                 dataset = Diabetes()
                 set_data_set(fun_control=fun_control,
                                 data_set=dataset)
-
                 add_core_model_to_fun_control(core_model=NetLightRegression,
                                             fun_control=fun_control,
                                             hyper_dict=LightHyperDict)
