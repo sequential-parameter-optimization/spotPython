@@ -33,18 +33,14 @@ def apk(actual, predicted, k=10):
     Computes the average precision at k.
     This function computes the average precision at k between two lists of
     items.
-    Parameters
-    ----------
-    actual : list
-             A list of elements that are to be predicted (order doesn't matter)
-    predicted : list
-                A list of predicted elements (order does matter)
-    k : int, optional
-        The maximum number of predicted elements
-    Returns
-    -------
-    score : double
-            The average precision at k over the input lists
+
+    Args:
+        actual (list): A list of elements that are to be predicted (order doesn't matter)
+        predicted (list): A list of predicted elements (order does matter)
+        k (int): The maximum number of predicted elements
+
+    Returns:
+        score (float): The average precision at k over the input lists
     """
     if len(predicted) > k:
         predicted = predicted[:k]
@@ -68,32 +64,31 @@ def mapk(actual, predicted, k=10):
     Computes the mean average precision at k.
     This function computes the mean average precision at k between two lists
     of lists of items.
-    Parameters
-    ----------
-    actual : list
-             A list of lists of elements that are to be predicted
-             (order doesn't matter in the lists)
-    predicted : list
-                A list of lists of predicted elements
-                (order matters in the lists)
-    k : int, optional
-        The maximum number of predicted elements
-    Returns
-    -------
-    score : double
-            The mean average precision at k over the input lists
+
+    Args:
+        actual (list): A list of lists of elements that are to be predicted
+            (order doesn't matter in the lists)
+        predicted (list): A list of lists of predicted elements
+            (order matters in the lists)
+        k (int): The maximum number of predicted elements
+
+    Returns:
+        score (float): The mean average precision at k over the input lists
     """
     return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
 
 
 def mapk_score(y_true, y_pred, k=3):
     """Wrapper for mapk func using numpy arrays
+
      Args:
             y_true (np.array): array of true values
             y_pred (np.array): array of predicted values
             k (int): number of predictions
+
     Returns:
             score (float): mean average precision at k
+
     Examples:
             >>> y_true = np.array([0, 1, 2, 2])
             >>> y_pred = np.array([[0.5, 0.2, 0.2],  # 0 is in top 2
@@ -121,18 +116,14 @@ def mapk_scorer(estimator, X, y):
     Scorer for mean average precision at k.
     This function computes the mean average precision at k between two lists
     of lists of items.
-    Parameters
-    ----------
-    estimator : sklearn estimator
-                The estimator to be used for prediction.
-    X : array-like of shape (n_samples, n_features)
-        The input samples.
-    y : array-like of shape (n_samples,)
-        The target values.
-    Returns
-    -------
-    score : double
-            The mean average precision at k over the input lists
+
+    Args:
+        estimator (sklearn estimator): The estimator to be used for prediction.
+        X (array-like of shape (n_samples, n_features)): The input samples.
+        y (array-like of shape (n_samples,)): The target values.
+
+    Returns:
+        score (float): The mean average precision at k over the input lists
     """
     y_pred = estimator.predict_proba(X)
     score = mapk_score(y, y_pred, k=3)

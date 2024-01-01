@@ -113,7 +113,6 @@ class HyperLight:
                 fun_control = fun_control_init(
                     _L_in=10,
                     _L_out=1,)
-
                 dataset = Diabetes()
                 set_data_set(fun_control=fun_control,
                                 data_set=dataset)

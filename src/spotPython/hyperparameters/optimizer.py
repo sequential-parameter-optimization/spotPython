@@ -33,7 +33,6 @@ def optimizer_handler(
             * Rprop
             * SGD
 
-
     Returns:
         (torch.optim.Optimizer):
             An instance of the specified optimizer.

@@ -19,11 +19,14 @@ import numpy as np
 def get_stars(input_list) -> list:
     """Converts a list of values to a list of stars, which can be used to
         visualize the importance of a variable.
+
     Args:
         input_list (list): A list of values.
+
     Returns:
         (list):
             A list of strings.
+
     Examples:
         >>> from spotPython.utils.eda import convert_list
         >>> get_stars([100, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
@@ -57,6 +60,7 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
             If a spot object is provided,
             the table will also include the value and the importance of each hyperparameter.
             Use the `print` function to display the table.
+
     Examples:
         >>> from spotPython.utils.eda import gen_design_table
         >>> from spotPython.hyperparameters.values import get_default_values
@@ -124,9 +128,11 @@ def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Sp
             A tree model.
         headers (list):
             A list with the headers of the table.
+
     Returns:
         (str):
             A table with the comparison of the two models.
+
     Examples:
         >>> from spotPython.utils.eda import compare_two_tree_models
         >>> from spotPython.hyperparameters.values import get_default_values
@@ -158,12 +164,15 @@ def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Sp
 
 def generate_config_id(config):
     """Generates a unique id for a configuration.
+
     Args:
         config (dict):
             A dictionary with the configuration.
+
     Returns:
         (str):
             A unique id for the configuration.
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_one_config_from_X
         >>> X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))
@@ -243,16 +252,16 @@ def filter_highly_correlated(df: pd.DataFrame, sorted: bool = True, threshold: f
     Return a new DataFrame with only those columns that are highly correlated.
 
     Args:
-    df (DataFrame): The input DataFrame.
-    threshold (float): The correlation threshold.
-    sorted (bool): If True, the columns are sorted by name.
+        df (DataFrame): The input DataFrame.
+        threshold (float): The correlation threshold.
+        sorted (bool): If True, the columns are sorted by name.
 
     Returns:
-    DataFrame: A new DataFrame with only highly correlated columns.
+        DataFrame: A new DataFrame with only highly correlated columns.
 
     Examples:
-    >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
-        df = filter_highly_correlated(df, sorted=True, threshold=0.99)
+        >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
+            df = filter_highly_correlated(df, sorted=True, threshold=0.99)
 
     """
     corr_matrix = df.corr()

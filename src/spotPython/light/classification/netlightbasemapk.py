@@ -95,6 +95,7 @@ class NetLightBaseMAPK(L.LightningModule):
 
         Raises:
             ValueError: If l1 is less than 4.
+
         Examples:
             >>> from torch.utils.data import DataLoader
             >>> from torchvision.datasets import MNIST
@@ -151,6 +152,7 @@ class NetLightBaseMAPK(L.LightningModule):
 
         Returns:
             torch.Tensor: A tensor containing the probabilities for each class.
+
         Examples:
             >>> from torch.utils.data import DataLoader
             >>> from torchvision.datasets import MNIST
@@ -177,6 +179,7 @@ class NetLightBaseMAPK(L.LightningModule):
 
         Returns:
             torch.Tensor: A tensor containing the loss for this batch.
+
         Examples:
             >>> from torch.utils.data import DataLoader
             >>> from torchvision.datasets import MNIST
@@ -212,6 +215,7 @@ class NetLightBaseMAPK(L.LightningModule):
 
         Returns:
             (NoneType): None
+
         Examples:
             >>> from torch.utils.data import DataLoader
             >>> from torchvision.datasets import MNIST

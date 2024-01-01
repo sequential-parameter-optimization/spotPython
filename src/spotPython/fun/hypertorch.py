@@ -63,6 +63,7 @@ class HyperTorch:
 
         Raises:
             Exception: if the second dimension of X does not match the length of var_name in fun_control.
+
         Examples:
             >>> from spotPython.fun.hypertorch import HyperTorch
             >>> import numpy as np
@@ -91,6 +92,7 @@ class HyperTorch:
             fun_control (dict): dictionary containing control parameters for the function.
         Returns:
             np.ndarray: output array.
+
         Examples:
             >>> from spotPython.fun.hypertorch import HyperTorch
             >>> import numpy as np

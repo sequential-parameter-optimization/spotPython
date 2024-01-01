@@ -919,6 +919,49 @@ class Spot:
 
         Note:
             This is step (S-14a) in [bart21i].
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.spot import spot
+                from spotPython.fun.objectivefunctions import analytical
+                nn = 3
+                fun_sphere = analytical().fun_sphere
+                spot_1 = spot.Spot(
+                    fun=fun_sphere,
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1]),
+                    n_points=nn,
+                )
+                # (S-2) Initial Design:
+                spot_1.X = spot_1.design.scipy_lhd(
+                    spot_1.design_control["init_size"], lower=spot_1.lower, upper=spot_1.upper
+                )
+                print(f"spot_1.X: {spot_1.X}")
+                # (S-3): Eval initial design:
+                spot_1.y = spot_1.fun(spot_1.X)
+                print(f"spot_1.y: {spot_1.y}")
+                spot_1.fit_surrogate()
+                X0 = spot_1.suggest_new_X()
+                print(f"X0: {X0}")
+                assert X0.size == spot_1.n_points * spot_1.k
+                assert X0.ndim == 2
+                assert X0.shape[0] == nn
+                assert X0.shape[1] == 2
+                spot_1.X: [[ 0.86352963  0.7892358 ]
+                            [-0.24407197 -0.83687436]
+                            [ 0.36481882  0.8375811 ]
+                            [ 0.415331    0.54468512]
+                            [-0.56395091 -0.77797854]
+                            [-0.90259409 -0.04899292]
+                            [-0.16484832  0.35724741]
+                            [ 0.05170659  0.07401196]
+                            [-0.78548145 -0.44638164]
+                            [ 0.64017497 -0.30363301]]
+                spot_1.y: [1.36857656 0.75992983 0.83463487 0.46918172 0.92329124 0.8170764
+                0.15480068 0.00815134 0.81623768 0.502017  ]
+                X0: [[0.00154544 0.003962  ]
+                    [0.00165526 0.00410847]
+                    [0.00165685 0.0039177 ]]
         """
         # (S-14a) Optimization on the surrogate:
         new_X = np.zeros([self.n_points, self.k], dtype=float)

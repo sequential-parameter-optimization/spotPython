@@ -159,10 +159,13 @@ def fun_control_init(
 
 def check_and_create_dir(path):
     """Check if the path exists and create it if it does not.
+
     Args:
         path (str): Path to the directory.
+
     Returns:
         (noneType): None
+
     Examples:
         >>> fromspotPy.utils.init import check_and_create_dir
         >>> check_and_create_dir("data/")

@@ -6,9 +6,11 @@ def getDevice(device=None):
     Args:
         device (str):
             Device for training. If None or "auto" the device is selected automatically.
+
     Returns:
         device (str):
             Device for training.
+
     Examples:
         >>> from spotPython.utils.device import getDevice
         >>> getDevice()

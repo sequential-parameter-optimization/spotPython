@@ -15,6 +15,7 @@ def load_data_cifar10(data_dir: str = "./data") -> Tuple[datasets.CIFAR10, datas
     Returns:
         Tuple[datasets.CIFAR10, datasets.CIFAR10]:
             A tuple containing the training set and the test set.
+
     Examples:
         >>> trainset, testset = load_data_cifar10()
         >>> print(f"Training set size: {len(trainset)}")

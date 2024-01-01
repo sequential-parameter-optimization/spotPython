@@ -57,6 +57,7 @@ def get_one_hot(alg: str, hyper_param: str, d: dict = None, filename: str = "dat
         filename (str): Name of the file containing the dictionary.
     Returns:
         dict: Dictionary of hyper parameter values and their one hot encoded values.
+
     Examples:
         >>> alg = "HoeffdingAdaptiveTreeClassifier"
             hyper_param = "split_criterion"
@@ -113,9 +114,11 @@ def find_closest_key(integer_value: int, encoding_dict: dict) -> str:
     Arguments:
         integer_value (int): The integer value to find the closest key for.
         encoding_dict (dict): The encoding dictionary that maps keys to binary values.
+
     Returns:
         str: The key in the encoding dictionary whose binary value is
         closest to the binary representation of the integer value.
+
     Examples:
         >>> encoding_dict = {'A': [1, 0, 0], 'B': [0, 1, 0], 'C': [0, 0, 1]}
             find_closest_key(6, encoding_dict)

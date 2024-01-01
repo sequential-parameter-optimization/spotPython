@@ -7,7 +7,7 @@ from itertools import combinations
 def class_for_name(module_name, class_name) -> object:
     """Returns a class for a given module and class name.
 
-    Parameters:
+    Args:
         module_name (str): The name of the module.
         class_name (str): The name of the class.
 
@@ -28,11 +28,14 @@ def class_for_name(module_name, class_name) -> object:
 
 def get_Xy_from_df(df, target_column) -> tuple:
     """Get X and y from a dataframe.
-    Parameters:
+
+    Args:
         df (pandas.DataFrame): The input dataframe.
         target_column (str): The name of the target column.
+
     Returns:
         tuple: The tuple (X, y).
+
     Examples:
         >>> from spotPython.utils.convert import get_Xy_from_df
         >>> import pandas as pd
@@ -59,8 +62,10 @@ def series_to_array(series):
     """Converts a pandas series to a numpy array.
     Args:
         series (pandas.Series): The input series.
+
     Returns:
         (numpy.ndarray): The output array.
+
     Examples:
         >>> from spotPython.utils.convert import series_to_array
         >>> import pandas as pd
@@ -81,8 +86,10 @@ def add_logical_columns(X, arity=2, operations=["and", "or", "xor"]):
         X (pd.DataFrame): dataframe with features
         arity (int): the number of columns to combine at once
         operations (list of str): the operations to apply. Possible values are 'and', 'or' and 'xor'
+
     Returns:
         X (pd.DataFrame): dataframe with new features
+
     Examples:
         >>> X = pd.DataFrame({"a": [True, False, True], "b": [True, True, False], "c": [False, False, True]})
         >>> add_logical_columns(X)

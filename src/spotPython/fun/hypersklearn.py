@@ -31,6 +31,7 @@ class HyperSklearn:
         rng (Generator): random number generator.
         fun_control (dict): dictionary containing control parameters for the function.
         log_level (int): log level for logger.
+
     Examples:
         >>> from spotPython.fun.hypersklearn import HyperSklearn
         >>> hyper_sklearn = HyperSklearn(seed=126, log_level=50)
@@ -70,6 +71,7 @@ class HyperSklearn:
 
         Raises:
             Exception: if the second dimension of X does not match the length of var_name in fun_control.
+
         Examples:
             >>> from spotPython.fun.hypersklearn import HyperSklearn
             >>> hyper_sklearn = HyperSklearn(seed=126, log_level=50)

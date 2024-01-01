@@ -283,6 +283,7 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
     Returns:
         fun_control (dict):
             updated fun_control
+
     Examples:
         >>> fun_control = {}
             from spotPython.hyperparameters.values import modify_hyper_parameter_levels
@@ -299,7 +300,6 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
 
 def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
     """
-
     Args:
         fun_control (dict):
             fun_control dictionary
@@ -312,6 +312,7 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
     Returns:
         fun_control (dict):
             updated fun_control
+
     Examples:
         >>> from spotPython.hyperparameters.values import modify_hyper_parameter_levels
             fun_control = {}
@@ -328,12 +329,15 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
 def get_default_values(fun_control) -> dict:
     """Get the values from the "default" keys from the dictionary fun_control as a dict.
     If the key of the value has as "type" the value "int" or "float", convert the value to the corresponding type.
+
     Args:
         fun_control (dict):
             dictionary with levels and types
+
     Returns:
         new_dict (dict):
             dictionary with default values
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_default_values
             d = {"core_model_hyper_dict":{
@@ -383,12 +387,15 @@ def get_default_values(fun_control) -> dict:
 
 def get_var_type(fun_control) -> list:
     """Get the types of the values from the dictionary fun_control as a list.
+
     Args:
         fun_control (dict):
             dictionary with levels and types
+
     Returns:
         (list):
             list with types
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_var_type
             d = {"core_model_hyper_dict":{
@@ -427,12 +434,15 @@ def get_var_type(fun_control) -> list:
 
 def get_transform(fun_control) -> list:
     """Get the transformations of the values from the dictionary fun_control as a list.
+
     Args:
         fun_control (dict):
             dictionary with levels and types
+
     Returns:
         (list):
             list with transformations
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_transform
             d = {"core_model_hyper_dict":{
@@ -476,12 +486,15 @@ def get_transform(fun_control) -> list:
 
 def get_var_name(fun_control) -> list:
     """Get the names of the values from the dictionary fun_control as a list.
+
     Args:
         fun_control (dict):
             dictionary with names
+
     Returns:
         (list):
             ist with names
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_var_name
             fun_control = {"core_model_hyper_dict":{
@@ -641,12 +654,15 @@ def get_values_from_dict(dictionary) -> np.array:
     """Get the values from a dictionary as an array.
     Generate an np.array that contains the values of the keys of a dictionary
     in the same order as the keys of the dictionary.
+
     Args:
         dictionary (dict):
             dictionary with values
+
     Returns:
         (np.array):
             array with values
+
     Examples:
         >>> from spotPython.hyperparameters.values import get_values_from_dict
         >>> d = {"a": 1, "b": 2, "c": 3}
@@ -683,7 +699,7 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, file
             add_core_model_to_fun_control(core_model=NetLightRegression,
                               fun_control=fun_control,
                               hyper_dict=LightHyperDict)
-        # or, if a user wants to use a custom hyper_dict:
+            # or, if a user wants to use a custom hyper_dict:
         >>> from spotPython.light.netlightregression import NetLightRegression
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
             add_core_model_to_fun_control(core_model=NetLightRegression,
@@ -710,9 +726,11 @@ def get_one_core_model_from_X(X, fun_control=None):
             The array with the hyper parameter values.
         fun_control (dict):
             The function control dictionary.
+
     Returns:
         (class):
             The core model.
+
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
             from spotRiver.data.river_hyper_dict import RiverHyperDict
@@ -733,14 +751,17 @@ def get_one_core_model_from_X(X, fun_control=None):
 
 def get_one_config_from_X(X, fun_control=None):
     """Get one config from X.
+
     Args:
         X (np.array):
             The array with the hyper parameter values.
         fun_control (dict):
             The function control dictionary.
+
     Returns:
         (dict):
             The config dictionary.
+
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
             from spotRiver.data.river_hyper_dict import RiverHyperDict
@@ -764,14 +785,17 @@ def get_one_config_from_X(X, fun_control=None):
 
 def get_one_sklearn_model_from_X(X, fun_control=None):
     """Get one sklearn model from X.
+
     Args:
         X (np.array):
             The array with the hyper parameter values.
         fun_control (dict):
             The function control dictionary.
+
     Returns:
         (class):
             The sklearn model.
+
     Examples:
     >>> from sklearn.linear_model import LinearRegression
         from spotRiver.data.sklearn_hyper_dict import SklearnHyperDict

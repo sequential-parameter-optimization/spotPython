@@ -46,6 +46,7 @@ def find_equal_in_lists(a: List[int], b: List[int]) -> List[int]:
 
     Returns:
         list: list with 1 if equal, otherwise 0
+
     Examples:
         >>> from spotPython.utils.compare import find_equal_in_lists
             a = [1, 2, 3, 4, 5]

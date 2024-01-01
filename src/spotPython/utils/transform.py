@@ -10,6 +10,7 @@ def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
 
     Note:
         equal lower and upper bounds are feasible.
+
     Args:
         X (array):
             Sample to scale.
@@ -48,10 +49,13 @@ def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
 
 def transform_power_2_int(x: int) -> int:
     """Transformations for hyperparameters of type int.
+
     Args:
         x (int): The exponent.
+
     Returns:
         (int): The result of raising 2 to the power of x.
+
     Examples:
         >>> from spotPython.utils.transform import transform_power_2_int
         >>> transform_power_2_int(3)
@@ -64,8 +68,10 @@ def transform_power_10_int(x: int) -> int:
     """Transformations for hyperparameters of type int.
     Args:
         x (int): The exponent.
+
     Returns:
         (int): The result of raising 10 to the power of x.
+
     Examples:
         >>> from spotPython.utils.transform import transform_power_10_int
         >>> transform_power_10_int(3)
@@ -76,10 +82,13 @@ def transform_power_10_int(x: int) -> int:
 
 def transform_power_2(x):
     """Transformations for hyperparameters of type float.
+
     Args:
         x (float): The exponent.
+
     Returns:
         (float): The result of raising 2 to the power of x.
+
     Examples:
         >>> from spotPython.utils.transform import transform_power_2
         >>> transform_power_2(3)
@@ -90,10 +99,13 @@ def transform_power_2(x):
 
 def transform_power_10(x):
     """Transformations for hyperparameters of type float.
+
     Args:
         x (float): The exponent.
+
     Returns:
         (float): The result of raising 10 to the power of x.
+
     Examples:
         >>> from spotPython.utils.transform import transform_power_10
         >>> transform_power_10(3)
@@ -105,14 +117,18 @@ def transform_power_10(x):
 def transform_none_to_None(x):
     """
     Transformations for hyperparameters of type None.
+
     Args:
         x (str): The string to transform.
+
     Returns:
         (str): The transformed string.
+
     Examples:
         >>> from spotPython.utils.transform import transform_none_to_None
         >>> transform_none_to_None("none")
         None
+
     Note:
         Needed for sklearn.linear_model.LogisticRegression
     """
@@ -137,6 +153,7 @@ def transform_power(base: int, x: int, as_int: bool = False) -> float:
     Returns:
         (float):
             The result of raising the base to the power of x.
+
     Examples:
         >>> from spotPython.utils.transform import transform_power
         >>> transform_power(2, 3)
@@ -159,17 +176,19 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     The function takes fun_control and v as input and returns a dictionary with the same structure as v.
     The function transforms the values of the hyperparameters according to the transform function
     specified in fun_control if the hyperparameter is of type "int", or "float" or "num".
-
     For example, transform_hyper_parameter_values(fun_control, v) returns
      {'max_depth': 1048576, 'leaf_prediction': 'mean'}.
+
     Args:
         fun_control (dict):
             A dictionary containing the information about the core model and the hyperparameters.
         hyper_parameter_values (dict):
             A dictionary containing the values of the hyperparameters.
+
     Returns:
         (dict):
             A dictionary containing the values of the hyperparameters.
+
     Examples:
         >>> import copy
             from spotPython.utils.prepare import transform_hyper_parameter_values

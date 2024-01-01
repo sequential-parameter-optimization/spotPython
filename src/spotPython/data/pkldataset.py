@@ -26,7 +26,6 @@ class PKLDataset(Dataset):
             batch_size = 5
             # Create DataLoader
             dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-
             # Iterate over the data in the DataLoader
             for batch in dataloader:
                 inputs, targets = batch
