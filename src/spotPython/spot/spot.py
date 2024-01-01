@@ -749,12 +749,12 @@ class Spot:
         """
         # OCBA (only if noise). Determination of the OCBA points depends on the
         # old X and y values.
-        if self.noise and self.ocba_delta > 0 and not np.all(self.var_y > 0):
-            logger.warning(
-                "self.var_y <= 0. OCBA points are not generated, because there are points with no variance information."
-            )
+        if self.noise and self.ocba_delta > 0 and not np.all(self.var_y > 0) and (self.mean_X.shape[0] <= 2):
+            logger.warning("self.var_y <= 0. OCBA points are not generated:")
+            logger.warning("There are less than 3 points or points with no variance information.")
+            logger.debug("In update_design(): self.mean_X: %s", self.mean_X)
             logger.debug("In update_design(): self.var_y: %s", self.var_y)
-        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0):
+        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0) and (self.mean_X.shape[0] > 2):
             X_ocba = get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
         else:
             X_ocba = None
