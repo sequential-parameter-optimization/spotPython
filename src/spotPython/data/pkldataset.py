@@ -7,15 +7,48 @@ import pathlib
 
 class PKLDataset(Dataset):
     """
-    A PyTorch Dataset for handling pickle (*.pkl) data.
+    A PyTorch Dataset Class for handling pickle (*.pkl) data.
 
     Args:
-        filename (str): The path to the pkl file. Defaults to "data.pkl".
-        train (bool): Whether the dataset is for training or not. Defaults to True.
+        filename (str):
+            The filename of the pkl file. Defaults to "data.pkl".
+        directory (str):
+            The directory where the pkl file is located. Defaults to None.
+        feature_type (torch.dtype):
+            The data type of the features. Defaults to torch.float.
+        target_column (str):
+            The name of the target column. Defaults to "y".
+        target_type (torch.dtype):
+            The data type of the targets. Defaults to torch.long.
+        train (bool):
+            Whether the dataset is for training or not. Defaults to True.
+        rmNA (bool):
+            Whether to remove rows with NA values or not. Defaults to True.
+        **desc (Any):
+            Additional arguments to be passed to the base class.
 
     Attributes:
-        data (Tensor): The data features.
-        targets (Tensor): The data targets.
+        filename (str):
+            The filename of the pkl file.
+        directory (str):
+            The directory where the pkl file is located.
+        feature_type (torch.dtype):
+            The data type of the features.
+        target_column (str):
+            The name of the target column.
+        target_type (torch.dtype):
+            The data type of the targets.
+        train (bool):
+            Whether the dataset is for training or not.
+        rmNA (bool):
+            Whether to remove rows with NA values or not.
+        data (torch.Tensor):
+            The features.
+        targets (torch.Tensor):
+            The targets.
+
+    Notes:
+        * `spotPython` comes with a sample pkl file, which is located at `spotPython/data/pkldataset.pkl`.
 
     Examples:
         >>> from spotPython.data.pkldataset import PKLDataset
@@ -34,6 +67,35 @@ class PKLDataset(Dataset):
                 print(f"Inputs: {inputs}")
                 print(f"Targets: {targets}")
                 break
+            Batch Size: 5
+            ---------------
+            Inputs: tensor([[1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0,
+                    0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                    [1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+                    1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+                    0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+                    [1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0,
+                    1, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                    0, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+            Targets: tensor([ 0,  1,  6,  9, 10])
+        >>> # Load the data from a different directory:
+        >>> # Similar to the above example, but with a different target column, full path, and different data type
+        >>> from spotPython.data.pkldataset import PKLDataset
+            import torch
+            from torch.utils.data import DataLoader
+            dataset = PKLDataset(directory="/Users/bartz/workspace/spotPython/notebooks/data/spotPython/",
+                                filename="data_sensitive.pkl",
+                                target_column='N',
+                                feature_type=torch.float32,
+                                target_type=torch.float32,
+                                rmNA=True)
     """
 
     def __init__(
@@ -100,11 +162,13 @@ class PKLDataset(Dataset):
             tuple: A tuple containing the feature and target at the given index.
 
         Examples:
-            >>> from spotPython.light.pkldataset import pklDataset
-                dataset = pklDataset(filename='./data/spotPython/data.pkl', target_column='prognosis')
+            >>> from spotPython.data.pkldataset import PKLDataset
+                import torch
+                from torch.utils.data import DataLoader
+                dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
-                torch.Size([11, 65])
+                torch.Size([11, 64])
                 torch.Size([11])
         """
         feature = self.data[idx]
@@ -119,27 +183,27 @@ class PKLDataset(Dataset):
             int: The length of the dataset.
 
         Examples:
-            >>> from spotPython.light import pklDataset
-            >>> dataset = pklDataset()
-            >>> print(len(dataset))
-            60000
-
+            >>> from spotPython.data.pkldataset import PKLDataset
+                import torch
+                from torch.utils.data import DataLoader
+                dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
+                print(len(dataset))
+                11
         """
         return len(self.data)
 
     def extra_repr(self) -> str:
         """
-        Returns a string representation of the dataset.
+        Returns a string with the filename and directory of the dataset.
 
         Returns:
-            str: A string representation of the dataset.
+            str: A string with the filename and directory of the dataset.
 
         Examples:
-            >>> from spotPython.light import pklDataset
-            >>> dataset = pklDataset()
-            >>> print(dataset)
-            Split: Train
-
+            >>> from spotPython.data.pkldataset import PKLDataset
+                import torch
+                from torch.utils.data import DataLoader
+                dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
+                print(dataset)
         """
-        split = "Train" if self.train else "Test"
-        return f"Split: {split}"
+        return "filename={}, directory={}".format(self.filename, self.directory)
