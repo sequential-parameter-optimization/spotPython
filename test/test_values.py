@@ -6,6 +6,7 @@ from spotPython.hyperparameters.values import get_bound_values
 from spotPython.hyperparameters.values import set_fun_control_fun_repeats, get_fun_control_fun_repeats
 from spotPython.hyperparameters.values import set_fun_control_seed, get_fun_control_seed
 from spotPython.hyperparameters.values import set_fun_control_sigma, get_fun_control_sigma
+from spotPython.hyperparameters.values import set_fun_control_max_time, get_fun_control_max_time
 
 
 def setup_function():
@@ -90,3 +91,22 @@ def test_get_fun_control_sigma():
     fun_control = fun_control_init()
     set_fun_control_sigma(fun_control, 10.0)
     assert get_fun_control_sigma(fun_control) == 10.0
+
+
+def test_set_fun_control_max_time():
+    fun_control = fun_control_init()
+    set_fun_control_max_time(fun_control, 5.0)
+    assert fun_control["max_time"] == 5.0
+
+def test_get_fun_control_max_time():
+    fun_control = fun_control_init()
+
+    # Test when "max_time" is not in fun_control
+    assert get_fun_control_max_time(fun_control) is None
+
+    # Test when fun_control is None
+    assert get_fun_control_max_time() is None
+
+    # Test when "max_time" is in fun_control
+    set_fun_control_max_time(fun_control, 10.0)
+    assert get_fun_control_max_time(fun_control) == 10.0

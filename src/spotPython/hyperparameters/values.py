@@ -386,7 +386,9 @@ def get_default_values(fun_control) -> dict:
 
 
 def get_var_type(fun_control) -> list:
-    """Get the types of the values from the dictionary fun_control as a list.
+    """
+    Get the types of the values from the dictionary fun_control as a list.
+    If no "core_model_hyper_dict" key exists in fun_control, return None.
 
     Args:
         fun_control (dict):
@@ -427,9 +429,12 @@ def get_var_type(fun_control) -> list:
             get_var_type(d)
             ['factor', 'factor', 'factor', 'factor', 'factor']
     """
-    return list(
-        fun_control["core_model_hyper_dict"][key]["type"] for key in fun_control["core_model_hyper_dict"].keys()
-    )
+    if "core_model_hyper_dict" not in fun_control.keys():
+        return None
+    else:
+        return list(
+            fun_control["core_model_hyper_dict"][key]["type"] for key in fun_control["core_model_hyper_dict"].keys()
+        )
 
 
 def get_transform(fun_control) -> list:
@@ -486,6 +491,7 @@ def get_transform(fun_control) -> list:
 
 def get_var_name(fun_control) -> list:
     """Get the names of the values from the dictionary fun_control as a list.
+    If no "core_model_hyper_dict" key exists in fun_control, return None.
 
     Args:
         fun_control (dict):
@@ -532,7 +538,10 @@ def get_var_name(fun_control) -> list:
                 'binary_split',
                 'stop_mem_management']
     """
-    return list(fun_control["core_model_hyper_dict"].keys())
+    if "core_model_hyper_dict" not in fun_control.keys():
+        return None
+    else:
+        return list(fun_control["core_model_hyper_dict"].keys())
 
 
 def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Union[List, np.ndarray]:
@@ -1229,3 +1238,57 @@ def get_fun_control_sigma(fun_control=None) -> float:
         return None
     else:
         return fun_control["sigma"]
+
+
+def set_fun_control_max_time(fun_control, max_time) -> dict:
+    """
+    This function sets the max_time in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        max_time (float): max_time
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        max_time (float): max_time
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_max_time
+            fun_control = fun_control_init()
+            set_fun_control_max_time(fun_control=fun_control,
+                          max_time=5)
+            fun_control["max_time"]
+
+    """
+    fun_control.update({"max_time": max_time})
+
+
+def get_fun_control_max_time(fun_control=None) -> float:
+    """
+    This function gets the max_time from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        max_time (float):
+            max_time
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_max_time
+            fun_control = fun_control_init()
+            get_fun_control_max_time(fun_control=fun_control)
+            0
+    """
+    # check if key "max_time" exists in fun_control:
+    if fun_control is None or "max_time" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["max_time"]

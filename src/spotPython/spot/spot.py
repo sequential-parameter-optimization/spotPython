@@ -36,6 +36,9 @@ from spotPython.hyperparameters.values import (
     get_fun_control_fun_repeats,
     set_fun_control_seed,
     set_fun_control_sigma,
+    get_var_name,
+    get_var_type,
+    get_fun_control_max_time,
 )
 import plotly.graph_objects as go
 from typing import List, Union, Callable, Dict
@@ -208,7 +211,6 @@ class Spot:
         tolerance_x: float = 0,
         var_type: List[str] = ["num"],
         var_name: List[str] = None,
-        all_var_name: List[str] = None,
         infill_criterion: str = "y",
         n_points: int = 1,
         ocba_delta: int = 0,
@@ -225,57 +227,75 @@ class Spot:
         optimizer_control: Dict[str, Union[int, float]] = {},
     ):
         self.fun = fun
-        # if fun is None, raise an exception
         if self.fun is None:
             raise Exception("No objective function specified.")
-        # if fun is not callable, raise an exception
         if not callable(self.fun):
             raise Exception("Objective function is not callable.")
+
         self.fun_control = fun_control
+
         # set fun_control["sigma"] to sigma if "sigma" is not in fun_control dictionary
         if "sigma" not in self.fun_control:
             set_fun_control_sigma(fun_control, sigma)
+
         # set fun_control["seed"] to seed if "seed" is not in fun_control dictionary
         if "seed" not in self.fun_control:
             set_fun_control_seed(self.fun_control, seed)
-        self.lower = lower
+
         # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
         # else use the lower bound lower
+        self.lower = lower
         if get_bound_values(fun_control, "lower") is not None:
             self.lower = get_bound_values(fun_control, "lower")
+
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         # else use the upper bound upper
         self.upper = upper
         if get_bound_values(fun_control, "upper") is not None:
             self.upper = get_bound_values(fun_control, "upper")
+
         self.var_type = var_type
+        if get_var_type(fun_control) is not None:
+            self.var_type = get_var_type(fun_control)
+
         self.var_name = var_name
+        if get_var_name(fun_control) is not None:
+            self.var_name = get_var_name(fun_control)
         # use x0, x1, ... as default variable names:
         if self.var_name is None:
             self.var_name = ["x" + str(i) for i in range(len(self.lower))]
-        self.all_var_name = all_var_name
-        # Reduce dim based on lower == upper logic:
-        # modifies lower, upper, and var_type
-        self.to_red_dim()
+
+        # Number of dimensions:
         self.k = self.lower.size
+
+        # Reduce dim based on lower == upper logic:
+        # modifies lower, upper, var_type, and var_name
+        self.to_red_dim()
+
         # Force numeric type as default in every dim:
         # assume all variable types are "num" if "num" is
-        # specified once:
+        # specified less than k times
         if len(self.var_type) < self.k:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
+
         # if fun_evals is in fun_control dictionary,
         # use the value of the key "fun_evals" as the number of function evaluations
         self.fun_evals = fun_evals
         if get_fun_control_fun_evals(fun_control) is not None:
             self.fun_evals = get_fun_control_fun_evals(fun_control)
+
         # if fun_repeats is in fun_control dictionary,
         # use the value of the key "fun_repeats" as the number of function repeats
         # else use the number of function repeats fun_repeats
         self.fun_repeats = fun_repeats
         if get_fun_control_fun_repeats(fun_control) is not None:
             self.fun_repeats = get_fun_control_fun_repeats(fun_control)
+
         self.max_time = max_time
+        if get_fun_control_max_time(fun_control) is not None:
+            self.max_time = get_fun_control_max_time(fun_control)
+
         self.noise = noise
         self.tolerance_x = tolerance_x
         self.ocba_delta = ocba_delta
@@ -445,14 +465,73 @@ class Spot:
         return df
 
     def to_red_dim(self) -> None:
+        """
+        Reduce dimension if lower == upper.
+        This is done by removing the corresponding entries from
+        lower, upper, var_type, and var_name.
+        k is modified accordingly.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        Attributes:
+            self.lower (numpy.ndarray): lower bound
+            self.upper (numpy.ndarray): upper bound
+            self.var_type (List[str]): list of variable types
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                # number of initial points:
+                ni = 3
+                # number of points
+                n = 10
+                fun = analytical().fun_sphere
+                lower = np.array([-1, -1])
+                upper = np.array([1, 1])
+                design_control={"init_size": ni}
+                spot_1 = spot.Spot(fun=fun,
+                            lower = lower,
+                            upper= upper,
+                            fun_evals = n,
+                            show_progress=True,
+                            design_control=design_control,)
+                spot_1.run()
+                assert spot_1.lower.size == 2
+                assert spot_1.upper.size == 2
+                assert len(spot_1.var_type) == 2
+                assert spot_1.red_dim == False
+                spot_1.lower = np.array([-1, -1])
+                spot_1.upper = np.array([-1, -1])
+                spot_1.to_red_dim()
+                assert spot_1.lower.size == 0
+                assert spot_1.upper.size == 0
+                assert len(spot_1.var_type) == 0
+                assert spot_1.red_dim == True
+
+        """
+        # Backup of the original values:
         self.all_lower = self.lower
         self.all_upper = self.upper
+        # Select only lower != upper:
         self.ident = (self.upper - self.lower) == 0
+        # Determine if dimension is reduced:
+        self.red_dim = self.ident.any()
+        # Modifications:
+        # Modify lower and upper:
         self.lower = self.lower[~self.ident]
         self.upper = self.upper[~self.ident]
-        self.red_dim = self.ident.any()
-        self.all_var_type = self.var_type
-        self.var_type = [x for x, y in zip(self.all_var_type, self.ident) if not y]
+        # Modify k (dim):
+        self.k = self.lower.size
+        # Modify var_type:
+        if self.var_type is not None:
+            self.all_var_type = self.var_type
+            self.var_type = [x for x, y in zip(self.all_var_type, self.ident) if not y]
+        # Modify var_name:
         if self.var_name is not None:
             self.all_var_name = self.var_name
             self.var_name = [x for x, y in zip(self.all_var_name, self.ident) if not y]
