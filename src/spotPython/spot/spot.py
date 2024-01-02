@@ -30,6 +30,13 @@ import logging
 import time
 from spotPython.utils.progress import progress_bar
 from spotPython.utils.convert import find_indices
+from spotPython.hyperparameters.values import (
+    get_bound_values,
+    get_fun_control_fun_evals,
+    get_fun_control_fun_repeats,
+    set_fun_control_seed,
+    set_fun_control_sigma,
+)
 import plotly.graph_objects as go
 from typing import List, Union, Callable, Dict
 
@@ -58,14 +65,15 @@ class Spot:
 
         1. Design
         2. Surrogate
-        3. Optimizer
+        3. Fun (Evaluation of the objective function)
 
     For each of the three components different implementations can be selected and combined.
     Internal components are selected as default.
     These can be replaced by components from other packages, e.g., scikit-learn or scikit-optimize.
 
     Args:
-        fun (Callable): objective function
+        fun (Callable):
+            objective function
         lower (np.array): lower bound
         upper (np.array): upper bound
         fun_evals (int):
@@ -189,9 +197,9 @@ class Spot:
 
     def __init__(
         self,
-        fun: Callable,
-        lower: np.array,
-        upper: np.array,
+        fun: Callable = None,
+        lower: np.array = None,
+        upper: np.array = None,
         fun_evals: int = 15,
         fun_repeats: int = 1,
         fun_control: Dict[str, Union[int, float]] = {},
@@ -205,6 +213,7 @@ class Spot:
         n_points: int = 1,
         ocba_delta: int = 0,
         seed: int = 123,
+        sigma: float = 0.0,
         log_level: int = 50,
         show_models: bool = False,
         show_progress: bool = True,
@@ -215,25 +224,57 @@ class Spot:
         optimizer: object = None,
         optimizer_control: Dict[str, Union[int, float]] = {},
     ):
-        # use x0, x1, ... as default variable names:
-        if var_name is None:
-            var_name = ["x" + str(i) for i in range(len(lower))]
-        self.X = None
-        self.y = None
-        # small value:
-        self.eps = sqrt(spacing(1))
         self.fun = fun
+        # if fun is None, raise an exception
+        if self.fun is None:
+            raise Exception("No objective function specified.")
+        # if fun is not callable, raise an exception
+        if not callable(self.fun):
+            raise Exception("Objective function is not callable.")
+        self.fun_control = fun_control
+        # set fun_control["sigma"] to sigma if "sigma" is not in fun_control dictionary
+        if "sigma" not in self.fun_control:
+            set_fun_control_sigma(fun_control, sigma)
+        # set fun_control["seed"] to seed if "seed" is not in fun_control dictionary
+        if "seed" not in self.fun_control:
+            set_fun_control_seed(self.fun_control, seed)
         self.lower = lower
+        # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
+        # else use the lower bound lower
+        if get_bound_values(fun_control, "lower") is not None:
+            self.lower = get_bound_values(fun_control, "lower")
+        # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
+        # else use the upper bound upper
         self.upper = upper
+        if get_bound_values(fun_control, "upper") is not None:
+            self.upper = get_bound_values(fun_control, "upper")
         self.var_type = var_type
         self.var_name = var_name
+        # use x0, x1, ... as default variable names:
+        if self.var_name is None:
+            self.var_name = ["x" + str(i) for i in range(len(self.lower))]
         self.all_var_name = all_var_name
         # Reduce dim based on lower == upper logic:
         # modifies lower, upper, and var_type
         self.to_red_dim()
         self.k = self.lower.size
+        # Force numeric type as default in every dim:
+        # assume all variable types are "num" if "num" is
+        # specified once:
+        if len(self.var_type) < self.k:
+            self.var_type = self.var_type * self.k
+            logger.warning("All variable types forced to 'num'.")
+        # if fun_evals is in fun_control dictionary,
+        # use the value of the key "fun_evals" as the number of function evaluations
         self.fun_evals = fun_evals
+        if get_fun_control_fun_evals(fun_control) is not None:
+            self.fun_evals = get_fun_control_fun_evals(fun_control)
+        # if fun_repeats is in fun_control dictionary,
+        # use the value of the key "fun_repeats" as the number of function repeats
+        # else use the number of function repeats fun_repeats
         self.fun_repeats = fun_repeats
+        if get_fun_control_fun_repeats(fun_control) is not None:
+            self.fun_repeats = get_fun_control_fun_repeats(fun_control)
         self.max_time = max_time
         self.noise = noise
         self.tolerance_x = tolerance_x
@@ -242,14 +283,7 @@ class Spot:
         self.show_models = show_models
         self.show_progress = show_progress
         # Random number generator:
-        self.seed = seed
-        self.rng = default_rng(self.seed)
-        # Force numeric type as default in every dim:
-        # assume all variable types are "num" if "num" is
-        # specified once:
-        if len(self.var_type) < self.k:
-            self.var_type = self.var_type * self.k
-            logger.warning("All variable types forced to 'num'.")
+        self.rng = default_rng(self.fun_control["seed"])
         self.infill_criterion = infill_criterion
         # Bounds
         de_bounds = []
@@ -258,13 +292,10 @@ class Spot:
         self.de_bounds = de_bounds
         # Infill points:
         self.n_points = n_points
-        # Objective function related information:
-        self.fun_control = {"sigma": 0, "seed": None}
-        self.fun_control.update(fun_control)
         # Design related information:
         self.design = design
         if design is None:
-            self.design = spacefilling(k=self.k, seed=self.seed)
+            self.design = spacefilling(k=self.k, seed=self.fun_control["seed"])
         self.design_control = {"init_size": 10, "repeats": 1}
         self.design_control.update(design_control)
         # Surrogate related information:
@@ -282,6 +313,10 @@ class Spot:
             "var_type": self.var_type,
             "seed": 124,
         }
+        self.X = None
+        self.y = None
+        # small value:
+        self.eps = sqrt(spacing(1))
         # Logging information:
         self.counter = 0
         self.min_y = None
@@ -514,7 +549,7 @@ class Spot:
             return X0
         # 2. No X0 found. Then generate self.n_points new solutions:
         else:
-            self.design = spacefilling(k=self.k, seed=self.seed + self.counter)
+            self.design = spacefilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
             X0 = self.generate_design(
                 size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper
             )

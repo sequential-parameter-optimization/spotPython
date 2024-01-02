@@ -570,14 +570,18 @@ def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Un
     # Throw value error if bound is not upper or lower:
     if bound not in ["upper", "lower"]:
         raise ValueError("bound must be either 'upper' or 'lower'")
-    d = fun_control["core_model_hyper_dict"]
-    b = []
-    for key, value in d.items():
-        b.append(value[bound])
-    if as_list:
-        return b
+    # check if key "core_model_hyper_dict" exists in fun_control:
+    if "core_model_hyper_dict" not in fun_control.keys():
+        return None
     else:
-        return np.array(b)
+        d = fun_control["core_model_hyper_dict"]
+        b = []
+        for key, value in d.items():
+            b.append(value[bound])
+        if as_list:
+            return b
+        else:
+            return np.array(b)
 
 
 def replace_levels_with_positions(hyper_dict, hyper_dict_values) -> dict:
@@ -1009,3 +1013,219 @@ def create_model(config, fun_control, **kwargs) -> object:
             model object.
     """
     return fun_control["core_model"](**config, **kwargs)
+
+
+def set_fun_control_fun_evals(fun_control, fun_evals) -> dict:
+    """
+    This function sets the number of function evaluations in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        fun_evals (int): number of function evaluations
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        fun_evals (int): number of function evaluations
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_fun_evals
+            fun_control = fun_control_init()
+            set_fun_control_fun_evals(fun_control=fun_control,
+                          fun_evals=5)
+            fun_control["fun_evals"]
+
+    """
+    fun_control.update({"fun_evals": fun_evals})
+
+
+def get_fun_control_fun_evals(fun_control=None) -> int:
+    """
+    This function gets the number of function evaluations from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        fun_evals (int):
+            number of function evaluations
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_fun_evals
+            fun_control = fun_control_init()
+            get_fun_control_fun_evals(fun_control=fun_control)
+            0
+    """
+    # check if key "fun_evals" exists in fun_control:
+    if fun_control is None or "fun_evals" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["fun_evals"]
+
+
+def set_fun_control_fun_repeats(fun_control, fun_repeats) -> dict:
+    """
+    This function sets the number of function repeats in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        fun_repeats (int): number of function repeats
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        fun_repeats (int): number of function repeats
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_fun_repeats
+            fun_control = fun_control_init()
+            set_fun_control_fun_repeats(fun_control=fun_control,
+                          fun_repeats=5)
+            fun_control["fun_repeats"]
+
+    """
+    fun_control.update({"fun_repeats": fun_repeats})
+
+
+def get_fun_control_fun_repeats(fun_control=None) -> int:
+    """
+    This function gets the number of function repeats from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        fun_repeats (int):
+            number of function repeats
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_fun_repeats
+            fun_control = fun_control_init()
+            get_fun_control_fun_repeats(fun_control=fun_control)
+            0
+    """
+    # check if key "fun_repeats" exists in fun_control:
+    if fun_control is None or "fun_repeats" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["fun_repeats"]
+
+
+def set_fun_control_seed(fun_control, seed) -> dict:
+    """
+    This function sets the seed in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        seed (int): seed
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        seed (int): seed
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_seed
+            fun_control = fun_control_init()
+            set_fun_control_seed(fun_control=fun_control,
+                          seed=5)
+            fun_control["seed"]
+
+    """
+    fun_control.update({"seed": seed})
+
+
+def get_fun_control_seed(fun_control=None) -> int:
+    """
+    This function gets the seed from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        seed (int):
+            seed
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_seed
+            fun_control = fun_control_init()
+            get_fun_control_seed(fun_control=fun_control)
+            0
+    """
+    # check if key "seed" exists in fun_control:
+    if fun_control is None or "seed" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["seed"]
+
+
+def set_fun_control_sigma(fun_control, sigma) -> dict:
+    """
+    This function sets the sigma in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        sigma (float): sigma
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        sigma (float): sigma
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_sigma
+            fun_control = fun_control_init()
+            set_fun_control_sigma(fun_control=fun_control,
+                          sigma=5)
+            fun_control["sigma"]
+
+    """
+    fun_control.update({"sigma": sigma})
+
+
+def get_fun_control_sigma(fun_control=None) -> float:
+    """
+    This function gets the sigma from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        sigma (float):
+            sigma
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_sigma
+            fun_control = fun_control_init()
+            get_fun_control_sigma(fun_control=fun_control)
+            0
+    """
+    # check if key "sigma" exists in fun_control:
+    if fun_control is None or "sigma" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["sigma"]

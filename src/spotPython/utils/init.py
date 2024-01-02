@@ -127,6 +127,7 @@ def fun_control_init(
         "device": device,
         "enable_progress_bar": enable_progress_bar,
         "eval": None,
+        "fun_evals": 15,
         "k_folds": 3,
         "loss_function": None,
         "metric_river": None,
