@@ -59,13 +59,14 @@ class Spot:
     * Displaying information. The `plot` method can be used for visualizing results. The `print` methods summarizes
     information about the tuning run.
 
-    The `Spot` class is built in a modular manner. It combines the following three components:
+    The `Spot` class is built in a modular manner. It combines the following components:
 
         1. Design
         2. Surrogate
-        3. Fun (Evaluation of the objective function)
+        3. Fun (objective function)
+        4. Optimizer
 
-    For each of the three components different implementations can be selected and combined.
+    For each of the components different implementations can be selected and combined.
     Internal components are selected as default.
     These can be replaced by components from other packages, e.g., scikit-learn or scikit-optimize.
 
@@ -221,6 +222,9 @@ class Spot:
         optimizer: object = None,
         optimizer_control: Dict[str, Union[int, float]] = {},
     ):
+        # small value:
+        self.eps = sqrt(spacing(1))
+
         self.fun = fun
         if self.fun is None:
             raise Exception("No objective function specified.")
@@ -238,8 +242,10 @@ class Spot:
         # objective functions from the spotPython.fun.objectivefunctions module.
         set_fun_control_key_value(fun_control=self.fun_control, key="sigma", value=sigma)
         set_fun_control_key_value(fun_control=self.fun_control, key="seed", value=seed)
+        # Random number generator:
+        self.rng = default_rng(self.fun_control["seed"])
 
-        # 2. self attributes updates:
+        # 2. lower attribute updates:
         # -----------------------
         # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
         # else use the lower bound lower
@@ -249,12 +255,16 @@ class Spot:
         # Number of dimensions is based on lower
         self.k = self.lower.size
 
+        # 3. upper attribute updates:
+        # -----------------------
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         # else use the upper bound upper
         self.upper = upper
         if get_bound_values(self.fun_control, "upper") is not None:
             self.upper = get_bound_values(self.fun_control, "upper")
 
+        # 4. var_type attribute updates:
+        # -----------------------
         self.set_self_attribute("var_type", var_type, self.fun_control)
         # Force numeric type as default in every dim:
         # assume all variable types are "num" if "num" is
@@ -263,6 +273,8 @@ class Spot:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
 
+        # 5. var_name attribute updates:
+        # -----------------------
         self.set_self_attribute("var_name", var_name, self.fun_control)
         # use x0, x1, ... as default variable names:
         if self.var_name is None:
@@ -272,6 +284,8 @@ class Spot:
         # modifies lower, upper, var_type, and var_name
         self.to_red_dim()
 
+        # 6. Additional self attributes updates:
+        # -----------------------
         self.set_self_attribute("fun_evals", fun_evals, self.fun_control)
         self.set_self_attribute("fun_repeats", fun_repeats, self.fun_control)
         self.set_self_attribute("max_time", max_time, self.fun_control)
@@ -284,8 +298,9 @@ class Spot:
         self.set_self_attribute("infill_criterion", infill_criterion, self.fun_control)
         self.set_self_attribute("n_points", n_points, self.fun_control)
 
-        # Random number generator:
-        self.rng = default_rng(self.fun_control["seed"])
+        # if the key "spot_writer" is not in the dictionary fun_control,
+        # set self.spot_writer to None else to the value of the key "spot_writer"
+        self.spot_writer = self.fun_control.get("spot_writer", None)
 
         # Bounds are internal, because they are functions of self.lower and self.upper
         # and used by the optimizer:
@@ -316,25 +331,6 @@ class Spot:
             "var_type": self.var_type,
             "seed": 124,
         }
-        self.X = None
-        self.y = None
-        # small value:
-        self.eps = sqrt(spacing(1))
-        # Logging information:
-        self.counter = 0
-        self.min_y = None
-        self.min_X = None
-        self.min_mean_X = None
-        self.min_mean_y = None
-        self.mean_X = None
-        self.mean_y = None
-        self.var_y = None
-        logger.setLevel(self.log_level)
-        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
-
-        # if the key "spot_writer" is not in the dictionary fun_control,
-        # set self.spot_writer to None else to the value of the key "spot_writer"
-        self.spot_writer = self.fun_control.get("spot_writer", None)
         self.surrogate_control.update(surrogate_control)
         # If no surrogate model is specified, use the internal
         # spotPython kriging surrogate:
@@ -357,12 +353,29 @@ class Spot:
                 spot_writer=self.spot_writer,
                 counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
             )
+
         # Optimizer related information:
         self.optimizer = optimizer
         self.optimizer_control = {"max_iter": 1000, "seed": 125}
         self.optimizer_control.update(optimizer_control)
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
+
+        # Internal attributes:
+        self.X = None
+        self.y = None
+        # Logging information:
+        self.counter = 0
+        self.min_y = None
+        self.min_X = None
+        self.min_mean_X = None
+        self.min_mean_y = None
+        self.mean_X = None
+        self.mean_y = None
+        self.var_y = None
+
+        logger.setLevel(self.log_level)
+        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
         logger.debug("In Spot() init(): fun_control: %s", self.fun_control)
         logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
         logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
