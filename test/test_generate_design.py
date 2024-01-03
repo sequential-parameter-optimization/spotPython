@@ -14,7 +14,8 @@ def test_generate_design():
         lower=np.array([-5,0,1]),
         upper=np.array([10,15,3]),
         seed=1,
-        design_control={"init_size": ni}
+        design_control={"init_size": ni},
+        fun_control={}
     )
 
     X = spot_test.generate_design(size=spot_test.design_control["init_size"],
@@ -38,7 +39,8 @@ def test_generate_design():
         lower=np.array([-5,0,1]),
         upper=np.array([10,15,3]),
         seed=1,
-        design_control={"init_size": ni}
+        design_control={"init_size": ni},
+        fun_control={}
     )
 
     X3 = spot_test.generate_design(size=spot_test.design_control["init_size"],
@@ -46,22 +48,23 @@ def test_generate_design():
                                    lower=spot_test.lower, 
                                    upper=spot_test.upper)
 
-    # spot_test = Spot(
-    #     fun=fun,
-    #     lower=np.array([-5,0,1]),
-    #     upper=np.array([10,15,3]),
-    #     seed=2,
-    #     design_control={"init_size": ni}
-    # )
+    spot_test = Spot(
+        fun=fun,
+        lower=np.array([-5,0,1]),
+        upper=np.array([10,15,3]),
+        seed=2,
+        design_control={"init_size": ni},
+        fun_control={}
+    )
 
-    # X4 = spot_test.generate_design(size=spot_test.design_control["init_size"],
-    #                                repeats=spot_test.design_control["repeats"],
-    #                                lower=spot_test.lower, 
-    #                                upper=spot_test.upper)
+    X4 = spot_test.generate_design(size=spot_test.design_control["init_size"],
+                                   repeats=spot_test.design_control["repeats"],
+                                   lower=spot_test.lower, 
+                                   upper=spot_test.upper)
 
     assert (X != X2).any()
     assert (X == X3).any()
-#    assert (X != X4).any()
+    assert (X != X4).any()
     assert (X2 != X3).any()
- #   assert (X2 != X4).any()
- #   assert (X3 != X4).any()
+    assert (X2 != X4).any()
+    assert (X3 != X4).any()

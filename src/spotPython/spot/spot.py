@@ -36,7 +36,7 @@ from spotPython.hyperparameters.values import (
     get_fun_control_key_value,
 )
 import plotly.graph_objects as go
-from typing import List, Union, Callable, Dict
+from typing import Union, Callable, Dict
 
 
 logger = logging.getLogger(__name__)
@@ -200,12 +200,12 @@ class Spot:
         upper: np.array = None,
         fun_evals: int = 15,
         fun_repeats: int = 1,
-        fun_control: Dict[str, Union[int, float]] = {},
+        fun_control: dict = {},
         max_time: int = inf,
         noise: bool = False,
         tolerance_x: float = 0,
-        var_type: List[str] = ["num"],
-        var_name: List[str] = None,
+        var_type: list = ["num"],
+        var_name: list = None,
         infill_criterion: str = "y",
         n_points: int = 1,
         ocba_delta: int = 0,
@@ -246,6 +246,8 @@ class Spot:
         self.lower = lower
         if get_bound_values(self.fun_control, "lower") is not None:
             self.lower = get_bound_values(self.fun_control, "lower")
+        # Number of dimensions is based on lower
+        self.k = self.lower.size
 
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         # else use the upper bound upper
@@ -254,24 +256,21 @@ class Spot:
             self.upper = get_bound_values(self.fun_control, "upper")
 
         self.set_self_attribute("var_type", var_type, self.fun_control)
-        self.set_self_attribute("var_name", var_name, self.fun_control)
-        # use x0, x1, ... as default variable names:
-        if self.var_name is None:
-            self.var_name = ["x" + str(i) for i in range(len(self.lower))]
-
-        # Number of dimensions:
-        self.k = self.lower.size
-
-        # Reduce dim based on lower == upper logic:
-        # modifies lower, upper, var_type, and var_name
-        self.to_red_dim()
-
         # Force numeric type as default in every dim:
         # assume all variable types are "num" if "num" is
         # specified less than k times
         if len(self.var_type) < self.k:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
+
+        self.set_self_attribute("var_name", var_name, self.fun_control)
+        # use x0, x1, ... as default variable names:
+        if self.var_name is None:
+            self.var_name = ["x" + str(i) for i in range(len(self.lower))]
+
+        # Reduce dim based on lower == upper logic:
+        # modifies lower, upper, var_type, and var_name
+        self.to_red_dim()
 
         self.set_self_attribute("fun_evals", fun_evals, self.fun_control)
         self.set_self_attribute("fun_repeats", fun_repeats, self.fun_control)
@@ -288,7 +287,7 @@ class Spot:
         # Random number generator:
         self.rng = default_rng(self.fun_control["seed"])
 
-        # Bounds are internal, because they are function of self.lower and self.upper
+        # Bounds are internal, because they are functions of self.lower and self.upper
         # and used by the optimizer:
         de_bounds = []
         for j in range(self.lower.size):
