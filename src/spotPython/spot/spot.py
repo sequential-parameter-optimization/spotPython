@@ -332,6 +332,13 @@ class Spot:
             "seed": 124,
         }
         self.surrogate_control.update(surrogate_control)
+
+        # If self.surrogate_control["n_theta"] > 1, use k theta values:
+        if self.surrogate_control["n_theta"] > 1:
+            surrogate_control.update({"n_theta": self.k})
+        else:
+            surrogate_control.update({"n_theta": 1})
+
         # If no surrogate model is specified, use the internal
         # spotPython kriging surrogate:
         if self.surrogate is None:

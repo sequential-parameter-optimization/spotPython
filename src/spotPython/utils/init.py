@@ -1,22 +1,28 @@
 import os
 import lightning as L
 import datetime
+from math import inf
 
 # PyTorch TensorBoard support
 from torch.utils.tensorboard import SummaryWriter
 
 
 def fun_control_init(
-    task="classification",
     _L_in=None,
     _L_out=None,
-    enable_progress_bar=False,
-    spot_tensorboard_path=None,
     TENSORBOARD_CLEAN=False,
-    num_workers=0,
     device=None,
+    enable_progress_bar=False,
+    fun_evals=inf,
+    log_level=10,
+    max_time=1,
+    num_workers=0,
     seed=1234,
     sigma=0.0,
+    show_progress=False,
+    spot_tensorboard_path=None,
+    task="classification",
+    tolerance_x=0,
 ):
     """Initialize fun_control dictionary.
     Args:
@@ -127,9 +133,11 @@ def fun_control_init(
         "device": device,
         "enable_progress_bar": enable_progress_bar,
         "eval": None,
-        "fun_evals": 15,
+        "fun_evals": fun_evals,
         "k_folds": 3,
+        "log_level": log_level,
         "loss_function": None,
+        "max_time": max_time,
         "metric_river": None,
         "metric_sklearn": None,
         "metric_torch": None,
@@ -143,9 +151,11 @@ def fun_control_init(
         "save_model": False,
         "seed": seed,
         "show_batch_interval": 1_000_000,
+        "show_progress": show_progress,
         "shuffle": None,
         "sigma": sigma,
         "target_column": None,
+        "tolerance_x": tolerance_x,
         "train": None,
         "test": None,
         "task": task,
