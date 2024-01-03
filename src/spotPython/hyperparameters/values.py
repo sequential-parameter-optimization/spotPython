@@ -268,7 +268,7 @@ def assign_values(X: np.array, var_list: list) -> dict:
     return result
 
 
-def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
+def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
     """
     This function modifies the levels of a hyperparameter in the fun_control dictionary.
 
@@ -281,8 +281,7 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
             list of levels
 
     Returns:
-        fun_control (dict):
-            updated fun_control
+        None.
 
     Examples:
         >>> fun_control = {}
@@ -298,7 +297,7 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> dict:
     fun_control["core_model_hyper_dict"][hyperparameter].update({"upper": len(levels) - 1})
 
 
-def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
+def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> None:
     """
     Args:
         fun_control (dict):
@@ -310,8 +309,7 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> dict:
             and the second value represents the upper bound.
 
     Returns:
-        fun_control (dict):
-            updated fun_control
+        None.
 
     Examples:
         >>> from spotPython.hyperparameters.values import modify_hyper_parameter_levels
@@ -1292,3 +1290,192 @@ def get_fun_control_max_time(fun_control=None) -> float:
         return None
     else:
         return fun_control["max_time"]
+
+
+def set_fun_control_noise(fun_control, noise) -> dict:
+    """
+    This function sets the noise in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        noise (float): noise
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        noise (float): noise
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_noise
+            fun_control = fun_control_init()
+            set_fun_control_noise(fun_control=fun_control,
+                          noise=5)
+            fun_control["noise"]
+
+    """
+    fun_control.update({"noise": noise})
+
+
+def get_fun_control_noise(fun_control=None) -> float:
+    """
+    This function gets the noise from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        noise (float):
+            noise
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_noise
+            fun_control = fun_control_init()
+            get_fun_control_noise(fun_control=fun_control)
+            0
+    """
+    # check if key "noise" exists in fun_control:
+    if fun_control is None or "noise" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["noise"]
+
+
+def set_fun_control_tolerance_x(fun_control, tolerance_x) -> dict:
+    """
+    This function sets the tolerance_x in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        tolerance_x (float): tolerance_x
+
+    Returns:
+        fun_control (dict):
+            updated fun_control
+
+    Attributes:
+        tolerance_x (float): tolerance_x
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_tolerance_x
+            fun_control = fun_control_init()
+            set_fun_control_tolerance_x(fun_control=fun_control,
+                          tolerance_x=5)
+            fun_control["tolerance_x"]
+
+    """
+    fun_control.update({"tolerance_x": tolerance_x})
+
+
+def get_fun_control_tolerance_x(fun_control=None) -> float:
+    """
+    This function gets the tolerance_x from the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+
+    Returns:
+        tolerance_x (float):
+            tolerance_x
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_tolerance_x
+            fun_control = fun_control_init()
+            get_fun_control_tolerance_x(fun_control=fun_control)
+            0
+    """
+    # check if key "tolerance_x" exists in fun_control:
+    if fun_control is None or "tolerance_x" not in fun_control.keys():
+        return None
+    else:
+        return fun_control["tolerance_x"]
+
+
+def set_fun_control_key_value(fun_control, key, value, replace=False) -> None:
+    """
+    This function sets the key value pair in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        key (str): key
+        value (Any): value
+        replace (bool): replace value if key already exists. Default is False.
+
+    Returns:
+        None.
+
+    Attributes:
+        key (str): key
+        value (Any): value
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_fun_control_key_value
+            fun_control = fun_control_init()
+            set_fun_control_key_value(fun_control=fun_control,
+                          key="key",
+                          value="value")
+            fun_control["key"]
+
+    """
+    if replace:
+        fun_control.update({key: value})
+    else:
+        if key not in fun_control.keys():
+            fun_control.update({key: value})
+
+
+def get_fun_control_key_value(fun_control=None, key=None) -> Any:
+    """
+    This function gets the key value pair from the fun_control dictionary.
+    If the key does not exist, return None.
+    If the fun_control dictionary is None, return None.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        key (str): key
+
+    Returns:
+        value (Any):
+            value
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_fun_control_key_value
+            fun_control = fun_control_init()
+            get_fun_control_key_value(fun_control=fun_control,
+                            key="key")
+            "value"
+    """
+    # check if key exists in fun_control:
+    if fun_control is None or key not in fun_control.keys():
+        return None
+    else:
+        return fun_control[key]
+
+
+def set_self_attribute(self, attribute, value, dict):
+    """
+    This function sets the attribute of the 'self' object to the provided value.
+    If the key exists in the provided dictionary, it updates the attribute with the value from the dictionary.
+
+    Args:
+        self (object): the object whose attribute is to be set
+        attribute (str): the attribute to set
+        value (Any): the value to set the attribute to
+        dict (dict): the dictionary to check for the key
+    """
+    setattr(self, attribute, value)
+    if get_fun_control_key_value(fun_control=dict, key=attribute) is not None:
+        setattr(self, attribute, get_fun_control_key_value(fun_control=dict, key=attribute))

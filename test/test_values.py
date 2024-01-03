@@ -7,6 +7,8 @@ from spotPython.hyperparameters.values import set_fun_control_fun_repeats, get_f
 from spotPython.hyperparameters.values import set_fun_control_seed, get_fun_control_seed
 from spotPython.hyperparameters.values import set_fun_control_sigma, get_fun_control_sigma
 from spotPython.hyperparameters.values import set_fun_control_max_time, get_fun_control_max_time
+from spotPython.hyperparameters.values import get_fun_control_key_value, set_fun_control_key_value
+
 
 
 def setup_function():
@@ -110,3 +112,36 @@ def test_get_fun_control_max_time():
     # Test when "max_time" is in fun_control
     set_fun_control_max_time(fun_control, 10.0)
     assert get_fun_control_max_time(fun_control) == 10.0
+
+def test_set_fun_control_key_value():
+    fun_control = fun_control_init()
+
+    # Test when key is not in fun_control and replace is False
+    set_fun_control_key_value(fun_control, "key1", "value1")
+    assert fun_control["key1"] == "value1"
+
+    # Test when key is in fun_control and replace is False
+    set_fun_control_key_value(fun_control, "key1", "value2")
+    assert fun_control["key1"] == "value1"
+
+    # Test when key is in fun_control and replace is True
+    set_fun_control_key_value(fun_control, "key1", "value2", replace=True)
+    assert fun_control["key1"] == "value2"
+
+    # Test when key is not in fun_control and replace is True
+    set_fun_control_key_value(fun_control, "key2", "value3", replace=True)
+    assert fun_control["key2"] == "value3"
+
+def test_get_fun_control_key_value():
+    fun_control = fun_control_init()
+
+    # Test when key is not in fun_control
+    assert get_fun_control_key_value(fun_control, "key1") is None
+
+    # Test when fun_control is None
+    assert get_fun_control_key_value() is None
+
+    # Test when key is in fun_control
+    set_fun_control_key_value(fun_control, "key1", "value1")
+    assert get_fun_control_key_value(fun_control, "key1") == "value1"
+    

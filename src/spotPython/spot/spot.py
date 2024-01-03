@@ -39,6 +39,8 @@ from spotPython.hyperparameters.values import (
     get_var_name,
     get_var_type,
     get_fun_control_max_time,
+    set_fun_control_key_value,
+    get_fun_control_key_value,
 )
 import plotly.graph_objects as go
 from typing import List, Union, Callable, Dict
@@ -235,12 +237,10 @@ class Spot:
         self.fun_control = fun_control
 
         # set fun_control["sigma"] to sigma if "sigma" is not in fun_control dictionary
-        if "sigma" not in self.fun_control:
-            set_fun_control_sigma(fun_control, sigma)
+        set_fun_control_key_value(fun_control=self.fun_control, key="sigma", value=sigma)
 
         # set fun_control["seed"] to seed if "seed" is not in fun_control dictionary
-        if "seed" not in self.fun_control:
-            set_fun_control_seed(self.fun_control, seed)
+        set_fun_control_key_value(fun_control=self.fun_control, key="seed", value=seed)
 
         # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
         # else use the lower bound lower
