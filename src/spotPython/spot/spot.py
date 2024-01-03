@@ -32,13 +32,6 @@ from spotPython.utils.progress import progress_bar
 from spotPython.utils.convert import find_indices
 from spotPython.hyperparameters.values import (
     get_bound_values,
-    get_fun_control_fun_evals,
-    get_fun_control_fun_repeats,
-    set_fun_control_seed,
-    set_fun_control_sigma,
-    get_var_name,
-    get_var_type,
-    get_fun_control_max_time,
     set_fun_control_key_value,
     get_fun_control_key_value,
 )
@@ -234,33 +227,34 @@ class Spot:
         if not callable(self.fun):
             raise Exception("Objective function is not callable.")
 
+        # 1. fun_control updates:
+        # -----------------------
         self.fun_control = fun_control
 
         # set fun_control["sigma"] to sigma if "sigma" is not in fun_control dictionary
+        # If no fun_control is provided, the fun_control dictionary is initialized with the
+        # key "sigma" and the value sigma amd the key "seed" and the value seed.
+        # This is a mimimum requirement for the fun_control dictionary to call
+        # objective functions from the spotPython.fun.objectivefunctions module.
         set_fun_control_key_value(fun_control=self.fun_control, key="sigma", value=sigma)
-
-        # set fun_control["seed"] to seed if "seed" is not in fun_control dictionary
         set_fun_control_key_value(fun_control=self.fun_control, key="seed", value=seed)
 
+        # 2. self attributes updates:
+        # -----------------------
         # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
         # else use the lower bound lower
         self.lower = lower
-        if get_bound_values(fun_control, "lower") is not None:
-            self.lower = get_bound_values(fun_control, "lower")
+        if get_bound_values(self.fun_control, "lower") is not None:
+            self.lower = get_bound_values(self.fun_control, "lower")
 
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         # else use the upper bound upper
         self.upper = upper
-        if get_bound_values(fun_control, "upper") is not None:
-            self.upper = get_bound_values(fun_control, "upper")
+        if get_bound_values(self.fun_control, "upper") is not None:
+            self.upper = get_bound_values(self.fun_control, "upper")
 
-        self.var_type = var_type
-        if get_var_type(fun_control) is not None:
-            self.var_type = get_var_type(fun_control)
-
-        self.var_name = var_name
-        if get_var_name(fun_control) is not None:
-            self.var_name = get_var_name(fun_control)
+        self.set_self_attribute("var_type", var_type, self.fun_control)
+        self.set_self_attribute("var_name", var_name, self.fun_control)
         # use x0, x1, ... as default variable names:
         if self.var_name is None:
             self.var_name = ["x" + str(i) for i in range(len(self.lower))]
@@ -279,45 +273,35 @@ class Spot:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
 
-        # if fun_evals is in fun_control dictionary,
-        # use the value of the key "fun_evals" as the number of function evaluations
-        self.fun_evals = fun_evals
-        if get_fun_control_fun_evals(fun_control) is not None:
-            self.fun_evals = get_fun_control_fun_evals(fun_control)
+        self.set_self_attribute("fun_evals", fun_evals, self.fun_control)
+        self.set_self_attribute("fun_repeats", fun_repeats, self.fun_control)
+        self.set_self_attribute("max_time", max_time, self.fun_control)
+        self.set_self_attribute("noise", noise, self.fun_control)
+        self.set_self_attribute("tolerance_x", tolerance_x, self.fun_control)
+        self.set_self_attribute("ocba_delta", ocba_delta, self.fun_control)
+        self.set_self_attribute("log_level", log_level, self.fun_control)
+        self.set_self_attribute("show_models", show_models, self.fun_control)
+        self.set_self_attribute("show_progress", show_progress, self.fun_control)
+        self.set_self_attribute("infill_criterion", infill_criterion, self.fun_control)
+        self.set_self_attribute("n_points", n_points, self.fun_control)
 
-        # if fun_repeats is in fun_control dictionary,
-        # use the value of the key "fun_repeats" as the number of function repeats
-        # else use the number of function repeats fun_repeats
-        self.fun_repeats = fun_repeats
-        if get_fun_control_fun_repeats(fun_control) is not None:
-            self.fun_repeats = get_fun_control_fun_repeats(fun_control)
-
-        self.max_time = max_time
-        if get_fun_control_max_time(fun_control) is not None:
-            self.max_time = get_fun_control_max_time(fun_control)
-
-        self.noise = noise
-        self.tolerance_x = tolerance_x
-        self.ocba_delta = ocba_delta
-        self.log_level = log_level
-        self.show_models = show_models
-        self.show_progress = show_progress
         # Random number generator:
         self.rng = default_rng(self.fun_control["seed"])
-        self.infill_criterion = infill_criterion
-        # Bounds
+
+        # Bounds are internal, because they are function of self.lower and self.upper
+        # and used by the optimizer:
         de_bounds = []
-        for j in range(self.k):
+        for j in range(self.lower.size):
             de_bounds.append([self.lower[j], self.upper[j]])
         self.de_bounds = de_bounds
-        # Infill points:
-        self.n_points = n_points
+
         # Design related information:
         self.design = design
         if design is None:
-            self.design = spacefilling(k=self.k, seed=self.fun_control["seed"])
+            self.design = spacefilling(k=self.lower.size, seed=self.fun_control["seed"])
         self.design_control = {"init_size": 10, "repeats": 1}
         self.design_control.update(design_control)
+
         # Surrogate related information:
         self.surrogate = surrogate
         self.surrogate_control = {
@@ -351,7 +335,7 @@ class Spot:
 
         # if the key "spot_writer" is not in the dictionary fun_control,
         # set self.spot_writer to None else to the value of the key "spot_writer"
-        self.spot_writer = fun_control.get("spot_writer", None)
+        self.spot_writer = self.fun_control.get("spot_writer", None)
         self.surrogate_control.update(surrogate_control)
         # If no surrogate model is specified, use the internal
         # spotPython kriging surrogate:
@@ -383,6 +367,22 @@ class Spot:
         logger.debug("In Spot() init(): fun_control: %s", self.fun_control)
         logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
         logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
+        logger.debug("In Spot() init(): self.get_spot_attributes_as_df(): %s", self.get_spot_attributes_as_df())
+
+    def set_self_attribute(self, attribute, value, dict):
+        """
+        This function sets the attribute of the 'self' object to the provided value.
+        If the key exists in the provided dictionary, it updates the attribute with the value from the dictionary.
+
+        Args:
+            self (object): the object whose attribute is to be set
+            attribute (str): the attribute to set
+            value (Any): the value to set the attribute to
+            dict (dict): the dictionary to check for the key
+        """
+        setattr(self, attribute, value)
+        if get_fun_control_key_value(fun_control=dict, key=attribute) is not None:
+            setattr(self, attribute, get_fun_control_key_value(fun_control=dict, key=attribute))
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
         """Get all attributes of the spot object as a pandas dataframe.
@@ -731,7 +731,10 @@ class Spot:
         self.X = X0
         # (S-3): Eval initial design:
         X_all = self.to_all_dim_if_needed(X0)
+        logger.debug("In Spot() initialize_design(), before calling self.fun: X_all: %s", X_all)
+        logger.debug("In Spot() initialize_design(), before calling self.fun: fun_control: %s", self.fun_control)
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
+        logger.debug("In Spot() initialize_design(), after calling self.fun: self.y: %s", self.y)
         # TODO: Error if only nan values are returned
         logger.debug("New y value: %s", self.y)
         #

@@ -21,8 +21,6 @@ def test_ocba():
 #     [11  9 19  9  2]
 
 fun = analytical().fun_linear
-fun_control = {"sigma": 0.001,
-               "seed": 123}
 spot_1_noisy = spot.Spot(fun=fun,
                    lower = np.array([-1]),
                    upper = np.array([1]),
@@ -32,7 +30,7 @@ spot_1_noisy = spot.Spot(fun=fun,
                    ocba_delta=1,
                    seed=123,
                    show_models=False,
-                   fun_control = fun_control,
+                   sigma=0.001,
                    design_control={"init_size": 3,
                                    "repeats": 2},
                    surrogate_control={"noise": True})

@@ -2,7 +2,9 @@ import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
 
+
 def update_stats_no_duplicates():
+   
     # number of initial points:
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
@@ -11,6 +13,7 @@ def update_stats_no_duplicates():
     upper = np.array([1, 1])
     design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
+                    fun_control={},
                 lower = lower,
                 upper= upper,
                 show_progress=True,
@@ -36,8 +39,8 @@ def test_update_stats_duplicates_and_noise():
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
     design_control={"init_size": ni}
-
     S = spot.Spot(fun=fun,
+                  fun_control={},
                 noise=True,
                 lower = lower,
                 upper= upper,
@@ -58,9 +61,12 @@ def test_update_stats_duplicates_and_noise():
                             [1., 0.],
                             [1., 1.]])).all()
     # the y values are also aggregated, there are only 4 values
+    print(f"S.mean_y: {S.mean_y}")
+    print(np.array([0., 1., 1., 2.]))
     assert np.equal(S.mean_y, np.array([0., 1., 1., 2.])).all()
 
 def test_update_stats_duplicates_nonoise():
+
     # number of initial points:
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
@@ -71,6 +77,7 @@ def test_update_stats_duplicates_nonoise():
     design_control={"init_size": ni}
 
     S = spot.Spot(fun=fun,
+                fun_control={},
                 noise=False,
                 lower = lower,
                 upper= upper,
