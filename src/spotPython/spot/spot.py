@@ -32,8 +32,8 @@ from spotPython.utils.progress import progress_bar
 from spotPython.utils.convert import find_indices
 from spotPython.hyperparameters.values import (
     get_bound_values,
-    set_fun_control_key_value,
-    get_fun_control_key_value,
+    set_control_key_value,
+    get_control_key_value,
 )
 import plotly.graph_objects as go
 from typing import Union, Callable, Dict
@@ -240,8 +240,8 @@ class Spot:
         # key "sigma" and the value sigma amd the key "seed" and the value seed.
         # This is a mimimum requirement for the fun_control dictionary to call
         # objective functions from the spotPython.fun.objectivefunctions module.
-        set_fun_control_key_value(fun_control=self.fun_control, key="sigma", value=sigma)
-        set_fun_control_key_value(fun_control=self.fun_control, key="seed", value=seed)
+        set_control_key_value(fun_control=self.fun_control, key="sigma", value=sigma)
+        set_control_key_value(fun_control=self.fun_control, key="seed", value=seed)
         # Random number generator:
         self.rng = default_rng(self.fun_control["seed"])
 
@@ -400,8 +400,8 @@ class Spot:
             dict (dict): the dictionary to check for the key
         """
         setattr(self, attribute, value)
-        if get_fun_control_key_value(fun_control=dict, key=attribute) is not None:
-            setattr(self, attribute, get_fun_control_key_value(fun_control=dict, key=attribute))
+        if get_control_key_value(fun_control=dict, key=attribute) is not None:
+            setattr(self, attribute, get_control_key_value(fun_control=dict, key=attribute))
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
         """Get all attributes of the spot object as a pandas dataframe.

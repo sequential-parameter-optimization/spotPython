@@ -1022,7 +1022,7 @@ def create_model(config, fun_control, **kwargs) -> object:
     return fun_control["core_model"](**config, **kwargs)
 
 
-def set_fun_control_key_value(fun_control, key, value, replace=False) -> None:
+def set_control_key_value(fun_control, key, value, replace=False) -> None:
     """
     This function sets the key value pair in the fun_control dictionary.
 
@@ -1042,9 +1042,9 @@ def set_fun_control_key_value(fun_control, key, value, replace=False) -> None:
 
     Examples:
         >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_fun_control_key_value
+            from spotPython.hyperparameters.values import set_control_key_value
             fun_control = fun_control_init()
-            set_fun_control_key_value(fun_control=fun_control,
+            set_control_key_value(fun_control=fun_control,
                           key="key",
                           value="value")
             fun_control["key"]
@@ -1057,7 +1057,7 @@ def set_fun_control_key_value(fun_control, key, value, replace=False) -> None:
             fun_control.update({key: value})
 
 
-def get_fun_control_key_value(fun_control=None, key=None) -> Any:
+def get_control_key_value(fun_control=None, key=None) -> Any:
     """
     This function gets the key value pair from the fun_control dictionary.
     If the key does not exist, return None.
@@ -1074,9 +1074,9 @@ def get_fun_control_key_value(fun_control=None, key=None) -> Any:
 
     Examples:
         >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import get_fun_control_key_value
+            from spotPython.hyperparameters.values import get_control_key_value
             fun_control = fun_control_init()
-            get_fun_control_key_value(fun_control=fun_control,
+            get_control_key_value(fun_control=fun_control,
                             key="key")
             "value"
     """

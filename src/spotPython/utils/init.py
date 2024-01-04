@@ -1,7 +1,7 @@
 import os
 import lightning as L
 import datetime
-from math import inf
+
 
 # PyTorch TensorBoard support
 from torch.utils.tensorboard import SummaryWriter
@@ -13,7 +13,7 @@ def fun_control_init(
     TENSORBOARD_CLEAN=False,
     device=None,
     enable_progress_bar=False,
-    fun_evals=inf,
+    fun_evals=15,
     log_level=10,
     max_time=1,
     num_workers=0,
