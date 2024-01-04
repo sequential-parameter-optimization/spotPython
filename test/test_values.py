@@ -33,31 +33,31 @@ def test_set_control_key_value():
     fun_control = fun_control_init()
 
     # Test when key is not in fun_control and replace is False
-    set_control_key_value(fun_control, "key1", "value1")
+    set_control_key_value(control_dict=fun_control, key="key1", value="value1")
     assert fun_control["key1"] == "value1"
 
     # Test when key is in fun_control and replace is False
-    set_control_key_value(fun_control, "key1", "value2")
+    set_control_key_value(control_dict=fun_control, key="key1", value="value2")
     assert fun_control["key1"] == "value1"
 
     # Test when key is in fun_control and replace is True
-    set_control_key_value(fun_control, "key1", "value2", replace=True)
+    set_control_key_value(control_dict=fun_control, key="key1", value="value2", replace=True)
     assert fun_control["key1"] == "value2"
 
     # Test when key is not in fun_control and replace is True
-    set_control_key_value(fun_control, "key2", "value3", replace=True)
+    set_control_key_value(control_dict=fun_control, key="key2", value="value3", replace=True)
     assert fun_control["key2"] == "value3"
 
 def test_get_control_key_value():
     fun_control = fun_control_init()
 
     # Test when key is not in fun_control
-    assert get_control_key_value(fun_control, "key1") is None
+    assert get_control_key_value(control_dict=fun_control, key="key1") is None
 
     # Test when fun_control is None
     assert get_control_key_value() is None
 
     # Test when key is in fun_control
-    set_control_key_value(fun_control, "key1", "value1")
-    assert get_control_key_value(fun_control, "key1") == "value1"
+    set_control_key_value(control_dict=fun_control, key="key1", value="value1")
+    assert get_control_key_value(control_dict=fun_control, key="key1") == "value1"
     

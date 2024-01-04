@@ -1022,13 +1022,13 @@ def create_model(config, fun_control, **kwargs) -> object:
     return fun_control["core_model"](**config, **kwargs)
 
 
-def set_control_key_value(fun_control, key, value, replace=False) -> None:
+def set_control_key_value(control_dict, key, value, replace=False) -> None:
     """
-    This function sets the key value pair in the fun_control dictionary.
+    This function sets the key value pair in the control_dict dictionary.
 
     Args:
-        fun_control (dict):
-            fun_control dictionary
+        control_dict (dict):
+            control_dict dictionary
         key (str): key
         value (Any): value
         replace (bool): replace value if key already exists. Default is False.
@@ -1043,29 +1043,29 @@ def set_control_key_value(fun_control, key, value, replace=False) -> None:
     Examples:
         >>> from spotPython.utils.init import fun_control_init
             from spotPython.hyperparameters.values import set_control_key_value
-            fun_control = fun_control_init()
-            set_control_key_value(fun_control=fun_control,
+            control_dict = fun_control_init()
+            set_control_key_value(control_dict=control_dict,
                           key="key",
                           value="value")
-            fun_control["key"]
+            control_dict["key"]
 
     """
     if replace:
-        fun_control.update({key: value})
+        control_dict.update({key: value})
     else:
-        if key not in fun_control.keys():
-            fun_control.update({key: value})
+        if key not in control_dict.keys():
+            control_dict.update({key: value})
 
 
-def get_control_key_value(fun_control=None, key=None) -> Any:
+def get_control_key_value(control_dict=None, key=None) -> Any:
     """
-    This function gets the key value pair from the fun_control dictionary.
+    This function gets the key value pair from the control_dict dictionary.
     If the key does not exist, return None.
-    If the fun_control dictionary is None, return None.
+    If the control_dict dictionary is None, return None.
 
     Args:
-        fun_control (dict):
-            fun_control dictionary
+        control_dict (dict):
+            control_dict dictionary
         key (str): key
 
     Returns:
@@ -1075,13 +1075,13 @@ def get_control_key_value(fun_control=None, key=None) -> Any:
     Examples:
         >>> from spotPython.utils.init import fun_control_init
             from spotPython.hyperparameters.values import get_control_key_value
-            fun_control = fun_control_init()
-            get_control_key_value(fun_control=fun_control,
+            control_dict = fun_control_init()
+            get_control_key_value(control_dict=control_dict,
                             key="key")
             "value"
     """
-    # check if key exists in fun_control:
-    if fun_control is None or key not in fun_control.keys():
+    # check if key exists in control_dict:
+    if control_dict is None or key not in control_dict.keys():
         return None
     else:
-        return fun_control[key]
+        return control_dict[key]
