@@ -476,6 +476,8 @@ class Kriging(surrogates):
                 [1.         1.00000001]]
 
         """
+        logger.debug("In fit(): nat_X: %s", nat_X)
+        logger.debug("In fit(): nat_y: %s", nat_y)
         self.initialize_variables(nat_X, nat_y)
         self.set_variable_types()
         self.set_theta_values()
@@ -539,6 +541,13 @@ class Kriging(surrogates):
         # aggregated y values:
         mu = Z[1]
         self.aggregated_mean_y = np.copy(mu)
+        logger.debug("In initialize_variables(): self.nat_X: %s", self.nat_X)
+        logger.debug("In initialize_variables(): self.nat_y: %s", self.nat_y)
+        logger.debug("In initialize_variables(): self.aggregated_mean_y: %s", self.aggregated_mean_y)
+        logger.debug("In initialize_variables(): self.min_X: %s", self.min_X)
+        logger.debug("In initialize_variables(): self.max_X: %s", self.max_X)
+        logger.debug("In initialize_variables(): self.n: %s", self.n)
+        logger.debug("In initialize_variables(): self.k: %s", self.k)
 
     def set_variable_types(self) -> None:
         """
@@ -573,15 +582,22 @@ class Kriging(surrogates):
         Returns:
             None
         """
+        logger.debug("In set_variable_types(): self.k: %s", self.k)
+        logger.debug("In set_variable_types(): self.var_type: %s", self.var_type)
         # assume all variable types are "num" if "num" is
         # specified once:
         if len(self.var_type) < self.k:
             self.var_type = self.var_type * self.k
-            logger.warning("Warning: All variable types forced to 'num'.")
+            logger.warning("In set_variable_types(): All variable types forced to 'num'.")
+            logger.debug("In set_variable_types(): self.var_type: %s", self.var_type)
         self.num_mask = np.array(list(map(lambda x: x == "num", self.var_type)))
         self.factor_mask = np.array(list(map(lambda x: x == "factor", self.var_type)))
         self.int_mask = np.array(list(map(lambda x: x == "int", self.var_type)))
         self.ordered_mask = np.array(list(map(lambda x: x == "int" or x == "num" or x == "float", self.var_type)))
+        logger.debug("In set_variable_types(): self.num_mask: %s", self.num_mask)
+        logger.debug("In set_variable_types(): self.factor_mask: %s", self.factor_mask)
+        logger.debug("In set_variable_types(): self.int_mask: %s", self.int_mask)
+        logger.debug("In set_variable_types(): self.ordered_mask: %s", self.ordered_mask)
 
     def set_theta_values(self) -> None:
         """
@@ -614,13 +630,19 @@ class Kriging(surrogates):
                 S.set_theta_values()
                 assert S.theta.all() == array([0., 0.]).all()
         """
-        if self.n_theta > self.k:
+        logger.debug("In set_theta_values(): self.k: %s", self.k)
+        logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
+        if self.n_theta > 1 or self.n_theta > self.k:
             self.n_theta = self.k
-            logger.warning("More theta values than dimensions. `n_theta` set to `k`.")
+            logger.warning("Too few theta values or more theta values than dimensions. `n_theta` set to `k`.")
+            logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
         if self.theta_init_zero:
             self.theta: List[float] = zeros(self.n_theta)
+            logger.debug("In set_theta_values(): self.theta: %s", self.theta)
         else:
+            logger.debug("In set_theta_values(): self.n: %s", self.n)
             self.theta: List[float] = ones((self.n_theta,)) * self.n / (100 * self.k)
+            logger.debug("In set_theta_values(): self.theta: %s", self.theta)
 
     def initialize_matrices(self) -> None:
         """
@@ -660,19 +682,30 @@ class Kriging(surrogates):
         Returns:
             None
         """
+        logger.debug("In initialize_matrices(): self.n_p: %s", self.n_p)
         self.p = ones(self.n_p) * 2.0
+        logger.debug("In initialize_matrices(): self.p: %s", self.p)
         # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
         # else self.pen_val = self.n * var(self.nat_y) + 1e4
+        logger.debug("In initialize_matrices(): var(self.nat_y): %s", var(self.nat_y))
+        logger.debug("In initialize_matrices(): self.n: %s", self.n)
         if var(self.nat_y) > 0:
             self.pen_val = self.n * log(var(self.nat_y)) + 1e4
         else:
             self.pen_val = self.n * var(self.nat_y) + 1e4
+        logger.debug("In initialize_matrices(): self.pen_val: %s", self.pen_val)
         self.negLnLike = None
+        logger.debug("In initialize_matrices(): self.k: %s", self.k)
+        logger.debug("In initialize_matrices(): self.seed: %s", self.seed)
         self.gen = spacefilling(k=self.k, seed=self.seed)
+        logger.debug("In initialize_matrices(): self.gen: %s", self.gen)
         self.LnDetPsi = None
         self.Psi = zeros((self.n, self.n), dtype=float64)
+        logger.debug("In initialize_matrices(): self.Psi: %s", self.Psi)
         self.psi = zeros((self.n, 1))
+        logger.debug("In initialize_matrices(): self.psi: %s", self.psi)
         self.one = ones(self.n)
+        logger.debug("In initialize_matrices(): self.one: %s", self.one)
         self.mu = None
         self.U = None
         self.SigmaSqr = None

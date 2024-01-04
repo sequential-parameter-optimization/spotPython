@@ -771,6 +771,8 @@ class Spot:
                 writer.flush()
         #
         self.X, self.y = remove_nan(self.X, self.y)
+        logger.debug("In Spot() initialize_design(), final X val, after remove nan: self.X: %s", self.X)
+        logger.debug("In Spot() initialize_design(), final y val, after remove nan: self.y: %s", self.y)
 
     def should_continue(self, timeout_start) -> bool:
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
@@ -949,7 +951,14 @@ class Spot:
                     S.fit_surrogate()
 
         """
-        self.surrogate.fit(self.X, self.y)
+        logger.debug("In fit_surrogate(): self.X: %s", self.X)
+        logger.debug("In fit_surrogate(): self.y: %s", self.y)
+        logger.debug("In fit_surrogate(): self.X.shape: %s", self.X.shape)
+        logger.debug("In fit_surrogate(): self.y.shape: %s", self.y.shape)
+        if self.X.shape[0] == self.y.shape[0]:
+            self.surrogate.fit(self.X, self.y)
+        else:
+            logger.warning("X and y have different sizes. Surrogate not fitted.")
         if self.show_models:
             self.plot_model()
 

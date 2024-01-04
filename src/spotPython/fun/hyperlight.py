@@ -59,7 +59,7 @@ class HyperLight:
         Examples:
             >>> import numpy as np
                 from spotPython.utils.init import fun_control_init
-                from spotPython.light.netlightregression import NetLightRegression
+                from spotPython.light.regression.netlightregression import NetLightRegression
                 from spotPython.hyperdict.light_hyper_dict import LightHyperDict
                 from spotPython.hyperparameters.values import add_core_model_to_fun_control
                 from spotPython.fun.hyperlight import HyperLight
@@ -101,11 +101,10 @@ class HyperLight:
 
         Examples:
             >>> from spotPython.utils.init import fun_control_init
-                from spotPython.light.netlightregression import NetLightRegression
+                from spotPython.light.regression.netlightregression import NetLightRegression
                 from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-                from spotPython.hyperparameters.values import
-                 (add_core_model_to_fun_control,
-                 get_default_hyperparameters_as_array)
+                from spotPython.hyperparameters.values import (add_core_model_to_fun_control,
+                    get_default_hyperparameters_as_array)
                 from spotPython.fun.hyperlight import HyperLight
                 from spotPython.data.diabetes import Diabetes
                 from spotPython.hyperparameters.values import set_data_set
