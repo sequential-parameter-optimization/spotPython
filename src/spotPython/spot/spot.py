@@ -33,6 +33,7 @@ from spotPython.utils.convert import find_indices
 from spotPython.hyperparameters.values import (
     set_control_key_value,
     get_control_key_value,
+    get_ith_hyperparameter_name_from_fun_control,
 )
 import plotly.graph_objects as go
 from typing import Union, Callable, Dict
@@ -89,7 +90,7 @@ class Spot:
         ocba_delta (int):
             OCBA increment (only used if `noise==True`)
         var_type (List[str]):
-            list of type information, can be either "num" or "factor"
+            list of type information, can be either "int", "num" or "factor"
         var_name (List[str]):
             list of variable names, e.g., ["x1", "x2"]
         infill_criterion (str):
@@ -1305,7 +1306,7 @@ class Spot:
                 plt.title("fun_evals: " + str(self.counter) + ". min_y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
-    def print_results(self, print_screen=True) -> list[str]:
+    def print_results(self, print_screen=True, dict=None) -> list[str]:
         """Print results from the run:
             1. min y
             2. min X
@@ -1326,10 +1327,18 @@ class Spot:
             print(f"min y: {self.min_y}")
         res = self.to_all_dim(self.min_X.reshape(1, -1))
         for i in range(res.shape[1]):
-            var_name = "x" + str(i) if self.all_var_name is None else self.all_var_name[i]
+            if self.all_var_name is None:
+                var_name = "x" + str(i)
+            else:
+                var_name = self.all_var_name[i]
+                var_type = self.all_var_type[i]
+                if var_type == "factor" and dict is not None:
+                    val = get_ith_hyperparameter_name_from_fun_control(fun_control=dict, key=var_name, i=int(res[0][i]))
+                else:
+                    val = res[0][i]
             if print_screen:
-                print(var_name + ":", res[0][i])
-            output.append([var_name, res[0][i]])
+                print(var_name + ":", val)
+            output.append([var_name, val])
         if self.noise:
             res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
             if print_screen:

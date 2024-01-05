@@ -684,15 +684,15 @@ def get_values_from_dict(dictionary) -> np.array:
     return np.array(list(dictionary.values()))
 
 
-def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, filename=None) -> dict:
+def add_core_model_to_fun_control(fun_control, core_model, hyper_dict=None, filename=None) -> dict:
     """Add the core model to the function control dictionary. It updates the keys "core_model",
     "core_model_hyper_dict", "var_type", "var_name" in the fun_control dictionary.
 
     Args:
-        core_model (class):
-            The core model.
         fun_control (dict):
             The fun_control dictionary.
+        core_model (class):
+            The core model.
         hyper_dict (dict):
             The hyper parameter dictionary. Optional. Default is None. If no hyper_dict is provided,
             the function will try to load the hyper_dict from the file specified by filename.
@@ -717,14 +717,14 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, file
         >>> from spotPython.light.regression.netlightregression import NetLightRegression
             from spotPython.hyperdict.light_hyper_dict import LightHyperDict
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            add_core_model_to_fun_control(core_model=NetLightRegression,
-                              fun_control=fun_control,
-                              hyper_dict=LightHyperDict)
+            add_core_model_to_fun_control(fun_control=fun_control,
+                                        core_model=NetLightRegression,
+                                        hyper_dict=LightHyperDict)
             # or, if a user wants to use a custom hyper_dict:
         >>> from spotPython.light.regression.netlightregression import NetLightRegression
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            add_core_model_to_fun_control(core_model=NetLightRegression,
-                                        fun_control=fun_control,
+            add_core_model_to_fun_control(fun_control=fun_control,
+                                        core_model=NetLightRegression,
                                         filename="./hyperdict/user_hyper_dict.json")
 
     """
@@ -737,7 +737,9 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, file
     fun_control.update({"core_model_hyper_dict": new_hyper_dict[core_model.__name__]})
     var_type = get_var_type(fun_control)
     var_name = get_var_name(fun_control)
-    fun_control.update({"var_type": var_type, "var_name": var_name})
+    lower = get_bound_values(fun_control, "lower", as_list=False)
+    upper = get_bound_values(fun_control, "upper", as_list=False)
+    fun_control.update({"var_type": var_type, "var_name": var_name, "lower": lower, "upper": upper})
 
 
 def get_one_core_model_from_X(X, fun_control=None):
@@ -1098,3 +1100,65 @@ def get_var_type_from_var_name(fun_control, var_name) -> str:
     var_type_list = get_control_key_value(control_dict=fun_control, key="var_type")
     var_name_list = get_control_key_value(control_dict=fun_control, key="var_name")
     return var_type_list[var_name_list.index(var_name)]
+
+
+def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
+    """
+    Get the ith hyperparameter name from the fun_control dictionary.
+
+    Args:
+        fun_control (dict): fun_control dictionary
+        key (str): key
+        i (int): index
+
+    Returns:
+        (str): hyperparameter name
+
+    Examples:
+        >>> from spotPython.utils.device import getDevice
+            from spotPython.utils.init import fun_control_init
+            from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
+            import numpy as np
+            from spotPython.data.diabetes import Diabetes
+            from spotPython.light.regression.netlightregression import NetLightRegression
+            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+            from spotPython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
+            from spotPython.hyperparameters.values import set_control_key_value
+            from spotPython.hyperparameters.values import set_control_hyperparameter_value
+            experiment_name = get_experiment_name(prefix="000")
+            fun_control = fun_control_init(
+                spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),
+                _L_in=10,
+                _L_out=1,
+                TENSORBOARD_CLEAN=True,
+                device=getDevice(),
+                enable_progress_bar=False,
+                fun_evals=15,
+                log_level=10,
+                max_time=1,
+                num_workers=0,
+                show_progress=True,
+                tolerance_x=np.sqrt(np.spacing(1)),
+                )
+            dataset = Diabetes()
+            set_control_key_value(control_dict=fun_control,
+                                    key="data_set",
+                                    value=dataset,
+                                    replace=True)
+            add_core_model_to_fun_control(core_model=NetLightRegression,
+                                        fun_control=fun_control,
+                                        hyper_dict=LightHyperDict)
+
+            set_control_hyperparameter_value(fun_control, "l1", [3,8])
+            set_control_hyperparameter_value(fun_control, "optimizer", ["Adam", "AdamW", "Adamax", "NAdam"])
+            get_ith_hyperparameter_name_from_fun_control(fun_control, key="optimizer", i=0)
+            Adam
+
+    """
+    if "core_model_hyper_dict" in fun_control:
+        if key in fun_control["core_model_hyper_dict"]:
+            if "levels" in fun_control["core_model_hyper_dict"][key]:
+                if i < len(fun_control["core_model_hyper_dict"][key]["levels"]):
+                    return fun_control["core_model_hyper_dict"][key]["levels"][i]
+    return None

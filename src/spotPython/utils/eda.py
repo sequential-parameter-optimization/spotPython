@@ -93,7 +93,7 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
             tablefmt=tablefmt,
         )
     else:
-        res = spot.print_results(print_screen=False)
+        res = spot.print_results(print_screen=False, dict=fun_control)
         tuned = [item[1] for item in res]
         # imp = spot.print_importance(threshold=0.0, print_screen=False)
         # importance = [item[1] for item in imp]
