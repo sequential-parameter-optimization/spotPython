@@ -31,7 +31,6 @@ import time
 from spotPython.utils.progress import progress_bar
 from spotPython.utils.convert import find_indices
 from spotPython.hyperparameters.values import (
-    get_bound_values,
     set_control_key_value,
     get_control_key_value,
 )
@@ -250,8 +249,8 @@ class Spot:
         # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
         # else use the lower bound lower
         self.lower = lower
-        if get_bound_values(self.fun_control, "lower") is not None:
-            self.lower = get_bound_values(self.fun_control, "lower")
+        if get_control_key_value(control_dict=self.fun_control, key="lower") is not None:
+            self.lower = get_control_key_value(control_dict=self.fun_control, key="lower")
         # Number of dimensions is based on lower
         self.k = self.lower.size
 
@@ -260,8 +259,8 @@ class Spot:
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         # else use the upper bound upper
         self.upper = upper
-        if get_bound_values(self.fun_control, "upper") is not None:
-            self.upper = get_bound_values(self.fun_control, "upper")
+        if get_control_key_value(control_dict=self.fun_control, key="upper") is not None:
+            self.upper = get_control_key_value(control_dict=self.fun_control, key="upper")
 
         # 4. var_type attribute updates:
         # -----------------------

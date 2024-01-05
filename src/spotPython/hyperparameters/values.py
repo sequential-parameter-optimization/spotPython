@@ -714,14 +714,14 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, file
         The original hyperparameters of the core model are stored in the "core_model_hyper_dict" key.
 
     Examples:
-        >>> from spotPython.light.netlightregressione import NetLightRegression
+        >>> from spotPython.light.regression.netlightregression import NetLightRegression
             from spotPython.hyperdict.light_hyper_dict import LightHyperDict
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
             add_core_model_to_fun_control(core_model=NetLightRegression,
                               fun_control=fun_control,
                               hyper_dict=LightHyperDict)
             # or, if a user wants to use a custom hyper_dict:
-        >>> from spotPython.light.netlightregression import NetLightRegression
+        >>> from spotPython.light.regression.netlightregression import NetLightRegression
             from spotPython.hyperparameters.values import add_core_model_to_fun_control
             add_core_model_to_fun_control(core_model=NetLightRegression,
                                         fun_control=fun_control,
@@ -1007,6 +1007,30 @@ def set_control_key_value(control_dict, key, value, replace=False) -> None:
             control_dict.update({key: value})
 
 
+def set_control_hyperparameter_value(control_dict, hyperparameter, value) -> None:
+    """
+    This function sets the hyperparameter values depending on the var_type
+    via modify_hyperameter_levels or modify_hyperparameter_bounds in the control_dict dictionary.
+    If the hyperparameter is a factor, it calls modify_hyper_parameter_levels.
+    Otherwise, it calls modify_hyper_parameter_bounds.
+
+    Args:
+        control_dict (dict):
+            control_dict dictionary
+        hyperparameter (str): key
+        value (Any): value
+
+    Returns:
+        None.
+
+    """
+    vt = get_var_type_from_var_name(fun_control=control_dict, var_name=hyperparameter)
+    if vt == "factor":
+        modify_hyper_parameter_levels(fun_control=control_dict, hyperparameter=hyperparameter, levels=value)
+    else:
+        modify_hyper_parameter_bounds(fun_control=control_dict, hyperparameter=hyperparameter, bounds=value)
+
+
 def get_control_key_value(control_dict=None, key=None) -> Any:
     """
     This function gets the key value pair from the control_dict dictionary.
@@ -1030,8 +1054,47 @@ def get_control_key_value(control_dict=None, key=None) -> Any:
                             key="key")
             "value"
     """
+    if key == "lower":
+        lower = get_bound_values(fun_control=control_dict, bound="lower")
+        return lower
+    if key == "upper":
+        upper = get_bound_values(fun_control=control_dict, bound="upper")
+        return upper
+    if key == "var_name":
+        var_name = get_var_name(fun_control=control_dict)
+        return var_name
+    if key == "var_type":
+        var_type = get_var_type(fun_control=control_dict)
+        return var_type
+    if key == "transform":
+        transform = get_transform(fun_control=control_dict)
+        return transform
     # check if key exists in control_dict:
     if control_dict is None or key not in control_dict.keys():
         return None
     else:
         return control_dict[key]
+
+
+def get_var_type_from_var_name(fun_control, var_name) -> str:
+    """
+    This function gets the variable type from the variable name.
+
+    Args:
+        fun_control (dict): fun_control dictionary
+        var_name (str): variable name
+
+    Returns:
+        (str): variable type
+
+    Examples:
+        >>> from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import get_var_type_from_var_name
+            control_dict = fun_control_init()
+            get_var_type_from_var_name(var_name="max_depth",
+                            fun_control=control_dict)
+            "int"
+    """
+    var_type_list = get_control_key_value(control_dict=fun_control, key="var_type")
+    var_name_list = get_control_key_value(control_dict=fun_control, key="var_name")
+    return var_type_list[var_name_list.index(var_name)]
