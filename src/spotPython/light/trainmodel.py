@@ -26,7 +26,7 @@ def train_model(config: dict, fun_control: dict) -> float:
                 add_core_model_to_fun_control,
                 get_default_hyperparameters_as_array)
             from spotPython.data.diabetes import Diabetes
-            from spotPython.hyperparameters.values import set_data_set
+            from spotPython.hyperparameters.values import set_control_key_value
             from spotPython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict
             from spotPython.light.traintest import train_model
             fun_control = fun_control_init(
@@ -34,8 +34,9 @@ def train_model(config: dict, fun_control: dict) -> float:
                 _L_out=1,)
             # Select a dataset
             dataset = Diabetes()
-            set_data_set(fun_control=fun_control,
-                            data_set=dataset)
+            set_control_key_value(control_dict=fun_control,
+                                key="data_set",
+                                value=dataset)
             # Select a model
             add_core_model_to_fun_control(core_model=NetLightRegression,
                                         fun_control=fun_control,

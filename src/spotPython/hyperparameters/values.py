@@ -271,6 +271,7 @@ def assign_values(X: np.array, var_list: list) -> dict:
 def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
     """
     This function modifies the levels of a hyperparameter in the fun_control dictionary.
+    It also sets the lower and upper bounds of the hyperparameter to 0 and len(levels) - 1, respectively.
 
     Args:
         fun_control (dict):
@@ -684,7 +685,8 @@ def get_values_from_dict(dictionary) -> np.array:
 
 
 def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, filename=None) -> dict:
-    """Add the core model to the function control dictionary.
+    """Add the core model to the function control dictionary. It updates the keys "core_model",
+    "core_model_hyper_dict", "var_type", "var_name" in the fun_control dictionary.
 
     Args:
         core_model (class):
@@ -702,6 +704,14 @@ def add_core_model_to_fun_control(core_model, fun_control, hyper_dict=None, file
     Returns:
         (dict):
             The updated fun_control dictionary.
+
+    Notes:
+        The function adds the following keys to the fun_control dictionary:
+        "core_model": The core model.
+        "core_model_hyper_dict": The hyper parameter dictionary for the core model.
+        "var_type": A list of variable types.
+        "var_name": A list of variable names.
+        The original hyperparameters of the core model are stored in the "core_model_hyper_dict" key.
 
     Examples:
         >>> from spotPython.light.netlightregressione import NetLightRegression
@@ -922,66 +932,6 @@ def get_default_hyperparameters_for_core_model(fun_control) -> dict:
     values = convert_keys(values, fun_control["var_type"])
     values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
     return values
-
-
-def set_data_set(fun_control, data_set) -> dict:
-    """
-    This function sets the lightning dataset in the fun_control dictionary.
-
-    Args:
-        fun_control (dict):
-            fun_control dictionary
-        data_set (class): Dataset class from torch.utils.data
-
-    Returns:
-        fun_control (dict):
-            updated fun_control
-
-    Examples:
-        >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_data_module
-            from spotPython.data.lightdatamodule import LightDataModule
-            from spotPython.data.csvdataset import CSVDataset
-            from spotPython.data.pkldataset import PKLDataset
-            import torch
-            fun_control = fun_control_init()
-            ds = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
-            set_data_set(fun_control=fun_control,
-                         data_set=ds)
-            fun_control["data_set"]
-    """
-    fun_control.update({"data_set": data_set})
-
-
-def set_data_module(fun_control, data_module) -> dict:
-    """
-    This function sets the lightning datamodule in the fun_control dictionary.
-
-    Args:
-        fun_control (dict):
-            fun_control dictionary
-        data_module (class): DataLoader class from torch.utils.data
-
-    Returns:
-        fun_control (dict):
-            updated fun_control
-
-    Examples:
-        >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_data_module
-            from spotPython.data.lightdatamodule import LightDataModule
-            from spotPython.data.csvdataset import CSVDataset
-            from spotPython.data.pkldataset import PKLDataset
-            import torch
-            fun_control = fun_control_init()
-            dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
-            dm = LightDataModule(dataset=dataset, batch_size=5, test_size=7)
-            dm.setup()
-            set_data_module(fun_control=fun_control,
-                            data_module=dm)
-            fun_control["data_module"]
-    """
-    fun_control.update({"data_module": data_module})
 
 
 def get_tuned_architecture(spot_tuner, fun_control) -> dict:

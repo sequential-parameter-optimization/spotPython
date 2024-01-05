@@ -1,7 +1,7 @@
 import torch
 import pandas as pd
 from torch.utils.data import Dataset
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
 import pathlib
 
 
@@ -85,17 +85,21 @@ class CSVDataset(Dataset):
             df = df.dropna()
         if self.dropId:
             df = df.drop(columns=["id"])
+
+        oe = OrdinalEncoder()
         # Apply LabelEncoder to string columns
         le = LabelEncoder()
-        df = df.apply(lambda col: le.fit_transform(col) if col.dtypes == object else col)
+        # df = df.apply(lambda col: le.fit_transform(col) if col.dtypes == object else col)
 
         # Split DataFrame into feature and target DataFrames
         feature_df = df.drop(columns=[self.target_column])
+        feature_df = oe.fit_transform(feature_df)
         target_df = df[self.target_column]
+        target_df = le.fit_transform(target_df)
 
         # Convert DataFrames to PyTorch tensors
-        feature_tensor = torch.tensor(feature_df.values, dtype=self.feature_type)
-        target_tensor = torch.tensor(target_df.values, dtype=self.target_type)
+        feature_tensor = torch.tensor(feature_df, dtype=self.feature_type)
+        target_tensor = torch.tensor(target_df, dtype=self.target_type)
 
         return feature_tensor, target_tensor
 
