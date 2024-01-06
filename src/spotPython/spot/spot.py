@@ -999,6 +999,7 @@ class Spot:
         self.min_y = min(self.y)
         self.min_X = self.X[argmin(self.y)]
         self.counter = self.y.size
+        self.fun_control.update({"counter": self.counter})
         # Update aggregated x and y values (if noise):
         if self.noise:
             Z = aggregate_mean_var(X=self.X, y=self.y)

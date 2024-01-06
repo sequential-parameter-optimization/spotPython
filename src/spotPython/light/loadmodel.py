@@ -40,7 +40,9 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
         >>> model = load_light_from_checkpoint(config, fun_control)
     """
     print(f"config: {config}")
-    config_id = generate_config_id(config) + postfix
+    # load a model from a checkpoint with the same config_id
+    # that was used in the test phase. Therefore, no timestamp is added.
+    config_id = generate_config_id(config, timestamp=False) + postfix
     default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id, "last.ckpt")
     print(f"Loading model with {config_id} from {default_root_dir}")
     model = fun_control["core_model"].load_from_checkpoint(

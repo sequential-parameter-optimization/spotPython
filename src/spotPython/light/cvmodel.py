@@ -44,7 +44,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
     else:
         enable_progress_bar = fun_control["enable_progress_bar"]
     # Add "CV" postfix to config_id
-    config_id = generate_config_id(config) + "_CV"
+    config_id = generate_config_id(config, timestamp=True) + "_CV"
     results = []
     num_folds = fun_control["k_folds"]
     split_seed = 12345

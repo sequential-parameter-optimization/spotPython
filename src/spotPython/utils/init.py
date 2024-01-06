@@ -39,6 +39,9 @@ def fun_control_init(
         acceleration (str):
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
+        counter (int):
+            The counter for the number of function evaluations. Updated in
+            Spot update_stats(). Initialized to 0.
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
         devices (str or int):
@@ -160,6 +163,7 @@ def fun_control_init(
         "_L_in": _L_in,
         "_L_out": _L_out,
         "accelerator": accelerator,
+        "counter": 0,
         "data": None,
         "data_dir": "./data",
         "data_module": None,

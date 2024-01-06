@@ -59,7 +59,10 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     else:
         enable_progress_bar = fun_control["enable_progress_bar"]
     # Add "TEST" postfix to config_id
-    config_id = generate_config_id(config) + "_TEST"
+    # config id is unique. Since the model is loaded from a checkpoint,
+    # the config id is generated here without a timestamp. This differs from
+    # the config id generated in cvmodel.py and trainmodel.py.
+    config_id = generate_config_id(config, timestamp=False) + "_TEST"
     dm = LightDataModule(
         dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
