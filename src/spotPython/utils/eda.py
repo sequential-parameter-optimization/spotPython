@@ -186,15 +186,23 @@ def generate_config_id(config, hash=False, timestamp=False):
     """
     config_id = ""
     for key in config:
-        config_id += str(config[key]) + "_"
-        # hash the config_id to make it shorter and unique
-        if hash:
-            config_id = str(hash(config_id)) + "_"
+        # if config[key] is a number, round it to 4 digits after the decimal point
+        if isinstance(config[key], float):
+            config_id += str(round(config[key], 4)) + "_"
+        else:
+            config_id += str(config[key]) + "_"
+    # hash the config_id to make it shorter and unique
+    if hash:
+        config_id = str(hash(config_id)) + "_"
+    # remove () and , from the string
+    config_id = config_id.replace("(", "")
+    config_id = config_id.replace(")", "")
+    config_id = config_id.replace(",", "")
+    config_id = config_id.replace(" ", "")
+    config_id = config_id.replace(":", "")
     if timestamp:
-        config_id += get_timestamp(only_int=True)
-        return config_id
-    else:
-        return config_id[:-1]
+        config_id = get_timestamp(only_int=True) + "_" + config_id
+    return config_id[:-1]
 
 
 def visualize_activations(net, device="cpu", color="C0") -> None:
