@@ -7,18 +7,21 @@ def test_evaluate_new_solutions():
     from spotPython.spot.spot import Spot
     from spotPython.utils.repair import repair_non_numeric
     import pytest
+    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
     fun = analytical().fun_sphere
 
     nn = 3
     ni = 4
 
+    fun_control=fun_control_init(lower=np.array([-10,-1]),
+        upper=np.array([10,1]),
+        n_points=nn,)
+    design_control = design_control_init(init_size=ni, repeats=1)
     spot_test = Spot(
         fun=fun,
-        lower=np.array([-10,-1]),
-        upper=np.array([10,1]),
-        n_points=nn,
-        design_control={"init_size": ni}
+        fun_control=fun_control,
+        design_control=design_control
     )
 
 

@@ -5,14 +5,14 @@ def test_evaluate_new_X():
     import numpy as np
     from spotPython.spot import spot
     from spotPython.fun.objectivefunctions import analytical
+    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
     nn = 3
     fun_sphere = analytical().fun_sphere
-    spot_1 = spot.Spot(
+    fun_control = fun_control_init(lower=np.array([-1, -1]), upper=np.array([1, 1]), n_points=nn)
+    spot_1 = spot.Spot(        
         fun=fun_sphere,
-        lower=np.array([-1, -1]),
-        upper=np.array([1, 1]),
-        n_points=nn
+        fun_control=fun_control,
     )
 
     # (S-2) Initial Design:

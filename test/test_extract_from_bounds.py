@@ -11,6 +11,7 @@ def test_extract_from_bounds():
     from numpy import spacing, empty_like
     from numpy import array
     from spotPython.design.spacefilling import spacefilling
+    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
     # One-dim objective function
     ni = 11
@@ -87,23 +88,20 @@ def test_extract_from_bounds():
     from spotPython.spot import spot
     from spotPython.utils.repair import repair_non_numeric
     fun = analytical().fun_sphere
-    lower = np.array([-1,-1])
-    upper = np.array([1,1])
-    design_control={"init_size": 10}
-    surrogate_control={
-                "infill_criterion": "y",
-                "n_points": 1,
-            }
+    fun_control = fun_control_init(
+    lower = np.array([-1,-1]),
+    upper = np.array([1,1]),
+    fun_evals = 25, 
+    noise = False,
+    log_level = 50, 
+    )
+    design_control = design_control_init(init_size=10, repeats=1)
+
     # Spot: to generate initial design
     S_spot = spot.Spot(fun=fun,
-                lower = lower, 
-                upper= upper, 
+                fun_control=fun_control,
                 surrogate=S, 
-                fun_evals = 25, 
-                noise = False,
-                log_level = 50, 
-                design_control=design_control, 
-                surrogate_control=surrogate_control)
+                design_control=design_control)
 
     X = S_spot.generate_design(size=S_spot.design_control["init_size"],
                                repeats=S_spot.design_control["repeats"],

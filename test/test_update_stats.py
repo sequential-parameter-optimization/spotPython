@@ -1,6 +1,7 @@
 import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 
 def update_stats_no_duplicates():
@@ -11,13 +12,13 @@ def update_stats_no_duplicates():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
+    
     S = spot.Spot(fun=fun,
-                    fun_control={},
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                                    lower = lower,
+                                    upper= upper,
+                                    show_progress=True),
+                  design_control=design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     S.update_stats()
     assert np.equal(S.min_X, X_start[0]).all()
@@ -38,14 +39,13 @@ def test_update_stats_duplicates_and_noise():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
-                  fun_control={},
-                noise=True,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                                    lower = lower,
+                                    upper= upper,
+                                    noise=True,
+                                    show_progress=True),
+                  design_control=design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     print(f"S.X: {S.X}")
     print(f"S.y: {S.y}")
@@ -74,15 +74,14 @@ def test_update_stats_duplicates_nonoise():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
 
     S = spot.Spot(fun=fun,
-                fun_control={},
-                noise=False,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                                    lower = lower,
+                                    upper= upper,
+                                    noise=False,
+                                    show_progress=True),
+                  design_control=design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     print(f"S.X: {S.X}")
     print(f"S.y: {S.y}")

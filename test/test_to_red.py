@@ -1,6 +1,7 @@
 import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 def test_to_red():
     """
@@ -17,16 +18,15 @@ def test_to_red():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1, -1])
     upper = np.array([-1, 1, 1])
-    design_control={"init_size": ni}
-    surrogate_control={"n_theta": 2}
     spot_1 = spot.Spot(fun=fun,
+                fun_control=fun_control_init(
                 lower = lower,
                 upper= upper,
                 fun_evals = fun_evals,
                 show_progress=True,
-                log_level=50,
-                design_control=design_control,
-                surrogate_control=surrogate_control,)
+                log_level=50),
+                design_control=design_control_init(init_size=ni),
+                surrogate_control=surrogate_control_init(n_theta=2))
     spot_1.run()
     assert spot_1.lower.size == 2
     assert spot_1.upper.size == 2

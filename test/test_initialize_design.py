@@ -1,6 +1,7 @@
 import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 def test_initialize_design():
     # number of initial points:
@@ -8,12 +9,12 @@ def test_initialize_design():
     fun = analytical().fun_sphere
     lower = np.array([-1])
     upper = np.array([1])
-    design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-                show_progress=False,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                  lower = lower,
+                  upper= upper,
+                  show_progress=False),
+                  design_control = design_control_init(init_size=ni))
     S.initialize_design()
     assert S.X.shape[0] == ni
     assert S.X.shape[1] == lower.size
@@ -26,13 +27,12 @@ def test_initialize_design_2():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 2])
-    design_control={"init_size": ni}
-
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                  lower = lower,
+                  upper= upper,
+                  show_progress=False),
+                  design_control = design_control_init(init_size=ni))
     S.initialize_design()
     assert S.X.shape[0] == ni
     assert S.X.shape[1] == lower.size
@@ -45,12 +45,12 @@ def test_initialize_design_3():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                  lower = lower,
+                  upper= upper,
+                  show_progress=False),
+                  design_control = design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     assert S.X.shape[0] == ni + np.atleast_2d(X_start).shape[0]
     assert S.X.shape[1] == lower.size
@@ -63,12 +63,12 @@ def test_initialize_design_4():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                  lower = lower,
+                  upper= upper,
+                  show_progress=False),
+                  design_control = design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     assert S.X.shape[0] == ni + np.atleast_2d(X_start).shape[0]
     assert S.X.shape[1] == lower.size
@@ -81,12 +81,12 @@ def test_initialize_design_5():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                  lower = lower,
+                  upper= upper,
+                  show_progress=False),
+                  design_control = design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     assert S.X.shape[0] == ni + np.atleast_2d(X_start).shape[0]
     assert S.X.shape[1] == lower.size
@@ -98,13 +98,12 @@ def test_initialize_design_noX0():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
-
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                  fun_control=fun_control_init(
+                  lower = lower,
+                  upper= upper,
+                  show_progress=False),
+                  design_control = design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     assert S.X.shape[0] == ni + np.atleast_2d(X_start).shape[0]
     assert S.X.shape[1] == lower.size

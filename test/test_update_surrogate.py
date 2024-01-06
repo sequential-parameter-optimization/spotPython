@@ -7,6 +7,7 @@ def test_update_statss():
     from spotPython.spot.spot import Spot
     from spotPython.utils.repair import repair_non_numeric
     import pytest
+    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
     fun = analytical().fun_sphere
 
@@ -15,10 +16,11 @@ def test_update_statss():
 
     spot_test = Spot(
         fun=fun,
+        fun_control=fun_control_init(
         lower=np.array([-10,-1]),
         upper=np.array([10,1]),
-        n_points=nn,
-        design_control={"init_size": ni}
+        n_points=nn),
+        design_control=design_control_init(init_size=ni)
     )
 
 

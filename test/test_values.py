@@ -12,6 +12,7 @@ from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
 from spotPython.data.diabetes import Diabetes
 from spotPython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
 from spotPython.hyperparameters.values import set_control_hyperparameter_value
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 
 def test_get_bound_values():

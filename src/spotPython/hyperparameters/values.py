@@ -1056,26 +1056,31 @@ def get_control_key_value(control_dict=None, key=None) -> Any:
                             key="key")
             "value"
     """
-    if key == "lower":
-        lower = get_bound_values(fun_control=control_dict, bound="lower")
-        return lower
-    if key == "upper":
-        upper = get_bound_values(fun_control=control_dict, bound="upper")
-        return upper
-    if key == "var_name":
-        var_name = get_var_name(fun_control=control_dict)
-        return var_name
-    if key == "var_type":
-        var_type = get_var_type(fun_control=control_dict)
-        return var_type
-    if key == "transform":
-        transform = get_transform(fun_control=control_dict)
-        return transform
-    # check if key exists in control_dict:
-    if control_dict is None or key not in control_dict.keys():
+    if control_dict is None:
         return None
     else:
-        return control_dict[key]
+        # check if key "core_model_hyper_dict" exists in fun_control:
+        if "core_model_hyper_dict" in control_dict.keys():
+            if key == "lower":
+                lower = get_bound_values(fun_control=control_dict, bound="lower")
+                return lower
+            if key == "upper":
+                upper = get_bound_values(fun_control=control_dict, bound="upper")
+                return upper
+            if key == "var_name":
+                var_name = get_var_name(fun_control=control_dict)
+                return var_name
+            if key == "var_type":
+                var_type = get_var_type(fun_control=control_dict)
+                return var_type
+            if key == "transform":
+                transform = get_transform(fun_control=control_dict)
+                return transform
+        # check if key exists in control_dict:
+        elif control_dict is None or key not in control_dict.keys():
+            return None
+        else:
+            return control_dict[key]
 
 
 def get_var_type_from_var_name(fun_control, var_name) -> str:

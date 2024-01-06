@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import pylab
 from scipy import optimize
-from scipy.optimize import differential_evolution
 from math import inf
 from math import isfinite
 import matplotlib.pyplot as plt
@@ -22,6 +21,7 @@ from numpy import ravel
 from numpy import array
 from numpy import append
 from numpy import min, max
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotPython.utils.compare import selectNew
 from spotPython.utils.aggregate import aggregate_mean_var
 from spotPython.utils.repair import remove_nan
@@ -36,7 +36,7 @@ from spotPython.hyperparameters.values import (
     get_ith_hyperparameter_name_from_fun_control,
 )
 import plotly.graph_objects as go
-from typing import Union, Callable, Dict
+from typing import Callable
 
 
 logger = logging.getLogger(__name__)
@@ -196,32 +196,36 @@ class Spot:
 
     def __init__(
         self,
+        design: object = None,
+        design_control: dict = design_control_init(),
         fun: Callable = None,
-        lower: np.array = None,
-        upper: np.array = None,
+        fun_control: dict = fun_control_init(),
         fun_evals: int = 15,
         fun_repeats: int = 1,
-        fun_control: dict = {},
-        max_time: int = inf,
-        noise: bool = False,
-        tolerance_x: float = 0,
-        var_type: list = ["num"],
-        var_name: list = None,
         infill_criterion: str = "y",
+        log_level: int = 50,
+        lower: np.array = None,
+        max_time: int = inf,
         n_points: int = 1,
+        noise: bool = False,
+        optimizer: object = None,
+        optimizer_control: dict = optimizer_control_init(),
         ocba_delta: int = 0,
         seed: int = 123,
-        sigma: float = 0.0,
-        log_level: int = 50,
         show_models: bool = False,
         show_progress: bool = True,
-        design: object = None,
-        design_control: Dict[str, Union[int, float]] = {},
+        sigma: float = 0.0,
         surrogate: object = None,
-        surrogate_control: Dict[str, Union[int, float]] = {},
-        optimizer: object = None,
-        optimizer_control: Dict[str, Union[int, float]] = {},
+        surrogate_control: dict = surrogate_control_init(),
+        tolerance_x: float = 0,
+        upper: np.array = None,
+        var_name: list = None,
+        var_type: list = ["num"],
     ):
+        self.design_control = design_control
+        self.optimizer_control = optimizer_control
+        self.surrogate_control = surrogate_control
+
         # small value:
         self.eps = sqrt(spacing(1))
 
@@ -234,6 +238,7 @@ class Spot:
         # 1. fun_control updates:
         # -----------------------
         self.fun_control = fun_control
+        print(f"self.fun_control: {self.fun_control}")
 
         # set fun_control["sigma"] to sigma if "sigma" is not in fun_control dictionary
         # If no fun_control is provided, the fun_control dictionary is initialized with the
@@ -254,49 +259,70 @@ class Spot:
             self.lower = get_control_key_value(control_dict=self.fun_control, key="lower")
         # Number of dimensions is based on lower
         self.k = self.lower.size
+        print(f"self.k: {self.k}")
 
         # 3. upper attribute updates:
         # -----------------------
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         # else use the upper bound upper
+        print(f"fun_control['upper']: {fun_control['upper']}")
         self.upper = upper
         if get_control_key_value(control_dict=self.fun_control, key="upper") is not None:
             self.upper = get_control_key_value(control_dict=self.fun_control, key="upper")
 
         # 4. var_type attribute updates:
         # -----------------------
-        self.set_self_attribute("var_type", var_type, self.fun_control)
+        # self.set_self_attribute("var_type", var_type, self.fun_control)
+        self.var_type = self.fun_control["var_type"]
         # Force numeric type as default in every dim:
         # assume all variable types are "num" if "num" is
         # specified less than k times
+        print(f"fun_control['var_type']: {fun_control['var_type']}")
         if len(self.var_type) < self.k:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
 
         # 5. var_name attribute updates:
         # -----------------------
-        self.set_self_attribute("var_name", var_name, self.fun_control)
+        # self.set_self_attribute("var_name", var_name, self.fun_control)
+        self.var_name = self.fun_control["var_name"]
         # use x0, x1, ... as default variable names:
         if self.var_name is None:
             self.var_name = ["x" + str(i) for i in range(len(self.lower))]
 
         # Reduce dim based on lower == upper logic:
         # modifies lower, upper, var_type, and var_name
+
+        print(f"self.lower: {self.lower}")
+        print(f"self.upper: {self.upper}")
+        print(f"self.var_type: {self.var_type}")
         self.to_red_dim()
 
         # 6. Additional self attributes updates:
         # -----------------------
-        self.set_self_attribute("fun_evals", fun_evals, self.fun_control)
-        self.set_self_attribute("fun_repeats", fun_repeats, self.fun_control)
-        self.set_self_attribute("max_time", max_time, self.fun_control)
-        self.set_self_attribute("noise", noise, self.fun_control)
-        self.set_self_attribute("tolerance_x", tolerance_x, self.fun_control)
-        self.set_self_attribute("ocba_delta", ocba_delta, self.fun_control)
-        self.set_self_attribute("log_level", log_level, self.fun_control)
-        self.set_self_attribute("show_models", show_models, self.fun_control)
-        self.set_self_attribute("show_progress", show_progress, self.fun_control)
-        self.set_self_attribute("infill_criterion", infill_criterion, self.fun_control)
-        self.set_self_attribute("n_points", n_points, self.fun_control)
+        self.fun_evals = self.fun_control["fun_evals"]
+        self.fun_repeats = self.fun_control["fun_repeats"]
+        self.max_time = self.fun_control["max_time"]
+        self.noise = self.fun_control["noise"]
+        self.tolerance_x = self.fun_control["tolerance_x"]
+        self.ocba_delta = self.fun_control["ocba_delta"]
+        self.log_level = self.fun_control["log_level"]
+        self.show_models = self.fun_control["show_models"]
+        self.show_progress = self.fun_control["show_progress"]
+        self.infill_criterion = self.fun_control["infill_criterion"]
+        self.n_points = self.fun_control["n_points"]
+
+        # self.set_self_attribute("fun_evals", fun_evals, self.fun_control)
+        # self.set_self_attribute("fun_repeats", fun_repeats, self.fun_control)
+        # self.set_self_attribute("max_time", max_time, self.fun_control)
+        # self.set_self_attribute("noise", noise, self.fun_control)
+        # self.set_self_attribute("tolerance_x", tolerance_x, self.fun_control)
+        # self.set_self_attribute("ocba_delta", ocba_delta, self.fun_control)
+        # self.set_self_attribute("log_level", log_level, self.fun_control)
+        # self.set_self_attribute("show_models", show_models, self.fun_control)
+        # self.set_self_attribute("show_progress", show_progress, self.fun_control)
+        # self.set_self_attribute("infill_criterion", infill_criterion, self.fun_control)
+        # self.set_self_attribute("n_points", n_points, self.fun_control)
 
         # if the key "spot_writer" is not in the dictionary fun_control,
         # set self.spot_writer to None else to the value of the key "spot_writer"
@@ -313,25 +339,27 @@ class Spot:
         self.design = design
         if design is None:
             self.design = spacefilling(k=self.lower.size, seed=self.fun_control["seed"])
-        self.design_control = {"init_size": 10, "repeats": 1}
-        self.design_control.update(design_control)
+        # self.design_control = {"init_size": 10, "repeats": 1}
+        # self.design_control.update(design_control)
 
         # Surrogate related information:
         self.surrogate = surrogate
-        self.surrogate_control = {
-            "noise": self.noise,
-            "model_optimizer": differential_evolution,
-            "model_fun_evals": None,
-            "min_theta": -3.0,
-            "max_theta": 3.0,
-            "n_theta": 1,
-            "theta_init_zero": True,
-            "n_p": 1,
-            "optim_p": False,
-            "var_type": self.var_type,
-            "seed": 124,
-        }
-        self.surrogate_control.update(surrogate_control)
+        self.surrogate_control.update({"var_type": self.var_type})
+
+        # self.surrogate_control = {
+        #     "noise": self.noise,
+        #     "model_optimizer": differential_evolution,
+        #     "model_fun_evals": None,
+        #     "min_theta": -3.0,
+        #     "max_theta": 3.0,
+        #     "n_theta": 1,
+        #     "theta_init_zero": True,
+        #     "n_p": 1,
+        #     "optim_p": False,
+        #     "var_type": self.var_type,
+        #     "seed": 124,
+        # }
+        # self.surrogate_control.update(surrogate_control)
 
         # If self.surrogate_control["n_theta"] > 1, use k theta values:
         if self.surrogate_control["n_theta"] > 1:
@@ -363,8 +391,8 @@ class Spot:
 
         # Optimizer related information:
         self.optimizer = optimizer
-        self.optimizer_control = {"max_iter": 1000, "seed": 125}
-        self.optimizer_control.update(optimizer_control)
+        # self.optimizer_control = {"max_iter": 1000, "seed": 125}
+        # self.optimizer_control.update(optimizer_control)
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
 

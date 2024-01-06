@@ -4,6 +4,7 @@ from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
 from spotPython.budget.ocba import get_ocba, get_ocba_X
 from spotPython.utils.aggregate import aggregate_mean_var
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 def test_ocba():
     """
@@ -21,8 +22,9 @@ def test_ocba():
 #     [11  9 19  9  2]
 
 fun = analytical().fun_linear
-spot_1_noisy = spot.Spot(fun=fun,
-                   lower = np.array([-1]),
+surrogate_control=surrogate_control_init(noise=True)
+design_control=design_control_init(init_size=3, repeats=2)
+fun_control = fun_control_init(lower = np.array([-1]),
                    upper = np.array([1]),
                    fun_evals = 20,
                    fun_repeats = 2,
@@ -30,10 +32,13 @@ spot_1_noisy = spot.Spot(fun=fun,
                    ocba_delta=1,
                    seed=123,
                    show_models=False,
-                   sigma=0.001,
-                   design_control={"init_size": 3,
-                                   "repeats": 2},
-                   surrogate_control={"noise": True})
+                   show_progress=True,
+                   sigma=0.001,)
+spot_1_noisy = spot.Spot(fun=fun,
+            surrogate_control=surrogate_control,
+            design_control=design_control,
+            fun_control=fun_control,            
+            )
 spot_1_noisy.run()
 spot_2 = copy.deepcopy(spot_1_noisy)
 spot_2.mean_y = np.array([1,2,3,4,5])

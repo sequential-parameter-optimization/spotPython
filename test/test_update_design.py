@@ -2,6 +2,7 @@ import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
 from spotPython.utils.init import fun_control_init
+from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 def test_update_design():
     # number of initial points:
@@ -10,13 +11,13 @@ def test_update_design():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    design_control={"init_size": ni}
     S = spot.Spot(fun=fun,
+                  fun_control=fun_control_init(
                 noise=False,
                 lower = lower,
                 upper= upper,
-                show_progress=True,
-                design_control=design_control,)
+                show_progress=True),
+                design_control=design_control_init(init_size=ni))
     S.initialize_design(X_start=X_start)
     X_shape_before = S.X.shape
     y_size_before = S.y.size
@@ -37,20 +38,16 @@ def test_update_design_with_repeats_and_ocba():
             sigma=0.02,
             seed=123,
             noise=True,
-            fun_repeats=2)
-    lower = np.array([-1, -1])
-    upper = np.array([1, 1])
-    design_control={"init_size": ni,
-                    "repeats": 2}
+            fun_repeats=2,
+            n_points=1,
+            ocba_delta=1,
+            show_progress=True,
+    lower = np.array([-1, -1]),
+    upper = np.array([1, 1]))
     S = spot.Spot(fun=fun,
-                n_points=1,
-                ocba_delta=1,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,
-                fun_control=fun_control
-    )
+                  fun_control=fun_control,
+                  design_control=design_control_init(init_size=ni,
+                                                   repeats=2))
     S.initialize_design(X_start=X_start)
     X_shape_before = S.X.shape
     y_size_before = S.y.size
@@ -71,21 +68,16 @@ def test_update_design_with_repeats_and_ocba_no_var():
     fun_control = fun_control_init(
             sigma=0.02,
             seed=123,
+            fun_repeats=2,
+            lower = np.array([-1, -1]),
+            upper = np.array([1, 1]),
             noise=True,
-            fun_repeats=2,)
-    lower = np.array([-1, -1])
-    upper = np.array([1, 1])
-    design_control={"init_size": ni,
-                    "repeats": 2}
+            n_points=1,
+            ocba_delta=1,
+            show_progress=True)
     S = spot.Spot(fun=fun,
-                noise=True,
-                n_points=1,
-                ocba_delta=1,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,
-                fun_control=fun_control
+                    fun_control=fun_control,
+                    design_control=design_control_init(init_size=ni, repeats=2)
     )
     S.initialize_design(X_start=X_start)
     X_shape_before = S.X.shape

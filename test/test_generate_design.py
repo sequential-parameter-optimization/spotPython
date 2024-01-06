@@ -6,18 +6,18 @@ def test_generate_design():
     from spotPython.fun.objectivefunctions import analytical
     from spotPython.spot.spot import Spot
     fun = analytical().fun_branin_factor
+    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
     ni = 7
 
     spot_test = Spot(
         fun=fun,
-        lower=np.array([-5,0,1]),
-        upper=np.array([10,15,3]),
-        seed=1,
-        design_control={"init_size": ni},
-        fun_control={}
-    )
-
+        fun_control=fun_control_init(
+            lower=np.array([-5,0,1]),
+            upper=np.array([10,15,3]),
+            seed=1),
+        design_control=design_control_init(init_size=ni))
+    
     X = spot_test.generate_design(size=spot_test.design_control["init_size"],
                                   repeats=spot_test.design_control["repeats"],
                                   lower=spot_test.lower, 
@@ -34,15 +34,15 @@ def test_generate_design():
                                    lower=spot_test.lower, 
                                    upper=spot_test.upper)
 
+    
     spot_test = Spot(
         fun=fun,
-        lower=np.array([-5,0,1]),
-        upper=np.array([10,15,3]),
-        seed=1,
-        design_control={"init_size": ni},
-        fun_control={}
-    )
-
+        fun_control=fun_control_init(
+            lower=np.array([-5,0,1]),
+            upper=np.array([10,15,3]),
+            seed=1),
+        design_control=design_control_init(init_size=ni))
+    
     X3 = spot_test.generate_design(size=spot_test.design_control["init_size"],
                                    repeats=spot_test.design_control["repeats"],
                                    lower=spot_test.lower, 
@@ -50,12 +50,11 @@ def test_generate_design():
 
     spot_test = Spot(
         fun=fun,
-        lower=np.array([-5,0,1]),
-        upper=np.array([10,15,3]),
-        seed=2,
-        design_control={"init_size": ni},
-        fun_control={}
-    )
+        fun_control=fun_control_init(
+            lower=np.array([-5,0,1]),
+            upper=np.array([10,15,3]),
+            seed=2),
+        design_control=design_control_init(init_size=ni))
 
     X4 = spot_test.generate_design(size=spot_test.design_control["init_size"],
                                    repeats=spot_test.design_control["repeats"],

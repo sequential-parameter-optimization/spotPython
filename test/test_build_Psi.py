@@ -15,25 +15,24 @@ def test_build_Psi():
     from spotPython.fun.objectivefunctions import analytical
     from spotPython.spot import spot
     from spotPython.utils.repair import repair_non_numeric
+    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
     # number of points:
     ni = 7
 
     fun = analytical().fun_sphere
-    lower = np.array([-1,-1])
-    upper = np.array([1,1])
-    design_control={"init_size": ni}
-    surrogate_control={
-                "infill_criterion": "y",
-                "n_points": 1,
-            }
+    fun_control = fun_control_init(
+        lower = np.array([-1,-1]),
+        upper = np.array([1,1]),
+        fun_evals = 25, 
+        noise = False,
+        log_level = 50)
+    design_control= design_control_init(init_size=ni)
+    surrogate_control = surrogate_control_init()
+
     # Spot: to generate initial design
     S_spot = spot.Spot(fun=fun,
-                lower = lower, 
-                upper= upper, 
-                fun_evals = 25, 
-                noise = False,
-                log_level = 50, 
+                fun_control=fun_control,
                 design_control=design_control, 
                 surrogate_control=surrogate_control)
 
