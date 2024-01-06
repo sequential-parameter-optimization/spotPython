@@ -162,12 +162,14 @@ def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Sp
     return tabulate(tbl, headers=headers, numalign="right", tablefmt="github")
 
 
-def generate_config_id(config):
+def generate_config_id(config, randomized=True):
     """Generates a unique id for a configuration.
 
     Args:
         config (dict):
             A dictionary with the configuration.
+        randomized (bool):
+            If True, a large random number is added to the end of the config_id.
 
     Returns:
         (str):
@@ -184,6 +186,9 @@ def generate_config_id(config):
         config_id += str(config[key]) + "_"
         # hash the config_id to make it shorter and unique
         config_id = str(hash(config_id)) + "_"
+    if randomized:
+        # add a large random number to the end of the config_id
+        config_id += str(np.random.randint(0, 1000000000))
     return config_id[:-1]
 
 

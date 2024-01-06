@@ -13,7 +13,7 @@ def fun_control_init(
     TENSORBOARD_CLEAN=False,
     accelerator="auto",
     device=None,
-    devices="auto",
+    devices=1,
     enable_progress_bar=False,
     fun_evals=15,
     log_level=50,
@@ -41,9 +41,9 @@ def fun_control_init(
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
-        devices (str):
+        devices (str or int):
             The number of devices to use for the training/validation/testing.
-            Default is "auto". Can be "auto" or an integer.
+            Default is 1. Can be "auto" or an integer.
         enable_progress_bar (bool):
             Whether to enable the progress bar or not.
         fun_evals (int):
