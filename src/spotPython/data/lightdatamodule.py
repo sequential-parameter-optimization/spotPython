@@ -118,6 +118,10 @@ class LightDataModule(L.LightningDataModule):
                 Training set size: 3
 
         """
+        print(f"LightDataModule: train_dataloader(). Training set size: {len(self.data_train)}")
+        print(f"LightDataModule: train_dataloader(). batch_size: {self.batch_size}")
+        print(f"LightDataModule: train_dataloader(). num_workers: {self.num_workers}")
+        print("Calling DataLoader()")
         return DataLoader(self.data_train, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:

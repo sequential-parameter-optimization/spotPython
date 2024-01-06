@@ -91,7 +91,9 @@ def train_model(config: dict, fun_control: dict) -> float:
         test_seed=fun_control["test_seed"],
     )
     dm.setup()
-    print(f"Train_model(): Test set size: {len(dm.data_test)}")
+    print(f"train_model(): Test set size: {len(dm.data_test)}")
+    print(f"train_model(): Train set size: {len(dm.data_train)}")
+    print(f"train_model(): Batch size: {config['batch_size']}")
 
     # Init trainer
     trainer = L.Trainer(
