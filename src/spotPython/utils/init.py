@@ -14,7 +14,7 @@ def fun_control_init(
     device=None,
     enable_progress_bar=False,
     fun_evals=15,
-    log_level=10,
+    log_level=50,
     max_time=1,
     num_workers=0,
     seed=1234,
@@ -22,6 +22,8 @@ def fun_control_init(
     show_progress=False,
     spot_tensorboard_path=None,
     task="classification",
+    test_seed=1234,
+    test_size=0.4,
     tolerance_x=0,
 ):
     """Initialize fun_control dictionary.
@@ -32,15 +34,36 @@ def fun_control_init(
             The number of input features.
         _L_out (int):
             The number of output features.
+        device (str):
+            The device to use for the training. It can be either "cpu", "mps", or "cuda".
         enable_progress_bar (bool):
             Whether to enable the progress bar or not.
+        fun_evals (int):
+            The number of function evaluations.
+        log_level (int):
+            The log level. Default is 50 (ERROR).
+        max_time (int):
+            The maximum time in minutes.
+        num_workers (int):
+            The number of workers to use for the data loading. Default is 0.
+        seed (int):
+            The seed to use for the random number generator.
+        sigma (float):
+            The standard deviation of the noise of the objective function.
+        show_progress (bool):
+            Whether to show the progress or not. Default is False.
         spot_tensorboard_path (str):
             The path to the folder where the spot tensorboard files are saved.
             If None, no spot tensorboard files are saved.
-        num_workers (int):
-            The number of workers to use for the data loading.
-        device (str):
-            The device to use for the training. It can be either "cpu", "mps", or "cuda".
+        task (str):
+            The task to perform. It can be either "classification" or "regression".
+        test_seed (int):
+            The seed to use for the test set. Default is 1234.
+        test_size (float):
+            The size of the test set. Default is 0.4, i.e.,
+            60% of the data is used for training and 40% for testing.
+        tolerance_x (float):
+            The tolerance for the new x values. Default is 0.
 
     Returns:
         fun_control (dict):
@@ -155,6 +178,8 @@ def fun_control_init(
         "shuffle": None,
         "sigma": sigma,
         "target_column": None,
+        "test_seed": test_seed,
+        "test_size": test_size,
         "tolerance_x": tolerance_x,
         "train": None,
         "test": None,
@@ -185,3 +210,27 @@ def check_and_create_dir(path):
         raise Exception("path must be a string")
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+def design_control_init():
+    """Initialize design_control dictionary.
+
+    Returns:
+        design_control (dict):
+            A dictionary containing the information about the design of experiments.
+
+    """
+    design_control = {}
+    return design_control
+
+
+def surrogate_control_init():
+    """Initialize surrogate_control dictionary.
+
+    Returns:
+        surrogate_control (dict):
+            A dictionary containing the information about the surrogate model.
+
+    """
+    surrogate_control = {}
+    return surrogate_control

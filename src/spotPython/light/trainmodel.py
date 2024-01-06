@@ -85,6 +85,8 @@ def train_model(config: dict, fun_control: dict) -> float:
         dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
+        test_size=fun_control["test_size"],
+        test_seed=fun_control["test_seed"],
     )
     dm.setup()
     print(f"Train_model(): Test set size: {len(dm.data_test)}")
