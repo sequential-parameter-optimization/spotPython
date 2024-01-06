@@ -35,14 +35,14 @@ def test_update_design_with_repeats_and_ocba():
     fun = analytical().fun_sphere
     fun_control = fun_control_init(
             sigma=0.02,
-            seed=123,)
+            seed=123,
+            noise=True,
+            fun_repeats=2)
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
     design_control={"init_size": ni,
                     "repeats": 2}
     S = spot.Spot(fun=fun,
-                noise=True,
-                fun_repeats=2,
                 n_points=1,
                 ocba_delta=1,
                 lower = lower,
@@ -70,14 +70,15 @@ def test_update_design_with_repeats_and_ocba_no_var():
     fun = analytical().fun_sphere
     fun_control = fun_control_init(
             sigma=0.02,
-            seed=123,)
+            seed=123,
+            noise=True,
+            fun_repeats=2,)
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
     design_control={"init_size": ni,
                     "repeats": 2}
     S = spot.Spot(fun=fun,
                 noise=True,
-                fun_repeats=2,
                 n_points=1,
                 ocba_delta=1,
                 lower = lower,

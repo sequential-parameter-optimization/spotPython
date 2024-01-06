@@ -19,6 +19,7 @@ def fun_control_init(
     fun_repeats=1,
     log_level=50,
     max_time=1,
+    noise=False,
     num_workers=0,
     seed=1234,
     sigma=0.0,
@@ -58,6 +59,9 @@ def fun_control_init(
             The log level. Default is 50 (ERROR).
         max_time (int):
             The maximum time in minutes.
+        noise (bool):
+            Whether the objective function is noiy or not. Default is False.
+            Affects the repeat of the function evaluations.
         num_workers (int):
             The number of workers to use for the data loading. Default is 0.
         seed (int):
@@ -108,6 +112,7 @@ def fun_control_init(
                 'metric_torch': None,
                 'metric_params': {},
                 'model_dict': {},
+                'noise': False,
                 'n_samples': None,
                 'num_workers': 0,
                 'optimizer': None,
@@ -186,6 +191,7 @@ def fun_control_init(
         "metric_torch": None,
         "metric_params": {},
         "model_dict": {},
+        "noise": noise,
         "n_samples": None,
         "num_workers": num_workers,
         "optimizer": None,
