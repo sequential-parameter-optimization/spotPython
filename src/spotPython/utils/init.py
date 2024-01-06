@@ -11,7 +11,9 @@ def fun_control_init(
     _L_in=None,
     _L_out=None,
     TENSORBOARD_CLEAN=False,
+    accelerator="auto",
     device=None,
+    devices="auto",
     enable_progress_bar=False,
     fun_evals=15,
     log_level=50,
@@ -21,7 +23,7 @@ def fun_control_init(
     sigma=0.0,
     show_progress=False,
     spot_tensorboard_path=None,
-    task="classification",
+    task=None,
     test_seed=1234,
     test_size=0.4,
     tolerance_x=0,
@@ -34,8 +36,14 @@ def fun_control_init(
             The number of input features.
         _L_out (int):
             The number of output features.
+        acceleration (str):
+            The accelerator to be used by the Lighting Trainer.
+            It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
+        devices (str):
+            The number of devices to use for the training/validation/testing.
+            Default is "auto". Can be "auto" or an integer.
         enable_progress_bar (bool):
             Whether to enable the progress bar or not.
         fun_evals (int):
@@ -80,9 +88,11 @@ def fun_control_init(
                 'TENSORBOARD_PATH': 'runs/',
                 '_L_in': 64,
                 '_L_out': 11,
+                'accelerator': "auto",
                 'data': None,
                 'data_dir': './data',
                 'device': None,
+                'devices': "auto",
                 'enable_progress_bar': False,
                 'eval': None,
                 'k_folds': None,
@@ -149,11 +159,13 @@ def fun_control_init(
         "TENSORBOARD_PATH": TENSORBOARD_PATH,
         "_L_in": _L_in,
         "_L_out": _L_out,
+        "accelerator": accelerator,
         "data": None,
         "data_dir": "./data",
         "data_module": None,
         "data_set": None,
         "device": device,
+        "devices": devices,
         "enable_progress_bar": enable_progress_bar,
         "eval": None,
         "fun_evals": fun_evals,

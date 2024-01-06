@@ -8,7 +8,7 @@ def test_fun_control_init():
     assert fun_control["_L_out"] == 11
     assert fun_control["num_workers"] == 0
     assert fun_control["device"] is None
-    assert fun_control["task"] == "classification"
+    assert fun_control["task"] is None
     assert fun_control["sigma"] == 0.0
     assert fun_control["CHECKPOINT_PATH"] == "runs/saved_models/"
     assert fun_control["DATASET_PATH"] == "data/"

@@ -81,8 +81,8 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         # Where to save models
         default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
         max_epochs=model.hparams.epochs,
-        accelerator="auto",
-        devices=1,
+        accelerator=fun_control["accelerator"],
+        devices=fun_control["devices"],
         logger=TensorBoardLogger(
             save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=True
         ),
