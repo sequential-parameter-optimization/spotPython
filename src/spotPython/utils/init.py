@@ -16,6 +16,7 @@ def fun_control_init(
     devices=1,
     enable_progress_bar=False,
     fun_evals=15,
+    fun_repeats=1,
     log_level=50,
     max_time=1,
     num_workers=0,
@@ -51,6 +52,8 @@ def fun_control_init(
             Whether to enable the progress bar or not.
         fun_evals (int):
             The number of function evaluations.
+        fun_repeats (int):
+            The number of function repeats. Default is 1.
         log_level (int):
             The log level. Default is 50 (ERROR).
         max_time (int):
@@ -173,6 +176,7 @@ def fun_control_init(
         "enable_progress_bar": enable_progress_bar,
         "eval": None,
         "fun_evals": fun_evals,
+        "fun_repeats": fun_repeats,
         "k_folds": 3,
         "log_level": log_level,
         "loss_function": None,
