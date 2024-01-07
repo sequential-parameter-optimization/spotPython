@@ -87,11 +87,10 @@ def test_get_var_type_from_var_name():
     assert get_var_type_from_var_name(fun_control, vn) == "factor"
 
 def test_get_th_hyperparameter_name_from_fun_control():
-    experiment_name = get_experiment_name(prefix="000")
     fun_control = fun_control_init(
-        spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),
         _L_in=10,
         _L_out=1,
+        PREFIX = "000",
         TENSORBOARD_CLEAN=True,
         device=getDevice(),
         enable_progress_bar=False,

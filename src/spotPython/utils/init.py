@@ -7,11 +7,13 @@ import numpy as np
 
 # PyTorch TensorBoard support
 from torch.utils.tensorboard import SummaryWriter
+from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
 
 
 def fun_control_init(
     _L_in=None,
     _L_out=None,
+    PREFIX=None,
     TENSORBOARD_CLEAN=False,
     accelerator="auto",
     design=None,
@@ -33,7 +35,6 @@ def fun_control_init(
     show_models=False,
     show_progress=True,
     sigma=0.0,
-    spot_tensorboard_path=None,
     task=None,
     test_seed=1234,
     test_size=0.4,
@@ -60,6 +61,10 @@ def fun_control_init(
             The experimental design object. Default is None.
         enable_progress_bar (bool):
             Whether to enable the progress bar or not.
+        EXPERIMENT_NAME (str):
+            The name of the experiment. If EXPERIMENT_NAME is not None,
+            the spot_tensorboard_path is compiled and
+            a spot_writer is initialized as a SummaryWriter(spot_tensorboard_path). Default is None.
         fun_evals (int):
             The number of function evaluations.
         fun_repeats (int):
@@ -93,6 +98,9 @@ def fun_control_init(
             the OCBA infill criterion. Default is 0.
         optimizer (object):
             The optimizer object used for the search on surrogate. Default is None.
+        PREFIX (str):
+            The prefix of the experiment name. If the PREFIX is not None, a spotWriter
+            that us an instance of a SummaryWriter(), is created. Default is None.
         seed (int):
             The seed to use for the random number generator. Default is 123.
         sigma (float):
@@ -102,9 +110,6 @@ def fun_control_init(
         show_models (bool):
             Plot model each generation.
             Currently only 1-dim functions are supported. Default is `False`.
-        spot_tensorboard_path (str):
-            The path to the folder where the spot tensorboard files are saved.
-            If None, no spot tensorboard files are saved.
         surrogate (object):
             The surrogate model object. Default is None.
         task (str):
@@ -206,11 +211,15 @@ def fun_control_init(
             print(f"Moving TENSORBOARD_PATH: {TENSORBOARD_PATH} to TENSORBOARD_PATH_OLD: {TENSORBOARD_PATH_OLD}")
             os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
     os.makedirs(TENSORBOARD_PATH, exist_ok=True)
-    if spot_tensorboard_path is not None:
+    if PREFIX is not None:
+        experiment_name = get_experiment_name(prefix=PREFIX)
+        spot_tensorboard_path = get_spot_tensorboard_path(experiment_name)
         os.makedirs(spot_tensorboard_path, exist_ok=True)
-        spot_writer = SummaryWriter(spot_tensorboard_path)
+        print(f"Created spot_tensorboard_path: {spot_tensorboard_path} for SummaryWriter()")
+        spot_writer = SummaryWriter(log_dir=spot_tensorboard_path)
     else:
         spot_writer = None
+        spot_tensorboard_path = None
 
     if not os.path.exists("./figures"):
         os.makedirs("./figures")
@@ -262,6 +271,7 @@ def fun_control_init(
         "shuffle": None,
         "sigma": sigma,
         "spot_tensorboard_path": spot_tensorboard_path,
+        "spot_writer": spot_writer,
         "target_column": None,
         "test_seed": test_seed,
         "test_size": test_size,
@@ -273,7 +283,6 @@ def fun_control_init(
         "var_name": var_name,
         "var_type": var_type,
         "weights": 1.0,
-        "spot_writer": spot_writer,
     }
     # lower = X_reshape(lower)
     # fun_control.update({"lower": lower})
