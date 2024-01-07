@@ -145,8 +145,8 @@ class RNNLightRegression(L.LightningModule):
         # Initialize RNN
         # input_size = number of features (= 11)
         # num_layers=1: only a single RNN and not stacked
-        rnn_units = self.hparams.l1
-        fc_units = self.hparams.l1
+        rnn_units = 64 #self.hparams.l1
+        fc_units = 64 # self.hparams.l1
 
         # TODO: make this a hyperparameter
         rnn_nonlinearity = "relu"
@@ -163,7 +163,8 @@ class RNNLightRegression(L.LightningModule):
 
         # Initialize Hidden- and Output-Layer
         self.fc = nn.Linear(rnn_units, fc_units)
-        self.output_layer = nn.Linear(fc_units, self._L_out)
+        # self.output_layer = nn.Linear(fc_units, self._L_out)
+        self.layers =nn.Linear(fc_units, self._L_out)
 
         # Initialize Activation Function and Dropouts
         # self.dropout1 = nn.Dropout(dropout[0])
@@ -174,8 +175,9 @@ class RNNLightRegression(L.LightningModule):
         self.dropout2 = nn.Dropout(self.hparams.dropout_prob // 10.0)
         self.dropout3 = nn.Dropout(self.hparams.dropout_prob // 100.0)
 
-        # self.activation_fct = activation_fct
-        self.activation_fct = self.hparams.act_fn
+        activation_fct = nn.ReLU()
+        self.activation_fct = activation_fct
+        # self.activation_fct = self.hparams.act_fn
 
         # old:
         # if self.hparams.l1 < 4:
@@ -209,21 +211,21 @@ class RNNLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the output of the model.
 
         """
-        print(f"input: {x.shape}")
+        # print(f"input: {x.shape}")
         x = self.dropout1(x)
-        print(f"dropout1: {x.shape}")
+        # print(f"dropout1: {x.shape}")
         x, _ = self.rnn_layer(x)
-        print(f"rnn_layer: {x.shape}")
-        x = x[:, -1, :]
-        print(f"slicing: {x.shape}")
+        # print(f"rnn_layer: {x.shape}")
+        # x = x[:, -1, :]
+        # print(f"slicing: {x.shape}")
         x = self.dropout2(x)
-        print(f"dropout2: {x.shape}")
+        # print(f"dropout2: {x.shape}")
         x = self.activation_fct(self.fc(x))
-        print(f"activation_fct: {x.shape}")
+        # print(f"activation_fct: {x.shape}")
         x = self.dropout3(x)
-        print(f"dropout3: {x.shape}")
+        # print(f"dropout3: {x.shape}")
         x = self.output_layer(x)
-        print(f"output_layer: {x.shape}")
+        # print(f"output_layer: {x.shape}")
         return x
 
         # old:
