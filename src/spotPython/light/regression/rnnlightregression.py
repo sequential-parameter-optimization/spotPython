@@ -145,61 +145,59 @@ class RNNLightRegression(L.LightningModule):
         # # Initialize RNN
         # # input_size = number of features (= 11)
         # # num_layers=1: only a single RNN and not stacked
-        # rnn_units = 64 #self.hparams.l1
-        # fc_units = 64 # self.hparams.l1
+        rnn_units = 64  # self.hparams.l1
+        fc_units = 64  # self.hparams.l1
 
         # # TODO: make this a hyperparameter
-        # rnn_nonlinearity = "relu"
+        rnn_nonlinearity = "relu"
 
-        # self.rnn_layer = nn.RNN(
-        #     input_size=self._L_in,
-        #     hidden_size=rnn_units,
-        #     num_layers=1,
-        #     nonlinearity=rnn_nonlinearity,
-        #     bias=True,
-        #     batch_first=True,
-        #     bidirectional=False,
-        # )
+        self.rnn_layer = nn.RNN(
+            input_size=self._L_in,
+            hidden_size=rnn_units,
+            num_layers=1,
+            nonlinearity=rnn_nonlinearity,
+            bias=True,
+            batch_first=True,
+            bidirectional=False,
+        )
 
         # # Initialize Hidden- and Output-Layer
-        # self.fc = nn.Linear(rnn_units, fc_units)
-        # # self.output_layer = nn.Linear(fc_units, self._L_out)
-        # self.layers =nn.Linear(fc_units, self._L_out)
+        self.fc = nn.Linear(rnn_units, fc_units)
+        self.output_layer = nn.Linear(fc_units, self._L_out)
 
         # # Initialize Activation Function and Dropouts
-        # # self.dropout1 = nn.Dropout(dropout[0])
-        # # self.dropout2 = nn.Dropout(dropout[1])
-        # # self.dropout3 = nn.Dropout(dropout[2])
+        dropout = [0.2, 0, 0]
+        self.dropout1 = nn.Dropout(dropout[0])
+        self.dropout2 = nn.Dropout(dropout[1])
+        self.dropout3 = nn.Dropout(dropout[2])
         # # TODO: use different dropout for different layers
         # self.dropout1 = nn.Dropout(self.hparams.dropout_prob)
         # self.dropout2 = nn.Dropout(self.hparams.dropout_prob // 10.0)
         # self.dropout3 = nn.Dropout(self.hparams.dropout_prob // 100.0)
 
-        # activation_fct = nn.ReLU()
-        # self.activation_fct = activation_fct
+        activation_fct = nn.ReLU()
+        self.activation_fct = activation_fct
         # self.activation_fct = self.hparams.act_fn
 
         # ###########################################
         # old:
-        if self.hparams.l1 < 4:
-            raise ValueError("l1 must be at least 4")
-
-        hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
-
+        # if self.hparams.l1 < 4:
+        #    raise ValueError("l1 must be at least 4")
+        # hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
         # Create the network based on the specified hidden sizes
-        layers = []
-        layer_sizes = [self._L_in] + hidden_sizes
-        layer_size_last = layer_sizes[0]
-        for layer_size in layer_sizes[1:]:
-            layers += [
-                nn.Linear(layer_size_last, layer_size),
-                self.hparams.act_fn,
-                nn.Dropout(self.hparams.dropout_prob),
-            ]
-            layer_size_last = layer_size
-        layers += [nn.Linear(layer_sizes[-1], self._L_out)]
-        # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
-        self.layers = nn.Sequential(*layers)
+        # layers = []
+        # layer_sizes = [self._L_in] + hidden_sizes
+        # layer_size_last = layer_sizes[0]
+        # for layer_size in layer_sizes[1:]:
+        #     layers += [
+        #         nn.Linear(layer_size_last, layer_size),
+        #         self.hparams.act_fn,
+        #         nn.Dropout(self.hparams.dropout_prob),
+        #     ]
+        #     layer_size_last = layer_size
+        # layers += [nn.Linear(layer_sizes[-1], self._L_out)]
+        # # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
+        # self.layers = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -212,32 +210,32 @@ class RNNLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the output of the model.
 
         """
-        # # print(f"input: {x.shape}")
-        # x = self.dropout1(x)
-        # # print(f"dropout1: {x.shape}")
-        # x, _ = self.rnn_layer(x)
-        # # print(f"rnn_layer: {x.shape}")
-        # # x = x[:, -1, :]
-        # # print(f"slicing: {x.shape}")
-        # x = self.dropout2(x)
-        # # print(f"dropout2: {x.shape}")
-        # x = self.activation_fct(self.fc(x))
-        # # print(f"activation_fct: {x.shape}")
-        # x = self.dropout3(x)
-        # # print(f"dropout3: {x.shape}")
-        # x = self.output_layer(x)
-        # # print(f"output_layer: {x.shape}")
-        # return x
+        # print(f"input: {x.shape}")
+        x = self.dropout1(x)
+        # print(f"dropout1: {x.shape}")
+        x, _ = self.rnn_layer(x)
+        # print(f"rnn_layer: {x.shape}")
+        # x = x[:, -1, :]
+        # print(f"slicing: {x.shape}")
+        x = self.dropout2(x)
+        # print(f"dropout2: {x.shape}")
+        x = self.activation_fct(self.fc(x))
+        # print(f"activation_fct: {x.shape}")
+        x = self.dropout3(x)
+        # print(f"dropout3: {x.shape}")
+        x = self.output_layer(x)
+        # print(f"output_layer: {x.shape}")
+        return x
 
         # old:
-        x = self.layers(x)
-        # check if the number of columns in x is 1, otherwise throw an error
-        try:
-            assert x.shape[1] == 1
-        except AssertionError:
-            print(f"forward x.shape: {x.shape}")
-            raise AssertionError("Number of columns in x is not 1.")
-        return x
+        # x = self.layers(x)
+        # # check if the number of columns in x is 1, otherwise throw an error
+        # try:
+        #     assert x.shape[1] == 1
+        # except AssertionError:
+        #     print(f"forward x.shape: {x.shape}")
+        #     raise AssertionError("Number of columns in x is not 1.")
+        # return x
 
     def training_step(self, batch: tuple) -> torch.Tensor:
         """
