@@ -142,63 +142,64 @@ class RNNLightRegression(L.LightningModule):
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
 
-        # Initialize RNN
-        # input_size = number of features (= 11)
-        # num_layers=1: only a single RNN and not stacked
-        rnn_units = 64 #self.hparams.l1
-        fc_units = 64 # self.hparams.l1
+        # # Initialize RNN
+        # # input_size = number of features (= 11)
+        # # num_layers=1: only a single RNN and not stacked
+        # rnn_units = 64 #self.hparams.l1
+        # fc_units = 64 # self.hparams.l1
 
-        # TODO: make this a hyperparameter
-        rnn_nonlinearity = "relu"
+        # # TODO: make this a hyperparameter
+        # rnn_nonlinearity = "relu"
 
-        self.rnn_layer = nn.RNN(
-            input_size=self._L_in,
-            hidden_size=rnn_units,
-            num_layers=1,
-            nonlinearity=rnn_nonlinearity,
-            bias=True,
-            batch_first=True,
-            bidirectional=False,
-        )
+        # self.rnn_layer = nn.RNN(
+        #     input_size=self._L_in,
+        #     hidden_size=rnn_units,
+        #     num_layers=1,
+        #     nonlinearity=rnn_nonlinearity,
+        #     bias=True,
+        #     batch_first=True,
+        #     bidirectional=False,
+        # )
 
-        # Initialize Hidden- and Output-Layer
-        self.fc = nn.Linear(rnn_units, fc_units)
-        # self.output_layer = nn.Linear(fc_units, self._L_out)
-        self.layers =nn.Linear(fc_units, self._L_out)
+        # # Initialize Hidden- and Output-Layer
+        # self.fc = nn.Linear(rnn_units, fc_units)
+        # # self.output_layer = nn.Linear(fc_units, self._L_out)
+        # self.layers =nn.Linear(fc_units, self._L_out)
 
-        # Initialize Activation Function and Dropouts
-        # self.dropout1 = nn.Dropout(dropout[0])
-        # self.dropout2 = nn.Dropout(dropout[1])
-        # self.dropout3 = nn.Dropout(dropout[2])
-        # TODO: use different dropout for different layers
-        self.dropout1 = nn.Dropout(self.hparams.dropout_prob)
-        self.dropout2 = nn.Dropout(self.hparams.dropout_prob // 10.0)
-        self.dropout3 = nn.Dropout(self.hparams.dropout_prob // 100.0)
+        # # Initialize Activation Function and Dropouts
+        # # self.dropout1 = nn.Dropout(dropout[0])
+        # # self.dropout2 = nn.Dropout(dropout[1])
+        # # self.dropout3 = nn.Dropout(dropout[2])
+        # # TODO: use different dropout for different layers
+        # self.dropout1 = nn.Dropout(self.hparams.dropout_prob)
+        # self.dropout2 = nn.Dropout(self.hparams.dropout_prob // 10.0)
+        # self.dropout3 = nn.Dropout(self.hparams.dropout_prob // 100.0)
 
-        activation_fct = nn.ReLU()
-        self.activation_fct = activation_fct
+        # activation_fct = nn.ReLU()
+        # self.activation_fct = activation_fct
         # self.activation_fct = self.hparams.act_fn
 
+        # ###########################################
         # old:
-        # if self.hparams.l1 < 4:
-        #     raise ValueError("l1 must be at least 4")
+        if self.hparams.l1 < 4:
+            raise ValueError("l1 must be at least 4")
 
-        # hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
+        hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
 
-        # # Create the network based on the specified hidden sizes
-        # layers = []
-        # layer_sizes = [self._L_in] + hidden_sizes
-        # layer_size_last = layer_sizes[0]
-        # for layer_size in layer_sizes[1:]:
-        #     layers += [
-        #         nn.Linear(layer_size_last, layer_size),
-        #         self.hparams.act_fn,
-        #         nn.Dropout(self.hparams.dropout_prob),
-        #     ]
-        #     layer_size_last = layer_size
-        # layers += [nn.Linear(layer_sizes[-1], self._L_out)]
-        # # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
-        # self.layers = nn.Sequential(*layers)
+        # Create the network based on the specified hidden sizes
+        layers = []
+        layer_sizes = [self._L_in] + hidden_sizes
+        layer_size_last = layer_sizes[0]
+        for layer_size in layer_sizes[1:]:
+            layers += [
+                nn.Linear(layer_size_last, layer_size),
+                self.hparams.act_fn,
+                nn.Dropout(self.hparams.dropout_prob),
+            ]
+            layer_size_last = layer_size
+        layers += [nn.Linear(layer_sizes[-1], self._L_out)]
+        # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
+        self.layers = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -211,26 +212,32 @@ class RNNLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the output of the model.
 
         """
-        # print(f"input: {x.shape}")
-        x = self.dropout1(x)
-        # print(f"dropout1: {x.shape}")
-        x, _ = self.rnn_layer(x)
-        # print(f"rnn_layer: {x.shape}")
-        # x = x[:, -1, :]
-        # print(f"slicing: {x.shape}")
-        x = self.dropout2(x)
-        # print(f"dropout2: {x.shape}")
-        x = self.activation_fct(self.fc(x))
-        # print(f"activation_fct: {x.shape}")
-        x = self.dropout3(x)
-        # print(f"dropout3: {x.shape}")
-        x = self.output_layer(x)
-        # print(f"output_layer: {x.shape}")
-        return x
+        # # print(f"input: {x.shape}")
+        # x = self.dropout1(x)
+        # # print(f"dropout1: {x.shape}")
+        # x, _ = self.rnn_layer(x)
+        # # print(f"rnn_layer: {x.shape}")
+        # # x = x[:, -1, :]
+        # # print(f"slicing: {x.shape}")
+        # x = self.dropout2(x)
+        # # print(f"dropout2: {x.shape}")
+        # x = self.activation_fct(self.fc(x))
+        # # print(f"activation_fct: {x.shape}")
+        # x = self.dropout3(x)
+        # # print(f"dropout3: {x.shape}")
+        # x = self.output_layer(x)
+        # # print(f"output_layer: {x.shape}")
+        # return x
 
         # old:
-        # x = self.layers(x)
-        # return x
+        x = self.layers(x)
+        # check if the number of columns in x is 1, otherwise throw an error
+        try:
+            assert x.shape[1] == 1
+        except AssertionError:
+            print(f"forward x.shape: {x.shape}")
+            raise AssertionError("Number of columns in x is not 1.")
+        return x
 
     def training_step(self, batch: tuple) -> torch.Tensor:
         """
@@ -244,8 +251,23 @@ class RNNLightRegression(L.LightningModule):
 
         """
         x, y = batch
+        # reshape the tensor y to be a column vector (len(y) rows and 1 column)
         y = y.view(len(y), 1)
+        # check if the number of rows in x is equal to the number of rows in y, otherwise throw an error
+        try:
+            assert x.shape[0] == y.shape[0]
+        except AssertionError:
+            print(f"training_step x.shape: {x.shape}")
+            print(f"training_step y.shape: {y.shape}")
+            raise AssertionError("Number of rows in x and y must be equal")
         y_hat = self(x)
+        # check if the number of rows in y_hat is equal to the number of rows in y, otherwise throw an error
+        try:
+            assert y_hat.shape[0] == y.shape[0]
+        except AssertionError:
+            print(f"training_step y_hat.shape: {y_hat.shape}")
+            print(f"training_step y.shape: {y.shape}")
+            raise AssertionError("Number of rows in y_hat and y must be equal")
         val_loss = F.mse_loss(y_hat, y)
         # mae_loss = F.l1_loss(y_hat, y)
         # self.log("train_loss", val_loss, on_step=True, on_epoch=True, prog_bar=True)
@@ -266,6 +288,7 @@ class RNNLightRegression(L.LightningModule):
 
         """
         x, y = batch
+        # reshape the tensor y to be a column vector (len(y) rows and 1 column)
         y = y.view(len(y), 1)
         y_hat = self(x)
         val_loss = F.mse_loss(y_hat, y)
@@ -288,8 +311,8 @@ class RNNLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
         """
         x, y = batch
-        y_hat = self(x)
         y = y.view(len(y), 1)
+        y_hat = self(x)
         val_loss = F.mse_loss(y_hat, y)
         # mae_loss = F.l1_loss(y_hat, y)
         self.log("val_loss", val_loss, prog_bar=prog_bar)
