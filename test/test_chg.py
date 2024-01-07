@@ -1,15 +1,16 @@
 import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
+from spotPython.utils.init import fun_control_init
 
 def test_chg():
     fun = analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
     S = spot.Spot(fun=fun,
-                lower = lower,
-                upper= upper,
-    )
+                  fun_control=fun_control_init(
+                      lower = lower,
+                      upper= upper))
     z0 = [1, 2, 3]
     new_val_1 = 4
     new_val_2 = 5

@@ -6,15 +6,19 @@ def test_infill():
     from spotPython.fun.objectivefunctions import analytical
     from spotPython.spot.spot import Spot
     from spotPython.utils.repair import repair_non_numeric
+    from spotPython.utils.init import fun_control_init
     from sklearn import linear_model
     import pytest
 
     fun = analytical().fun_sphere
 
+    fun_control=fun_control_init(
+        lower=np.array([-10,-1]),
+        upper=np.array([10,1]))
+    
     spot_test = Spot(
         fun=fun,
-        lower=np.array([-10,-1]),
-        upper=np.array([10,1]),
+        fun_control=fun_control
     )
 
 
@@ -44,8 +48,7 @@ def test_infill():
     S_LM = linear_model.LinearRegression()
     spot_test = Spot(
         fun=fun,
-        lower=np.array([-10,-1]),
-        upper=np.array([10,1]),
+        fun_control=fun_control,
         surrogate=S_LM
     )
     # (S-2) Initial Design:

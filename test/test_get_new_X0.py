@@ -1,7 +1,7 @@
 import numpy as np
 from spotPython.fun.objectivefunctions import analytical
 from spotPython.spot import spot
-from spotPython.utils.init import fun_control_init
+from spotPython.utils.init import fun_control_init, design_control_init
 
 def test_get_new_X0():
     # number of initial points:
@@ -9,24 +9,25 @@ def test_get_new_X0():
     X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
 
     fun = analytical().fun_sphere
+
     fun_control = fun_control_init(
             sigma=0.0,
-            seed=123,)
-    lower = np.array([-1, -1])
-    upper = np.array([1, 1])
-    design_control={"init_size": ni,
-                    "repeats": 1}
+            seed=123,
+            lower = np.array([-1, -1]),
+            upper= np.array([1, 1]),
+            noise=False,
+            fun_repeats=1,
+            n_points=10,
+            ocba_delta=0,
+            show_progress=True
+    )
+
+    design_control=design_control_init(init_size=ni,
+                                       repeats=1)
 
     S = spot.Spot(fun=fun,
-                noise=False,
-                fun_repeats=1,
-                n_points=10,
-                ocba_delta=0,
-                lower = lower,
-                upper= upper,
-                show_progress=True,
-                design_control=design_control,
-                fun_control=fun_control
+                  fun_control=fun_control,
+                  design_control=design_control
     )
     S.initialize_design(X_start=X_start)
     S.update_stats()
