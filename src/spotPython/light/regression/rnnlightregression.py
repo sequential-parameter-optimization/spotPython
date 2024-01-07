@@ -145,8 +145,8 @@ class RNNLightRegression(L.LightningModule):
         # # Initialize RNN
         # # input_size = number of features (= 11)
         # # num_layers=1: only a single RNN and not stacked
-        rnn_units = 64  # self.hparams.l1
-        fc_units = 64  # self.hparams.l1
+        rnn_units = self.hparams.l1
+        fc_units = self.hparams.l1
 
         # # TODO: make this a hyperparameter
         rnn_nonlinearity = "relu"
@@ -166,14 +166,14 @@ class RNNLightRegression(L.LightningModule):
         self.output_layer = nn.Linear(fc_units, self._L_out)
 
         # # Initialize Activation Function and Dropouts
-        dropout = [0.2, 0, 0]
-        self.dropout1 = nn.Dropout(dropout[0])
-        self.dropout2 = nn.Dropout(dropout[1])
-        self.dropout3 = nn.Dropout(dropout[2])
+        # dropout = [0.2, 0, 0]
+        # self.dropout1 = nn.Dropout(dropout[0])
+        # self.dropout2 = nn.Dropout(dropout[1])
+        # self.dropout3 = nn.Dropout(dropout[2])
         # # TODO: use different dropout for different layers
-        # self.dropout1 = nn.Dropout(self.hparams.dropout_prob)
-        # self.dropout2 = nn.Dropout(self.hparams.dropout_prob // 10.0)
-        # self.dropout3 = nn.Dropout(self.hparams.dropout_prob // 100.0)
+        self.dropout1 = nn.Dropout(self.hparams.dropout_prob)
+        self.dropout2 = nn.Dropout(self.hparams.dropout_prob // 10.0)
+        self.dropout3 = nn.Dropout(self.hparams.dropout_prob // 100.0)
 
         activation_fct = nn.ReLU()
         self.activation_fct = activation_fct
