@@ -700,6 +700,8 @@
       
         
       
+        
+      
     
     
     
@@ -861,6 +863,26 @@
   
   <span class="md-ellipsis">
     pkldataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/pkldataset_intern/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pkldataset_intern
   </span>
   
 
@@ -2450,6 +2472,8 @@
       
         
       
+        
+      
     
     
     
@@ -2711,6 +2735,26 @@
   
   <span class="md-ellipsis">
     tensorboard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/time/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    time
   </span>
   
 
@@ -3096,7 +3140,9 @@
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
-<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_light_from_checkpoint</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">postfix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_TEST&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_light_from_checkpoint</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">postfix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_TEST&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Loads a model from a checkpoint using the given configuration and function control parameters.</span>
 
@@ -3133,7 +3179,9 @@
 <span class="sd">        &gt;&gt;&gt; model = load_light_from_checkpoint(config, fun_control)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;config: </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">+</span> <span class="n">postfix</span>
+    <span class="c1"># load a model from a checkpoint with the same config_id</span>
+    <span class="c1"># that was used in the test phase. Therefore, no timestamp is added.</span>
+    <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="n">postfix</span>
     <span class="n">default_root_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">,</span> <span class="s2">&quot;last.ckpt&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading model with </span><span class="si">{</span><span class="n">config_id</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">default_root_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span>

@@ -700,6 +700,8 @@
       
         
       
+        
+      
     
     
     
@@ -861,6 +863,26 @@
   
   <span class="md-ellipsis">
     pkldataset
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/pkldataset_intern/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    pkldataset_intern
   </span>
   
 
@@ -2450,6 +2472,8 @@
       
         
       
+        
+      
     
     
     
@@ -2711,6 +2735,26 @@
   
   <span class="md-ellipsis">
     tensorboard
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/time/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    time
   </span>
   
 
@@ -3014,7 +3058,7 @@
 <span class="go">        add_core_model_to_fun_control,</span>
 <span class="go">        get_default_hyperparameters_as_array)</span>
 <span class="go">    from spotPython.data.diabetes import Diabetes</span>
-<span class="go">    from spotPython.hyperparameters.values import set_data_set</span>
+<span class="go">    from spotPython.hyperparameters.values import set_control_key_value</span>
 <span class="go">    from spotPython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict</span>
 <span class="go">    from spotPython.light.traintest import train_model</span>
 <span class="go">    fun_control = fun_control_init(</span>
@@ -3022,8 +3066,9 @@
 <span class="go">        _L_out=1,)</span>
 <span class="go">    # Select a dataset</span>
 <span class="go">    dataset = Diabetes()</span>
-<span class="go">    set_data_set(fun_control=fun_control,</span>
-<span class="go">                    data_set=dataset)</span>
+<span class="go">    set_control_key_value(control_dict=fun_control,</span>
+<span class="go">                        key=&quot;data_set&quot;,</span>
+<span class="go">                        value=dataset)</span>
 <span class="go">    # Select a model</span>
 <span class="go">    add_core_model_to_fun_control(core_model=NetLightRegression,</span>
 <span class="go">                                fun_control=fun_control,</span>
@@ -3158,7 +3203,14 @@
 <span class="normal">111</span>
 <span class="normal">112</span>
 <span class="normal">113</span>
-<span class="normal">114</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters.</span>
 
@@ -3177,7 +3229,7 @@
 <span class="sd">                add_core_model_to_fun_control,</span>
 <span class="sd">                get_default_hyperparameters_as_array)</span>
 <span class="sd">            from spotPython.data.diabetes import Diabetes</span>
-<span class="sd">            from spotPython.hyperparameters.values import set_data_set</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_control_key_value</span>
 <span class="sd">            from spotPython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict</span>
 <span class="sd">            from spotPython.light.traintest import train_model</span>
 <span class="sd">            fun_control = fun_control_init(</span>
@@ -3185,8 +3237,9 @@
 <span class="sd">                _L_out=1,)</span>
 <span class="sd">            # Select a dataset</span>
 <span class="sd">            dataset = Diabetes()</span>
-<span class="sd">            set_data_set(fun_control=fun_control,</span>
-<span class="sd">                            data_set=dataset)</span>
+<span class="sd">            set_control_key_value(control_dict=fun_control,</span>
+<span class="sd">                                key=&quot;data_set&quot;,</span>
+<span class="sd">                                value=dataset)</span>
 <span class="sd">            # Select a model</span>
 <span class="sd">            add_core_model_to_fun_control(core_model=NetLightRegression,</span>
 <span class="sd">                                        fun_control=fun_control,</span>
@@ -3221,7 +3274,9 @@
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;enable_progress_bar&quot;</span><span class="p">]</span>
-    <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="c1"># config id is unique. Since the model is not loaded from a checkpoint,</span>
+    <span class="c1"># the config id is generated here with a timestamp.</span>
+    <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">)</span>
     <span class="n">initialization</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;initialization&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Xavier&quot;</span><span class="p">:</span>
@@ -3235,17 +3290,21 @@
         <span class="n">dataset</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_set&quot;</span><span class="p">],</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">],</span>
+        <span class="n">test_size</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">],</span>
+        <span class="n">test_seed</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;test_seed&quot;</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train_model(): Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_model(): Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_model(): Train set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dm</span><span class="o">.</span><span class="n">data_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_model(): Batch size: </span><span class="si">{</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Init trainer</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
         <span class="c1"># Where to save models</span>
         <span class="n">default_root_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">),</span>
         <span class="n">max_epochs</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span>
-        <span class="n">accelerator</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-        <span class="n">devices</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">accelerator</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;accelerator&quot;</span><span class="p">],</span>
+        <span class="n">devices</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;devices&quot;</span><span class="p">],</span>
         <span class="n">logger</span><span class="o">=</span><span class="n">TensorBoardLogger</span><span class="p">(</span>
             <span class="n">save_dir</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;TENSORBOARD_PATH&quot;</span><span class="p">],</span> <span class="n">version</span><span class="o">=</span><span class="n">config_id</span><span class="p">,</span> <span class="n">default_hp_metric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_graph</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">),</span>
