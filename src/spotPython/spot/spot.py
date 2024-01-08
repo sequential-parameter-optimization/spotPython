@@ -1165,18 +1165,25 @@ class Spot:
         s_y = pd.Series(self.y)
         s_c = s_y.cummin()
         n_init = self.design_control["init_size"] * self.design_control["repeats"]
+
         ax = fig.add_subplot(211)
-        ax.plot(
-            range(1, n_init + 1),
-            s_y[:n_init],
-            style[0],
-            range(1, n_init + 2),
-            [s_c[:n_init].min()] * (n_init + 1),
-            style[1],
-            range(n_init + 1, len(s_c) + 1),
-            s_c[n_init:],
-            style[2],
-        )
+        if n_init <= len(s_y):
+            ax.plot(
+                range(1, n_init + 1),
+                s_y[:n_init],
+                style[0],
+                range(1, n_init + 2),
+                [s_c[:n_init].min()] * (n_init + 1),
+                style[1],
+                range(n_init + 1, len(s_c) + 1),
+                s_c[n_init:],
+                style[2],
+            )
+        else:
+            # plot only s_y values:
+            ax.plot(range(1, len(s_y) + 1), s_y, style[0])
+            logger.warning("Less evaluations ({len(s_y)}) than initial design points ({n_init}).")
+        ax.set_xlabel("Iteration")
         if log_x:
             ax.set_xscale("log")
         if log_y:
