@@ -124,9 +124,6 @@ class RNNLightRegression(L.LightningModule):
         Returns:
             (NoneType): None
 
-        Raises:
-            ValueError: If l1 is less than 4.
-
         """
         super().__init__()
         # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during
@@ -142,9 +139,10 @@ class RNNLightRegression(L.LightningModule):
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
 
-        # # Initialize RNN
-        # # input_size = number of features (= 11)
-        # # num_layers=1: only a single RNN and not stacked
+        # Initialize RNN
+        # input_size = number of features is defined via _L_in
+        # output size via _L_out
+        # num_layers=1: only a single RNN and not stacked
         rnn_units = self.hparams.l1
         fc_units = self.hparams.l1
 
@@ -292,7 +290,6 @@ class RNNLightRegression(L.LightningModule):
             torch.optim.Optimizer: The optimizer to use during training.
 
         """
-        # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         optimizer = optimizer_handler(
             optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
         )
