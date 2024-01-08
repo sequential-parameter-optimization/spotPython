@@ -284,7 +284,10 @@ class Spot:
             self.surrogate_control.update({"noise": self.fun_control.noise})
         if self.surrogate_control["model_fun_evals"] is None:
             self.surrogate_control.update({"model_fun_evals": self.optimizer_control["max_iter"]})
-        if self.surrogate_control["model_optimizer"] is None:
+        # self.optimizer is not None here. If 1) the key "model_optimizer"
+        # is still None or 2) a user specified optimizer is provided, update the value of
+        # the key "model_optimizer" to the value of self.optimizer.
+        if self.surrogate_control["model_optimizer"] is None or optimizer is not None:
             self.surrogate_control.update({"model_optimizer": self.optimizer})
 
         # If self.surrogate_control["n_theta"] > 1, use k theta values:
