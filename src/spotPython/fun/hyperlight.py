@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import pprint
 from numpy.random import default_rng
 from spotPython.light.trainmodel import train_model
 from spotPython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
@@ -132,6 +133,9 @@ class HyperLight:
         var_dict = assign_values(X, get_var_name(fun_control))
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, fun_control):
+            if fun_control["verbosity"] > 0:
+                print("\nIn fun(): config:")
+                pprint.pprint(config)
             logger.debug(f"\nconfig: {config}")
             # extract parameters like epochs, batch_size, lr, etc. from config
             # config_id = generate_config_id(config)
@@ -140,6 +144,10 @@ class HyperLight:
                 df_eval = train_model(config, fun_control)
                 logger.debug("fun: train_model returned")
             except Exception as err:
+                if fun_control["verbosity"] > 0:
+                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                    print(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
+                    print("Setting df_eval to np.nan\n")
                 logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                 logger.error("Setting df_eval to np.nan")
                 df_eval = np.nan

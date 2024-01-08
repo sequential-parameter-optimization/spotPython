@@ -42,6 +42,7 @@ def fun_control_init(
     upper=None,
     var_name=None,
     var_type=["num"],
+    verbosity=0,
 ):
     """Initialize fun_control dictionary.
     Args:
@@ -133,6 +134,9 @@ def fun_control_init(
         var_type (List[str]):
             list of type information, can be either "int", "num" or "factor".
             Default is ["num"].
+        verbosity (int):
+            The verbosity level. Determines print output to console. Higher values
+            result in more output. Default is 0.
 
     Returns:
         fun_control (dict):
@@ -282,6 +286,7 @@ def fun_control_init(
         "upper": upper,
         "var_name": var_name,
         "var_type": var_type,
+        "verbosity": verbosity,
         "weights": 1.0,
     }
     # lower = X_reshape(lower)
