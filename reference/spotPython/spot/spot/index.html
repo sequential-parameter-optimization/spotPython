@@ -1784,6 +1784,8 @@
       
         
       
+        
+      
     
     
     
@@ -1825,6 +1827,26 @@
   
   <span class="md-ellipsis">
     netlightregression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../light/regression/rnnlightregression/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    rnnlightregression
   </span>
   
 
@@ -5207,7 +5229,14 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1655</span>
 <span class="normal">1656</span>
 <span class="normal">1657</span>
-<span class="normal">1658</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">1658</span>
+<span class="normal">1659</span>
+<span class="normal">1660</span>
+<span class="normal">1661</span>
+<span class="normal">1662</span>
+<span class="normal">1663</span>
+<span class="normal">1664</span>
+<span class="normal">1665</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -6325,18 +6354,25 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="n">s_y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
         <span class="n">s_c</span> <span class="o">=</span> <span class="n">s_y</span><span class="o">.</span><span class="n">cummin</span><span class="p">()</span>
         <span class="n">n_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">[</span><span class="s2">&quot;init_size&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">]</span>
+
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-            <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">s_y</span><span class="p">[:</span><span class="n">n_init</span><span class="p">],</span>
-            <span class="n">style</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
-            <span class="p">[</span><span class="n">s_c</span><span class="p">[:</span><span class="n">n_init</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">style</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="nb">range</span><span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_c</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-            <span class="n">s_c</span><span class="p">[</span><span class="n">n_init</span><span class="p">:],</span>
-            <span class="n">style</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_init</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_y</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+                <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">s_y</span><span class="p">[:</span><span class="n">n_init</span><span class="p">],</span>
+                <span class="n">style</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="p">[</span><span class="n">s_c</span><span class="p">[:</span><span class="n">n_init</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">style</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="nb">range</span><span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_c</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">s_c</span><span class="p">[</span><span class="n">n_init</span><span class="p">:],</span>
+                <span class="n">style</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># plot only s_y values:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_y</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">s_y</span><span class="p">,</span> <span class="n">style</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Less evaluations ({len(s_y)}) than initial design points (</span><span class="si">{n_init}</span><span class="s2">).&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">log_x</span><span class="p">:</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">log_y</span><span class="p">:</span>
@@ -6987,14 +7023,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1312</span>
-<span class="normal">1313</span>
-<span class="normal">1314</span>
-<span class="normal">1315</span>
-<span class="normal">1316</span>
-<span class="normal">1317</span>
-<span class="normal">1318</span>
-<span class="normal">1319</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1319</span>
 <span class="normal">1320</span>
 <span class="normal">1321</span>
 <span class="normal">1322</span>
@@ -7033,7 +7062,14 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1355</span>
 <span class="normal">1356</span>
 <span class="normal">1357</span>
-<span class="normal">1358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1358</span>
+<span class="normal">1359</span>
+<span class="normal">1360</span>
+<span class="normal">1361</span>
+<span class="normal">1362</span>
+<span class="normal">1363</span>
+<span class="normal">1364</span>
+<span class="normal">1365</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.</span>
 
@@ -7348,14 +7384,7 @@ other surrogate models can be used as well.</li>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1512</span>
-<span class="normal">1513</span>
-<span class="normal">1514</span>
-<span class="normal">1515</span>
-<span class="normal">1516</span>
-<span class="normal">1517</span>
-<span class="normal">1518</span>
-<span class="normal">1519</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1519</span>
 <span class="normal">1520</span>
 <span class="normal">1521</span>
 <span class="normal">1522</span>
@@ -7367,7 +7396,14 @@ other surrogate models can be used as well.</li>
 <span class="normal">1528</span>
 <span class="normal">1529</span>
 <span class="normal">1530</span>
-<span class="normal">1531</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1531</span>
+<span class="normal">1532</span>
+<span class="normal">1533</span>
+<span class="normal">1534</span>
+<span class="normal">1535</span>
+<span class="normal">1536</span>
+<span class="normal">1537</span>
+<span class="normal">1538</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Returns:</span>
@@ -8547,14 +8583,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1600</span>
-<span class="normal">1601</span>
-<span class="normal">1602</span>
-<span class="normal">1603</span>
-<span class="normal">1604</span>
-<span class="normal">1605</span>
-<span class="normal">1606</span>
-<span class="normal">1607</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1607</span>
 <span class="normal">1608</span>
 <span class="normal">1609</span>
 <span class="normal">1610</span>
@@ -8605,7 +8634,14 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="normal">1655</span>
 <span class="normal">1656</span>
 <span class="normal">1657</span>
-<span class="normal">1658</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="normal">1658</span>
+<span class="normal">1659</span>
+<span class="normal">1660</span>
+<span class="normal">1661</span>
+<span class="normal">1662</span>
+<span class="normal">1663</span>
+<span class="normal">1664</span>
+<span class="normal">1665</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallel plot.</span>
 
@@ -8884,14 +8920,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1360</span>
-<span class="normal">1361</span>
-<span class="normal">1362</span>
-<span class="normal">1363</span>
-<span class="normal">1364</span>
-<span class="normal">1365</span>
-<span class="normal">1366</span>
-<span class="normal">1367</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1367</span>
 <span class="normal">1368</span>
 <span class="normal">1369</span>
 <span class="normal">1370</span>
@@ -8976,7 +9005,14 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="normal">1449</span>
 <span class="normal">1450</span>
 <span class="normal">1451</span>
-<span class="normal">1452</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
+<span class="normal">1452</span>
+<span class="normal">1453</span>
+<span class="normal">1454</span>
+<span class="normal">1455</span>
+<span class="normal">1456</span>
+<span class="normal">1457</span>
+<span class="normal">1458</span>
+<span class="normal">1459</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the contour of any dimension.</span>
@@ -9189,14 +9225,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1568</span>
-<span class="normal">1569</span>
-<span class="normal">1570</span>
-<span class="normal">1571</span>
-<span class="normal">1572</span>
-<span class="normal">1573</span>
-<span class="normal">1574</span>
-<span class="normal">1575</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1575</span>
 <span class="normal">1576</span>
 <span class="normal">1577</span>
 <span class="normal">1578</span>
@@ -9219,7 +9248,14 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="normal">1595</span>
 <span class="normal">1596</span>
 <span class="normal">1597</span>
-<span class="normal">1598</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1598</span>
+<span class="normal">1599</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span>
+<span class="normal">1602</span>
+<span class="normal">1603</span>
+<span class="normal">1604</span>
+<span class="normal">1605</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the importance of each variable.</span>
 
 <span class="sd">    Args:</span>
@@ -9388,14 +9424,7 @@ Importance can be specified by the threshold.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1454</span>
-<span class="normal">1455</span>
-<span class="normal">1456</span>
-<span class="normal">1457</span>
-<span class="normal">1458</span>
-<span class="normal">1459</span>
-<span class="normal">1460</span>
-<span class="normal">1461</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1461</span>
 <span class="normal">1462</span>
 <span class="normal">1463</span>
 <span class="normal">1464</span>
@@ -9444,7 +9473,14 @@ Importance can be specified by the threshold.</p>
 <span class="normal">1507</span>
 <span class="normal">1508</span>
 <span class="normal">1509</span>
-<span class="normal">1510</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1510</span>
+<span class="normal">1511</span>
+<span class="normal">1512</span>
+<span class="normal">1513</span>
+<span class="normal">1514</span>
+<span class="normal">1515</span>
+<span class="normal">1516</span>
+<span class="normal">1517</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the contour of important hyperparameters.</span>
 <span class="sd">    Calls `plot_contour` for each pair of important hyperparameters.</span>
@@ -9636,14 +9672,7 @@ S.plot_model()
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1189</span>
-<span class="normal">1190</span>
-<span class="normal">1191</span>
-<span class="normal">1192</span>
-<span class="normal">1193</span>
-<span class="normal">1194</span>
-<span class="normal">1195</span>
-<span class="normal">1196</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1196</span>
 <span class="normal">1197</span>
 <span class="normal">1198</span>
 <span class="normal">1199</span>
@@ -9713,7 +9742,14 @@ S.plot_model()
 <span class="normal">1263</span>
 <span class="normal">1264</span>
 <span class="normal">1265</span>
-<span class="normal">1266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1266</span>
+<span class="normal">1267</span>
+<span class="normal">1268</span>
+<span class="normal">1269</span>
+<span class="normal">1270</span>
+<span class="normal">1271</span>
+<span class="normal">1272</span>
+<span class="normal">1273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the model fit for 1-dim objective functions.</span>
 
@@ -10028,7 +10064,14 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">1184</span>
 <span class="normal">1185</span>
 <span class="normal">1186</span>
-<span class="normal">1187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
+<span class="normal">1187</span>
+<span class="normal">1188</span>
+<span class="normal">1189</span>
+<span class="normal">1190</span>
+<span class="normal">1191</span>
+<span class="normal">1192</span>
+<span class="normal">1193</span>
+<span class="normal">1194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;plot.png&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ko&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;ro-&quot;</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the progress of the hyperparameter tuning (optimization).</span>
@@ -10081,18 +10124,25 @@ and the subsequent points as red dots connected by a line.</p>
     <span class="n">s_y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
     <span class="n">s_c</span> <span class="o">=</span> <span class="n">s_y</span><span class="o">.</span><span class="n">cummin</span><span class="p">()</span>
     <span class="n">n_init</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">[</span><span class="s2">&quot;init_size&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">[</span><span class="s2">&quot;repeats&quot;</span><span class="p">]</span>
+
     <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">211</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-        <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="n">s_y</span><span class="p">[:</span><span class="n">n_init</span><span class="p">],</span>
-        <span class="n">style</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-        <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="p">[</span><span class="n">s_c</span><span class="p">[:</span><span class="n">n_init</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="n">style</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-        <span class="nb">range</span><span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_c</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-        <span class="n">s_c</span><span class="p">[</span><span class="n">n_init</span><span class="p">:],</span>
-        <span class="n">style</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_init</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_y</span><span class="p">):</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">s_y</span><span class="p">[:</span><span class="n">n_init</span><span class="p">],</span>
+            <span class="n">style</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_init</span> <span class="o">+</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">[</span><span class="n">s_c</span><span class="p">[:</span><span class="n">n_init</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">style</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="nb">range</span><span class="p">(</span><span class="n">n_init</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_c</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">s_c</span><span class="p">[</span><span class="n">n_init</span><span class="p">:],</span>
+            <span class="n">style</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># plot only s_y values:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_y</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">s_y</span><span class="p">,</span> <span class="n">style</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Less evaluations ({len(s_y)}) than initial design points (</span><span class="si">{n_init}</span><span class="s2">).&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">log_x</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">log_y</span><span class="p">:</span>
@@ -10193,14 +10243,7 @@ and the subsequent points as red dots connected by a line.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1533</span>
-<span class="normal">1534</span>
-<span class="normal">1535</span>
-<span class="normal">1536</span>
-<span class="normal">1537</span>
-<span class="normal">1538</span>
-<span class="normal">1539</span>
-<span class="normal">1540</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1540</span>
 <span class="normal">1541</span>
 <span class="normal">1542</span>
 <span class="normal">1543</span>
@@ -10226,7 +10269,14 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">1563</span>
 <span class="normal">1564</span>
 <span class="normal">1565</span>
-<span class="normal">1566</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1566</span>
+<span class="normal">1567</span>
+<span class="normal">1568</span>
+<span class="normal">1569</span>
+<span class="normal">1570</span>
+<span class="normal">1571</span>
+<span class="normal">1572</span>
+<span class="normal">1573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Args:</span>
@@ -10347,14 +10397,7 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1268</span>
-<span class="normal">1269</span>
-<span class="normal">1270</span>
-<span class="normal">1271</span>
-<span class="normal">1272</span>
-<span class="normal">1273</span>
-<span class="normal">1274</span>
-<span class="normal">1275</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1275</span>
 <span class="normal">1276</span>
 <span class="normal">1277</span>
 <span class="normal">1278</span>
@@ -10389,7 +10432,14 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 <span class="normal">1307</span>
 <span class="normal">1308</span>
 <span class="normal">1309</span>
-<span class="normal">1310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">1310</span>
+<span class="normal">1311</span>
+<span class="normal">1312</span>
+<span class="normal">1313</span>
+<span class="normal">1314</span>
+<span class="normal">1315</span>
+<span class="normal">1316</span>
+<span class="normal">1317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print results from the run:</span>
 <span class="sd">        1. min y</span>
 <span class="sd">        2. min X</span>
