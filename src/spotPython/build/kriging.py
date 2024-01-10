@@ -43,43 +43,6 @@ logger.addHandler(py_handler)
 
 class Kriging(surrogates):
     """Kriging surrogate.
-
-    Attributes:
-        nat_range_X (list):
-            List of X natural ranges.
-        nat_range_y (list):
-            List of y nat ranges.
-        noise (bool):
-            noisy objective function. Default: False. If `True`, regression kriging will be used.
-        var_type (str):
-            variable type. Can be either `"num`" (numerical) of `"factor"` (factor).
-        num_mask (array):
-            array of bool variables. `True` represent numerical (float) variables.
-        factor_mask (array):
-            array of factor variables. `True` represents factor (unordered) variables.
-        int_mask (array):
-            array of integer variables. `True` represents integers (ordered) variables.
-        ordered_mask (array):
-            array of ordered variables. `True` represents integers or float (ordered) variables.
-            Set of veriables which an order relation, i.e., they are either num (float) or int.
-        name (str):
-            Surrogate name
-        seed (int):
-            Random seed.
-        sigma (float):
-            Kriging sigma.
-        gen (method):
-            Design generator, e.g., spotPython.design.spacefilling.spacefilling.
-        min_theta (float):
-            min log10 theta value. Defaults: -6.
-        max_theta (float):
-            max log10 theta value. Defaults: 3.
-        min_p (float):
-            min p value. Default: 1.
-        max_p (float):
-            max p value. Default: 2.
-        theta_init_zero (bool):
-            Initialize theta with zero. Default: True.
     """
     def __init__(
             self: object,
@@ -89,12 +52,15 @@ class Kriging(surrogates):
             seed: int = 124,
             model_optimizer=None,
             model_fun_evals: Optional[int] = None,
-            min_theta: float = -3,
-            max_theta: float = 2,
+            min_theta: float = -3.0,
+            max_theta: float = 2.0,
             n_theta: int = 1,
-            n_p: int = 1,
             theta_init_zero: bool = True,
+            p_val: float = 2.0,
+            n_p: int = 1,
             optim_p: bool = False,
+            min_Lambda: float = 1e-9,
+            max_Lambda: float = 1.,
             log_level: int = 50,
             spot_writer=None,
             counter=None,
@@ -108,19 +74,38 @@ class Kriging(surrogates):
             var_type (List[str]):
                 Variable type. Can be either "num" (numerical) or "factor" (factor).
                 Defaults to ["num"].
-            name (str): Surrogate name. Defaults to "kriging".
-            seed (int): Random seed. Defaults to 124.
-            model_optimizer : Optimizer on the surrogate. If None, differential_evolution is selected.
-            model_fun_evals (Optional[int]): Number of iterations used by the optimizer on the surrogate.
-            min_theta (float): Min log10 theta value. Defaults to -3.
-            max_theta (float): Max log10 theta value. Defaults to 2.
-            n_theta (int): Number of theta values. Defaults to 1.
-            theta_init_zero (bool): Initialize theta with zero. Defaults to True.
-            n_p (int): Number of p values. Defaults to 1.
-            optim_p (bool): Determines whether p should be optimized.
-            log_level (int): Logging level, e.g., 20 is "INFO". Defaults to 50 ("CRITICAL").
-            spot_writer : Spot writer.
-            counter : Counter.
+            name (str):
+                Surrogate name. Defaults to "kriging".
+            seed (int):
+                Random seed. Defaults to 124.
+            model_optimizer (Optional[object]):
+                Optimizer on the surrogate. If None, differential_evolution is selected.
+            model_fun_evals (Optional[int]):
+                Number of iterations used by the optimizer on the surrogate.
+            min_theta (float):
+                Min log10 theta value. Defaults to -3.
+            max_theta (float):
+                Max log10 theta value. Defaults to 2.
+            n_theta (int):
+                Number of theta values. Defaults to 1.
+            theta_init_zero (bool):
+                Initialize theta with zero. Defaults to True.
+            p_val (float):
+                p value. Used as an initial value if optim_p = True. Otherwise as a constant. Defaults to 2.
+            n_p (int):
+                Number of p values. Defaults to 1.
+            optim_p (bool):
+                Determines whether p should be optimized. Deafults to False.
+            min_Lambda (float):
+                Min Lambda value. Defaults to 1e-9.
+            max_Lambda (float):
+                Max Lambda value. Defaults to 1.
+            log_level (int):
+                Logging level, e.g., 20 is "INFO". Defaults to 50 ("CRITICAL").
+            spot_writer (Optional[object]):
+                Spot writer. Defaults to None.
+            counter (Optional[int]):
+                Counter. Defaults to None.
 
         Examples:
             >>> from spotPython.build.kriging import Kriging
@@ -173,9 +158,10 @@ class Kriging(surrogates):
         self.max_theta = max_theta
         self.min_p = 1
         self.max_p = 2
-        self.min_Lambda = 1e-9
-        self.max_Lambda = 1.
+        self.min_Lambda = min_Lambda
+        self.max_Lambda = max_Lambda
         self.n_theta = n_theta
+        self.p_val = p_val
         self.n_p = n_p
         self.optim_p = optim_p
         self.theta_init_zero = theta_init_zero
@@ -187,7 +173,7 @@ class Kriging(surrogates):
         if self.model_optimizer is None:
             self.model_optimizer = differential_evolution
         self.model_fun_evals = model_fun_evals
-        # differential evaluation uses maxiter = 1000
+        # differential evolution uses maxiter = 1000
         # and sets the number of function evaluations to
         # (maxiter + 1) * popsize * N, which results in
         # 1000 * 15 * k, because the default popsize is 15 and
@@ -683,7 +669,7 @@ class Kriging(surrogates):
             None
         """
         logger.debug("In initialize_matrices(): self.n_p: %s", self.n_p)
-        self.p = ones(self.n_p) * 2.0
+        self.p = ones(self.n_p) * self.p_val
         logger.debug("In initialize_matrices(): self.p: %s", self.p)
         # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
         # else self.pen_val = self.n * var(self.nat_y) + 1e4

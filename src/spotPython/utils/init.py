@@ -359,10 +359,13 @@ def surrogate_control_init(
     model_optimizer=differential_evolution,
     model_fun_evals=10000,
     min_theta=-3,
-    max_theta=3,
+    max_theta=2,
     n_theta=1,
+    p_val=2,
     n_p=1,
     optim_p=False,
+    min_Lambda=1e-9,
+    max_Lambda=1,
     seed=124,
     theta_init_zero=True,
     var_type=None,
@@ -387,10 +390,16 @@ def surrogate_control_init(
         n_theta (int):
             The number of theta values. If larger than 1, then the k theta values are
             used, where k is the problem dimension. Default is 1.
+        p_val (float):
+                p value. Used as an initial value if optim_p = True. Otherwise as a constant. Defaults to 2.
         n_p (int):
             The number of p values. Number of p values to be used. Default is 1.
         optim_p (bool):
             Whether to optimize p or not.
+        min_Lambda (float):
+            The minimum value of lambda. Default is 1e-9.
+        max_Lambda (float):
+            The maximum value of lambda. Default is 1.
         seed (int):
             The seed to use for the random number generator.
         theta_init_zero (bool):
@@ -433,8 +442,11 @@ def surrogate_control_init(
         "min_theta": min_theta,
         "max_theta": max_theta,
         "n_theta": n_theta,
+        "p_val": p_val,
         "n_p": n_p,
         "optim_p": optim_p,
+        "min_Lambda": min_Lambda,
+        "max_Lambda": max_Lambda,
         "seed": seed,
         "theta_init_zero": theta_init_zero,
         "var_type": var_type,
