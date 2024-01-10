@@ -358,10 +358,10 @@ def surrogate_control_init(
     noise=False,
     model_optimizer=differential_evolution,
     model_fun_evals=10000,
-    min_theta=-3,
-    max_theta=2,
+    min_theta=-3.0,
+    max_theta=2.0,
     n_theta=1,
-    p_val=2,
+    p_val=2.0,
     n_p=1,
     optim_p=False,
     min_Lambda=1e-9,
@@ -391,7 +391,7 @@ def surrogate_control_init(
             The number of theta values. If larger than 1, then the k theta values are
             used, where k is the problem dimension. Default is 1.
         p_val (float):
-                p value. Used as an initial value if optim_p = True. Otherwise as a constant. Defaults to 2.
+                p value. Used as an initial value if optim_p = True. Otherwise as a constant. Defaults to 2.0.
         n_p (int):
             The number of p values. Number of p values to be used. Default is 1.
         optim_p (bool):
