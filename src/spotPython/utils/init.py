@@ -355,6 +355,7 @@ def design_control_init(init_size=10, repeats=1) -> dict:
 
 
 def surrogate_control_init(
+    log_level: int = 50,
     noise=False,
     model_optimizer=differential_evolution,
     model_fun_evals=10000,
@@ -436,6 +437,7 @@ def surrogate_control_init(
 
     """
     surrogate_control = {
+        "log_level": log_level,
         "noise": noise,
         "model_optimizer": model_optimizer,
         "model_fun_evals": model_fun_evals,

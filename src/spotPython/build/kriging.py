@@ -255,6 +255,17 @@ class Kriging(surrogates):
         Returns:
             None
         """
+        logger.debug("In set_de_bounds(): self.min_theta: %s", self.min_theta)
+        logger.debug("In set_de_bounds(): self.max_theta: %s", self.max_theta)
+        logger.debug("In set_de_bounds(): self.n_theta: %s", self.n_theta)
+        logger.debug("In set_de_bounds(): self.optim_p: %s", self.optim_p)
+        logger.debug("In set_de_bounds(): self.min_p: %s", self.min_p)
+        logger.debug("In set_de_bounds(): self.max_p: %s", self.max_p)
+        logger.debug("In set_de_bounds(): self.n_p: %s", self.n_p)
+        logger.debug("In set_de_bounds(): self.noise: %s", self.noise)
+        logger.debug("In set_de_bounds(): self.min_Lambda: %s", self.min_Lambda)
+        logger.debug("In set_de_bounds(): self.max_Lambda: %s", self.max_Lambda)
+
         de_bounds = [[self.min_theta, self.max_theta] for _ in range(self.n_theta)]
         if self.optim_p:
             de_bounds += [[self.min_p, self.max_p] for _ in range(self.n_p)]
@@ -264,6 +275,7 @@ class Kriging(surrogates):
             if self.noise:
                 de_bounds.append([self.min_Lambda, self.max_Lambda])
         self.de_bounds = de_bounds
+        logger.debug("In set_de_bounds(): self.de_bounds: %s", self.de_bounds)
 
     def extract_from_bounds(self, new_theta_p_Lambda: np.ndarray) -> None:
         """
@@ -290,14 +302,19 @@ class Kriging(surrogates):
         Returns:
             None
         """
+        logger.debug("In extract_from_bounds(): new_theta_p_Lambda: %s", new_theta_p_Lambda)
         self.theta = new_theta_p_Lambda[:self.n_theta]
+        logger.debug("In extract_from_bounds(): self.n_theta: %s", self.n_theta)
         if self.optim_p:
             self.p = new_theta_p_Lambda[self.n_theta:self.n_theta + self.n_p]
+            logger.debug("In extract_from_bounds(): self.p: %s", self.p)
             if self.noise:
                 self.Lambda = new_theta_p_Lambda[self.n_theta + self.n_p]
+                logger.debug("In extract_from_bounds(): self.Lambda: %s", self.Lambda)
         else:
             if self.noise:
                 self.Lambda = new_theta_p_Lambda[self.n_theta]
+                logger.debug("In extract_from_bounds(): self.Lambda: %s", self.Lambda)
 
     def optimize_model(self) -> Union[List[float], Tuple[float]]:
         """
@@ -332,6 +349,7 @@ class Kriging(surrogates):
             result["x"] (Union[List[float], Tuple[float]]):
                 A list or tuple of optimized parameter values.
         """
+        logger.debug("In optimize_model(): self.de_bounds passed to optimizer: %s", self.de_bounds)
         if self.model_optimizer.__name__ == 'dual_annealing':
             result = self.model_optimizer(func=self.fun_likelihood,
                                           bounds=self.de_bounds)
@@ -353,6 +371,8 @@ class Kriging(surrogates):
                                           x0=mean(self.de_bounds, axis=1))
         else:
             result = self.model_optimizer(func=self.fun_likelihood, bounds=self.de_bounds)
+        logger.debug("In optimize_model(): result: %s", result)
+        logger.debug('In optimize_model(): returned result["x"]: %s', result["x"])
         return result["x"]
 
     def update_log(self) -> None:
@@ -896,6 +916,7 @@ class Kriging(surrogates):
         except LinAlgError as err:
             print(f"Building Psi failed:\n {self.Psi}. {err=}, {type(err)=}")
         if self.noise:
+            logger.debug("In build_Psi(): self.Lambda: %s", self.Lambda)
             self.Psi[diag_indices_from(self.Psi)] += self.Lambda
         else:
             self.Psi[diag_indices_from(self.Psi)] += self.eps
