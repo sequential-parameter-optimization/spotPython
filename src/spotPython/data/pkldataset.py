@@ -121,9 +121,12 @@ class PKLDataset(Dataset):
 
     @property
     def path(self):
+        # user defined directory:
         if self.directory:
             return pathlib.Path(self.directory).joinpath(self.filename)
-        return pathlib.Path(__file__).parent.joinpath(self.filename)
+        # no user defined directory, use package directory
+        else:
+            return pathlib.Path(__file__).parent.joinpath(self.filename)
 
     @property
     def _repr_content(self):
