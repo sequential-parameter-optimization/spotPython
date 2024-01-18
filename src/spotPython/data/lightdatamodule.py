@@ -9,11 +9,18 @@ class LightDataModule(L.LightningDataModule):
     A LightningDataModule for handling data.
 
     Args:
-        batch_size (int): The batch size.
-        dataset (Dataset): The dataset.
-        test_size (float): The test size. Defaults to 0.6.
-        test_seed (int): The test seed. Defaults to 42.
-        num_workers (int): The number of workers. Defaults to 0.
+        batch_size (int):
+            The batch size. Required.
+        dataset (torch.utils.data.Dataset):
+            The dataset from the torch.utils.data Dataset class.
+            It  must implement three functions: __init__, __len__, and __getitem__.
+            Required.
+        test_size (float):
+            The test size. Defaults to 0.6.
+        test_seed (int):
+            The test seed. Defaults to 42.
+        num_workers (int):
+            The number of workers. Defaults to 0.
 
     Attributes:
         batch_size (int): The batch size.
@@ -24,6 +31,18 @@ class LightDataModule(L.LightningDataModule):
         num_workers (int): The number of workers.
         test_seed (int): The test seed.
         test_size (float): The test size.
+
+    Methods:
+        prepare_data(self):
+            Usually used for downloading the data. Here: Does nothing, i.e., pass.
+        setup(self, stage: Optional[str] = None):
+            Performs the training, validation, and test split.
+        train_dataloader():
+            Returns a DataLoader instance for the training set.
+        val_dataloader():
+            Returns a DataLoader instance for the validation set.
+        test_dataloader():
+            Returns a DataLoader instance for the test set.
 
     Examples:
         >>> from spotPython.data.lightdatamodule import LightDataModule
@@ -55,10 +74,15 @@ class LightDataModule(L.LightningDataModule):
 
     def setup(self, stage: Optional[str] = None) -> None:
         """
-        Sets up the data for use.
+        Splits the data for use in training, validation, and testing.
+        Uses torch.utils.data.random_split() to split the data.
+        Splitting is based on the test_size and test_seed.
+        The test_size can be a float or an int.
 
         Args:
-            stage (Optional[str]): The current stage. Defaults to None.
+            stage (Optional[str]):
+                The current stage. Can be "fit" (for training and validation), "test" (testing),
+                or None (for all three stages). Defaults to None.
 
         Examples:
             >>> from spotPython.data.lightdatamodule import LightDataModule
@@ -101,7 +125,8 @@ class LightDataModule(L.LightningDataModule):
 
     def train_dataloader(self) -> DataLoader:
         """
-        Returns the training dataloader.
+        Returns the training dataloader, i.e., a pytorch DataLoader instance
+        using the training dataset.
 
         Returns:
             DataLoader: The training dataloader.
@@ -125,7 +150,8 @@ class LightDataModule(L.LightningDataModule):
 
     def val_dataloader(self) -> DataLoader:
         """
-        Returns the validation dataloader.
+        Returns the validation dataloader, i.e., a pytorch DataLoader instance
+        using the validation dataset.
 
         Returns:
             DataLoader: The validation dataloader.
@@ -146,7 +172,8 @@ class LightDataModule(L.LightningDataModule):
 
     def test_dataloader(self) -> DataLoader:
         """
-        Returns the test dataloader.
+        Returns the test dataloader, i.e., a pytorch DataLoader instance
+        using the test dataset.
 
         Returns:
             DataLoader: The test dataloader.
