@@ -194,3 +194,9 @@ class LightDataModule(L.LightningDataModule):
         print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
         print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
+
+    def predict_dataloader(self) -> DataLoader:
+        print(f"LightDataModule: predict_dataloader(). Training set size: {len(self.data_test)}")
+        print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
+        print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
+        return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
