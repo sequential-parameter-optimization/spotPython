@@ -103,8 +103,8 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     trainer.fit(model=model, datamodule=dm)
 
     dm.setup(stage="predict")
-    # predictions = trainer.predict(model=model, datamodule=dm)
-    predictions = trainer.predict(datamodule=dm)
+    predictions = trainer.predict(model=model, datamodule=dm)
+    # predictions = trainer.predict(datamodule=dm)
 
     # # Load the last checkpoint
     # test_result = trainer.test(datamodule=dm, ckpt_path="last")

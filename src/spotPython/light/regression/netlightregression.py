@@ -239,6 +239,35 @@ class NetLightRegression(L.LightningModule):
         self.log("hp_metric", val_loss, prog_bar=prog_bar)
         return val_loss
 
+    def predict_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
+        """
+        Performs a single prediction step.
+
+        Args:
+            batch (tuple): A tuple containing a batch of input data and labels.
+            batch_idx (int): The index of the current batch.
+            prog_bar (bool, optional): Whether to display the progress bar. Defaults to False.
+
+        Returns:
+            torch.Tensor: A tensor containing the prediction for this batch.
+        """
+        x, y = batch
+        yhat = self(x)
+        y = y.view(len(y), 1)
+        yhat = yhat.view(len(yhat), 1)
+        print(f"Predict step x: {x}")
+        print(f"Predict step y: {y}")
+        print(f"Predict step y_hat: {yhat}")
+        # pred_loss = F.mse_loss(y_hat, y)
+        # pred loss not registered
+        # self.log("pred_loss", pred_loss, prog_bar=prog_bar)
+        # self.log("hp_metric", pred_loss, prog_bar=prog_bar)
+        # MisconfigurationException: You are trying to `self.log()`
+        # but the loop's result collection is not registered yet.
+        # This is most likely because you are trying to log in a `predict` hook, but it doesn't support logging.
+        # If you want to manually log, please consider using `self.log_dict({'pred_loss': pred_loss})` instead.
+        return (x, y, yhat)
+
     def configure_optimizers(self) -> torch.optim.Optimizer:
         """
         Configures the optimizer for the model.

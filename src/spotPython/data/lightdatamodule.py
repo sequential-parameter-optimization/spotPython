@@ -124,14 +124,22 @@ class LightDataModule(L.LightningDataModule):
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
 
+        # if stage == "predict" or stage is None:
+        #     print(f"test_size, full_train_size: {test_size}, {full_train_size}")
+        #     generator_predict = torch.Generator().manual_seed(self.test_seed)
+        #     full_data_predict, _ = random_split(
+        #         self.data_full, [test_size, full_train_size], generator=generator_predict
+        #     )
+        #     # Only keep the features for prediction
+        #     self.data_predict = [x for x, _ in full_data_predict]
+
+        # Assign pred dataset for use in dataloader(s)
         if stage == "predict" or stage is None:
-            print(f"test_size, full_train_size: {test_size}, {full_train_size}")
+            # get test data aset as test_abs percent of the full dataset
             generator_predict = torch.Generator().manual_seed(self.test_seed)
-            full_data_predict, _ = random_split(
+            self.data_predict, _ = random_split(
                 self.data_full, [test_size, full_train_size], generator=generator_predict
             )
-            # Only keep the features for prediction
-            self.data_predict = [x for x, _ in full_data_predict]
 
     def train_dataloader(self) -> DataLoader:
         """
@@ -209,4 +217,4 @@ class LightDataModule(L.LightningDataModule):
         print(f"LightDataModule: predict_dataloader(). Predict set size: {len(self.data_predict)}")
         print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
-        return DataLoader(self.data_predict, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
