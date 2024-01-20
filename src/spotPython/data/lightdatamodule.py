@@ -16,7 +16,11 @@ class LightDataModule(L.LightningDataModule):
             It  must implement three functions: __init__, __len__, and __getitem__.
             Required.
         test_size (float):
-            The test size. Required.
+            The test size. if test_size is float, then train_size is 1 - test_size.
+            If test_size is int, then train_size is len(data_full) - test_size.
+            Train size will be split into train and validation sets.
+            So if test size is 0.7, the 0.7 train size will be split into 0.7 * 0.7 = 0.49 train set
+            amd 0.7 * 0.3 = 0.21 validation set.
         test_seed (int):
             The test seed. Defaults to 42.
         num_workers (int):
@@ -47,13 +51,21 @@ class LightDataModule(L.LightningDataModule):
     Examples:
         >>> from spotPython.data.lightdatamodule import LightDataModule
             from spotPython.data.csvdataset import CSVDataset
-            from spotPython.data.pkldataset import PKLDataset
             import torch
+            # data.csv is simple csv file with 11 samples
             dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
             data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
             data_module.setup()
             print(f"Training set size: {len(data_module.data_train)}")
+            print(f"Validation set size: {len(data_module.data_val)}")
+            print(f"Test set size: {len(data_module.data_test)}")
+            full_train_size: 0.5
+            val_size: 0.25
+            train_size: 0.25
+            test_size: 0.5
             Training set size: 3
+            Validation set size: 3
+            Test set size: 6
 
     References:
         See https://lightning.ai/docs/pytorch/stable/data/datamodule.html
@@ -109,17 +121,20 @@ class LightDataModule(L.LightningDataModule):
             val_size = int(full_train_size * test_size / len(self.data_full))
             train_size = full_train_size - val_size
 
-        print(f"full_train_size: {full_train_size}")
-        print(f"val_size: {val_size}")
-        print(f"train_size: {train_size}")
-        print(f"test_size: {test_size}")
+        print(f"LightDataModule: setup(). stage: {stage}")
+        print(f"LightDataModule setup(): full_train_size: {full_train_size}")
+        print(f"LightDataModule setup(): val_size: {val_size}")
+        print(f"LightDataModule setup(): train_size: {train_size}")
+        print(f"LightDataModule setup(): test_size: {test_size}")
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
+            print("LightDataModule: setup(). stage: fit")
             self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size])
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
+            print("LightDataModule: setup(). stage: test")
             # get test data aset as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
@@ -135,6 +150,7 @@ class LightDataModule(L.LightningDataModule):
 
         # Assign pred dataset for use in dataloader(s)
         if stage == "predict" or stage is None:
+            print("LightDataModule: setup(). stage: predict")
             # get test data aset as test_abs percent of the full dataset
             generator_predict = torch.Generator().manual_seed(self.test_seed)
             self.data_predict, _ = random_split(
@@ -152,7 +168,6 @@ class LightDataModule(L.LightningDataModule):
         Examples:
             >>> from spotPython.data.lightdatamodule import LightDataModule
                 from spotPython.data.csvdataset import CSVDataset
-                from spotPython.data.pkldataset import PKLDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -177,15 +192,16 @@ class LightDataModule(L.LightningDataModule):
         Examples:
             >>> from spotPython.data.lightdatamodule import LightDataModule
                 from spotPython.data.csvdataset import CSVDataset
-                from spotPython.data.pkldataset import PKLDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
                 data_module.setup()
                 print(f"Training set size: {len(data_module.data_val)}")
                 Training set size: 3
-
         """
+        print(f"LightDataModule: val_dataloader(). Training set size: {len(self.data_val)}")
+        print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
+        print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_val, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
@@ -199,7 +215,6 @@ class LightDataModule(L.LightningDataModule):
         Examples:
             >>> from spotPython.data.lightdatamodule import LightDataModule
                 from spotPython.data.csvdataset import CSVDataset
-                from spotPython.data.pkldataset import PKLDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -214,6 +229,24 @@ class LightDataModule(L.LightningDataModule):
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def predict_dataloader(self) -> DataLoader:
+        """
+        Returns the predict dataloader, i.e., a pytorch DataLoader instance
+        using the predict dataset.
+
+        Returns:
+            DataLoader: The predict dataloader.
+
+        Examples:
+            >>> from spotPython.data.lightdatamodule import LightDataModule
+                from spotPython.data.csvdataset import CSVDataset
+                import torch
+                dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
+                data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
+                data_module.setup()
+                print(f"Predict set size: {len(data_module.data_predict)}")
+                Predict set size: 6
+
+        """
         print(f"LightDataModule: predict_dataloader(). Predict set size: {len(self.data_predict)}")
         print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
