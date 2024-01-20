@@ -172,7 +172,6 @@ class NetLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the output of the model.
 
         """
-        print(f"forward: x.shape: {x.shape}")
         x = self.layers(x)
         return x
 

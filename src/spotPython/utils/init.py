@@ -229,6 +229,7 @@ def fun_control_init(
         os.makedirs("./figures")
 
     fun_control = {
+        "PREFIX": PREFIX,
         "CHECKPOINT_PATH": CHECKPOINT_PATH,
         "DATASET_PATH": DATASET_PATH,
         "RESULTS_PATH": RESULTS_PATH,

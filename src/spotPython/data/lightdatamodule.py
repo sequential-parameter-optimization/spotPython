@@ -16,7 +16,7 @@ class LightDataModule(L.LightningDataModule):
             It  must implement three functions: __init__, __len__, and __getitem__.
             Required.
         test_size (float):
-            The test size. Defaults to 0.6.
+            The test size. Required.
         test_seed (int):
             The test seed. Defaults to 42.
         num_workers (int):
@@ -55,11 +55,12 @@ class LightDataModule(L.LightningDataModule):
             print(f"Training set size: {len(data_module.data_train)}")
             Training set size: 3
 
+    References:
+        See https://lightning.ai/docs/pytorch/stable/data/datamodule.html
+
     """
 
-    def __init__(
-        self, batch_size: int, dataset=None, test_size: float = 0.6, test_seed: int = 42, num_workers: int = 0
-    ):
+    def __init__(self, batch_size: int, dataset: object, test_size: float, test_seed: int = 42, num_workers: int = 0):
         super().__init__()
         self.batch_size = batch_size
         self.data_full = dataset
@@ -108,10 +109,10 @@ class LightDataModule(L.LightningDataModule):
             val_size = int(full_train_size * test_size / len(self.data_full))
             train_size = full_train_size - val_size
 
-        # print(f"full_train_size: {full_train_size}")
-        # print(f"val_size: {val_size}")
-        # print(f"train_size: {train_size}")
-        # print(f"test_size: {test_size}")
+        print(f"full_train_size: {full_train_size}")
+        print(f"val_size: {val_size}")
+        print(f"train_size: {train_size}")
+        print(f"test_size: {test_size}")
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
@@ -122,6 +123,15 @@ class LightDataModule(L.LightningDataModule):
             # get test data aset as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
+
+        if stage == "predict" or stage is None:
+            print(f"test_size, full_train_size: {test_size}, {full_train_size}")
+            generator_predict = torch.Generator().manual_seed(self.test_seed)
+            full_data_predict, _ = random_split(
+                self.data_full, [test_size, full_train_size], generator=generator_predict
+            )
+            # Only keep the features for prediction
+            self.data_predict = [x for x, _ in full_data_predict]
 
     def train_dataloader(self) -> DataLoader:
         """
@@ -190,13 +200,13 @@ class LightDataModule(L.LightningDataModule):
                 Test set size: 6
 
         """
-        print(f"LightDataModule: test_dataloader(). Training set size: {len(self.data_test)}")
+        print(f"LightDataModule: test_dataloader(). Test set size: {len(self.data_test)}")
         print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
         print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def predict_dataloader(self) -> DataLoader:
-        print(f"LightDataModule: predict_dataloader(). Training set size: {len(self.data_test)}")
+        print(f"LightDataModule: predict_dataloader(). Predict set size: {len(self.data_predict)}")
         print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
-        return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_predict, batch_size=self.batch_size, num_workers=self.num_workers)

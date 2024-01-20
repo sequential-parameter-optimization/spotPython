@@ -67,8 +67,10 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
         num_workers=fun_control["num_workers"],
+        test_size=fun_control["test_size"],
+        test_seed=fun_control["test_seed"],
     )
-    dm.setup()
+    dm.setup(stage="train")
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
     initialization = config["initialization"]
@@ -100,7 +102,9 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
 
-    predictions = trainer.predict(model, datamodule=dm)
+    dm.setup(stage="predict")
+    # predictions = trainer.predict(model=model, datamodule=dm)
+    predictions = trainer.predict(datamodule=dm)
 
     # # Load the last checkpoint
     # test_result = trainer.test(datamodule=dm, ckpt_path="last")

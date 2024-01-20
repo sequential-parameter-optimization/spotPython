@@ -112,3 +112,44 @@ def get_tensorboard_path(fun_control):
         tensorboard_path (str): The path to the folder where the tensorboard files are saved.
     """
     return fun_control["TENSORBOARD_PATH"]
+
+
+def save_experiment(spot_tuner, fun_control) -> str:
+    """
+    Saves the experiment as a pickle file.
+
+    Args:
+        spot_tuner (object): The spot tuner object.
+        fun_control (dict): The function control dictionary.
+
+    Returns:
+        PKL_NAME (str):
+            Name of the pickle file. Build as "spot_" + PREFIX + "experiment.pickle".
+
+    """
+    experiment = {"spot_tuner": spot_tuner, "fun_control": fun_control}
+    PREFIX = fun_control["PREFIX"]
+    PKL_NAME = "spot_" + PREFIX + "experiment.pickle"
+    with open(PKL_NAME, "wb") as handle:
+        pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    print(f"Experiment saved as {PKL_NAME}")
+    return PKL_NAME
+
+
+def load_experiment(PKL_NAME):
+    """
+    Loads the experiment from a pickle file.
+
+    Args:
+        PKL_NAME (str): Name of the pickle file.
+
+    Returns:
+        spot_tuner (object): The spot tuner object.
+        fun_control (dict): The function control dictionary.
+
+    """
+    with open(PKL_NAME, "rb") as handle:
+        experiment = pickle.load(handle)
+    spot_tuner = experiment["spot_tuner"]
+    fun_control = experiment["fun_control"]
+    return spot_tuner, fun_control
