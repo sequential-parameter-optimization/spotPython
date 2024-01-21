@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://github.com/sequential-parameter-optimization/spotPython/reference/spotPython/light/regression/netlightregression/">
       
       
-        <link rel="prev" href="../../loadmodel/">
+        <link rel="prev" href="../../predictmodel/">
       
       
         <link rel="next" href="../rnnlightregression/">
@@ -1475,6 +1475,8 @@
       
         
       
+        
+      
     
     
     
@@ -1828,6 +1830,27 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../predictmodel/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    predictmodel
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1848,10 +1871,10 @@
         
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_8_7" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_8_8" checked>
         
           
-          <label class="md-nav__link" for="__nav_2_1_8_7" id="__nav_2_1_8_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_1_8_8" id="__nav_2_1_8_8_label" tabindex="0">
             
   
   <span class="md-ellipsis">
@@ -1862,8 +1885,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_8_7_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_1_8_7">
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_8_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_1_8_8">
             <span class="md-nav__icon md-icon"></span>
             regression
           </label>
@@ -1958,6 +1981,15 @@
   <a href="#spotPython.light.regression.netlightregression.NetLightRegression.forward" class="md-nav__link">
     <span class="md-ellipsis">
       forward
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spotPython.light.regression.netlightregression.NetLightRegression.predict_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_step
     </span>
   </a>
   
@@ -2096,6 +2128,8 @@
       
         
       
+        
+      
     
     
     
@@ -2159,6 +2193,27 @@
   
   <span class="md-ellipsis">
     validation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../plot/xai/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xai
   </span>
   
 
@@ -3128,6 +3183,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotPython.light.regression.netlightregression.NetLightRegression.predict_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotPython.light.regression.netlightregression.NetLightRegression.test_step" class="md-nav__link">
     <span class="md-ellipsis">
       test_step
@@ -3675,7 +3739,36 @@
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
-<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningModule class for a regresssion neural network model.</span>
 
@@ -3908,6 +4001,35 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="n">prog_bar</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="s2">&quot;hp_metric&quot;</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="n">prog_bar</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">val_loss</span>
+
+    <span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a single prediction step.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            batch (tuple): A tuple containing a batch of input data and labels.</span>
+<span class="sd">            batch_idx (int): The index of the current batch.</span>
+<span class="sd">            prog_bar (bool, optional): Whether to display the progress bar. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            torch.Tensor: A tensor containing the prediction for this batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">yhat</span> <span class="o">=</span> <span class="n">yhat</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yhat</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict step x: </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict step y: </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict step y_hat: </span><span class="si">{</span><span class="n">yhat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># pred_loss = F.mse_loss(y_hat, y)</span>
+        <span class="c1"># pred loss not registered</span>
+        <span class="c1"># self.log(&quot;pred_loss&quot;, pred_loss, prog_bar=prog_bar)</span>
+        <span class="c1"># self.log(&quot;hp_metric&quot;, pred_loss, prog_bar=prog_bar)</span>
+        <span class="c1"># MisconfigurationException: You are trying to `self.log()`</span>
+        <span class="c1"># but the loop&#39;s result collection is not registered yet.</span>
+        <span class="c1"># This is most likely because you are trying to log in a `predict` hook, but it doesn&#39;t support logging.</span>
+        <span class="c1"># If you want to manually log, please consider using `self.log_dict({&#39;pred_loss&#39;: pred_loss})` instead.</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4371,26 +4493,26 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configures the optimizer for the model.</span>
 
@@ -4512,6 +4634,166 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">x</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h3 id="spotPython.light.regression.netlightregression.NetLightRegression.predict_step" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">predict_step</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">prog_bar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#spotPython.light.regression.netlightregression.NetLightRegression.predict_step" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Performs a single prediction step.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>batch</code></td>
+          <td>
+                <code>tuple</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A tuple containing a batch of input data and labels.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>batch_idx</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The index of the current batch.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>prog_bar</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Whether to display the progress bar. Defaults to False.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="torch.Tensor">Tensor</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>torch.Tensor: A tensor containing the prediction for this batch.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs a single prediction step.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        batch (tuple): A tuple containing a batch of input data and labels.</span>
+<span class="sd">        batch_idx (int): The index of the current batch.</span>
+<span class="sd">        prog_bar (bool, optional): Whether to display the progress bar. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: A tensor containing the prediction for this batch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
+    <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">yhat</span> <span class="o">=</span> <span class="n">yhat</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yhat</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict step x: </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict step y: </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Predict step y_hat: </span><span class="si">{</span><span class="n">yhat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># pred_loss = F.mse_loss(y_hat, y)</span>
+    <span class="c1"># pred loss not registered</span>
+    <span class="c1"># self.log(&quot;pred_loss&quot;, pred_loss, prog_bar=prog_bar)</span>
+    <span class="c1"># self.log(&quot;hp_metric&quot;, pred_loss, prog_bar=prog_bar)</span>
+    <span class="c1"># MisconfigurationException: You are trying to `self.log()`</span>
+    <span class="c1"># but the loop&#39;s result collection is not registered yet.</span>
+    <span class="c1"># This is most likely because you are trying to log in a `predict` hook, but it doesn&#39;t support logging.</span>
+    <span class="c1"># If you want to manually log, please consider using `self.log_dict({&#39;pred_loss&#39;: pred_loss})` instead.</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yhat</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
