@@ -936,21 +936,29 @@ def get_default_hyperparameters_for_core_model(fun_control) -> dict:
     return values
 
 
-def get_tuned_architecture(spot_tuner, fun_control) -> dict:
+def get_tuned_architecture(spot_tuner, fun_control, force_minX=False) -> dict:
     """
-    Returns the tuned architecture.
+    Returns the tuned architecture. If the spot tuner has noise,
+    it returns the architecture with the lowest mean (.min_mean_X),
+    otherwise it returns the architecture with the lowest value (.min_X).
 
     Args:
         spot_tuner (object):
             spot tuner object.
         fun_control (dict):
             dictionary containing control parameters for the hyperparameter tuning.
+        force_minX (bool):
+            If True, return the architecture with the lowest value (.min_X).
 
     Returns:
         (dict):
             dictionary containing the tuned architecture.
     """
-    X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1, -1))
+    if not spot_tuner.noise or force_minX:
+        X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1, -1))
+    else:
+        # noise or force_minX is False:
+        X = spot_tuner.to_all_dim(spot_tuner.min_mean_X.reshape(1, -1))
     config = get_one_config_from_X(X, fun_control)
     return config
 
