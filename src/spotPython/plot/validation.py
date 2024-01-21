@@ -234,6 +234,16 @@ def plot_actual_vs_predicted(y_test, y_pred, title=None, show=True) -> None:
 
     Returns:
         (NoneType): None
+
+    Examples:
+        >>> from sklearn.datasets import load_diabetes
+            from sklearn.linear_model import LinearRegression
+            from spotPython.plot.validation import plot_actual_vs_predicted
+            X, y = load_diabetes(return_X_y=True)
+            lr = LinearRegression()
+            lr.fit(X, y)
+            y_pred = lr.predict(X)
+            plot_actual_vs_predicted(y, y_pred)
     """
     fig, axs = plt.subplots(ncols=2, figsize=(8, 4))
     PredictionErrorDisplay.from_predictions(
