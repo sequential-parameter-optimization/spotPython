@@ -1,10 +1,10 @@
 {
     "TransformerLightRegression": {
-        "l_nodes": {
+        "d_mult": {
             "type": "int",
-            "default": 3,
-            "transform": "transform_power_2_int",
-            "lower": 2,
+            "default": 1,
+            "transform": "None",
+            "lower": 1,
             "upper": 4
         },
         "l1": {
@@ -21,12 +21,12 @@
             "lower": 4,
             "upper": 11
         },
-        "n_head": {
+        "nhead": {
             "type": "int",
             "default": 2,
-            "transform": "transform_power_2_int",
-            "lower": 2,
-            "upper": 2
+            "transform": "transform_multby2_int",
+            "lower": 1,
+            "upper": 5
         },
         "num_layers": {
             "type": "int",
@@ -46,8 +46,8 @@
             "type": "int",
             "default": 4,
             "transform": "transform_power_2_int",
-            "lower": 1,
-            "upper": 4
+            "lower": 5,
+            "upper": 10
         },
         "act_fn": {
             "levels": [
@@ -55,7 +55,7 @@
                 "ReLU"
             ],
             "type": "factor",
-            "default": "ReLU",
+            "default": "Tanh",
             "transform": "None",
             "class_name": "spotPython.torch.activation",
             "core_model_parameter_type": "instance()",
@@ -68,9 +68,7 @@
                 "Adagrad",
                 "Adam",
                 "AdamW",
-                "SparseAdam",
                 "Adamax",
-                "ASGD",
                 "NAdam",
                 "RAdam",
                 "RMSprop",
@@ -78,12 +76,12 @@
                 "SGD"
             ],
             "type": "factor",
-            "default": "SGD",
+            "default": "Adam",
             "transform": "None",
             "class_name": "torch.optim",
             "core_model_parameter_type": "str",
             "lower": 0,
-            "upper": 11
+            "upper": 9
         },
         "dropout_prob": {
             "type": "float",

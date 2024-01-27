@@ -47,6 +47,25 @@ def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
     return X
 
 
+def transform_multby2_int(x: int) -> int:
+    """Transformations for hyperparameters of type int.
+
+    Args:
+        x (int):
+            input, will be multiplied by 2
+
+    Returns:
+        (int):
+            The result of multiplying x by 2.
+
+    Examples:
+        >>> from spotPython.utils.transform import transform_multby2_int
+        >>> transform_multby2_int(3)
+        6
+    """
+    return int(2 * x)
+
+
 def transform_power_2_int(x: int) -> int:
     """Transformations for hyperparameters of type int.
 

@@ -95,9 +95,9 @@ class TransformerLightRegression(L.LightningModule):
     def __init__(
         self,
         l1: int,
-        l_nodes: int,
+        d_mult: int,
         dim_feedforward: int,
-        n_head: int,
+        nhead: int,
         num_layers: int,
         epochs: int,
         batch_size: int,
@@ -152,10 +152,10 @@ class TransformerLightRegression(L.LightningModule):
             _L_out=self._L_out,
             act_fn=act_fn,
             dropout_prob=dropout_prob,
-            l_nodes=l_nodes,
+            d_mult=d_mult,
             l1=l1,
             dim_feedforward=dim_feedforward,
-            n_head=n_head,
+            nhead=nhead,
             num_layers=num_layers,
         )
 

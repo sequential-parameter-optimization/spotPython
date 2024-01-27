@@ -11,10 +11,10 @@ class TransformerNet(torch.nn.Module):
         _L_in,
         _L_out,
         dropout_prob,
-        l_nodes,
+        d_mult,
         l1,
         dim_feedforward,
-        n_head,
+        nhead,
         num_layers,
     ):
         """
@@ -29,13 +29,13 @@ class TransformerNet(torch.nn.Module):
                 the output dimension
             dropout_prob (float):
                 the dropout value
-            l_nodes (int):
-                the number of nodes per input
+            d_mult (int):
+                the multiplier for the number of nodes in the transformer
             l1 (int):
                 the number of nodes in the first hidden layer
             dim_feedforward (int):
                 the hidden size of the feedforward network model
-            n_head (int):
+            nhead (int):
                 the number of heads in the multiheadattention models
             num_layers (int):
                 the number of sub-encoder-layers in the encoder
@@ -52,24 +52,33 @@ class TransformerNet(torch.nn.Module):
         super(TransformerNet, self).__init__()
         self._L_in = _L_in
         self._L_out = _L_out
+        self.d_mult = d_mult
+        self.l1 = l1
+        self.dim_feedforward = dim_feedforward
+        self.nhead = nhead
+        self.num_layers = num_layers
         self.act_fn = act_fn
         self.dropout_prob = dropout_prob
-        self.l_nodes = l_nodes
-        self.l1 = l1
-        self.n_head = n_head
-        self.num_layers = num_layers
-        # Each of the _L_1 inputs is forwarded to l_nodes nodes
-        self.embed = SkipLinear(_L_in, _L_in * l_nodes)
-        self.pos_enc = PositionalEncoding(d_model=l_nodes, dropout_prob=dropout_prob)
+        self.d_model = d_mult * nhead
+        # Each of the _L_1 inputs is forwarded to d_model nodes
+        self.embed = SkipLinear(_L_in, _L_in * self.d_model)
+
+        # Positional encoding
+        self.pos_enc = PositionalEncoding(d_model=self.d_model, dropout_prob=dropout_prob)
+
+        # Transformer encoder layer
         # embed_dim "d_model" must be divisible by num_heads
         self.enc_layer = torch.nn.TransformerEncoderLayer(
-            d_model=l_nodes, nhead=l_nodes // n_head, dim_feedforward=dim_feedforward, batch_first=True
+            d_model=self.d_model, nhead=nhead, dim_feedforward=dim_feedforward, batch_first=True
         )
+        # Transformer encoder
         self.trans_enc = torch.nn.TransformerEncoder(self.enc_layer, num_layers=num_layers)
+
+        # Linear layers (incl. output layer)
         hidden_sizes = [self.l1, self.l1 // 2, self.l1 // 2, self.l1 // 4]
         # Create the network based on the specified hidden sizes
         layers = []
-        layer_sizes = [self._L_in * self.l_nodes] + hidden_sizes
+        layer_sizes = [self._L_in * self.d_model] + hidden_sizes
         layer_size_last = layer_sizes[0]
         for layer_size in layer_sizes[1:]:
             layers += [
@@ -85,10 +94,10 @@ class TransformerNet(torch.nn.Module):
 
     def forward(self, x):
         z = self.embed(x)
-        z = z.reshape(-1, self._L_in, self.l_nodes)
+        z = z.reshape(-1, self._L_in, self.d_model)
         z = self.pos_enc(z)
         z = self.trans_enc(z)
         # flatten
-        z = z.reshape(-1, self._L_in * self.l_nodes)
+        z = z.reshape(-1, self._L_in * self.d_model)
         z = self.layers(z)
         return z
