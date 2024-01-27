@@ -12,6 +12,42 @@ class SkipLinear(torch.nn.Module):
     Reference:
         https://jamesmccaffrey.wordpress.com/2023/12/01/regression-using-a-pytorch-neural-network-with-a-transformer-component/
 
+    Args:
+        n_in (int):
+            the input dimension
+        n_out (int):
+            the output dimension
+
+    Examples:
+        >>> from spotPython.light.transformer.skiplinear import SkipLinear
+            import torch
+            n_in = 2
+            n_out = 4
+            sl = SkipLinear(n_in, n_out)
+            input = torch.zeros(1, n_in)
+            for i in range(n_in):
+                input[0, i] = i
+            print(f"Input shape: {input.shape}")
+            print(f"Input: {input}")
+            output = sl(input)
+            print(f"Output shape: {output.shape}")
+            print(f"Output: {output}")
+            print(sl.lst_modules)
+            for i in sl.lst_modules:
+                print(f"weights: {i.weights}")
+            Input shape: torch.Size([1, 2])
+            Input: tensor([[0., 1.]])
+            Output shape: torch.Size([1, 4])
+            Output: tensor([[ 0.0000,  0.0000, -0.0062, -0.0032]], grad_fn=<ViewBackward0>)
+            ModuleList(
+            (0-1): 2 x Core()
+            )
+            weights: Parameter containing:
+            tensor([[-0.0098],
+                    [ 0.0038]], requires_grad=True)
+            weights: Parameter containing:
+            tensor([[0.0041],
+                    [0.0074]], requires_grad=True)
     """
 
     class Core(torch.nn.Module):

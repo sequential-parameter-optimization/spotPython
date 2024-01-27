@@ -60,7 +60,7 @@ class TransformerNet(torch.nn.Module):
         self.num_layers = num_layers
         # Each of the _L_1 inputs is forwarded to l_nodes nodes
         self.embed = SkipLinear(_L_in, _L_in * l_nodes)
-        self.pos_enc = PositionalEncoding(l_nodes, dropout_prob=dropout_prob)
+        self.pos_enc = PositionalEncoding(d_model=l_nodes, dropout_prob=dropout_prob)
         # embed_dim "d_model" must be divisible by num_heads
         self.enc_layer = torch.nn.TransformerEncoderLayer(
             d_model=l_nodes, nhead=l_nodes // n_head, dim_feedforward=dim_feedforward, batch_first=True
