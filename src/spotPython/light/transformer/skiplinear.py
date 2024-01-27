@@ -53,7 +53,7 @@ class SkipLinear(torch.nn.Module):
     class Core(torch.nn.Module):
         def __init__(self, n):
             super().__init__()
-            # 1 node to n nodes, n gte 2
+            # 1 node to n nodes, n >= 2
             self.weights = torch.nn.Parameter(torch.zeros((n, 1), dtype=torch.float32))
             self.biases = torch.nn.Parameter(torch.tensor(n, dtype=torch.float32))
             lim = 0.01
@@ -70,7 +70,7 @@ class SkipLinear(torch.nn.Module):
         self.n_in = n_in
         self.n_out = n_out
         if n_out % n_in != 0:
-            print("FATAL: n_out must be divisible by n_in")
+            raise ValueError("n_out % n_in != 0")
         n = n_out // n_in  # num nodes per input
 
         self.lst_modules = torch.nn.ModuleList([SkipLinear.Core(n) for i in range(n_in)])
