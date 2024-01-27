@@ -1,4 +1,125 @@
 {
+    "TransformerLightRegression": {
+        "l_nodes": {
+            "type": "int",
+            "default": 3,
+            "transform": "transform_power_2_int",
+            "lower": 2,
+            "upper": 4
+        },
+        "l1": {
+            "type": "int",
+            "default": 3,
+            "transform": "transform_power_2_int",
+            "lower": 3,
+            "upper": 8
+        },
+        "dim_feedforward": {
+            "type": "int",
+            "default": 4,
+            "transform": "transform_power_2_int",
+            "lower": 4,
+            "upper": 11
+        },
+        "n_head": {
+            "type": "int",
+            "default": 2,
+            "transform": "transform_power_2_int",
+            "lower": 2,
+            "upper": 2
+        },
+        "num_layers": {
+            "type": "int",
+            "default": 6,
+            "transform": "None",
+            "lower": 2,
+            "upper": 12
+        },
+        "epochs": {
+            "type": "int",
+            "default": 4,
+            "transform": "transform_power_2_int",
+            "lower": 4,
+            "upper": 9
+        },
+        "batch_size": {
+            "type": "int",
+            "default": 4,
+            "transform": "transform_power_2_int",
+            "lower": 1,
+            "upper": 4
+        },
+        "act_fn": {
+            "levels": [
+                "Tanh",
+                "ReLU"
+            ],
+            "type": "factor",
+            "default": "ReLU",
+            "transform": "None",
+            "class_name": "spotPython.torch.activation",
+            "core_model_parameter_type": "instance()",
+            "lower": 0,
+            "upper": 1
+        },
+        "optimizer": {
+            "levels": [
+                "Adadelta",
+                "Adagrad",
+                "Adam",
+                "AdamW",
+                "SparseAdam",
+                "Adamax",
+                "ASGD",
+                "NAdam",
+                "RAdam",
+                "RMSprop",
+                "Rprop",
+                "SGD"
+            ],
+            "type": "factor",
+            "default": "SGD",
+            "transform": "None",
+            "class_name": "torch.optim",
+            "core_model_parameter_type": "str",
+            "lower": 0,
+            "upper": 11
+        },
+        "dropout_prob": {
+            "type": "float",
+            "default": 0.01,
+            "transform": "None",
+            "lower": 0.0,
+            "upper": 0.25
+        },
+        "lr_mult": {
+            "type": "float",
+            "default": 1.0,
+            "transform": "None",
+            "lower": 0.1,
+            "upper": 10.0
+        },
+        "patience": {
+            "type": "int",
+            "default": 2,
+            "transform": "transform_power_2_int",
+            "lower": 2,
+            "upper": 6
+        },
+        "initialization": {
+            "levels": [
+                "Default",
+                "Kaiming",
+                "Xavier"
+            ],
+            "type": "factor",
+            "default": "Default",
+            "transform": "None",
+            "core_model_parameter_type": "str",
+            "lower": 0,
+            "upper": 2
+        }
+    },
     "RNNLightRegression": {
         "l1": {
             "type": "int",

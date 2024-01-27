@@ -95,7 +95,9 @@ class CSVDataset(Dataset):
         feature_df = df.drop(columns=[self.target_column])
         feature_df = oe.fit_transform(feature_df)
         target_df = df[self.target_column]
-        target_df = le.fit_transform(target_df)
+        # only apply LabelEncoder to target column if it is a string
+        if target_df.dtype == object:
+            target_df = le.fit_transform(target_df)
 
         # Convert DataFrames to PyTorch tensors
         feature_tensor = torch.tensor(feature_df, dtype=self.feature_type)
