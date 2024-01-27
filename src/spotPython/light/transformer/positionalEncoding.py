@@ -27,9 +27,20 @@ class PositionalEncoding(nn.Module):
     Reference:
         https://pytorch.org/tutorials/beginner/transformer_tutorial.html#positional-encoding
 
+    Examples:
+        >>> from spotPython.light.transformer.positionalEncoding import PositionalEncoding
+        >>> import torch
+        >>> pe = PositionalEncoding(d_model=20, dropout_prob=0)
+        >>> input = torch.zeros(1, 10, 20)
+        >>> output = pe(input)
+        >>> print(output.shape)
+        torch.Size([1, 10, 20])
+
+
+
     """
 
-    def __init__(self, d_model: int, dropout_prob: float, max_len: int = 5000):
+    def __init__(self, d_model: int, dropout_prob: float, max_len: int = 12552):
         super().__init__()
         self.dropout = nn.Dropout(p=dropout_prob)
 
