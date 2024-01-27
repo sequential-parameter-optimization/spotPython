@@ -18,9 +18,8 @@ class PositionalEncoding(nn.Module):
         max_len (int):
             the maximum length of the incoming sequence. Usually related to the max batch_size.
             Can be larger as the batch size, e.g., if prediction is done on a single test set.
-            Default: 100000
-        verbose (bool):
-            whether to print the internal tensors
+            Default: 5000
+
 
     Shape:
         Input:
@@ -71,22 +70,14 @@ class PositionalEncoding(nn.Module):
                 [2., 3., 2., 3., 2., 3., 2., 3., 2., 3.]]])
     """
 
-    def __init__(self, d_model: int, dropout_prob: float, max_len: int = 100000, verbose=False) -> None:
-        super().__init__()
+    def __init__(self, d_model: int, dropout_prob: float, max_len: int = 5000) -> None:
+        super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout_prob)
         position = torch.arange(max_len).unsqueeze(1)
         div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
-        if verbose:
-            print(f"position: {position}")
-            print(f"div_term: {div_term}")
         pe = torch.zeros(max_len, 1, d_model)
-
-        try:
-            pe[:, 0, 0::2] = torch.sin(position * div_term)
-            pe[:, 0, 1::2] = torch.cos(position * div_term)
-        except IndexError as e:
-            raise e
-
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
         self.register_buffer("pe", pe)
 
     def forward(self, x: Tensor) -> Tensor:
@@ -102,8 +93,5 @@ class PositionalEncoding(nn.Module):
         Raises:
             IndexError: if the positional encoding cannot be added to the input tensor
         """
-        try:
-            x = x + self.pe[: x.size(0)]
-        except IndexError as e:
-            raise e
+        x = x + self.pe[: x.size(0), :]
         return self.dropout(x)
