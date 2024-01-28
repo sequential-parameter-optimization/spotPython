@@ -2,6 +2,7 @@ from spotPython.light.transformer.skiplinear import SkipLinear
 from spotPython.light.transformer.positionalEncoding import PositionalEncoding
 from torch import nn
 import torch
+from spotPython.utils.device import getDevice
 
 
 class TransformerNet(torch.nn.Module):
@@ -73,8 +74,10 @@ class TransformerNet(torch.nn.Module):
         # embed_dim "d_model" must be divisible by num_heads
         print(f"l_nodes: {self.l_nodes} must be divisible by nhead: {nhead} and 2.")
         # self.enc_layer = torch.nn.TransformerEncoderLayer(d_model=4, nhead=2, dim_feedforward=10, batch_first=True)
+        device = getDevice()
+        print(f"device: {device}")
         self.enc_layer = torch.nn.TransformerEncoderLayer(
-            d_model=self.l_nodes, nhead=nhead, dim_feedforward=dim_feedforward, batch_first=True
+            d_model=self.l_nodes, nhead=nhead, dim_feedforward=dim_feedforward, batch_first=True, device=device
         )
 
         # Transformer encoder
