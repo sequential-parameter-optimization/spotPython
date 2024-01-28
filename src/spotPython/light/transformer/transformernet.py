@@ -84,7 +84,10 @@ class TransformerNet(torch.nn.Module):
         hidden_sizes = [self.l1, self.l1 // 2, self.l1 // 2, self.l1 // 4]
         # Create the network based on the specified hidden sizes
         layers = []
-        layer_sizes = [self._L_in * self.d_model] + hidden_sizes
+
+        layer_sizes = [360] + hidden_sizes
+        # layer_sizes = [self._L_in * self.d_model] + hidden_sizes
+        print(f"layer_sizes: {layer_sizes}")
         layer_size_last = layer_sizes[0]
         for layer_size in layer_sizes[1:]:
             layers += [
