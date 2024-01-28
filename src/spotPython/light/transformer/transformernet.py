@@ -110,7 +110,7 @@ class TransformerNet(torch.nn.Module):
         # hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
         n_low = _L_in // 4
         # ensure that n_high is larger than n_low
-        n_high = max(self.hparams.l1, 2 * n_low)
+        n_high = max(self.l1, 2 * n_low)
         hidden_sizes = generate_div2_list(n_high, n_low)
 
         # Create the network based on the specified hidden sizes
@@ -121,8 +121,8 @@ class TransformerNet(torch.nn.Module):
             layers += [
                 nn.Linear(layer_size_last, layer_size),
                 nn.BatchNorm1d(layer_size),
-                self.hparams.act_fn,
-                nn.Dropout(self.hparams.dropout_prob),
+                self.act_fn,
+                nn.Dropout(self.dropout_prob),
             ]
             layer_size_last = layer_size
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
