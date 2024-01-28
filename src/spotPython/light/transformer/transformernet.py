@@ -60,19 +60,25 @@ class TransformerNet(torch.nn.Module):
         self.act_fn = act_fn
         self.dropout_prob = dropout_prob
         self.d_model = d_mult * nhead
-        # Each of the _L_1 inputs is forwarded to d_model nodes
-        self.embed = SkipLinear(_L_in, _L_in * self.d_model)
+        # Each of the _L_1 inputs is forwarded to d_model nodes,
+        # e.g., if _L_in = 90 and d_model = 4, then the input is forwarded to 360 nodes
+        self.embed = SkipLinear(90, 360)
+        # self.embed = SkipLinear(_L_in, _L_in * self.d_model)
 
         # Positional encoding
-        self.pos_enc = PositionalEncoding(d_model=self.d_model, dropout_prob=dropout_prob)
+        self.pos_enc = PositionalEncoding(d_model=4, dropout_prob=dropout_prob)
+        # self.pos_enc = PositionalEncoding(d_model=self.d_model, dropout_prob=dropout_prob)
 
         # Transformer encoder layer
         # embed_dim "d_model" must be divisible by num_heads
-        self.enc_layer = torch.nn.TransformerEncoderLayer(
-            d_model=self.d_model, nhead=nhead, dim_feedforward=dim_feedforward, batch_first=True
-        )
+        self.enc_layer = torch.nn.TransformerEncoderLayer(d_model=4, nhead=2, dim_feedforward=10, batch_first=True)
+        # self.enc_layer = torch.nn.TransformerEncoderLayer(
+        #     d_model=self.d_model, nhead=nhead, dim_feedforward=dim_feedforward, batch_first=True
+        # )
+
         # Transformer encoder
-        self.trans_enc = torch.nn.TransformerEncoder(self.enc_layer, num_layers=num_layers)
+        self.trans_enc = torch.nn.TransformerEncoder(self.enc_layer, num_layers=2)
+        # self.trans_enc = torch.nn.TransformerEncoder(self.enc_layer, num_layers=num_layers)
 
         # Linear layers (incl. output layer)
         hidden_sizes = [self.l1, self.l1 // 2, self.l1 // 2, self.l1 // 4]
@@ -94,10 +100,16 @@ class TransformerNet(torch.nn.Module):
 
     def forward(self, x):
         z = self.embed(x)
-        z = z.reshape(-1, self._L_in, self.d_model)
+
+        z = z.reshape(-1, 90, 4)
+        # z = z.reshape(-1, self._L_in, self.d_model)
+
         z = self.pos_enc(z)
         z = self.trans_enc(z)
+
         # flatten
-        z = z.reshape(-1, self._L_in * self.d_model)
+        z = z.reshape(-1, 360)
+        # z = z.reshape(-1, self._L_in * self.d_model)
+
         z = self.layers(z)
         return z
