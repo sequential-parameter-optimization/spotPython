@@ -82,7 +82,10 @@ def cv_model(config: dict, fun_control: dict) -> float:
             accelerator=fun_control["accelerator"],
             devices=fun_control["devices"],
             logger=TensorBoardLogger(
-                save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=True
+                save_dir=fun_control["TENSORBOARD_PATH"],
+                version=config_id,
+                default_hp_metric=True,
+                log_graph=fun_control["log_graph"],
             ),
             callbacks=[
                 EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
