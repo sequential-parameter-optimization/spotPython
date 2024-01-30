@@ -6,6 +6,7 @@ from spotPython.hyperparameters.optimizer import optimizer_handler
 from spotPython.light.transformer.skiplinear import SkipLinear
 from spotPython.light.transformer.positionalEncoding import PositionalEncoding
 from spotPython.utils.math import generate_div2_list
+from spotPython.utils.device import getDevice
 
 
 class TransformerLightRegression(L.LightningModule):
@@ -176,6 +177,7 @@ class TransformerLightRegression(L.LightningModule):
             nhead=self.hparams.nhead,
             dim_feedforward=self.hparams.dim_feedforward,
             batch_first=True,
+            device=getDevice(),
         )
 
         # Transformer encoder
