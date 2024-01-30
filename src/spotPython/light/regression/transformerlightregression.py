@@ -3,7 +3,9 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from spotPython.hyperparameters.optimizer import optimizer_handler
-from spotPython.light.transformer.transformernet import TransformerNet
+from spotPython.light.transformer.skiplinear import SkipLinear
+from spotPython.light.transformer.positionalEncoding import PositionalEncoding
+from spotPython.utils.math import generate_div2_list
 
 
 class TransformerLightRegression(L.LightningModule):
@@ -39,7 +41,6 @@ class TransformerLightRegression(L.LightningModule):
     Examples:
         >>> from torch.utils.data import DataLoader
             from spotPython.data.diabetes import Diabetes
-            from spotPython.light.netlightregression2 import NetLightRegression2
             from torch import nn
             import lightning as L
             PATH_DATASETS = './data'
@@ -111,7 +112,7 @@ class TransformerLightRegression(L.LightningModule):
         _L_out: int,
     ):
         """
-        Initializes the NetLightRegression2 object.
+        Initializes the TransformerLightRegression object.
 
         Args:
             l1 (int): The number of neurons in the first hidden layer.
@@ -141,36 +142,83 @@ class TransformerLightRegression(L.LightningModule):
         #
         self._L_in = _L_in
         self._L_out = _L_out
+        self.d_mult = d_mult
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
         self.save_hyperparameters(ignore=["_L_in", "_L_out"])
         # set dummy input array for Tensorboard Graphs
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
 
-        self.model = TransformerNet(
-            _L_in=self._L_in,
-            _L_out=self._L_out,
-            act_fn=act_fn,
-            dropout_prob=dropout_prob,
-            d_mult=d_mult,
-            l1=l1,
-            dim_feedforward=dim_feedforward,
-            nhead=nhead,
-            num_layers=num_layers,
+        # self.l1 = l1
+        # self.dim_feedforward = dim_feedforward
+        # self.nhead = nhead
+        # self.num_layers = num_layers
+        # self.act_fn = act_fn
+        # self.dropout_prob = dropout_prob
+
+        l_nodes = d_mult * nhead * 2
+        # Each of the _L_1 inputs is forwarded to d_model nodes,
+        # e.g., if _L_in = 90 and d_model = 4, then the input is forwarded to 360 nodes
+        # self.embed = SkipLinear(90, 360)
+        self.embed = SkipLinear(_L_in, _L_in * l_nodes)
+
+        # Positional encoding
+        # self.pos_enc = PositionalEncoding(d_model=4, dropout_prob=dropout_prob)
+        self.pos_enc = PositionalEncoding(d_model=l_nodes, dropout_prob=self.hparams.dropout_prob)
+
+        # Transformer encoder layer
+        # embed_dim "d_model" must be divisible by num_heads
+        print(f"l_nodes: {l_nodes} must be divisible by nhead: {self.hparams.nhead} and 2.")
+        # self.enc_layer = torch.nn.TransformerEncoderLayer(d_model=4, nhead=2, dim_feedforward=10, batch_first=True)
+        # device = getDevice()
+        self.enc_layer = torch.nn.TransformerEncoderLayer(
+            d_model=l_nodes,
+            nhead=self.hparams.nhead,
+            dim_feedforward=self.hparams.dim_feedforward,
+            batch_first=True,
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Performs a forward pass through the model.
+        # Transformer encoder
+        # self.trans_enc = torch.nn.TransformerEncoder(self.enc_layer, num_layers=2)
+        self.trans_enc = torch.nn.TransformerEncoder(self.enc_layer, num_layers=self.hparams.num_layers)
 
-        Args:
-            x (torch.Tensor): A tensor containing a batch of input data.
+        n_low = _L_in // 4
+        # ensure that n_high is larger than n_low
+        n_high = max(self.hparams.l1, 2 * n_low)
+        hidden_sizes = generate_div2_list(n_high, n_low)
 
-        Returns:
-            torch.Tensor: A tensor containing the output of the model.
+        # Create the network based on the specified hidden sizes
+        layers = []
+        layer_sizes = [self._L_in * l_nodes] + hidden_sizes
+        layer_size_last = layer_sizes[0]
+        for layer_size in layer_sizes[1:]:
+            layers += [
+                nn.Linear(layer_size_last, layer_size),
+                nn.BatchNorm1d(layer_size),
+                self.hparams.act_fn,
+                nn.Dropout(self.hparams.dropout_prob),
+            ]
+            layer_size_last = layer_size
+        layers += [nn.Linear(layer_sizes[-1], self._L_out)]
+        # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
+        self.layers = nn.Sequential(*layers)
 
-        """
-        return self.model(x)
+    def forward(self, x):
+        l_nodes = self.hparams.d_mult * self.hparams.nhead * 2
+        z = self.embed(x)
+
+        # z = z.reshape(-1, 90, 4)
+        z = z.reshape(-1, self._L_in, l_nodes)
+
+        z = self.pos_enc(z)
+        z = self.trans_enc(z)
+
+        # flatten
+        # z = z.reshape(-1, 360)
+        z = z.reshape(-1, self._L_in * l_nodes)
+
+        z = self.layers(z)
+        return z
 
     def training_step(self, batch: tuple, prog_bar: bool = False) -> torch.Tensor:
         """
