@@ -251,6 +251,7 @@ def fun_control_init(
         "fun_repeats": fun_repeats,
         "infill_criterion": infill_criterion,
         "k_folds": 3,
+        "log_graph": False,
         "log_level": log_level,
         "loss_function": None,
         "lower": lower,
