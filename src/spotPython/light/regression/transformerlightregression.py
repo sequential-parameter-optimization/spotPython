@@ -136,6 +136,7 @@ class TransformerLightRegression(L.LightningModule):
 
         """
         super().__init__()
+        device = getDevice()
         # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during
         # checkpointing. It is recommended to ignore them
         # using `self.save_hyperparameters(ignore=['act_fn'])`
@@ -177,7 +178,7 @@ class TransformerLightRegression(L.LightningModule):
             nhead=self.hparams.nhead,
             dim_feedforward=self.hparams.dim_feedforward,
             batch_first=True,
-            device=getDevice(),
+            device=device,
         )
 
         # Transformer encoder
@@ -195,8 +196,8 @@ class TransformerLightRegression(L.LightningModule):
         layer_size_last = layer_sizes[0]
         for layer_size in layer_sizes[1:]:
             layers += [
-                nn.Linear(layer_size_last, layer_size),
-                nn.BatchNorm1d(layer_size),
+                nn.Linear(layer_size_last, layer_size, device=device),
+                nn.BatchNorm1d(layer_size, device=device),
                 self.hparams.act_fn,
                 nn.Dropout(self.hparams.dropout_prob),
             ]
