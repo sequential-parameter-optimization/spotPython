@@ -6,7 +6,6 @@ from spotPython.hyperparameters.optimizer import optimizer_handler
 from spotPython.light.transformer.skiplinear import SkipLinear
 from spotPython.light.transformer.positionalEncoding import PositionalEncoding
 from spotPython.utils.math import generate_div2_list
-from spotPython.utils.device import getDevice
 
 
 class TransformerLightRegression(L.LightningModule):
@@ -136,7 +135,6 @@ class TransformerLightRegression(L.LightningModule):
 
         """
         super().__init__()
-        device = getDevice()
         # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during
         # checkpointing. It is recommended to ignore them
         # using `self.save_hyperparameters(ignore=['act_fn'])`
@@ -172,13 +170,11 @@ class TransformerLightRegression(L.LightningModule):
         # embed_dim "d_model" must be divisible by num_heads
         print(f"l_nodes: {l_nodes} must be divisible by nhead: {self.hparams.nhead} and 2.")
         # self.enc_layer = torch.nn.TransformerEncoderLayer(d_model=4, nhead=2, dim_feedforward=10, batch_first=True)
-        # device = getDevice()
         self.enc_layer = torch.nn.TransformerEncoderLayer(
             d_model=l_nodes,
             nhead=self.hparams.nhead,
             dim_feedforward=self.hparams.dim_feedforward,
             batch_first=True,
-            device=device,
         )
 
         # Transformer encoder
@@ -196,8 +192,8 @@ class TransformerLightRegression(L.LightningModule):
         layer_size_last = layer_sizes[0]
         for layer_size in layer_sizes[1:]:
             layers += [
-                nn.Linear(layer_size_last, layer_size, device=device),
-                nn.BatchNorm1d(layer_size, device=device),
+                nn.Linear(layer_size_last, layer_size),
+                nn.BatchNorm1d(layer_size),
                 self.hparams.act_fn,
                 nn.Dropout(self.hparams.dropout_prob),
             ]
