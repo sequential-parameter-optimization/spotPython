@@ -61,10 +61,10 @@ class SkipLinear(torch.nn.Module):
                 n (int): The number of output nodes.
             """
             super().__init__()
-            self.weights = torch.nn.Parameter(torch.zeros((n, 1), dtype=torch.float32))
-            self.biases = torch.nn.Parameter(torch.zeros(n, dtype=torch.float32))
-            lim = 0.01
-            torch.nn.init.uniform_(self.weights, -lim, lim)
+            # initialize with random weights using normal distribution
+            self.weights = torch.nn.Parameter(torch.randn(1, n))
+            # self.weights = torch.nn.Parameter(torch.rand(1, n) * 2 - 1)
+            self.linear = torch.nn.Linear(1, n)
 
         def forward(self, x) -> torch.Tensor:
             """
@@ -76,7 +76,7 @@ class SkipLinear(torch.nn.Module):
             Returns:
                 torch.Tensor: The output of the layer.
             """
-            return x @ self.weights.t() + self.biases
+            return self.linear(x)
 
     def __init__(self, n_in, n_out):
         super().__init__()
@@ -86,16 +86,12 @@ class SkipLinear(torch.nn.Module):
             raise ValueError("n_out % n_in != 0")
         n = n_out // n_in  # num nodes per input
 
-        self.lst_modules = torch.nn.ModuleList([SkipLinear.Core(n) for i in range(n_in)])
+        self.lst_modules = torch.nn.ModuleList([SkipLinear.Core(n) for _ in range(n_in)])
 
     def forward(self, x):
-        lst_nodes = []
-        for i in range(self.n_in):
-            xi = x[:, i].reshape(-1, 1)
-            oupt = self.lst_modules[i](xi)
-            lst_nodes.append(oupt)
-        result = torch.cat((lst_nodes[0], lst_nodes[1]), 1)
-        for i in range(2, self.n_in):
-            result = torch.cat((result, lst_nodes[i]), 1)
-        result = result.reshape(-1, self.n_out)
-        return result
+        # We want to apply each module to a slice of the input tensor x and collect the outputs.
+        # This applies the i-th module to the i-th column of x, reshaped as a column vector.
+        # The result is a list of output tensors, which are then concatenated to form the final output.
+        lst_nodes = [self.lst_modules[i](x[:, i].unsqueeze(1)) for i in range(self.n_in)]
+        result = torch.cat(lst_nodes, dim=1)
+        return result.reshape(-1, self.n_out)
