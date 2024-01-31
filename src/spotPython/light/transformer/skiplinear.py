@@ -51,19 +51,32 @@ class SkipLinear(torch.nn.Module):
     """
 
     class Core(torch.nn.Module):
+        """A simple linear layer with n outputs."""
+
         def __init__(self, n):
+            """
+            Initialize the layer.
+
+            Args:
+                n (int): The number of output nodes.
+            """
             super().__init__()
-            # 1 node to n nodes, n >= 2
             self.weights = torch.nn.Parameter(torch.zeros((n, 1), dtype=torch.float32))
-            self.biases = torch.nn.Parameter(torch.tensor(n, dtype=torch.float32))
+            self.biases = torch.nn.Parameter(torch.zeros(n, dtype=torch.float32))
             lim = 0.01
             torch.nn.init.uniform_(self.weights, -lim, lim)
-            torch.nn.init.zeros_(self.biases)
 
-        def forward(self, x):
-            wx = torch.mm(x, self.weights.t())
-            v = torch.add(wx, self.biases)
-            return v
+        def forward(self, x) -> torch.Tensor:
+            """
+            Forward pass through the layer.
+
+            Args:
+                x (torch.Tensor): The input tensor.
+
+            Returns:
+                torch.Tensor: The output of the layer.
+            """
+            return x @ self.weights.t() + self.biases
 
     def __init__(self, n_in, n_out):
         super().__init__()
