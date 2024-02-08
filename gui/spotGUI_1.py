@@ -1,21 +1,17 @@
 import tkinter as tk
 import json
 from spotPython.hyperparameters.values import get_default_values, get_bound_values
+from spotPython.hyperdict.light_hyper_dict import LightHyperDict
 
-def get_default_values(elements):
-    pass
 
-def get_bound_values(elements):
-    pass
-
-def create_gui(dict_file):
-    # Load the dictionary from the file
-    with open(dict_file, 'r') as f:
-        elements = json.load(f)
+def create_gui(model):
+    lhd = LightHyperDict()
+    # generate a dictionary fun_control with the key "core_model_hyper_dict" and the value lhd.hyper_dict['NetLightRegression']
+    fun_control = {"core_model_hyper_dict": lhd.hyper_dict['NetLightRegression']}
 
     # Apply the functions to the dictionary
-    default_values = get_default_values(elements)
-    bound_values = get_bound_values(elements)
+    default_values = get_default_values(fun_control)
+    bound_values = get_bound_values(fun_control)
 
     # Create a tkinter window
     root = tk.Tk()
@@ -40,5 +36,5 @@ def create_gui(dict_file):
     root.mainloop()
 
 # Call the function to create the GUI
-create_gui("elements.json")
+create_gui(model = 'NetLightRegression')
 
