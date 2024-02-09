@@ -8,7 +8,7 @@ from spotPython.hyperparameters.values import add_core_model_to_fun_control
 from spotPython.light.regression.netlightregression import NetLightRegression
 from spotPython.hyperdict.light_hyper_dict import LightHyperDict
 from spotPython.utils.device import getDevice
-from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
+from spotPython.utils.init import get_experiment_name, get_spot_tensorboard_path
 from spotPython.data.diabetes import Diabetes
 from spotPython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
 from spotPython.hyperparameters.values import set_control_hyperparameter_value

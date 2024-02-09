@@ -1,13 +1,11 @@
 import os
 import lightning as L
-import datetime
 from scipy.optimize import differential_evolution
 import numpy as np
-
-
-# PyTorch TensorBoard support
+import socket
+import datetime
+from dateutil.tz import tzlocal
 from torch.utils.tensorboard import SummaryWriter
-from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
 
 
 def fun_control_init(
@@ -15,6 +13,7 @@ def fun_control_init(
     _L_out=None,
     PREFIX=None,
     TENSORBOARD_CLEAN=False,
+    SUMMARY_WRITER=True,
     accelerator="auto",
     design=None,
     device=None,
@@ -215,7 +214,7 @@ def fun_control_init(
             print(f"Moving TENSORBOARD_PATH: {TENSORBOARD_PATH} to TENSORBOARD_PATH_OLD: {TENSORBOARD_PATH_OLD}")
             os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
     os.makedirs(TENSORBOARD_PATH, exist_ok=True)
-    if PREFIX is not None:
+    if PREFIX is not None and SUMMARY_WRITER:
         experiment_name = get_experiment_name(prefix=PREFIX)
         spot_tensorboard_path = get_spot_tensorboard_path(experiment_name)
         os.makedirs(spot_tensorboard_path, exist_ok=True)
@@ -487,3 +486,50 @@ def optimizer_control_init(
     """
     optimizer_control = {"max_iter": max_iter, "seed": seed}
     return optimizer_control
+
+
+def get_experiment_name(prefix: str = "00") -> str:
+    """Returns a unique experiment name with a given prefix.
+
+    Args:
+        prefix (str, optional): Prefix for the experiment name. Defaults to "00".
+
+    Returns:
+        str: Unique experiment name.
+
+    Examples:
+        >>> from spotPython.utils.file import get_experiment_name
+        >>> get_experiment_name(prefix="00")
+        00_ubuntu_2021-08-31_14-30-00
+    """
+    start_time = datetime.datetime.now(tzlocal())
+    HOSTNAME = socket.gethostname().split(".")[0]
+    experiment_name = prefix + "_" + HOSTNAME + "_" + str(start_time).split(".", 1)[0].replace(" ", "_")
+    experiment_name = experiment_name.replace(":", "-")
+    return experiment_name
+
+
+def get_spot_tensorboard_path(experiment_name):
+    """Get the path to the spot tensorboard files.
+
+    Args:
+        experiment_name (str): The name of the experiment.
+
+    Returns:
+        spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
+    """
+    spot_tensorboard_path = os.environ.get("PATH_TENSORBOARD", "runs/spot_logs/")
+    spot_tensorboard_path = os.path.join(spot_tensorboard_path, experiment_name)
+    return spot_tensorboard_path
+
+
+def get_tensorboard_path(fun_control):
+    """Get the path to the tensorboard files.
+
+    Args:
+        fun_control (dict): The function control dictionary.
+
+    Returns:
+        tensorboard_path (str): The path to the folder where the tensorboard files are saved.
+    """
+    return fun_control["TENSORBOARD_PATH"]

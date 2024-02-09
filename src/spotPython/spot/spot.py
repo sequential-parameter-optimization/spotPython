@@ -120,8 +120,8 @@ class Spot:
                 y = x0**2 + 10*x1**2
                 return y
             fun_control = fun_control_init(
-                        lower = np.array([0, 0])
-                        upper = np.array([10, 10])
+                        lower = np.array([0, 0]),
+                        upper = np.array([10, 10]),
                         fun_evals=8,
                         fun_repeats=1,
                         max_time=inf,

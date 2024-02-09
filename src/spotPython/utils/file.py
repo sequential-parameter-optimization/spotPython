@@ -1,10 +1,13 @@
 import torchvision
 import torchvision.transforms as transforms
-import socket
-from datetime import datetime
-from dateutil.tz import tzlocal
 import pickle
-import os
+from spotPython.utils.init import (
+    design_control_init,
+    surrogate_control_init,
+    optimizer_control_init,
+)
+
+# from torch.utils.tensorboard import SummaryWriter
 
 
 def load_data(data_dir="./data"):
@@ -28,27 +31,6 @@ def load_data(data_dir="./data"):
     testset = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transform)
 
     return trainset, testset
-
-
-def get_experiment_name(prefix: str = "00") -> str:
-    """Returns a unique experiment name with a given prefix.
-
-    Args:
-        prefix (str, optional): Prefix for the experiment name. Defaults to "00".
-
-    Returns:
-        str: Unique experiment name.
-
-    Examples:
-        >>> from spotPython.utils.file import get_experiment_name
-        >>> get_experiment_name(prefix="00")
-        00_ubuntu_2021-08-31_14-30-00
-    """
-    start_time = datetime.now(tzlocal())
-    HOSTNAME = socket.gethostname().split(".")[0]
-    experiment_name = prefix + "_" + HOSTNAME + "_" + str(start_time).split(".", 1)[0].replace(" ", "_")
-    experiment_name = experiment_name.replace(":", "-")
-    return experiment_name
 
 
 def save_pickle(obj, filename: str):
@@ -88,46 +70,42 @@ def load_pickle(filename: str):
     return obj
 
 
-def get_spot_tensorboard_path(experiment_name):
-    """Get the path to the spot tensorboard files.
-
-    Args:
-        experiment_name (str): The name of the experiment.
-
-    Returns:
-        spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
-    """
-    spot_tensorboard_path = os.environ.get("PATH_TENSORBOARD", "runs/spot_logs/")
-    spot_tensorboard_path = os.path.join(spot_tensorboard_path, experiment_name)
-    return spot_tensorboard_path
-
-
-def get_tensorboard_path(fun_control):
-    """Get the path to the tensorboard files.
-
-    Args:
-        fun_control (dict): The function control dictionary.
-
-    Returns:
-        tensorboard_path (str): The path to the folder where the tensorboard files are saved.
-    """
-    return fun_control["TENSORBOARD_PATH"]
-
-
-def save_experiment(spot_tuner, fun_control) -> str:
+def save_experiment(
+    spot_tuner, fun_control, design_control=None, surrogate_control=None, optimizer_control=None
+) -> str:
     """
     Saves the experiment as a pickle file.
 
     Args:
         spot_tuner (object): The spot tuner object.
         fun_control (dict): The function control dictionary.
+        design_control (dict, optional): The design control dictionary. Defaults to None.
+        surrogate_control (dict, optional): The surrogate control dictionary. Defaults to None.
+        optimizer_control (dict, optional): The optimizer control dictionary. Defaults to None.
 
     Returns:
         PKL_NAME (str):
             Name of the pickle file. Build as "spot_" + PREFIX + "experiment.pickle".
 
     """
-    experiment = {"spot_tuner": spot_tuner, "fun_control": fun_control}
+    if design_control is None:
+        design_control = design_control_init()
+    if surrogate_control is None:
+        surrogate_control = surrogate_control_init()
+    if optimizer_control is None:
+        optimizer_control = optimizer_control_init()
+    # remove the key "spot_writer" from the fun_control dictionary,
+    # because it is not serializable.
+    # TODO: It will be re-added when the experiment is loaded.
+    fun_control.pop("spot_writer", None)
+
+    experiment = {
+        "spot_tuner": spot_tuner,
+        "fun_control": fun_control,
+        "design_control": design_control,
+        "surrogate_control": surrogate_control,
+        "optimizer_control": optimizer_control,
+    }
     PREFIX = fun_control["PREFIX"]
     PKL_NAME = "spot_" + PREFIX + "experiment.pickle"
     with open(PKL_NAME, "wb") as handle:
@@ -146,10 +124,18 @@ def load_experiment(PKL_NAME):
     Returns:
         spot_tuner (object): The spot tuner object.
         fun_control (dict): The function control dictionary.
+        design_control (dict): The design control dictionary.
+        surrogate_control (dict): The surrogate control dictionary.
+        optimizer_control (dict): The optimizer control dictionary.
 
     """
     with open(PKL_NAME, "rb") as handle:
         experiment = pickle.load(handle)
     spot_tuner = experiment["spot_tuner"]
     fun_control = experiment["fun_control"]
-    return spot_tuner, fun_control
+    design_control = experiment["design_control"]
+    surrogate_control = experiment["surrogate_control"]
+    optimizer_control = experiment["optimizer_control"]
+    # TODO: Add the key "spot_writer" to the fun_control dictionary,
+    # because it was not saved in the pickle file.
+    return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
