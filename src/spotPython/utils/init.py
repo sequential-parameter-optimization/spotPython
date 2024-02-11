@@ -15,6 +15,10 @@ def fun_control_init(
     TENSORBOARD_CLEAN=False,
     SUMMARY_WRITER=True,
     accelerator="auto",
+    data=None,
+    data_dir="./data",
+    data_module=None,
+    data_set=None,
     design=None,
     device=None,
     devices=1,
@@ -52,6 +56,15 @@ def fun_control_init(
         acceleration (str):
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
+            Default is "auto".
+        data (object):
+            The data object. Default is None.
+        data_dir (str):
+            The directory to save the data. Default is "./data".
+        data_module (object):
+            The data module object. Default is None.
+        data_set (object):
+            The data set object. Default is None.
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
         devices (str or int):
@@ -237,10 +250,10 @@ def fun_control_init(
         "_L_out": _L_out,
         "accelerator": accelerator,
         "counter": 0,
-        "data": None,
-        "data_dir": "./data",
-        "data_module": None,
-        "data_set": None,
+        "data": data,
+        "data_dir": data_dir,
+        "data_module": data_module,
+        "data_set": data_set,
         "design": design,
         "device": device,
         "devices": devices,
