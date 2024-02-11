@@ -68,7 +68,7 @@ def test_file_save_load():
     spot_tuner_1, fun_control_1, design_control_1, surrogate_control_1, optimizer_control_1 = load_experiment(pkl_name)
 
     # Verify the name of the pickle file
-    assert pkl_name == f"spot_{fun_control['PREFIX']}experiment.pickle"
+    assert pkl_name == f"spot_{fun_control['PREFIX']}_experiment.pickle"
 
     # Clean up the temporary directory
     os.remove(pkl_name)

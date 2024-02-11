@@ -23,6 +23,7 @@ def fun_control_init(
     device=None,
     devices=1,
     enable_progress_bar=False,
+    EXPERIMENT_NAME=None,
     fun_evals=15,
     fun_repeats=1,
     infill_criterion="y",
@@ -38,6 +39,7 @@ def fun_control_init(
     show_models=False,
     show_progress=True,
     sigma=0.0,
+    surrogate=None,
     task=None,
     test_seed=1234,
     test_size=0.4,
@@ -48,12 +50,13 @@ def fun_control_init(
     verbosity=0,
 ):
     """Initialize fun_control dictionary.
+
     Args:
         _L_in (int):
             The number of input features.
         _L_out (int):
             The number of output features.
-        acceleration (str):
+        accelerator (str):
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
             Default is "auto".
@@ -447,7 +450,6 @@ def surrogate_control_init(
           because the default popsize is 15 and N is the number of parameters. This is already sufficient
           for many situations. For example, for k=2 these are 30 000 iterations.
           Therefore we set this value to 1000.
-
 
     """
     surrogate_control = {

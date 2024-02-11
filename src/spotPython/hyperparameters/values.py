@@ -75,7 +75,6 @@ def return_conf_list_from_var_dict(
 
 def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, Union[int, float]], None, None]:
     """Iterate over the values of a dictionary of variables.
-
     This function takes a dictionary of variables as input arguments and returns a generator that
     yields dictionaries with the values from the arrays in the input dictionary.
 
@@ -100,7 +99,6 @@ def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, 
 
 def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> Dict[str, Union[int, float]]:
     """Convert values in a dictionary to integers based on a list of variable types.
-
     This function takes a dictionary `d` and a list of variable types `var_type` as arguments.
     For each key in the dictionary,
     if the corresponding entry in `var_type` is not equal to `"num"`,
@@ -131,7 +129,6 @@ def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> D
 
 def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any]) -> Dict[str, Any]:
     """Get dictionary with levels and types.
-
     The function maps the numerical output of the hyperparameter optimization to the corresponding levels
     of the hyperparameter needed by the core model, i.e., the tuned algorithm.
     The function takes the dictionaries fun_control and v and returns a new dictionary with the same keys as v
@@ -300,6 +297,8 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
 
 def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> None:
     """
+    Modify the bounds of a hyperparameter in the fun_control dictionary.
+
     Args:
         fun_control (dict):
             fun_control dictionary
@@ -545,7 +544,6 @@ def get_var_name(fun_control) -> list:
 
 def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Union[List, np.ndarray]:
     """Generate a list or array from a dictionary.
-
     This function takes the values from the keys "bound" in the
     fun_control["core_model_hyper_dict"] dictionary and returns a list or array of the values
     in the same order as the keys in the dictionary.
@@ -744,6 +742,7 @@ def add_core_model_to_fun_control(fun_control, core_model, hyper_dict=None, file
 
 def get_one_core_model_from_X(X, fun_control=None):
     """Get one core model from X.
+
     Args:
         X (np.array):
             The array with the hyper parameter values.
@@ -874,6 +873,7 @@ def get_one_river_model_from_X(X, fun_control=None):
 
 def get_default_hyperparameters_as_array(fun_control) -> np.array:
     """Get the default hyper parameters as array.
+
     Args:
         fun_control (dict):
             The function control dictionary.
@@ -906,6 +906,7 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
 
 def get_default_hyperparameters_for_core_model(fun_control) -> dict:
     """Get the default hyper parameters for the core model.
+
     Args:
         fun_control (dict):
             The function control dictionary.
