@@ -6,6 +6,10 @@ from spotPython.utils.init import (
     surrogate_control_init,
     optimizer_control_init,
 )
+import os
+import json
+import sys
+import importlib
 
 # from torch.utils.tensorboard import SummaryWriter
 
@@ -203,3 +207,42 @@ def load_experiment(PKL_NAME):
     surrogate_control = experiment["surrogate_control"]
     optimizer_control = experiment["optimizer_control"]
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
+
+
+def load_dict_from_file(coremodel, dirname="userModel"):
+    """Loads a dictionary from a json file.
+
+    Args:
+        coremodel (str): Name of the core model.
+        dirname (str, optional): Directory name. Defaults to "userModel".
+
+    Returns:
+        dict (dict): Dictionary with the core model.
+
+    """
+    file_path = os.path.join(dirname, f"{coremodel}.json")
+    if os.path.isfile(file_path):
+        with open(file_path, "r") as f:
+            dict_tmp = json.load(f)
+            dict = dict_tmp[coremodel]
+    else:
+        print(f"The file {file_path} does not exist.")
+        dict = None
+    return dict
+
+
+def load_core_model_from_file(coremodel, dirname="userModel"):
+    """Loads a core model from a python file.
+
+    Args:
+        coremodel (str): Name of the core model.
+        dirname (str, optional): Directory name. Defaults to "userModel".
+
+    Returns:
+        coremodel (object): Core model.
+
+    """
+    sys.path.insert(0, "./" + dirname)
+    module = importlib.import_module(coremodel)
+    core_model = getattr(module, coremodel)
+    return core_model
