@@ -610,9 +610,11 @@ def replace_levels_with_positions(hyper_dict, hyper_dict_values) -> dict:
             dictionary with levels
         hyper_dict_values (dict):
             dictionary with values
+
     Returns:
         (dict):
             dictionary with values
+
     Examples:
         >>> from spotPython.hyperparameters.values import replace_levels_with_positions
             hyper_dict = {"leaf_prediction": {
@@ -819,16 +821,16 @@ def get_one_sklearn_model_from_X(X, fun_control=None):
             The sklearn model.
 
     Examples:
-    >>> from sklearn.linear_model import LinearRegression
-        from spotRiver.data.sklearn_hyper_dict import SklearnHyperDict
-        fun_control = {}
-        add_core_model_to_fun_control(core_model=LinearRegression,
-            fun_control=func_control,
-            hyper_dict=SklearnHyperDict,
-            filename=None)
-        X = np.array([0, 0, 0, 0, 0])
-        get_one_sklearn_model_from_X(X, fun_control)
-        LinearRegression()
+        >>> from sklearn.linear_model import LinearRegression
+            from spotRiver.data.sklearn_hyper_dict import SklearnHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=LinearRegression,
+                fun_control=func_control,
+                hyper_dict=SklearnHyperDict,
+                filename=None)
+            X = np.array([0, 0, 0, 0, 0])
+            get_one_sklearn_model_from_X(X, fun_control)
+            LinearRegression()
     """
     core_model = get_one_core_model_from_X(X=X, fun_control=fun_control)
     if fun_control["prep_model"] is not None:
