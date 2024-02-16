@@ -128,3 +128,52 @@ def mapk_scorer(estimator, X, y):
     y_pred = estimator.predict_proba(X)
     score = mapk_score(y, y_pred, k=3)
     return score
+
+
+def get_metric_sign(metric_name):
+    """Returns the sign of a metric.
+
+    Args:
+        metric_name (str):
+            The name of the metric. Can be one of the following:
+                - "accuracy_score"
+                - "cohen_kappa_score"
+                - "f1_score"
+                - "hamming_loss"
+                - "hinge_loss"
+                -"jaccard_score"
+                - "matthews_corrcoef"
+                - "precision_score"
+                - "recall_score"
+                - "roc_auc_score"
+                - "zero_one_loss"
+
+    Returns:
+        sign (float): The sign of the metric. -1 for max, +1 for min.
+
+    Raises:
+        ValueError: If the metric is not found.
+
+    Examples:
+        >>> from spotPython.metrics import get_metric_sign
+        >>> get_metric_sign("accuracy_score")
+        -1
+        >>> get_metric_sign("hamming_loss")
+        +1
+
+    """
+    if metric_name in [
+        "accuracy_score",
+        "cohen_kappa_score",
+        "f1_score",
+        "jaccard_score",
+        "matthews_corrcoef",
+        "precision_score",
+        "recall_score",
+        "roc_auc_score",
+    ]:
+        return -1
+    elif metric_name in ["hamming_loss", "hinge_loss", "zero_one_loss"]:
+        return +1
+    else:
+        raise ValueError(f"Metric '{metric_name}' not found.")

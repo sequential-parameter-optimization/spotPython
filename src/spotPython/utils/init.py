@@ -55,6 +55,8 @@ def fun_control_init(
     var_name=None,
     var_type=["num"],
     verbosity=0,
+    weights=1.0,
+    weight_coeff=0.0,
 ):
     """Initialize fun_control dictionary.
 
@@ -171,6 +173,12 @@ def fun_control_init(
         verbosity (int):
             The verbosity level. Determines print output to console. Higher values
             result in more output. Default is 0.
+        weights (float):
+            The weight coefficient of the objective function. Positive values mean minimization.
+            If set to -1, scores that are better when maximized will be minimized, e.g, accuracy.
+            Can be an array, so that different weights can be used for different (multiple) objectives.
+        weight_coeff (float):
+            Determines how to weight older measures. Default is 1.0. Used in the OML algorithm eval_oml.py.
 
     Returns:
         fun_control (dict):
@@ -327,7 +335,8 @@ def fun_control_init(
         "var_name": var_name,
         "var_type": var_type,
         "verbosity": verbosity,
-        "weights": 1.0,
+        "weights": weights,
+        "weight_coeff": weight_coeff,
     }
     # lower = X_reshape(lower)
     # fun_control.update({"lower": lower})

@@ -172,7 +172,15 @@ def plot_roc_from_dataframes(
 
 
 def plot_confusion_matrix(
-    model=None, fun_control=None, df=None, title=None, target_names=None, y_true_name=None, y_pred_name=None, show=False
+    model=None,
+    fun_control=None,
+    df=None,
+    title=None,
+    target_names=None,
+    y_true_name=None,
+    y_pred_name=None,
+    show=False,
+    ax=None,
 ):
     """
     Plotting a confusion matrix. If a model and the fun_control dictionary are passed,
@@ -197,6 +205,8 @@ def plot_confusion_matrix(
             Name of the column with the predicted values if a dataframe is specified. Defaults to None.
         show (bool, optional):
             If True, the plot is shown. Defaults to False.
+        ax (matplotlib.axes._subplots.AxesSubplot, optional):
+            Axes to plot the confusion matrix. Defaults to None.
 
     Returns:
         (NoneType): None
@@ -212,8 +222,9 @@ def plot_confusion_matrix(
         X_test, y_true = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ConfusionMatrixDisplay.from_predictions(y_true=y_true, y_pred=y_pred, ax=ax)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(10, 5))
+    ConfusionMatrixDisplay.from_predictions(y_true=y_true, y_pred=y_pred, ax=ax, colorbar=False)
     if target_names is not None:
         ax.xaxis.set_ticklabels(target_names)
         ax.yaxis.set_ticklabels(target_names)
