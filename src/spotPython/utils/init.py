@@ -32,6 +32,7 @@ def fun_control_init(
     log_level=50,
     lower=None,
     max_time=1,
+    metric_sklearn=None,
     noise=False,
     n_points=1,
     num_workers=0,
@@ -43,6 +44,7 @@ def fun_control_init(
     show_progress=True,
     sigma=0.0,
     surrogate=None,
+    target_column=None,
     task=None,
     test=None,
     test_seed=1234,
@@ -109,6 +111,8 @@ def fun_control_init(
             lower bound
         max_time (int):
             The maximum time in minutes.
+        metric_sklearn (object):
+            The metric object from the scikit-learn library. Default is None.
         noise (bool):
             Whether the objective function is noiy or not. Default is False.
             Affects the repeat of the function evaluations.
@@ -137,6 +141,8 @@ def fun_control_init(
             Currently only 1-dim functions are supported. Default is `False`.
         surrogate (object):
             The surrogate model object. Default is None.
+        target_column (str):
+            The name of the target column. Default is None.
         task (str):
             The task to perform. It can be either "classification" or "regression".
             Default is None.
@@ -288,7 +294,7 @@ def fun_control_init(
         "lower": lower,
         "max_time": max_time,
         "metric_river": None,
-        "metric_sklearn": None,
+        "metric_sklearn": metric_sklearn,
         "metric_torch": None,
         "metric_params": {},
         "model_dict": {},
@@ -310,7 +316,7 @@ def fun_control_init(
         "sigma": sigma,
         "spot_tensorboard_path": spot_tensorboard_path,
         "spot_writer": spot_writer,
-        "target_column": None,
+        "target_column": target_column,
         "task": task,
         "test": test,
         "test_seed": test_seed,
