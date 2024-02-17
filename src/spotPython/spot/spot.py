@@ -1464,7 +1464,7 @@ class Spot:
         if show:
             pylab.show()
 
-    def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None, show=True) -> None:
+    def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None, show=True, max_imp=None) -> None:
         """
         Plot the contour of important hyperparameters.
         Calls `plot_contour` for each pair of important hyperparameters.
@@ -1477,6 +1477,9 @@ class Spot:
                 filename of the plot
             show (bool):
                 show the plot. Default is `True`.
+            max_imp (int):
+                maximum number of important hyperparameters. If there are more important hyperparameters
+                than `max_imp`, only the max_imp important ones are selected.
 
         Returns:
             None.
@@ -1510,6 +1513,12 @@ class Spot:
 
         """
         impo = self.print_importance(threshold=threshold, print_screen=True)
+        print(f"impo: {impo}")
+        # if there are more than imp_max variables, select only the most important ones:
+        if max_imp is not None:
+            if len(impo) > max_imp:
+                impo = impo[:max_imp]
+        print(f"impo after select: {impo}")
         var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
         min_z = min(self.y)
         max_z = max(self.y)
