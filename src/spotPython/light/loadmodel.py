@@ -34,6 +34,7 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
         >>> fun_control = {
         ...     "_L_in": 10,
         ...     "_L_out": 1,
+        ...     "_torchmetric": "mean_squared_error",
         ...     "core_model": MyModel,
         ...     "TENSORBOARD_PATH": "./tensorboard",
         ... }
@@ -46,7 +47,10 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
     default_root_dir = os.path.join(fun_control["CHECKPOINT_PATH"], config_id, "last.ckpt")
     print(f"Loading model with {config_id} from {default_root_dir}")
     model = fun_control["core_model"].load_from_checkpoint(
-        default_root_dir, _L_in=fun_control["_L_in"], _L_out=fun_control["_L_out"]
+        default_root_dir,
+        _L_in=fun_control["_L_in"],
+        _L_out=fun_control["_L_out"],
+        _torchmetric=fun_control["_torchmetric"],
     )
     # disable randomness, dropout, etc...
     print(f"Model: {model}")
