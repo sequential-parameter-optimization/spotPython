@@ -39,22 +39,25 @@ class NetLightRegression2(L.LightningModule):
     Examples:
         >>> from torch.utils.data import DataLoader
             from spotPython.data.diabetes import Diabetes
-            from spotPython.light.netlightregression2 import NetLightRegression2
+            from spotPython.light.regression.netlightregression2 import NetLightRegression2
             from torch import nn
             import lightning as L
+            import torch
             PATH_DATASETS = './data'
             BATCH_SIZE = 8
             dataset = Diabetes()
-            train_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
-            test_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
-            val_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
+            train1_set, test_set = torch.utils.data.random_split(dataset, [0.6, 0.4])
+            train_set, val_set = torch.utils.data.random_split(train1_set, [0.6, 0.4])
+            train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True, drop_last=True, pin_memory=True)
+            test_loader = DataLoader(test_set, batch_size=BATCH_SIZE)
+            val_loader = DataLoader(val_set, batch_size=BATCH_SIZE)
             batch_x, batch_y = next(iter(train_loader))
-            print(batch_x.shape)
-            print(batch_y.shape)
+            print(f"batch_x.shape: {batch_x.shape}")
+            print(f"batch_y.shape: {batch_y.shape}")
             net_light_base = NetLightRegression2(l1=128,
                                                 epochs=10,
                                                 batch_size=BATCH_SIZE,
-                                                initialization='xavier',
+                                                initialization='Default',
                                                 act_fn=nn.ReLU(),
                                                 optimizer='Adam',
                                                 dropout_prob=0.1,
@@ -62,34 +65,31 @@ class NetLightRegression2(L.LightningModule):
                                                 patience=5,
                                                 _L_in=10,
                                                 _L_out=1)
-            trainer = L.Trainer(max_epochs=2,  enable_progress_bar=True)
+            trainer = L.Trainer(max_epochs=10,  enable_progress_bar=False)
             trainer.fit(net_light_base, train_loader)
             trainer.validate(net_light_base, val_loader)
             trainer.test(net_light_base, test_loader)
-
-              | Name   | Type       | Params | In sizes | Out sizes
+            | Name   | Type       | Params | In sizes | Out sizes
             -------------------------------------------------------------
-            0 | layers | Sequential | 15.9 K | [8, 10]  | [8, 1]
+            0 | layers | Sequential | 25.6 K | [8, 10]  | [8, 1]
             -------------------------------------------------------------
-            15.9 K    Trainable params
+            25.6 K    Trainable params
             0         Non-trainable params
-            15.9 K    Total params
-            0.064     Total estimated model params size (MB)
-
-            ─────────────────────────────────────────────────────────────
-                Validate metric           DataLoader 0
-            ─────────────────────────────────────────────────────────────
-                    hp_metric              29010.7734375
-                    val_loss               29010.7734375
-            ─────────────────────────────────────────────────────────────
-            ─────────────────────────────────────────────────────────────
-                Test metric             DataLoader 0
-            ─────────────────────────────────────────────────────────────
-                    hp_metric              29010.7734375
-                    val_loss               29010.7734375
-            ─────────────────────────────────────────────────────────────
-
-            [{'val_loss': 28981.529296875, 'hp_metric': 28981.529296875}]
+            25.6 K    Total params
+            0.102     Total estimated model params size (MB)
+            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+            ┃      Validate metric      ┃       DataLoader 0        ┃
+            ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+            │         hp_metric         │      28803.052734375      │
+            │         val_loss          │      28803.052734375      │
+            └───────────────────────────┴───────────────────────────┘
+            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+            ┃        Test metric        ┃       DataLoader 0        ┃
+            ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+            │         hp_metric         │      28280.533203125      │
+            │         val_loss          │      28280.533203125      │
+            └───────────────────────────┴───────────────────────────┘
+            [{'val_loss': 28280.533203125, 'hp_metric': 28280.533203125}]
     """
 
     def __init__(
@@ -181,6 +181,27 @@ class NetLightRegression2(L.LightningModule):
         x = self.layers(x)
         return x
 
+    def _calculate_loss(self, batch, mode="train"):
+        """
+        Calculate the loss for the given batch.
+
+        Args:
+            batch (tuple): A tuple containing a batch of input data and labels.
+            mode (str, optional): The mode of the model. Defaults to "train".
+
+        Returns:
+            torch.Tensor: A tensor containing the loss for this batch.
+
+        """
+        x, y = batch
+        y = y.view(len(y), 1)
+        y_hat = self(x)
+        loss = F.mse_loss(y_hat, y)
+        if mode == "val" or mode == "test":
+            self.log(f"{mode}_loss", loss, prog_bar=True)
+            self.log("hp_metric", loss, prog_bar=True)
+        return loss
+
     def training_step(self, batch: tuple, prog_bar: bool = False) -> torch.Tensor:
         """
         Performs a single training step.
@@ -192,14 +213,8 @@ class NetLightRegression2(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
 
         """
-        x, y = batch
-        y = y.view(len(y), 1)
-        y_hat = self(x)
-        val_loss = F.mse_loss(y_hat, y)
-        # mae_loss = F.l1_loss(y_hat, y)
-        # self.log("train_loss", val_loss, prog_bar=prog_bar)
-        # self.log("train_mae_loss", mae_loss, on_step=True, on_epoch=True, prog_bar=True)
-        return val_loss
+        loss = self._calculate_loss(batch, mode="train")
+        return loss
 
     def validation_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
@@ -214,15 +229,8 @@ class NetLightRegression2(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
 
         """
-        x, y = batch
-        y = y.view(len(y), 1)
-        y_hat = self(x)
-        val_loss = F.mse_loss(y_hat, y)
-        # mae_loss = F.l1_loss(y_hat, y)
-        # self.log("val_loss", val_loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
-        self.log("val_loss", val_loss, prog_bar=prog_bar)
-        self.log("hp_metric", val_loss, prog_bar=prog_bar)
-        return val_loss
+        loss = self._calculate_loss(batch, mode="val")
+        return loss
 
     def test_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
@@ -236,14 +244,8 @@ class NetLightRegression2(L.LightningModule):
         Returns:
             torch.Tensor: A tensor containing the loss for this batch.
         """
-        x, y = batch
-        y_hat = self(x)
-        y = y.view(len(y), 1)
-        val_loss = F.mse_loss(y_hat, y)
-        # mae_loss = F.l1_loss(y_hat, y)
-        self.log("val_loss", val_loss, prog_bar=prog_bar)
-        self.log("hp_metric", val_loss, prog_bar=prog_bar)
-        return val_loss
+        loss = self._calculate_loss(batch, mode="val")
+        return loss
 
     def predict_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """

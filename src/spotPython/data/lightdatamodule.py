@@ -130,12 +130,15 @@ class LightDataModule(L.LightningDataModule):
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
             print("LightDataModule: setup(). stage: fit")
-            self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size])
+            generator_fit = torch.Generator().manual_seed(self.test_seed)
+            self.data_train, self.data_val, _ = random_split(
+                self.data_full, [train_size, val_size, test_size], generator=generator_fit
+            )
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
             print("LightDataModule: setup(). stage: test")
-            # get test data aset as test_abs percent of the full dataset
+            # get test data set as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
 
@@ -151,7 +154,7 @@ class LightDataModule(L.LightningDataModule):
         # Assign pred dataset for use in dataloader(s)
         if stage == "predict" or stage is None:
             print("LightDataModule: setup(). stage: predict")
-            # get test data aset as test_abs percent of the full dataset
+            # get test data set as test_abs percent of the full dataset
             generator_predict = torch.Generator().manual_seed(self.test_seed)
             self.data_predict, _ = random_split(
                 self.data_full, [test_size, full_train_size], generator=generator_predict
@@ -199,7 +202,7 @@ class LightDataModule(L.LightningDataModule):
                 print(f"Training set size: {len(data_module.data_val)}")
                 Training set size: 3
         """
-        print(f"LightDataModule: val_dataloader(). Training set size: {len(self.data_val)}")
+        print(f"LightDataModule: val_dataloader(). Validation set size: {len(self.data_val)}")
         print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
         print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_val, batch_size=self.batch_size, num_workers=self.num_workers)
