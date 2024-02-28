@@ -22,7 +22,8 @@ def test_net_light_regression_class():
                                         dropout_prob=0.1,
                                         lr_mult=0.1,                                  patience=5, 
                                         _L_in=10,
-                                        _L_out=1)
+                                        _L_out=1,
+                                        _torchmetric="mean_squared_error")
     trainer = L.Trainer(max_epochs=2,  enable_progress_bar=False)
     trainer.fit(net_light_regression, train_loader, val_loader)    
     res = trainer.test(net_light_regression, test_loader)

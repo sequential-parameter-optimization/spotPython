@@ -54,6 +54,7 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     """
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
+    _torchmetric = fun_control["_torchmetric"]
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
@@ -72,7 +73,7 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     )
     dm.setup(stage="train")
     # Init model from datamodule's attributes
-    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     initialization = config["initialization"]
     if initialization == "Xavier":
         xavier_init(model)

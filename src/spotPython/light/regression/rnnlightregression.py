@@ -3,6 +3,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from spotPython.hyperparameters.optimizer import optimizer_handler
+import torchmetrics.functional.regression
 
 
 class RNNLightRegression(L.LightningModule):
@@ -32,6 +33,8 @@ class RNNLightRegression(L.LightningModule):
             The number of input features.
         _L_out (int):
             The number of output classes.
+        _torchmetric (str):
+            The metric to use for the loss function, e.g., "mean_squared_error".
         layers (nn.Sequential):
             The neural network model.
 
@@ -104,6 +107,7 @@ class RNNLightRegression(L.LightningModule):
         patience: int,
         _L_in: int,
         _L_out: int,
+        _torchmetric: str,
     ):
         """
         Initializes the NetLightRegression object.
@@ -120,6 +124,7 @@ class RNNLightRegression(L.LightningModule):
             patience (int): The number of epochs to wait before early stopping.
             _L_in (int): The number of input features. Not a hyperparameter, but needed to create the network.
             _L_out (int): The number of output classes. Not a hyperparameter, but needed to create the network.
+            _torchmetric (str): The metric to use for the loss function, e.g., "mean_squared_error".
 
         Returns:
             (NoneType): None
@@ -133,8 +138,10 @@ class RNNLightRegression(L.LightningModule):
         #
         self._L_in = _L_in
         self._L_out = _L_out
+        self._torchmetric = _torchmetric
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
-        self.save_hyperparameters(ignore=["_L_in", "_L_out"])
+        # _torchmetric is not a hyperparameter, but is needed to calculate the loss
+        self.save_hyperparameters(ignore=["_L_in", "_L_out", "_torchmetric"])
         # set dummy input array for Tensorboard Graphs
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
@@ -224,7 +231,9 @@ class RNNLightRegression(L.LightningModule):
         # Note: the number of rows in x is equal to the number of rows in y
         y_hat = self(x)
         # Note: the number of rows in y_hat is equal to the number of rows in y
-        train_loss = F.mse_loss(y_hat, y)
+        # train_loss = F.mse_loss(y_hat, y)
+        metric = getattr(torchmetrics.functional.regression, self._torchmetric)
+        train_loss = metric(y_hat, y)
         # mae_loss = F.l1_loss(y_hat, y)
         # self.log("train_loss", val_loss, on_step=True, on_epoch=True, prog_bar=True)
         # self.log("train_mae_loss", mae_loss, on_step=True, on_epoch=True, prog_bar=True)

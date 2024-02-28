@@ -39,7 +39,8 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
             import spotPython.light.testmodel as tm
             fun_control = fun_control_init(
                 _L_in=10,
-                _L_out=1,)
+                _L_out=1,
+                _torchmetric="mean_squared_error")
             dataset = Diabetes()
             set_control_key_value(control_dict=fun_control,
                                     key="data_set",
@@ -54,6 +55,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     """
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
+    _torchmetric = fun_control["_torchmetric"]
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
@@ -72,7 +74,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     )
     dm.setup()
     # Init model from datamodule's attributes
-    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     initialization = config["initialization"]
     if initialization == "Xavier":
         xavier_init(model)

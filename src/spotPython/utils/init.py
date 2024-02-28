@@ -11,6 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 def fun_control_init(
     _L_in=None,
     _L_out=None,
+    _torchmetric=None,
     PREFIX=None,
     TENSORBOARD_CLEAN=False,
     SUMMARY_WRITER=True,
@@ -69,6 +70,10 @@ def fun_control_init(
             The number of input features.
         _L_out (int):
             The number of output features.
+        _torchmetric (str):
+            The metric to be used by the Lighting Trainer.
+            For example "mean_squared_error",
+            see https://lightning.ai/docs/torchmetrics/stable/regression/mean_squared_error.html
         accelerator (str):
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
@@ -294,6 +299,7 @@ def fun_control_init(
         "TENSORBOARD_PATH": TENSORBOARD_PATH,
         "_L_in": _L_in,
         "_L_out": _L_out,
+        "_torchmetric": _torchmetric,
         "accelerator": accelerator,
         "converters": converters,
         "core_model": core_model,

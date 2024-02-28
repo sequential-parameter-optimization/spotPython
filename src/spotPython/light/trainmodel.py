@@ -67,6 +67,7 @@ def train_model(config: dict, fun_control: dict) -> float:
     """
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
+    _torchmetric = fun_control["_torchmetric"]
     if fun_control["enable_progress_bar"] is None:
         enable_progress_bar = False
     else:
@@ -74,7 +75,7 @@ def train_model(config: dict, fun_control: dict) -> float:
     # config id is unique. Since the model is not loaded from a checkpoint,
     # the config id is generated here with a timestamp.
     config_id = generate_config_id(config, timestamp=True)
-    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     initialization = config["initialization"]
     if initialization == "Xavier":
         xavier_init(model)

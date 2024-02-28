@@ -6,6 +6,7 @@ from spotPython.hyperparameters.optimizer import optimizer_handler
 from spotPython.light.transformer.skiplinear import SkipLinear
 from spotPython.light.transformer.positionalEncoding import PositionalEncoding
 from spotPython.utils.math import generate_div2_list
+import torchmetrics.functional.regression
 
 
 class TransformerLightRegression(L.LightningModule):
@@ -35,6 +36,8 @@ class TransformerLightRegression(L.LightningModule):
             The number of input features.
         _L_out (int):
             The number of output classes.
+        _torchmetric (str):
+            The metric to use for the loss function, e.g., "mean_squared_error".
         layers (nn.Sequential):
             The neural network model.
 
@@ -110,6 +113,7 @@ class TransformerLightRegression(L.LightningModule):
         patience: int,
         _L_in: int,
         _L_out: int,
+        _torchmetric: str,
     ):
         """
         Initializes the TransformerLightRegression object.
@@ -126,6 +130,7 @@ class TransformerLightRegression(L.LightningModule):
             patience (int): The number of epochs to wait before early stopping.
             _L_in (int): The number of input features. Not a hyperparameter, but needed to create the network.
             _L_out (int): The number of output classes. Not a hyperparameter, but needed to create the network.
+            _torchmetric (str): The metric to use for the loss function, e.g., "mean_squared_error".
 
         Returns:
             (NoneType): None
@@ -142,9 +147,11 @@ class TransformerLightRegression(L.LightningModule):
         #
         self._L_in = _L_in
         self._L_out = _L_out
+        self.metric = getattr(torchmetrics.functional.regression, _torchmetric)
         self.d_mult = d_mult
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
-        self.save_hyperparameters(ignore=["_L_in", "_L_out"])
+        # _torchmetric is not a hyperparameter, but is needed to calculate the loss
+        self.save_hyperparameters(ignore=["_L_in", "_L_out", "_torchmetric"])
         # set dummy input array for Tensorboard Graphs
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))

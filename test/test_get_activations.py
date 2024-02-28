@@ -12,7 +12,7 @@ import numpy as np
 
 def test_get_activations():
     # Initialize the function control
-    fun_control = fun_control_init(_L_in=10, _L_out=1)
+    fun_control = fun_control_init(_L_in=10, _L_out=1, _torchmetric="mean_squared_error")
     
     # Set up the dataset
     dataset = Diabetes()
@@ -32,9 +32,10 @@ def test_get_activations():
     # Set the input and output layer sizes
     _L_in = fun_control["_L_in"]
     _L_out = fun_control["_L_out"]
+    _torchmetric = fun_control["_torchmetric"]
     
     # Create the model
-    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
+    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     print(f"model = {model}")
     
     # config.update({"batch_size": 1})

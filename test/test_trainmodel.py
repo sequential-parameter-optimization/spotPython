@@ -12,7 +12,8 @@ from spotPython.light.trainmodel import train_model
 def test_trainmodel():
     fun_control = fun_control_init(
         _L_in=10,
-        _L_out=1,)
+        _L_out=1,
+        _torchmetric="mean_squared_error")
 
     dataset = Diabetes()
     set_control_key_value(control_dict=fun_control,
