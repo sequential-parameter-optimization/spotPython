@@ -8,7 +8,7 @@ import torchmetrics.functional.regression
 
 class NetLightRegression(L.LightningModule):
     """
-    A LightningModule class for a regresssion neural network model.
+    A LightningModule class for a regression neural network model.
 
     Attributes:
         l1 (int):
@@ -34,7 +34,8 @@ class NetLightRegression(L.LightningModule):
         _L_out (int):
             The number of output classes.
         _torchmetric (str):
-            The metric to use for the loss function, e.g., "mean_squared_error".
+            The metric to use for the loss function. If `None`,
+            then "mean_squared_error" is used.
         layers (nn.Sequential):
             The neural network model.
 
@@ -124,7 +125,9 @@ class NetLightRegression(L.LightningModule):
             patience (int): The number of epochs to wait before early stopping.
             _L_in (int): The number of input features. Not a hyperparameter, but needed to create the network.
             _L_out (int): The number of output classes. Not a hyperparameter, but needed to create the network.
-            _torchmetric (str): The metric to use for the loss function, e.g., "mean_squared_error".
+        _torchmetric (str):
+            The metric to use for the loss function. If `None`,
+            then "mean_squared_error" is used.
 
         Returns:
             (NoneType): None
@@ -141,7 +144,10 @@ class NetLightRegression(L.LightningModule):
         #
         self._L_in = _L_in
         self._L_out = _L_out
+        if _torchmetric is None:
+            _torchmetric = "mean_squared_error"
         self._torchmetric = _torchmetric
+        self.metric = getattr(torchmetrics.functional.regression, _torchmetric)
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
         # _torchmetric is not a hyperparameter, but is needed to calculate the loss
         self.save_hyperparameters(ignore=["_L_in", "_L_out", "_torchmetric"])

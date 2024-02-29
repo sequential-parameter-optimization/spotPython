@@ -141,6 +141,9 @@ class NetLightRegression2(L.LightningModule):
         #
         self._L_in = _L_in
         self._L_out = _L_out
+        if _torchmetric is None:
+            _torchmetric = "mean_squared_error"
+        self._torchmetric = _torchmetric
         self.metric = getattr(torchmetrics.functional.regression, _torchmetric)
         # _L_in and _L_out are not hyperparameters, but are needed to create the network
         # _torchmetric is not a hyperparameter, but is needed to calculate the loss
