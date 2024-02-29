@@ -63,7 +63,8 @@ class RNNLightRegression(L.LightningModule):
                                                 lr_mult=0.1,
                                                 patience=5,
                                                 _L_in=10,
-                                                _L_out=1)
+                                                _L_out=1,
+                                                _torchmetric="mean_squared_error")
             trainer = L.Trainer(max_epochs=2,  enable_progress_bar=True)
             trainer.fit(net_light_base, train_loader)
             trainer.validate(net_light_base, val_loader)
