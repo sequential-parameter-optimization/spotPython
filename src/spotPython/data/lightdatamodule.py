@@ -121,15 +121,15 @@ class LightDataModule(L.LightningDataModule):
             val_size = int(full_train_size * test_size / len(self.data_full))
             train_size = full_train_size - val_size
 
-        print(f"LightDataModule: setup(). stage: {stage}")
-        print(f"LightDataModule setup(): full_train_size: {full_train_size}")
-        print(f"LightDataModule setup(): val_size: {val_size}")
-        print(f"LightDataModule setup(): train_size: {train_size}")
-        print(f"LightDataModule setup(): test_size: {test_size}")
+        print(f"LightDataModule.setup(): stage: {stage}")
+        # print(f"LightDataModule setup(): full_train_size: {full_train_size}")
+        # print(f"LightDataModule setup(): val_size: {val_size}")
+        # print(f"LightDataModule setup(): train_size: {train_size}")
+        # print(f"LightDataModule setup(): test_size: {test_size}")
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
-            print("LightDataModule: setup(). stage: fit")
+            print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
             generator_fit = torch.Generator().manual_seed(self.test_seed)
             self.data_train, self.data_val, _ = random_split(
                 self.data_full, [train_size, val_size, test_size], generator=generator_fit
@@ -137,7 +137,7 @@ class LightDataModule(L.LightningDataModule):
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
-            print("LightDataModule: setup(). stage: test")
+            print(f"test_size: {test_size} used for test dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
@@ -153,7 +153,7 @@ class LightDataModule(L.LightningDataModule):
 
         # Assign pred dataset for use in dataloader(s)
         if stage == "predict" or stage is None:
-            print("LightDataModule: setup(). stage: predict")
+            print(f"test_size: {test_size} used for predict dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_predict = torch.Generator().manual_seed(self.test_seed)
             self.data_predict, _ = random_split(
@@ -179,9 +179,9 @@ class LightDataModule(L.LightningDataModule):
                 Training set size: 3
 
         """
-        print(f"LightDataModule: train_dataloader(). Training set size: {len(self.data_train)}")
-        print(f"LightDataModule: train_dataloader(). batch_size: {self.batch_size}")
-        print(f"LightDataModule: train_dataloader(). num_workers: {self.num_workers}")
+        print(f"LightDataModule.train_dataloader(). data_train size: {len(self.data_train)}")
+        # print(f"LightDataModule: train_dataloader(). batch_size: {self.batch_size}")
+        # print(f"LightDataModule: train_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_train, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:
@@ -202,9 +202,9 @@ class LightDataModule(L.LightningDataModule):
                 print(f"Training set size: {len(data_module.data_val)}")
                 Training set size: 3
         """
-        print(f"LightDataModule: val_dataloader(). Validation set size: {len(self.data_val)}")
-        print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
-        print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
+        print(f"LightDataModule.val_dataloader(). Val. set size: {len(self.data_val)}")
+        # print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
+        # print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_val, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
@@ -226,9 +226,9 @@ class LightDataModule(L.LightningDataModule):
                 Test set size: 6
 
         """
-        print(f"LightDataModule: test_dataloader(). Test set size: {len(self.data_test)}")
-        print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
-        print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
+        print(f"LightDataModule.test_dataloader(). Test set size: {len(self.data_test)}")
+        # print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
+        # print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def predict_dataloader(self) -> DataLoader:
@@ -250,7 +250,7 @@ class LightDataModule(L.LightningDataModule):
                 Predict set size: 6
 
         """
-        print(f"LightDataModule: predict_dataloader(). Predict set size: {len(self.data_predict)}")
-        print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
-        print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
+        print(f"LightDataModule.predict_dataloader(). Predict set size: {len(self.data_predict)}")
+        # print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
+        # print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
         return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)

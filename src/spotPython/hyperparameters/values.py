@@ -1178,3 +1178,98 @@ def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
                 if i < len(fun_control["core_model_hyper_dict"][key]["levels"]):
                     return fun_control["core_model_hyper_dict"][key]["levels"][i]
     return None
+
+
+def get_tuned_hyperparameters(spot_tuner):
+    """
+    Get the tuned hyperparameters from the spot tuner.
+    This is just a wrapper function for the spot `get_tuned_hyperparameters` method.
+
+    Args:
+        spot_tuner (object):
+            spot tuner object.
+
+    Returns:
+        (dict):
+            dictionary containing the tuned hyperparameters.
+
+    Examples:
+        >>> from spotPython.utils.device import getDevice
+            from math import inf
+            from spotPython.utils.init import fun_control_init
+            import numpy as np
+            from spotPython.hyperparameters.values import set_control_key_value
+            from spotPython.data.diabetes import Diabetes
+            from spotPython.hyperparameters.values import get_tuned_hyperparameters
+            MAX_TIME = 1
+            FUN_EVALS = 10
+            INIT_SIZE = 5
+            WORKERS = 0
+            PREFIX="037"
+            DEVICE = getDevice()
+            DEVICES = 1
+            TEST_SIZE = 0.4
+            TORCH_METRIC = "mean_squared_error"
+            dataset = Diabetes()
+            fun_control = fun_control_init(
+                _L_in=10,
+                _L_out=1,
+                _torchmetric=TORCH_METRIC,
+                PREFIX=PREFIX,
+                TENSORBOARD_CLEAN=True,
+                data_set=dataset,
+                device=DEVICE,
+                enable_progress_bar=False,
+                fun_evals=FUN_EVALS,
+                log_level=50,
+                max_time=MAX_TIME,
+                num_workers=WORKERS,
+                show_progress=True,
+                test_size=TEST_SIZE,
+                tolerance_x=np.sqrt(np.spacing(1)),
+                )
+            from spotPython.light.regression.netlightregression import NetLightRegression
+            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+            add_core_model_to_fun_control(fun_control=fun_control,
+                                        core_model=NetLightRegression,
+                                        hyper_dict=LightHyperDict)
+            from spotPython.hyperparameters.values import set_control_hyperparameter_value
+            set_control_hyperparameter_value(fun_control, "l1", [7, 8])
+            set_control_hyperparameter_value(fun_control, "epochs", [3, 5])
+            set_control_hyperparameter_value(fun_control, "batch_size", [4, 5])
+            set_control_hyperparameter_value(fun_control, "optimizer", [
+                            "Adam",
+                            "RAdam",
+                        ])
+            set_control_hyperparameter_value(fun_control, "dropout_prob", [0.01, 0.1])
+            set_control_hyperparameter_value(fun_control, "lr_mult", [0.5, 5.0])
+            set_control_hyperparameter_value(fun_control, "patience", [2, 3])
+            set_control_hyperparameter_value(fun_control, "act_fn",[
+                            "ReLU",
+                            "LeakyReLU"
+                        ] )
+            from spotPython.utils.init import design_control_init, surrogate_control_init
+            design_control = design_control_init(init_size=INIT_SIZE)
+            surrogate_control = surrogate_control_init(noise=True,
+                                                        n_theta=2)
+            from spotPython.fun.hyperlight import HyperLight
+            fun = HyperLight(log_level=50).fun
+            from spotPython.spot import spot
+            spot_tuner = spot.Spot(fun=fun,
+                                fun_control=fun_control,
+                                design_control=design_control,
+                                surrogate_control=surrogate_control)
+            spot_tuner.run()
+            get_tuned_hyperparameters(spot_tuner)
+                {'l1': 7.0,
+                'epochs': 5.0,
+                'batch_size': 4.0,
+                'act_fn': 0.0,
+                'optimizer': 0.0,
+                'dropout_prob': 0.01,
+                'lr_mult': 5.0,
+                'patience': 3.0,
+                'initialization': 1.0}
+    """
+    return spot_tuner.get_tuned_hyperparameters()
