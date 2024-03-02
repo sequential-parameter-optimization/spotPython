@@ -5837,7 +5837,11 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1785</span>
 <span class="normal">1786</span>
 <span class="normal">1787</span>
-<span class="normal">1788</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">1788</span>
+<span class="normal">1789</span>
+<span class="normal">1790</span>
+<span class="normal">1791</span>
+<span class="normal">1792</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -7116,86 +7120,90 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tuned hyperparameter values from the run.</span>
 <span class="sd">        If `noise == True`, the mean values are returned.</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            fun_control (dict, optional):</span>
+<span class="sd">                fun_control dictionary</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            (dict): dictionary of tuned hyperparameters.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from spotPython.utils.device import getDevice</span>
-<span class="sd">            from math import inf</span>
-<span class="sd">            from spotPython.utils.init import fun_control_init</span>
-<span class="sd">            import numpy as np</span>
-<span class="sd">            from spotPython.hyperparameters.values import set_control_key_value</span>
-<span class="sd">            from spotPython.data.diabetes import Diabetes</span>
-<span class="sd">            MAX_TIME = 1</span>
-<span class="sd">            FUN_EVALS = 10</span>
-<span class="sd">            INIT_SIZE = 5</span>
-<span class="sd">            WORKERS = 0</span>
-<span class="sd">            PREFIX=&quot;037&quot;</span>
-<span class="sd">            DEVICE = getDevice()</span>
-<span class="sd">            DEVICES = 1</span>
-<span class="sd">            TEST_SIZE = 0.4</span>
-<span class="sd">            TORCH_METRIC = &quot;mean_squared_error&quot;</span>
-<span class="sd">            dataset = Diabetes()</span>
-<span class="sd">            fun_control = fun_control_init(</span>
-<span class="sd">                _L_in=10,</span>
-<span class="sd">                _L_out=1,</span>
-<span class="sd">                _torchmetric=TORCH_METRIC,</span>
-<span class="sd">                PREFIX=PREFIX,</span>
-<span class="sd">                TENSORBOARD_CLEAN=True,</span>
-<span class="sd">                data_set=dataset,</span>
-<span class="sd">                device=DEVICE,</span>
-<span class="sd">                enable_progress_bar=False,</span>
-<span class="sd">                fun_evals=FUN_EVALS,</span>
-<span class="sd">                log_level=50,</span>
-<span class="sd">                max_time=MAX_TIME,</span>
-<span class="sd">                num_workers=WORKERS,</span>
-<span class="sd">                show_progress=True,</span>
-<span class="sd">                test_size=TEST_SIZE,</span>
-<span class="sd">                tolerance_x=np.sqrt(np.spacing(1)),</span>
-<span class="sd">                )</span>
-<span class="sd">            from spotPython.light.regression.netlightregression import NetLightRegression</span>
-<span class="sd">            from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
-<span class="sd">            from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
-<span class="sd">            add_core_model_to_fun_control(fun_control=fun_control,</span>
-<span class="sd">                                        core_model=NetLightRegression,</span>
-<span class="sd">                                        hyper_dict=LightHyperDict)</span>
-<span class="sd">            from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;l1&quot;, [7, 8])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;epochs&quot;, [3, 5])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;batch_size&quot;, [4, 5])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;optimizer&quot;, [</span>
-<span class="sd">                            &quot;Adam&quot;,</span>
-<span class="sd">                            &quot;RAdam&quot;,</span>
-<span class="sd">                        ])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;dropout_prob&quot;, [0.01, 0.1])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;lr_mult&quot;, [0.5, 5.0])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;patience&quot;, [2, 3])</span>
-<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;act_fn&quot;,[</span>
-<span class="sd">                            &quot;ReLU&quot;,</span>
-<span class="sd">                            &quot;LeakyReLU&quot;</span>
-<span class="sd">                        ] )</span>
-<span class="sd">            from spotPython.utils.init import design_control_init, surrogate_control_init</span>
-<span class="sd">            design_control = design_control_init(init_size=INIT_SIZE)</span>
-<span class="sd">            surrogate_control = surrogate_control_init(noise=True,</span>
-<span class="sd">                                                        n_theta=2)</span>
-<span class="sd">            from spotPython.fun.hyperlight import HyperLight</span>
-<span class="sd">            fun = HyperLight(log_level=50).fun</span>
-<span class="sd">            from spotPython.spot import spot</span>
-<span class="sd">            spot_tuner = spot.Spot(fun=fun,</span>
-<span class="sd">                                fun_control=fun_control,</span>
-<span class="sd">                                design_control=design_control,</span>
-<span class="sd">                                surrogate_control=surrogate_control)</span>
-<span class="sd">            spot_tuner.run()</span>
-<span class="sd">            spot_tuner.get_tuned_hyperparameters()</span>
-<span class="sd">                {&#39;l1&#39;: 7.0,</span>
-<span class="sd">                &#39;epochs&#39;: 5.0,</span>
-<span class="sd">                &#39;batch_size&#39;: 4.0,</span>
-<span class="sd">                &#39;act_fn&#39;: 0.0,</span>
-<span class="sd">                &#39;optimizer&#39;: 0.0,</span>
-<span class="sd">                &#39;dropout_prob&#39;: 0.01,</span>
-<span class="sd">                &#39;lr_mult&#39;: 5.0,</span>
-<span class="sd">                &#39;patience&#39;: 3.0,</span>
-<span class="sd">                &#39;initialization&#39;: 1.0}</span>
+<span class="sd">            &gt;&gt;&gt; from spotPython.utils.device import getDevice</span>
+<span class="sd">                from math import inf</span>
+<span class="sd">                from spotPython.utils.init import fun_control_init</span>
+<span class="sd">                import numpy as np</span>
+<span class="sd">                from spotPython.hyperparameters.values import set_control_key_value</span>
+<span class="sd">                from spotPython.data.diabetes import Diabetes</span>
+<span class="sd">                MAX_TIME = 1</span>
+<span class="sd">                FUN_EVALS = 10</span>
+<span class="sd">                INIT_SIZE = 5</span>
+<span class="sd">                WORKERS = 0</span>
+<span class="sd">                PREFIX=&quot;037&quot;</span>
+<span class="sd">                DEVICE = getDevice()</span>
+<span class="sd">                DEVICES = 1</span>
+<span class="sd">                TEST_SIZE = 0.4</span>
+<span class="sd">                TORCH_METRIC = &quot;mean_squared_error&quot;</span>
+<span class="sd">                dataset = Diabetes()</span>
+<span class="sd">                fun_control = fun_control_init(</span>
+<span class="sd">                    _L_in=10,</span>
+<span class="sd">                    _L_out=1,</span>
+<span class="sd">                    _torchmetric=TORCH_METRIC,</span>
+<span class="sd">                    PREFIX=PREFIX,</span>
+<span class="sd">                    TENSORBOARD_CLEAN=True,</span>
+<span class="sd">                    data_set=dataset,</span>
+<span class="sd">                    device=DEVICE,</span>
+<span class="sd">                    enable_progress_bar=False,</span>
+<span class="sd">                    fun_evals=FUN_EVALS,</span>
+<span class="sd">                    log_level=50,</span>
+<span class="sd">                    max_time=MAX_TIME,</span>
+<span class="sd">                    num_workers=WORKERS,</span>
+<span class="sd">                    show_progress=True,</span>
+<span class="sd">                    test_size=TEST_SIZE,</span>
+<span class="sd">                    tolerance_x=np.sqrt(np.spacing(1)),</span>
+<span class="sd">                    )</span>
+<span class="sd">                from spotPython.light.regression.netlightregression import NetLightRegression</span>
+<span class="sd">                from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">                from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
+<span class="sd">                add_core_model_to_fun_control(fun_control=fun_control,</span>
+<span class="sd">                                            core_model=NetLightRegression,</span>
+<span class="sd">                                            hyper_dict=LightHyperDict)</span>
+<span class="sd">                from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;l1&quot;, [7, 8])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;epochs&quot;, [3, 5])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;batch_size&quot;, [4, 5])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;optimizer&quot;, [</span>
+<span class="sd">                                &quot;Adam&quot;,</span>
+<span class="sd">                                &quot;RAdam&quot;,</span>
+<span class="sd">                            ])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;dropout_prob&quot;, [0.01, 0.1])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;lr_mult&quot;, [0.5, 5.0])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;patience&quot;, [2, 3])</span>
+<span class="sd">                set_control_hyperparameter_value(fun_control, &quot;act_fn&quot;,[</span>
+<span class="sd">                                &quot;ReLU&quot;,</span>
+<span class="sd">                                &quot;LeakyReLU&quot;</span>
+<span class="sd">                            ] )</span>
+<span class="sd">                from spotPython.utils.init import design_control_init, surrogate_control_init</span>
+<span class="sd">                design_control = design_control_init(init_size=INIT_SIZE)</span>
+<span class="sd">                surrogate_control = surrogate_control_init(noise=True,</span>
+<span class="sd">                                                            n_theta=2)</span>
+<span class="sd">                from spotPython.fun.hyperlight import HyperLight</span>
+<span class="sd">                fun = HyperLight(log_level=50).fun</span>
+<span class="sd">                from spotPython.spot import spot</span>
+<span class="sd">                spot_tuner = spot.Spot(fun=fun,</span>
+<span class="sd">                                    fun_control=fun_control,</span>
+<span class="sd">                                    design_control=design_control,</span>
+<span class="sd">                                    surrogate_control=surrogate_control)</span>
+<span class="sd">                spot_tuner.run()</span>
+<span class="sd">                spot_tuner.get_tuned_hyperparameters()</span>
+<span class="sd">                    {&#39;l1&#39;: 7.0,</span>
+<span class="sd">                    &#39;epochs&#39;: 5.0,</span>
+<span class="sd">                    &#39;batch_size&#39;: 4.0,</span>
+<span class="sd">                    &#39;act_fn&#39;: 0.0,</span>
+<span class="sd">                    &#39;optimizer&#39;: 0.0,</span>
+<span class="sd">                    &#39;dropout_prob&#39;: 0.01,</span>
+<span class="sd">                    &#39;lr_mult&#39;: 5.0,</span>
+<span class="sd">                    &#39;patience&#39;: 3.0,</span>
+<span class="sd">                    &#39;initialization&#39;: 1.0}</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
@@ -7746,11 +7754,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1433</span>
-<span class="normal">1434</span>
-<span class="normal">1435</span>
-<span class="normal">1436</span>
-<span class="normal">1437</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1437</span>
 <span class="normal">1438</span>
 <span class="normal">1439</span>
 <span class="normal">1440</span>
@@ -7792,7 +7796,11 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">1476</span>
 <span class="normal">1477</span>
 <span class="normal">1478</span>
-<span class="normal">1479</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1479</span>
+<span class="normal">1480</span>
+<span class="normal">1481</span>
+<span class="normal">1482</span>
+<span class="normal">1483</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.</span>
 
@@ -8105,11 +8113,7 @@ other surrogate models can be used as well.</li>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1642</span>
-<span class="normal">1643</span>
-<span class="normal">1644</span>
-<span class="normal">1645</span>
-<span class="normal">1646</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1646</span>
 <span class="normal">1647</span>
 <span class="normal">1648</span>
 <span class="normal">1649</span>
@@ -8124,7 +8128,11 @@ other surrogate models can be used as well.</li>
 <span class="normal">1658</span>
 <span class="normal">1659</span>
 <span class="normal">1660</span>
-<span class="normal">1661</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1661</span>
+<span class="normal">1662</span>
+<span class="normal">1663</span>
+<span class="normal">1664</span>
+<span class="normal">1665</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Returns:</span>
@@ -8725,6 +8733,36 @@ If <code>noise == True</code>, the mean values are returned.</p>
 
 
 
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>fun_control</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>fun_control dictionary</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
   <p><strong>Returns:</strong></p>
   <table>
     <thead>
@@ -8750,89 +8788,83 @@ If <code>noise == True</code>, the mean values are returned.</p>
 
 
 <p><strong>Examples:</strong></p>
-    
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>from spotPython.utils.device import getDevice
-    from math import inf
-    from spotPython.utils.init import fun_control_init
-    import numpy as np
-    from spotPython.hyperparameters.values import set_control_key_value
-    from spotPython.data.diabetes import Diabetes
-    MAX_TIME = 1
-    FUN_EVALS = 10
-    INIT_SIZE = 5
-    WORKERS = 0
-    PREFIX=&rdquo;037&rdquo;
-    DEVICE = getDevice()
-    DEVICES = 1
-    TEST_SIZE = 0.4
-    TORCH_METRIC = &ldquo;mean_squared_error&rdquo;
-    dataset = Diabetes()
-    fun_control = fun_control_init(
-        _L_in=10,
-        _L_out=1,
-        _torchmetric=TORCH_METRIC,
-        PREFIX=PREFIX,
-        TENSORBOARD_CLEAN=True,
-        data_set=dataset,
-        device=DEVICE,
-        enable_progress_bar=False,
-        fun_evals=FUN_EVALS,
-        log_level=50,
-        max_time=MAX_TIME,
-        num_workers=WORKERS,
-        show_progress=True,
-        test_size=TEST_SIZE,
-        tolerance_x=np.sqrt(np.spacing(1)),
-        )
-    from spotPython.light.regression.netlightregression import NetLightRegression
-    from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-    from spotPython.hyperparameters.values import add_core_model_to_fun_control
-    add_core_model_to_fun_control(fun_control=fun_control,
-                                core_model=NetLightRegression,
-                                hyper_dict=LightHyperDict)
-    from spotPython.hyperparameters.values import set_control_hyperparameter_value
-    set_control_hyperparameter_value(fun_control, &ldquo;l1&rdquo;, [7, 8])
-    set_control_hyperparameter_value(fun_control, &ldquo;epochs&rdquo;, [3, 5])
-    set_control_hyperparameter_value(fun_control, &ldquo;batch_size&rdquo;, [4, 5])
-    set_control_hyperparameter_value(fun_control, &ldquo;optimizer&rdquo;, [
-                    &ldquo;Adam&rdquo;,
-                    &ldquo;RAdam&rdquo;,
-                ])
-    set_control_hyperparameter_value(fun_control, &ldquo;dropout_prob&rdquo;, [0.01, 0.1])
-    set_control_hyperparameter_value(fun_control, &ldquo;lr_mult&rdquo;, [0.5, 5.0])
-    set_control_hyperparameter_value(fun_control, &ldquo;patience&rdquo;, [2, 3])
-    set_control_hyperparameter_value(fun_control, &ldquo;act_fn&rdquo;,[
-                    &ldquo;ReLU&rdquo;,
-                    &ldquo;LeakyReLU&rdquo;
-                ] )
-    from spotPython.utils.init import design_control_init, surrogate_control_init
-    design_control = design_control_init(init_size=INIT_SIZE)
-    surrogate_control = surrogate_control_init(noise=True,
-                                                n_theta=2)
-    from spotPython.fun.hyperlight import HyperLight
-    fun = HyperLight(log_level=50).fun
-    from spotPython.spot import spot
-    spot_tuner = spot.Spot(fun=fun,
-                        fun_control=fun_control,
-                        design_control=design_control,
-                        surrogate_control=surrogate_control)
-    spot_tuner.run()
-    spot_tuner.get_tuned_hyperparameters()
-        {&lsquo;l1&rsquo;: 7.0,
-        &lsquo;epochs&rsquo;: 5.0,
-        &lsquo;batch_size&rsquo;: 4.0,
-        &lsquo;act_fn&rsquo;: 0.0,
-        &lsquo;optimizer&rsquo;: 0.0,
-        &lsquo;dropout_prob&rsquo;: 0.01,
-        &lsquo;lr_mult&rsquo;: 5.0,
-        &lsquo;patience&rsquo;: 3.0,
-        &lsquo;initialization&rsquo;: 1.0}</p>
-</blockquote>
-</blockquote>
-</blockquote>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.device</span> <span class="kn">import</span> <span class="n">getDevice</span>
+<span class="go">    from math import inf</span>
+<span class="go">    from spotPython.utils.init import fun_control_init</span>
+<span class="go">    import numpy as np</span>
+<span class="go">    from spotPython.hyperparameters.values import set_control_key_value</span>
+<span class="go">    from spotPython.data.diabetes import Diabetes</span>
+<span class="go">    MAX_TIME = 1</span>
+<span class="go">    FUN_EVALS = 10</span>
+<span class="go">    INIT_SIZE = 5</span>
+<span class="go">    WORKERS = 0</span>
+<span class="go">    PREFIX=&quot;037&quot;</span>
+<span class="go">    DEVICE = getDevice()</span>
+<span class="go">    DEVICES = 1</span>
+<span class="go">    TEST_SIZE = 0.4</span>
+<span class="go">    TORCH_METRIC = &quot;mean_squared_error&quot;</span>
+<span class="go">    dataset = Diabetes()</span>
+<span class="go">    fun_control = fun_control_init(</span>
+<span class="go">        _L_in=10,</span>
+<span class="go">        _L_out=1,</span>
+<span class="go">        _torchmetric=TORCH_METRIC,</span>
+<span class="go">        PREFIX=PREFIX,</span>
+<span class="go">        TENSORBOARD_CLEAN=True,</span>
+<span class="go">        data_set=dataset,</span>
+<span class="go">        device=DEVICE,</span>
+<span class="go">        enable_progress_bar=False,</span>
+<span class="go">        fun_evals=FUN_EVALS,</span>
+<span class="go">        log_level=50,</span>
+<span class="go">        max_time=MAX_TIME,</span>
+<span class="go">        num_workers=WORKERS,</span>
+<span class="go">        show_progress=True,</span>
+<span class="go">        test_size=TEST_SIZE,</span>
+<span class="go">        tolerance_x=np.sqrt(np.spacing(1)),</span>
+<span class="go">        )</span>
+<span class="go">    from spotPython.light.regression.netlightregression import NetLightRegression</span>
+<span class="go">    from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="go">    from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
+<span class="go">    add_core_model_to_fun_control(fun_control=fun_control,</span>
+<span class="go">                                core_model=NetLightRegression,</span>
+<span class="go">                                hyper_dict=LightHyperDict)</span>
+<span class="go">    from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;l1&quot;, [7, 8])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;epochs&quot;, [3, 5])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;batch_size&quot;, [4, 5])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;optimizer&quot;, [</span>
+<span class="go">                    &quot;Adam&quot;,</span>
+<span class="go">                    &quot;RAdam&quot;,</span>
+<span class="go">                ])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;dropout_prob&quot;, [0.01, 0.1])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;lr_mult&quot;, [0.5, 5.0])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;patience&quot;, [2, 3])</span>
+<span class="go">    set_control_hyperparameter_value(fun_control, &quot;act_fn&quot;,[</span>
+<span class="go">                    &quot;ReLU&quot;,</span>
+<span class="go">                    &quot;LeakyReLU&quot;</span>
+<span class="go">                ] )</span>
+<span class="go">    from spotPython.utils.init import design_control_init, surrogate_control_init</span>
+<span class="go">    design_control = design_control_init(init_size=INIT_SIZE)</span>
+<span class="go">    surrogate_control = surrogate_control_init(noise=True,</span>
+<span class="go">                                                n_theta=2)</span>
+<span class="go">    from spotPython.fun.hyperlight import HyperLight</span>
+<span class="go">    fun = HyperLight(log_level=50).fun</span>
+<span class="go">    from spotPython.spot import spot</span>
+<span class="go">    spot_tuner = spot.Spot(fun=fun,</span>
+<span class="go">                        fun_control=fun_control,</span>
+<span class="go">                        design_control=design_control,</span>
+<span class="go">                        surrogate_control=surrogate_control)</span>
+<span class="go">    spot_tuner.run()</span>
+<span class="go">    spot_tuner.get_tuned_hyperparameters()</span>
+<span class="go">        {&#39;l1&#39;: 7.0,</span>
+<span class="go">        &#39;epochs&#39;: 5.0,</span>
+<span class="go">        &#39;batch_size&#39;: 4.0,</span>
+<span class="go">        &#39;act_fn&#39;: 0.0,</span>
+<span class="go">        &#39;optimizer&#39;: 0.0,</span>
+<span class="go">        &#39;dropout_prob&#39;: 0.01,</span>
+<span class="go">        &#39;lr_mult&#39;: 5.0,</span>
+<span class="go">        &#39;patience&#39;: 3.0,</span>
+<span class="go">        &#39;initialization&#39;: 1.0}</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
@@ -8942,90 +8974,98 @@ If <code>noise == True</code>, the mean values are returned.</p>
 <span class="normal">1428</span>
 <span class="normal">1429</span>
 <span class="normal">1430</span>
-<span class="normal">1431</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">1431</span>
+<span class="normal">1432</span>
+<span class="normal">1433</span>
+<span class="normal">1434</span>
+<span class="normal">1435</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the tuned hyperparameter values from the run.</span>
 <span class="sd">    If `noise == True`, the mean values are returned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fun_control (dict, optional):</span>
+<span class="sd">            fun_control dictionary</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (dict): dictionary of tuned hyperparameters.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; from spotPython.utils.device import getDevice</span>
-<span class="sd">        from math import inf</span>
-<span class="sd">        from spotPython.utils.init import fun_control_init</span>
-<span class="sd">        import numpy as np</span>
-<span class="sd">        from spotPython.hyperparameters.values import set_control_key_value</span>
-<span class="sd">        from spotPython.data.diabetes import Diabetes</span>
-<span class="sd">        MAX_TIME = 1</span>
-<span class="sd">        FUN_EVALS = 10</span>
-<span class="sd">        INIT_SIZE = 5</span>
-<span class="sd">        WORKERS = 0</span>
-<span class="sd">        PREFIX=&quot;037&quot;</span>
-<span class="sd">        DEVICE = getDevice()</span>
-<span class="sd">        DEVICES = 1</span>
-<span class="sd">        TEST_SIZE = 0.4</span>
-<span class="sd">        TORCH_METRIC = &quot;mean_squared_error&quot;</span>
-<span class="sd">        dataset = Diabetes()</span>
-<span class="sd">        fun_control = fun_control_init(</span>
-<span class="sd">            _L_in=10,</span>
-<span class="sd">            _L_out=1,</span>
-<span class="sd">            _torchmetric=TORCH_METRIC,</span>
-<span class="sd">            PREFIX=PREFIX,</span>
-<span class="sd">            TENSORBOARD_CLEAN=True,</span>
-<span class="sd">            data_set=dataset,</span>
-<span class="sd">            device=DEVICE,</span>
-<span class="sd">            enable_progress_bar=False,</span>
-<span class="sd">            fun_evals=FUN_EVALS,</span>
-<span class="sd">            log_level=50,</span>
-<span class="sd">            max_time=MAX_TIME,</span>
-<span class="sd">            num_workers=WORKERS,</span>
-<span class="sd">            show_progress=True,</span>
-<span class="sd">            test_size=TEST_SIZE,</span>
-<span class="sd">            tolerance_x=np.sqrt(np.spacing(1)),</span>
-<span class="sd">            )</span>
-<span class="sd">        from spotPython.light.regression.netlightregression import NetLightRegression</span>
-<span class="sd">        from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
-<span class="sd">        from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
-<span class="sd">        add_core_model_to_fun_control(fun_control=fun_control,</span>
-<span class="sd">                                    core_model=NetLightRegression,</span>
-<span class="sd">                                    hyper_dict=LightHyperDict)</span>
-<span class="sd">        from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;l1&quot;, [7, 8])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;epochs&quot;, [3, 5])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;batch_size&quot;, [4, 5])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;optimizer&quot;, [</span>
-<span class="sd">                        &quot;Adam&quot;,</span>
-<span class="sd">                        &quot;RAdam&quot;,</span>
-<span class="sd">                    ])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;dropout_prob&quot;, [0.01, 0.1])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;lr_mult&quot;, [0.5, 5.0])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;patience&quot;, [2, 3])</span>
-<span class="sd">        set_control_hyperparameter_value(fun_control, &quot;act_fn&quot;,[</span>
-<span class="sd">                        &quot;ReLU&quot;,</span>
-<span class="sd">                        &quot;LeakyReLU&quot;</span>
-<span class="sd">                    ] )</span>
-<span class="sd">        from spotPython.utils.init import design_control_init, surrogate_control_init</span>
-<span class="sd">        design_control = design_control_init(init_size=INIT_SIZE)</span>
-<span class="sd">        surrogate_control = surrogate_control_init(noise=True,</span>
-<span class="sd">                                                    n_theta=2)</span>
-<span class="sd">        from spotPython.fun.hyperlight import HyperLight</span>
-<span class="sd">        fun = HyperLight(log_level=50).fun</span>
-<span class="sd">        from spotPython.spot import spot</span>
-<span class="sd">        spot_tuner = spot.Spot(fun=fun,</span>
-<span class="sd">                            fun_control=fun_control,</span>
-<span class="sd">                            design_control=design_control,</span>
-<span class="sd">                            surrogate_control=surrogate_control)</span>
-<span class="sd">        spot_tuner.run()</span>
-<span class="sd">        spot_tuner.get_tuned_hyperparameters()</span>
-<span class="sd">            {&#39;l1&#39;: 7.0,</span>
-<span class="sd">            &#39;epochs&#39;: 5.0,</span>
-<span class="sd">            &#39;batch_size&#39;: 4.0,</span>
-<span class="sd">            &#39;act_fn&#39;: 0.0,</span>
-<span class="sd">            &#39;optimizer&#39;: 0.0,</span>
-<span class="sd">            &#39;dropout_prob&#39;: 0.01,</span>
-<span class="sd">            &#39;lr_mult&#39;: 5.0,</span>
-<span class="sd">            &#39;patience&#39;: 3.0,</span>
-<span class="sd">            &#39;initialization&#39;: 1.0}</span>
+<span class="sd">        &gt;&gt;&gt; from spotPython.utils.device import getDevice</span>
+<span class="sd">            from math import inf</span>
+<span class="sd">            from spotPython.utils.init import fun_control_init</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_control_key_value</span>
+<span class="sd">            from spotPython.data.diabetes import Diabetes</span>
+<span class="sd">            MAX_TIME = 1</span>
+<span class="sd">            FUN_EVALS = 10</span>
+<span class="sd">            INIT_SIZE = 5</span>
+<span class="sd">            WORKERS = 0</span>
+<span class="sd">            PREFIX=&quot;037&quot;</span>
+<span class="sd">            DEVICE = getDevice()</span>
+<span class="sd">            DEVICES = 1</span>
+<span class="sd">            TEST_SIZE = 0.4</span>
+<span class="sd">            TORCH_METRIC = &quot;mean_squared_error&quot;</span>
+<span class="sd">            dataset = Diabetes()</span>
+<span class="sd">            fun_control = fun_control_init(</span>
+<span class="sd">                _L_in=10,</span>
+<span class="sd">                _L_out=1,</span>
+<span class="sd">                _torchmetric=TORCH_METRIC,</span>
+<span class="sd">                PREFIX=PREFIX,</span>
+<span class="sd">                TENSORBOARD_CLEAN=True,</span>
+<span class="sd">                data_set=dataset,</span>
+<span class="sd">                device=DEVICE,</span>
+<span class="sd">                enable_progress_bar=False,</span>
+<span class="sd">                fun_evals=FUN_EVALS,</span>
+<span class="sd">                log_level=50,</span>
+<span class="sd">                max_time=MAX_TIME,</span>
+<span class="sd">                num_workers=WORKERS,</span>
+<span class="sd">                show_progress=True,</span>
+<span class="sd">                test_size=TEST_SIZE,</span>
+<span class="sd">                tolerance_x=np.sqrt(np.spacing(1)),</span>
+<span class="sd">                )</span>
+<span class="sd">            from spotPython.light.regression.netlightregression import NetLightRegression</span>
+<span class="sd">            from spotPython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">            from spotPython.hyperparameters.values import add_core_model_to_fun_control</span>
+<span class="sd">            add_core_model_to_fun_control(fun_control=fun_control,</span>
+<span class="sd">                                        core_model=NetLightRegression,</span>
+<span class="sd">                                        hyper_dict=LightHyperDict)</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;l1&quot;, [7, 8])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;epochs&quot;, [3, 5])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;batch_size&quot;, [4, 5])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;optimizer&quot;, [</span>
+<span class="sd">                            &quot;Adam&quot;,</span>
+<span class="sd">                            &quot;RAdam&quot;,</span>
+<span class="sd">                        ])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;dropout_prob&quot;, [0.01, 0.1])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;lr_mult&quot;, [0.5, 5.0])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;patience&quot;, [2, 3])</span>
+<span class="sd">            set_control_hyperparameter_value(fun_control, &quot;act_fn&quot;,[</span>
+<span class="sd">                            &quot;ReLU&quot;,</span>
+<span class="sd">                            &quot;LeakyReLU&quot;</span>
+<span class="sd">                        ] )</span>
+<span class="sd">            from spotPython.utils.init import design_control_init, surrogate_control_init</span>
+<span class="sd">            design_control = design_control_init(init_size=INIT_SIZE)</span>
+<span class="sd">            surrogate_control = surrogate_control_init(noise=True,</span>
+<span class="sd">                                                        n_theta=2)</span>
+<span class="sd">            from spotPython.fun.hyperlight import HyperLight</span>
+<span class="sd">            fun = HyperLight(log_level=50).fun</span>
+<span class="sd">            from spotPython.spot import spot</span>
+<span class="sd">            spot_tuner = spot.Spot(fun=fun,</span>
+<span class="sd">                                fun_control=fun_control,</span>
+<span class="sd">                                design_control=design_control,</span>
+<span class="sd">                                surrogate_control=surrogate_control)</span>
+<span class="sd">            spot_tuner.run()</span>
+<span class="sd">            spot_tuner.get_tuned_hyperparameters()</span>
+<span class="sd">                {&#39;l1&#39;: 7.0,</span>
+<span class="sd">                &#39;epochs&#39;: 5.0,</span>
+<span class="sd">                &#39;batch_size&#39;: 4.0,</span>
+<span class="sd">                &#39;act_fn&#39;: 0.0,</span>
+<span class="sd">                &#39;optimizer&#39;: 0.0,</span>
+<span class="sd">                &#39;dropout_prob&#39;: 0.01,</span>
+<span class="sd">                &#39;lr_mult&#39;: 5.0,</span>
+<span class="sd">                &#39;patience&#39;: 3.0,</span>
+<span class="sd">                &#39;initialization&#39;: 1.0}</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
@@ -9647,11 +9687,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1730</span>
-<span class="normal">1731</span>
-<span class="normal">1732</span>
-<span class="normal">1733</span>
-<span class="normal">1734</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1734</span>
 <span class="normal">1735</span>
 <span class="normal">1736</span>
 <span class="normal">1737</span>
@@ -9705,7 +9741,11 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="normal">1785</span>
 <span class="normal">1786</span>
 <span class="normal">1787</span>
-<span class="normal">1788</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="normal">1788</span>
+<span class="normal">1789</span>
+<span class="normal">1790</span>
+<span class="normal">1791</span>
+<span class="normal">1792</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallel plot.</span>
 
@@ -9983,11 +10023,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1481</span>
-<span class="normal">1482</span>
-<span class="normal">1483</span>
-<span class="normal">1484</span>
-<span class="normal">1485</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1485</span>
 <span class="normal">1486</span>
 <span class="normal">1487</span>
 <span class="normal">1488</span>
@@ -10075,7 +10111,11 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="normal">1570</span>
 <span class="normal">1571</span>
 <span class="normal">1572</span>
-<span class="normal">1573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
+<span class="normal">1573</span>
+<span class="normal">1574</span>
+<span class="normal">1575</span>
+<span class="normal">1576</span>
+<span class="normal">1577</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the contour of any dimension.</span>
@@ -10287,11 +10327,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1698</span>
-<span class="normal">1699</span>
-<span class="normal">1700</span>
-<span class="normal">1701</span>
-<span class="normal">1702</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1702</span>
 <span class="normal">1703</span>
 <span class="normal">1704</span>
 <span class="normal">1705</span>
@@ -10317,7 +10353,11 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
 <span class="normal">1725</span>
 <span class="normal">1726</span>
 <span class="normal">1727</span>
-<span class="normal">1728</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1728</span>
+<span class="normal">1729</span>
+<span class="normal">1730</span>
+<span class="normal">1731</span>
+<span class="normal">1732</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the importance of each variable.</span>
 
 <span class="sd">    Args:</span>
@@ -10500,11 +10540,7 @@ than <code>max_imp</code>, only the max_imp important ones are selected.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1575</span>
-<span class="normal">1576</span>
-<span class="normal">1577</span>
-<span class="normal">1578</span>
-<span class="normal">1579</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1579</span>
 <span class="normal">1580</span>
 <span class="normal">1581</span>
 <span class="normal">1582</span>
@@ -10565,7 +10601,11 @@ than <code>max_imp</code>, only the max_imp important ones are selected.</p>
 <span class="normal">1637</span>
 <span class="normal">1638</span>
 <span class="normal">1639</span>
-<span class="normal">1640</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1640</span>
+<span class="normal">1641</span>
+<span class="normal">1642</span>
+<span class="normal">1643</span>
+<span class="normal">1644</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the contour of important hyperparameters.</span>
 <span class="sd">    Calls `plot_contour` for each pair of important hyperparameters.</span>
@@ -11334,11 +11374,7 @@ and the subsequent points as red dots connected by a line.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1663</span>
-<span class="normal">1664</span>
-<span class="normal">1665</span>
-<span class="normal">1666</span>
-<span class="normal">1667</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1667</span>
 <span class="normal">1668</span>
 <span class="normal">1669</span>
 <span class="normal">1670</span>
@@ -11367,7 +11403,11 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">1693</span>
 <span class="normal">1694</span>
 <span class="normal">1695</span>
-<span class="normal">1696</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">1696</span>
+<span class="normal">1697</span>
+<span class="normal">1698</span>
+<span class="normal">1699</span>
+<span class="normal">1700</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Args:</span>
