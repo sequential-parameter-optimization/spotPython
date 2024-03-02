@@ -2097,6 +2097,18 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2134,6 +2146,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../transformer/attention/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    attention
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/encoder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    encoder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/encoderblock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    encoderblock
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/multiheadattention/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    multiheadattention
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../transformer/positionalEncoding/" class="md-nav__link">
         
   
@@ -2155,11 +2251,53 @@
   
   
     <li class="md-nav__item">
+      <a href="../transformer/positionalEncodingBasic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    positionalEncodingBasic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../transformer/skiplinear/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     skiplinear
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer/transformerlightpredictor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    transformerlightpredictor
   </span>
   
 
@@ -2470,6 +2608,8 @@
       
         
       
+        
+      
     
     
     
@@ -2512,6 +2652,27 @@
   
   <span class="md-ellipsis">
     activation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../torch/cosinewarmupcheduler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cosinewarmupcheduler
   </span>
   
 
@@ -3393,7 +3554,8 @@
 <span class="go">    import spotPython.light.testmodel as tm</span>
 <span class="go">    fun_control = fun_control_init(</span>
 <span class="go">        _L_in=10,</span>
-<span class="go">        _L_out=1,)</span>
+<span class="go">        _L_out=1,</span>
+<span class="go">        _torchmetric=&quot;mean_squared_error&quot;)</span>
 <span class="go">    dataset = Diabetes()</span>
 <span class="go">    set_control_key_value(control_dict=fun_control,</span>
 <span class="go">                            key=&quot;data_set&quot;,</span>
@@ -3508,7 +3670,9 @@
 <span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
-<span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tests a model using the given configuration and function control parameters.</span>
 
@@ -3538,7 +3702,8 @@
 <span class="sd">            import spotPython.light.testmodel as tm</span>
 <span class="sd">            fun_control = fun_control_init(</span>
 <span class="sd">                _L_in=10,</span>
-<span class="sd">                _L_out=1,)</span>
+<span class="sd">                _L_out=1,</span>
+<span class="sd">                _torchmetric=&quot;mean_squared_error&quot;)</span>
 <span class="sd">            dataset = Diabetes()</span>
 <span class="sd">            set_control_key_value(control_dict=fun_control,</span>
 <span class="sd">                                    key=&quot;data_set&quot;,</span>
@@ -3553,6 +3718,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_L_in</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">]</span>
     <span class="n">_L_out</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_out&quot;</span><span class="p">]</span>
+    <span class="n">_torchmetric</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_torchmetric&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;enable_progress_bar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
@@ -3571,7 +3737,7 @@
     <span class="p">)</span>
     <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
     <span class="c1"># Init model from datamodule&#39;s attributes</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
     <span class="n">initialization</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;initialization&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Xavier&quot;</span><span class="p">:</span>
         <span class="n">xavier_init</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>

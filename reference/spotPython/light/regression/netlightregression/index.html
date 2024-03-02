@@ -2168,6 +2168,18 @@
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
@@ -2205,6 +2217,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../transformer/attention/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    attention
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transformer/encoder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    encoder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transformer/encoderblock/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    encoderblock
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transformer/multiheadattention/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    multiheadattention
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../transformer/positionalEncoding/" class="md-nav__link">
         
   
@@ -2226,11 +2322,53 @@
   
   
     <li class="md-nav__item">
+      <a href="../../transformer/positionalEncodingBasic/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    positionalEncodingBasic
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../transformer/skiplinear/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     skiplinear
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../transformer/transformerlightpredictor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    transformerlightpredictor
   </span>
   
 
@@ -2541,6 +2679,8 @@
       
         
       
+        
+      
     
     
     
@@ -2583,6 +2723,27 @@
   
   <span class="md-ellipsis">
     activation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../torch/cosinewarmupcheduler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    cosinewarmupcheduler
   </span>
   
 
@@ -3441,7 +3602,7 @@
             Bases: <code><span title="lightning.LightningModule">LightningModule</span></code></p>
 
   
-      <p>A LightningModule class for a regresssion neural network model.</p>
+      <p>A LightningModule class for a regression neural network model.</p>
 
 
 
@@ -3577,6 +3738,18 @@
           </td>
         </tr>
         <tr>
+          <td><code><span title="spotPython.light.regression.netlightregression.NetLightRegression._torchmetric">_torchmetric</span></code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The metric to use for the loss function. If <code>None</code>,
+then &ldquo;mean_squared_error&rdquo; is used.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
           <td><code><span title="spotPython.light.regression.netlightregression.NetLightRegression.layers">layers</span></code></td>
           <td>
                 <code><span title="torch.nn.Sequential">Sequential</span></code>
@@ -3650,8 +3823,7 @@
 
             <details class="quote">
               <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  8</span>
-<span class="normal">  9</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  9</span>
 <span class="normal"> 10</span>
 <span class="normal"> 11</span>
 <span class="normal"> 12</span>
@@ -3932,9 +4104,24 @@
 <span class="normal">287</span>
 <span class="normal">288</span>
 <span class="normal">289</span>
-<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">NetLightRegression</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A LightningModule class for a regresssion neural network model.</span>
+<span class="sd">    A LightningModule class for a regression neural network model.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        l1 (int):</span>
@@ -3959,6 +4146,9 @@
 <span class="sd">            The number of input features.</span>
 <span class="sd">        _L_out (int):</span>
 <span class="sd">            The number of output classes.</span>
+<span class="sd">        _torchmetric (str):</span>
+<span class="sd">            The metric to use for the loss function. If `None`,</span>
+<span class="sd">            then &quot;mean_squared_error&quot; is used.</span>
 <span class="sd">        layers (nn.Sequential):</span>
 <span class="sd">            The neural network model.</span>
 
@@ -4031,6 +4221,7 @@
         <span class="n">patience</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">_L_in</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">_L_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">_torchmetric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes the NetLightRegression object.</span>
@@ -4047,6 +4238,9 @@
 <span class="sd">            patience (int): The number of epochs to wait before early stopping.</span>
 <span class="sd">            _L_in (int): The number of input features. Not a hyperparameter, but needed to create the network.</span>
 <span class="sd">            _L_out (int): The number of output classes. Not a hyperparameter, but needed to create the network.</span>
+<span class="sd">        _torchmetric (str):</span>
+<span class="sd">            The metric to use for the loss function. If `None`,</span>
+<span class="sd">            then &quot;mean_squared_error&quot; is used.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (NoneType): None</span>
@@ -4063,8 +4257,13 @@
         <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_L_in</span> <span class="o">=</span> <span class="n">_L_in</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_L_out</span> <span class="o">=</span> <span class="n">_L_out</span>
+        <span class="k">if</span> <span class="n">_torchmetric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_torchmetric</span> <span class="o">=</span> <span class="s2">&quot;mean_squared_error&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_torchmetric</span> <span class="o">=</span> <span class="n">_torchmetric</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torchmetrics</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">regression</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="p">)</span>
         <span class="c1"># _L_in and _L_out are not hyperparameters, but are needed to create the network</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">,</span> <span class="s2">&quot;_L_out&quot;</span><span class="p">])</span>
+        <span class="c1"># _torchmetric is not a hyperparameter, but is needed to calculate the loss</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">,</span> <span class="s2">&quot;_L_out&quot;</span><span class="p">,</span> <span class="s2">&quot;_torchmetric&quot;</span><span class="p">])</span>
         <span class="c1"># set dummy input array for Tensorboard Graphs</span>
         <span class="c1"># set log_graph=True in Trainer to see the graph (in traintest.py)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">example_input_array</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L_in</span><span class="p">))</span>
@@ -4116,7 +4315,9 @@
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">val_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="c1"># val_loss = F.mse_loss(y_hat, y)</span>
+        <span class="n">metric</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torchmetrics</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">regression</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_torchmetric</span><span class="p">)</span>
+        <span class="n">val_loss</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         <span class="c1"># mae_loss = F.l1_loss(y_hat, y)</span>
         <span class="c1"># self.log(&quot;train_loss&quot;, val_loss, on_step=True, on_epoch=True, prog_bar=True)</span>
         <span class="c1"># self.log(&quot;train_mae_loss&quot;, mae_loss, on_step=True, on_epoch=True, prog_bar=True)</span>
@@ -4236,7 +4437,7 @@
 
 
 <h3 id="spotPython.light.regression.netlightregression.NetLightRegression.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">initialization</span><span class="p">,</span> <span class="n">act_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">dropout_prob</span><span class="p">,</span> <span class="n">lr_mult</span><span class="p">,</span> <span class="n">patience</span><span class="p">,</span> <span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">initialization</span><span class="p">,</span> <span class="n">act_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">dropout_prob</span><span class="p">,</span> <span class="n">lr_mult</span><span class="p">,</span> <span class="n">patience</span><span class="p">,</span> <span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="p">)</span></code>
 
 <a href="#spotPython.light.regression.netlightregression.NetLightRegression.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -4414,6 +4615,9 @@
         </tr>
     </tbody>
   </table>
+      <p>_torchmetric (str):
+    The metric to use for the loss function. If <code>None</code>,
+    then &ldquo;mean_squared_error&rdquo; is used.</p>
 
 
 
@@ -4465,11 +4669,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
@@ -4533,7 +4733,20 @@
 <span class="normal">159</span>
 <span class="normal">160</span>
 <span class="normal">161</span>
-<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">l1</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -4546,6 +4759,7 @@
     <span class="n">patience</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">_L_in</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">_L_out</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">_torchmetric</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initializes the NetLightRegression object.</span>
@@ -4562,6 +4776,9 @@
 <span class="sd">        patience (int): The number of epochs to wait before early stopping.</span>
 <span class="sd">        _L_in (int): The number of input features. Not a hyperparameter, but needed to create the network.</span>
 <span class="sd">        _L_out (int): The number of output classes. Not a hyperparameter, but needed to create the network.</span>
+<span class="sd">    _torchmetric (str):</span>
+<span class="sd">        The metric to use for the loss function. If `None`,</span>
+<span class="sd">        then &quot;mean_squared_error&quot; is used.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (NoneType): None</span>
@@ -4578,8 +4795,13 @@
     <span class="c1">#</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_L_in</span> <span class="o">=</span> <span class="n">_L_in</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_L_out</span> <span class="o">=</span> <span class="n">_L_out</span>
+    <span class="k">if</span> <span class="n">_torchmetric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_torchmetric</span> <span class="o">=</span> <span class="s2">&quot;mean_squared_error&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_torchmetric</span> <span class="o">=</span> <span class="n">_torchmetric</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torchmetrics</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">regression</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="p">)</span>
     <span class="c1"># _L_in and _L_out are not hyperparameters, but are needed to create the network</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">,</span> <span class="s2">&quot;_L_out&quot;</span><span class="p">])</span>
+    <span class="c1"># _torchmetric is not a hyperparameter, but is needed to calculate the loss</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">,</span> <span class="s2">&quot;_L_out&quot;</span><span class="p">,</span> <span class="s2">&quot;_torchmetric&quot;</span><span class="p">])</span>
     <span class="c1"># set dummy input array for Tensorboard Graphs</span>
     <span class="c1"># set log_graph=True in Trainer to see the graph (in traintest.py)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">example_input_array</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L_in</span><span class="p">))</span>
@@ -4657,26 +4879,26 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">286</span>
 <span class="normal">287</span>
 <span class="normal">288</span>
 <span class="normal">289</span>
-<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configures the optimizer for the model.</span>
 
@@ -4773,19 +4995,19 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a forward pass through the model.</span>
 
@@ -4903,22 +5125,7 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
@@ -4930,7 +5137,22 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 <span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
-<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single prediction step.</span>
 
@@ -5063,26 +5285,26 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span>
-<span class="normal">240</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single test step.</span>
 
@@ -5179,25 +5401,27 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
-<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single training step.</span>
 
@@ -5211,7 +5435,9 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">val_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="c1"># val_loss = F.mse_loss(y_hat, y)</span>
+    <span class="n">metric</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torchmetrics</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">regression</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_torchmetric</span><span class="p">)</span>
+    <span class="n">val_loss</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="c1"># mae_loss = F.l1_loss(y_hat, y)</span>
     <span class="c1"># self.log(&quot;train_loss&quot;, val_loss, on_step=True, on_epoch=True, prog_bar=True)</span>
     <span class="c1"># self.log(&quot;train_mae_loss&quot;, mae_loss, on_step=True, on_epoch=True, prog_bar=True)</span>
@@ -5321,28 +5547,28 @@ well as other hyperparameters. See <code>spotPython.hyperparameters.optimizer.py
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/regression/netlightregression.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
-<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prog_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs a single validation step.</span>
 
