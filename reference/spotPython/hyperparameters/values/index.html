@@ -2179,8 +2179,6 @@
       
         
       
-        
-      
     
     
     
@@ -2223,27 +2221,6 @@
   
   <span class="md-ellipsis">
     netlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/netlightregression2/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    netlightregression2
   </span>
   
 
@@ -7524,7 +7501,7 @@ otherwise it returns the architecture with the lowest value (.min_X).</p>
 
 
 <h2 id="spotPython.hyperparameters.values.get_tuned_hyperparameters" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#spotPython.hyperparameters.values.get_tuned_hyperparameters" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -7559,6 +7536,21 @@ This is just a wrapper function for the spot <code>get_tuned_hyperparameters</co
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>fun_control</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dictionary containing control parameters for the hyperparameter tuning.
+Optional. Default is None.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
           </td>
         </tr>
     </tbody>
@@ -7764,7 +7756,10 @@ This is just a wrapper function for the spot <code>get_tuned_hyperparameters</co
 <span class="normal">1272</span>
 <span class="normal">1273</span>
 <span class="normal">1274</span>
-<span class="normal">1275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">):</span>
+<span class="normal">1275</span>
+<span class="normal">1276</span>
+<span class="normal">1277</span>
+<span class="normal">1278</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the tuned hyperparameters from the spot tuner.</span>
 <span class="sd">    This is just a wrapper function for the spot `get_tuned_hyperparameters` method.</span>
@@ -7772,6 +7767,9 @@ This is just a wrapper function for the spot <code>get_tuned_hyperparameters</co
 <span class="sd">    Args:</span>
 <span class="sd">        spot_tuner (object):</span>
 <span class="sd">            spot tuner object.</span>
+<span class="sd">        fun_control (dict):</span>
+<span class="sd">            dictionary containing control parameters for the hyperparameter tuning.</span>
+<span class="sd">            Optional. Default is None.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (dict):</span>
@@ -7856,7 +7854,7 @@ This is just a wrapper function for the spot <code>get_tuned_hyperparameters</co
 <span class="sd">                &#39;patience&#39;: 3.0,</span>
 <span class="sd">                &#39;initialization&#39;: 1.0}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">spot_tuner</span><span class="o">.</span><span class="n">get_tuned_hyperparameters</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">spot_tuner</span><span class="o">.</span><span class="n">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
