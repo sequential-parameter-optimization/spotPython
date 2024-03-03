@@ -1,6 +1,5 @@
 import lightning as L
 import torch
-import torch.nn.functional as F
 from torch import nn
 from spotPython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
@@ -157,7 +156,12 @@ class NetLightRegression(L.LightningModule):
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
 
+        # TODO: Implement a hidden_sizes generator function
         hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
+        # n_low = _L_in // 4
+        # # ensure that n_high is larger than n_low
+        # n_high = max(self.hparams.l1, 2 * n_low)
+        # hidden_sizes = generate_div2_list(n_high, n_low)
 
         # Create the network based on the specified hidden sizes
         layers = []
@@ -188,6 +192,24 @@ class NetLightRegression(L.LightningModule):
         x = self.layers(x)
         return x
 
+    def _calculate_loss(self, batch):
+        """
+        Calculate the loss for the given batch.
+
+        Args:
+            batch (tuple): A tuple containing a batch of input data and labels.
+            mode (str, optional): The mode of the model. Defaults to "train".
+
+        Returns:
+            torch.Tensor: A tensor containing the loss for this batch.
+
+        """
+        x, y = batch
+        y = y.view(len(y), 1)
+        y_hat = self(x)
+        loss = self.metric(y_hat, y)
+        return loss
+
     def training_step(self, batch: tuple) -> torch.Tensor:
         """
         Performs a single training step.
@@ -199,13 +221,7 @@ class NetLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
 
         """
-        x, y = batch
-        y = y.view(len(y), 1)
-        y_hat = self(x)
-        # val_loss = F.mse_loss(y_hat, y)
-        metric = getattr(torchmetrics.functional.regression, self._torchmetric)
-        val_loss = metric(y_hat, y)
-        # mae_loss = F.l1_loss(y_hat, y)
+        val_loss = self._calculate_loss(batch)
         # self.log("train_loss", val_loss, on_step=True, on_epoch=True, prog_bar=True)
         # self.log("train_mae_loss", mae_loss, on_step=True, on_epoch=True, prog_bar=True)
         return val_loss
@@ -223,11 +239,7 @@ class NetLightRegression(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
 
         """
-        x, y = batch
-        y = y.view(len(y), 1)
-        y_hat = self(x)
-        val_loss = F.mse_loss(y_hat, y)
-        # mae_loss = F.l1_loss(y_hat, y)
+        val_loss = self._calculate_loss(batch)
         # self.log("val_loss", val_loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
         self.log("val_loss", val_loss, prog_bar=prog_bar)
         self.log("hp_metric", val_loss, prog_bar=prog_bar)
@@ -245,11 +257,7 @@ class NetLightRegression(L.LightningModule):
         Returns:
             torch.Tensor: A tensor containing the loss for this batch.
         """
-        x, y = batch
-        y_hat = self(x)
-        y = y.view(len(y), 1)
-        val_loss = F.mse_loss(y_hat, y)
-        # mae_loss = F.l1_loss(y_hat, y)
+        val_loss = self._calculate_loss(batch)
         self.log("val_loss", val_loss, prog_bar=prog_bar)
         self.log("hp_metric", val_loss, prog_bar=prog_bar)
         return val_loss
