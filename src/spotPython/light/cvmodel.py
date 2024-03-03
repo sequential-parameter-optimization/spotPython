@@ -73,7 +73,9 @@ def cv_model(config: dict, fun_control: dict) -> float:
             data_dir=fun_control["DATASET_PATH"],
         )
         dm.prepare_data()
-        dm.setup()
+
+        # TODO: Check if this is necessary:
+        # dm.setup()
 
         # Init trainer
         trainer = L.Trainer(

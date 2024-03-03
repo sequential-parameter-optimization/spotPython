@@ -72,7 +72,8 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         test_size=fun_control["test_size"],
         test_seed=fun_control["test_seed"],
     )
-    dm.setup()
+    # TODO: Check if this is necessary:
+    # dm.setup()
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     initialization = config["initialization"]
