@@ -3630,7 +3630,9 @@
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cv_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cv_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs k-fold cross-validation on a model using the given configuration and function control parameters.</span>
 
@@ -3696,7 +3698,9 @@
             <span class="n">data_dir</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;DATASET_PATH&quot;</span><span class="p">],</span>
         <span class="p">)</span>
         <span class="n">dm</span><span class="o">.</span><span class="n">prepare_data</span><span class="p">()</span>
-        <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+        <span class="c1"># TODO: Check if this is necessary:</span>
+        <span class="c1"># dm.setup()</span>
 
         <span class="c1"># Init trainer</span>
         <span class="n">trainer</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
