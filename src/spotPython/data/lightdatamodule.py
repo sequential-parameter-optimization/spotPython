@@ -1,7 +1,6 @@
 import lightning as L
 import torch
 from torch.utils.data import DataLoader, random_split
-from typing import Optional
 
 
 class LightDataModule(L.LightningDataModule):
@@ -85,7 +84,7 @@ class LightDataModule(L.LightningDataModule):
         # download
         pass
 
-    def setup(self, stage: Optional[str] = None) -> None:
+    def setup(self, stage) -> None:
         """
         Splits the data for use in training, validation, and testing.
         Uses torch.utils.data.random_split() to split the data.
@@ -95,7 +94,7 @@ class LightDataModule(L.LightningDataModule):
         Args:
             stage (Optional[str]):
                 The current stage. Can be "fit" (for training and validation), "test" (testing),
-                or None (for all three stages). Defaults to None.
+                or "predict" (for prediction).
 
         Examples:
             >>> from spotPython.data.lightdatamodule import LightDataModule
@@ -128,7 +127,7 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule setup(): test_size: {test_size}")
 
         # Assign train/val datasets for use in dataloaders
-        if stage == "fit" or stage is None:
+        if stage == "fit":
             print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
             generator_fit = torch.Generator().manual_seed(self.test_seed)
             self.data_train, self.data_val, _ = random_split(
@@ -136,11 +135,14 @@ class LightDataModule(L.LightningDataModule):
             )
 
         # Assign test dataset for use in dataloader(s)
-        if stage == "test" or stage is None:
+        if stage == "test":
+            print(f"full_train_size: {full_train_size}")
             print(f"test_size: {test_size} used for test dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
-            self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
+            self.data_test, self.data_train = random_split(
+                self.data_full, [test_size, full_train_size], generator=generator_test
+            )
 
         # if stage == "predict" or stage is None:
         #     print(f"test_size, full_train_size: {test_size}, {full_train_size}")
@@ -152,7 +154,7 @@ class LightDataModule(L.LightningDataModule):
         #     self.data_predict = [x for x, _ in full_data_predict]
 
         # Assign pred dataset for use in dataloader(s)
-        if stage == "predict" or stage is None:
+        if stage == "predict":
             print(f"test_size: {test_size} used for predict dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_predict = torch.Generator().manual_seed(self.test_seed)
