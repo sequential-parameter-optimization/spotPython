@@ -1180,7 +1180,7 @@ def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
     return None
 
 
-def get_tuned_hyperparameters(spot_tuner):
+def get_tuned_hyperparameters(spot_tuner, fun_control=None) -> dict:
     """
     Get the tuned hyperparameters from the spot tuner.
     This is just a wrapper function for the spot `get_tuned_hyperparameters` method.
@@ -1188,6 +1188,9 @@ def get_tuned_hyperparameters(spot_tuner):
     Args:
         spot_tuner (object):
             spot tuner object.
+        fun_control (dict):
+            dictionary containing control parameters for the hyperparameter tuning.
+            Optional. Default is None.
 
     Returns:
         (dict):
@@ -1272,4 +1275,4 @@ def get_tuned_hyperparameters(spot_tuner):
                 'patience': 3.0,
                 'initialization': 1.0}
     """
-    return spot_tuner.get_tuned_hyperparameters()
+    return spot_tuner.get_tuned_hyperparameters(fun_control=fun_control)
