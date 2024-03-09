@@ -18,10 +18,12 @@ def fun_control_init(
     accelerator="auto",
     converters=None,
     core_model=None,
+    core_model_name=None,
     data=None,
     data_dir="./data",
     data_module=None,
     data_set=None,
+    data_set_name=None,
     design=None,
     device=None,
     devices=1,
@@ -82,6 +84,8 @@ def fun_control_init(
             A dictionary containing the converters. Default is None.
         core_model (object):
             The core model object. Default is None.
+        core_model_name (str):
+            The name of the core model. Default is None.
         data (object):
             The data object. Default is None.
         data_dir (str):
@@ -90,6 +94,8 @@ def fun_control_init(
             The data module object. Default is None.
         data_set (object):
             The data set object. Default is None.
+        data_set_name (str):
+            The name of the data set. Default is None.
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
         devices (str or int):
@@ -215,6 +221,8 @@ def fun_control_init(
                 '_L_in': 64,
                 '_L_out': 11,
                 'accelerator': "auto",
+                'core_model': None,
+                'core_model_name': None,
                 'data': None,
                 'data_dir': './data',
                 'device': None,
@@ -303,11 +311,13 @@ def fun_control_init(
         "accelerator": accelerator,
         "converters": converters,
         "core_model": core_model,
+        "core_model_name": core_model_name,
         "counter": 0,
         "data": data,
         "data_dir": data_dir,
         "data_module": data_module,
         "data_set": data_set,
+        "data_set_name": data_set_name,
         "design": design,
         "device": device,
         "devices": devices,
