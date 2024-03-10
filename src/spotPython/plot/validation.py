@@ -129,6 +129,7 @@ def plot_roc_from_dataframes(
     model_names: List[str] = None,
     target_column: str = None,
     show: bool = True,
+    title: str = "",
 ) -> None:
     """
     Plot ROC curve for a list of dataframes from model evaluations.
@@ -144,6 +145,8 @@ def plot_roc_from_dataframes(
             Name of the target column.
         show:
             If True, the plot is shown.
+        title:
+            Title of the plot.
 
     Returns:
         None
@@ -167,6 +170,8 @@ def plot_roc_from_dataframes(
         else:
             model_name = None
         RocCurveDisplay.from_predictions(y_test, y_pred, ax=ax, alpha=alpha, name=model_name)
+    # add a title to the plot
+    ax.set_title(title)
     if show:
         plt.show()
 

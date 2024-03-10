@@ -1297,6 +1297,46 @@ class Spot:
         output = []
         if print_screen:
             print(f"min y: {self.min_y}")
+            if self.noise:
+                print(f"min mean y: {self.min_mean_y}")
+        if self.noise:
+            res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
+        else:
+            res = self.to_all_dim(self.min_X.reshape(1, -1))
+        for i in range(res.shape[1]):
+            if self.all_var_name is None:
+                var_name = "x" + str(i)
+            else:
+                var_name = self.all_var_name[i]
+                var_type = self.all_var_type[i]
+                if var_type == "factor" and dict is not None:
+                    val = get_ith_hyperparameter_name_from_fun_control(fun_control=dict, key=var_name, i=int(res[0][i]))
+                else:
+                    val = res[0][i]
+            if print_screen:
+                print(var_name + ":", val)
+            output.append([var_name, val])
+        return output
+
+    def print_results_old(self, print_screen=True, dict=None) -> list[str]:
+        """Print results from the run:
+            1. min y
+            2. min X
+            If `noise == True`, additionally the following values are printed:
+            3. min mean y
+            4. min mean X
+
+        Args:
+            print_screen (bool, optional):
+                print results to screen
+
+        Returns:
+            output (list):
+                list of results
+        """
+        output = []
+        if print_screen:
+            print(f"min y: {self.min_y}")
         res = self.to_all_dim(self.min_X.reshape(1, -1))
         for i in range(res.shape[1]):
             if self.all_var_name is None:
@@ -1483,7 +1523,17 @@ class Spot:
         return z0
 
     def plot_contour(
-        self, i=0, j=1, min_z=None, max_z=None, show=True, filename=None, n_grid=25, contour_levels=10, dpi=200
+        self,
+        i=0,
+        j=1,
+        min_z=None,
+        max_z=None,
+        show=True,
+        filename=None,
+        n_grid=25,
+        contour_levels=10,
+        dpi=200,
+        title="",
     ) -> None:
         """Plot the contour of any dimension.
 
@@ -1506,6 +1556,8 @@ class Spot:
                 number of contour levels
             dpi (int):
                 dpi of the plot. Default is 200.
+            title (str):
+                title of the plot
 
         Returns:
             None
@@ -1561,7 +1613,7 @@ class Spot:
         else:
             plt.xlabel("x" + str(i) + ": " + self.var_name[i])
             plt.ylabel("x" + str(j) + ": " + self.var_name[j])
-        plt.title("Surrogate")
+        # plt.title("Surrogate")
         pylab.colorbar()
         ax = fig.add_subplot(222, projection="3d")
         ax.plot_surface(X, Y, Z, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
@@ -1571,12 +1623,15 @@ class Spot:
         else:
             plt.xlabel("x" + str(i) + ": " + self.var_name[i])
             plt.ylabel("x" + str(j) + ": " + self.var_name[j])
+        plt.title(title)
         if filename:
             pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0),
         if show:
             pylab.show()
 
-    def plot_important_hyperparameter_contour(self, threshold=0.025, filename=None, show=True, max_imp=None) -> None:
+    def plot_important_hyperparameter_contour(
+        self, threshold=0.025, filename=None, show=True, max_imp=None, title=""
+    ) -> None:
         """
         Plot the contour of important hyperparameters.
         Calls `plot_contour` for each pair of important hyperparameters.
@@ -1592,6 +1647,8 @@ class Spot:
             max_imp (int):
                 maximum number of important hyperparameters. If there are more important hyperparameters
                 than `max_imp`, only the max_imp important ones are selected.
+            title (str):
+                title of the plots
 
         Returns:
             None.
@@ -1625,12 +1682,12 @@ class Spot:
 
         """
         impo = self.print_importance(threshold=threshold, print_screen=True)
-        print(f"impo: {impo}")
+        # print(f"impo: {impo}")
         # if there are more than imp_max variables, select only the most important ones:
         if max_imp is not None:
             if len(impo) > max_imp:
                 impo = impo[:max_imp]
-        print(f"impo after select: {impo}")
+        # print(f"impo after select: {impo}")
         var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
         min_z = min(self.y)
         max_z = max(self.y)
@@ -1641,7 +1698,9 @@ class Spot:
                         filename_full = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
                     else:
                         filename_full = None
-                    self.plot_contour(i=i, j=j, min_z=min_z, max_z=max_z, filename=filename_full, show=show)
+                    self.plot_contour(
+                        i=i, j=j, min_z=min_z, max_z=max_z, filename=filename_full, show=show, title=title
+                    )
 
     def get_importance(self) -> list:
         """Get importance of each variable and return the results as a list.
