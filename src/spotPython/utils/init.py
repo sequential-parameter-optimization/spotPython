@@ -452,6 +452,7 @@ def surrogate_control_init(
     seed=124,
     theta_init_zero=True,
     var_type=None,
+    metric_factorial="canberra",
 ) -> dict:
     """Initialize surrogate_control dictionary.
 
@@ -490,6 +491,8 @@ def surrogate_control_init(
         var_type (list):
             A list containing the type of the variables. Default is None.
             Note: Will be set in the Spot class.
+        metric_factorial (str):
+            The metric to be used for the factorial design. Default is "canberra".
 
     Returns:
         surrogate_control (dict):
@@ -533,6 +536,7 @@ def surrogate_control_init(
         "seed": seed,
         "theta_init_zero": theta_init_zero,
         "var_type": var_type,
+        "metric_factorial": metric_factorial,
     }
     return surrogate_control
 

@@ -148,6 +148,7 @@ class Spot:
                         n_p=1,
                         optim_p=False,
                         var_type=["num", "num"],
+                        metric_factorial="canberra",
                         seed=124)
             optimizer_control = optimizer_control_init(
                         max_iter=1000,
@@ -309,6 +310,7 @@ class Spot:
                 log_level=self.log_level,
                 min_theta=self.surrogate_control["min_theta"],
                 max_theta=self.surrogate_control["max_theta"],
+                metric_factorial=self.surrogate_control["metric_factorial"],
                 n_theta=self.surrogate_control["n_theta"],
                 theta_init_zero=self.surrogate_control["theta_init_zero"],
                 p_val=self.surrogate_control["p_val"],

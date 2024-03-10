@@ -64,6 +64,7 @@ class Kriging(surrogates):
             log_level: int = 50,
             spot_writer=None,
             counter=None,
+            metric_factorial="canberra",
             **kwargs
     ):
         """
@@ -106,6 +107,11 @@ class Kriging(surrogates):
                 Spot writer. Defaults to None.
             counter (Optional[int]):
                 Counter. Defaults to None.
+            metric_factorial (str):
+                Metric for factorial. Defaults to "canberra". Can be "euclidean",
+                "cityblock", seuclidean", "sqeuclidean", "cosine",
+                "correlation", "hamming", "jaccard", "jensenshannon",
+                "chebyshev", "canberra", "braycurtis", "mahalanobis", "matching".
 
         Examples:
             >>> from spotPython.build.kriging import Kriging
@@ -137,7 +143,7 @@ class Kriging(surrogates):
                 plt.show()
 
         References:
-
+            https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.pdist.html
             [[1](https://scikit-learn.org/stable/auto_examples/gaussian_process/plot_gpr_noisy_targets.html)]
             scikit-learn: Gaussian Processes regression: basic introductory example
 
@@ -151,6 +157,7 @@ class Kriging(surrogates):
         self.log_level = log_level
         self.spot_writer = spot_writer
         self.counter = counter
+        self.metric_factorial = metric_factorial
 
         self.sigma = 0
         self.eps = sqrt(spacing(1))
@@ -638,7 +645,7 @@ class Kriging(surrogates):
         """
         logger.debug("In set_theta_values(): self.k: %s", self.k)
         logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
-        if self.n_theta > 1 or self.n_theta > self.k:
+        if ((self.n_theta > 1) or (self.n_theta > self.k)) and (self.n_theta != self.k):
             self.n_theta = self.k
             logger.warning("Too few theta values or more theta values than dimensions. `n_theta` set to `k`.")
             logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
@@ -909,7 +916,7 @@ class Kriging(surrogates):
                 X_factor = self.nat_X[:, self.factor_mask]
                 D = (D + squareform(
                     pdist(X_factor,
-                          metric='hamming',
+                          metric=self.metric_factorial,
                           out=None,
                           w=theta[self.factor_mask])))
             self.Psi = exp(-D)
@@ -1340,7 +1347,7 @@ class Kriging(surrogates):
                 x_factor = cod_x[self.factor_mask]
                 D = (D + cdist(x_factor.reshape(-1, sum(self.factor_mask)),
                                X_factor.reshape(-1, sum(self.factor_mask)),
-                               metric='hamming',
+                               metric=self.metric_factorial,
                                out=None,
                                w=theta[self.factor_mask]))
             self.psi = exp(-D).T
