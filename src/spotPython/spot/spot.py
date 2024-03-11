@@ -1536,6 +1536,7 @@ class Spot:
         contour_levels=10,
         dpi=200,
         title="",
+        verbosity=0,
     ) -> None:
         """Plot the contour of any dimension.
 
@@ -1560,6 +1561,8 @@ class Spot:
                 dpi of the plot. Default is 200.
             title (str):
                 title of the plot
+            verbosity (int):
+                verbosity level. Default is 0.
 
         Returns:
             None
@@ -1608,6 +1611,21 @@ class Spot:
             max_z = np.max(Z)
         ax = fig.add_subplot(221)
         # plot predicted values:
+        if verbosity > 0:
+            print(f"self.lower[i]: {self.lower[i]}")
+            print(f"self.upper[i]: {self.upper[i]}")
+            print(f"self.lower[j]: {self.lower[j]}")
+            print(f"self.upper[j]: {self.upper[j]}")
+            print(f"x: {x}")
+            print(f"y: {y}")
+            print(f"X: {X}")
+            print(f"Y: {Y}")
+            print(f"z0: {z0}")
+            print(f"zz: {zz}")
+            print(f"zs: {zs}")
+            print(f"Z: {Z}")
+            print(f"min_z: {min_z}")
+            print(f"max_z: {max_z}")
         plt.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
         if self.var_name is None:
             plt.xlabel("x" + str(i))

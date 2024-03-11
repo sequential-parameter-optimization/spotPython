@@ -265,6 +265,27 @@ def assign_values(X: np.array, var_list: list) -> dict:
     return result
 
 
+def modify_boolean_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
+    """
+    This function modifies the levels of a boolean hyperparameter in the fun_control dictionary.
+    It also sets the lower and upper bounds of the hyperparameter to 0 and len(levels) - 1, respectively.
+
+    Args:
+        fun_control (dict):
+            fun_control dictionary
+        hyperparameter (str):
+            hyperparameter name
+        levels (list):
+            list of levels
+
+    Returns:
+        None.
+    """
+    fun_control["core_model_hyper_dict"][hyperparameter].update({"levels": levels})
+    fun_control["core_model_hyper_dict"][hyperparameter].update({"lower": levels[0]})
+    fun_control["core_model_hyper_dict"][hyperparameter].update({"upper": levels[1]})
+
+
 def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
     """
     This function modifies the levels of a hyperparameter in the fun_control dictionary.
@@ -655,10 +676,17 @@ def replace_levels_with_positions(hyper_dict, hyper_dict_values) -> dict:
                 'stop_mem_management': 0}
     """
     hyper_dict_values_new = copy.deepcopy(hyper_dict_values)
-    for key, value in hyper_dict_values.items():
-        if key in hyper_dict.keys():
-            if "levels" in hyper_dict[key].keys():
-                hyper_dict_values_new[key] = hyper_dict[key]["levels"].index(value)
+    # generate an error if the following code fails and write an error message:
+    try:
+        for key, value in hyper_dict_values.items():
+            if key in hyper_dict.keys():
+                if "levels" in hyper_dict[key].keys():
+                    hyper_dict_values_new[key] = hyper_dict[key]["levels"].index(value)
+    except Exception as e:
+        print("!!! Warning: ", e)
+        print("Did you modify lower and upper bounds so that the default values are not included?")
+        print("Returning 'None'.")
+        return None
     return hyper_dict_values_new
 
 
@@ -900,10 +928,13 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
     """
     X0 = get_default_values(fun_control)
     X0 = replace_levels_with_positions(fun_control["core_model_hyper_dict"], X0)
-    X0 = get_values_from_dict(X0)
-    X0 = np.array([X0])
-    X0.shape[1]
-    return X0
+    if X0 is None:
+        return None
+    else:
+        X0 = get_values_from_dict(X0)
+        X0 = np.array([X0])
+        X0.shape[1]
+        return X0
 
 
 def get_default_hyperparameters_for_core_model(fun_control) -> dict:
@@ -1037,10 +1068,19 @@ def set_control_hyperparameter_value(control_dict, hyperparameter, value) -> Non
         None.
 
     """
+    print(f"Setting hyperparameter {hyperparameter} to value {value}.")
     vt = get_var_type_from_var_name(fun_control=control_dict, var_name=hyperparameter)
-    if vt == "factor":
+    print(f"Variable type is {vt}.")
+    core_type = get_core_model_parameter_type_from_var_name(fun_control=control_dict, var_name=hyperparameter)
+    print(f"Core type is {core_type}.")
+    if vt == "factor" and core_type != "bool":
+        print("Calling modify_hyper_parameter_levels().")
         modify_hyper_parameter_levels(fun_control=control_dict, hyperparameter=hyperparameter, levels=value)
+    elif vt == "factor" and core_type == "bool":
+        print("Calling modify_boolean_hyper_parameter_levels().")
+        modify_boolean_hyper_parameter_levels(fun_control=control_dict, hyperparameter=hyperparameter, levels=value)
     else:
+        print("Calling modify_hyper_parameter_bounds().")
         modify_hyper_parameter_bounds(fun_control=control_dict, hyperparameter=hyperparameter, bounds=value)
 
 
@@ -1116,6 +1156,30 @@ def get_var_type_from_var_name(fun_control, var_name) -> str:
     var_type_list = get_control_key_value(control_dict=fun_control, key="var_type")
     var_name_list = get_control_key_value(control_dict=fun_control, key="var_name")
     return var_type_list[var_name_list.index(var_name)]
+
+
+def get_core_model_parameter_type_from_var_name(fun_control, var_name) -> str:
+    """
+    Extracts the core_model_parameter_type value from a dictionary for a specified key.
+
+    Args:
+        fun_control (dict):
+            The dictionary containing the information.
+        var_name (str):
+            The key for which to extract the core_model_parameter_type value.
+
+    Returns:
+        (str):
+            The core_model_parameter_type value if available, else None.
+    """
+    # Check if the key exists in the dictionary and it has a 'core_model_parameter_type' entry
+    if (
+        var_name in fun_control["core_model_hyper_dict"]
+        and "core_model_parameter_type" in fun_control["core_model_hyper_dict"][var_name]
+    ):
+        return fun_control["core_model_hyper_dict"][var_name]["core_model_parameter_type"]
+    else:
+        return None
 
 
 def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
