@@ -115,3 +115,27 @@ def add_logical_columns(X, arity=2, operations=["and", "or", "xor"]):
     # Join all the new columns at once
     X = pd.concat([X] + new_cols, axis=1)
     return X
+
+
+def map_to_True_False(value):
+    """
+    Map the string value to a boolean value.
+    If the value is "True" or "true", return True.
+    Otherwise, return False.
+
+    Args:
+        value (str):
+            The string to be mapped to a boolean value.
+    Returns:
+        bool:
+            True if the value is "True" or "true", False otherwise.
+
+    Examples:
+    >>> from spotPython.utils.convert import map_to_True_False
+        map_to_True_False("True")
+        True
+    """
+    if value.lower() == "true":
+        return True
+    else:
+        return False
