@@ -171,9 +171,28 @@ def get_metric_sign(metric_name):
         "precision_score",
         "recall_score",
         "roc_auc_score",
+        "explained_variance_score",
+        "r2_score",
+        "d2_absolute_error_score",
+        "d2_pinball_score",
+        "d2_tweedie_score",
     ]:
         return -1
-    elif metric_name in ["hamming_loss", "hinge_loss", "zero_one_loss"]:
+    elif metric_name in [
+        "hamming_loss",
+        "hinge_loss",
+        "zero_one_loss",
+        "max_error",
+        "mean_absolute_error",
+        "mean_squared_error",
+        "root_mean_squared_error",
+        "mean_squared_log_error",
+        "root_mean_squared_log_error",
+        "median_absolute_error",
+        "mean_poisson_deviance",
+        "mean_gamma_deviance",
+        "mean_absolute_percentage_error",
+    ]:
         return +1
     else:
         raise ValueError(f"Metric '{metric_name}' not found.")
