@@ -22,7 +22,7 @@ from numpy import append
 from numpy import min, max
 from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotPython.utils.compare import selectNew
-from spotPython.utils.aggregate import aggregate_mean_var
+from spotPython.utils.aggregate import aggregate_mean_var, select_distant_points
 from spotPython.utils.repair import remove_nan
 from spotPython.budget.ocba import get_ocba_X
 import logging
@@ -247,6 +247,7 @@ class Spot:
         self.show_progress = self.fun_control["show_progress"]
         self.infill_criterion = self.fun_control["infill_criterion"]
         self.n_points = self.fun_control["n_points"]
+        self.max_surrogate_points = self.fun_control["max_surrogate_points"]
 
         # if the key "spot_writer" is not in the dictionary fun_control,
         # set self.spot_writer to None else to the value of the key "spot_writer"
@@ -912,8 +913,15 @@ class Spot:
         logger.debug("In fit_surrogate(): self.y: %s", self.y)
         logger.debug("In fit_surrogate(): self.X.shape: %s", self.X.shape)
         logger.debug("In fit_surrogate(): self.y.shape: %s", self.y.shape)
-        if self.X.shape[0] == self.y.shape[0]:
-            self.surrogate.fit(self.X, self.y)
+        X_points = self.X.shape[0]
+        y_points = self.y.shape[0]
+        if X_points == y_points:
+            if X_points > self.max_surrogate_points:
+                X_S, y_S = select_distant_points(X=self.X, y=self.y, k=self.max_surrogate_points)
+            else:
+                X_S = self.X
+                y_S = self.y
+            self.surrogate.fit(X_S, y_S)
         else:
             logger.warning("X and y have different sizes. Surrogate not fitted.")
         if self.show_models:

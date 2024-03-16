@@ -6,6 +6,7 @@ import socket
 import datetime
 from dateutil.tz import tzlocal
 from torch.utils.tensorboard import SummaryWriter
+from math import inf
 
 
 def fun_control_init(
@@ -36,6 +37,7 @@ def fun_control_init(
     log_level=50,
     lower=None,
     max_time=1,
+    max_surrogate_points=inf,
     metric_sklearn=None,
     noise=False,
     n_points=1,
@@ -132,6 +134,8 @@ def fun_control_init(
             lower bound
         max_time (int):
             The maximum time in minutes.
+        max_surrogate_points (int):
+            The maximum number of points in the surrogate model. Default is inf.
         metric_sklearn (object):
             The metric object from the scikit-learn library. Default is None.
         noise (bool):
@@ -234,6 +238,7 @@ def fun_control_init(
                 'k_folds': None,
                 'loss_function': None,
                 'lower': None,
+                'max_surrogate_points': 100,
                 'metric_river': None,
                 'metric_sklearn': None,
                 'metric_torch': None,
@@ -333,6 +338,7 @@ def fun_control_init(
         "loss_function": None,
         "lower": lower,
         "max_time": max_time,
+        "max_surrogate_points": max_surrogate_points,
         "metric_river": None,
         "metric_sklearn": metric_sklearn,
         "metric_torch": None,

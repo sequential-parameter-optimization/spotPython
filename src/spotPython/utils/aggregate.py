@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.cluster import KMeans
 
 
 def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray):
@@ -72,3 +73,42 @@ def get_ranks(x):
     ranks = np.empty_like(ts)
     ranks[ts] = np.arange(len(x))
     return ranks
+
+
+def select_distant_points(X, y, k):
+    """
+    Selects k points that are distant from each other using a clustering approach.
+
+    Args:
+        X (numpy.ndarray): X array, shape `(n, k)`.
+        y (numpy.ndarray): values, shape `(n,)`.
+        k (int): number of points to select.
+
+    Returns:
+        (numpy.ndarray):
+            selected `X` values, shape `(k, k)`.
+        (numpy.ndarray):
+            selected `y` values, shape `(k,)`.
+
+    Examples:
+        >>> from spotPython.utils.aggregate import select_distant_points
+            X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+            y = np.array([1, 2, 3, 4, 5])
+            selected_points, selected_y = select_distant_points(X, y, 3)
+            print(selected_points)
+            [[1 2]
+            [7 8]
+            [9 10]]
+            print(selected_y)
+            [1 4 5]
+
+    """
+    # Perform k-means clustering to find k clusters
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto").fit(X)
+    # Find the closest point in X to each cluster center
+    selected_points = np.array([X[np.argmin(np.linalg.norm(X - center, axis=1))] for center in kmeans.cluster_centers_])
+    # Find indices of the selected points in the original X array
+    indices = np.array([np.where(np.all(X == point, axis=1))[0][0] for point in selected_points])
+    # Select the corresponding y values
+    selected_y = y[indices]
+    return selected_points, selected_y
