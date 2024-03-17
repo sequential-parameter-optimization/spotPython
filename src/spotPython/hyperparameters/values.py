@@ -4,13 +4,14 @@ import json
 from sklearn.pipeline import make_pipeline
 from river import compose
 from typing import Union, List, Dict, Generator, Any
-
 from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
 
 
 def generate_one_config_from_var_dict(
-    var_dict: Dict[str, np.ndarray], fun_control: Dict[str, Union[List[str], str]]
+    var_dict: Dict[str, np.ndarray],
+    fun_control: Dict[str, Union[List[str], str]],
+    default: bool = False,
 ) -> Generator[Dict[str, Union[int, float]], None, None]:
     """Generate one configuration from a dictionary of variables (as a generator).
 
@@ -18,10 +19,14 @@ def generate_one_config_from_var_dict(
     that yields dictionaries with the values from the arrays in the input dictionary.
 
     Args:
-        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
-        fun_control (dict): A dictionary which (at least) has an entry with the following key:
+        var_dict (dict):
+            A dictionary where keys are variable names and values are numpy arrays.
+        fun_control (dict):
+            A dictionary which (at least) has an entry with the following key:
             "var_type" (list): A list of variable types. If the entry is not "num" the corresponding
             value will be converted to the type "int".
+        default (bool):
+            A boolean value indicating whether to use the default values from fun_control.
 
     Returns:
         Generator[dict]: A generator that yields dictionaries with the values from the arrays in the input dictionary.
@@ -36,13 +41,15 @@ def generate_one_config_from_var_dict(
     """
     for values in iterate_dict_values(var_dict):
         values = convert_keys(values, fun_control["var_type"])
-        values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
+        values = get_dict_with_levels_and_types(fun_control=fun_control, v=values, default=default)
         values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
         yield values
 
 
 def return_conf_list_from_var_dict(
-    var_dict: Dict[str, np.ndarray], fun_control: Dict[str, Union[List[str], str]]
+    var_dict: Dict[str, np.ndarray],
+    fun_control: Dict[str, Union[List[str], str]],
+    default: bool = False,
 ) -> List[Dict[str, Union[int, float]]]:
     """Return a list of configurations from a dictionary of variables.
 
@@ -68,7 +75,7 @@ def return_conf_list_from_var_dict(
         [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
     """
     conf_list = []
-    for values in generate_one_config_from_var_dict(var_dict, fun_control):
+    for values in generate_one_config_from_var_dict(var_dict, fun_control, default=default):
         conf_list.append(values)
     return conf_list
 
@@ -127,7 +134,7 @@ def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> D
     return d
 
 
-def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any]) -> Dict[str, Any]:
+def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any], default=False) -> Dict[str, Any]:
     """Get dictionary with levels and types.
     The function maps the numerical output of the hyperparameter optimization to the corresponding levels
     of the hyperparameter needed by the core model, i.e., the tuned algorithm.
@@ -140,8 +147,12 @@ def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any
     via getattr("class", value).
 
     Args:
-        fun_control (Dict[str, Any]): A dictionary containing information about the core model hyperparameters.
-        v (Dict[str, Any]): A dictionary containing the numerical output of the hyperparameter optimization.
+        fun_control (Dict[str, Any]):
+            A dictionary containing information about the core model hyperparameters.
+        v (Dict[str, Any]):
+            A dictionary containing the numerical output of the hyperparameter optimization.
+        default (bool):
+            A boolean value indicating whether to use the default values from fun_control.
 
     Returns:
         Dict[str, Any]:
@@ -214,7 +225,10 @@ def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any
             'max_size': 500.0
         }
     """
-    d = fun_control["core_model_hyper_dict"]
+    if default:
+        d = fun_control["core_model_hyper_dict_default"]
+    else:
+        d = fun_control["core_model_hyper_dict"]
     new_dict = {}
     for key, value in v.items():
         if key in d and d[key]["type"] == "factor":
@@ -773,7 +787,11 @@ def add_core_model_to_fun_control(fun_control, core_model, hyper_dict=None, file
     fun_control.update({"var_type": var_type, "var_name": var_name, "lower": lower, "upper": upper})
 
 
-def get_one_core_model_from_X(X, fun_control=None):
+def get_one_core_model_from_X(
+    X,
+    fun_control=None,
+    default=False,
+):
     """Get one core model from X.
 
     Args:
@@ -781,6 +799,8 @@ def get_one_core_model_from_X(X, fun_control=None):
             The array with the hyper parameter values.
         fun_control (dict):
             The function control dictionary.
+        default (bool):
+            A boolean value indicating whether to use the default values from fun_control.
 
     Returns:
         (class):
@@ -798,8 +818,9 @@ def get_one_core_model_from_X(X, fun_control=None):
             get_one_core_model_from_X(X, fun_control)
             HoeffdingAdaptiveTreeRegressor()
     """
-    var_dict = assign_values(X=X, var_list=get_var_name(fun_control))
-    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    var_dict = assign_values(X, fun_control["var_name"])
+    # var_dict = assign_values(X, get_var_name(fun_control))
+    config = return_conf_list_from_var_dict(var_dict, fun_control, default=default)[0]
     core_model = fun_control["core_model"](**config)
     return core_model
 
@@ -940,37 +961,39 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
         return X0
 
 
-def get_default_hyperparameters_for_core_model(fun_control) -> dict:
-    """Get the default hyper parameters for the core model.
+# def get_default_hyperparameters_for_core_model(fun_control) -> dict:
+#     """Get the default hyper parameters for the core model.
 
-    Args:
-        fun_control (dict):
-            The function control dictionary.
+#     Args:
+#         fun_control (dict):
+#             The function control dictionary.
 
-    Returns:
-        (dict):
-            The default hyper parameters for the core model.
+#     Returns:
+#         (dict):
+#             The default hyper parameters for the core model.
 
-    Examples:
-        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotRiver.data.river_hyper_dict import RiverHyperDict
-            fun_control = {}
-            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-                fun_control=func_control,
-                hyper_dict=RiverHyperDict,
-                filename=None)
-            get_default_hyperparameters_for_core_model(fun_control)
-            {'leaf_prediction': 'mean',
-            'leaf_model': 'NBAdaptive',
-            'splitter': 'HoeffdingAdaptiveTreeSplitter',
-            'binary_split': 'info_gain',
-            'stop_mem_management': False}
-    """
-    values = get_default_values(fun_control)
-    values = get_dict_with_levels_and_types(fun_control=fun_control, v=values)
-    values = convert_keys(values, fun_control["var_type"])
-    values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
-    return values
+#     Examples:
+#         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+#             from spotRiver.data.river_hyper_dict import RiverHyperDict
+#             fun_control = {}
+#             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+#                 fun_control=func_control,
+#                 hyper_dict=RiverHyperDict,
+#                 filename=None)
+#             get_default_hyperparameters_for_core_model(fun_control)
+#             {'leaf_prediction': 'mean',
+#             'leaf_model': 'NBAdaptive',
+#             'splitter': 'HoeffdingAdaptiveTreeSplitter',
+#             'binary_split': 'info_gain',
+#             'stop_mem_management': False}
+#     """
+#     values = get_default_values(fun_control)
+#     print(f"values: {values}")
+#     pprint.pprint(fun_control)
+#     values = get_dict_with_levels_and_types(fun_control=fun_control, v=values, default=True)
+#     values = convert_keys(values, fun_control["var_type"])
+#     values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
+#     return values
 
 
 def get_tuned_architecture(spot_tuner, fun_control, force_minX=False) -> dict:
