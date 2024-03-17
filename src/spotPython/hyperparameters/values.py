@@ -392,7 +392,7 @@ def get_default_values(fun_control) -> dict:
             'binary_split': 0,
             'stop_mem_management': 0}
     """
-    d = fun_control["core_model_hyper_dict"]
+    d = fun_control["core_model_hyper_dict_default"]
     new_dict = {}
     for key, value in d.items():
         if value["type"] == "int":
@@ -737,9 +737,11 @@ def add_core_model_to_fun_control(fun_control, core_model, hyper_dict=None, file
         The function adds the following keys to the fun_control dictionary:
         "core_model": The core model.
         "core_model_hyper_dict": The hyper parameter dictionary for the core model.
+        "core_model_hyper_dict_default": The hyper parameter dictionary for the core model.
         "var_type": A list of variable types.
         "var_name": A list of variable names.
-        The original hyperparameters of the core model are stored in the "core_model_hyper_dict" key.
+        The original hyperparameters of the core model are stored in the "core_model_hyper_dict_default" key.
+        These remain unmodified, while the "core_model_hyper_dict" key is modified during the tuning process.
 
     Examples:
         >>> from spotPython.light.regression.netlightregression import NetLightRegression
@@ -763,6 +765,7 @@ def add_core_model_to_fun_control(fun_control, core_model, hyper_dict=None, file
         with open(filename, "r") as f:
             new_hyper_dict = json.load(f)
     fun_control.update({"core_model_hyper_dict": new_hyper_dict[core_model.__name__]})
+    fun_control.update({"core_model_hyper_dict_default": copy.deepcopy(new_hyper_dict[core_model.__name__])})
     var_type = get_var_type(fun_control)
     var_name = get_var_name(fun_control)
     lower = get_bound_values(fun_control, "lower", as_list=False)
@@ -788,14 +791,14 @@ def get_one_core_model_from_X(X, fun_control=None):
             from spotRiver.data.river_hyper_dict import RiverHyperDict
             fun_control = {}
             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-                fun_control=func_control,
+                fun_control=fun_control,
                 hyper_dict=RiverHyperDict,
                 filename=None)
             X = np.array([0, 0, 0, 0, 0])
             get_one_core_model_from_X(X, fun_control)
             HoeffdingAdaptiveTreeRegressor()
     """
-    var_dict = assign_values(X, fun_control["var_name"])
+    var_dict = assign_values(X=X, var_list=get_var_name(fun_control))
     config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
     core_model = fun_control["core_model"](**config)
     return core_model
@@ -927,7 +930,7 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
             array([0, 0, 0, 0, 0])
     """
     X0 = get_default_values(fun_control)
-    X0 = replace_levels_with_positions(fun_control["core_model_hyper_dict"], X0)
+    X0 = replace_levels_with_positions(fun_control["core_model_hyper_dict_default"], X0)
     if X0 is None:
         return None
     else:
