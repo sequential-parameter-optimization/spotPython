@@ -37,7 +37,7 @@ def fun_control_init(
     log_level=50,
     lower=None,
     max_time=1,
-    max_surrogate_points=inf,
+    max_surrogate_points=30,
     metric_sklearn=None,
     noise=False,
     n_points=1,
