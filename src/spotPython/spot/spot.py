@@ -28,7 +28,7 @@ from spotPython.budget.ocba import get_ocba_X
 import logging
 import time
 from spotPython.utils.progress import progress_bar
-from spotPython.utils.convert import find_indices
+from spotPython.utils.convert import find_indices, sort_by_kth_and_return_indices
 from spotPython.hyperparameters.values import (
     get_control_key_value,
     get_ith_hyperparameter_name_from_fun_control,
@@ -1640,7 +1640,7 @@ class Spot:
             pylab.show()
 
     def plot_important_hyperparameter_contour(
-        self, threshold=0.0, filename=None, show=True, max_imp=None, title=""
+        self, threshold=0.0, filename=None, show=True, max_imp=None, title="", scale_global=False
     ) -> None:
         """
         Plot the contour of important hyperparameters.
@@ -1649,7 +1649,7 @@ class Spot:
 
         Args:
             threshold (float):
-                threshold for the importance
+                threshold for the importance. Not used any more in spotPython >= 0.13.2.
             filename (str):
                 filename of the plot
             show (bool):
@@ -1691,23 +1691,22 @@ class Spot:
                 S.plot_important_hyperparameter_contour()
 
         """
-        impo_org = self.print_importance(threshold=threshold, print_screen=True)
-        print(f"impo: {impo_org}")
-        try:
-            impo = sorted(impo_org, key=lambda x: x[1], reverse=True)
-        except ValueError as e:
-            print(f"ValueError: {e}")
-            impo = impo_org
-        # if there are more than imp_max variables, select only the most important ones:
+        impo = self.print_importance(threshold=threshold, print_screen=True)
+        print(f"impo: {impo}")
+        indices = sort_by_kth_and_return_indices(array=impo, k=1)
+        print(f"indices: {indices}")
+        # take the first max_imp values from the indices array
         if max_imp is not None:
-            if len(impo) > max_imp:
-                impo = impo[:max_imp]
-        print(f"impo after select: {impo}")
-        var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
-        min_z = min(self.y)
-        max_z = max(self.y)
-        for i in var_plots:
-            for j in var_plots:
+            indices = indices[:max_imp]
+        print(f"indices after max_imp selection: {indices}")
+        if scale_global:
+            min_z = min(self.y)
+            max_z = max(self.y)
+        else:
+            min_z = None
+            max_z = None
+        for i in indices:
+            for j in indices:
                 if j > i:
                     if filename is not None:
                         filename_full = filename + "_contour_" + str(i) + "_" + str(j) + ".png"

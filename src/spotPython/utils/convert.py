@@ -139,3 +139,43 @@ def map_to_True_False(value):
         return True
     else:
         return False
+
+
+def sort_by_kth_and_return_indices(array, k):
+    """Sorts an array of arrays based on the k-th values in descending order and returns
+    the indices of the original array entries.
+
+    Args:
+        array (list of lists): The array to be sorted. Each sub-array should have at least
+            `k+1` elements.
+        k (int): The index (zero-based) of the element within each sub-array to sort by.
+
+    Returns:
+        list of int: Indices of the original array entries after sorting by the k-th value.
+
+    Raises:
+        ValueError: If the input array is empty, None, or any sub-array does not have at least
+            `k+1` elements, or if k is out of bounds for any sub-array.
+
+    Examples:
+        >>> from spotPython.utils.convert import sort_by_kth_and_return_indices
+            try:
+                array = [['x0', 85.50983192204619], ['x1', 100.0], ['x2', 81.35712613549178]]
+                k = 1  # Sort by the second element in each sub-array
+                indices = sort_by_kth_and_return_indices(array, k)
+                print("Indices of the sorted elements using the k-th value:", indices)
+            except ValueError as error:
+                print(f"Sorting failed due to: {error}")
+    """
+    if not array:
+        return []
+
+    # Check for improperly structured sub-arrays and that k is within bounds
+    for item in array:
+        if not isinstance(item, list) or len(item) <= k:
+            raise ValueError("All sub-arrays must be lists with at least k+1 elements.")
+
+    # Enumerate the array to keep track of original indices, then sort by the k-th item
+    sorted_indices = [index for index, value in sorted(enumerate(array), key=lambda x: x[1][k], reverse=True)]
+
+    return sorted_indices
