@@ -6,7 +6,6 @@ import socket
 import datetime
 from dateutil.tz import tzlocal
 from torch.utils.tensorboard import SummaryWriter
-from math import inf
 
 
 def fun_control_init(

@@ -1691,13 +1691,18 @@ class Spot:
                 S.plot_important_hyperparameter_contour()
 
         """
-        impo = self.print_importance(threshold=threshold, print_screen=True)
-        # print(f"impo: {impo}")
+        impo_org = self.print_importance(threshold=threshold, print_screen=True)
+        print(f"impo: {impo_org}")
+        try:
+            impo = sorted(impo_org, key=lambda x: x[1], reverse=True)
+        except ValueError as e:
+            print(f"ValueError: {e}")
+            impo = impo_org
         # if there are more than imp_max variables, select only the most important ones:
         if max_imp is not None:
             if len(impo) > max_imp:
                 impo = impo[:max_imp]
-        # print(f"impo after select: {impo}")
+        print(f"impo after select: {impo}")
         var_plots = [i for i, x in enumerate(impo) if x[1] > threshold]
         min_z = min(self.y)
         max_z = max(self.y)
