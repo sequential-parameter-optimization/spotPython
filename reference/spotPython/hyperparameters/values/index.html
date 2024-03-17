@@ -4080,9 +4080,11 @@ hyper_dict from the hyper_dict dictionary.</p>
   <p>The function adds the following keys to the fun_control dictionary:
 &ldquo;core_model&rdquo;: The core model.
 &ldquo;core_model_hyper_dict&rdquo;: The hyper parameter dictionary for the core model.
+&ldquo;core_model_hyper_dict_default&rdquo;: The hyper parameter dictionary for the core model.
 &ldquo;var_type&rdquo;: A list of variable types.
 &ldquo;var_name&rdquo;: A list of variable names.
-The original hyperparameters of the core model are stored in the &ldquo;core_model_hyper_dict&rdquo; key.</p>
+The original hyperparameters of the core model are stored in the &ldquo;core_model_hyper_dict_default&rdquo; key.
+These remain unmodified, while the &ldquo;core_model_hyper_dict&rdquo; key is modified during the tuning process.</p>
 </details>
 
 
@@ -4158,7 +4160,10 @@ The original hyperparameters of the core model are stored in the &ldquo;core_mod
 <span class="normal">767</span>
 <span class="normal">768</span>
 <span class="normal">769</span>
-<span class="normal">770</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_core_model_to_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">core_model</span><span class="p">,</span> <span class="n">hyper_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_core_model_to_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">core_model</span><span class="p">,</span> <span class="n">hyper_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add the core model to the function control dictionary. It updates the keys &quot;core_model&quot;,</span>
 <span class="sd">    &quot;core_model_hyper_dict&quot;, &quot;var_type&quot;, &quot;var_name&quot; in the fun_control dictionary.</span>
 
@@ -4183,9 +4188,11 @@ The original hyperparameters of the core model are stored in the &ldquo;core_mod
 <span class="sd">        The function adds the following keys to the fun_control dictionary:</span>
 <span class="sd">        &quot;core_model&quot;: The core model.</span>
 <span class="sd">        &quot;core_model_hyper_dict&quot;: The hyper parameter dictionary for the core model.</span>
+<span class="sd">        &quot;core_model_hyper_dict_default&quot;: The hyper parameter dictionary for the core model.</span>
 <span class="sd">        &quot;var_type&quot;: A list of variable types.</span>
 <span class="sd">        &quot;var_name&quot;: A list of variable names.</span>
-<span class="sd">        The original hyperparameters of the core model are stored in the &quot;core_model_hyper_dict&quot; key.</span>
+<span class="sd">        The original hyperparameters of the core model are stored in the &quot;core_model_hyper_dict_default&quot; key.</span>
+<span class="sd">        These remain unmodified, while the &quot;core_model_hyper_dict&quot; key is modified during the tuning process.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.light.regression.netlightregression import NetLightRegression</span>
@@ -4209,6 +4216,7 @@ The original hyperparameters of the core model are stored in the &ldquo;core_mod
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">new_hyper_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
     <span class="n">fun_control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;core_model_hyper_dict&quot;</span><span class="p">:</span> <span class="n">new_hyper_dict</span><span class="p">[</span><span class="n">core_model</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]})</span>
+    <span class="n">fun_control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;core_model_hyper_dict_default&quot;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">new_hyper_dict</span><span class="p">[</span><span class="n">core_model</span><span class="o">.</span><span class="vm">__name__</span><span class="p">])})</span>
     <span class="n">var_type</span> <span class="o">=</span> <span class="n">get_var_type</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
     <span class="n">var_name</span> <span class="o">=</span> <span class="n">get_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
     <span class="n">lower</span> <span class="o">=</span> <span class="n">get_bound_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">as_list</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -4642,10 +4650,7 @@ value will be converted to the type <code>"int"</code>.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1000</span>
-<span class="normal">1001</span>
-<span class="normal">1002</span>
-<span class="normal">1003</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1003</span>
 <span class="normal">1004</span>
 <span class="normal">1005</span>
 <span class="normal">1006</span>
@@ -4658,7 +4663,10 @@ value will be converted to the type <code>"int"</code>.</p>
 <span class="normal">1013</span>
 <span class="normal">1014</span>
 <span class="normal">1015</span>
-<span class="normal">1016</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1016</span>
+<span class="normal">1017</span>
+<span class="normal">1018</span>
+<span class="normal">1019</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a model for the given configuration and control parameters.</span>
 
@@ -5183,10 +5191,7 @@ If the control_dict dictionary is None, return None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1087</span>
-<span class="normal">1088</span>
-<span class="normal">1089</span>
-<span class="normal">1090</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1090</span>
 <span class="normal">1091</span>
 <span class="normal">1092</span>
 <span class="normal">1093</span>
@@ -5230,7 +5235,10 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">1131</span>
 <span class="normal">1132</span>
 <span class="normal">1133</span>
-<span class="normal">1134</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_control_key_value</span><span class="p">(</span><span class="n">control_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">1134</span>
+<span class="normal">1135</span>
+<span class="normal">1136</span>
+<span class="normal">1137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_control_key_value</span><span class="p">(</span><span class="n">control_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function gets the key value pair from the control_dict dictionary.</span>
 <span class="sd">    If the key does not exist, return None.</span>
@@ -5370,10 +5378,7 @@ If the control_dict dictionary is None, return None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1161</span>
-<span class="normal">1162</span>
-<span class="normal">1163</span>
-<span class="normal">1164</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1164</span>
 <span class="normal">1165</span>
 <span class="normal">1166</span>
 <span class="normal">1167</span>
@@ -5391,7 +5396,10 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">1179</span>
 <span class="normal">1180</span>
 <span class="normal">1181</span>
-<span class="normal">1182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_parameter_type_from_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">1182</span>
+<span class="normal">1183</span>
+<span class="normal">1184</span>
+<span class="normal">1185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_parameter_type_from_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts the core_model_parameter_type value from a dictionary for a specified key.</span>
 
@@ -5508,10 +5516,7 @@ If the control_dict dictionary is None, return None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">904</span>
-<span class="normal">905</span>
-<span class="normal">906</span>
-<span class="normal">907</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">907</span>
 <span class="normal">908</span>
 <span class="normal">909</span>
 <span class="normal">910</span>
@@ -5541,7 +5546,10 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">934</span>
 <span class="normal">935</span>
 <span class="normal">936</span>
-<span class="normal">937</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_hyperparameters_as_array</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">937</span>
+<span class="normal">938</span>
+<span class="normal">939</span>
+<span class="normal">940</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_hyperparameters_as_array</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the default hyper parameters as array.</span>
 
 <span class="sd">    Args:</span>
@@ -5567,7 +5575,7 @@ If the control_dict dictionary is None, return None.</p>
 <span class="sd">            array([0, 0, 0, 0, 0])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">X0</span> <span class="o">=</span> <span class="n">get_default_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
-    <span class="n">X0</span> <span class="o">=</span> <span class="n">replace_levels_with_positions</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model_hyper_dict&quot;</span><span class="p">],</span> <span class="n">X0</span><span class="p">)</span>
+    <span class="n">X0</span> <span class="o">=</span> <span class="n">replace_levels_with_positions</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model_hyper_dict_default&quot;</span><span class="p">],</span> <span class="n">X0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">X0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
@@ -5671,10 +5679,7 @@ If the control_dict dictionary is None, return None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">940</span>
-<span class="normal">941</span>
-<span class="normal">942</span>
-<span class="normal">943</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">943</span>
 <span class="normal">944</span>
 <span class="normal">945</span>
 <span class="normal">946</span>
@@ -5701,7 +5706,10 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">967</span>
 <span class="normal">968</span>
 <span class="normal">969</span>
-<span class="normal">970</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_hyperparameters_for_core_model</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">970</span>
+<span class="normal">971</span>
+<span class="normal">972</span>
+<span class="normal">973</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_default_hyperparameters_for_core_model</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the default hyper parameters for the core model.</span>
 
 <span class="sd">    Args:</span>
@@ -5952,7 +5960,7 @@ If the key of the value has as &ldquo;type&rdquo; the value &ldquo;int&rdquo; or
 <span class="sd">            &#39;binary_split&#39;: 0,</span>
 <span class="sd">            &#39;stop_mem_management&#39;: 0}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model_hyper_dict&quot;</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model_hyper_dict_default&quot;</span><span class="p">]</span>
     <span class="n">new_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span><span class="p">:</span>
@@ -6495,10 +6503,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1185</span>
-<span class="normal">1186</span>
-<span class="normal">1187</span>
-<span class="normal">1188</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1188</span>
 <span class="normal">1189</span>
 <span class="normal">1190</span>
 <span class="normal">1191</span>
@@ -6554,7 +6559,10 @@ Adam
 <span class="normal">1241</span>
 <span class="normal">1242</span>
 <span class="normal">1243</span>
-<span class="normal">1244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ith_hyperparameter_name_from_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="normal">1244</span>
+<span class="normal">1245</span>
+<span class="normal">1246</span>
+<span class="normal">1247</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ith_hyperparameter_name_from_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the ith hyperparameter name from the fun_control dictionary.</span>
 
@@ -6725,10 +6733,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">804</span>
-<span class="normal">805</span>
-<span class="normal">806</span>
-<span class="normal">807</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">807</span>
 <span class="normal">808</span>
 <span class="normal">809</span>
 <span class="normal">810</span>
@@ -6756,7 +6761,10 @@ Adam
 <span class="normal">832</span>
 <span class="normal">833</span>
 <span class="normal">834</span>
-<span class="normal">835</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_config_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_config_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get one config from X.</span>
 
 <span class="sd">    Args:</span>
@@ -6885,7 +6893,7 @@ Adam
 <span class="go">    from spotRiver.data.river_hyper_dict import RiverHyperDict</span>
 <span class="go">    fun_control = {}</span>
 <span class="go">    add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,</span>
-<span class="go">        fun_control=func_control,</span>
+<span class="go">        fun_control=fun_control,</span>
 <span class="go">        hyper_dict=RiverHyperDict,</span>
 <span class="go">        filename=None)</span>
 <span class="go">    X = np.array([0, 0, 0, 0, 0])</span>
@@ -6895,10 +6903,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">773</span>
-<span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">776</span>
 <span class="normal">777</span>
 <span class="normal">778</span>
 <span class="normal">779</span>
@@ -6923,7 +6928,10 @@ Adam
 <span class="normal">798</span>
 <span class="normal">799</span>
 <span class="normal">800</span>
-<span class="normal">801</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_core_model_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_core_model_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get one core model from X.</span>
 
 <span class="sd">    Args:</span>
@@ -6941,14 +6949,14 @@ Adam
 <span class="sd">            from spotRiver.data.river_hyper_dict import RiverHyperDict</span>
 <span class="sd">            fun_control = {}</span>
 <span class="sd">            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,</span>
-<span class="sd">                fun_control=func_control,</span>
+<span class="sd">                fun_control=fun_control,</span>
 <span class="sd">                hyper_dict=RiverHyperDict,</span>
 <span class="sd">                filename=None)</span>
 <span class="sd">            X = np.array([0, 0, 0, 0, 0])</span>
 <span class="sd">            get_one_core_model_from_X(X, fun_control)</span>
 <span class="sd">            HoeffdingAdaptiveTreeRegressor()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">var_dict</span> <span class="o">=</span> <span class="n">assign_values</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;var_name&quot;</span><span class="p">])</span>
+    <span class="n">var_dict</span> <span class="o">=</span> <span class="n">assign_values</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">get_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">))</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">return_conf_list_from_var_dict</span><span class="p">(</span><span class="n">var_dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">core_model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">core_model</span>
@@ -7059,10 +7067,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">874</span>
 <span class="normal">875</span>
 <span class="normal">876</span>
 <span class="normal">877</span>
@@ -7089,7 +7094,10 @@ Adam
 <span class="normal">898</span>
 <span class="normal">899</span>
 <span class="normal">900</span>
-<span class="normal">901</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_river_model_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_river_model_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get one river model from X.</span>
 
 <span class="sd">    Args:</span>
@@ -7227,10 +7235,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">838</span>
-<span class="normal">839</span>
-<span class="normal">840</span>
-<span class="normal">841</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">841</span>
 <span class="normal">842</span>
 <span class="normal">843</span>
 <span class="normal">844</span>
@@ -7257,7 +7262,10 @@ Adam
 <span class="normal">865</span>
 <span class="normal">866</span>
 <span class="normal">867</span>
-<span class="normal">868</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_sklearn_model_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_one_sklearn_model_from_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get one sklearn model from X.</span>
 
 <span class="sd">    Args:</span>
@@ -7612,31 +7620,31 @@ otherwise it returns the architecture with the lowest value (.min_X).</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">973</span>
-<span class="normal">974</span>
-<span class="normal">975</span>
-<span class="normal">976</span>
-<span class="normal">977</span>
-<span class="normal">978</span>
-<span class="normal">979</span>
-<span class="normal">980</span>
-<span class="normal">981</span>
-<span class="normal">982</span>
-<span class="normal">983</span>
-<span class="normal">984</span>
-<span class="normal">985</span>
-<span class="normal">986</span>
-<span class="normal">987</span>
-<span class="normal">988</span>
-<span class="normal">989</span>
-<span class="normal">990</span>
-<span class="normal">991</span>
-<span class="normal">992</span>
-<span class="normal">993</span>
-<span class="normal">994</span>
-<span class="normal">995</span>
-<span class="normal">996</span>
-<span class="normal">997</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_architecture</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">force_minX</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 976</span>
+<span class="normal"> 977</span>
+<span class="normal"> 978</span>
+<span class="normal"> 979</span>
+<span class="normal"> 980</span>
+<span class="normal"> 981</span>
+<span class="normal"> 982</span>
+<span class="normal"> 983</span>
+<span class="normal"> 984</span>
+<span class="normal"> 985</span>
+<span class="normal"> 986</span>
+<span class="normal"> 987</span>
+<span class="normal"> 988</span>
+<span class="normal"> 989</span>
+<span class="normal"> 990</span>
+<span class="normal"> 991</span>
+<span class="normal"> 992</span>
+<span class="normal"> 993</span>
+<span class="normal"> 994</span>
+<span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_architecture</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">force_minX</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the tuned architecture. If the spot tuner has noise,</span>
 <span class="sd">    it returns the architecture with the lowest mean (.min_mean_X),</span>
@@ -7837,10 +7845,7 @@ Optional. Default is None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1247</span>
-<span class="normal">1248</span>
-<span class="normal">1249</span>
-<span class="normal">1250</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1250</span>
 <span class="normal">1251</span>
 <span class="normal">1252</span>
 <span class="normal">1253</span>
@@ -7932,7 +7937,10 @@ Optional. Default is None.</p>
 <span class="normal">1339</span>
 <span class="normal">1340</span>
 <span class="normal">1341</span>
-<span class="normal">1342</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the tuned hyperparameters from the spot tuner.</span>
 <span class="sd">    This is just a wrapper function for the spot `get_tuned_hyperparameters` method.</span>
@@ -8695,10 +8703,7 @@ If no &ldquo;core_model_hyper_dict&rdquo; key exists in fun_control, return None
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1137</span>
-<span class="normal">1138</span>
-<span class="normal">1139</span>
-<span class="normal">1140</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1140</span>
 <span class="normal">1141</span>
 <span class="normal">1142</span>
 <span class="normal">1143</span>
@@ -8716,7 +8721,10 @@ If no &ldquo;core_model_hyper_dict&rdquo; key exists in fun_control, return None
 <span class="normal">1155</span>
 <span class="normal">1156</span>
 <span class="normal">1157</span>
-<span class="normal">1158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_var_type_from_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_var_type_from_var_name</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">var_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function gets the variable type from the variable name.</span>
 
@@ -9937,10 +9945,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1054</span>
-<span class="normal">1055</span>
-<span class="normal">1056</span>
-<span class="normal">1057</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1057</span>
 <span class="normal">1058</span>
 <span class="normal">1059</span>
 <span class="normal">1060</span>
@@ -9967,7 +9972,10 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1081</span>
 <span class="normal">1082</span>
 <span class="normal">1083</span>
-<span class="normal">1084</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_control_hyperparameter_value</span><span class="p">(</span><span class="n">control_dict</span><span class="p">,</span> <span class="n">hyperparameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1084</span>
+<span class="normal">1085</span>
+<span class="normal">1086</span>
+<span class="normal">1087</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_control_hyperparameter_value</span><span class="p">(</span><span class="n">control_dict</span><span class="p">,</span> <span class="n">hyperparameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function sets the hyperparameter values depending on the var_type</span>
 <span class="sd">    via modify_hyperameter_levels or modify_hyperparameter_bounds in the control_dict dictionary.</span>
@@ -10167,10 +10175,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1019</span>
-<span class="normal">1020</span>
-<span class="normal">1021</span>
-<span class="normal">1022</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1022</span>
 <span class="normal">1023</span>
 <span class="normal">1024</span>
 <span class="normal">1025</span>
@@ -10199,7 +10204,10 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1048</span>
 <span class="normal">1049</span>
 <span class="normal">1050</span>
-<span class="normal">1051</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_control_key_value</span><span class="p">(</span><span class="n">control_dict</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1051</span>
+<span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_control_key_value</span><span class="p">(</span><span class="n">control_dict</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function sets the key value pair in the control_dict dictionary.</span>
 
