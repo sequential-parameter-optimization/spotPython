@@ -53,6 +53,7 @@ def fun_control_init(
     sigma=0.0,
     surrogate=None,
     target_column=None,
+    target_type=None,
     task=None,
     test=None,
     test_seed=1234,
@@ -173,6 +174,8 @@ def fun_control_init(
             The surrogate model object. Default is None.
         target_column (str):
             The name of the target column. Default is None.
+        target_type (str):
+            The type of the target column. Default is None.
         task (str):
             The task to perform. It can be either "classification" or "regression".
             Default is None.
@@ -258,6 +261,7 @@ def fun_control_init(
                 'shuffle': None,
                 'sigma': 0.0,
                 'target_column': None,
+                'target_type': None,
                 'train': None,
                 'test': None,
                 'task': 'classification',
@@ -363,6 +367,7 @@ def fun_control_init(
         "spot_tensorboard_path": spot_tensorboard_path,
         "spot_writer": spot_writer,
         "target_column": target_column,
+        "target_type": target_type,
         "task": task,
         "test": test,
         "test_seed": test_seed,
