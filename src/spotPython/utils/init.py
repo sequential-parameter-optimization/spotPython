@@ -38,6 +38,7 @@ def fun_control_init(
     max_time=1,
     max_surrogate_points=30,
     metric_sklearn=None,
+    metric_sklearn_name=None,
     noise=False,
     n_points=1,
     n_samples=None,
@@ -47,9 +48,11 @@ def fun_control_init(
     oml_grace_period=None,
     optimizer=None,
     prep_model=None,
+    prep_model_name=None,
     seed=123,
     show_models=False,
     show_progress=True,
+    shuffle=None,
     sigma=0.0,
     surrogate=None,
     target_column=None,
@@ -66,6 +69,7 @@ def fun_control_init(
     verbosity=0,
     weights=1.0,
     weight_coeff=0.0,
+    weights_entry=None,
 ):
     """Initialize fun_control dictionary.
 
@@ -138,6 +142,8 @@ def fun_control_init(
             The maximum number of points in the surrogate model. Default is inf.
         metric_sklearn (object):
             The metric object from the scikit-learn library. Default is None.
+        metric_sklearn_name (str):
+            The name of the metric object from the scikit-learn library. Default is None.
         noise (bool):
             Whether the objective function is noiy or not. Default is False.
             Affects the repeat of the function evaluations.
@@ -161,6 +167,8 @@ def fun_control_init(
             that us an instance of a SummaryWriter(), is created. Default is None.
         prep_model (object):
             The preprocessing model object. Used for river. Default is None.
+        prep_model_name (str):
+            The name of the preprocessing model. Default is None.
         seed (int):
             The seed to use for the random number generator. Default is 123.
         sigma (float):
@@ -170,6 +178,8 @@ def fun_control_init(
         show_models (bool):
             Plot model each generation.
             Currently only 1-dim functions are supported. Default is `False`.
+        shuffle (bool):
+            Whether the data were shuffled or not. Default is None.
         surrogate (object):
             The surrogate model object. Default is None.
         target_column (str):
@@ -210,6 +220,8 @@ def fun_control_init(
             Can be an array, so that different weights can be used for different (multiple) objectives.
         weight_coeff (float):
             Determines how to weight older measures. Default is 1.0. Used in the OML algorithm eval_oml.py.
+        weights_entry (str):
+            The weights entry used in the GUI. Default is None.
 
     Returns:
         fun_control (dict):
@@ -243,6 +255,7 @@ def fun_control_init(
                 'max_surrogate_points': 100,
                 'metric_river': None,
                 'metric_sklearn': None,
+                'metric_sklearn_name': None,
                 'metric_torch': None,
                 'metric_params': {},
                 'model_dict': {},
@@ -255,6 +268,7 @@ def fun_control_init(
                 'optimizer': None,
                 'path': None,
                 'prep_model': None,
+                prep_model_name': None,
                 'save_model': False,
                 'seed': 1234,
                 'show_batch_interval': 1000000,
@@ -344,6 +358,7 @@ def fun_control_init(
         "max_surrogate_points": max_surrogate_points,
         "metric_river": None,
         "metric_sklearn": metric_sklearn,
+        "metric_sklearn_name": metric_sklearn_name,
         "metric_torch": None,
         "metric_params": {},
         "model_dict": {},
@@ -357,12 +372,13 @@ def fun_control_init(
         "optimizer": optimizer,
         "path": None,
         "prep_model": prep_model,
+        "prep_model_name": prep_model_name,
         "save_model": False,
         "seed": seed,
         "show_batch_interval": 1_000_000,
         "show_models": show_models,
         "show_progress": show_progress,
-        "shuffle": None,
+        "shuffle": shuffle,
         "sigma": sigma,
         "spot_tensorboard_path": spot_tensorboard_path,
         "spot_writer": spot_writer,
@@ -380,6 +396,7 @@ def fun_control_init(
         "verbosity": verbosity,
         "weights": weights,
         "weight_coeff": weight_coeff,
+        "weights_entry": weights_entry
     }
     # lower = X_reshape(lower)
     # fun_control.update({"lower": lower})

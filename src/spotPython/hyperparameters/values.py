@@ -1366,3 +1366,40 @@ def get_tuned_hyperparameters(spot_tuner, fun_control=None) -> dict:
                 'initialization': 1.0}
     """
     return spot_tuner.get_tuned_hyperparameters(fun_control=fun_control)
+
+
+def update_fun_control(fun_control, new_control) -> dict:
+    for i, (key, value) in enumerate(new_control.items()):
+        if new_control[key]["type"] == "int":
+            set_control_hyperparameter_value(
+                fun_control,
+                key,
+                [
+                    int(new_control[key]["lower"]),
+                    int(new_control[key]["upper"]),
+                ],
+            )
+        if (new_control[key]["type"] == "factor") and (new_control[key]["core_model_parameter_type"] == "bool"):
+            set_control_hyperparameter_value(
+                fun_control,
+                key,
+                [
+                    int(new_control[key]["lower"]),
+                    int(new_control[key]["upper"]),
+                ],
+            )
+        if new_control[key]["type"] == "float":
+            set_control_hyperparameter_value(
+                fun_control,
+                key,
+                [
+                    float(new_control[key]["lower"]),
+                    float(new_control[key]["upper"]),
+                ],
+            )
+        if new_control[key]["type"] == "factor" and new_control[key]["core_model_parameter_type"] != "bool":
+            fle = new_control[key]["levels"]
+            # convert the string to a list of strings
+            fle = fle.split()
+            set_control_hyperparameter_value(fun_control, key, fle)
+            fun_control["core_model_hyper_new_control"][key].update({"upper": len(fle) - 1})
