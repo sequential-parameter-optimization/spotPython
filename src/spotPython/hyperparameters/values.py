@@ -1403,3 +1403,57 @@ def update_fun_control(fun_control, new_control) -> dict:
             fle = fle.split()
             set_control_hyperparameter_value(fun_control, key, fle)
             fun_control["core_model_hyper_new_control"][key].update({"upper": len(fle) - 1})
+
+
+def update_fun_control_with_hyper_num_cat_dicts(fun_control, num_dict, cat_dict, dict):
+    """
+    Update an existing fun_control dictionary with new hyperparameter values.
+    All values from the hyperparameter dict (dict) are updated in the fun_control dictionary
+    using the num_dict and cat_dict dictionaries.
+
+    Args:
+        fun_control (dict):
+            The fun_control dictionary. This dictionary is updated with the new hyperparameter values.
+        num_dict (dict):
+            The dictionary containing the numerical hyperparameter values, which
+            are used to update the fun_control dictionary.
+        cat_dict (dict):
+            The dictionary containing the categorical hyperparameter values, which
+            are used to update the fun_control dictionary.
+        dict (dict):
+            The dictionary containing the "old" hyperparameter values.
+    """
+    for i, (key, value) in enumerate(dict.items()):
+        if dict[key]["type"] == "int":
+            set_control_hyperparameter_value(
+                fun_control,
+                key,
+                [
+                    int(num_dict[key]["lower"]),
+                    int(num_dict[key]["upper"]),
+                ],
+            )
+        if (dict[key]["type"] == "factor") and (dict[key]["core_model_parameter_type"] == "bool"):
+            set_control_hyperparameter_value(
+                fun_control,
+                key,
+                [
+                    int(num_dict[key]["lower"]),
+                    int(num_dict[key]["upper"]),
+                ],
+            )
+        if dict[key]["type"] == "float":
+            set_control_hyperparameter_value(
+                fun_control,
+                key,
+                [
+                    float(num_dict[key]["lower"]),
+                    float(num_dict[key]["upper"]),
+                ],
+            )
+        if dict[key]["type"] == "factor" and dict[key]["core_model_parameter_type"] != "bool":
+            fle = cat_dict[key]["levels"]
+            # convert the string to a list of strings
+            fle = fle.split()
+            set_control_hyperparameter_value(fun_control, key, fle)
+            fun_control["core_model_hyper_dict"][key].update({"upper": len(fle) - 1})

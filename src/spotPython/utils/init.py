@@ -396,7 +396,7 @@ def fun_control_init(
         "verbosity": verbosity,
         "weights": weights,
         "weight_coeff": weight_coeff,
-        "weights_entry": weights_entry
+        "weights_entry": weights_entry,
     }
     # lower = X_reshape(lower)
     # fun_control.update({"lower": lower})
