@@ -1,5 +1,5 @@
 import os
-from spotPython.utils.file import save_experiment, load_experiment
+from spotPython.utils.file import load_experiment
 import numpy as np
 from math import inf
 from spotPython.spot import spot
@@ -10,14 +10,15 @@ from spotPython.utils.init import (
     optimizer_control_init)
 from spotPython.fun.objectivefunctions import analytical
 
+
 def test_file_save_load():
     fun = analytical().fun_branin
 
     fun_control = fun_control_init(
                 PREFIX="branin",
                 SUMMARY_WRITER=False,
-                lower = np.array([0, 0]),
-                upper = np.array([10, 10]),
+                lower=np.array([0, 0]),
+                upper=np.array([10, 10]),
                 fun_evals=8,
                 fun_repeats=1,
                 max_time=inf,
@@ -53,22 +54,14 @@ def test_file_save_load():
                 surrogate_control=surrogate_control,
                 optimizer_control=optimizer_control)
     # Call the save_experiment function
-    pkl_name = save_experiment(
-        spot_tuner=spot_tuner,
-        fun_control=fun_control,
-        design_control=None,
-        surrogate_control=None,
-        optimizer_control=None
-    )
+    filename = "test.pkl"
+    spot_tuner.save_experiment(filename=filename)
 
     # Verify that the pickle file is created
-    assert os.path.exists(pkl_name)
+    assert os.path.exists(filename)
 
     # Call the load_experiment function
-    spot_tuner_1, fun_control_1, design_control_1, surrogate_control_1, optimizer_control_1 = load_experiment(pkl_name)
-
-    # Verify the name of the pickle file
-    assert pkl_name == f"spot_{fun_control['PREFIX']}_experiment.pickle"
+    spot_tuner_1, fun_control_1, design_control_1, surrogate_control_1, optimizer_control_1 = load_experiment(filename)
 
     # Clean up the temporary directory
-    os.remove(pkl_name)
+    os.remove(filename)

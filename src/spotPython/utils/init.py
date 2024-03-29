@@ -50,6 +50,7 @@ def fun_control_init(
     optimizer=None,
     prep_model=None,
     prep_model_name=None,
+    progress_file=None,
     seed=123,
     show_models=False,
     show_progress=True,
@@ -172,6 +173,8 @@ def fun_control_init(
             The preprocessing model object. Used for river. Default is None.
         prep_model_name (str):
             The name of the preprocessing model. Default is None.
+        progress_file (str):
+            The name of the progress file. Default is None.
         seed (int):
             The seed to use for the random number generator. Default is 123.
         sigma (float):
@@ -378,6 +381,7 @@ def fun_control_init(
         "path": None,
         "prep_model": prep_model,
         "prep_model_name": prep_model_name,
+        "progress_file": progress_file,
         "save_model": False,
         "seed": seed,
         "show_batch_interval": 1_000_000,

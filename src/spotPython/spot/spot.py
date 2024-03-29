@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pickle
 import pprint
 import os
 import copy
@@ -28,6 +29,7 @@ from spotPython.utils.init import fun_control_init, optimizer_control_init, surr
 from spotPython.utils.compare import selectNew
 from spotPython.utils.aggregate import aggregate_mean_var, select_distant_points
 from spotPython.utils.repair import remove_nan
+from spotPython.utils.file import get_experiment_filename
 from spotPython.budget.ocba import get_ocba_X
 import logging
 import time
@@ -253,6 +255,7 @@ class Spot:
         self.infill_criterion = self.fun_control["infill_criterion"]
         self.n_points = self.fun_control["n_points"]
         self.max_surrogate_points = self.fun_control["max_surrogate_points"]
+        self.progress_file = self.fun_control["progress_file"]
 
         # if the key "spot_writer" is not in the dictionary fun_control,
         # set self.spot_writer to None else to the value of the key "spot_writer"
@@ -617,20 +620,23 @@ class Spot:
             logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
             return X0
 
-    def write_db_dict(self) -> None:
-        """Writes a dictionary with the experiment parameters to the json file spotPython_db.json.
+    def de_serialize_dicts(self) -> tuple:
+        """
+        Deserialize the spot object and return the dictionaries.
 
         Args:
-            self (object): Spot object
+            self (object):
+                Spot object
 
         Returns:
-            (NoneType): None
-
+            (tuple):
+                tuple containing dictionaries of spot object:
+                fun_control (dict): function control dictionary,
+                design_control (dict): design control dictionary,
+                optimizer_control (dict): optimizer control dictionary,
+                spot_tuner_control (dict): spot tuner control dictionary, and
+                surrogate_control (dict): surrogate control dictionary
         """
-        # get the time in seconds from 1.1.1970 and convert the time to a string
-        t_str = str(time.time())
-        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
-
         spot_tuner = copy.deepcopy(self)
         spot_tuner_control = vars(spot_tuner)
 
@@ -663,6 +669,29 @@ class Spot:
         surrogate_control.pop("model_optimizer", None)
         surrogate_control.pop("surrogate", None)
 
+        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
+
+    def write_db_dict(self) -> None:
+        """Writes a dictionary with the experiment parameters to the json file spotPython_db.json.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        """
+        # get the time in seconds from 1.1.1970 and convert the time to a string
+        t_str = str(time.time())
+        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
+
+        (
+            fun_control,
+            design_control,
+            optimizer_control,
+            spot_tuner_control,
+            surrogate_control,
+        ) = self.de_serialize_dicts()
         print("\n**********************")
         print("The following dictionaries are written to the json file spotPython_db.json:")
         print("fun_control:")
@@ -671,10 +700,10 @@ class Spot:
         pprint.pprint(design_control)
         print("optimizer_control:")
         pprint.pprint(optimizer_control)
-        print("surrogate_control:")
-        pprint.pprint(surrogate_control)
         print("spot_tuner_control:")
         pprint.pprint(spot_tuner_control)
+        print("surrogate_control:")
+        pprint.pprint(surrogate_control)
         db_dict = {
             str(ident): {
                 "fun_control": fun_control,
@@ -730,6 +759,7 @@ class Spot:
         pprint.pprint(self.fun_control)
         if self.fun_control["db_dict_name"] is not None:
             self.write_db_dict()
+        self.save_experiment()
         return self
 
     def initialize_design(self, X_start=None) -> None:
@@ -1021,9 +1051,11 @@ class Spot:
         if not self.show_progress:
             return
         if isfinite(self.fun_evals):
-            progress_bar(progress=self.counter / self.fun_evals, y=self.min_y)
+            progress_bar(progress=self.counter / self.fun_evals, y=self.min_y, filename=self.progress_file)
         else:
-            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y)
+            progress_bar(
+                progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y, filename=self.progress_file
+            )
 
     def generate_design(self, size, repeats, lower, upper) -> np.array:
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)
@@ -1953,3 +1985,34 @@ class Spot:
         if show:
             fig.show()
         return fig
+
+    def save_experiment(self, filename=None) -> None:
+        """
+        Save the experiment to a file.
+        """
+        design_control = copy.deepcopy(self.design_control)
+        fun_control = copy.deepcopy(self.fun_control)
+        optimizer_control = copy.deepcopy(self.optimizer_control)
+        spot_tuner = copy.deepcopy(self)
+        surrogate_control = copy.deepcopy(self.surrogate_control)
+
+        # remove the key "spot_writer" from the fun_control dictionary,
+        # because it is not serializable.
+        # TODO: It will be re-added when the experiment is loaded.
+        fun_control.pop("spot_writer", None)
+        experiment = {
+            "design_control": design_control,
+            "fun_control": fun_control,
+            "optimizer_control": optimizer_control,
+            "spot_tuner": spot_tuner,
+            "surrogate_control": surrogate_control,
+        }
+        # check if the key "spot_writer" is in the fun_control dictionary
+        if "spot_writer" in fun_control and fun_control["spot_writer"] is not None:
+            fun_control["spot_writer"].close()
+        PREFIX = fun_control["PREFIX"]
+        if filename is None and PREFIX is not None:
+            filename = get_experiment_filename(PREFIX)
+        if filename is not None:
+            with open(filename, "wb") as handle:
+                pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
