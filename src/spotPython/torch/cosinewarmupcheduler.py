@@ -10,9 +10,6 @@ class CosineWarmupScheduler(optim.lr_scheduler._LRScheduler):
         warmup (int): The number of warmup steps.
         max_iters (int): The number of maximum iterations the model is trained for.
 
-    Returns:
-        torch.optim.Optimizer: The optimizer with the learning rate updated.
-
     Example:
         >>> optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
         >>> scheduler = CosineWarmupScheduler(optimizer, warmup=10, max_iters=100)

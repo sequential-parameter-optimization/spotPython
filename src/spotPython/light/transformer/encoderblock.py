@@ -3,7 +3,7 @@ from spotPython.light.transformer.multiheadattention import MultiheadAttention
 
 
 class EncoderBlock(nn.Module):
-    def __init__(self, input_dim, num_heads, dim_feedforward, dropout=0.0):
+    def __init__(self, input_dim, num_heads, dim_feedforward, dropout=0.0) -> None:
         """
         Initializes the EncoderBlock object.
 

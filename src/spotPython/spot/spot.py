@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import pprint
+import os
+import copy
+import json
 from numpy.random import default_rng
 from spotPython.design.spacefilling import spacefilling
 from spotPython.build.kriging import Kriging
@@ -35,6 +39,7 @@ from spotPython.hyperparameters.values import (
 )
 import plotly.graph_objects as go
 from typing import Callable
+from spotPython.utils.numpy2json import NumpyEncoder
 
 
 logger = logging.getLogger(__name__)
@@ -612,6 +617,88 @@ class Spot:
             logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
             return X0
 
+    def write_db_dict(self) -> None:
+        """Writes a dictionary with the experiment parameters to the json file spotPython_db.json.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        """
+        # get the time in seconds from 1.1.1970 and convert the time to a string
+        t_str = str(time.time())
+        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
+
+        spot_tuner = copy.deepcopy(self)
+        spot_tuner_control = vars(spot_tuner)
+
+        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
+        design_control = copy.deepcopy(spot_tuner_control["design_control"])
+        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
+        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
+
+        # remove keys from the dictionaries:
+        spot_tuner_control.pop("fun_control", None)
+        spot_tuner_control.pop("design_control", None)
+        spot_tuner_control.pop("optimizer_control", None)
+        spot_tuner_control.pop("surrogate_control", None)
+        spot_tuner_control.pop("spot_writer", None)
+        spot_tuner_control.pop("design", None)
+        spot_tuner_control.pop("fun", None)
+        spot_tuner_control.pop("optimizer", None)
+        spot_tuner_control.pop("rng", None)
+        spot_tuner_control.pop("surrogate", None)
+
+        fun_control.pop("core_model", None)
+        fun_control.pop("metric_river", None)
+        fun_control.pop("metric_sklearn", None)
+        fun_control.pop("metric_torch", None)
+        fun_control.pop("prep_model", None)
+        fun_control.pop("spot_writer", None)
+        fun_control.pop("test", None)
+        fun_control.pop("train", None)
+
+        surrogate_control.pop("model_optimizer", None)
+        surrogate_control.pop("surrogate", None)
+
+        print("\n**********************")
+        print("The following dictionaries are written to the json file spotPython_db.json:")
+        print("fun_control:")
+        pprint.pprint(fun_control)
+        print("design_control:")
+        pprint.pprint(design_control)
+        print("optimizer_control:")
+        pprint.pprint(optimizer_control)
+        print("surrogate_control:")
+        pprint.pprint(surrogate_control)
+        print("spot_tuner_control:")
+        pprint.pprint(spot_tuner_control)
+        db_dict = {
+            str(ident): {
+                "fun_control": fun_control,
+                "design_control": design_control,
+                "surrogate_control": surrogate_control,
+                "optimizer_control": optimizer_control,
+                "spot_tuner_control": spot_tuner_control,
+            }
+        }
+
+        # check if the directory "db_dicts" exists.
+        if not os.path.exists("db_dicts"):
+            try:
+                os.makedirs("db_dicts")
+            except OSError as e:
+                raise Exception(f"Error creating directory: {e}")
+        if os.path.exists("db_dicts"):
+            try:
+                with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
+                    json.dump(db_dict, f, indent=4, cls=NumpyEncoder)
+                f.close()
+            except OSError as e:
+                raise Exception(f"Error writing to file: {e}")
+
     def run(self, X_start=None) -> Spot:
         self.initialize_design(X_start)
         # New: self.update_stats() moved here:
@@ -640,6 +727,9 @@ class Spot:
         if self.spot_writer is not None:
             writer = self.spot_writer
             writer.close()
+        pprint.pprint(self.fun_control)
+        if self.fun_control["db_dict_name"] is not None:
+            self.write_db_dict()
         return self
 
     def initialize_design(self, X_start=None) -> None:

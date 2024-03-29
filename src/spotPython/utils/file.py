@@ -74,18 +74,51 @@ def load_pickle(filename: str):
     return obj
 
 
+def get_experiment_filename(PREFIX):
+    """Returns the name of the experiment.
+
+    Args:
+        PREFIX (str): Prefix of the experiment.
+
+    Returns:
+        filename (str): Name of the experiment.
+
+    Examples:
+        >>> from spotPython.utils.file import get_experiment_name
+        >>> from spotPython.utils.init import fun_control_init
+        >>> fun_control = fun_control_init(PREFIX="branin")
+        >>> PREFIX = fun_control["PREFIX"]
+        >>> filename = get_experiment_filename(PREFIX)
+    """
+    filename = "spot_" + PREFIX + "_experiment.pickle"
+    return filename
+
+
 def save_experiment(
-    spot_tuner, fun_control, design_control=None, surrogate_control=None, optimizer_control=None
+    spot_tuner,
+    fun_control,
+    design_control=None,
+    surrogate_control=None,
+    optimizer_control=None,
+    filename=None,
 ) -> str:
     """
     Saves the experiment as a pickle file.
 
     Args:
-        spot_tuner (object): The spot tuner object.
-        fun_control (dict): The function control dictionary.
-        design_control (dict, optional): The design control dictionary. Defaults to None.
-        surrogate_control (dict, optional): The surrogate control dictionary. Defaults to None.
-        optimizer_control (dict, optional): The optimizer control dictionary. Defaults to None.
+        spot_tuner (object):
+            The spot tuner object.
+        fun_control (dict):
+            The function control dictionary.
+        design_control (dict, optional):
+            The design control dictionary. Defaults to None.
+        surrogate_control (dict, optional):
+            The surrogate control dictionary. Defaults to None.
+        optimizer_control (dict, optional):
+            The optimizer control dictionary. Defaults to None.
+        filename (str, optional):
+            Name of the pickle file. Defaults to None.
+            If None, the name is built as "spot_" + PREFIX + "_experiment.pickle".
 
     Returns:
         PKL_NAME (str):
@@ -176,12 +209,13 @@ def save_experiment(
     # check if the key "spot_writer" is in the fun_control dictionary
     if "spot_writer" in fun_control and fun_control["spot_writer"] is not None:
         fun_control["spot_writer"].close()
-    PREFIX = fun_control["PREFIX"]
-    PKL_NAME = "spot_" + PREFIX + "_experiment.pickle"
-    with open(PKL_NAME, "wb") as handle:
+    if filename is None:
+        PREFIX = fun_control["PREFIX"]
+        filename = get_experiment_filename(PREFIX)
+    with open(filename, "wb") as handle:
         pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print(f"Experiment saved as {PKL_NAME}")
-    return PKL_NAME
+    print(f"Experiment saved as {filename}")
+    return filename
 
 
 def load_experiment(PKL_NAME):

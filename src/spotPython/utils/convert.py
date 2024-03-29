@@ -141,7 +141,7 @@ def map_to_True_False(value):
         return False
 
 
-def sort_by_kth_and_return_indices(array, k):
+def sort_by_kth_and_return_indices(array, k) -> list:
     """Sorts an array of arrays based on the k-th values in descending order and returns
     the indices of the original array entries.
 

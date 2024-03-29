@@ -24,6 +24,7 @@ def fun_control_init(
     data_module=None,
     data_set=None,
     data_set_name=None,
+    db_dict_name=None,
     design=None,
     device=None,
     devices=1,
@@ -102,6 +103,8 @@ def fun_control_init(
             The data set object. Default is None.
         data_set_name (str):
             The name of the data set. Default is None.
+        db_dict_name (str):
+            The name of the database dictionary. Default is None.
         device (str):
             The device to use for the training. It can be either "cpu", "mps", or "cuda".
         devices (str or int):
@@ -243,6 +246,7 @@ def fun_control_init(
                 'core_model_name': None,
                 'data': None,
                 'data_dir': './data',
+                'db_dict_name': None,
                 'device': None,
                 'devices': "auto",
                 'enable_progress_bar': False,
@@ -340,6 +344,7 @@ def fun_control_init(
         "data_module": data_module,
         "data_set": data_set,
         "data_set_name": data_set_name,
+        "db_dict_name": db_dict_name,
         "design": design,
         "device": device,
         "devices": devices,
