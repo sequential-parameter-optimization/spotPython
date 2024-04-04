@@ -19,6 +19,9 @@ def progress_bar(
         filename (str):
             If not None, write the progress bar to filename.
     """
+    if filename is not None:
+        # open the file in append mode
+        file = open(filename, "a")
     status = ""
     if y is not None:
         message = f"{message} {y}"
@@ -30,8 +33,10 @@ def progress_bar(
         status = "Done...\r\n"
     block = int(round(bar_length * progress))
     text = f"{message} [{'#' * block + '-' * (bar_length - block)}] {progress * 100:.2f}% {status}\r\n"
+    if filename is not None:
+        file.write(text)
+        file.flush()
     stdout.write(text)
     stdout.flush()
     if filename is not None:
-        with open(filename, "a") as file:
-            file.write(text)
+        file.close()
