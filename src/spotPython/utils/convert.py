@@ -179,3 +179,32 @@ def sort_by_kth_and_return_indices(array, k) -> list:
     sorted_indices = [index for index, value in sorted(enumerate(array), key=lambda x: x[1][k], reverse=True)]
 
     return sorted_indices
+
+
+def check_type(value):
+    """Check the type of the input value and return the type as a string.
+
+    Args:
+        value (object): The input value.
+
+    Returns:
+        str: The type of the input value as a string.
+        Possible values are "int", "float", "str", "bool", or None.
+        Checks for numpy types as well, i.e., np.integer, np.floating, np.str_, np.bool_.
+
+    Examples:
+        >>> from spotPython.utils.convert import check_type
+        >>> check_type(5)
+        "int"
+
+    """
+    if isinstance(value, (int, np.integer)):
+        return "int"
+    elif isinstance(value, (float, np.floating)):
+        return "float"
+    elif isinstance(value, (str, np.str_)):
+        return "str"
+    elif isinstance(value, (bool, np.bool_)):
+        return "bool"
+    else:
+        return None

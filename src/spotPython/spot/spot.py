@@ -1048,6 +1048,17 @@ class Spot:
             self.plot_model()
 
     def show_progress_if_needed(self, timeout_start) -> None:
+        """Show progress bar if `show_progress` is `True`. If
+        self.progress_file is not `None`, the progress bar is saved
+        in the file with the name `self.progress_file`.
+
+        Args:
+            self (object): Spot object
+            timeout_start (float): start time
+
+        Returns:
+            (NoneType): None
+        """
         if not self.show_progress:
             return
         if isfinite(self.fun_evals):
