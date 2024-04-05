@@ -704,29 +704,42 @@ class Spot:
         pprint.pprint(spot_tuner_control)
         print("surrogate_control:")
         pprint.pprint(surrogate_control)
-        db_dict = {
-            str(ident): {
-                "fun_control": fun_control,
-                "design_control": design_control,
-                "surrogate_control": surrogate_control,
-                "optimizer_control": optimizer_control,
-                "spot_tuner_control": spot_tuner_control,
+        #
+        # Generate a description of the results:
+        # if spot_tuner_control['min_y'] exists:
+        try:
+            result = f"Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']} at {spot_tuner_control['min_X']}."
+            #
+            db_dict = {
+                "data": {
+                    "id": str(ident),
+                    "result": result,
+                    "fun_control": fun_control,
+                    "design_control": design_control,
+                    "surrogate_control": surrogate_control,
+                    "optimizer_control": optimizer_control,
+                    "spot_tuner_control": spot_tuner_control,
+                }
             }
-        }
+            # Check if the directory "db_dicts" exists.
+            if not os.path.exists("db_dicts"):
+                try:
+                    os.makedirs("db_dicts")
+                except OSError as e:
+                    raise Exception(f"Error creating directory: {e}")
 
-        # check if the directory "db_dicts" exists.
-        if not os.path.exists("db_dicts"):
-            try:
-                os.makedirs("db_dicts")
-            except OSError as e:
-                raise Exception(f"Error creating directory: {e}")
-        if os.path.exists("db_dicts"):
-            try:
-                with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
-                    json.dump(db_dict, f, indent=4, cls=NumpyEncoder)
-                f.close()
-            except OSError as e:
-                raise Exception(f"Error writing to file: {e}")
+            if os.path.exists("db_dicts"):
+                try:
+                    # Open the file in append mode to add each new dict as a new line
+                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
+                        # Using json.dumps to convert the dict to a JSON formatted string
+                        # We then write this string to the file followed by a newline character
+                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
+                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
+                except OSError as e:
+                    raise Exception(f"Error writing to file: {e}")
+        except KeyError:
+            print("No results to write.")
 
     def run(self, X_start=None) -> Spot:
         self.initialize_design(X_start)
