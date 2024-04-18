@@ -1,3 +1,3 @@
 #!/bin/sh
-rm -f dist/spotPython*; python -m build; python -m pip install dist/spotPython*.tar.gz
+rm -f dist/spotpython*; python -m build; python -m pip install dist/spotpython*.tar.gz
 python -m mkdocs build

@@ -2,6 +2,7 @@ import importlib
 import numpy as np
 import pandas as pd
 from itertools import combinations
+import copy
 
 
 def class_for_name(module_name, class_name) -> object:
@@ -208,3 +209,28 @@ def check_type(value):
         return "bool"
     else:
         return None
+
+
+def set_dataset_target_type(dataset, target="y"):
+    """Set the target column to 0 and 1.
+
+    Args:
+        dataset (pd.DataFrame): The input dataset.
+        target (str): The name of the target column. Default is "y".
+
+    Returns:
+        pd.DataFrame: The dataset with the target column set to 0 and 1.
+
+    Examples:
+    >>> from spotPython.utils.convert import set_dataset_target_type
+        dataset = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "y": [True, False, True]})
+        dataset = set_dataset_target_type(dataset)
+
+
+    """
+    val = copy.deepcopy(dataset.iloc[0, -1])
+    target_type = check_type(val)
+    if target_type == "bool" or target_type == "str":
+        # convert the target column to 0 and 1
+        dataset[target] = dataset[target].astype(int)
+    return dataset
