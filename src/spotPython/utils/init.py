@@ -51,6 +51,7 @@ def fun_control_init(
     prep_model=None,
     prep_model_name=None,
     progress_file=None,
+    scenario=None,
     seed=123,
     show_models=False,
     show_progress=True,
@@ -175,6 +176,8 @@ def fun_control_init(
             The name of the preprocessing model. Default is None.
         progress_file (str):
             The name of the progress file. Default is None.
+        scenario (str):
+            The scenario to use. Default is None. Can be "river", "sklearn", or "lightning".
         seed (int):
             The seed to use for the random number generator. Default is 123.
         sigma (float):
@@ -275,8 +278,9 @@ def fun_control_init(
                 'optimizer': None,
                 'path': None,
                 'prep_model': None,
-                prep_model_name': None,
+                'prep_model_name': None,
                 'save_model': False,
+                'scenario': "lightning",
                 'seed': 1234,
                 'show_batch_interval': 1000000,
                 'shuffle': None,
@@ -383,6 +387,7 @@ def fun_control_init(
         "prep_model_name": prep_model_name,
         "progress_file": progress_file,
         "save_model": False,
+        "scenario": scenario,
         "seed": seed,
         "show_batch_interval": 1_000_000,
         "show_models": show_models,

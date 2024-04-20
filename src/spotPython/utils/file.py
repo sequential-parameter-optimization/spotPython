@@ -9,7 +9,7 @@ import importlib
 # from torch.utils.tensorboard import SummaryWriter
 
 
-def load_data(data_dir="./data"):
+def load_cifar10_data(data_dir="./data"):
     """Loads the CIFAR10 dataset.
 
     Args:
@@ -19,16 +19,13 @@ def load_data(data_dir="./data"):
         trainset (torchvision.datasets.CIFAR10): Training dataset.
 
     Examples:
-        >>> from spotPython.utils.file import load_data
-        >>> trainset = load_data(data_dir="./data")
+        >>> from spotPython.utils.file import load_cifar10_data
+        >>> trainset = load_cifar10_data(data_dir="./data")
 
     """
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
     trainset = torchvision.datasets.CIFAR10(root=data_dir, train=True, download=True, transform=transform)
-
     testset = torchvision.datasets.CIFAR10(root=data_dir, train=False, download=True, transform=transform)
-
     return trainset, testset
 
 
@@ -105,6 +102,9 @@ def load_experiment(PKL_NAME):
         design_control (dict): The design control dictionary.
         surrogate_control (dict): The surrogate control dictionary.
         optimizer_control (dict): The optimizer control dictionary.
+
+    Notes:
+        The corresponding save_experiment function is part of the class spot.
 
     """
     with open(PKL_NAME, "rb") as handle:
