@@ -3454,7 +3454,7 @@
 
 
 <h2 id="spotPython.light.trainmodel.train_model" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 <a href="#spotPython.light.trainmodel.train_model" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -3502,6 +3502,21 @@
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>timestamp</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A boolean value indicating whether to include a timestamp in the config id. Default is True.
+If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
+            </div>
+          </td>
+          <td>
+                <code>True</code>
           </td>
         </tr>
     </tbody>
@@ -3582,8 +3597,7 @@
 
           <details class="quote">
             <summary>Source code in <code>spotPython/light/trainmodel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 10</span>
-<span class="normal"> 11</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 11</span>
 <span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
@@ -3698,13 +3712,38 @@
 <span class="normal">123</span>
 <span class="normal">124</span>
 <span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        config (dict): A dictionary containing the configuration parameters for the model.</span>
-<span class="sd">        fun_control (dict): A dictionary containing the function control parameters.</span>
+<span class="sd">        config (dict):</span>
+<span class="sd">            A dictionary containing the configuration parameters for the model.</span>
+<span class="sd">        fun_control (dict):</span>
+<span class="sd">            A dictionary containing the function control parameters.</span>
+<span class="sd">        timestamp (bool):</span>
+<span class="sd">            A boolean value indicating whether to include a timestamp in the config id. Default is True.</span>
+<span class="sd">            If False, the string &quot;_TRAIN&quot; is appended to the config id.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        float: The validation loss of the trained model.</span>
@@ -3763,9 +3802,15 @@
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;enable_progress_bar&quot;</span><span class="p">]</span>
-    <span class="c1"># config id is unique. Since the model is not loaded from a checkpoint,</span>
-    <span class="c1"># the config id is generated here with a timestamp.</span>
-    <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">timestamp</span><span class="p">:</span>
+        <span class="c1"># config id is unique. Since the model is not loaded from a checkpoint,</span>
+        <span class="c1"># the config id is generated here with a timestamp.</span>
+        <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># config id is not time-dependent and therefore unique,</span>
+        <span class="c1"># so that the model can be loaded from a checkpoint,</span>
+        <span class="c1"># the config id is generated here without a timestamp.</span>
+        <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_TRAIN&quot;</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
     <span class="n">initialization</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;initialization&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Xavier&quot;</span><span class="p">:</span>
@@ -3788,6 +3833,16 @@
     <span class="c1"># print(f&quot;train_model(): Train set size: {len(dm.data_train)}&quot;)</span>
     <span class="c1"># print(f&quot;train_model(): Batch size: {config[&#39;batch_size&#39;]}&quot;)</span>
 
+    <span class="c1"># Callbacks</span>
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">timestamp</span><span class="p">:</span>
+        <span class="c1"># add ModelCheckpoint only if timestamp is False</span>
+        <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">ModelCheckpoint</span><span class="p">(</span><span class="n">dirpath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">),</span> <span class="n">save_last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># Save the last checkpoint</span>
+
     <span class="c1"># Init trainer</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
         <span class="c1"># Where to save models</span>
@@ -3801,9 +3856,7 @@
             <span class="n">default_hp_metric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">log_graph</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;log_graph&quot;</span><span class="p">],</span>
         <span class="p">),</span>
-        <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="p">],</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
         <span class="n">enable_progress_bar</span><span class="o">=</span><span class="n">enable_progress_bar</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># Pass the datamodule as arg to trainer.fit to override model hooks :)</span>
