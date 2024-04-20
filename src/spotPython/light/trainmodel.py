@@ -4,16 +4,22 @@ from spotPython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from spotPython.torch.initialization import kaiming_init, xavier_init
+from lightning.pytorch.callbacks import ModelCheckpoint
 import os
 
 
-def train_model(config: dict, fun_control: dict) -> float:
+def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> float:
     """
     Trains a model using the given configuration and function control parameters.
 
     Args:
-        config (dict): A dictionary containing the configuration parameters for the model.
-        fun_control (dict): A dictionary containing the function control parameters.
+        config (dict):
+            A dictionary containing the configuration parameters for the model.
+        fun_control (dict):
+            A dictionary containing the function control parameters.
+        timestamp (bool):
+            A boolean value indicating whether to include a timestamp in the config id. Default is True.
+            If False, the string "_TRAIN" is appended to the config id.
 
     Returns:
         float: The validation loss of the trained model.
@@ -72,9 +78,15 @@ def train_model(config: dict, fun_control: dict) -> float:
         enable_progress_bar = False
     else:
         enable_progress_bar = fun_control["enable_progress_bar"]
-    # config id is unique. Since the model is not loaded from a checkpoint,
-    # the config id is generated here with a timestamp.
-    config_id = generate_config_id(config, timestamp=True)
+    if timestamp:
+        # config id is unique. Since the model is not loaded from a checkpoint,
+        # the config id is generated here with a timestamp.
+        config_id = generate_config_id(config, timestamp=True)
+    else:
+        # config id is not time-dependent and therefore unique,
+        # so that the model can be loaded from a checkpoint,
+        # the config id is generated here without a timestamp.
+        config_id = generate_config_id(config, timestamp=False) + "_TRAIN"
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     initialization = config["initialization"]
     if initialization == "Xavier":
@@ -97,6 +109,16 @@ def train_model(config: dict, fun_control: dict) -> float:
     # print(f"train_model(): Train set size: {len(dm.data_train)}")
     # print(f"train_model(): Batch size: {config['batch_size']}")
 
+    # Callbacks
+    callbacks = [
+        EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
+    ]
+    if not timestamp:
+        # add ModelCheckpoint only if timestamp is False
+        callbacks.append(
+            ModelCheckpoint(dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True)
+        )  # Save the last checkpoint
+
     # Init trainer
     trainer = L.Trainer(
         # Where to save models
@@ -110,9 +132,7 @@ def train_model(config: dict, fun_control: dict) -> float:
             default_hp_metric=True,
             log_graph=fun_control["log_graph"],
         ),
-        callbacks=[
-            EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
-        ],
+        callbacks=callbacks,
         enable_progress_bar=enable_progress_bar,
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)

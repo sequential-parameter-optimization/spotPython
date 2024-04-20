@@ -7,6 +7,13 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.colors as colors
+from spotPython.hyperparameters.values import get_tuned_architecture
+from spotPython.light.trainmodel import train_model
+from spotPython.light.loadmodel import load_light_from_checkpoint
+from spotPython.utils.classes import get_removed_attributes_and_base_net
+import pandas as pd
+from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradients
+from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
 
 
 def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
@@ -472,3 +479,119 @@ def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray"
         batch_size=batch_size,
     )
     plot_nn_values_scatter(nn_values=grads, nn_values_names="Gradients", absolute=absolute, cmap=cmap, figsize=figsize)
+
+
+def get_attributions(
+    spot_tuner,
+    fun_control,
+    attr_method="IntegratedGradients",
+    baseline=None,
+    abs_attr=True,
+    n_rel=5,
+    feature_names=None,
+):
+    """Get the attributions of a neural network.
+
+    Args:
+        spot_tuner (object):
+            The spot tuner object.
+        fun_control (dict):
+            A dictionary with the function control.
+        attr_method (str, optional):
+            The attribution method. Defaults to "IntegratedGradients".
+        baseline (torch.Tensor, optional):
+            The baseline for the attribution methods. Defaults to None.
+        abs_attr (bool, optional):
+            Whether the method should sort by the absolute attribution values. Defaults to True.
+        n_rel (int, optional):
+            The number of relevant features. Defaults to 5.
+        feature_names (list, optional):
+            The feature names. Defaults to None.
+
+    Returns:
+        pd.DataFrame: A DataFrame with the attributions.
+    """
+    total_attributions = None
+    config = get_tuned_architecture(spot_tuner, fun_control)
+    train_model(config, fun_control, timestamp=False)
+    model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
+    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    model = model.to("cpu")
+    model.eval()
+    dataset = fun_control["data_set"]
+    n_features = dataset.data.shape[1]
+    if feature_names is None:
+        feature_names = [f"x{i}" for i in range(n_features)]
+    batch_size = config["batch_size"]
+    # train_loader = DataLoader(dataset, batch_size=batch_size)
+    test_loader = DataLoader(dataset, batch_size=batch_size)
+    if attr_method == "IntegratedGradients":
+        attr = IntegratedGradients(model)
+    elif attr_method == "DeepLift":
+        attr = DeepLift(model)
+    elif attr_method == "GradientShap":  # Todo: would need a baseline
+        if baseline is None:
+            raise ValueError("baseline cannot be 'None' for GradientShap")
+        attr = GradientShap(model)
+    elif attr_method == "FeatureAblation":
+        attr = FeatureAblation(model)
+    else:
+        raise ValueError(
+            """
+            Unsupported attribution method.
+            Please choose from 'IntegratedGradients', 'DeepLift', 'GradientShap', or 'FeatureAblation'.
+            """
+        )
+    for inputs, labels in test_loader:
+        attributions = attr.attribute(inputs, return_convergence_delta=False, baselines=baseline)
+        if total_attributions is None:
+            total_attributions = attributions
+        else:
+            if len(attributions) == len(total_attributions):
+                total_attributions += attributions
+
+    # Calculation of average attribution across all batches
+    avg_attributions = total_attributions.mean(dim=0).detach().numpy()
+
+    # Transformation to the absolute attribution values if abs_attr is True
+    # Get indices of the n most important features
+    if abs_attr is True:
+        abs_avg_attributions = abs(avg_attributions)
+        top_n_indices = abs_avg_attributions.argsort()[-n_rel:][::-1]
+    else:
+        top_n_indices = avg_attributions.argsort()[-n_rel:][::-1]
+
+    # Get the importance values for the top n features
+    top_n_importances = avg_attributions[top_n_indices]
+
+    df = pd.DataFrame(
+        {
+            "Feature Index": top_n_indices,
+            "Feature": [feature_names[i] for i in top_n_indices],
+            attr_method + "Attribution": top_n_importances,
+        }
+    )
+    return df
+
+
+def plot_attributions(df, attr_method="IntegratedGradients"):
+    """
+    Plot the attributions of a neural network.
+
+    Args:
+        df (pd.DataFrame):
+            A DataFrame with the attributions.
+        attr_method (str, optional):
+            The attribution method. Defaults to "IntegratedGradients".
+
+    Returns:
+        None
+
+    """
+    sns.set_theme(style="whitegrid")
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x=attr_method + "Attribution", y="Feature", data=df, palette="viridis", hue="Feature")
+    plt.title(f"Top {df.shape[0]} Features by {attr_method} Attribution")
+    plt.xlabel(f"{attr_method} Attribution Value")
+    plt.ylabel("Feature")
+    plt.show()

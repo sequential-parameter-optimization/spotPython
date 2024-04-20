@@ -708,7 +708,9 @@ class Spot:
         # Generate a description of the results:
         # if spot_tuner_control['min_y'] exists:
         try:
-            result = f"Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']} at {spot_tuner_control['min_X']}."
+            result = f"""
+                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
+                      at {spot_tuner_control['min_X']}."""
             #
             db_dict = {
                 "data": {

@@ -21,6 +21,7 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
             A dictionary containing the function control parameters.
         postfix (str):
             The postfix to append to the configuration ID when generating the checkpoint path.
+            Default is "_TEST". Can be set to "_TRAIN" for training checkpoints.
 
     Returns:
         Any: The loaded model.
