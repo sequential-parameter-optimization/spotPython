@@ -14,6 +14,7 @@ from spotPython.utils.classes import get_removed_attributes_and_base_net
 import pandas as pd
 from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradients
 from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
+from matplotlib.ticker import MaxNLocator
 
 
 def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
@@ -87,16 +88,21 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
     return activations
 
 
-def get_weights(net) -> dict:
+def get_weights(net, return_index=False) -> dict:
     """
     Get the weights of a neural network.
 
     Args:
         net (object):
             A neural network.
+        return_index (bool, optional):
+            Whether to return the index. Defaults to False.
 
     Returns:
-        dict: A dictionary with the weights of the neural network.
+        dict:
+            A dictionary with the weights of the neural network.
+        index (list):
+            The layer index list.
 
     Examples:
         >>> from torch.utils.data import DataLoader
@@ -150,13 +156,19 @@ def get_weights(net) -> dict:
 
     """
     weights = {}
+    index = []
     for name, param in net.named_parameters():
         if name.endswith(".bias"):
             continue
+        # add (int(name.split(".")[1])) to the index list
+        index.append(int(name.split(".")[1]))
         key_name = f"Layer {name.split('.')[1]}"
         weights[key_name] = param.detach().view(-1).cpu().numpy()
     # print(f"weights: {weights}")
-    return weights
+    if return_index:
+        return weights, index
+    else:
+        return weights
 
 
 def get_gradients(net, fun_control, batch_size, device="cpu") -> dict:
@@ -573,7 +585,6 @@ def get_attributions(
     baseline=None,
     abs_attr=True,
     n_rel=5,
-    feature_names=None,
 ):
     """Get the attributions of a neural network.
 
@@ -590,12 +601,15 @@ def get_attributions(
             Whether the method should sort by the absolute attribution values. Defaults to True.
         n_rel (int, optional):
             The number of relevant features. Defaults to 5.
-        feature_names (list, optional):
-            The feature names. Defaults to None.
 
     Returns:
         pd.DataFrame: A DataFrame with the attributions.
     """
+    try:
+        fun_control["data_set"].names
+    except AttributeError:
+        fun_control["data_set"].names = None
+    feature_names = fun_control["data_set"].names
     total_attributions = None
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
@@ -698,3 +712,114 @@ def is_square(n):
         False
     """
     return n == int(math.sqrt(n)) ** 2
+
+
+def get_layer_conductance(spot_tuner, fun_control, layer_idx):
+    """
+    Compute the average layer conductance attributions for a specified layer in the model.
+
+    Args:
+        spot_tuner (spot.Spot):
+            The spot tuner object containing the trained model.
+        fun_control (dict):
+            The fun_control dictionary containing the hyperparameters used to train the model.
+        layer_idx (int):
+            Index of the layer for which to compute layer conductance attributions.
+
+    Returns:
+        numpy.ndarray:
+            An array containing the average layer conductance attributions for the specified layer.
+            The shape of the array corresponds to the shape of the attributions.
+    """
+    try:
+        fun_control["data_set"].names
+    except AttributeError:
+        fun_control["data_set"].names = None
+    feature_names = fun_control["data_set"].names
+
+    config = get_tuned_architecture(spot_tuner, fun_control)
+    train_model(config, fun_control, timestamp=False)
+    model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
+    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    model = model.to("cpu")
+    model.eval()
+
+    dataset = fun_control["data_set"]
+    n_features = dataset.data.shape[1]
+    if feature_names is None:
+        feature_names = [f"x{i}" for i in range(n_features)]
+    batch_size = config["batch_size"]
+    # train_loader = DataLoader(dataset, batch_size=batch_size)
+    test_loader = DataLoader(dataset, batch_size=batch_size)
+
+    total_layer_attributions = None
+    layers = model.layers
+    print("Conductance analysis for layer: ", layers[layer_idx])
+    lc = LayerConductance(model, layers[layer_idx])
+
+    for inputs, labels in test_loader:
+        lc_attr_test = lc.attribute(inputs, n_steps=10, attribute_to_layer_input=True)
+        if total_layer_attributions is None:
+            total_layer_attributions = lc_attr_test
+        else:
+            if len(lc_attr_test) == len(total_layer_attributions):
+                total_layer_attributions += lc_attr_test
+
+    avg_layer_attributions = total_layer_attributions.mean(dim=0).detach().numpy()
+
+    return avg_layer_attributions
+
+
+def get_weights_conductance_last_layer(spot_tuner, fun_control):
+    """
+    Get the weights and the conductance of the last layer.
+    """
+    config = get_tuned_architecture(spot_tuner, fun_control)
+    train_model(config, fun_control, timestamp=False)
+    model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
+    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    model = model.to("cpu")
+    model.eval()
+
+    weights, index = get_weights(model, return_index=True)
+    layer_idx = index[-1]
+    weights_last = weights[f"Layer {layer_idx}"]
+    weights_last
+    layer_conductance_last = get_layer_conductance(spot_tuner, fun_control, layer_idx=layer_idx)
+
+    return weights_last, layer_conductance_last
+
+
+def plot_conductance_last_layer(weights_last, layer_conductance_last, show=True):
+    """
+    Plot the conductance of the last layer.
+    """
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(range(len(weights_last)), weights_last / weights_last.max(), label="Weights", alpha=0.5)
+    ax.bar(
+        range(len(layer_conductance_last)),
+        layer_conductance_last / layer_conductance_last.max(),
+        label="Layer Conductance",
+        alpha=0.5,
+    )
+    ax.set_xlabel("Weight Index")
+    ax.set_ylabel("Normalized Value")
+    ax.set_title("Layer Conductance vs. Weights")
+    ax.legend()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    if show:
+        plt.show()
+
+
+def get_all_layers_conductance(spot_tuner, fun_control):
+    config = get_tuned_architecture(spot_tuner, fun_control)
+    train_model(config, fun_control, timestamp=False)
+    model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
+    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    model = model.to("cpu")
+    model.eval()
+    _, index = get_weights(model, return_index=True)
+    layer_conductance = {}
+    for i in index:
+        layer_conductance[i] = get_layer_conductance(spot_tuner, fun_control, layer_idx=i)
+    return layer_conductance

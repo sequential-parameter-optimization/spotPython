@@ -152,4 +152,4 @@ class Diabetes(Dataset):
                 print(dataset.get_names())
                 ["age", "sex", "bmi", "bp", "tc", "ldl", "hdl", "tch", "ltg", "glu"]
         """
-        return ["age", "sex", "bmi", "bp", "tc", "ldl", "hdl", "tch", "ltg", "glu"]
+        return ["age", "sex", "bmi", "bp", "s1_tc", "s2_ldl", "s3_hdl", "s4_tch", "s5_ltg", "s6_glu"]
