@@ -275,7 +275,9 @@ def plot_nn_values_hist(nn_values, net, nn_values_names="", color="C0", columns=
     plt.show()
 
 
-def plot_nn_values_scatter(nn_values, nn_values_names="", absolute=True, cmap="gray", figsize=(6, 6)):
+def old_plot_nn_values_scatter(
+    nn_values, nn_values_names="", absolute=True, cmap="gray", figsize=(6, 6), return_reshaped=False
+):
     """
     Plot the values of a neural network.
     Can be used to plot the weights, gradients, or activations of a neural network.
@@ -292,6 +294,8 @@ def plot_nn_values_scatter(nn_values, nn_values_names="", absolute=True, cmap="g
             The colormap to use. Defaults to "gray".
         figsize (tuple, optional):
             The figure size. Defaults to (6, 6).
+        return_reshaped (bool, optional):
+            Whether to return the reshaped values. Defaults to False.
 
     """
     if cmap == "gray":
@@ -301,13 +305,19 @@ def plot_nn_values_scatter(nn_values, nn_values_names="", absolute=True, cmap="g
     else:
         cmap = "viridis"
 
+    res = {}
     for layer, values in nn_values.items():
-        n = int(math.sqrt(len(values)))
-        if n * n != len(values):  # if the length is not a perfect square
-            n += 1  # increase n by 1
+        k = len(values)
+        print(f"{k} values in Layer {layer}.")
+        if is_square(k):
+            n = int(math.sqrt(k))
+        else:
+            n = int(math.sqrt(len(values)) + 1)
             padding = np.zeros(n * n - len(values))  # create a zero array for padding
+            print(f"{len(padding)} padding values added.")
             values = np.concatenate((values, padding))  # append the padding to the values
 
+        print(f"{len(values)} values in Layer {layer}.")
         if absolute:
             reshaped_values = np.abs(values.reshape((n, n)))
         else:
@@ -318,6 +328,81 @@ def plot_nn_values_scatter(nn_values, nn_values_names="", absolute=True, cmap="g
         plt.colorbar(label="Value")
         plt.title(f"{nn_values_names} Plot for {layer}")
         plt.show()
+        # add reshaped_values to the dictionary res
+        res[layer] = reshaped_values
+    if return_reshaped:
+        return res
+
+
+def plot_nn_values_scatter(
+    nn_values, nn_values_names="", absolute=True, cmap="gray", figsize=(6, 6), return_reshaped=False, show=True
+) -> dict:
+    """
+    Plot the values of a neural network including a marker for padding values.
+    For simplicity, this example will annotate 'P' directly on the plot for padding values
+    using a unique marker value approach.
+
+    Args:
+        nn_values (dict):
+            A dictionary with the values of the neural network. For example,
+            the weights, gradients, or activations.
+        nn_values_names (str, optional):
+            The name of the values. Defaults to "".
+        absolute (bool, optional):
+            Whether to use the absolute values. Defaults to True.
+        cmap (str, optional):
+            The colormap to use. Defaults to "gray".
+        figsize (tuple, optional):
+            The figure size. Defaults to (6, 6).
+        return_reshaped (bool, optional):
+            Whether to return the reshaped values. Defaults to False.
+        show (bool, optional):
+            Whether to show the plot. Defaults to True.
+
+    Returns:
+        dict: A dictionary with the reshaped values.
+    """
+    if cmap == "gray":
+        cmap = "gray"
+    elif cmap == "BlueWhiteRed":
+        cmap = colors.LinearSegmentedColormap.from_list("", ["blue", "white", "red"])
+    else:
+        cmap = "viridis"
+
+    res = {}
+    padding_marker = np.nan  # Use NaN as a special marker for padding
+    for layer, values in nn_values.items():
+        k = len(values)
+        print(f"{k} values in Layer {layer}.")
+        n = int(math.sqrt(k))
+        if n * n != k:  # if the length is not a perfect square
+            n += 1  # Adjust n for padding
+            print(f"{n*n-k} padding values added.")
+            values = np.append(values, [padding_marker] * (n * n - k))  # Append padding values
+
+        print(f"{len(values)} values now in Layer {layer}.")
+
+        if absolute:
+            reshaped_values = np.abs(values).reshape((n, n))
+            # Mark padding values distinctly by setting them back to NaN
+            reshaped_values[reshaped_values == np.abs(padding_marker)] = np.nan
+        else:
+            reshaped_values = values.reshape((n, n))
+
+        _, ax = plt.figure(figsize=figsize), plt.gca()
+        cax = ax.imshow(reshaped_values, cmap=cmap, interpolation="nearest")
+        for i in range(n):
+            for j in range(n):
+                if np.isnan(reshaped_values[i, j]):
+                    ax.text(j, i, "P", ha="center", va="center", color="red")
+        plt.colorbar(cax, label="Value")
+        plt.title(f"{nn_values_names} Plot for {layer}")
+        if show:
+            plt.show()
+        # Add reshaped_values to the dictionary res
+        res[layer] = reshaped_values
+    if return_reshaped:
+        return res
 
 
 def visualize_activations_distributions(net, fun_control, batch_size, device="cpu", color="C0", columns=2) -> None:
@@ -595,3 +680,21 @@ def plot_attributions(df, attr_method="IntegratedGradients"):
     plt.xlabel(f"{attr_method} Attribution Value")
     plt.ylabel("Feature")
     plt.show()
+
+
+def is_square(n):
+    """Check if a number is a square number.
+
+    Args:
+        n (int): The number to check.
+
+    Returns:
+        bool: True if the number is a square number, False otherwise.
+
+    Examples:
+        >>> is_square(4)
+        True
+        >>> is_square(5)
+        False
+    """
+    return n == int(math.sqrt(n)) ** 2
