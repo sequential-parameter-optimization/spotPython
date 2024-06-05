@@ -212,19 +212,31 @@ def check_type(value):
 
 
 def set_dataset_target_type(dataset, target="y"):
-    """Set the target column to 0 and 1.
+    """Set the target column to 0 and 1 for boolean and string values.
 
     Args:
         dataset (pd.DataFrame): The input dataset.
         target (str): The name of the target column. Default is "y".
 
     Returns:
-        pd.DataFrame: The dataset with the target column set to 0 and 1.
+        pd.DataFrame: The dataset with boolean and string target column
+        values set to 0 and 1.
 
     Examples:
     >>> from spotPython.utils.convert import set_dataset_target_type
+        import pandas as pd
         dataset = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "y": [True, False, True]})
+        print(dataset)
         dataset = set_dataset_target_type(dataset)
+        print(dataset)
+            a  b  c      y
+            0  1  4  7   True
+            1  2  5  8  False
+            2  3  6  9   True
+            a  b  c  y
+            0  1  4  7  1
+            1  2  5  8  0
+            2  3  6  9  1
 
 
     """
