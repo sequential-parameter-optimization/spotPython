@@ -771,7 +771,6 @@ class Spot:
         if self.spot_writer is not None:
             writer = self.spot_writer
             writer.close()
-        pprint.pprint(self.fun_control)
         if self.fun_control["db_dict_name"] is not None:
             self.write_db_dict()
         self.save_experiment()
