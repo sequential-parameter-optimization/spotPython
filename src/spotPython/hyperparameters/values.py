@@ -1,11 +1,18 @@
 import numpy as np
 import copy
 import json
+import river
+import river.preprocessing
 from sklearn.pipeline import make_pipeline
 from river import compose
 from typing import Union, List, Dict, Generator, Any
 from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
+
+# Important, do not delete the following imports, they are needed for the function add_core_model_to_fun_control
+from river import forest, tree, linear_model, rules
+from river import preprocessing
+import sklearn.metrics
 
 
 def generate_one_config_from_var_dict(
@@ -1457,3 +1464,51 @@ def update_fun_control_with_hyper_num_cat_dicts(fun_control, num_dict, cat_dict,
             fle = fle.split()
             set_control_hyperparameter_value(fun_control, key, fle)
             fun_control["core_model_hyper_dict"][key].update({"upper": len(fle) - 1})
+
+
+def get_core_model_from_name(core_model_name):
+    """
+    Returns the core model name and instance from a core model name.
+
+    Args:
+        core_model_name (str): The name of the core model.
+
+    Returns:
+        Tuple: The core model name and instance.
+    """
+    core_model_module = core_model_name.split(".")[0]
+    coremodel = core_model_name.split(".")[1]
+    core_model_instance = getattr(getattr(river, core_model_module), coremodel)
+    return coremodel, core_model_instance
+
+
+def get_prep_model(prepmodel_name):
+    """
+    Get the preprocessing model from the name.
+
+    Args:
+        prepmodel_name (str): The name of the preprocessing model.
+
+    Returns:
+        river.preprocessing: The preprocessing model.
+
+    """
+    if prepmodel_name == "None":
+        prepmodel = None
+    else:
+        prepmodel = getattr(river.preprocessing, prepmodel_name)
+    return prepmodel
+
+
+def get_metric_sklearn(metric_name):
+    """
+    Returns the metric from the metric name.
+
+    Args:
+        metric_name (str): The name of the metric.
+
+    Returns:
+        sklearn.metrics: The metric from the metric name.
+    """
+    metric_sklearn = getattr(sklearn.metrics, metric_name)
+    return metric_sklearn

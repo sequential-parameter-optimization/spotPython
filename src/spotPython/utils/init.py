@@ -6,6 +6,8 @@ import socket
 import datetime
 from dateutil.tz import tzlocal
 from torch.utils.tensorboard import SummaryWriter
+from spotPython.hyperparameters.values import (add_core_model_to_fun_control,
+                                               get_core_model_from_name, get_metric_sklearn, get_prep_model)
 
 
 def fun_control_init(
@@ -33,6 +35,7 @@ def fun_control_init(
     fun_evals=15,
     fun_repeats=1,
     horizon=None,
+    hyperdict=None,
     infill_criterion="y",
     log_level=50,
     lower=None,
@@ -128,6 +131,9 @@ def fun_control_init(
             design_control). Default is 1.
         horizon (int):
             The horizon of the time series data. Default is None.
+        hyperdict (dict):
+            A dictionary containing the hyperparameters. Default is None.
+            For example: `spotRiver.hyperdict.river_hyper_dict import RiverHyperDict`
         infill_criterion (str):
             Can be `"y"`, `"s"`, `"ei"` (negative expected improvement), or `"all"`. Default is "y".
         log_level (int):
@@ -332,6 +338,11 @@ def fun_control_init(
     if not os.path.exists("./figures"):
         os.makedirs("./figures")
 
+    if metric_sklearn is None and metric_sklearn_name is not None:
+        metric_sklearn = get_metric_sklearn(metric_sklearn_name)
+    if prep_model is None and prep_model_name is not None:
+        prep_model = get_prep_model(prep_model_name)
+
     fun_control = {
         "PREFIX": PREFIX,
         "CHECKPOINT_PATH": CHECKPOINT_PATH,
@@ -360,6 +371,7 @@ def fun_control_init(
         "fun_evals": fun_evals,
         "fun_repeats": fun_repeats,
         "horizon": horizon,
+        "hyperdict": hyperdict,
         "infill_criterion": infill_criterion,
         "k_folds": 3,
         "log_graph": False,
@@ -412,10 +424,14 @@ def fun_control_init(
         "weight_coeff": weight_coeff,
         "weights_entry": weights_entry,
     }
-    # lower = X_reshape(lower)
-    # fun_control.update({"lower": lower})
-    # upper = X_reshape(upper)
-    # fun_control.update({"upper": upper})
+    if hyperdict is not None and core_model_name is not None:
+        coremodel, core_model_instance = get_core_model_from_name(core_model_name)
+        add_core_model_to_fun_control(
+            core_model=core_model_instance,
+            fun_control=fun_control,
+            hyper_dict=hyperdict,
+            filename=None,
+        )
     return fun_control
 
 
