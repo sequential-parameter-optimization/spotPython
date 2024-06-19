@@ -6,8 +6,12 @@ import socket
 import datetime
 from dateutil.tz import tzlocal
 from torch.utils.tensorboard import SummaryWriter
-from spotPython.hyperparameters.values import (add_core_model_to_fun_control,
-                                               get_core_model_from_name, get_metric_sklearn, get_prep_model)
+from spotPython.hyperparameters.values import (
+    add_core_model_to_fun_control,
+    get_core_model_from_name,
+    get_metric_sklearn,
+    get_prep_model,
+)
 
 
 def fun_control_init(
