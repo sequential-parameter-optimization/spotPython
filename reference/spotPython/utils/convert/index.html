@@ -711,6 +711,8 @@
       
         
       
+        
+      
     
     
     
@@ -816,6 +818,27 @@
   
   <span class="md-ellipsis">
     diabetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/friedman/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    friedman
   </span>
   
 
@@ -1345,6 +1368,8 @@
       
         
       
+        
+      
     
     
     
@@ -1408,6 +1433,27 @@
   
   <span class="md-ellipsis">
     optimizer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hyperparameters/update/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    update
   </span>
   
 
@@ -4429,7 +4475,7 @@ Args:
 
   <div class="doc doc-contents ">
   
-      <p>Set the target column to 0 and 1.</p>
+      <p>Set the target column to 0 and 1 for boolean and string values.</p>
 
 
 
@@ -4491,7 +4537,16 @@ Args:
           </td>
           <td>
             <div class="doc-md-description">
-              <p>pd.DataFrame: The dataset with the target column set to 0 and 1.</p>
+              <p>pd.DataFrame: The dataset with boolean and string target column</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>values set to 0 and 1.</p>
             </div>
           </td>
         </tr>
@@ -4506,8 +4561,19 @@ Args:
 <blockquote>
 <blockquote>
 <p>from spotPython.utils.convert import set_dataset_target_type
+    import pandas as pd
     dataset = pd.DataFrame({&ldquo;a&rdquo;: [1, 2, 3], &ldquo;b&rdquo;: [4, 5, 6], &ldquo;c&rdquo;: [7, 8, 9], &ldquo;y&rdquo;: [True, False, True]})
-    dataset = set_dataset_target_type(dataset)</p>
+    print(dataset)
+    dataset = set_dataset_target_type(dataset)
+    print(dataset)
+        a  b  c      y
+        0  1  4  7   True
+        1  2  5  8  False
+        2  3  6  9   True
+        a  b  c  y
+        0  1  4  7  1
+        1  2  5  8  0
+        2  3  6  9  1</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -4536,20 +4602,44 @@ Args:
 <span class="normal">233</span>
 <span class="normal">234</span>
 <span class="normal">235</span>
-<span class="normal">236</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_dataset_target_type</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the target column to 0 and 1.</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_dataset_target_type</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;y&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the target column to 0 and 1 for boolean and string values.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dataset (pd.DataFrame): The input dataset.</span>
 <span class="sd">        target (str): The name of the target column. Default is &quot;y&quot;.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: The dataset with the target column set to 0 and 1.</span>
+<span class="sd">        pd.DataFrame: The dataset with boolean and string target column</span>
+<span class="sd">        values set to 0 and 1.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">    &gt;&gt;&gt; from spotPython.utils.convert import set_dataset_target_type</span>
+<span class="sd">        import pandas as pd</span>
 <span class="sd">        dataset = pd.DataFrame({&quot;a&quot;: [1, 2, 3], &quot;b&quot;: [4, 5, 6], &quot;c&quot;: [7, 8, 9], &quot;y&quot;: [True, False, True]})</span>
+<span class="sd">        print(dataset)</span>
 <span class="sd">        dataset = set_dataset_target_type(dataset)</span>
+<span class="sd">        print(dataset)</span>
+<span class="sd">            a  b  c      y</span>
+<span class="sd">            0  1  4  7   True</span>
+<span class="sd">            1  2  5  8  False</span>
+<span class="sd">            2  3  6  9   True</span>
+<span class="sd">            a  b  c  y</span>
+<span class="sd">            0  1  4  7  1</span>
+<span class="sd">            1  2  5  8  0</span>
+<span class="sd">            2  3  6  9  1</span>
 
 
 <span class="sd">    &quot;&quot;&quot;</span>
