@@ -585,7 +585,7 @@ def get_attributions(
     baseline=None,
     abs_attr=True,
     n_rel=5,
-):
+) -> pd.DataFrame:
     """Get the attributions of a neural network.
 
     Args:
@@ -603,7 +603,7 @@ def get_attributions(
             The number of relevant features. Defaults to 5.
 
     Returns:
-        pd.DataFrame: A DataFrame with the attributions.
+        pd.DataFrame (object): A DataFrame with the attributions.
     """
     try:
         fun_control["data_set"].names
@@ -673,7 +673,7 @@ def get_attributions(
     return df
 
 
-def plot_attributions(df, attr_method="IntegratedGradients"):
+def plot_attributions(df, attr_method="IntegratedGradients") -> None:
     """
     Plot the attributions of a neural network.
 
@@ -696,7 +696,7 @@ def plot_attributions(df, attr_method="IntegratedGradients"):
     plt.show()
 
 
-def is_square(n):
+def is_square(n) -> bool:
     """Check if a number is a square number.
 
     Args:
@@ -714,7 +714,7 @@ def is_square(n):
     return n == int(math.sqrt(n)) ** 2
 
 
-def get_layer_conductance(spot_tuner, fun_control, layer_idx):
+def get_layer_conductance(spot_tuner, fun_control, layer_idx) -> np.ndarray:
     """
     Compute the average layer conductance attributions for a specified layer in the model.
 

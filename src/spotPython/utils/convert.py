@@ -182,16 +182,17 @@ def sort_by_kth_and_return_indices(array, k) -> list:
     return sorted_indices
 
 
-def check_type(value):
+def check_type(value) -> str:
     """Check the type of the input value and return the type as a string.
 
     Args:
         value (object): The input value.
 
     Returns:
-        str: The type of the input value as a string.
-        Possible values are "int", "float", "str", "bool", or None.
-        Checks for numpy types as well, i.e., np.integer, np.floating, np.str_, np.bool_.
+        str:
+            The type of the input value as a string.
+            Possible values are "int", "float", "str", "bool", or None.
+            Checks for numpy types as well, i.e., np.integer, np.floating, np.str_, np.bool_.
 
     Examples:
         >>> from spotPython.utils.convert import check_type
@@ -211,7 +212,7 @@ def check_type(value):
         return None
 
 
-def set_dataset_target_type(dataset, target="y"):
+def set_dataset_target_type(dataset, target="y") -> pd.DataFrame:
     """Set the target column to 0 and 1 for boolean and string values.
 
     Args:
@@ -219,8 +220,8 @@ def set_dataset_target_type(dataset, target="y"):
         target (str): The name of the target column. Default is "y".
 
     Returns:
-        pd.DataFrame: The dataset with boolean and string target column
-        values set to 0 and 1.
+        pd.DataFrame:
+            The dataset with boolean and string target column values set to 0 and 1.
 
     Examples:
     >>> from spotPython.utils.convert import set_dataset_target_type

@@ -5,7 +5,7 @@ import random
 class FriedmanDriftDataset:
     """Friedman Drift Dataset."""
 
-    def __init__(self, n_samples=100, change_point1=50, change_point2=75, seed=None, constant=False):
+    def __init__(self, n_samples=100, change_point1=50, change_point2=75, seed=None, constant=False) -> None:
         """Constructor for the Friedman Drift Dataset.
 
         Args:
@@ -16,7 +16,7 @@ class FriedmanDriftDataset:
             constant (bool): If True, only the first feature is set to 1 and all others are set to 0.
 
         Returns:
-            None
+            None (None): None
 
         Examples:
             >>> from spotPython.data.friedman import FriedmanDriftDataset

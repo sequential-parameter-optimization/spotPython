@@ -1466,15 +1466,15 @@ def update_fun_control_with_hyper_num_cat_dicts(fun_control, num_dict, cat_dict,
             fun_control["core_model_hyper_dict"][key].update({"upper": len(fle) - 1})
 
 
-def get_core_model_from_name(core_model_name):
+def get_core_model_from_name(core_model_name) -> object:
     """
-    Returns the core model name and instance from a core model name.
+    Returns the river core model name and instance from a core model name.
 
     Args:
         core_model_name (str): The name of the core model.
 
     Returns:
-        Tuple: The core model name and instance.
+        (str, object): The core model name and instance.
     """
     core_model_module = core_model_name.split(".")[0]
     coremodel = core_model_name.split(".")[1]
@@ -1482,15 +1482,15 @@ def get_core_model_from_name(core_model_name):
     return coremodel, core_model_instance
 
 
-def get_prep_model(prepmodel_name):
+def get_prep_model(prepmodel_name) -> object:
     """
-    Get the preprocessing model from the name.
+    Get the river preprocessing model from the name.
 
     Args:
         prepmodel_name (str): The name of the preprocessing model.
 
     Returns:
-        river.preprocessing: The preprocessing model.
+        river.preprocessing (object): The river preprocessing model.
 
     """
     if prepmodel_name == "None":
@@ -1500,15 +1500,15 @@ def get_prep_model(prepmodel_name):
     return prepmodel
 
 
-def get_metric_sklearn(metric_name):
+def get_metric_sklearn(metric_name) -> object:
     """
-    Returns the metric from the metric name.
+    Returns the sklearn metric from the metric name.
 
     Args:
         metric_name (str): The name of the metric.
 
     Returns:
-        sklearn.metrics: The metric from the metric name.
+        sklearn.metrics (object): The sklearn metric.
     """
     metric_sklearn = getattr(sklearn.metrics, metric_name)
     return metric_sklearn
