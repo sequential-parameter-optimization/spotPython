@@ -5478,7 +5478,7 @@ If the control_dict dictionary is None, return None.</p>
 
   <div class="doc doc-contents ">
   
-      <p>Returns the core model name and instance from a core model name.</p>
+      <p>Returns the river core model name and instance from a core model name.</p>
 
 
 
@@ -5516,13 +5516,14 @@ If the control_dict dictionary is None, return None.</p>
   <table>
     <thead>
       <tr>
-<th>Name</th>        <th>Type</th>
+        <th>Type</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
         <tr>
-<td><code>Tuple</code></td>          <td>
+          <td>
+                <code>(str, object)</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -5548,15 +5549,15 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">1479</span>
 <span class="normal">1480</span>
 <span class="normal">1481</span>
-<span class="normal">1482</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">):</span>
+<span class="normal">1482</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns the core model name and instance from a core model name.</span>
+<span class="sd">    Returns the river core model name and instance from a core model name.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        core_model_name (str): The name of the core model.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple: The core model name and instance.</span>
+<span class="sd">        (str, object): The core model name and instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">core_model_module</span> <span class="o">=</span> <span class="n">core_model_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">coremodel</span> <span class="o">=</span> <span class="n">core_model_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
@@ -6789,7 +6790,7 @@ Adam
 
   <div class="doc doc-contents ">
   
-      <p>Returns the metric from the metric name.</p>
+      <p>Returns the sklearn metric from the metric name.</p>
 
 
 
@@ -6834,10 +6835,11 @@ Adam
     <tbody>
         <tr>
           <td>
+                <code>object</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>sklearn.metrics: The metric from the metric name.</p>
+              <p>sklearn.metrics (object): The sklearn metric.</p>
             </div>
           </td>
         </tr>
@@ -6857,15 +6859,15 @@ Adam
 <span class="normal">1511</span>
 <span class="normal">1512</span>
 <span class="normal">1513</span>
-<span class="normal">1514</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metric_sklearn</span><span class="p">(</span><span class="n">metric_name</span><span class="p">):</span>
+<span class="normal">1514</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metric_sklearn</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns the metric from the metric name.</span>
+<span class="sd">    Returns the sklearn metric from the metric name.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        metric_name (str): The name of the metric.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        sklearn.metrics: The metric from the metric name.</span>
+<span class="sd">        sklearn.metrics (object): The sklearn metric.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">metric_sklearn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">metric_sklearn</span>
@@ -7591,7 +7593,7 @@ Adam
 
   <div class="doc doc-contents ">
   
-      <p>Get the preprocessing model from the name.</p>
+      <p>Get the river preprocessing model from the name.</p>
 
 
 
@@ -7636,10 +7638,11 @@ Adam
     <tbody>
         <tr>
           <td>
+                <code>object</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>river.preprocessing: The preprocessing model.</p>
+              <p>river.preprocessing (object): The river preprocessing model.</p>
             </div>
           </td>
         </tr>
@@ -7663,15 +7666,15 @@ Adam
 <span class="normal">1497</span>
 <span class="normal">1498</span>
 <span class="normal">1499</span>
-<span class="normal">1500</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">):</span>
+<span class="normal">1500</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the preprocessing model from the name.</span>
+<span class="sd">    Get the river preprocessing model from the name.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        prepmodel_name (str): The name of the preprocessing model.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        river.preprocessing: The preprocessing model.</span>
+<span class="sd">        river.preprocessing (object): The river preprocessing model.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">prepmodel_name</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
