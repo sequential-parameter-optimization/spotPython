@@ -92,6 +92,9 @@ def get_experiment_filename(PREFIX):
 def load_experiment(PKL_NAME):
     """
     Loads the experiment from a pickle file.
+    If the spot tuner object and the fun control dictionary do not exist, an error is thrown.
+    If the design control, surrogate control, and optimizer control dictionaries do not exist, a warning is issued
+    and `None` is assigned to the corresponding variables.
 
     Args:
         PKL_NAME (str): Name of the pickle file.
@@ -109,11 +112,32 @@ def load_experiment(PKL_NAME):
     """
     with open(PKL_NAME, "rb") as handle:
         experiment = pickle.load(handle)
+    # assign spot_tuner and fun_control only if they exist otherwise throw an error
+    if "spot_tuner" not in experiment:
+        raise ValueError("The spot tuner object does not exist in the pickle file.")
+    if "fun_control" not in experiment:
+        raise ValueError("The fun control dictionary does not exist in the pickle file.")
     spot_tuner = experiment["spot_tuner"]
     fun_control = experiment["fun_control"]
-    design_control = experiment["design_control"]
-    surrogate_control = experiment["surrogate_control"]
-    optimizer_control = experiment["optimizer_control"]
+    # assign the rest of the dictionaries if they exist otherwise assign None
+    if "design_control" not in experiment:
+        design_control = None
+        # issue a warning
+        print("The design control dictionary does not exist in the pickle file. Returning None.")
+    else:
+        design_control = experiment["design_control"]
+    if "surrogate_control" not in experiment:
+        surrogate_control = None
+        # issue a warning
+        print("The surrogate control dictionary does not exist in the pickle file. Returning None.")
+    else:
+        surrogate_control = experiment["surrogate_control"]
+    if "optimizer_control" not in experiment:
+        # issue a warning
+        print("The optimizer control dictionary does not exist in the pickle file. Returning None.")
+        optimizer_control = None
+    else:
+        optimizer_control = experiment["optimizer_control"]
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
 
 
