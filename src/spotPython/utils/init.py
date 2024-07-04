@@ -58,6 +58,7 @@ def fun_control_init(
     prep_model=None,
     prep_model_name=None,
     progress_file=None,
+    scaler=None,
     scenario=None,
     seed=123,
     show_models=False,
@@ -186,6 +187,9 @@ def fun_control_init(
             The name of the preprocessing model. Default is None.
         progress_file (str):
             The name of the progress file. Default is None.
+        scaler (object):
+            The scaler object, e.g., StandardScaler from sklearn via "from sklearn.preprocessing import StandardScaler".
+            Default is None.
         scenario (str):
             The scenario to use. Default is None. Can be "river", "sklearn", or "lightning".
         seed (int):
@@ -403,6 +407,7 @@ def fun_control_init(
         "prep_model_name": prep_model_name,
         "progress_file": progress_file,
         "save_model": False,
+        "scaler": scaler,
         "scenario": scenario,
         "seed": seed,
         "show_batch_interval": 1_000_000,
