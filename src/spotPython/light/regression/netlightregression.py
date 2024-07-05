@@ -170,6 +170,7 @@ class NetLightRegression(L.LightningModule):
         for layer_size in layer_sizes[1:]:
             layers += [
                 nn.Linear(layer_size_last, layer_size),
+                nn.BatchNorm1d(layer_size),
                 self.hparams.act_fn,
                 nn.Dropout(self.hparams.dropout_prob),
             ]

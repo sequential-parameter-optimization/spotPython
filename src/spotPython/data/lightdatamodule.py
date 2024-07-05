@@ -77,7 +77,6 @@ class LightDataModule(L.LightningDataModule):
         batch_size: int,
         dataset: object,
         test_size: float,
-        scaler: None = None,
         test_seed: int = 42,
         num_workers: int = 0,
     ):
@@ -85,10 +84,6 @@ class LightDataModule(L.LightningDataModule):
         self.batch_size = batch_size
         self.data_full = dataset
         self.test_size = test_size
-        if scaler is not None:
-            self.scaler = scaler()
-        else:
-            self.scaler = None
         self.test_seed = test_seed
         self.num_workers = num_workers
 
@@ -112,7 +107,6 @@ class LightDataModule(L.LightningDataModule):
         Examples:
             >>> from spotPython.data.lightdatamodule import LightDataModule
                 from spotPython.data.csvdataset import CSVDataset
-                from spotPython.data.pkldataset import PKLDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -195,8 +189,6 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule: train_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: train_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the training data
-        if self.scaler is not None:
-            self.data_train = self.scaler.fit_transform(self.data_train)
         return DataLoader(self.data_train, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:
@@ -221,8 +213,6 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
-        if self.scaler is not None:
-            self.data_val = self.scaler.transform(self.data_val)
         return DataLoader(self.data_val, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
@@ -248,8 +238,6 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
-        if self.scaler is not None:
-            self.data_test = self.scaler.transform(self.data_test)
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def predict_dataloader(self) -> DataLoader:
@@ -275,7 +263,5 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
-        if self.scaler is not None:
-            self.data_test = self.scaler.transform(self.data_test)
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
         return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
