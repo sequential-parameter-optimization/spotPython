@@ -1466,6 +1466,105 @@ def update_fun_control_with_hyper_num_cat_dicts(fun_control, num_dict, cat_dict,
             fun_control["core_model_hyper_dict"][key].update({"upper": len(fle) - 1})
 
 
+def set_int_hyperparameter_values(fun_control, key, lower, upper):
+    """
+    Set the integer hyperparameter values in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            The fun_control dictionary.
+        key (str):
+            The key of the hyperparameter.
+        lower (int):
+            The lower bound of the hyperparameter.
+        upper (int):
+            The upper bound of the hyperparameter.
+    """
+    set_control_hyperparameter_value(
+        fun_control,
+        key,
+        [
+            lower,
+            upper,
+        ],
+    )
+
+
+def set_float_hyperparameter_values(fun_control, key, lower, upper):
+    """
+    Set the float hyperparameter values in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            The fun_control dictionary.
+        key (str):
+            The key of the hyperparameter.
+        lower (float):
+            The lower bound of the hyperparameter.
+        upper (float):
+            The upper bound of the hyperparameter.
+    """
+    set_control_hyperparameter_value(
+        fun_control,
+        key,
+        [
+            lower,
+            upper,
+        ],
+    )
+
+
+def set_boolean_hyperparameter_values(fun_control, key, lower, upper):
+    """
+    Set the boolean hyperparameter values in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            The fun_control dictionary.
+        key (str):
+            The key of the hyperparameter.
+        lower (bool):
+            The lower bound of the hyperparameter.
+        upper (bool):
+            The upper bound of the hyperparameter.
+    """
+    set_control_hyperparameter_value(
+        fun_control,
+        key,
+        [
+            lower,
+            upper,
+        ],
+    )
+
+
+def set_factor_hyperparameter_values(fun_control, key, levels):
+    """
+    Set the factor hyperparameter values in the fun_control dictionary.
+
+    Args:
+        fun_control (dict):
+            The fun_control dictionary.
+        key (str):
+            The key of the hyperparameter.
+        levels (list):
+            The levels of the hyperparameter.
+    """
+    # check if levels is a list of strings. If not, convert it to a list
+    if not isinstance(levels, list):
+        levels = [levels]
+    # check if levels is a list of strings. Othewise, issue a warning and return None
+    if not all(isinstance(x, str) for x in levels):
+        print("!!! Warning: levels should be a list of strings.")
+        return None
+    # check if key "core_model_hyper_dict" exists in fun_control:
+    if "core_model_hyper_dict" not in fun_control.keys():
+        return None
+    else:
+        fun_control["core_model_hyper_dict"][key].update({"levels": levels})
+        fun_control["core_model_hyper_dict"][key].update({"upper": len(levels) - 1})
+
+
 def get_core_model_from_name(core_model_name) -> object:
     """
     Returns the river core model name and instance from a core model name.
