@@ -6,10 +6,7 @@ def test_california_housing():
     dataset = CaliforniaHousing()
 
     # Expected outputs
-    expected_names = [
-        'MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population',
-        'AveOccup', 'Latitude', 'Longitude'
-    ]
+    expected_names = ["MedInc", "HouseAge", "AveRooms", "AveBedrms", "Population", "AveOccup", "Latitude", "Longitude"]
     expected_length = 20640
 
     # Assert if get_names() returns the correct feature names

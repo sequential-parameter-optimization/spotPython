@@ -1,6 +1,7 @@
 from spotPython.utils.metrics import get_metric_sign
 import pytest
 
+
 def test_get_metric_sign():
     # Test for accuracy_score
     assert get_metric_sign("accuracy_score") == -1

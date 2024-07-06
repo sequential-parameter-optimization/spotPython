@@ -6,7 +6,7 @@ from spotPython.data.pkldataset import PKLDataset
 
 def test_pkl_dataset():
     # Create an instance of PKLDataset for testing
-    dataset = PKLDataset(target_column='prognosis')
+    dataset = PKLDataset(target_column="prognosis")
 
     # Test the length of the dataset
     assert len(dataset) > 0

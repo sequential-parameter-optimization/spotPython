@@ -1,6 +1,7 @@
 import numpy as np
 from spotPython.utils.transform import cod_to_nat_y, cod_to_nat_X
 
+
 def test_cod_to_nat_y():
     # Test with cod_type = "norm"
     cod_y = np.array([0.5, 0.5, 0.5])
@@ -61,4 +62,3 @@ def test_cod_to_nat_X():
     std_X = np.array([0, 0, 0])
     X = cod_to_nat_X(cod_X, "std", mean_X=mean_X, std_X=std_X)
     assert np.allclose(X, np.array([[0, 0, 0], [0, 0, 0]]))
-

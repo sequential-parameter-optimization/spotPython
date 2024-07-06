@@ -1,4 +1,3 @@
-import pytest
 import torch
 from torch.utils.data import DataLoader
 from spotPython.data.csvdataset import CSVDataset
@@ -6,7 +5,7 @@ from spotPython.data.csvdataset import CSVDataset
 
 def test_csv_dataset():
     # Create an instance of CSVDataset for testing
-    dataset = CSVDataset(target_column='prognosis')
+    dataset = CSVDataset(target_column="prognosis")
 
     # Test the length of the dataset
     assert len(dataset) > 0
@@ -28,7 +27,3 @@ def test_csv_dataset():
         assert inputs.size(0) == batch_size
         assert targets.size(0) == batch_size
         break
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

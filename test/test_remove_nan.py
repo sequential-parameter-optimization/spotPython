@@ -1,4 +1,3 @@
-import warnings
 import numpy as np
 from spotPython.utils.repair import remove_nan
 import pytest

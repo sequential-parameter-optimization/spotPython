@@ -5,20 +5,20 @@ def test_evaluate_new_X():
     import numpy as np
     from spotPython.spot import spot
     from spotPython.fun.objectivefunctions import analytical
-    from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+    from spotPython.utils.init import (
+        fun_control_init,
+    )
 
     nn = 3
     fun_sphere = analytical().fun_sphere
     fun_control = fun_control_init(lower=np.array([-1, -1]), upper=np.array([1, 1]), n_points=nn)
-    spot_1 = spot.Spot(        
+    spot_1 = spot.Spot(
         fun=fun_sphere,
         fun_control=fun_control,
     )
 
     # (S-2) Initial Design:
-    spot_1.X = spot_1.design.scipy_lhd(
-        spot_1.design_control["init_size"], lower=spot_1.lower, upper=spot_1.upper
-    )
+    spot_1.X = spot_1.design.scipy_lhd(spot_1.design_control["init_size"], lower=spot_1.lower, upper=spot_1.upper)
     print(spot_1.X)
 
     # (S-3): Eval initial design:

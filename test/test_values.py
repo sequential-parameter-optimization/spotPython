@@ -8,11 +8,9 @@ from spotPython.hyperparameters.values import add_core_model_to_fun_control
 from spotPython.light.regression.netlightregression import NetLightRegression
 from spotPython.hyperdict.light_hyper_dict import LightHyperDict
 from spotPython.utils.device import getDevice
-from spotPython.utils.init import get_experiment_name, get_spot_tensorboard_path
 from spotPython.data.diabetes import Diabetes
 from spotPython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
 from spotPython.hyperparameters.values import set_control_hyperparameter_value
-from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 
 
 def test_get_bound_values():
@@ -58,6 +56,7 @@ def test_set_control_key_value():
     set_control_key_value(control_dict=fun_control, key="key2", value="value3", replace=True)
     assert fun_control["key2"] == "value3"
 
+
 def test_get_control_key_value():
     fun_control = fun_control_init()
 
@@ -74,9 +73,7 @@ def test_get_control_key_value():
 
 def test_get_var_type_from_var_name():
     fun_control = fun_control_init()
-    add_core_model_to_fun_control(core_model=NetLightRegression,
-                        fun_control=fun_control,
-                        hyper_dict=LightHyperDict)
+    add_core_model_to_fun_control(core_model=NetLightRegression, fun_control=fun_control, hyper_dict=LightHyperDict)
     var_type = get_control_key_value(control_dict=fun_control, key="var_type")
     var_name = get_control_key_value(control_dict=fun_control, key="var_name")
     vn = "l1"
@@ -86,11 +83,12 @@ def test_get_var_type_from_var_name():
     assert var_type[var_name.index(vn)] == "factor"
     assert get_var_type_from_var_name(fun_control, vn) == "factor"
 
+
 def test_get_th_hyperparameter_name_from_fun_control():
     fun_control = fun_control_init(
         _L_in=10,
         _L_out=1,
-        PREFIX = "000",
+        PREFIX="000",
         TENSORBOARD_CLEAN=True,
         device=getDevice(),
         enable_progress_bar=False,
@@ -100,16 +98,11 @@ def test_get_th_hyperparameter_name_from_fun_control():
         num_workers=0,
         show_progress=True,
         tolerance_x=np.sqrt(np.spacing(1)),
-        )
+    )
     dataset = Diabetes()
-    set_control_key_value(control_dict=fun_control,
-                            key="data_set",
-                            value=dataset,
-                            replace=True)
-    add_core_model_to_fun_control(core_model=NetLightRegression,
-                                fun_control=fun_control,
-                                hyper_dict=LightHyperDict)
+    set_control_key_value(control_dict=fun_control, key="data_set", value=dataset, replace=True)
+    add_core_model_to_fun_control(core_model=NetLightRegression, fun_control=fun_control, hyper_dict=LightHyperDict)
 
-    set_control_hyperparameter_value(fun_control, "l1", [3,8])
+    set_control_hyperparameter_value(fun_control, "l1", [3, 8])
     set_control_hyperparameter_value(fun_control, "optimizer", ["Adam", "AdamW", "Adamax", "NAdam"])
     assert get_ith_hyperparameter_name_from_fun_control(fun_control, key="optimizer", i=0) == "Adam"

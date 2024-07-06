@@ -10,20 +10,12 @@ from spotPython.light.trainmodel import train_model
 
 
 def test_trainmodel():
-    fun_control = fun_control_init(
-        _L_in=10,
-        _L_out=1,
-        _torchmetric="mean_squared_error")
+    fun_control = fun_control_init(_L_in=10, _L_out=1, _torchmetric="mean_squared_error")
 
     dataset = Diabetes()
-    set_control_key_value(control_dict=fun_control,
-                          key="data_set",
-                          value=dataset,
-                          replace=True)
+    set_control_key_value(control_dict=fun_control, key="data_set", value=dataset, replace=True)
 
-    add_core_model_to_fun_control(core_model=NetLightRegression,
-                                fun_control=fun_control,
-                                hyper_dict=LightHyperDict)
+    add_core_model_to_fun_control(core_model=NetLightRegression, fun_control=fun_control, hyper_dict=LightHyperDict)
     X = get_default_hyperparameters_as_array(fun_control)
     var_dict = assign_values(X, get_var_name(fun_control))
     for config in generate_one_config_from_var_dict(var_dict, fun_control):
@@ -31,7 +23,7 @@ def test_trainmodel():
         break
     # check if y is a float
     assert isinstance(y_train, float)
-    
+
 
 if __name__ == "__main__":
     pytest.main(["-v", __file__])
