@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import numpy as np
+import warnings
 
 
 def repair_non_numeric(X: np.ndarray, var_type: List[str]) -> np.ndarray:
@@ -28,23 +29,48 @@ def repair_non_numeric(X: np.ndarray, var_type: List[str]) -> np.ndarray:
 
 def remove_nan(X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Remove rows from X and y where y contains NaN values.
+    Remove rows from X and y where y contains NaN values and issue a warning
+    if the dimension of the returned y array is smaller than the dimension of the original y array.
+    Issues a ValueError if the dimension of the returned y array is less than 2.
 
     Args:
         X (numpy.ndarray): X array
         y (numpy.ndarray): y array
 
     Returns:
-        Tuple[numpy.ndarray, numpy.ndarray]: X and y arrays with rows containing NaN values in y removed
+        Tuple[numpy.ndarray, np.ndarray]:
+        X and y arrays with rows containing NaN values in y removed.
 
     Examples:
-        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
-        >>> y = np.array([1, np.nan, 2])
-        >>> remove_nan(X, y)
-        (array([[1, 2],
-                [5, 6]]), array([1., 2.]))
+        >>> import numpy as np
+            from spotPython.utils.repair import remove_nan
+            X = np.array([[1, 2], [3, 4], [5, 6]])
+            y = np.array([1, np.nan, 2])
+            X_cleaned, y_cleaned = remove_nan(X, y)
+            print(X_cleaned, y_cleaned)
+            [[1 2]
+             [5 6]] [1. 2.]
     """
+    # Get the original dimension of the y array
+    original_dim = y.shape[0]
+
+    # Identify indices where y is not NaN
     ind = np.isfinite(y)
-    y = y[ind]
-    X = X[ind, :]
-    return X, y
+
+    # Update X and y by removing rows with NaN in y
+    X_cleaned = X[ind, :]
+    y_cleaned = y[ind]
+
+    # Check if dimensions have been reduced
+    returned_dim = y_cleaned.shape[0]
+    if returned_dim < original_dim:
+        warnings.warn(
+            f"\n!!! The dimension of the returned y array is {y_cleaned.shape[0]}, "
+            f"which is smaller than the original dimension {original_dim}."
+        )
+        warnings.warn("\n!!! Check whether to continue with the reduced dimension is useful.")
+    # throw an error if the returned dimension is smaller than one
+    if returned_dim < 1:
+        raise ValueError("!!!! The dimension of the returned y array is less than 1. Check the input data.")
+
+    return X_cleaned, y_cleaned
