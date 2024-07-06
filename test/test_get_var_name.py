@@ -1,4 +1,3 @@
-import pytest
 from spotPython.hyperparameters.values import get_var_name
 
 
@@ -34,7 +33,3 @@ def test_get_var_name():
     }
     # fun_control has 5 keys (hyperparameters)
     assert len(get_var_name(fun_control)) == 5
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

@@ -1,4 +1,3 @@
-import pytest
 from torch.utils.data import DataLoader
 from spotPython.data.diabetes import Diabetes
 from spotPython.light.regression.netlightregression import NetLightRegression
@@ -61,7 +60,3 @@ def test_optimizer_handler_adadelta():
     # Adadelta uses a lr which is calculated as lr=lr_mult * 1.0, so this value
     # should be 1.0 * 0.1 = 0.1
     assert trainer.optimizers[0].param_groups[0]["lr"] == lr_mult * 1.0
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

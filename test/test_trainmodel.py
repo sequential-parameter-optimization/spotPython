@@ -1,4 +1,3 @@
-import pytest
 from spotPython.utils.init import fun_control_init
 from spotPython.light.regression.netlightregression import NetLightRegression
 from spotPython.hyperdict.light_hyper_dict import LightHyperDict
@@ -23,7 +22,3 @@ def test_trainmodel():
         break
     # check if y is a float
     assert isinstance(y_train, float)
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

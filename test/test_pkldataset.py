@@ -1,4 +1,3 @@
-import pytest
 import torch
 from torch.utils.data import DataLoader
 from spotPython.data.pkldataset import PKLDataset
@@ -28,7 +27,3 @@ def test_pkl_dataset():
         assert inputs.size(0) == batch_size
         assert targets.size(0) == batch_size
         break
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

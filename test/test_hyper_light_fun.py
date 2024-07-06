@@ -1,4 +1,3 @@
-import pytest
 from spotPython.utils.init import fun_control_init
 from spotPython.light.regression.netlightregression import NetLightRegression
 from spotPython.hyperdict.light_hyper_dict import LightHyperDict
@@ -26,7 +25,3 @@ def test_hyper_light_fun():
     X = np.vstack((X, X))
     y = hyper_light.fun(X, fun_control)
     assert y.shape == (2,)
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])
