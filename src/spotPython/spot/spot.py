@@ -744,6 +744,75 @@ class Spot:
             print("No results to write.")
 
     def run(self, X_start=None) -> Spot:
+        """
+        Run the surrogate based optimization.
+        The optimization process is controlled by the following steps:
+            1. Initialize design
+            2. Update stats
+            3. Fit surrogate
+            4. Update design
+            5. Update stats
+            6. Update writer
+            7. Fit surrogate
+            8. Show progress if needed
+
+        Args:
+            self (object): Spot object
+            X_start (numpy.ndarray, optional): initial design. Defaults to None.
+
+        Returns:
+            (object): Spot object
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                from spotPython.utils.init import (
+                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                    )
+                # number of initial points:
+                ni = 7
+                # start point X_0
+                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+                fun = analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1]))
+                design_control=design_control_init(init_size=ni)
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control,)
+                S.run(X_start=X_start)
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+                Seed set to 123
+                Seed set to 123
+                spotPython tuning: 0.0 [########--] 80.00% 
+                spotPython tuning: 0.0 [#########-] 86.67% 
+                spotPython tuning: 0.0 [#########-] 93.33% 
+                spotPython tuning: 0.0 [##########] 100.00% Done...
+
+                S.X: [[ 0.00000000e+00  0.00000000e+00]
+                [ 0.00000000e+00  1.00000000e+00]
+                [ 1.00000000e+00  0.00000000e+00]
+                [ 1.00000000e+00  1.00000000e+00]
+                [-9.09243389e-01 -1.58234577e-01]
+                [-2.05817107e-01 -4.81249089e-01]
+                [ 9.49741171e-01 -9.46312716e-01]
+                [-1.20955714e-01  6.38358863e-02]
+                [-6.62787018e-01  1.74316373e-01]
+                [ 2.82008441e-01  9.30010114e-01]
+                [ 4.78788115e-01  6.53210582e-01]
+                [ 2.64764215e-04  4.00803185e-03]
+                [-1.66363820e-05  4.65001027e-03]
+                [-2.60995680e-04  5.46114194e-03]
+                [ 3.74504308e-03  1.86731890e-02]]
+                S.y: [0.00000000e+00 1.00000000e+00 1.00000000e+00 2.00000000e+00
+                8.51761723e-01 2.73961367e-01 1.79751605e+00 1.87053051e-02
+                4.69672829e-01 9.44447573e-01 6.55922124e-01 1.61344194e-05
+                2.16228723e-05 2.98921900e-05 3.62713334e-04]
+
+        """
         self.initialize_design(X_start)
         # New: self.update_stats() moved here:
         # changed in 0.5.9:
