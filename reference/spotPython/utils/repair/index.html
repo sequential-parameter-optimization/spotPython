@@ -713,6 +713,8 @@
       
         
       
+        
+      
     
     
     
@@ -776,6 +778,27 @@
   
   <span class="md-ellipsis">
     california
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data/california_housing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    california_housing
   </span>
   
 
@@ -3525,7 +3548,9 @@
 
   <div class="doc doc-contents ">
   
-      <p>Remove rows from X and y where y contains NaN values.</p>
+      <p>Remove rows from X and y where y contains NaN values and issue a warning
+if the dimension of the returned y array is smaller than the dimension of the original y array.
+Issues a ValueError if the dimension of the returned y array is less than 2.</p>
 
 
 
@@ -3584,11 +3609,21 @@
     <tbody>
         <tr>
           <td>
-                <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.ndarray">ndarray</span>, <span title="numpy.ndarray">ndarray</span>]</code>
+                <code><span title="numpy.ndarray">ndarray</span></code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Tuple[numpy.ndarray, numpy.ndarray]: X and y arrays with rows containing NaN values in y removed</p>
+              <p>Tuple[numpy.ndarray, np.ndarray]:</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code><span title="numpy.ndarray">ndarray</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>X and y arrays with rows containing NaN values in y removed.</p>
             </div>
           </td>
         </tr>
@@ -3598,17 +3633,19 @@
 
 
 <p><strong>Examples:</strong></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="go">(array([[1, 2],</span>
-<span class="go">        [5, 6]]), array([1., 2.]))</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="go">    from spotPython.utils.repair import remove_nan</span>
+<span class="go">    X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="go">    y = np.array([1, np.nan, 2])</span>
+<span class="go">    X_cleaned, y_cleaned = remove_nan(X, y)</span>
+<span class="go">    print(X_cleaned, y_cleaned)</span>
+<span class="go">    [[1 2]</span>
+<span class="go">     [5 6]] [1. 2.]</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/repair.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
-<span class="normal">30</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
@@ -3628,28 +3665,79 @@
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove rows from X and y where y contains NaN values.</span>
+<span class="sd">    Remove rows from X and y where y contains NaN values and issue a warning</span>
+<span class="sd">    if the dimension of the returned y array is smaller than the dimension of the original y array.</span>
+<span class="sd">    Issues a ValueError if the dimension of the returned y array is less than 2.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        X (numpy.ndarray): X array</span>
 <span class="sd">        y (numpy.ndarray): y array</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[numpy.ndarray, numpy.ndarray]: X and y arrays with rows containing NaN values in y removed</span>
+<span class="sd">        Tuple[numpy.ndarray, np.ndarray]:</span>
+<span class="sd">        X and y arrays with rows containing NaN values in y removed.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; X = np.array([[1, 2], [3, 4], [5, 6]])</span>
-<span class="sd">        &gt;&gt;&gt; y = np.array([1, np.nan, 2])</span>
-<span class="sd">        &gt;&gt;&gt; remove_nan(X, y)</span>
-<span class="sd">        (array([[1, 2],</span>
-<span class="sd">                [5, 6]]), array([1., 2.]))</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            from spotPython.utils.repair import remove_nan</span>
+<span class="sd">            X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="sd">            y = np.array([1, np.nan, 2])</span>
+<span class="sd">            X_cleaned, y_cleaned = remove_nan(X, y)</span>
+<span class="sd">            print(X_cleaned, y_cleaned)</span>
+<span class="sd">            [[1 2]</span>
+<span class="sd">             [5 6]] [1. 2.]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the original dimension of the y array</span>
+    <span class="n">original_dim</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Identify indices where y is not NaN</span>
     <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span>
+
+    <span class="c1"># Update X and y by removing rows with NaN in y</span>
+    <span class="n">X_cleaned</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">y_cleaned</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+
+    <span class="c1"># Check if dimensions have been reduced</span>
+    <span class="n">returned_dim</span> <span class="o">=</span> <span class="n">y_cleaned</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">returned_dim</span> <span class="o">&lt;</span> <span class="n">original_dim</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! The dimension of the returned y array is </span><span class="si">{</span><span class="n">y_cleaned</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;which is smaller than the original dimension </span><span class="si">{</span><span class="n">original_dim</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! Check whether to continue with the reduced dimension is useful.&quot;</span><span class="p">)</span>
+    <span class="c1"># throw an error if the returned dimension is smaller than one</span>
+    <span class="k">if</span> <span class="n">returned_dim</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;!!!! The dimension of the returned y array is less than 1. Check the input data.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X_cleaned</span><span class="p">,</span> <span class="n">y_cleaned</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -3753,8 +3841,7 @@ This applies to all variables except for &ldquo;num&rdquo; and &ldquo;float&rdqu
 
           <details class="quote">
             <summary>Source code in <code>spotPython/utils/repair.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 5</span>
-<span class="normal"> 6</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 6</span>
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
@@ -3774,7 +3861,8 @@ This applies to all variables except for &ldquo;num&rdquo; and &ldquo;float&rdqu
 <span class="normal">23</span>
 <span class="normal">24</span>
 <span class="normal">25</span>
-<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">repair_non_numeric</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">var_type</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">26</span>
+<span class="normal">27</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">repair_non_numeric</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">var_type</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Round non-numeric values to integers.</span>
 <span class="sd">    This applies to all variables except for &quot;num&quot; and &quot;float&quot;.</span>
