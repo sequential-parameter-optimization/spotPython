@@ -787,9 +787,9 @@ class Spot:
                 print(f"S.y: {S.y}")
                 Seed set to 123
                 Seed set to 123
-                spotPython tuning: 0.0 [########--] 80.00% 
-                spotPython tuning: 0.0 [#########-] 86.67% 
-                spotPython tuning: 0.0 [#########-] 93.33% 
+                spotPython tuning: 0.0 [########--] 80.00%
+                spotPython tuning: 0.0 [#########-] 86.67%
+                spotPython tuning: 0.0 [#########-] 93.33%
                 spotPython tuning: 0.0 [##########] 100.00% Done...
 
                 S.X: [[ 0.00000000e+00  0.00000000e+00]
