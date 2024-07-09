@@ -54,10 +54,12 @@ class LightDataModule(L.LightningDataModule):
     Examples:
         >>> from spotPython.data.lightdatamodule import LightDataModule
             from spotPython.data.csvdataset import CSVDataset
+            from spotPython.utils.scaler import TorchStandardScaler
             import torch
             # data.csv is simple csv file with 11 samples
             dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
-            data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
+            scaler = TorchStandardScaler()
+            data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5, scaler=scaler)
             data_module.setup()
             print(f"Training set size: {len(data_module.data_train)}")
             print(f"Validation set size: {len(data_module.data_val)}")
@@ -152,13 +154,13 @@ class LightDataModule(L.LightningDataModule):
                 train_val_data = torch.cat([self.data_train[i][0] for i in range(len(self.data_train))])
                 self.scaler.fit(train_val_data)
                 self.data_train = [(self.scaler.transform(data), target) for data, target in self.data_train]
-                data_tensors_train = [torch.tensor(data, dtype=torch.float32) for data, target in self.data_train]
-                target_tensors_train = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_train]
+                data_tensors_train = [data.clone().detach().requires_grad_(True) for data, target in self.data_train]
+                target_tensors_train = [target.clone().detach() for data, target in self.data_train]
                 self.data_train = TensorDataset(torch.stack(data_tensors_train), torch.stack(target_tensors_train))
                 #print(self.data_train)
                 self.data_val = [(self.scaler.transform(data), target) for data, target in self.data_val]
-                data_tensors_val = [torch.tensor(data, dtype=torch.float32) for data, target in self.data_val]
-                target_tensors_val = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_val]
+                data_tensors_val = [data.clone().detach().requires_grad_(True) for data, target in self.data_val]
+                target_tensors_val = [target.clone().detach() for data, target in self.data_val]
                 self.data_val = TensorDataset(torch.stack(data_tensors_val), torch.stack(target_tensors_val))
                
         # Assign test dataset for use in dataloader(s)
@@ -169,8 +171,8 @@ class LightDataModule(L.LightningDataModule):
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
             if self.scaler is not None:
                 self.data_test = [(self.scaler.transform(data), target) for data, target in self.data_test]
-                data_tensors_test = [torch.tensor(data, dtype=torch.float32) for data, target in self.data_test]
-                target_tensors_test = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_test]
+                data_tensors_test = [data.clone().detach().requires_grad_(True) for data, target in self.data_test]
+                target_tensors_test = [target.clone().detach() for data, target in self.data_test]
                 self.data_test = TensorDataset(torch.stack(data_tensors_test), torch.stack(target_tensors_test))
                
         # if stage == "predict" or stage is None:
@@ -192,8 +194,8 @@ class LightDataModule(L.LightningDataModule):
             )
             if self.scaler is not None:
                 self.data_predict = [(self.scaler.transform(data), target) for data, target in self.data_predict]
-                data_tensors_predict= [torch.tensor(data, dtype=torch.float32) for data, target in self.data_predict]
-                target_tensors_predict = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_predict]
+                data_tensors_predict= [data.clone().detach().requires_grad_(True) for data, target in self.data_predict]
+                target_tensors_predict = [target.clone().detach() for data, target in self.data_predict]
                 self.data_predict = TensorDataset(torch.stack(data_tensors_predict), torch.stack(target_tensors_predict))
 
     def train_dataloader(self) -> DataLoader:
