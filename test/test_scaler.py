@@ -1,10 +1,13 @@
 import torch
 from spotPython.data.lightdatamodule import LightDataModule
 from spotPython.data.csvdataset import CSVDataset
-from spotPython.utils.scaler import TorchStandardScaler
+from spotPython.utils.scaler import TorchStandardScaler, TorchMinMaxScaler
 from spotPython.data.california_housing import CaliforniaHousing
 
-def test_scaler():
+def test_standard_scaler():
+    """
+    Test if TorchStandardScaler scales data around 0.
+    """
     dataset = CaliforniaHousing(feature_type=torch.float32, target_type=torch.float32)
     scaler = TorchStandardScaler()
     data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5, scaler=scaler)
@@ -30,4 +33,19 @@ def test_scaler():
     #assert that overall mean goes against zero
     assert overall_mean < 0.00001
     
+def test_min_max_scaler():
+    """
+    Test if TorchMinMaxScaler scales data between 0 and 1.
+    """
+    dataset = CaliforniaHousing(feature_type=torch.float32, target_type=torch.float32)
+    scaler = TorchMinMaxScaler()
+    data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5, scaler=scaler)
+    data_module.setup()
+
+    loader = data_module.train_dataloader
+
+    # Iterate over batches in the DataLoader
+    for batch in loader():
+        inputs, targets = batch
+        assert torch.all(inputs >= 0) and torch.all(inputs <= 1), "Inputs are not scaled between 0 and 1"
 
