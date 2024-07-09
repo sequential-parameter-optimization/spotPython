@@ -1,7 +1,8 @@
 import lightning as L
 import torch
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, random_split, TensorDataset
 from typing import Optional
+
 
 
 class LightDataModule(L.LightningDataModule):
@@ -25,6 +26,8 @@ class LightDataModule(L.LightningDataModule):
             The test seed. Defaults to 42.
         num_workers (int):
             The number of workers. Defaults to 0.
+        scaler (object):
+            The spot scaler object (e.g. TorchStandardScaler). Defaults to None.
 
     Attributes:
         batch_size (int): The batch size.
@@ -79,6 +82,7 @@ class LightDataModule(L.LightningDataModule):
         test_size: float,
         test_seed: int = 42,
         num_workers: int = 0,
+        scaler: Optional[object] = None,
     ):
         super().__init__()
         self.batch_size = batch_size
@@ -86,6 +90,8 @@ class LightDataModule(L.LightningDataModule):
         self.test_size = test_size
         self.test_seed = test_seed
         self.num_workers = num_workers
+        self.scaler = scaler
+
 
     def prepare_data(self) -> None:
         """Prepares the data for use."""
@@ -98,6 +104,7 @@ class LightDataModule(L.LightningDataModule):
         Uses torch.utils.data.random_split() to split the data.
         Splitting is based on the test_size and test_seed.
         The test_size can be a float or an int.
+        If a spotPython scaler object is defined, the data will be scaled.
 
         Args:
             stage (Optional[str]):
@@ -140,14 +147,32 @@ class LightDataModule(L.LightningDataModule):
             self.data_train, self.data_val, _ = random_split(
                 self.data_full, [train_size, val_size, test_size], generator=generator_fit
             )
-
+            if self.scaler is not None:
+                # Fit the scaler on training data and transform both train and val data
+                train_val_data = torch.cat([self.data_train[i][0] for i in range(len(self.data_train))])
+                self.scaler.fit(train_val_data)
+                self.data_train = [(self.scaler.transform(data), target) for data, target in self.data_train]
+                data_tensors_train = [torch.tensor(data, dtype=torch.float32) for data, target in self.data_train]
+                target_tensors_train = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_train]
+                self.data_train = TensorDataset(torch.stack(data_tensors_train), torch.stack(target_tensors_train))
+                #print(self.data_train)
+                self.data_val = [(self.scaler.transform(data), target) for data, target in self.data_val]
+                data_tensors_val = [torch.tensor(data, dtype=torch.float32) for data, target in self.data_val]
+                target_tensors_val = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_val]
+                self.data_val = TensorDataset(torch.stack(data_tensors_val), torch.stack(target_tensors_val))
+               
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
             print(f"test_size: {test_size} used for test dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
-
+            if self.scaler is not None:
+                self.data_test = [(self.scaler.transform(data), target) for data, target in self.data_test]
+                data_tensors_test = [torch.tensor(data, dtype=torch.float32) for data, target in self.data_test]
+                target_tensors_test = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_test]
+                self.data_test = TensorDataset(torch.stack(data_tensors_test), torch.stack(target_tensors_test))
+               
         # if stage == "predict" or stage is None:
         #     print(f"test_size, full_train_size: {test_size}, {full_train_size}")
         #     generator_predict = torch.Generator().manual_seed(self.test_seed)
@@ -165,6 +190,11 @@ class LightDataModule(L.LightningDataModule):
             self.data_predict, _ = random_split(
                 self.data_full, [test_size, full_train_size], generator=generator_predict
             )
+            if self.scaler is not None:
+                self.data_predict = [(self.scaler.transform(data), target) for data, target in self.data_predict]
+                data_tensors_predict= [torch.tensor(data, dtype=torch.float32) for data, target in self.data_predict]
+                target_tensors_predict = [torch.tensor(target, dtype=torch.float32) for data, target in self.data_predict]
+                self.data_predict = TensorDataset(torch.stack(data_tensors_predict), torch.stack(target_tensors_predict))
 
     def train_dataloader(self) -> DataLoader:
         """
@@ -265,3 +295,5 @@ class LightDataModule(L.LightningDataModule):
         # apply fit_transform to the val data
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
         return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
+
+
