@@ -30,6 +30,7 @@ def test_net_light_regression_class():
     trainer = L.Trainer(
         max_epochs=2,
         enable_progress_bar=False,
+        accelerator="cpu",
     )
     trainer.fit(net_light_regression, train_loader, val_loader)
     res = trainer.test(net_light_regression, test_loader)

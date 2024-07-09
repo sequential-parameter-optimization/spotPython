@@ -4,7 +4,6 @@ from torch.utils.data import DataLoader, random_split, TensorDataset
 from typing import Optional
 
 
-
 class LightDataModule(L.LightningDataModule):
     """
     A LightningDataModule for handling data.
@@ -94,7 +93,6 @@ class LightDataModule(L.LightningDataModule):
         self.num_workers = num_workers
         self.scaler = scaler
 
-
     def prepare_data(self) -> None:
         """Prepares the data for use."""
         # download
@@ -157,12 +155,12 @@ class LightDataModule(L.LightningDataModule):
                 data_tensors_train = [data.clone().detach().requires_grad_(True) for data, target in self.data_train]
                 target_tensors_train = [target.clone().detach() for data, target in self.data_train]
                 self.data_train = TensorDataset(torch.stack(data_tensors_train), torch.stack(target_tensors_train))
-                #print(self.data_train)
+                # print(self.data_train)
                 self.data_val = [(self.scaler.transform(data), target) for data, target in self.data_val]
                 data_tensors_val = [data.clone().detach().requires_grad_(True) for data, target in self.data_val]
                 target_tensors_val = [target.clone().detach() for data, target in self.data_val]
                 self.data_val = TensorDataset(torch.stack(data_tensors_val), torch.stack(target_tensors_val))
-               
+
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
             print(f"test_size: {test_size} used for test dataset.")
@@ -174,7 +172,7 @@ class LightDataModule(L.LightningDataModule):
                 data_tensors_test = [data.clone().detach().requires_grad_(True) for data, target in self.data_test]
                 target_tensors_test = [target.clone().detach() for data, target in self.data_test]
                 self.data_test = TensorDataset(torch.stack(data_tensors_test), torch.stack(target_tensors_test))
-               
+
         # if stage == "predict" or stage is None:
         #     print(f"test_size, full_train_size: {test_size}, {full_train_size}")
         #     generator_predict = torch.Generator().manual_seed(self.test_seed)
@@ -194,9 +192,13 @@ class LightDataModule(L.LightningDataModule):
             )
             if self.scaler is not None:
                 self.data_predict = [(self.scaler.transform(data), target) for data, target in self.data_predict]
-                data_tensors_predict= [data.clone().detach().requires_grad_(True) for data, target in self.data_predict]
+                data_tensors_predict = [
+                    data.clone().detach().requires_grad_(True) for data, target in self.data_predict
+                ]
                 target_tensors_predict = [target.clone().detach() for data, target in self.data_predict]
-                self.data_predict = TensorDataset(torch.stack(data_tensors_predict), torch.stack(target_tensors_predict))
+                self.data_predict = TensorDataset(
+                    torch.stack(data_tensors_predict), torch.stack(target_tensors_predict)
+                )
 
     def train_dataloader(self) -> DataLoader:
         """
@@ -297,5 +299,3 @@ class LightDataModule(L.LightningDataModule):
         # apply fit_transform to the val data
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
         return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
-
-

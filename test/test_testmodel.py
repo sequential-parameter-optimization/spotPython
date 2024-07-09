@@ -9,7 +9,7 @@ import spotPython.light.testmodel as tm
 
 
 def test_testmodel():
-    fun_control = fun_control_init(_L_in=10, _L_out=1, _torchmetric="mean_squared_error")
+    fun_control = fun_control_init(_L_in=10, _L_out=1, _torchmetric="mean_squared_error", accelerator="cpu")
 
     dataset = Diabetes()
     set_control_key_value(control_dict=fun_control, key="data_set", value=dataset, replace=True)

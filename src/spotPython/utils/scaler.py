@@ -1,9 +1,11 @@
 import torch
 
+
 class TorchStandardScaler:
     """
     A class for scaling data using standardization with torch tensors.
     """
+
     def fit(self, x):
         """
         Compute the mean and standard deviation of the input tensor.
@@ -16,7 +18,7 @@ class TorchStandardScaler:
             raise TypeError("Input should be a torch tensor")
         self.mean = x.mean(0, keepdim=True)
         self.std = x.std(0, unbiased=False, keepdim=True)
-    
+
     def transform(self, x):
         """
         Scale the input tensor using the computed mean and standard deviation.
@@ -30,11 +32,11 @@ class TorchStandardScaler:
         """
         if not torch.is_tensor(x):
             raise TypeError("Input should be a torch tensor")
-        if not hasattr(self, 'mean') or not hasattr(self, 'std'):
+        if not hasattr(self, "mean") or not hasattr(self, "std"):
             raise RuntimeError("Must fit scaler before transforming data")
         x = (x - self.mean) / (self.std + 1e-7)
         return x
-    
+
     def fit_transform(self, x):
         """
         Fit the scaler to the input tensor and then scale the tensor.
@@ -47,11 +49,11 @@ class TorchStandardScaler:
         return self.transform(x)
 
 
-
 class TorchMinMaxScaler:
     """
     A class for scaling data using min-max normalization with PyTorch tensors.
     """
+
     def fit(self, x):
         """
         Fit the scaler to the input data.
@@ -65,7 +67,7 @@ class TorchMinMaxScaler:
             raise TypeError("Input should be a torch tensor")
         self.min = x.min(0, keepdim=True).values
         self.max = x.max(0, keepdim=True).values
-    
+
     def transform(self, x):
         """
         Transform the input data using the fitted scaler.
@@ -80,11 +82,11 @@ class TorchMinMaxScaler:
         """
         if not torch.is_tensor(x):
             raise TypeError("Input should be a torch tensor")
-        if not hasattr(self, 'min') or not hasattr(self, 'max'):
+        if not hasattr(self, "min") or not hasattr(self, "max"):
             raise RuntimeError("Must fit scaler before transforming data")
         x = (x - self.min) / (self.max - self.min + 1e-7)
         return x
-    
+
     def fit_transform(self, x):
         """
         Fit the scaler to the input data and transform it.

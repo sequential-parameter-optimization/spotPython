@@ -407,7 +407,7 @@ def fun_control_init(
         "prep_model_name": prep_model_name,
         "progress_file": progress_file,
         "save_model": False,
-        "scaler":scaler,
+        "scaler": scaler,
         "scenario": scenario,
         "seed": seed,
         "show_batch_interval": 1_000_000,

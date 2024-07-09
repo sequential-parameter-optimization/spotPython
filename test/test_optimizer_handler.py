@@ -27,7 +27,7 @@ def test_optimizer_handler_adam():
         _L_out=1,
         _torchmetric="mean_squared_error",
     )
-    trainer = L.Trainer(max_epochs=2, enable_progress_bar=False)
+    trainer = L.Trainer(accelerator="cpu", max_epochs=2, enable_progress_bar=False)
     trainer.fit(net_light_base, train_loader, val_loader)
     # Adam uses a lr which is calculated as lr=lr_mult * 0.001, so this value
     # should be 0.1 * 0.001 = 0.0001
@@ -55,7 +55,7 @@ def test_optimizer_handler_adadelta():
         _L_out=1,
         _torchmetric="mean_squared_error",
     )
-    trainer = L.Trainer(max_epochs=2, enable_progress_bar=False)
+    trainer = L.Trainer(accelerator="cpu", max_epochs=2, enable_progress_bar=False)
     trainer.fit(net_light_base, train_loader, val_loader)
     # Adadelta uses a lr which is calculated as lr=lr_mult * 1.0, so this value
     # should be 1.0 * 0.1 = 0.1
