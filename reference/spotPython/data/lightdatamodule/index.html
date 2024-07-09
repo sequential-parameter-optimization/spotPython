@@ -3026,6 +3026,8 @@
       
         
       
+        
+      
     
     
     
@@ -3320,6 +3322,27 @@
   
   <span class="md-ellipsis">
     repair
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/scaler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    scaler
   </span>
   
 
@@ -3743,6 +3766,20 @@ amd 0.7 * 0.3 = 0.21 validation set.</p>
                 <code>0</code>
           </td>
         </tr>
+        <tr>
+          <td><code>scaler</code></td>
+          <td>
+                <code>object</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The spot scaler object (e.g. TorchStandardScaler). Defaults to None.</p>
+            </div>
+          </td>
+          <td>
+                <code>None</code>
+          </td>
+        </tr>
     </tbody>
   </table>
 
@@ -3909,10 +3946,12 @@ Performs the training, validation, and test split.</p>
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.data.lightdatamodule</span> <span class="kn">import</span> <span class="n">LightDataModule</span>
 <span class="go">    from spotPython.data.csvdataset import CSVDataset</span>
+<span class="go">    from spotPython.utils.scaler import TorchStandardScaler</span>
 <span class="go">    import torch</span>
 <span class="go">    # data.csv is simple csv file with 11 samples</span>
 <span class="go">    dataset = CSVDataset(csv_file=&#39;data.csv&#39;, target_column=&#39;prognosis&#39;, feature_type=torch.long)</span>
-<span class="go">    data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)</span>
+<span class="go">    scaler = TorchStandardScaler()</span>
+<span class="go">    data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5, scaler=scaler)</span>
 <span class="go">    data_module.setup()</span>
 <span class="go">    print(f&quot;Training set size: {len(data_module.data_train)}&quot;)</span>
 <span class="go">    print(f&quot;Validation set size: {len(data_module.data_val)}&quot;)</span>
@@ -4192,7 +4231,41 @@ Performs the training, validation, and test split.</p>
 <span class="normal">264</span>
 <span class="normal">265</span>
 <span class="normal">266</span>
-<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningDataModule for handling data.</span>
 
@@ -4213,6 +4286,8 @@ Performs the training, validation, and test split.</p>
 <span class="sd">            The test seed. Defaults to 42.</span>
 <span class="sd">        num_workers (int):</span>
 <span class="sd">            The number of workers. Defaults to 0.</span>
+<span class="sd">        scaler (object):</span>
+<span class="sd">            The spot scaler object (e.g. TorchStandardScaler). Defaults to None.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        batch_size (int): The batch size.</span>
@@ -4239,10 +4314,12 @@ Performs the training, validation, and test split.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.data.lightdatamodule import LightDataModule</span>
 <span class="sd">            from spotPython.data.csvdataset import CSVDataset</span>
+<span class="sd">            from spotPython.utils.scaler import TorchStandardScaler</span>
 <span class="sd">            import torch</span>
 <span class="sd">            # data.csv is simple csv file with 11 samples</span>
 <span class="sd">            dataset = CSVDataset(csv_file=&#39;data.csv&#39;, target_column=&#39;prognosis&#39;, feature_type=torch.long)</span>
-<span class="sd">            data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)</span>
+<span class="sd">            scaler = TorchStandardScaler()</span>
+<span class="sd">            data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5, scaler=scaler)</span>
 <span class="sd">            data_module.setup()</span>
 <span class="sd">            print(f&quot;Training set size: {len(data_module.data_train)}&quot;)</span>
 <span class="sd">            print(f&quot;Validation set size: {len(data_module.data_val)}&quot;)</span>
@@ -4267,6 +4344,7 @@ Performs the training, validation, and test split.</p>
         <span class="n">test_size</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">test_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">scaler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -4274,6 +4352,7 @@ Performs the training, validation, and test split.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span> <span class="o">=</span> <span class="n">test_seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">scaler</span>
 
     <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares the data for use.&quot;&quot;&quot;</span>
@@ -4286,6 +4365,7 @@ Performs the training, validation, and test split.</p>
 <span class="sd">        Uses torch.utils.data.random_split() to split the data.</span>
 <span class="sd">        Splitting is based on the test_size and test_seed.</span>
 <span class="sd">        The test_size can be a float or an int.</span>
+<span class="sd">        If a spotPython scaler object is defined, the data will be scaled.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stage (Optional[str]):</span>
@@ -4328,6 +4408,19 @@ Performs the training, validation, and test split.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">,</span> <span class="n">test_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_fit</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Fit the scaler on training data and transform both train and val data</span>
+                <span class="n">train_val_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">))])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_val_data</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
+                <span class="n">data_tensors_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
+                <span class="n">target_tensors_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_train</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_train</span><span class="p">))</span>
+                <span class="c1"># print(self.data_train)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">]</span>
+                <span class="n">data_tensors_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">]</span>
+                <span class="n">target_tensors_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_val</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_val</span><span class="p">))</span>
 
         <span class="c1"># Assign test dataset for use in dataloader(s)</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4335,6 +4428,11 @@ Performs the training, validation, and test split.</p>
             <span class="c1"># get test data set as test_abs percent of the full dataset</span>
             <span class="n">generator_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">]</span>
+                <span class="n">data_tensors_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">]</span>
+                <span class="n">target_tensors_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_test</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_test</span><span class="p">))</span>
 
         <span class="c1"># if stage == &quot;predict&quot; or stage is None:</span>
         <span class="c1">#     print(f&quot;test_size, full_train_size: {test_size}, {full_train_size}&quot;)</span>
@@ -4353,6 +4451,15 @@ Performs the training, validation, and test split.</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_predict</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">]</span>
+                <span class="n">data_tensors_predict</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span>
+                <span class="p">]</span>
+                <span class="n">target_tensors_predict</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_predict</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_predict</span><span class="p">)</span>
+                <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4524,31 +4631,31 @@ using the predict dataset.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the predict dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the predict dataset.</span>
@@ -4597,10 +4704,10 @@ using the predict dataset.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span>
+<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepares the data for use.&quot;&quot;&quot;</span>
     <span class="c1"># download</span>
     <span class="k">pass</span>
@@ -4627,7 +4734,8 @@ using the predict dataset.</p>
       <p>Splits the data for use in training, validation, and testing.
 Uses torch.utils.data.random_split() to split the data.
 Splitting is based on the test_size and test_seed.
-The test_size can be a float or an int.</p>
+The test_size can be a float or an int.
+If a spotPython scaler object is defined, the data will be scaled.</p>
 
 
 
@@ -4675,13 +4783,7 @@ or None (for all three stages). Defaults to None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
@@ -4747,12 +4849,47 @@ or None (for all three stages). Defaults to None.</p>
 <span class="normal">164</span>
 <span class="normal">165</span>
 <span class="normal">166</span>
-<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Splits the data for use in training, validation, and testing.</span>
 <span class="sd">    Uses torch.utils.data.random_split() to split the data.</span>
 <span class="sd">    Splitting is based on the test_size and test_seed.</span>
 <span class="sd">    The test_size can be a float or an int.</span>
+<span class="sd">    If a spotPython scaler object is defined, the data will be scaled.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        stage (Optional[str]):</span>
@@ -4795,6 +4932,19 @@ or None (for all three stages). Defaults to None.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">,</span> <span class="n">test_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_fit</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Fit the scaler on training data and transform both train and val data</span>
+            <span class="n">train_val_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">))])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_val_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
+            <span class="n">data_tensors_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
+            <span class="n">target_tensors_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_train</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_train</span><span class="p">))</span>
+            <span class="c1"># print(self.data_train)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">]</span>
+            <span class="n">data_tensors_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">]</span>
+            <span class="n">target_tensors_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_val</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_val</span><span class="p">))</span>
 
     <span class="c1"># Assign test dataset for use in dataloader(s)</span>
     <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4802,6 +4952,11 @@ or None (for all three stages). Defaults to None.</p>
         <span class="c1"># get test data set as test_abs percent of the full dataset</span>
         <span class="n">generator_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">]</span>
+            <span class="n">data_tensors_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">]</span>
+            <span class="n">target_tensors_test</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_test</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_test</span><span class="p">))</span>
 
     <span class="c1"># if stage == &quot;predict&quot; or stage is None:</span>
     <span class="c1">#     print(f&quot;test_size, full_train_size: {test_size}, {full_train_size}&quot;)</span>
@@ -4820,6 +4975,15 @@ or None (for all three stages). Defaults to None.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_predict</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">]</span>
+            <span class="n">data_tensors_predict</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span>
+            <span class="p">]</span>
+            <span class="n">target_tensors_predict</span> <span class="o">=</span> <span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span> <span class="o">=</span> <span class="n">TensorDataset</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">data_tensors_predict</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">target_tensors_predict</span><span class="p">)</span>
+            <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -4882,30 +5046,30 @@ using the test dataset.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span>
-<span class="normal">225</span>
-<span class="normal">226</span>
-<span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the test dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the test dataset.</span>
@@ -4991,30 +5155,30 @@ using the training dataset.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
-<span class="normal">192</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the training dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the training dataset.</span>
@@ -5100,29 +5264,29 @@ using the validation dataset.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/data/lightdatamodule.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">194</span>
-<span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the validation dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the validation dataset.</span>
