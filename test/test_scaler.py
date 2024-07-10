@@ -1,8 +1,8 @@
 import torch
 from spotPython.data.lightdatamodule import LightDataModule
-from spotPython.data.csvdataset import CSVDataset
 from spotPython.utils.scaler import TorchStandardScaler, TorchMinMaxScaler
 from spotPython.data.california_housing import CaliforniaHousing
+
 
 def test_standard_scaler():
     """
@@ -30,9 +30,10 @@ def test_standard_scaler():
     # Calculate the mean over all inputs
     mean_inputs = total_sum / total_count
     overall_mean = mean_inputs.mean()
-    #assert that overall mean goes against zero
+    # assert that overall mean goes against zero
     assert overall_mean < 0.00001
-    
+
+
 def test_min_max_scaler():
     """
     Test if TorchMinMaxScaler scales data between 0 and 1.
@@ -48,4 +49,3 @@ def test_min_max_scaler():
     for batch in loader():
         inputs, targets = batch
         assert torch.all(inputs >= 0) and torch.all(inputs <= 1), "Inputs are not scaled between 0 and 1"
-
