@@ -9,8 +9,10 @@ class TorchStandardScaler:
     def fit(self, x):
         """
         Compute the mean and standard deviation of the input tensor.
+
         Args:
             x (torch.Tensor): The input tensor.
+
         Raises:
             TypeError: If the input is not a torch tensor.
         """
@@ -22,10 +24,13 @@ class TorchStandardScaler:
     def transform(self, x):
         """
         Scale the input tensor using the computed mean and standard deviation.
+
         Args:
             x (torch.Tensor): The input tensor.
+
         Returns:
             torch.Tensor: The scaled tensor.
+
         Raises:
             TypeError: If the input is not a torch tensor.
             RuntimeError: If the scaler has not been fitted before transforming data.
@@ -40,11 +45,18 @@ class TorchStandardScaler:
     def fit_transform(self, x):
         """
         Fit the scaler to the input tensor and then scale the tensor.
+
         Args:
             x (torch.Tensor): The input tensor.
+
         Returns:
             torch.Tensor: The scaled tensor.
+       
+        Raises:
+            TypeError: If the input is not a torch tensor.
         """
+        if not torch.is_tensor(x):
+            raise TypeError("Input should be a torch tensor")
         self.fit(x)
         return self.transform(x)
 
@@ -56,12 +68,13 @@ class TorchMinMaxScaler:
 
     def fit(self, x):
         """
-        Fit the scaler to the input data.
+        Compute the minimum and maximum value of the input tensor.
+
         Parameters:
-        - x: torch.Tensor
-            The input data to fit the scaler to.
+            x (torch.Tensor): The input tensor.
+
         Raises:
-        - TypeError: If the input is not a torch tensor.
+            TypeError: If the input is not a torch tensor.
         """
         if not torch.is_tensor(x):
             raise TypeError("Input should be a torch tensor")
@@ -70,15 +83,17 @@ class TorchMinMaxScaler:
 
     def transform(self, x):
         """
-        Transform the input data using the fitted scaler.
-        Parameters:
-        - x: torch.Tensor
-            The input data to transform.
+        Scale the input tensor using the computed minimum and maximum values.
+
+        Args:
+            x (torch.Tensor): The input tensor.
+
         Returns:
-        - torch.Tensor: The transformed data.
+            torch.Tensor: The scaled tensor.
+
         Raises:
-        - TypeError: If the input is not a torch tensor.
-        - RuntimeError: If the scaler has not been fitted before transforming data.
+            TypeError: If the input is not a torch tensor.
+            RuntimeError: If the scaler has not been fitted before transforming data.
         """
         if not torch.is_tensor(x):
             raise TypeError("Input should be a torch tensor")
@@ -89,14 +104,18 @@ class TorchMinMaxScaler:
 
     def fit_transform(self, x):
         """
-        Fit the scaler to the input data and transform it.
-        Parameters:
-        - x: torch.Tensor
-            The input data to fit and transform.
+        Fit the scaler to the input tensor and then scale the tensor.
+
+        Args:
+            x (torch.Tensor): The input tensor.
+
         Returns:
-        - torch.Tensor: The transformed data.
+            torch.Tensor: The scaled tensor.
+
         Raises:
-        - TypeError: If the input is not a torch tensor.
+            TypeError: If the input is not a torch tensor.
         """
+        if not torch.is_tensor(x):
+            raise TypeError("Input should be a torch tensor")
         self.fit(x)
         return self.transform(x)
