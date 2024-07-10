@@ -1466,9 +1466,9 @@ def update_fun_control_with_hyper_num_cat_dicts(fun_control, num_dict, cat_dict,
             fun_control["core_model_hyper_dict"][key].update({"upper": len(fle) - 1})
 
 
-def set_int_hyperparameter_values(fun_control, key, lower, upper):
+def set_int_hyperparameter_values(fun_control, key, lower, upper) -> None:
     """
-    Set the integer hyperparameter values in the fun_control dictionary.
+    Set (modify) the integer hyperparameter values in the fun_control dictionary.
 
     Args:
         fun_control (dict):
@@ -1479,6 +1479,38 @@ def set_int_hyperparameter_values(fun_control, key, lower, upper):
             The lower bound of the hyperparameter.
         upper (int):
             The upper bound of the hyperparameter.
+
+    Examples:
+        >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+            from spotPython.utils.init import fun_control_init
+            from spotPython.hyperparameters.values import set_int_hyperparameter_values
+            from spotPython.utils.eda import gen_design_table
+            fun_control = fun_control_init(
+                core_model_name="forest.AMFRegressor",
+                hyperdict=RiverHyperDict,
+            )
+            print("Before modification:")
+            print(gen_design_table(fun_control))
+            set_int_hyperparameter_values(fun_control, "n_estimators", 2, 5)
+            print("After modification:")
+            print(gen_design_table(fun_control))
+            Seed set to 123
+                Before modification:
+                | name            | type   |   default |   lower |   upper | transform   |
+                |-----------------|--------|-----------|---------|---------|-------------|
+                | n_estimators    | int    |        10 |     2   |    1000 | None        |
+                | step            | float  |         1 |     0.1 |      10 | None        |
+                | use_aggregation | factor |         1 |     0   |       1 | None        |
+                Setting hyperparameter n_estimators to value [2, 5].
+                Variable type is int.
+                Core type is None.
+                Calling modify_hyper_parameter_bounds().
+                After modification:
+                | name            | type   |   default |   lower |   upper | transform   |
+                |-----------------|--------|-----------|---------|---------|-------------|
+                | n_estimators    | int    |        10 |     2   |       5 | None        |
+                | step            | float  |         1 |     0.1 |      10 | None        |
+                | use_aggregation | factor |         1 |     0   |       1 | None        |
     """
     set_control_hyperparameter_value(
         fun_control,
@@ -1490,7 +1522,7 @@ def set_int_hyperparameter_values(fun_control, key, lower, upper):
     )
 
 
-def set_float_hyperparameter_values(fun_control, key, lower, upper):
+def set_float_hyperparameter_values(fun_control, key, lower, upper) -> None:
     """
     Set the float hyperparameter values in the fun_control dictionary.
 
@@ -1503,6 +1535,22 @@ def set_float_hyperparameter_values(fun_control, key, lower, upper):
             The lower bound of the hyperparameter.
         upper (float):
             The upper bound of the hyperparameter.
+
+    Examples:
+    >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        from spotPython.utils.init import fun_control_init
+        from spotPython.hyperparameters.values import set_float_hyperparameter_values
+        from spotPython.utils.eda import gen_design_table
+        fun_control = fun_control_init(
+            core_model_name="forest.AMFRegressor",
+            hyperdict=RiverHyperDict,
+        )
+        print("Before modification:")
+        print(gen_design_table(fun_control))
+        set_float_hyperparameter_values(fun_control, "step", 0.2, 5)
+        print("After modification:")
+        print(gen_design_table(fun_control))
+        Seed set to 123
     """
     set_control_hyperparameter_value(
         fun_control,
@@ -1527,6 +1575,38 @@ def set_boolean_hyperparameter_values(fun_control, key, lower, upper):
             The lower bound of the hyperparameter.
         upper (bool):
             The upper bound of the hyperparameter.
+
+    Examples:
+    >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        from spotPython.utils.init import fun_control_init
+        from spotPython.hyperparameters.values import set_boolean_hyperparameter_values
+        from spotPython.utils.eda import gen_design_table
+        fun_control = fun_control_init(
+            core_model_name="forest.AMFRegressor",
+            hyperdict=RiverHyperDict,
+        )
+        print("Before modification:")
+        print(gen_design_table(fun_control))
+        set_boolean_hyperparameter_values(fun_control, "use_aggregation", 0, 0)
+        print("After modification:")
+        print(gen_design_table(fun_control))
+        Seed set to 123
+        Before modification:
+        | name            | type   |   default |   lower |   upper | transform   |
+        |-----------------|--------|-----------|---------|---------|-------------|
+        | n_estimators    | int    |        10 |     2   |    1000 | None        |
+        | step            | float  |         1 |     0.1 |      10 | None        |
+        | use_aggregation | factor |         1 |     0   |       1 | None        |
+        Setting hyperparameter use_aggregation to value [0, 0].
+        Variable type is factor.
+        Core type is bool.
+        Calling modify_boolean_hyper_parameter_levels().
+        After modification:
+        | name            | type   |   default |   lower |   upper | transform   |
+        |-----------------|--------|-----------|---------|---------|-------------|
+        | n_estimators    | int    |        10 |     2   |    1000 | None        |
+        | step            | float  |         1 |     0.1 |      10 | None        |
+        | use_aggregation | factor |         1 |     0   |       0 | None        |
     """
     set_control_hyperparameter_value(
         fun_control,
@@ -1549,6 +1629,59 @@ def set_factor_hyperparameter_values(fun_control, key, levels):
             The key of the hyperparameter.
         levels (list):
             The levels of the hyperparameter.
+
+    Examples:
+    >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        from spotPython.utils.init import fun_control_init
+        from spotPython.hyperparameters.values import set_factor_hyperparameter_values
+        from spotPython.utils.eda import gen_design_table
+        fun_control = fun_control_init(
+            core_model_name="tree.HoeffdingTreeRegressor",
+            hyperdict=RiverHyperDict,
+        )
+        print("Before modification:")
+        print(gen_design_table(fun_control))
+        set_factor_hyperparameter_values(fun_control, "leaf_model", ['LinearRegression',
+                                                            'Perceptron'])
+        print("After modification:")
+        print(gen_design_table(fun_control))
+            Seed set to 123
+            Before modification:
+            | name                   | type   | default          |   lower |    upper | transform              |
+            |------------------------|--------|------------------|---------|----------|------------------------|
+            | grace_period           | int    | 200              |  10     | 1000     | None                   |
+            | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |
+            | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |
+            | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |
+            | leaf_prediction        | factor | mean             |   0     |    2     | None                   |
+            | leaf_model             | factor | LinearRegression |   0     |    2     | None                   |
+            | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |
+            | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |
+            | min_samples_split      | int    | 5                |   2     |   10     | None                   |
+            | binary_split           | factor | 0                |   0     |    1     | None                   |
+            | max_size               | float  | 500.0            | 100     | 1000     | None                   |
+            | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |
+            | stop_mem_management    | factor | 0                |   0     |    1     | None                   |
+            | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |
+            | merit_preprune         | factor | 1                |   0     |    1     | None                   |
+            After modification:
+            | name                   | type   | default          |   lower |    upper | transform              |
+            |------------------------|--------|------------------|---------|----------|------------------------|
+            | grace_period           | int    | 200              |  10     | 1000     | None                   |
+            | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |
+            | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |
+            | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |
+            | leaf_prediction        | factor | mean             |   0     |    2     | None                   |
+            | leaf_model             | factor | LinearRegression |   0     |    1     | None                   |
+            | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |
+            | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |
+            | min_samples_split      | int    | 5                |   2     |   10     | None                   |
+            | binary_split           | factor | 0                |   0     |    1     | None                   |
+            | max_size               | float  | 500.0            | 100     | 1000     | None                   |
+            | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |
+            | stop_mem_management    | factor | 0                |   0     |    1     | None                   |
+            | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |
+            | merit_preprune         | factor | 1                |   0     |    1     | None                   |
     """
     # check if levels is a list of strings. If not, convert it to a list
     if not isinstance(levels, list):
