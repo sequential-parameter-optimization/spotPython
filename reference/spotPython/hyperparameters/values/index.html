@@ -10441,43 +10441,37 @@ value will be converted to the type &ldquo;int&rdquo;.</p>
 
 
 <p><strong>Examples:</strong></p>
-    
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-    from spotPython.utils.init import fun_control_init
-    from spotPython.hyperparameters.values import set_boolean_hyperparameter_values
-    from spotPython.utils.eda import gen_design_table
-    fun_control = fun_control_init(
-        core_model_name=&rdquo;forest.AMFRegressor&rdquo;,
-        hyperdict=RiverHyperDict,
-    )
-    print(&ldquo;Before modification:&rdquo;)
-    print(gen_design_table(fun_control))
-    set_boolean_hyperparameter_values(fun_control, &ldquo;use_aggregation&rdquo;, 0, 0)
-    print(&ldquo;After modification:&rdquo;)
-    print(gen_design_table(fun_control))
-    Seed set to 123
-    Before modification:
-    | name            | type   |   default |   lower |   upper | transform   |
-    |-----------------|--------|-----------|---------|---------|-------------|
-    | n_estimators    | int    |        10 |     2   |    1000 | None        |
-    | step            | float  |         1 |     0.1 |      10 | None        |
-    | use_aggregation | factor |         1 |     0   |       1 | None        |
-    Setting hyperparameter use_aggregation to value [0, 0].
-    Variable type is factor.
-    Core type is bool.
-    Calling modify_boolean_hyper_parameter_levels().
-    After modification:
-    | name            | type   |   default |   lower |   upper | transform   |
-    |-----------------|--------|-----------|---------|---------|-------------|
-    | n_estimators    | int    |        10 |     2   |    1000 | None        |
-    | step            | float  |         1 |     0.1 |      10 | None        |
-    | use_aggregation | factor |         1 |     0   |       0 | None        |</p>
-</blockquote>
-</blockquote>
-</blockquote>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotRiver.hyperdict.river_hyper_dict</span> <span class="kn">import</span> <span class="n">RiverHyperDict</span>
+<span class="go">    from spotPython.utils.init import fun_control_init</span>
+<span class="go">    from spotPython.hyperparameters.values import set_boolean_hyperparameter_values</span>
+<span class="go">    from spotPython.utils.eda import gen_design_table</span>
+<span class="go">    fun_control = fun_control_init(</span>
+<span class="go">        core_model_name=&quot;forest.AMFRegressor&quot;,</span>
+<span class="go">        hyperdict=RiverHyperDict,</span>
+<span class="go">    )</span>
+<span class="go">    print(&quot;Before modification:&quot;)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
+<span class="go">    set_boolean_hyperparameter_values(fun_control, &quot;use_aggregation&quot;, 0, 0)</span>
+<span class="go">    print(&quot;After modification:&quot;)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
+<span class="go">    Seed set to 123</span>
+<span class="go">    Before modification:</span>
+<span class="go">    | name            | type   |   default |   lower |   upper | transform   |</span>
+<span class="go">    |-----------------|--------|-----------|---------|---------|-------------|</span>
+<span class="go">    | n_estimators    | int    |        10 |     2   |    1000 | None        |</span>
+<span class="go">    | step            | float  |         1 |     0.1 |      10 | None        |</span>
+<span class="go">    | use_aggregation | factor |         1 |     0   |       1 | None        |</span>
+<span class="go">    Setting hyperparameter use_aggregation to value [0, 0].</span>
+<span class="go">    Variable type is factor.</span>
+<span class="go">    Core type is bool.</span>
+<span class="go">    Calling modify_boolean_hyper_parameter_levels().</span>
+<span class="go">    After modification:</span>
+<span class="go">    | name            | type   |   default |   lower |   upper | transform   |</span>
+<span class="go">    |-----------------|--------|-----------|---------|---------|-------------|</span>
+<span class="go">    | n_estimators    | int    |        10 |     2   |    1000 | None        |</span>
+<span class="go">    | step            | float  |         1 |     0.1 |      10 | None        |</span>
+<span class="go">    | use_aggregation | factor |         1 |     0   |       0 | None        |</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
@@ -10549,36 +10543,36 @@ value will be converted to the type &ldquo;int&rdquo;.</p>
 <span class="sd">            The upper bound of the hyperparameter.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict</span>
-<span class="sd">        from spotPython.utils.init import fun_control_init</span>
-<span class="sd">        from spotPython.hyperparameters.values import set_boolean_hyperparameter_values</span>
-<span class="sd">        from spotPython.utils.eda import gen_design_table</span>
-<span class="sd">        fun_control = fun_control_init(</span>
-<span class="sd">            core_model_name=&quot;forest.AMFRegressor&quot;,</span>
-<span class="sd">            hyperdict=RiverHyperDict,</span>
-<span class="sd">        )</span>
-<span class="sd">        print(&quot;Before modification:&quot;)</span>
-<span class="sd">        print(gen_design_table(fun_control))</span>
-<span class="sd">        set_boolean_hyperparameter_values(fun_control, &quot;use_aggregation&quot;, 0, 0)</span>
-<span class="sd">        print(&quot;After modification:&quot;)</span>
-<span class="sd">        print(gen_design_table(fun_control))</span>
-<span class="sd">        Seed set to 123</span>
-<span class="sd">        Before modification:</span>
-<span class="sd">        | name            | type   |   default |   lower |   upper | transform   |</span>
-<span class="sd">        |-----------------|--------|-----------|---------|---------|-------------|</span>
-<span class="sd">        | n_estimators    | int    |        10 |     2   |    1000 | None        |</span>
-<span class="sd">        | step            | float  |         1 |     0.1 |      10 | None        |</span>
-<span class="sd">        | use_aggregation | factor |         1 |     0   |       1 | None        |</span>
-<span class="sd">        Setting hyperparameter use_aggregation to value [0, 0].</span>
-<span class="sd">        Variable type is factor.</span>
-<span class="sd">        Core type is bool.</span>
-<span class="sd">        Calling modify_boolean_hyper_parameter_levels().</span>
-<span class="sd">        After modification:</span>
-<span class="sd">        | name            | type   |   default |   lower |   upper | transform   |</span>
-<span class="sd">        |-----------------|--------|-----------|---------|---------|-------------|</span>
-<span class="sd">        | n_estimators    | int    |        10 |     2   |    1000 | None        |</span>
-<span class="sd">        | step            | float  |         1 |     0.1 |      10 | None        |</span>
-<span class="sd">        | use_aggregation | factor |         1 |     0   |       0 | None        |</span>
+<span class="sd">        &gt;&gt;&gt; from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict</span>
+<span class="sd">            from spotPython.utils.init import fun_control_init</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_boolean_hyperparameter_values</span>
+<span class="sd">            from spotPython.utils.eda import gen_design_table</span>
+<span class="sd">            fun_control = fun_control_init(</span>
+<span class="sd">                core_model_name=&quot;forest.AMFRegressor&quot;,</span>
+<span class="sd">                hyperdict=RiverHyperDict,</span>
+<span class="sd">            )</span>
+<span class="sd">            print(&quot;Before modification:&quot;)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
+<span class="sd">            set_boolean_hyperparameter_values(fun_control, &quot;use_aggregation&quot;, 0, 0)</span>
+<span class="sd">            print(&quot;After modification:&quot;)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
+<span class="sd">            Seed set to 123</span>
+<span class="sd">            Before modification:</span>
+<span class="sd">            | name            | type   |   default |   lower |   upper | transform   |</span>
+<span class="sd">            |-----------------|--------|-----------|---------|---------|-------------|</span>
+<span class="sd">            | n_estimators    | int    |        10 |     2   |    1000 | None        |</span>
+<span class="sd">            | step            | float  |         1 |     0.1 |      10 | None        |</span>
+<span class="sd">            | use_aggregation | factor |         1 |     0   |       1 | None        |</span>
+<span class="sd">            Setting hyperparameter use_aggregation to value [0, 0].</span>
+<span class="sd">            Variable type is factor.</span>
+<span class="sd">            Core type is bool.</span>
+<span class="sd">            Calling modify_boolean_hyper_parameter_levels().</span>
+<span class="sd">            After modification:</span>
+<span class="sd">            | name            | type   |   default |   lower |   upper | transform   |</span>
+<span class="sd">            |-----------------|--------|-----------|---------|---------|-------------|</span>
+<span class="sd">            | n_estimators    | int    |        10 |     2   |    1000 | None        |</span>
+<span class="sd">            | step            | float  |         1 |     0.1 |      10 | None        |</span>
+<span class="sd">            | use_aggregation | factor |         1 |     0   |       0 | None        |</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">set_control_hyperparameter_value</span><span class="p">(</span>
         <span class="n">fun_control</span><span class="p">,</span>
@@ -11075,64 +11069,58 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
 
 <p><strong>Examples:</strong></p>
-    
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-    from spotPython.utils.init import fun_control_init
-    from spotPython.hyperparameters.values import set_factor_hyperparameter_values
-    from spotPython.utils.eda import gen_design_table
-    fun_control = fun_control_init(
-        core_model_name=&rdquo;tree.HoeffdingTreeRegressor&rdquo;,
-        hyperdict=RiverHyperDict,
-    )
-    print(&ldquo;Before modification:&rdquo;)
-    print(gen_design_table(fun_control))
-    set_factor_hyperparameter_values(fun_control, &ldquo;leaf_model&rdquo;, [&lsquo;LinearRegression&rsquo;,
-                                                        &lsquo;Perceptron&rsquo;])
-    print(&ldquo;After modification:&rdquo;)
-    print(gen_design_table(fun_control))
-        Seed set to 123
-        Before modification:
-        | name                   | type   | default          |   lower |    upper | transform              |
-        |------------------------|--------|------------------|---------|----------|------------------------|
-        | grace_period           | int    | 200              |  10     | 1000     | None                   |
-        | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |
-        | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |
-        | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |
-        | leaf_prediction        | factor | mean             |   0     |    2     | None                   |
-        | leaf_model             | factor | LinearRegression |   0     |    2     | None                   |
-        | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |
-        | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |
-        | min_samples_split      | int    | 5                |   2     |   10     | None                   |
-        | binary_split           | factor | 0                |   0     |    1     | None                   |
-        | max_size               | float  | 500.0            | 100     | 1000     | None                   |
-        | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |
-        | stop_mem_management    | factor | 0                |   0     |    1     | None                   |
-        | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |
-        | merit_preprune         | factor | 1                |   0     |    1     | None                   |
-        After modification:
-        | name                   | type   | default          |   lower |    upper | transform              |
-        |------------------------|--------|------------------|---------|----------|------------------------|
-        | grace_period           | int    | 200              |  10     | 1000     | None                   |
-        | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |
-        | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |
-        | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |
-        | leaf_prediction        | factor | mean             |   0     |    2     | None                   |
-        | leaf_model             | factor | LinearRegression |   0     |    1     | None                   |
-        | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |
-        | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |
-        | min_samples_split      | int    | 5                |   2     |   10     | None                   |
-        | binary_split           | factor | 0                |   0     |    1     | None                   |
-        | max_size               | float  | 500.0            | 100     | 1000     | None                   |
-        | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |
-        | stop_mem_management    | factor | 0                |   0     |    1     | None                   |
-        | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |
-        | merit_preprune         | factor | 1                |   0     |    1     | None                   |</p>
-</blockquote>
-</blockquote>
-</blockquote>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotRiver.hyperdict.river_hyper_dict</span> <span class="kn">import</span> <span class="n">RiverHyperDict</span>
+<span class="go">    from spotPython.utils.init import fun_control_init</span>
+<span class="go">    from spotPython.hyperparameters.values import set_factor_hyperparameter_values</span>
+<span class="go">    from spotPython.utils.eda import gen_design_table</span>
+<span class="go">    fun_control = fun_control_init(</span>
+<span class="go">        core_model_name=&quot;tree.HoeffdingTreeRegressor&quot;,</span>
+<span class="go">        hyperdict=RiverHyperDict,</span>
+<span class="go">    )</span>
+<span class="go">    print(&quot;Before modification:&quot;)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
+<span class="go">    set_factor_hyperparameter_values(fun_control, &quot;leaf_model&quot;, [&#39;LinearRegression&#39;,</span>
+<span class="go">                                                        &#39;Perceptron&#39;])</span>
+<span class="go">    print(&quot;After modification:&quot;)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
+<span class="go">        Seed set to 123</span>
+<span class="go">        Before modification:</span>
+<span class="go">        | name                   | type   | default          |   lower |    upper | transform              |</span>
+<span class="go">        |------------------------|--------|------------------|---------|----------|------------------------|</span>
+<span class="go">        | grace_period           | int    | 200              |  10     | 1000     | None                   |</span>
+<span class="go">        | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |</span>
+<span class="go">        | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |</span>
+<span class="go">        | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |</span>
+<span class="go">        | leaf_prediction        | factor | mean             |   0     |    2     | None                   |</span>
+<span class="go">        | leaf_model             | factor | LinearRegression |   0     |    2     | None                   |</span>
+<span class="go">        | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |</span>
+<span class="go">        | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |</span>
+<span class="go">        | min_samples_split      | int    | 5                |   2     |   10     | None                   |</span>
+<span class="go">        | binary_split           | factor | 0                |   0     |    1     | None                   |</span>
+<span class="go">        | max_size               | float  | 500.0            | 100     | 1000     | None                   |</span>
+<span class="go">        | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |</span>
+<span class="go">        | stop_mem_management    | factor | 0                |   0     |    1     | None                   |</span>
+<span class="go">        | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |</span>
+<span class="go">        | merit_preprune         | factor | 1                |   0     |    1     | None                   |</span>
+<span class="go">        After modification:</span>
+<span class="go">        | name                   | type   | default          |   lower |    upper | transform              |</span>
+<span class="go">        |------------------------|--------|------------------|---------|----------|------------------------|</span>
+<span class="go">        | grace_period           | int    | 200              |  10     | 1000     | None                   |</span>
+<span class="go">        | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |</span>
+<span class="go">        | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |</span>
+<span class="go">        | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |</span>
+<span class="go">        | leaf_prediction        | factor | mean             |   0     |    2     | None                   |</span>
+<span class="go">        | leaf_model             | factor | LinearRegression |   0     |    1     | None                   |</span>
+<span class="go">        | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |</span>
+<span class="go">        | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |</span>
+<span class="go">        | min_samples_split      | int    | 5                |   2     |   10     | None                   |</span>
+<span class="go">        | binary_split           | factor | 0                |   0     |    1     | None                   |</span>
+<span class="go">        | max_size               | float  | 500.0            | 100     | 1000     | None                   |</span>
+<span class="go">        | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |</span>
+<span class="go">        | stop_mem_management    | factor | 0                |   0     |    1     | None                   |</span>
+<span class="go">        | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |</span>
+<span class="go">        | merit_preprune         | factor | 1                |   0     |    1     | None                   |</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
@@ -11226,57 +11214,57 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="sd">            The levels of the hyperparameter.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict</span>
-<span class="sd">        from spotPython.utils.init import fun_control_init</span>
-<span class="sd">        from spotPython.hyperparameters.values import set_factor_hyperparameter_values</span>
-<span class="sd">        from spotPython.utils.eda import gen_design_table</span>
-<span class="sd">        fun_control = fun_control_init(</span>
-<span class="sd">            core_model_name=&quot;tree.HoeffdingTreeRegressor&quot;,</span>
-<span class="sd">            hyperdict=RiverHyperDict,</span>
-<span class="sd">        )</span>
-<span class="sd">        print(&quot;Before modification:&quot;)</span>
-<span class="sd">        print(gen_design_table(fun_control))</span>
-<span class="sd">        set_factor_hyperparameter_values(fun_control, &quot;leaf_model&quot;, [&#39;LinearRegression&#39;,</span>
-<span class="sd">                                                            &#39;Perceptron&#39;])</span>
-<span class="sd">        print(&quot;After modification:&quot;)</span>
-<span class="sd">        print(gen_design_table(fun_control))</span>
-<span class="sd">            Seed set to 123</span>
-<span class="sd">            Before modification:</span>
-<span class="sd">            | name                   | type   | default          |   lower |    upper | transform              |</span>
-<span class="sd">            |------------------------|--------|------------------|---------|----------|------------------------|</span>
-<span class="sd">            | grace_period           | int    | 200              |  10     | 1000     | None                   |</span>
-<span class="sd">            | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |</span>
-<span class="sd">            | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |</span>
-<span class="sd">            | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |</span>
-<span class="sd">            | leaf_prediction        | factor | mean             |   0     |    2     | None                   |</span>
-<span class="sd">            | leaf_model             | factor | LinearRegression |   0     |    2     | None                   |</span>
-<span class="sd">            | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |</span>
-<span class="sd">            | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |</span>
-<span class="sd">            | min_samples_split      | int    | 5                |   2     |   10     | None                   |</span>
-<span class="sd">            | binary_split           | factor | 0                |   0     |    1     | None                   |</span>
-<span class="sd">            | max_size               | float  | 500.0            | 100     | 1000     | None                   |</span>
-<span class="sd">            | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |</span>
-<span class="sd">            | stop_mem_management    | factor | 0                |   0     |    1     | None                   |</span>
-<span class="sd">            | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |</span>
-<span class="sd">            | merit_preprune         | factor | 1                |   0     |    1     | None                   |</span>
-<span class="sd">            After modification:</span>
-<span class="sd">            | name                   | type   | default          |   lower |    upper | transform              |</span>
-<span class="sd">            |------------------------|--------|------------------|---------|----------|------------------------|</span>
-<span class="sd">            | grace_period           | int    | 200              |  10     | 1000     | None                   |</span>
-<span class="sd">            | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |</span>
-<span class="sd">            | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |</span>
-<span class="sd">            | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |</span>
-<span class="sd">            | leaf_prediction        | factor | mean             |   0     |    2     | None                   |</span>
-<span class="sd">            | leaf_model             | factor | LinearRegression |   0     |    1     | None                   |</span>
-<span class="sd">            | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |</span>
-<span class="sd">            | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |</span>
-<span class="sd">            | min_samples_split      | int    | 5                |   2     |   10     | None                   |</span>
-<span class="sd">            | binary_split           | factor | 0                |   0     |    1     | None                   |</span>
-<span class="sd">            | max_size               | float  | 500.0            | 100     | 1000     | None                   |</span>
-<span class="sd">            | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |</span>
-<span class="sd">            | stop_mem_management    | factor | 0                |   0     |    1     | None                   |</span>
-<span class="sd">            | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |</span>
-<span class="sd">            | merit_preprune         | factor | 1                |   0     |    1     | None                   |</span>
+<span class="sd">        &gt;&gt;&gt; from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict</span>
+<span class="sd">            from spotPython.utils.init import fun_control_init</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_factor_hyperparameter_values</span>
+<span class="sd">            from spotPython.utils.eda import gen_design_table</span>
+<span class="sd">            fun_control = fun_control_init(</span>
+<span class="sd">                core_model_name=&quot;tree.HoeffdingTreeRegressor&quot;,</span>
+<span class="sd">                hyperdict=RiverHyperDict,</span>
+<span class="sd">            )</span>
+<span class="sd">            print(&quot;Before modification:&quot;)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
+<span class="sd">            set_factor_hyperparameter_values(fun_control, &quot;leaf_model&quot;, [&#39;LinearRegression&#39;,</span>
+<span class="sd">                                                                &#39;Perceptron&#39;])</span>
+<span class="sd">            print(&quot;After modification:&quot;)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
+<span class="sd">                Seed set to 123</span>
+<span class="sd">                Before modification:</span>
+<span class="sd">                | name                   | type   | default          |   lower |    upper | transform              |</span>
+<span class="sd">                |------------------------|--------|------------------|---------|----------|------------------------|</span>
+<span class="sd">                | grace_period           | int    | 200              |  10     | 1000     | None                   |</span>
+<span class="sd">                | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |</span>
+<span class="sd">                | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |</span>
+<span class="sd">                | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |</span>
+<span class="sd">                | leaf_prediction        | factor | mean             |   0     |    2     | None                   |</span>
+<span class="sd">                | leaf_model             | factor | LinearRegression |   0     |    2     | None                   |</span>
+<span class="sd">                | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |</span>
+<span class="sd">                | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |</span>
+<span class="sd">                | min_samples_split      | int    | 5                |   2     |   10     | None                   |</span>
+<span class="sd">                | binary_split           | factor | 0                |   0     |    1     | None                   |</span>
+<span class="sd">                | max_size               | float  | 500.0            | 100     | 1000     | None                   |</span>
+<span class="sd">                | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |</span>
+<span class="sd">                | stop_mem_management    | factor | 0                |   0     |    1     | None                   |</span>
+<span class="sd">                | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |</span>
+<span class="sd">                | merit_preprune         | factor | 1                |   0     |    1     | None                   |</span>
+<span class="sd">                After modification:</span>
+<span class="sd">                | name                   | type   | default          |   lower |    upper | transform              |</span>
+<span class="sd">                |------------------------|--------|------------------|---------|----------|------------------------|</span>
+<span class="sd">                | grace_period           | int    | 200              |  10     | 1000     | None                   |</span>
+<span class="sd">                | max_depth              | int    | 20               |   2     |   20     | transform_power_2_int  |</span>
+<span class="sd">                | delta                  | float  | 1e-07            |   1e-08 |    1e-06 | None                   |</span>
+<span class="sd">                | tau                    | float  | 0.05             |   0.01  |    0.1   | None                   |</span>
+<span class="sd">                | leaf_prediction        | factor | mean             |   0     |    2     | None                   |</span>
+<span class="sd">                | leaf_model             | factor | LinearRegression |   0     |    1     | None                   |</span>
+<span class="sd">                | model_selector_decay   | float  | 0.95             |   0.9   |    0.99  | None                   |</span>
+<span class="sd">                | splitter               | factor | EBSTSplitter     |   0     |    2     | None                   |</span>
+<span class="sd">                | min_samples_split      | int    | 5                |   2     |   10     | None                   |</span>
+<span class="sd">                | binary_split           | factor | 0                |   0     |    1     | None                   |</span>
+<span class="sd">                | max_size               | float  | 500.0            | 100     | 1000     | None                   |</span>
+<span class="sd">                | memory_estimate_period | int    | 6                |   3     |    8     | transform_power_10_int |</span>
+<span class="sd">                | stop_mem_management    | factor | 0                |   0     |    1     | None                   |</span>
+<span class="sd">                | remove_poor_attrs      | factor | 0                |   0     |    1     | None                   |</span>
+<span class="sd">                | merit_preprune         | factor | 1                |   0     |    1     | None                   |</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check if levels is a list of strings. If not, convert it to a list</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">levels</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -11388,27 +11376,21 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
 
 <p><strong>Examples:</strong></p>
-    
-      <blockquote>
-<blockquote>
-<blockquote>
-<p>from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-    from spotPython.utils.init import fun_control_init
-    from spotPython.hyperparameters.values import set_float_hyperparameter_values
-    from spotPython.utils.eda import gen_design_table
-    fun_control = fun_control_init(
-        core_model_name=&rdquo;forest.AMFRegressor&rdquo;,
-        hyperdict=RiverHyperDict,
-    )
-    print(&ldquo;Before modification:&rdquo;)
-    print(gen_design_table(fun_control))
-    set_float_hyperparameter_values(fun_control, &ldquo;step&rdquo;, 0.2, 5)
-    print(&ldquo;After modification:&rdquo;)
-    print(gen_design_table(fun_control))
-    Seed set to 123</p>
-</blockquote>
-</blockquote>
-</blockquote>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotRiver.hyperdict.river_hyper_dict</span> <span class="kn">import</span> <span class="n">RiverHyperDict</span>
+<span class="go">    from spotPython.utils.init import fun_control_init</span>
+<span class="go">    from spotPython.hyperparameters.values import set_float_hyperparameter_values</span>
+<span class="go">    from spotPython.utils.eda import gen_design_table</span>
+<span class="go">    fun_control = fun_control_init(</span>
+<span class="go">        core_model_name=&quot;forest.AMFRegressor&quot;,</span>
+<span class="go">        hyperdict=RiverHyperDict,</span>
+<span class="go">    )</span>
+<span class="go">    print(&quot;Before modification:&quot;)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
+<span class="go">    set_float_hyperparameter_values(fun_control, &quot;step&quot;, 0.2, 5)</span>
+<span class="go">    print(&quot;After modification:&quot;)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
+<span class="go">    Seed set to 123</span>
+</code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
@@ -11464,20 +11446,20 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="sd">            The upper bound of the hyperparameter.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">    &gt;&gt;&gt; from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict</span>
-<span class="sd">        from spotPython.utils.init import fun_control_init</span>
-<span class="sd">        from spotPython.hyperparameters.values import set_float_hyperparameter_values</span>
-<span class="sd">        from spotPython.utils.eda import gen_design_table</span>
-<span class="sd">        fun_control = fun_control_init(</span>
-<span class="sd">            core_model_name=&quot;forest.AMFRegressor&quot;,</span>
-<span class="sd">            hyperdict=RiverHyperDict,</span>
-<span class="sd">        )</span>
-<span class="sd">        print(&quot;Before modification:&quot;)</span>
-<span class="sd">        print(gen_design_table(fun_control))</span>
-<span class="sd">        set_float_hyperparameter_values(fun_control, &quot;step&quot;, 0.2, 5)</span>
-<span class="sd">        print(&quot;After modification:&quot;)</span>
-<span class="sd">        print(gen_design_table(fun_control))</span>
-<span class="sd">        Seed set to 123</span>
+<span class="sd">        &gt;&gt;&gt; from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict</span>
+<span class="sd">            from spotPython.utils.init import fun_control_init</span>
+<span class="sd">            from spotPython.hyperparameters.values import set_float_hyperparameter_values</span>
+<span class="sd">            from spotPython.utils.eda import gen_design_table</span>
+<span class="sd">            fun_control = fun_control_init(</span>
+<span class="sd">                core_model_name=&quot;forest.AMFRegressor&quot;,</span>
+<span class="sd">                hyperdict=RiverHyperDict,</span>
+<span class="sd">            )</span>
+<span class="sd">            print(&quot;Before modification:&quot;)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
+<span class="sd">            set_float_hyperparameter_values(fun_control, &quot;step&quot;, 0.2, 5)</span>
+<span class="sd">            print(&quot;After modification:&quot;)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
+<span class="sd">            Seed set to 123</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">set_control_hyperparameter_value</span><span class="p">(</span>
         <span class="n">fun_control</span><span class="p">,</span>
