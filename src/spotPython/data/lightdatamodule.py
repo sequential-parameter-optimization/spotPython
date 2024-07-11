@@ -149,18 +149,19 @@ class LightDataModule(L.LightningDataModule):
             )
             if self.scaler is not None:
                 # Fit the scaler on training data and transform both train and val data
-                train_val_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))])
-                # train_val_data = self.data_train[:,0]
-                self.scaler.fit(train_val_data)
+                scaler_train_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))]).squeeze(1)
+                #train_val_data = self.data_train[:,0]
+                print(scaler_train_data.shape)
+                self.scaler.fit(scaler_train_data)
                 self.data_train = [(self.scaler.transform(data), target) for data, target in self.data_train]
-                data_tensors_train = [data.clone().detach().requires_grad_(True) for data, target in self.data_train]
+                data_tensors_train = [data.clone().detach() for data, target in self.data_train]
                 target_tensors_train = [target.clone().detach() for data, target in self.data_train]
-                self.data_train = TensorDataset(torch.stack(data_tensors_train), torch.stack(target_tensors_train))
+                self.data_train = TensorDataset(torch.stack(data_tensors_train).squeeze(1), torch.stack(target_tensors_train))
                 # print(self.data_train)
                 self.data_val = [(self.scaler.transform(data), target) for data, target in self.data_val]
-                data_tensors_val = [data.clone().detach().requires_grad_(True) for data, target in self.data_val]
+                data_tensors_val = [data.clone().detach() for data, target in self.data_val]
                 target_tensors_val = [target.clone().detach() for data, target in self.data_val]
-                self.data_val = TensorDataset(torch.stack(data_tensors_val), torch.stack(target_tensors_val))
+                self.data_val = TensorDataset(torch.stack(data_tensors_val).squeeze(1), torch.stack(target_tensors_val))
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
@@ -170,9 +171,9 @@ class LightDataModule(L.LightningDataModule):
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
             if self.scaler is not None:
                 self.data_test = [(self.scaler.transform(data), target) for data, target in self.data_test]
-                data_tensors_test = [data.clone().detach().requires_grad_(True) for data, target in self.data_test]
+                data_tensors_test = [data.clone().detach() for data, target in self.data_test]
                 target_tensors_test = [target.clone().detach() for data, target in self.data_test]
-                self.data_test = TensorDataset(torch.stack(data_tensors_test), torch.stack(target_tensors_test))
+                self.data_test = TensorDataset(torch.stack(data_tensors_test).squeeze(1), torch.stack(target_tensors_test))
 
         # if stage == "predict" or stage is None:
         #     print(f"test_size, full_train_size: {test_size}, {full_train_size}")
@@ -194,11 +195,11 @@ class LightDataModule(L.LightningDataModule):
             if self.scaler is not None:
                 self.data_predict = [(self.scaler.transform(data), target) for data, target in self.data_predict]
                 data_tensors_predict = [
-                    data.clone().detach().requires_grad_(True) for data, target in self.data_predict
+                    data.clone().detach() for data, target in self.data_predict
                 ]
                 target_tensors_predict = [target.clone().detach() for data, target in self.data_predict]
                 self.data_predict = TensorDataset(
-                    torch.stack(data_tensors_predict), torch.stack(target_tensors_predict)
+                    torch.stack(data_tensors_predict).squeeze(1), torch.stack(target_tensors_predict)
                 )
 
     def train_dataloader(self) -> DataLoader:
@@ -298,4 +299,5 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
+
         return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
