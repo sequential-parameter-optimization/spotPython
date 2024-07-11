@@ -149,7 +149,8 @@ class LightDataModule(L.LightningDataModule):
             )
             if self.scaler is not None:
                 # Fit the scaler on training data and transform both train and val data
-                train_val_data = torch.cat([self.data_train[i][0] for i in range(len(self.data_train))])
+                train_val_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))])
+                # train_val_data = self.data_train[:,0]
                 self.scaler.fit(train_val_data)
                 self.data_train = [(self.scaler.transform(data), target) for data, target in self.data_train]
                 data_tensors_train = [data.clone().detach().requires_grad_(True) for data, target in self.data_train]
