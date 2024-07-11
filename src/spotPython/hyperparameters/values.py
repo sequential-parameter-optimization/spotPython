@@ -1744,3 +1744,75 @@ def get_metric_sklearn(metric_name) -> object:
     """
     metric_sklearn = getattr(sklearn.metrics, metric_name)
     return metric_sklearn
+
+
+def set_hyperparameter(fun_control, key, values):
+    """
+    Set hyperparameter values in the fun_control dictionary based on the type of the values argument.
+
+    Args:
+        fun_control (dict):
+            The fun_control dictionary.
+        key (str):
+            The key of the hyperparameter.
+        values (Union[int, float, bool, list]):
+            The values of the hyperparameter. This can be:
+                - For int and float: a list containing lower and upper bounds.
+                - For bool: a list containing two boolean values.
+                - For factor: a list of strings representing levels.
+
+    Examples:
+        >>> from spotPython.hyperparameters.values import set_hyperparameter
+        >>> fun_control = {
+                "core_model_hyper_dict": {
+                    "n_estimators": {"type": "int", "default": 10, "lower": 2, "upper": 1000},
+                    "step": {"type": "float", "default": 1.0, "lower": 0.1, "upper": 10.0},
+                    "use_aggregation": {"type": "factor", "default": 1, "lower": 0, "upper": 1, "levels": [0, 1]},
+                    "leaf_model": {"type": "factor", "default": "LinearRegression", "upper": 2}
+                }
+            }
+        >>> set_hyperparameter(fun_control, "n_estimators", [2, 5])
+        >>> set_hyperparameter(fun_control, "step", [0.2, 5.0])
+        >>> set_hyperparameter(fun_control, "use_aggregation", [False, True])
+        >>> set_hyperparameter(fun_control, "leaf_model", ["LinearRegression", "Perceptron"])
+    """
+    if isinstance(values, list):
+        if all(isinstance(v, int) for v in values):
+            _set_int_hyperparameter_values(fun_control, key, values[0], values[1])
+        elif all(isinstance(v, float) for v in values):
+            _set_float_hyperparameter_values(fun_control, key, values[0], values[1])
+        elif all(isinstance(v, bool) for v in values):
+            _set_boolean_hyperparameter_values(fun_control, key, values[0], values[1])
+        elif all(isinstance(v, str) for v in values):
+            _set_factor_hyperparameter_values(fun_control, key, values)
+        else:
+            raise ValueError("Invalid type in values list.")
+    else:
+        raise TypeError("values should be a list.")
+
+
+def _set_int_hyperparameter_values(fun_control, key, lower, upper) -> None:
+    # Set integer hyperparameter values in fun_control dictionary
+    fun_control["core_model_hyper_dict"][key].update({"lower": lower, "upper": upper})
+
+
+def _set_float_hyperparameter_values(fun_control, key, lower, upper) -> None:
+    # Set float hyperparameter values in fun_control dictionary
+    fun_control["core_model_hyper_dict"][key].update({"lower": lower, "upper": upper})
+
+
+def _set_boolean_hyperparameter_values(fun_control, key, lower, upper):
+    # Set boolean hyperparameter values in fun_control dictionary
+    fun_control["core_model_hyper_dict"][key].update({"lower": lower, "upper": upper})
+
+
+def _set_factor_hyperparameter_values(fun_control, key, levels):
+    # Set factor hyperparameter values in fun_control dictionary
+    if "core_model_hyper_dict" not in fun_control.keys():
+        return
+    if not isinstance(levels, list):
+        levels = [levels]
+    if not all(isinstance(level, str) for level in levels):
+        print("!!! Warning: levels should be a list of strings.")
+        return
+    fun_control["core_model_hyper_dict"][key].update({"levels": levels, "upper": len(levels) - 1})
