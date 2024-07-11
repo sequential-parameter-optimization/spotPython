@@ -1,4 +1,3 @@
-import pytest
 import torch
 from spotPython.data.lightdatamodule import LightDataModule
 from spotPython.data.csvdataset import CSVDataset
@@ -44,7 +43,3 @@ def test_light_data_module_sizes():
     assert len(data_module.data_train) == 3
     assert len(data_module.data_val) == 3
     assert len(data_module.data_test) == 6
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", __file__])

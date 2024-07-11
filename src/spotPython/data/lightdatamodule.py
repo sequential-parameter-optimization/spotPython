@@ -298,5 +298,4 @@ class LightDataModule(L.LightningDataModule):
         # print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
-        return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
         return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
