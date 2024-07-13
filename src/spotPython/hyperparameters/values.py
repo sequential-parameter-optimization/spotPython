@@ -1,7 +1,6 @@
 import numpy as np
 import copy
 import json
-import river
 import river.preprocessing
 from sklearn.pipeline import make_pipeline
 from river import compose
@@ -10,9 +9,12 @@ from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
 
 # Important, do not delete the following imports, they are needed for the function add_core_model_to_fun_control
+import river
 from river import forest, tree, linear_model, rules
 from river import preprocessing
 import sklearn.metrics
+import spotPython
+from spotPython.light import regression
 
 
 def generate_one_config_from_var_dict(
@@ -1698,20 +1700,47 @@ def set_factor_hyperparameter_values(fun_control, key, levels):
         fun_control["core_model_hyper_dict"][key].update({"upper": len(levels) - 1})
 
 
-def get_core_model_from_name(core_model_name) -> object:
+def get_core_model_from_name(core_model_name: str) -> tuple:
     """
-    Returns the river core model name and instance from a core model name.
+    Returns the river or spotPython core model name and instance from a core model name.
 
     Args:
-        core_model_name (str): The name of the core model.
+        core_model_name (str): The full name of the core model in the format 'module.Model'.
 
     Returns:
-        (str, object): The core model name and instance.
+        (str, object): A tuple containing the core model name and an instance of the core model.
+
+    Examples:
+        >>> from spotPython.hyperparameters.values import get_core_model_from_name
+            model_name, model_instance = get_core_model_from_name('tree.HoeffdingTreeRegressor')
+            print(f"Model Name: {model_name}, Model Instance: {model_instance}")
+                Model Name: HoeffdingTreeRegressor, Model Instance: <class 'river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor'>
+        >>> model_name, model_instance = get_core_model_from_name("light.regression.NNLinearRegressor")
+            print(f"Model Name: {model_name}, Model Instance: {model_instance}")
+                Model Name: NNLinearRegressor, Model Instance: <class 'spotPython.light.regression.nn_linear_regressor.NNLinearRegressor'>
     """
-    core_model_module = core_model_name.split(".")[0]
-    coremodel = core_model_name.split(".")[1]
-    core_model_instance = getattr(getattr(river, core_model_module), coremodel)
-    return coremodel, core_model_instance
+    # Split the model name into its components
+    name_parts = core_model_name.split(".")
+    if len(name_parts) < 2:
+        raise ValueError(f"Invalid core model name: {core_model_name}. Expected format: 'module.ModelName'.")
+    module_name = name_parts[0]
+    model_name = name_parts[1]
+    try:
+        # Try to get the model from the river library
+        core_model_instance = getattr(getattr(river, module_name), model_name)
+        return model_name, core_model_instance
+    except AttributeError:
+        try:
+            # Try to get the model from the spotPython library
+            submodule_name = name_parts[1]
+            model_name = name_parts[2] if len(name_parts) == 3 else model_name
+            print(f"module_name: {module_name}")
+            print(f"submodule_name: {submodule_name}")
+            print(f"model_name: {model_name}")
+            core_model_instance = getattr(getattr(getattr(spotPython, module_name), submodule_name), model_name)
+            return model_name, core_model_instance
+        except AttributeError:
+            raise ValueError(f"Model '{core_model_name}' not found in either 'river' or 'spotPython' libraries.")
 
 
 def get_prep_model(prepmodel_name) -> object:
