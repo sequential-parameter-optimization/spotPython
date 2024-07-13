@@ -5,6 +5,7 @@ import os
 import json
 import sys
 import importlib
+from spotPython.hyperparameters.values import get_tuned_architecture
 
 # from torch.utils.tensorboard import SummaryWriter
 
@@ -178,3 +179,26 @@ def load_core_model_from_file(coremodel, dirname="userModel"):
     module = importlib.import_module(coremodel)
     core_model = getattr(module, coremodel)
     return core_model
+
+
+def get_experiment_from_PREFIX(PREFIX) -> tuple:
+    """
+    Setup the experiment based on the PREFIX provided and return the relevant configuration
+    and control objects.
+
+    Args:
+        PREFIX (str): The prefix for the experiment filename.
+
+    Returns:
+        tuple:
+            A tuple containing config, spot_tuner, fun_control, design_control, surrogate_control,
+            and optimizer_control.
+
+    Example:
+        >>> config, _, _, _, _, _ = get_experiment_from_PREFIX("100")
+
+    """
+    experiment_name = get_experiment_filename(PREFIX)
+    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(experiment_name)
+    config = get_tuned_architecture(spot_tuner, fun_control)
+    return config, spot_tuner, fun_control, design_control, surrogate_control, optimizer_control

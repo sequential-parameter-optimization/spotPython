@@ -932,7 +932,7 @@ class Spot:
                 writer.add_hparams(config, {"spot_y": y_j})
                 writer.flush()
         #
-        self.X, self.y = remove_nan(self.X, self.y)
+        self.X, self.y = remove_nan(self.X, self.y, stop_on_zero_return=True)
         logger.debug("In Spot() initialize_design(), final X val, after remove nan: self.X: %s", self.X)
         logger.debug("In Spot() initialize_design(), final y val, after remove nan: self.y: %s", self.y)
 
@@ -1063,7 +1063,7 @@ class Spot:
         )
         # (S-18): Evaluating New Solutions:
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
-        X0, y0 = remove_nan(X0, y0)
+        X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         # Append New Solutions:
         self.X = np.append(self.X, X0, axis=0)
         self.y = np.append(self.y, y0)

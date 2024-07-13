@@ -29,11 +29,20 @@ def test_set_hyperparameter_boolean():
 
 def test_set_hyperparameter_factor():
     fun_control = {
-        "core_model_hyper_dict": {"leaf_model": {"type": "factor", "default": "LinearRegression", "upper": 1}}
+        "core_model_hyper_dict": {"leaf_model": {"type": "factor", "default": "LinearRegression", "upper": 2}}
     }
     set_hyperparameter(fun_control, "leaf_model", ["LinearRegression", "Perceptron"])
     assert fun_control["core_model_hyper_dict"]["leaf_model"]["levels"] == ["LinearRegression", "Perceptron"]
     assert fun_control["core_model_hyper_dict"]["leaf_model"]["upper"] == 1
+
+
+def test_set_hyperparameter_single_string():
+    fun_control = {
+        "core_model_hyper_dict": {"leaf_model": {"type": "factor", "default": "LinearRegression", "upper": 0}}
+    }
+    set_hyperparameter(fun_control, "leaf_model", "LinearRegression")
+    assert fun_control["core_model_hyper_dict"]["leaf_model"]["levels"] == ["LinearRegression"]
+    assert fun_control["core_model_hyper_dict"]["leaf_model"]["upper"] == 0
 
 
 def test_set_hyperparameter_invalid_type():
@@ -45,4 +54,4 @@ def test_set_hyperparameter_invalid_type():
 def test_set_hyperparameter_invalid_values_type():
     fun_control = {"core_model_hyper_dict": {"n_estimators": {"type": "int", "default": 10, "lower": 2, "upper": 1000}}}
     with pytest.raises(TypeError):
-        set_hyperparameter(fun_control, "n_estimators", "2, 5")
+        set_hyperparameter(fun_control, "n_estimators", 2, 5)

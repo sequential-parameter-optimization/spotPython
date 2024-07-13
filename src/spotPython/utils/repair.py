@@ -27,19 +27,23 @@ def repair_non_numeric(X: np.ndarray, var_type: List[str]) -> np.ndarray:
     return X
 
 
-def remove_nan(X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Remove rows from X and y where y contains NaN values and issue a warning
-    if the dimension of the returned y array is smaller than the dimension of the original y array.
-    Issues a ValueError if the dimension of the returned y array is less than 2.
+def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+    """Remove rows from X and y where y contains NaN values and issue a warning
+        if the dimension of the returned y array is smaller than the dimension of the original y array.
+        Issues a ValueError if the dimension of the returned y array is less than 2.
 
     Args:
-        X (numpy.ndarray): X array
-        y (numpy.ndarray): y array
+        X (numpy.ndarray):
+            X array
+        y (numpy.ndarray):
+            y array
+        stop_on_zero_return (bool):
+            whether to stop if the returned dimension is less than 1.
+            Default is False.
 
     Returns:
         Tuple[numpy.ndarray, np.ndarray]:
-        X and y arrays with rows containing NaN values in y removed.
+            X and y arrays with rows containing NaN values in y removed.
 
     Examples:
         >>> import numpy as np
@@ -70,7 +74,7 @@ def remove_nan(X: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         )
         warnings.warn("\n!!! Check whether to continue with the reduced dimension is useful.")
     # throw an error if the returned dimension is smaller than one
-    if returned_dim < 1:
+    if returned_dim < 1 and stop_on_zero_return:
         raise ValueError("!!!! The dimension of the returned y array is less than 1. Check the input data.")
 
     return X_cleaned, y_cleaned

@@ -1804,7 +1804,11 @@ def set_hyperparameter(fun_control, key, values):
         >>> set_hyperparameter(fun_control, "step", [0.2, 5.0])
         >>> set_hyperparameter(fun_control, "use_aggregation", [False, True])
         >>> set_hyperparameter(fun_control, "leaf_model", ["LinearRegression", "Perceptron"])
+        >>> set_hyperparameter(fun_control, "leaf_model", "LinearRegression")
     """
+    # if values is only a string  and not a list of strings, convert it to a list
+    if isinstance(values, str):
+        values = [values]
     if isinstance(values, list):
         if all(isinstance(v, int) for v in values):
             _set_int_hyperparameter_values(fun_control, key, values[0], values[1])
