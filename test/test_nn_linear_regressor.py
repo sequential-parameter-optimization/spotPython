@@ -69,7 +69,7 @@ def test_forward_pass(nn_linear_regressor):
 
 
 def test_training_step(nn_linear_regressor):
-    trainer = L.Trainer(max_epochs=1, enable_checkpointing=False)
+    trainer = L.Trainer(max_epochs=1, enable_checkpointing=False, accelerator="cpu")
     train_loader = data_loader
     trainer.fit(nn_linear_regressor, train_loader)
     batch_x, batch_y = next(iter(train_loader))
@@ -83,7 +83,7 @@ def test_training_step(nn_linear_regressor):
 
 
 def test_validation_step(nn_linear_regressor):
-    trainer = L.Trainer(max_epochs=1, enable_checkpointing=False)
+    trainer = L.Trainer(max_epochs=1, enable_checkpointing=False, accelerator="cpu")
     val_loader = data_loader
     trainer.validate(nn_linear_regressor, val_loader)
 
@@ -98,7 +98,7 @@ def test_validation_step(nn_linear_regressor):
 
 
 def test_testing_step(nn_linear_regressor):
-    trainer = L.Trainer(max_epochs=1, enable_checkpointing=False)
+    trainer = L.Trainer(max_epochs=1, enable_checkpointing=False, accelerator="cpu")
     test_loader = data_loader
     trainer.test(nn_linear_regressor, test_loader)
 
