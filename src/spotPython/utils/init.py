@@ -242,8 +242,10 @@ def fun_control_init(
             The weight coefficient of the objective function. Positive values mean minimization.
             If set to -1, scores that are better when maximized will be minimized, e.g, accuracy.
             Can be an array, so that different weights can be used for different (multiple) objectives.
+            Default is 1.0.
         weight_coeff (float):
             Determines how to weight older measures. Default is 1.0. Used in the OML algorithm eval_oml.py.
+            Default is 0.0.
         weights_entry (str):
             The weights entry used in the GUI. Default is None.
 

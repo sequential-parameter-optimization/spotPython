@@ -149,3 +149,20 @@ class CSVDataset(Dataset):
         """
         split = "Train" if self.train else "Test"
         return f"Split: {split}"
+
+    def __ncols__(self) -> int:
+        """
+        Returns the number of columns in the dataset.
+
+        Returns:
+            int: The number of columns in the dataset.
+
+        Examples:
+            >>> from spotPython.data.pkldataset import PKLDataset
+                import torch
+                from torch.utils.data import DataLoader
+                dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
+                print(dataset.__ncols__())
+                64
+        """
+        return self.data.size(1)

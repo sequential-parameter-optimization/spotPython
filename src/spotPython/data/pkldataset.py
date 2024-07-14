@@ -34,10 +34,12 @@ class PKLDataset(Dataset):
             The directory where the pkl file is located.
         feature_type (torch.dtype):
             The data type of the features.
+            Defaults to torch.float.
         target_column (str):
             The name of the target column.
         target_type (torch.dtype):
             The data type of the targets.
+            Defaults to torch.float.
         train (bool):
             Whether the dataset is for training or not.
         rmNA (bool):
@@ -73,7 +75,7 @@ class PKLDataset(Dataset):
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                     [1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0,
                     0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0],
                     [1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
                     1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
@@ -104,9 +106,11 @@ class PKLDataset(Dataset):
         directory: None = None,
         feature_type: torch.dtype = torch.float,
         target_column: str = "y",
-        target_type: torch.dtype = torch.long,
+        target_type: torch.dtype = torch.float,
         train: bool = True,
         rmNA=True,
+        oe=OrdinalEncoder(),
+        le=LabelEncoder(),
         **desc,
     ) -> None:
         super().__init__()
@@ -117,16 +121,15 @@ class PKLDataset(Dataset):
         self.target_column = target_column
         self.train = train
         self.rmNA = rmNA
+        self.oe = oe
+        self.le = le
         self.data, self.targets = self._load_data()
 
     @property
     def path(self):
-        # user defined directory:
         if self.directory:
             return pathlib.Path(self.directory).joinpath(self.filename)
-        # no user defined directory, use package directory
-        else:
-            return pathlib.Path(__file__).parent.joinpath(self.filename)
+        return pathlib.Path(__file__).parent.joinpath(self.filename)
 
     @property
     def _repr_content(self):
@@ -135,26 +138,37 @@ class PKLDataset(Dataset):
         return content
 
     def _load_data(self) -> tuple:
+        # ensure that self.target_type and self.feature_type are the same torch types
+        if self.target_type != self.feature_type:
+            raise ValueError("target_type and feature_type must be the same torch type")
         with open(self.path, "rb") as f:
             df = pd.read_pickle(f)
         # rm rows with NA
         if self.rmNA:
             df = df.dropna()
 
-        oe = OrdinalEncoder()
-        # Apply LabelEncoder to string columns
-        le = LabelEncoder()
-        # df = df.apply(lambda col: le.fit_transform(col) if col.dtypes == object else col)
-
         # Split DataFrame into feature and target DataFrames
         feature_df = df.drop(columns=[self.target_column])
-        feature_df = oe.fit_transform(feature_df)
-        target_df = df[self.target_column]
-        target_df = le.fit_transform(target_df)
 
-        # Convert DataFrames to PyTorch tensors
-        feature_tensor = torch.tensor(feature_df, dtype=self.feature_type)
-        target_tensor = torch.tensor(target_df, dtype=self.target_type)
+        # Identify non-numerical columns in the feature DataFrame
+        non_numerical_columns = feature_df.select_dtypes(exclude=["number"]).columns.tolist()
+
+        # Apply OrdinalEncoder to non-numerical feature columns
+        if non_numerical_columns:
+            feature_df[non_numerical_columns] = self.oe.fit_transform(feature_df[non_numerical_columns])
+
+        target_df = df[self.target_column]
+
+        # Check if the target column is non-numerical using dtype
+        if not pd.api.types.is_numeric_dtype(target_df):
+            target_df = self.le.fit_transform(target_df)
+
+        # Convert DataFrames to NumPy arrays and then to PyTorch tensors
+        feature_array = feature_df.to_numpy()
+        target_array = target_df
+
+        feature_tensor = torch.tensor(feature_array, dtype=self.feature_type)
+        target_tensor = torch.tensor(target_array, dtype=self.target_type)
 
         return feature_tensor, target_tensor
 
@@ -214,3 +228,20 @@ class PKLDataset(Dataset):
                 print(dataset)
         """
         return "filename={}, directory={}".format(self.filename, self.directory)
+
+    def __ncols__(self) -> int:
+        """
+        Returns the number of columns in the dataset.
+
+        Returns:
+            int: The number of columns in the dataset.
+
+        Examples:
+            >>> from spotPython.data.pkldataset import PKLDataset
+                import torch
+                from torch.utils.data import DataLoader
+                dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
+                print(dataset.__ncols__())
+                64
+        """
+        return self.data.size(1)
