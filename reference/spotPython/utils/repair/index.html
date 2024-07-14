@@ -1539,6 +1539,8 @@
         
       
         
+          
+        
       
         
       
@@ -1558,16 +1560,24 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_8" >
         
           
-          <label class="md-nav__link" for="__nav_2_1_8" id="__nav_2_1_8_label" tabindex="0">
-            
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../light/regression/" class="md-nav__link ">
+              
   
   <span class="md-ellipsis">
     light
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_1_8" id="__nav_2_1_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
         <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2_1_8">
@@ -1917,120 +1927,6 @@
               
             
               
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_8_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_1_8_8" id="__nav_2_1_8_8_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    regression
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_1_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            regression
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/netlightregression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    netlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/rnnlightregression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    rnnlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/transformerlightregression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    transformerlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
             
               
                 
@@ -2328,6 +2224,8 @@
       
         
       
+        
+      
     
     
     
@@ -2412,6 +2310,27 @@
   
   <span class="md-ellipsis">
     xai
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/xy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xy
   </span>
   
 
@@ -3564,7 +3483,7 @@
 
 
 <h2 id="spotPython.utils.repair.remove_nan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#spotPython.utils.repair.remove_nan" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -3572,8 +3491,8 @@
   <div class="doc doc-contents ">
   
       <p>Remove rows from X and y where y contains NaN values and issue a warning
-if the dimension of the returned y array is smaller than the dimension of the original y array.
-Issues a ValueError if the dimension of the returned y array is less than 2.</p>
+    if the dimension of the returned y array is smaller than the dimension of the original y array.
+    Issues a ValueError if the dimension of the returned y array is less than 2.</p>
 
 
 
@@ -3616,6 +3535,21 @@ Issues a ValueError if the dimension of the returned y array is less than 2.</p>
               <em>required</em>
           </td>
         </tr>
+        <tr>
+          <td><code>stop_on_zero_return</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>whether to stop if the returned dimension is less than 1.
+Default is False.</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
     </tbody>
   </table>
 
@@ -3632,21 +3566,12 @@ Issues a ValueError if the dimension of the returned y array is less than 2.</p>
     <tbody>
         <tr>
           <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
+                <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.ndarray">ndarray</span>, <span title="numpy.ndarray">ndarray</span>]</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Tuple[numpy.ndarray, np.ndarray]:</p>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>X and y arrays with rows containing NaN values in y removed.</p>
+              <p>Tuple[numpy.ndarray, np.ndarray]:
+X and y arrays with rows containing NaN values in y removed.</p>
             </div>
           </td>
         </tr>
@@ -3714,19 +3639,27 @@ Issues a ValueError if the dimension of the returned y array is less than 2.</p>
 <span class="normal">73</span>
 <span class="normal">74</span>
 <span class="normal">75</span>
-<span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Remove rows from X and y where y contains NaN values and issue a warning</span>
-<span class="sd">    if the dimension of the returned y array is smaller than the dimension of the original y array.</span>
-<span class="sd">    Issues a ValueError if the dimension of the returned y array is less than 2.</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove rows from X and y where y contains NaN values and issue a warning</span>
+<span class="sd">        if the dimension of the returned y array is smaller than the dimension of the original y array.</span>
+<span class="sd">        Issues a ValueError if the dimension of the returned y array is less than 2.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        X (numpy.ndarray): X array</span>
-<span class="sd">        y (numpy.ndarray): y array</span>
+<span class="sd">        X (numpy.ndarray):</span>
+<span class="sd">            X array</span>
+<span class="sd">        y (numpy.ndarray):</span>
+<span class="sd">            y array</span>
+<span class="sd">        stop_on_zero_return (bool):</span>
+<span class="sd">            whether to stop if the returned dimension is less than 1.</span>
+<span class="sd">            Default is False.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Tuple[numpy.ndarray, np.ndarray]:</span>
-<span class="sd">        X and y arrays with rows containing NaN values in y removed.</span>
+<span class="sd">            X and y arrays with rows containing NaN values in y removed.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
@@ -3757,7 +3690,7 @@ Issues a ValueError if the dimension of the returned y array is less than 2.</p>
         <span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! Check whether to continue with the reduced dimension is useful.&quot;</span><span class="p">)</span>
     <span class="c1"># throw an error if the returned dimension is smaller than one</span>
-    <span class="k">if</span> <span class="n">returned_dim</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">returned_dim</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">stop_on_zero_return</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;!!!! The dimension of the returned y array is less than 1. Check the input data.&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">X_cleaned</span><span class="p">,</span> <span class="n">y_cleaned</span>

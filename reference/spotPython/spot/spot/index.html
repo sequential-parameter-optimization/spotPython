@@ -1539,6 +1539,8 @@
         
       
         
+          
+        
       
         
       
@@ -1558,16 +1560,24 @@
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_8" >
         
           
-          <label class="md-nav__link" for="__nav_2_1_8" id="__nav_2_1_8_label" tabindex="0">
-            
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../light/regression/" class="md-nav__link ">
+              
   
   <span class="md-ellipsis">
     light
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_1_8" id="__nav_2_1_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
         
         <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2_1_8">
@@ -1917,120 +1927,6 @@
               
             
               
-                
-  
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1_8_8" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_1_8_8" id="__nav_2_1_8_8_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    regression
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_1_8_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_1_8_8">
-            <span class="md-nav__icon md-icon"></span>
-            regression
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/netlightregression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    netlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/rnnlightregression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    rnnlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../light/regression/transformerlightregression/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    transformerlightregression
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
             
               
                 
@@ -2328,6 +2224,8 @@
       
         
       
+        
+      
     
     
     
@@ -2412,6 +2310,27 @@
   
   <span class="md-ellipsis">
     xai
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/xy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xy
   </span>
   
 
@@ -7234,7 +7153,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                 <span class="n">writer</span><span class="o">.</span><span class="n">add_hparams</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;spot_y&quot;</span><span class="p">:</span> <span class="n">y_j</span><span class="p">})</span>
                 <span class="n">writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="c1">#</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In Spot() initialize_design(), final X val, after remove nan: self.X: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In Spot() initialize_design(), final y val, after remove nan: self.y: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 
@@ -7365,7 +7284,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="p">)</span>
         <span class="c1"># (S-18): Evaluating New Solutions:</span>
         <span class="n">y0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_all</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
-        <span class="n">X0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
+        <span class="n">X0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="c1"># Append New Solutions:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">X0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
@@ -10595,7 +10514,7 @@ Therefore, the design size is <code>init_size</code> + <code>X_start.shape[0]</c
             <span class="n">writer</span><span class="o">.</span><span class="n">add_hparams</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;spot_y&quot;</span><span class="p">:</span> <span class="n">y_j</span><span class="p">})</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
     <span class="c1">#</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In Spot() initialize_design(), final X val, after remove nan: self.X: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In Spot() initialize_design(), final y val, after remove nan: self.y: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -14620,7 +14539,7 @@ assert y_size_before + S.n_points * S.fun_repeats + S.ocba_delta == S.y.size
     <span class="p">)</span>
     <span class="c1"># (S-18): Evaluating New Solutions:</span>
     <span class="n">y0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_all</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
-    <span class="n">X0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="n">X0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="n">X0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="c1"># Append New Solutions:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">X0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
