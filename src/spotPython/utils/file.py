@@ -181,24 +181,38 @@ def load_core_model_from_file(coremodel, dirname="userModel"):
     return core_model
 
 
-def get_experiment_from_PREFIX(PREFIX) -> tuple:
+def get_experiment_from_PREFIX(PREFIX, return_dict=True) -> dict:
     """
     Setup the experiment based on the PREFIX provided and return the relevant configuration
     and control objects.
 
     Args:
-        PREFIX (str): The prefix for the experiment filename.
+        PREFIX (str):
+            The prefix for the experiment filename.
+        return_dict (bool, optional):
+            Whether to return the configuration and control objects as a dictionary.
+            If False, a tuple is returned:
+            "(config, fun_control, design_control, surrogate_control, optimizer_control)."
+            Defaults to True.
 
     Returns:
-        tuple:
-            A tuple containing config, spot_tuner, fun_control, design_control, surrogate_control,
-            and optimizer_control.
+        dict: Dictionary containing the configuration and control objects.
 
     Example:
-        >>> config, _, _, _, _, _ = get_experiment_from_PREFIX("100")
+        >>> from spotPython.utils.file import get_experiment_from_PREFIX
+        >>> config = get_experiment_from_PREFIX("100")["config"]
 
     """
     experiment_name = get_experiment_filename(PREFIX)
     spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(experiment_name)
     config = get_tuned_architecture(spot_tuner, fun_control)
-    return config, spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
+    if return_dict:
+        return {
+            "config": config,
+            "fun_control": fun_control,
+            "design_control": design_control,
+            "surrogate_control": surrogate_control,
+            "optimizer_control": optimizer_control,
+        }
+    else:
+        return config, fun_control, design_control, surrogate_control, optimizer_control

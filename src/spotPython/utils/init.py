@@ -1,4 +1,5 @@
 import os
+from typing import List, Dict, Any
 import lightning as L
 from scipy.optimize import differential_evolution
 import numpy as np
@@ -683,3 +684,29 @@ def get_tensorboard_path(fun_control):
         tensorboard_path (str): The path to the folder where the tensorboard files are saved.
     """
     return fun_control["TENSORBOARD_PATH"]
+
+
+def get_feature_names(fun_control: Dict[str, Any]) -> List[str]:
+    """
+    Get the feature names from the fun_control dictionary.
+
+    Args:
+        fun_control (dict): The function control dictionary. Must contain a "data_set" key.
+
+    Returns:
+        List[str]: List of feature names.
+
+    Raises:
+        ValueError: If "data_set" is not in fun_control.
+        ValueError: If "data_set" is None.
+
+    Examples:
+        >>> from spotPython.utils.init import get_feature_names
+            get_feature_names(fun_control)
+    """
+    data_set = fun_control.get("data_set")
+
+    if data_set is None:
+        raise ValueError("'data_set' key not found or is None in 'fun_control'")
+
+    return data_set.names
