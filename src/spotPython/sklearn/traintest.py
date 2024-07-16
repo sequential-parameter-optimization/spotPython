@@ -3,9 +3,11 @@ from spotPython.utils.convert import get_Xy_from_df
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import make_scorer
 from spotPython.utils.metrics import mapk_scorer
+import pprint
 
 
 def evaluate_model(model, fun_control):
+    # pprint.pprint(fun_control)
     try:
         X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
         X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
@@ -23,6 +25,7 @@ def evaluate_model(model, fun_control):
 
 
 def evaluate_hold_out(model, fun_control):
+    # pprint.pprint(fun_control)
     train_df = fun_control["train"]
     target_column = fun_control["target_column"]
     try:

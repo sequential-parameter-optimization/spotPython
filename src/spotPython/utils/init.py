@@ -10,9 +10,11 @@ from torch.utils.tensorboard import SummaryWriter
 from spotPython.hyperparameters.values import (
     add_core_model_to_fun_control,
     get_core_model_from_name,
+    get_river_core_model_from_name,
     get_metric_sklearn,
     get_prep_model,
 )
+from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
 
 
 def fun_control_init(
@@ -37,6 +39,7 @@ def fun_control_init(
     devices=1,
     enable_progress_bar=False,
     EXPERIMENT_NAME=None,
+    eval=None,
     fun_evals=15,
     fun_repeats=1,
     horizon=None,
@@ -125,6 +128,9 @@ def fun_control_init(
             The experimental design object. Default is None.
         enable_progress_bar (bool):
             Whether to enable the progress bar or not.
+        eval (str):
+            evaluation method used in sklearn taintest.py.
+            Can be "eval_test", "eval_oon_score", "train_cv" or None. Default is None.
         EXPERIMENT_NAME (str):
             The name of the experiment. If EXPERIMENT_NAME is not None,
             the spot_tensorboard_path is compiled and
@@ -378,7 +384,7 @@ def fun_control_init(
         "device": device,
         "devices": devices,
         "enable_progress_bar": enable_progress_bar,
-        "eval": None,
+        "eval": eval,
         "fun_evals": fun_evals,
         "fun_repeats": fun_repeats,
         "horizon": horizon,
@@ -437,7 +443,10 @@ def fun_control_init(
         "weights_entry": weights_entry,
     }
     if hyperdict is not None and core_model_name is not None:
-        coremodel, core_model_instance = get_core_model_from_name(core_model_name)
+        if fun_control["hyperdict"].__name__ == RiverHyperDict.__name__:
+            coremodel, core_model_instance = get_river_core_model_from_name(core_model_name)
+        else:
+            coremodel, core_model_instance = get_core_model_from_name(core_model_name)
         add_core_model_to_fun_control(
             core_model=core_model_instance,
             fun_control=fun_control,

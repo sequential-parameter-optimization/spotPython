@@ -4,12 +4,6 @@ import spotPython
 from spotPython.hyperparameters.values import get_core_model_from_name
 
 
-def test_valid_river_model():
-    model_name, model_instance = get_core_model_from_name("tree.HoeffdingTreeRegressor")
-    assert model_name == "HoeffdingTreeRegressor"
-    assert model_instance == river.tree.HoeffdingTreeRegressor
-
-
 def test_valid_spotpython_model():
     model_name, model_instance = get_core_model_from_name("light.regression.NNLinearRegressor")
     assert model_name == "NNLinearRegressor"

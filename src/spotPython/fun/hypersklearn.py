@@ -6,7 +6,7 @@ from spotPython.hyperparameters.values import assign_values
 from spotPython.hyperparameters.values import (
     generate_one_config_from_var_dict,
 )
-from spotPython.sklearn.traintest import evaluate_cv, evaluate_model_oob, evaluate_hold_out
+from spotPython.sklearn.traintest import evaluate_cv, evaluate_model_oob, evaluate_hold_out, evaluate_model
 import logging
 from sklearn.metrics import mean_absolute_error
 
@@ -139,7 +139,9 @@ class HyperSklearn:
                 model = self.fun_control["core_model"](**config)
             try:
                 eval_type = fun_control["eval"]
-                if eval_type == "eval_oob_score":
+                if eval_type == "eval_test":
+                    df_eval, _ = evaluate_model(model, self.fun_control)
+                elif eval_type == "eval_oob_score":
                     df_eval, _ = evaluate_model_oob(model, self.fun_control)
                 elif eval_type == "train_cv":
                     df_eval, _ = evaluate_cv(model, self.fun_control)
