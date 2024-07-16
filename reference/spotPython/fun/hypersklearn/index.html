@@ -3788,7 +3788,9 @@ See Numpy Random Sampling</p>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperSklearn</span><span class="p">:</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperSklearn</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Sklearn.</span>
 
@@ -3910,7 +3912,9 @@ See Numpy Random Sampling</p>
                 <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">eval_type</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;eval&quot;</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;eval_oob_score&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;eval_test&quot;</span><span class="p">:</span>
+                    <span class="n">df_eval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;eval_oob_score&quot;</span><span class="p">:</span>
                     <span class="n">df_eval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate_model_oob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;train_cv&quot;</span><span class="p">:</span>
                     <span class="n">df_eval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate_cv</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
@@ -4229,7 +4233,9 @@ See Numpy Random Sampling</p>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
-<span class="normal">153</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun_sklearn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun_sklearn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate a sklearn model using hyperparameters specified in X.</span>
 
@@ -4256,7 +4262,9 @@ See Numpy Random Sampling</p>
             <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">eval_type</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;eval&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;eval_oob_score&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;eval_test&quot;</span><span class="p">:</span>
+                <span class="n">df_eval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;eval_oob_score&quot;</span><span class="p">:</span>
                 <span class="n">df_eval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate_model_oob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">eval_type</span> <span class="o">==</span> <span class="s2">&quot;train_cv&quot;</span><span class="p">:</span>
                 <span class="n">df_eval</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">evaluate_cv</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
