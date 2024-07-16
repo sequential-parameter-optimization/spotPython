@@ -3,7 +3,6 @@ from spotPython.utils.convert import get_Xy_from_df
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import make_scorer
 from spotPython.utils.metrics import mapk_scorer
-import pprint
 
 
 def evaluate_model(model, fun_control):

@@ -13,6 +13,7 @@ from spotPython.hyperparameters.values import (
     get_river_core_model_from_name,
     get_metric_sklearn,
     get_prep_model,
+    get_river_prep_model,
 )
 from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
 
@@ -357,8 +358,6 @@ def fun_control_init(
 
     if metric_sklearn is None and metric_sklearn_name is not None:
         metric_sklearn = get_metric_sklearn(metric_sklearn_name)
-    if prep_model is None and prep_model_name is not None:
-        prep_model = get_prep_model(prep_model_name)
 
     fun_control = {
         "PREFIX": PREFIX,
@@ -443,10 +442,20 @@ def fun_control_init(
         "weights_entry": weights_entry,
     }
     if hyperdict is not None and core_model_name is not None:
-        if fun_control["hyperdict"].__name__ == RiverHyperDict.__name__:
+        # check if hyperdict implements the methods get_scenario:
+        if hasattr(hyperdict, "get_scenario"):
+            scenario = hyperdict().get_scenario()
+        else:
+            scenario = None
+        if fun_control["hyperdict"].__name__ == RiverHyperDict.__name__ or scenario == "river":
             coremodel, core_model_instance = get_river_core_model_from_name(core_model_name)
+            if prep_model is None and prep_model_name is not None:
+                prep_model = get_river_prep_model(prep_model_name)
         else:
             coremodel, core_model_instance = get_core_model_from_name(core_model_name)
+            if prep_model is None and prep_model_name is not None:
+                prep_model = get_prep_model(prep_model_name)
+        fun_control.update({"prep_model": prep_model})
         add_core_model_to_fun_control(
             core_model=core_model_instance,
             fun_control=fun_control,
