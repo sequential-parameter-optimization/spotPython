@@ -1,17 +1,19 @@
 import numpy as np
 import copy
 import json
-import river.preprocessing
 from sklearn.pipeline import make_pipeline
-from river import compose
+
 from typing import Union, List, Dict, Generator, Any
 from spotPython.utils.convert import class_for_name
 from spotPython.utils.transform import transform_hyper_parameter_values
 
 # Begin Important, do not delete the following imports, they are needed for the function add_core_model_to_fun_control
 import river
+from river import compose
 from river import forest, tree, linear_model, rules
-from river import preprocessing
+
+# from river import preprocessing
+import river.preprocessing
 
 import sklearn
 import sklearn.metrics
