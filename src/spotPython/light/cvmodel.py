@@ -71,7 +71,9 @@ def cv_model(config: dict, fun_control: dict) -> float:
             num_workers=fun_control["num_workers"],
             batch_size=config["batch_size"],
             data_dir=fun_control["DATASET_PATH"],
+            scaler=fun_control["scaler"],
         )
+        dm.setup()
         dm.prepare_data()
 
         # TODO: Check if this is necessary:
