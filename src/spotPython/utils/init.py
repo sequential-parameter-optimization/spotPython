@@ -64,6 +64,7 @@ def fun_control_init(
     prep_model_name=None,
     progress_file=None,
     scaler=None,
+    scaler_name=None,
     scenario=None,
     seed=123,
     show_models=False,
@@ -198,6 +199,8 @@ def fun_control_init(
         scaler (object):
             The scaler object, e.g., the TorchStandard scaler from spot.utils.scaler.py.
             Default is None.
+        scaler_name (str):
+            The name of the scaler object. Default is None.
         scenario (str):
             The scenario to use. Default is None. Can be "river", "sklearn", or "lightning".
         seed (int):
@@ -416,6 +419,7 @@ def fun_control_init(
         "progress_file": progress_file,
         "save_model": False,
         "scaler": scaler,
+        "scaler_name": scaler_name,
         "scenario": scenario,
         "seed": seed,
         "show_batch_interval": 1_000_000,

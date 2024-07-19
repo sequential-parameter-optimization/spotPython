@@ -6,10 +6,12 @@ from spotPython.utils.metrics import mapk_scorer
 
 
 def evaluate_model(model, fun_control):
-    # pprint.pprint(fun_control)
     try:
         X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
         X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
+        if fun_control["scaler"] is not None:
+            X_train = fun_control["scaler"]().fit_transform(X_train)
+            X_test = fun_control["scaler"]().transform(X_test)
         model.fit(X_train, y_train)
         if fun_control["predict_proba"]:
             df_preds = model.predict_proba(X_test)
@@ -24,7 +26,6 @@ def evaluate_model(model, fun_control):
 
 
 def evaluate_hold_out(model, fun_control):
-    # pprint.pprint(fun_control)
     train_df = fun_control["train"]
     target_column = fun_control["target_column"]
     try:
@@ -32,22 +33,31 @@ def evaluate_hold_out(model, fun_control):
             train_df.drop(target_column, axis=1),
             train_df[target_column],
             random_state=42,
-            test_size=0.25,
-            stratify=train_df[target_column],
+            test_size=fun_control["test_size"],
+            # stratify=train_df[target_column],
         )
-        # scaler fit_transform(X_train)
+    except Exception as err:
+        print(f"Error in evaluate_hold_out(). Call to train_test_split() failed. {err=}, {type(err)=}")
+    try:
+        if fun_control["scaler"] is not None:
+            scaler = fun_control["scaler"]()
+            X_train = scaler.fit_transform(X_train)
         model.fit(X_train, y_train)
+    except Exception as err:
+        print(f"Error in evaluate_hold_out(). Call to fit() failed. {err=}, {type(err)=}")
+    try:
         # convert to numpy array, see https://github.com/scikit-learn/scikit-learn/pull/26772
         X_test = np.array(X_test)
-        # scaler transform(X_test)
+        if fun_control["scaler"] is not None:
+            X_test = scaler.transform(X_test)
         y_test = np.array(y_test)
-        if fun_control["predict_proba"]:
+        if fun_control["predict_proba"] or fun_control["task"] == "classification":
             df_preds = model.predict_proba(X_test)
         else:
             df_preds = model.predict(X_test)
         df_eval = fun_control["metric_sklearn"](y_test, df_preds, **fun_control["metric_params"])
     except Exception as err:
-        print(f"Error in fun_sklearn(). Call to evaluate_hold_out failed. {err=}, {type(err)=}")
+        print(f"Error in evaluate_hold_out(). Call to predict() failed. {err=}, {type(err)=}")
         df_eval = np.nan
         df_eval = np.nan
     return df_eval, df_preds

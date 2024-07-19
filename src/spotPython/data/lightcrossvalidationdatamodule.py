@@ -6,7 +6,6 @@ from torch.utils.data import Dataset, TensorDataset
 import torch
 
 
-
 class LightCrossValidationDataModule(L.LightningDataModule):
     """
     A LightningDataModule for handling cross-validation data splits.
@@ -89,7 +88,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
             print(f"Train Dataset Size: {len(self.data_train)}")
             self.data_val = Subset(dataset_full, val_indexes)
             print(f"Val Dataset Size: {len(self.data_val)}")
-        
+
         if self.scaler is not None:
             # Fit the scaler on training data and transform both train and val data
             scaler_train_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))]).squeeze(1)

@@ -144,7 +144,7 @@ class HyperSklearn:
                     df_eval, _ = evaluate_model_oob(model, self.fun_control)
                 elif eval_type == "train_cv":
                     df_eval, _ = evaluate_cv(model, self.fun_control)
-                else:  # eval_type == "train_hold_out":
+                else:  # None or "evaluate_hold_out":
                     df_eval, _ = evaluate_hold_out(model, self.fun_control)
             except Exception as err:
                 print(f"Error in fun_sklearn(). Call to evaluate_model failed. {err=}, {type(err)=}")

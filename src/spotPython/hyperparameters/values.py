@@ -265,6 +265,9 @@ def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any
                 c = d[key]["levels"][value]
                 k = class_for_name(mdl, c)
                 new_dict[key] = k()
+            # bool() introduced to convert 0 and 1 to False and True in v0.14.54
+            elif d[key]["core_model_parameter_type"] == "bool":
+                new_dict[key] = bool(d[key]["levels"][value])
             else:
                 new_dict[key] = d[key]["levels"][value]
         else:
@@ -1819,6 +1822,24 @@ def get_prep_model(prepmodel_name) -> object:
     else:
         prepmodel = getattr(sklearn.preprocessing, prepmodel_name)
     return prepmodel
+
+
+def get_sklearn_scaler(scaler_name) -> object:
+    """
+    Get the sklearn scaler model from the name.
+
+    Args:
+        scaler_name (str): The name of the preprocessing model.
+
+    Returns:
+        sklearn.preprocessing (object): The sklearn scaler.
+
+    """
+    if scaler_name == "None":
+        scaler = None
+    else:
+        scaler = getattr(sklearn.preprocessing, scaler_name)
+    return scaler
 
 
 def get_metric_sklearn(metric_name) -> object:
