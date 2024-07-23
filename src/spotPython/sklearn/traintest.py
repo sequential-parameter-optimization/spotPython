@@ -3,6 +3,7 @@ from spotPython.utils.convert import get_Xy_from_df
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import make_scorer
 from spotPython.utils.metrics import mapk_scorer
+import pandas as pd
 
 
 def evaluate_model(model, fun_control):
@@ -42,14 +43,16 @@ def evaluate_hold_out(model, fun_control):
         if fun_control["scaler"] is not None:
             scaler = fun_control["scaler"]()
             X_train = scaler.fit_transform(X_train)
+            X_train = pd.DataFrame(
+                X_train, columns=train_df.drop(target_column, axis=1).columns
+            )  # Maintain column names
         model.fit(X_train, y_train)
     except Exception as err:
         print(f"Error in evaluate_hold_out(). Call to fit() failed. {err=}, {type(err)=}")
     try:
-        # convert to numpy array, see https://github.com/scikit-learn/scikit-learn/pull/26772
-        X_test = np.array(X_test)
         if fun_control["scaler"] is not None:
             X_test = scaler.transform(X_test)
+            X_test = pd.DataFrame(X_test, columns=train_df.drop(target_column, axis=1).columns)  # Maintain column names
         y_test = np.array(y_test)
         if fun_control["predict_proba"] or fun_control["task"] == "classification":
             df_preds = model.predict_proba(X_test)
@@ -58,7 +61,6 @@ def evaluate_hold_out(model, fun_control):
         df_eval = fun_control["metric_sklearn"](y_test, df_preds, **fun_control["metric_params"])
     except Exception as err:
         print(f"Error in evaluate_hold_out(). Call to predict() failed. {err=}, {type(err)=}")
-        df_eval = np.nan
         df_eval = np.nan
     return df_eval, df_preds
 

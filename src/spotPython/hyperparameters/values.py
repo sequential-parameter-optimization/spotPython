@@ -1731,7 +1731,10 @@ def get_river_core_model_from_name(core_model_name: str) -> tuple:
         >>> from spotPython.hyperparameters.values import get_core_model_from_name
             model_name, model_instance = get_core_model_from_name('tree.HoeffdingTreeRegressor')
             print(f"Model Name: {model_name}, Model Instance: {model_instance}")
-                Model Name: HoeffdingTreeRegressor, Model Instance: <class 'river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor'>
+                Model Name:
+                HoeffdingTreeRegressor,
+                Model Instance:
+                <class 'river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor'>
     """
     # Split the model name into its components
     name_parts = core_model_name.split(".")
@@ -1760,7 +1763,10 @@ def get_core_model_from_name(core_model_name: str) -> tuple:
     Examples:
         >>> model_name, model_instance = get_core_model_from_name("light.regression.NNLinearRegressor")
             print(f"Model Name: {model_name}, Model Instance: {model_instance}")
-                Model Name: NNLinearRegressor, Model Instance: <class 'spotPython.light.regression.nn_linear_regressor.NNLinearRegressor'>
+                Model Name:
+                NNLinearRegressor,
+                Model Instance:
+                <class 'spotPython.light.regression.nn_linear_regressor.NNLinearRegressor'>
     """
     # Split the model name into its components
     name_parts = core_model_name.split(".")
