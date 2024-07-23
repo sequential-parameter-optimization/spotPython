@@ -5648,15 +5648,15 @@ If the control_dict dictionary is None, return None.</p>
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">model_name</span><span class="p">,</span> <span class="n">model_instance</span> <span class="o">=</span> <span class="n">get_core_model_from_name</span><span class="p">(</span><span class="s2">&quot;light.regression.NNLinearRegressor&quot;</span><span class="p">)</span>
 <span class="go">    print(f&quot;Model Name: {model_name}, Model Instance: {model_instance}&quot;)</span>
-<span class="go">        Model Name: NNLinearRegressor, Model Instance: &lt;class &#39;spotPython.light.regression.nn_linear_regressor.NNLinearRegressor&#39;&gt;</span>
+<span class="go">        Model Name:</span>
+<span class="go">        NNLinearRegressor,</span>
+<span class="go">        Model Instance:</span>
+<span class="go">        &lt;class &#39;spotPython.light.regression.nn_linear_regressor.NNLinearRegressor&#39;&gt;</span>
 </code></pre></div>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1750</span>
-<span class="normal">1751</span>
-<span class="normal">1752</span>
-<span class="normal">1753</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1753</span>
 <span class="normal">1754</span>
 <span class="normal">1755</span>
 <span class="normal">1756</span>
@@ -5691,7 +5691,13 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">1785</span>
 <span class="normal">1786</span>
 <span class="normal">1787</span>
-<span class="normal">1788</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">1788</span>
+<span class="normal">1789</span>
+<span class="normal">1790</span>
+<span class="normal">1791</span>
+<span class="normal">1792</span>
+<span class="normal">1793</span>
+<span class="normal">1794</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the sklearn or spotPython lightning core model name and instance from a core model name.</span>
 
@@ -5704,7 +5710,10 @@ If the control_dict dictionary is None, return None.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; model_name, model_instance = get_core_model_from_name(&quot;light.regression.NNLinearRegressor&quot;)</span>
 <span class="sd">            print(f&quot;Model Name: {model_name}, Model Instance: {model_instance}&quot;)</span>
-<span class="sd">                Model Name: NNLinearRegressor, Model Instance: &lt;class &#39;spotPython.light.regression.nn_linear_regressor.NNLinearRegressor&#39;&gt;</span>
+<span class="sd">                Model Name:</span>
+<span class="sd">                NNLinearRegressor,</span>
+<span class="sd">                Model Instance:</span>
+<span class="sd">                &lt;class &#39;spotPython.light.regression.nn_linear_regressor.NNLinearRegressor&#39;&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Split the model name into its components</span>
     <span class="n">name_parts</span> <span class="o">=</span> <span class="n">core_model_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
@@ -7021,18 +7030,18 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1845</span>
-<span class="normal">1846</span>
-<span class="normal">1847</span>
-<span class="normal">1848</span>
-<span class="normal">1849</span>
-<span class="normal">1850</span>
-<span class="normal">1851</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1851</span>
 <span class="normal">1852</span>
 <span class="normal">1853</span>
 <span class="normal">1854</span>
 <span class="normal">1855</span>
-<span class="normal">1856</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metric_sklearn</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1856</span>
+<span class="normal">1857</span>
+<span class="normal">1858</span>
+<span class="normal">1859</span>
+<span class="normal">1860</span>
+<span class="normal">1861</span>
+<span class="normal">1862</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metric_sklearn</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the sklearn metric from the metric name.</span>
 
@@ -7824,13 +7833,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
-<span class="normal">1815</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1815</span>
 <span class="normal">1816</span>
 <span class="normal">1817</span>
 <span class="normal">1818</span>
@@ -7839,7 +7842,13 @@ Adam
 <span class="normal">1821</span>
 <span class="normal">1822</span>
 <span class="normal">1823</span>
-<span class="normal">1824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1824</span>
+<span class="normal">1825</span>
+<span class="normal">1826</span>
+<span class="normal">1827</span>
+<span class="normal">1828</span>
+<span class="normal">1829</span>
+<span class="normal">1830</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the sklearn preprocessing model from the name.</span>
 
@@ -7937,7 +7946,10 @@ Adam
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.hyperparameters.values</span> <span class="kn">import</span> <span class="n">get_core_model_from_name</span>
 <span class="go">    model_name, model_instance = get_core_model_from_name(&#39;tree.HoeffdingTreeRegressor&#39;)</span>
 <span class="go">    print(f&quot;Model Name: {model_name}, Model Instance: {model_instance}&quot;)</span>
-<span class="go">        Model Name: HoeffdingTreeRegressor, Model Instance: &lt;class &#39;river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor&#39;&gt;</span>
+<span class="go">        Model Name:</span>
+<span class="go">        HoeffdingTreeRegressor,</span>
+<span class="go">        Model Instance:</span>
+<span class="go">        &lt;class &#39;river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor&#39;&gt;</span>
 </code></pre></div>
 
           <details class="quote">
@@ -7969,7 +7981,10 @@ Adam
 <span class="normal">1744</span>
 <span class="normal">1745</span>
 <span class="normal">1746</span>
-<span class="normal">1747</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">1747</span>
+<span class="normal">1748</span>
+<span class="normal">1749</span>
+<span class="normal">1750</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the river core model name and instance from a core model name.</span>
 
@@ -7983,7 +7998,10 @@ Adam
 <span class="sd">        &gt;&gt;&gt; from spotPython.hyperparameters.values import get_core_model_from_name</span>
 <span class="sd">            model_name, model_instance = get_core_model_from_name(&#39;tree.HoeffdingTreeRegressor&#39;)</span>
 <span class="sd">            print(f&quot;Model Name: {model_name}, Model Instance: {model_instance}&quot;)</span>
-<span class="sd">                Model Name: HoeffdingTreeRegressor, Model Instance: &lt;class &#39;river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor&#39;&gt;</span>
+<span class="sd">                Model Name:</span>
+<span class="sd">                HoeffdingTreeRegressor,</span>
+<span class="sd">                Model Instance:</span>
+<span class="sd">                &lt;class &#39;river.tree.hoeffding_tree_regressor.HoeffdingTreeRegressor&#39;&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Split the model name into its components</span>
     <span class="n">name_parts</span> <span class="o">=</span> <span class="n">core_model_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
@@ -8075,13 +8093,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1791</span>
-<span class="normal">1792</span>
-<span class="normal">1793</span>
-<span class="normal">1794</span>
-<span class="normal">1795</span>
-<span class="normal">1796</span>
-<span class="normal">1797</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1797</span>
 <span class="normal">1798</span>
 <span class="normal">1799</span>
 <span class="normal">1800</span>
@@ -8090,7 +8102,13 @@ Adam
 <span class="normal">1803</span>
 <span class="normal">1804</span>
 <span class="normal">1805</span>
-<span class="normal">1806</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1806</span>
+<span class="normal">1807</span>
+<span class="normal">1808</span>
+<span class="normal">1809</span>
+<span class="normal">1810</span>
+<span class="normal">1811</span>
+<span class="normal">1812</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the river preprocessing model from the name.</span>
 
@@ -8184,13 +8202,7 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1827</span>
-<span class="normal">1828</span>
-<span class="normal">1829</span>
-<span class="normal">1830</span>
-<span class="normal">1831</span>
-<span class="normal">1832</span>
-<span class="normal">1833</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1833</span>
 <span class="normal">1834</span>
 <span class="normal">1835</span>
 <span class="normal">1836</span>
@@ -8199,7 +8211,13 @@ Adam
 <span class="normal">1839</span>
 <span class="normal">1840</span>
 <span class="normal">1841</span>
-<span class="normal">1842</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_sklearn_scaler</span><span class="p">(</span><span class="n">scaler_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1842</span>
+<span class="normal">1843</span>
+<span class="normal">1844</span>
+<span class="normal">1845</span>
+<span class="normal">1846</span>
+<span class="normal">1847</span>
+<span class="normal">1848</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_sklearn_scaler</span><span class="p">(</span><span class="n">scaler_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the sklearn scaler model from the name.</span>
 
@@ -11988,13 +12006,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1859</span>
-<span class="normal">1860</span>
-<span class="normal">1861</span>
-<span class="normal">1862</span>
-<span class="normal">1863</span>
-<span class="normal">1864</span>
-<span class="normal">1865</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1865</span>
 <span class="normal">1866</span>
 <span class="normal">1867</span>
 <span class="normal">1868</span>
@@ -12034,7 +12046,13 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1902</span>
 <span class="normal">1903</span>
 <span class="normal">1904</span>
-<span class="normal">1905</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_hyperparameter</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="normal">1905</span>
+<span class="normal">1906</span>
+<span class="normal">1907</span>
+<span class="normal">1908</span>
+<span class="normal">1909</span>
+<span class="normal">1910</span>
+<span class="normal">1911</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_hyperparameter</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set hyperparameter values in the fun_control dictionary based on the type of the values argument.</span>
 
