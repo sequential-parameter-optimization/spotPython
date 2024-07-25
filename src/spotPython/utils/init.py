@@ -265,7 +265,7 @@ def fun_control_init(
             loss function, metrics, and the hyperparameters.
 
     Examples:
-        >>> from spotPy.utils.init import fun_control_init
+        >>> from spotPython.utils.init import fun_control_init
             fun_control = fun_control_init(_L_in=64, _L_out=11, num_workers=0, device=None)
             fun_control
             {'CHECKPOINT_PATH': 'saved_models/',
