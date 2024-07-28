@@ -239,14 +239,20 @@ def plot_confusion_matrix(
         plt.show()
 
 
-def plot_actual_vs_predicted(y_test, y_pred, title=None, show=True) -> None:
+def plot_actual_vs_predicted(y_test, y_pred, title=None, show=True, filename=None) -> None:
     """Plot actual vs. predicted values.
 
     Args:
-        y_test (np.ndarray): True values.
-        y_pred (np.ndarray): Predicted values.
-        title (str, optional): Title of the plot. Defaults to None.
-        show (bool, optional): If True, the plot is shown. Defaults to True.
+        y_test (np.ndarray):
+            True values.
+        y_pred (np.ndarray):
+            Predicted values.
+        title (str, optional):
+            Title of the plot. Defaults to None.
+        show (bool, optional):
+            If True, the plot is shown. Defaults to True.
+        filename (str, optional):
+            Name of the file to save the plot. Defaults to None.
 
     Returns:
         (NoneType): None
@@ -284,5 +290,7 @@ def plot_actual_vs_predicted(y_test, y_pred, title=None, show=True) -> None:
     if title is not None:
         fig.suptitle(title)
     plt.tight_layout()
+    if filename is not None:
+        plt.savefig(filename)
     if show:
         plt.show()

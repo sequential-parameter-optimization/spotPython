@@ -22,7 +22,7 @@ def plot_y_vs_X(X, y, nrows=5, ncols=2, figsize=(30, 20), ylabel="y", feature_na
         feature_names (list of str, optional):
             List of feature names. Defaults to None. If None, generates feature names as x0, x1, etc.
 
-    Example:
+    Examples:
         >>> from sklearn.datasets import load_diabetes
         >>> from spotPython.plot.xy import plot_y_vs_X
         >>> data = load_diabetes()
