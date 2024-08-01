@@ -6,7 +6,28 @@ from spotPython.utils.metrics import mapk_scorer
 import pandas as pd
 
 
-def evaluate_model(model, fun_control):
+def evaluate_model(model, fun_control) -> np.ndarray:
+    """Evaluate a model using the test set.
+    First, the model is trained on the training set. If a scaler
+    is provided, the data is transformed using the scaler and `fit_transform(X_train)`.
+    Then, the model is evaluated using the test set from `fun_control`,
+    the scaler with `transform(X_test)`,
+    the model.predict() method and the
+    `metric_params` specified in `fun_control`.
+
+    Note:
+    In contrast to `evaluate_hold_out()`, this function uses the test set.
+    It can be selected by setting `fun_control["eval"] = "eval_test"`.
+
+    Args:
+        model (sklearn model):
+            sklearn model.
+        fun_control (dict):
+            dictionary containing control parameters for the function.
+
+    Returns:
+        (np.ndarray): array containing evaluation results.
+    """
     try:
         X_train, y_train = get_Xy_from_df(fun_control["train"], fun_control["target_column"])
         X_test, y_test = get_Xy_from_df(fun_control["test"], fun_control["target_column"])
@@ -26,11 +47,32 @@ def evaluate_model(model, fun_control):
     return df_eval, df_preds
 
 
-def evaluate_hold_out(model, fun_control):
+def evaluate_hold_out(model, fun_control) -> np.ndarray:
+    """Evaluate a model using hold-out validation.
+    A validation set is created from the training set.
+    The test set is not used in this evaluation.
+
+    Note:
+    In contrast to `evaluate_model()`, this function creates a validation set as
+    a subset of the training set.
+    It can be selected by setting `fun_control["eval"] = "evaluate_hold_out"`.
+
+    Args:
+        model (sklearn model):
+            sklearn model.
+        fun_control (dict):
+            dictionary containing control parameters for the function.
+
+    Returns:
+        (np.ndarray): array containing evaluation results.
+
+    Raises:
+        Exception: if call to train_test_split() or fit() or predict() fails.
+    """
     train_df = fun_control["train"]
     target_column = fun_control["target_column"]
     try:
-        X_train, X_test, y_train, y_test = train_test_split(
+        X_train, X_val, y_train, y_val = train_test_split(
             train_df.drop(target_column, axis=1),
             train_df[target_column],
             random_state=42,
@@ -51,14 +93,14 @@ def evaluate_hold_out(model, fun_control):
         print(f"Error in evaluate_hold_out(). Call to fit() failed. {err=}, {type(err)=}")
     try:
         if fun_control["scaler"] is not None:
-            X_test = scaler.transform(X_test)
-            X_test = pd.DataFrame(X_test, columns=train_df.drop(target_column, axis=1).columns)  # Maintain column names
-        y_test = np.array(y_test)
+            X_val = scaler.transform(X_val)
+            X_val = pd.DataFrame(X_val, columns=train_df.drop(target_column, axis=1).columns)  # Maintain column names
+        y_val = np.array(y_val)
         if fun_control["predict_proba"] or fun_control["task"] == "classification":
-            df_preds = model.predict_proba(X_test)
+            df_preds = model.predict_proba(X_val)
         else:
-            df_preds = model.predict(X_test)
-        df_eval = fun_control["metric_sklearn"](y_test, df_preds, **fun_control["metric_params"])
+            df_preds = model.predict(X_val)
+        df_eval = fun_control["metric_sklearn"](y_val, df_preds, **fun_control["metric_params"])
     except Exception as err:
         print(f"Error in evaluate_hold_out(). Call to predict() failed. {err=}, {type(err)=}")
         df_eval = np.nan
