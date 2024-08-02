@@ -2117,4 +2117,18 @@ class Spot:
             filename = get_experiment_filename(PREFIX)
         if filename is not None:
             with open(filename, "wb") as handle:
-                pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                try:
+                    pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                except Exception as e:
+                    logger.error(f"Error: {e}")
+                    pprint.pprint(fun_control)
+                    print("design_control:")
+                    pprint.pprint(design_control)
+                    print("optimizer_control:")
+                    pprint.pprint(optimizer_control)
+                    print("surrogate_control:")
+                    pprint.pprint(surrogate_control)
+                    print("spot_tuner:")
+                    pprint.pprint(spot_tuner)
+
+                    raise e
