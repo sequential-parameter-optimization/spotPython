@@ -30,7 +30,8 @@ def repair_non_numeric(X: np.ndarray, var_type: List[str]) -> np.ndarray:
 def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """Remove rows from X and y where y contains NaN values and issue a warning
         if the dimension of the returned y array is smaller than the dimension of the original y array.
-        Issues a ValueError if the dimension of the returned y array is less than 2.
+        Issues a ValueError if the dimension of the returned y array is less than 21 and
+        stop_on_zero_return is True.
 
     Args:
         X (numpy.ndarray):

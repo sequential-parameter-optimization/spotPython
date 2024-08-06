@@ -1072,9 +1072,10 @@ class Spot:
         # (S-18): Evaluating New Solutions:
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
-        # Append New Solutions:
-        self.X = np.append(self.X, X0, axis=0)
-        self.y = np.append(self.y, y0)
+        # Append New Solutions (only if they are not nan):
+        if y0.shape[0] > 0:
+            self.X = np.append(self.X, X0, axis=0)
+            self.y = np.append(self.y, y0)
 
     def fit_surrogate(self) -> None:
         """
