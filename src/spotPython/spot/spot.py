@@ -947,6 +947,53 @@ class Spot:
     def should_continue(self, timeout_start) -> bool:
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
 
+    def generate_random_point(self):
+        """Generate a random point in the design space.
+
+        Returns:
+            (tuple): tuple containing:
+                X0 (numpy.ndarray): random point in the design space
+                y0 (numpy.ndarray): function value at X
+
+        Notes:
+            If the evaluation fails, the function returns arrays of shape[0] == 0.
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.fun.objectivefunctions import analytical
+                from spotPython.spot import spot
+                from spotPython.utils.init import fun_control_init
+                fun = analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1])
+                    )
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            )
+                X0, y0 = S.generate_random_point()
+                print(f"X0: {X0}")
+                print(f"y0: {y0}")
+                assert X0.size == 2
+                assert y0.size == 1
+                assert np.all(X0 >= S.lower)
+                assert np.all(X0 <= S.upper)
+                assert y0 >= 0
+        """
+        X0 = self.generate_design(
+            size=1,
+            repeats=1,
+            lower=self.lower,
+            upper=self.upper,
+        )
+        X0 = repair_non_numeric(X0, self.var_type)
+        X_all = self.to_all_dim_if_needed(X0)
+        logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
+        logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
+        y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
+        return X0, y0
+
     def update_design(self) -> None:
         """
         Update design. Generate and evaluate new design points.
@@ -1076,6 +1123,11 @@ class Spot:
         if y0.shape[0] > 0:
             self.X = np.append(self.X, X0, axis=0)
             self.y = np.append(self.y, y0)
+        else:
+            # otherwise, generate a random point and append it to the design
+            Xr, yr = self.generate_random_point()
+            self.X = np.append(self.X, Xr, axis=0)
+            self.y = np.append(self.y, yr)
 
     def fit_surrogate(self) -> None:
         """
