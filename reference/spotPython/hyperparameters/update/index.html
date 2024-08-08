@@ -6439,7 +6439,7 @@ A new dictionary with the same keys as v but with the values of the levels of th
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.device</span> <span class="kn">import</span> <span class="n">getDevice</span>
 <span class="go">    from spotPython.utils.init import fun_control_init</span>
-<span class="go">    from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path</span>
+<span class="go">    from spotPython.utils.file import get_experiment_name</span>
 <span class="go">    import numpy as np</span>
 <span class="go">    from spotPython.data.diabetes import Diabetes</span>
 <span class="go">    from spotPython.light.regression.netlightregression import NetLightRegression</span>
@@ -6450,7 +6450,6 @@ A new dictionary with the same keys as v but with the values of the levels of th
 <span class="go">    from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
 <span class="go">    experiment_name = get_experiment_name(prefix=&quot;000&quot;)</span>
 <span class="go">    fun_control = fun_control_init(</span>
-<span class="go">        spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),</span>
 <span class="go">        _L_in=10,</span>
 <span class="go">        _L_out=1,</span>
 <span class="go">        TENSORBOARD_CLEAN=True,</span>
@@ -6538,8 +6537,7 @@ Adam
 <span class="normal">1266</span>
 <span class="normal">1267</span>
 <span class="normal">1268</span>
-<span class="normal">1269</span>
-<span class="normal">1270</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ith_hyperparameter_name_from_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="normal">1269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ith_hyperparameter_name_from_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the ith hyperparameter name from the fun_control dictionary.</span>
 
@@ -6554,7 +6552,7 @@ Adam
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.device import getDevice</span>
 <span class="sd">            from spotPython.utils.init import fun_control_init</span>
-<span class="sd">            from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path</span>
+<span class="sd">            from spotPython.utils.file import get_experiment_name</span>
 <span class="sd">            import numpy as np</span>
 <span class="sd">            from spotPython.data.diabetes import Diabetes</span>
 <span class="sd">            from spotPython.light.regression.netlightregression import NetLightRegression</span>
@@ -6565,7 +6563,6 @@ Adam
 <span class="sd">            from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
 <span class="sd">            experiment_name = get_experiment_name(prefix=&quot;000&quot;)</span>
 <span class="sd">            fun_control = fun_control_init(</span>
-<span class="sd">                spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),</span>
 <span class="sd">                _L_in=10,</span>
 <span class="sd">                _L_out=1,</span>
 <span class="sd">                TENSORBOARD_CLEAN=True,</span>
@@ -7850,7 +7847,8 @@ Optional. Default is None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/update.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1273</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1272</span>
+<span class="normal">1273</span>
 <span class="normal">1274</span>
 <span class="normal">1275</span>
 <span class="normal">1276</span>
@@ -7944,8 +7942,7 @@ Optional. Default is None.</p>
 <span class="normal">1364</span>
 <span class="normal">1365</span>
 <span class="normal">1366</span>
-<span class="normal">1367</span>
-<span class="normal">1368</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">1367</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the tuned hyperparameters from the spot tuner.</span>
 <span class="sd">    This is just a wrapper function for the spot `get_tuned_hyperparameters` method.</span>
@@ -10349,7 +10346,8 @@ are used to update the fun_control dictionary.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/update.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1408</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1407</span>
+<span class="normal">1408</span>
 <span class="normal">1409</span>
 <span class="normal">1410</span>
 <span class="normal">1411</span>
@@ -10399,8 +10397,7 @@ are used to update the fun_control dictionary.</p>
 <span class="normal">1455</span>
 <span class="normal">1456</span>
 <span class="normal">1457</span>
-<span class="normal">1458</span>
-<span class="normal">1459</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_fun_control_with_hyper_num_cat_dicts</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">num_dict</span><span class="p">,</span> <span class="n">cat_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="normal">1458</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_fun_control_with_hyper_num_cat_dicts</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">num_dict</span><span class="p">,</span> <span class="n">cat_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update an existing fun_control dictionary with new hyperparameter values.</span>
 <span class="sd">    All values from the hyperparameter dict (dict) are updated in the fun_control dictionary</span>

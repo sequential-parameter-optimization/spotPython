@@ -5679,7 +5679,8 @@ If the control_dict dictionary is None, return None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1753</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1752</span>
+<span class="normal">1753</span>
 <span class="normal">1754</span>
 <span class="normal">1755</span>
 <span class="normal">1756</span>
@@ -5719,8 +5720,7 @@ If the control_dict dictionary is None, return None.</p>
 <span class="normal">1790</span>
 <span class="normal">1791</span>
 <span class="normal">1792</span>
-<span class="normal">1793</span>
-<span class="normal">1794</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">1793</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the sklearn or spotPython lightning core model name and instance from a core model name.</span>
 
@@ -6815,7 +6815,7 @@ A new dictionary with the same keys as v but with the values of the levels of th
 <p><strong>Examples:</strong></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.device</span> <span class="kn">import</span> <span class="n">getDevice</span>
 <span class="go">    from spotPython.utils.init import fun_control_init</span>
-<span class="go">    from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path</span>
+<span class="go">    from spotPython.utils.file import get_experiment_name</span>
 <span class="go">    import numpy as np</span>
 <span class="go">    from spotPython.data.diabetes import Diabetes</span>
 <span class="go">    from spotPython.light.regression.netlightregression import NetLightRegression</span>
@@ -6826,7 +6826,6 @@ A new dictionary with the same keys as v but with the values of the levels of th
 <span class="go">    from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
 <span class="go">    experiment_name = get_experiment_name(prefix=&quot;000&quot;)</span>
 <span class="go">    fun_control = fun_control_init(</span>
-<span class="go">        spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),</span>
 <span class="go">        _L_in=10,</span>
 <span class="go">        _L_out=1,</span>
 <span class="go">        TENSORBOARD_CLEAN=True,</span>
@@ -6914,8 +6913,7 @@ Adam
 <span class="normal">1292</span>
 <span class="normal">1293</span>
 <span class="normal">1294</span>
-<span class="normal">1295</span>
-<span class="normal">1296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ith_hyperparameter_name_from_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<span class="normal">1295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ith_hyperparameter_name_from_fun_control</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the ith hyperparameter name from the fun_control dictionary.</span>
 
@@ -6930,7 +6928,7 @@ Adam
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.device import getDevice</span>
 <span class="sd">            from spotPython.utils.init import fun_control_init</span>
-<span class="sd">            from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path</span>
+<span class="sd">            from spotPython.utils.file import get_experiment_name</span>
 <span class="sd">            import numpy as np</span>
 <span class="sd">            from spotPython.data.diabetes import Diabetes</span>
 <span class="sd">            from spotPython.light.regression.netlightregression import NetLightRegression</span>
@@ -6941,7 +6939,6 @@ Adam
 <span class="sd">            from spotPython.hyperparameters.values import set_control_hyperparameter_value</span>
 <span class="sd">            experiment_name = get_experiment_name(prefix=&quot;000&quot;)</span>
 <span class="sd">            fun_control = fun_control_init(</span>
-<span class="sd">                spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),</span>
 <span class="sd">                _L_in=10,</span>
 <span class="sd">                _L_out=1,</span>
 <span class="sd">                TENSORBOARD_CLEAN=True,</span>
@@ -7053,7 +7050,8 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1851</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1850</span>
+<span class="normal">1851</span>
 <span class="normal">1852</span>
 <span class="normal">1853</span>
 <span class="normal">1854</span>
@@ -7063,8 +7061,7 @@ Adam
 <span class="normal">1858</span>
 <span class="normal">1859</span>
 <span class="normal">1860</span>
-<span class="normal">1861</span>
-<span class="normal">1862</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metric_sklearn</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1861</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_metric_sklearn</span><span class="p">(</span><span class="n">metric_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the sklearn metric from the metric name.</span>
 
@@ -7856,7 +7853,8 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1815</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1814</span>
+<span class="normal">1815</span>
 <span class="normal">1816</span>
 <span class="normal">1817</span>
 <span class="normal">1818</span>
@@ -7870,8 +7868,7 @@ Adam
 <span class="normal">1826</span>
 <span class="normal">1827</span>
 <span class="normal">1828</span>
-<span class="normal">1829</span>
-<span class="normal">1830</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1829</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the sklearn preprocessing model from the name.</span>
 
@@ -7977,7 +7974,8 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1720</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1719</span>
+<span class="normal">1720</span>
 <span class="normal">1721</span>
 <span class="normal">1722</span>
 <span class="normal">1723</span>
@@ -8006,8 +8004,7 @@ Adam
 <span class="normal">1746</span>
 <span class="normal">1747</span>
 <span class="normal">1748</span>
-<span class="normal">1749</span>
-<span class="normal">1750</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">1749</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_core_model_from_name</span><span class="p">(</span><span class="n">core_model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the river core model name and instance from a core model name.</span>
 
@@ -8116,7 +8113,8 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1797</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1796</span>
+<span class="normal">1797</span>
 <span class="normal">1798</span>
 <span class="normal">1799</span>
 <span class="normal">1800</span>
@@ -8130,8 +8128,7 @@ Adam
 <span class="normal">1808</span>
 <span class="normal">1809</span>
 <span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1811</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_river_prep_model</span><span class="p">(</span><span class="n">prepmodel_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the river preprocessing model from the name.</span>
 
@@ -8225,7 +8222,8 @@ Adam
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1833</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1832</span>
+<span class="normal">1833</span>
 <span class="normal">1834</span>
 <span class="normal">1835</span>
 <span class="normal">1836</span>
@@ -8239,8 +8237,7 @@ Adam
 <span class="normal">1844</span>
 <span class="normal">1845</span>
 <span class="normal">1846</span>
-<span class="normal">1847</span>
-<span class="normal">1848</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_sklearn_scaler</span><span class="p">(</span><span class="n">scaler_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">1847</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_sklearn_scaler</span><span class="p">(</span><span class="n">scaler_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the sklearn scaler model from the name.</span>
 
@@ -8805,7 +8802,8 @@ Optional. Default is None.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1299</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1298</span>
+<span class="normal">1299</span>
 <span class="normal">1300</span>
 <span class="normal">1301</span>
 <span class="normal">1302</span>
@@ -8899,8 +8897,7 @@ Optional. Default is None.</p>
 <span class="normal">1390</span>
 <span class="normal">1391</span>
 <span class="normal">1392</span>
-<span class="normal">1393</span>
-<span class="normal">1394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">1393</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the tuned hyperparameters from the spot tuner.</span>
 <span class="sd">    This is just a wrapper function for the spot `get_tuned_hyperparameters` method.</span>
@@ -10931,7 +10928,8 @@ value will be converted to the type &ldquo;int&rdquo;.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1584</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1583</span>
+<span class="normal">1584</span>
 <span class="normal">1585</span>
 <span class="normal">1586</span>
 <span class="normal">1587</span>
@@ -10983,8 +10981,7 @@ value will be converted to the type &ldquo;int&rdquo;.</p>
 <span class="normal">1633</span>
 <span class="normal">1634</span>
 <span class="normal">1635</span>
-<span class="normal">1636</span>
-<span class="normal">1637</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_boolean_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
+<span class="normal">1636</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_boolean_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the boolean hyperparameter values in the fun_control dictionary.</span>
 
@@ -11580,7 +11577,8 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1640</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1639</span>
+<span class="normal">1640</span>
 <span class="normal">1641</span>
 <span class="normal">1642</span>
 <span class="normal">1643</span>
@@ -11656,8 +11654,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1713</span>
 <span class="normal">1714</span>
 <span class="normal">1715</span>
-<span class="normal">1716</span>
-<span class="normal">1717</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_factor_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">levels</span><span class="p">):</span>
+<span class="normal">1716</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_factor_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">levels</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the factor hyperparameter values in the fun_control dictionary.</span>
 
@@ -11850,7 +11847,8 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1544</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1543</span>
+<span class="normal">1544</span>
 <span class="normal">1545</span>
 <span class="normal">1546</span>
 <span class="normal">1547</span>
@@ -11886,8 +11884,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1577</span>
 <span class="normal">1578</span>
 <span class="normal">1579</span>
-<span class="normal">1580</span>
-<span class="normal">1581</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_float_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1580</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_float_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the float hyperparameter values in the fun_control dictionary.</span>
 
@@ -12029,7 +12026,8 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1865</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1864</span>
+<span class="normal">1865</span>
 <span class="normal">1866</span>
 <span class="normal">1867</span>
 <span class="normal">1868</span>
@@ -12074,8 +12072,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1907</span>
 <span class="normal">1908</span>
 <span class="normal">1909</span>
-<span class="normal">1910</span>
-<span class="normal">1911</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_hyperparameter</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="normal">1910</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_hyperparameter</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set hyperparameter values in the fun_control dictionary based on the type of the values argument.</span>
 
@@ -12253,7 +12250,8 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1488</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1487</span>
+<span class="normal">1488</span>
 <span class="normal">1489</span>
 <span class="normal">1490</span>
 <span class="normal">1491</span>
@@ -12305,8 +12303,7 @@ Otherwise, it calls modify_hyper_parameter_bounds.</p>
 <span class="normal">1537</span>
 <span class="normal">1538</span>
 <span class="normal">1539</span>
-<span class="normal">1540</span>
-<span class="normal">1541</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_int_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1540</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_int_hyperparameter_values</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set (modify) the integer hyperparameter values in the fun_control dictionary.</span>
 
@@ -12460,7 +12457,8 @@ are used to update the fun_control dictionary.</p>
 
           <details class="quote">
             <summary>Source code in <code>spotPython/hyperparameters/values.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1434</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1433</span>
+<span class="normal">1434</span>
 <span class="normal">1435</span>
 <span class="normal">1436</span>
 <span class="normal">1437</span>
@@ -12510,8 +12508,7 @@ are used to update the fun_control dictionary.</p>
 <span class="normal">1481</span>
 <span class="normal">1482</span>
 <span class="normal">1483</span>
-<span class="normal">1484</span>
-<span class="normal">1485</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_fun_control_with_hyper_num_cat_dicts</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">num_dict</span><span class="p">,</span> <span class="n">cat_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="normal">1484</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_fun_control_with_hyper_num_cat_dicts</span><span class="p">(</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">num_dict</span><span class="p">,</span> <span class="n">cat_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update an existing fun_control dictionary with new hyperparameter values.</span>
 <span class="sd">    All values from the hyperparameter dict (dict) are updated in the fun_control dictionary</span>
