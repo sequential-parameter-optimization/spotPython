@@ -469,6 +469,11 @@ def setup_paths(tensorboard_clean) -> tuple:
         TENSORBOARD_PATH (str):
             The path to the folder where the tensorboard files are saved.
 
+    Examples:
+        >>> from spotPython.utils.init import setup_paths
+        >>> setup_paths(tensorboard_clean=True)
+        ('runs/saved_models/', 'data/', 'results/', 'runs/')
+
     """
     # Path to the folder where the pretrained models are saved
     CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "runs/saved_models/")

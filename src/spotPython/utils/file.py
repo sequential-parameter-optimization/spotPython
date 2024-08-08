@@ -9,6 +9,7 @@ from spotPython.hyperparameters.values import get_tuned_architecture
 import pprint
 from spotPython.utils.eda import gen_design_table
 from spotPython.utils.tensorboard import start_tensorboard, stop_tensorboard
+from spotPython.utils.init import setup_paths
 
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -244,7 +245,11 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     print("\nLoaded fun_control in spotRun():")
     pprint.pprint(fun_control)
     print(gen_design_table(fun_control))
-    p_open = start_tensorboard()
+    setup_paths(fun_control["TENSORBOARD_CLEAN"])
+    if fun_control["tensorboard_start"]:
+        p_open = start_tensorboard()
+    else:
+        p_open = None
     spot_tuner.run()
     spot_tuner.save_experiment()
     # tensorboard --logdir="runs/"
