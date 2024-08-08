@@ -433,21 +433,20 @@ class Kriging(surrogates):
         # get the length of the log
         self.log_length = len(self.log["negLnLike"])
         if self.spot_writer is not None:
-            writer = self.spot_writer
             negLnLike = self.negLnLike.copy()
-            writer.add_scalar("spot_negLnLike", negLnLike, self.counter+self.log_length)
+            self.spot_writer.add_scalar("spot_negLnLike", negLnLike, self.counter+self.log_length)
             # add the self.n_theta theta values to the writer with one key "theta",
             # i.e, the same key for all theta values
             theta = self.theta.copy()
-            writer.add_scalars("spot_theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)},
-                               self.counter+self.log_length)
+            self.spot_writer.add_scalars("spot_theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)},
+                                         self.counter+self.log_length)
             if self.noise:
                 Lambda = self.Lambda.copy()
-                writer.add_scalar("spot_Lambda", Lambda, self.counter+self.log_length)
+                self.spot_writer.add_scalar("spot_Lambda", Lambda, self.counter+self.log_length)
             if self.optim_p:
                 p = self.p.copy()
-                writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
-            writer.flush()
+                self.spot_writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
+            self.spot_writer.flush()
 
     def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
         """

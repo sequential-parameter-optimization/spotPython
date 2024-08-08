@@ -6,7 +6,6 @@ import numpy as np
 import socket
 import datetime
 from dateutil.tz import tzlocal
-from torch.utils.tensorboard import SummaryWriter
 from spotPython.hyperparameters.values import (
     add_core_model_to_fun_control,
     get_core_model_from_name,
@@ -22,9 +21,9 @@ def fun_control_init(
     _L_in=None,
     _L_out=None,
     _torchmetric=None,
-    PREFIX=None,
+    PREFIX="00",
     TENSORBOARD_CLEAN=False,
-    SUMMARY_WRITER=True,
+    SUMMARY_WRITER=False,
     accelerator="auto",
     converters=None,
     core_model=None,
@@ -189,7 +188,7 @@ def fun_control_init(
             The optimizer object used for the search on surrogate. Default is None.
         PREFIX (str):
             The prefix of the experiment name. If the PREFIX is not None, a spotWriter
-            that us an instance of a SummaryWriter(), is created. Default is None.
+            that us an instance of a SummaryWriter(), is created. Default is "00".
         prep_model (object):
             The preprocessing model object. Used for river. Default is None.
         prep_model_name (str):
@@ -214,6 +213,10 @@ def fun_control_init(
             Currently only 1-dim functions are supported. Default is `False`.
         shuffle (bool):
             Whether the data were shuffled or not. Default is None.
+        SUMMARY_WRITER (bool):
+            If True, the path to the folder where the spot tensorboard files are saved, i.e.,
+            spot_tensorboard_path, is created. If spot_tensorboard_path exists,
+            the SummaryWriter is initialized in the spot() loop. Default is False.
         surrogate (object):
             The surrogate model object. Default is None.
         target_column (str):
@@ -325,39 +328,8 @@ def fun_control_init(
     # Setting the seed
     L.seed_everything(seed)
 
-    # Path to the folder where the pretrained models are saved
-    CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "runs/saved_models/")
-    os.makedirs(CHECKPOINT_PATH, exist_ok=True)
-    # Path to the folder where the datasets are/should be downloaded (e.g. MNIST)
-    DATASET_PATH = os.environ.get("PATH_DATASETS", "data/")
-    os.makedirs(DATASET_PATH, exist_ok=True)
-    # Path to the folder where the results (plots, csv, etc.) are saved
-    RESULTS_PATH = os.environ.get("PATH_RESULTS", "results/")
-    os.makedirs(RESULTS_PATH, exist_ok=True)
-    # Path to the folder where the tensorboard files are saved
-    TENSORBOARD_PATH = os.environ.get("PATH_TENSORBOARD", "runs/")
-    if TENSORBOARD_CLEAN:
-        # if the folder "runs"  exists, move it to "runs_Y_M_D_H_M_S" to avoid overwriting old tensorboard files
-        if os.path.exists(TENSORBOARD_PATH):
-            now = datetime.datetime.now()
-            os.makedirs("runs_OLD", exist_ok=True)
-            # use [:-1] to remove "/" from the end of the path
-            TENSORBOARD_PATH_OLD = "runs_OLD/" + TENSORBOARD_PATH[:-1] + "_" + now.strftime("%Y_%m_%d_%H_%M_%S")
-            print(f"Moving TENSORBOARD_PATH: {TENSORBOARD_PATH} to TENSORBOARD_PATH_OLD: {TENSORBOARD_PATH_OLD}")
-            os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
-    os.makedirs(TENSORBOARD_PATH, exist_ok=True)
-    if PREFIX is not None and SUMMARY_WRITER:
-        experiment_name = get_experiment_name(prefix=PREFIX)
-        spot_tensorboard_path = get_spot_tensorboard_path(experiment_name)
-        os.makedirs(spot_tensorboard_path, exist_ok=True)
-        print(f"Created spot_tensorboard_path: {spot_tensorboard_path} for SummaryWriter()")
-        spot_writer = SummaryWriter(log_dir=spot_tensorboard_path)
-    else:
-        spot_writer = None
-        spot_tensorboard_path = None
-
-    if not os.path.exists("./figures"):
-        os.makedirs("./figures")
+    CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH = setup_paths(TENSORBOARD_CLEAN)
+    spot_tensorboard_path = create_spot_tensorboard_path(SUMMARY_WRITER, PREFIX)
 
     if metric_sklearn is None and metric_sklearn_name is not None:
         metric_sklearn = get_metric_sklearn(metric_sklearn_name)
@@ -428,7 +400,6 @@ def fun_control_init(
         "shuffle": shuffle,
         "sigma": sigma,
         "spot_tensorboard_path": spot_tensorboard_path,
-        "spot_writer": spot_writer,
         "target_column": target_column,
         "target_type": target_type,
         "task": task,
@@ -469,7 +440,83 @@ def fun_control_init(
     return fun_control
 
 
-def X_reshape(X):
+def setup_paths(tensorboard_clean) -> tuple:
+    """
+    Setup paths for checkpoints, datasets, results, and tensorboard files.
+    This function also handles cleaning the tensorboard path if specified.
+
+    Args:
+        tensorboard_clean (bool):
+            If True, move the existing tensorboard folder to a timestamped backup
+            folder to avoid overwriting old tensorboard files.
+
+    Returns:
+        CHECKPOINT_PATH (str):
+            The path to the folder where the pretrained models are saved.
+        DATASET_PATH (str):
+            The path to the folder where the datasets are/should be downloaded.
+        RESULTS_PATH (str):
+            The path to the folder where the results (plots, csv, etc.) are saved.
+        TENSORBOARD_PATH (str):
+            The path to the folder where the tensorboard files are saved.
+
+    """
+    # Path to the folder where the pretrained models are saved
+    CHECKPOINT_PATH = os.environ.get("PATH_CHECKPOINT", "runs/saved_models/")
+    os.makedirs(CHECKPOINT_PATH, exist_ok=True)
+
+    # Path to the folder where the datasets are/should be downloaded (e.g. MNIST)
+    DATASET_PATH = os.environ.get("PATH_DATASETS", "data/")
+    os.makedirs(DATASET_PATH, exist_ok=True)
+
+    # Path to the folder where the results (plots, csv, etc.) are saved
+    RESULTS_PATH = os.environ.get("PATH_RESULTS", "results/")
+    os.makedirs(RESULTS_PATH, exist_ok=True)
+
+    # Path to the folder where the tensorboard files are saved
+    TENSORBOARD_PATH = os.environ.get("PATH_TENSORBOARD", "runs/")
+    if tensorboard_clean:
+        # if the folder "runs" exists, move it to "runs_Y_M_D_H_M_S" to avoid overwriting old tensorboard files
+        if os.path.exists(TENSORBOARD_PATH):
+            now = datetime.datetime.now()
+            os.makedirs("runs_OLD", exist_ok=True)
+            # use [:-1] to remove "/" from the end of the path
+            TENSORBOARD_PATH_OLD = "runs_OLD/" + TENSORBOARD_PATH[:-1] + "_" + now.strftime("%Y_%m_%d_%H_%M_%S")
+            print(f"Moving TENSORBOARD_PATH: {TENSORBOARD_PATH} to TENSORBOARD_PATH_OLD: {TENSORBOARD_PATH_OLD}")
+            os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
+
+    os.makedirs(TENSORBOARD_PATH, exist_ok=True)
+
+    # Ensure the figures folder exists
+    if not os.path.exists("./figures"):
+        os.makedirs("./figures")
+    return CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH
+
+
+def create_spot_tensorboard_path(summary_writer, prefix) -> str:
+    """Creates the spot_tensorboard_path and returns it.
+
+    Args:
+        summary_writer (bool):
+            If True, the path to the folder where the tensorboard files are saved is created.
+        prefix (str):
+            The prefix for the experiment name.
+
+    Returns:
+        spot_tensorboard_path (str):
+            The path to the folder where the tensorboard files are saved.
+    """
+    if summary_writer:
+        experiment_name = get_experiment_name(prefix=prefix)
+        spot_tensorboard_path = get_spot_tensorboard_path(experiment_name)
+        os.makedirs(spot_tensorboard_path, exist_ok=True)
+        print(f"Created spot_tensorboard_path: {spot_tensorboard_path} for SummaryWriter()")
+    else:
+        spot_tensorboard_path = None
+    return spot_tensorboard_path
+
+
+def X_reshape(X) -> np.array:
     """Reshape X to 2D array.
 
     Args:
@@ -492,7 +539,7 @@ def X_reshape(X):
     return X
 
 
-def check_and_create_dir(path):
+def check_and_create_dir(path) -> None:
     """Check if the path exists and create it if it does not.
 
     Args:
@@ -635,7 +682,7 @@ def surrogate_control_init(
 def optimizer_control_init(
     max_iter=1000,
     seed=125,
-):
+) -> dict:
     """Initialize optimizer_control dictionary.
 
     Args:
@@ -673,7 +720,7 @@ def get_experiment_name(prefix: str = "00") -> str:
         str: Unique experiment name.
 
     Examples:
-        >>> from spotPython.utils.file import get_experiment_name
+        >>> from spotPython.utils.init import get_experiment_name
         >>> get_experiment_name(prefix="00")
         00_ubuntu_2021-08-31_14-30-00
     """
@@ -684,7 +731,7 @@ def get_experiment_name(prefix: str = "00") -> str:
     return experiment_name
 
 
-def get_spot_tensorboard_path(experiment_name):
+def get_spot_tensorboard_path(experiment_name) -> str:
     """Get the path to the spot tensorboard files.
 
     Args:
@@ -692,13 +739,19 @@ def get_spot_tensorboard_path(experiment_name):
 
     Returns:
         spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
+
+    Examples:
+        >>> from spotPython.utils.init import get_spot_tensorboard_path
+        >>> get_spot_tensorboard_path("00_ubuntu_2021-08-31_14-30-00")
+        runs/spot_logs/00_ubuntu_2021-08-31_14-30-00
+
     """
     spot_tensorboard_path = os.environ.get("PATH_TENSORBOARD", "runs/spot_logs/")
     spot_tensorboard_path = os.path.join(spot_tensorboard_path, experiment_name)
     return spot_tensorboard_path
 
 
-def get_tensorboard_path(fun_control):
+def get_tensorboard_path(fun_control) -> str:
     """Get the path to the tensorboard files.
 
     Args:
@@ -706,6 +759,11 @@ def get_tensorboard_path(fun_control):
 
     Returns:
         tensorboard_path (str): The path to the folder where the tensorboard files are saved.
+
+    Examples:
+        >>> from spotPython.utils.init import get_tensorboard_path
+        >>> get_tensorboard_path(fun_control)
+        runs/
     """
     return fun_control["TENSORBOARD_PATH"]
 

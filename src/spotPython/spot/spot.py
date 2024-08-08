@@ -16,6 +16,7 @@ from scipy import optimize
 from math import isfinite
 import matplotlib.pyplot as plt
 from numpy import argmin
+from torch.utils.tensorboard import SummaryWriter
 
 from numpy import repeat
 from numpy import sqrt
@@ -257,9 +258,8 @@ class Spot:
         self.max_surrogate_points = self.fun_control["max_surrogate_points"]
         self.progress_file = self.fun_control["progress_file"]
 
-        # if the key "spot_writer" is not in the dictionary fun_control,
-        # set self.spot_writer to None else to the value of the key "spot_writer"
-        self.spot_writer = self.fun_control.get("spot_writer", None)
+        # Tensorboard:
+        self.init_spot_writer()
 
         # Bounds are internal, because they are functions of self.lower and self.upper
         # and used by the optimizer:
@@ -846,8 +846,8 @@ class Spot:
             # progress bar:
             self.show_progress_if_needed(timeout_start)
         if self.spot_writer is not None:
-            writer = self.spot_writer
-            writer.close()
+            self.spot_writer.flush()
+            self.spot_writer.close()
         if self.fun_control["db_dict_name"] is not None:
             self.write_db_dict()
         self.save_experiment()
@@ -929,7 +929,7 @@ class Spot:
         #
         self.counter = self.y.size
         if self.spot_writer is not None:
-            writer = self.spot_writer
+            # writer = self.spot_writer
             # range goes to init_size -1 because the last value is added by update_stats(),
             # which always adds the last value.
             # Changed in 0.5.9:
@@ -937,8 +937,10 @@ class Spot:
                 X_j = self.X[j].copy()
                 y_j = self.y[j].copy()
                 config = {self.var_name[i]: X_j[i] for i in range(self.k)}
-                writer.add_hparams(config, {"spot_y": y_j})
-                writer.flush()
+                # see: https://github.com/pytorch/pytorch/issues/32651
+                # self.spot_writer.add_hparams(config, {"spot_y": y_j}, run_name=self.spot_tensorboard_path)
+                self.spot_writer.add_hparams(config, {"spot_y": y_j})
+                self.spot_writer.flush()
         #
         self.X, self.y = remove_nan(self.X, self.y, stop_on_zero_return=True)
         logger.debug("In Spot() initialize_design(), final X val, after remove nan: self.X: %s", self.X)
@@ -1257,7 +1259,7 @@ class Spot:
 
     def update_writer(self) -> None:
         if self.spot_writer is not None:
-            writer = self.spot_writer
+            # writer = self.spot_writer
             # get the last y value:
             y_last = self.y[-1].copy()
             if self.noise is False:
@@ -1265,9 +1267,9 @@ class Spot:
                 X_min = self.min_X.copy()
                 # y_min: best y value so far
                 # y_last: last y value, can be worse than y_min
-                writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
+                self.spot_writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
                 # X_min: X value of the best y value so far
-                writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
+                self.spot_writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
             else:
                 # get the last n y values:
                 y_last_n = self.y[-self.fun_repeats :].copy()
@@ -1277,23 +1279,25 @@ class Spot:
                 X_min_mean = self.min_mean_X.copy()
                 # y_min_var: variance of the min y value so far
                 y_min_var = self.min_var_y.copy()
-                writer.add_scalar("spot_y_min_var", y_min_var, self.counter)
+                self.spot_writer.add_scalar("spot_y_min_var", y_min_var, self.counter)
                 # y_min_mean: best mean y value so far (see above)
-                writer.add_scalar("spot_y", y_min_mean, self.counter)
+                self.spot_writer.add_scalar("spot_y", y_min_mean, self.counter)
                 # last n y values (noisy):
-                writer.add_scalars(
+                self.spot_writer.add_scalars(
                     "spot_y", {f"y_last_n{i}": y_last_n[i] for i in range(self.fun_repeats)}, self.counter
                 )
                 # X_min_mean: X value of the best mean y value so far (see above)
-                writer.add_scalars(
+                self.spot_writer.add_scalars(
                     "spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter
                 )
             # get last value of self.X and convert to dict. take the values from self.var_name as keys:
             X_last = self.X[-1].copy()
             config = {self.var_name[i]: X_last[i] for i in range(self.k)}
             # hyperparameters X and value y of the last configuration:
-            writer.add_hparams(config, {"spot_y": y_last})
-            writer.flush()
+            # see: https://github.com/pytorch/pytorch/issues/32651
+            # self.spot_writer.add_hparams(config, {"spot_y": y_last}, run_name=self.spot_tensorboard_path)
+            self.spot_writer.add_hparams(config, {"spot_y": y_last})
+            self.spot_writer.flush()
 
     def suggest_new_X(self) -> np.array:
         """
@@ -2185,3 +2189,13 @@ class Spot:
                     pprint.pprint(spot_tuner)
 
                     raise e
+
+    def init_spot_writer(self) -> None:
+        """
+        Initialize the spot_writer for the current experiment.
+        """
+        self.spot_tensorboard_path = self.fun_control["spot_tensorboard_path"]
+        if self.spot_tensorboard_path is not None:
+            self.spot_writer = SummaryWriter(log_dir=self.spot_tensorboard_path)
+        else:
+            self.spot_writer = None

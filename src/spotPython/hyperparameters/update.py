@@ -1223,7 +1223,7 @@ def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
     Examples:
         >>> from spotPython.utils.device import getDevice
             from spotPython.utils.init import fun_control_init
-            from spotPython.utils.file import get_experiment_name, get_spot_tensorboard_path
+            from spotPython.utils.file import get_experiment_name
             import numpy as np
             from spotPython.data.diabetes import Diabetes
             from spotPython.light.regression.netlightregression import NetLightRegression
@@ -1234,7 +1234,6 @@ def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
             from spotPython.hyperparameters.values import set_control_hyperparameter_value
             experiment_name = get_experiment_name(prefix="000")
             fun_control = fun_control_init(
-                spot_tensorboard_path=get_spot_tensorboard_path(experiment_name),
                 _L_in=10,
                 _L_out=1,
                 TENSORBOARD_CLEAN=True,
