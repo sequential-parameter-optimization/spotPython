@@ -74,6 +74,8 @@ def fun_control_init(
     target_column=None,
     target_type=None,
     task=None,
+    tensorboard_start=False,
+    tensorboard_stop=False,
     test=None,
     test_seed=1234,
     test_size=0.4,
@@ -228,6 +230,10 @@ def fun_control_init(
             Default is None.
         TENSORBOARD_CLEAN (bool):
             Whether to clean (delete) the tensorboard folder or not. Default is False.
+        tensorboard_start (bool):
+            Whether to start the tensorboard or not. Default is False.
+        tensorboard_stop (bool):
+            Whether to stop the tensorboard or not. Default is False.
         test (object):
             The test data set for spotRiver. Default is None.
         test_seed (int):
@@ -340,6 +346,7 @@ def fun_control_init(
         "DATASET_PATH": DATASET_PATH,
         "RESULTS_PATH": RESULTS_PATH,
         "TENSORBOARD_PATH": TENSORBOARD_PATH,
+        "TENSORBOARD_CLEAN": TENSORBOARD_CLEAN,
         "_L_in": _L_in,
         "_L_out": _L_out,
         "_torchmetric": _torchmetric,
@@ -403,6 +410,8 @@ def fun_control_init(
         "target_column": target_column,
         "target_type": target_type,
         "task": task,
+        "tensorboard_start": tensorboard_start,
+        "tensorboard_stop": tensorboard_stop,
         "test": test,
         "test_seed": test_seed,
         "test_size": test_size,

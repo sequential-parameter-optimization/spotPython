@@ -8,6 +8,7 @@ def start_tensorboard() -> subprocess.Popen:
         process: The process of the tensorboard server.
 
     Examples:
+        >>> from spotPython.utils.tensorboard import start_tensorboard
         >>> process = start_tensorboard()
 
     """
@@ -17,17 +18,22 @@ def start_tensorboard() -> subprocess.Popen:
 
 
 def stop_tensorboard(process) -> None:
-    """Stops a tensorboard server.
+    """
+    Stops a tensorboard server if the process exists.
 
     Args:
-        process (subprocess.Popen):
-            The process of the tensorboard server.
+        process (subprocess.Popen): The process of the tensorboard server.
 
     Returns:
         None
 
     Examples:
+        >>> from spotPython.utils.tensorboard import start_tensorboard, stop_tensorboard
         >>> process = start_tensorboard()
         >>> stop_tensorboard(process)
     """
-    process.terminate()
+    if process is not None and process.poll() is None:
+        process.terminate()
+        process.wait()  # Ensure the process has terminated
+    else:
+        print("No active tensorboard process found or the process is already terminated.")
