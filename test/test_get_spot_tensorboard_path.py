@@ -9,10 +9,13 @@ def test_get_spot_tensorboard_path():
     expected_default_path = os.path.join("runs/spot_logs", experiment_name)
     custom_path = "/custom/path"
 
+    # Normalize paths
+    expected_default_path = os.path.normpath(expected_default_path)
+
     # Test with default path
     with patch.dict(os.environ, {}, clear=True):
-        assert get_spot_tensorboard_path(experiment_name) == expected_default_path
+        assert os.path.normpath(get_spot_tensorboard_path(experiment_name)) == expected_default_path
 
     # Test with custom environment path
     with patch.dict(os.environ, {"PATH_TENSORBOARD": custom_path}):
-        assert get_spot_tensorboard_path(experiment_name) == os.path.join(custom_path, experiment_name)
+        assert os.path.normpath(get_spot_tensorboard_path(experiment_name)) == os.path.normpath(os.path.join(custom_path, experiment_name))

@@ -928,8 +928,7 @@ class Spot:
         logger.debug("New y value: %s", self.y)
         #
         self.counter = self.y.size
-        if self.spot_writer is not None:
-            # writer = self.spot_writer
+        if hasattr(self, "spot_writer") and self.spot_writer is not None:
             # range goes to init_size -1 because the last value is added by update_stats(),
             # which always adds the last value.
             # Changed in 0.5.9:
@@ -1258,8 +1257,7 @@ class Spot:
             self.min_mean_y = self.mean_y[argmin(self.mean_y)]
 
     def update_writer(self) -> None:
-        if self.spot_writer is not None:
-            # writer = self.spot_writer
+        if hasattr(self, "spot_writer") and self.spot_writer is not None:
             # get the last y value:
             y_last = self.y[-1].copy()
             if self.noise is False:

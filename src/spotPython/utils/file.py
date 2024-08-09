@@ -246,6 +246,7 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     pprint.pprint(fun_control)
     print(gen_design_table(fun_control))
     setup_paths(fun_control["TENSORBOARD_CLEAN"])
+    spot_tuner.init_spot_writer()
     if fun_control["tensorboard_start"]:
         p_open = start_tensorboard()
     else:
