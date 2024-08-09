@@ -4042,7 +4042,8 @@ config = get_experiment_from_PREFIX(&ldquo;100&rdquo;)[&ldquo;config&rdquo;]</p>
 <span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
-<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_and_run_spot_python_experiment</span><span class="p">(</span><span class="n">spot_pkl_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">257</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_and_run_spot_python_experiment</span><span class="p">(</span><span class="n">spot_pkl_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads and runs a spot experiment.</span>
 
 <span class="sd">    Args:</span>
@@ -4065,6 +4066,7 @@ config = get_experiment_from_PREFIX(&ldquo;100&rdquo;)[&ldquo;config&rdquo;]</p>
     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">gen_design_table</span><span class="p">(</span><span class="n">fun_control</span><span class="p">))</span>
     <span class="n">setup_paths</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;TENSORBOARD_CLEAN&quot;</span><span class="p">])</span>
+    <span class="n">spot_tuner</span><span class="o">.</span><span class="n">init_spot_writer</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;tensorboard_start&quot;</span><span class="p">]:</span>
         <span class="n">p_open</span> <span class="o">=</span> <span class="n">start_tensorboard</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
