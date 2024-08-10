@@ -23,7 +23,6 @@ def fun_control_init(
     _torchmetric=None,
     PREFIX="00",
     TENSORBOARD_CLEAN=False,
-    SUMMARY_WRITER=False,
     accelerator="auto",
     converters=None,
     core_model=None,
@@ -215,10 +214,6 @@ def fun_control_init(
             Currently only 1-dim functions are supported. Default is `False`.
         shuffle (bool):
             Whether the data were shuffled or not. Default is None.
-        SUMMARY_WRITER (bool):
-            If True, the path to the folder where the spot tensorboard files are saved, i.e.,
-            spot_tensorboard_path, is created. If spot_tensorboard_path exists,
-            the SummaryWriter is initialized in the spot() loop. Default is False.
         surrogate (object):
             The surrogate model object. Default is None.
         target_column (str):
@@ -335,7 +330,7 @@ def fun_control_init(
     L.seed_everything(seed)
 
     CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH = setup_paths(TENSORBOARD_CLEAN)
-    spot_tensorboard_path = create_spot_tensorboard_path(SUMMARY_WRITER, PREFIX)
+    spot_tensorboard_path = create_spot_tensorboard_path(tensorboard_start, PREFIX)
 
     if metric_sklearn is None and metric_sklearn_name is not None:
         metric_sklearn = get_metric_sklearn(metric_sklearn_name)
@@ -507,11 +502,11 @@ def setup_paths(tensorboard_clean) -> tuple:
     return CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH
 
 
-def create_spot_tensorboard_path(summary_writer, prefix) -> str:
+def create_spot_tensorboard_path(tensorboard_start, prefix) -> str:
     """Creates the spot_tensorboard_path and returns it.
 
     Args:
-        summary_writer (bool):
+        tensorboard_start (bool):
             If True, the path to the folder where the tensorboard files are saved is created.
         prefix (str):
             The prefix for the experiment name.
@@ -520,7 +515,7 @@ def create_spot_tensorboard_path(summary_writer, prefix) -> str:
         spot_tensorboard_path (str):
             The path to the folder where the tensorboard files are saved.
     """
-    if summary_writer:
+    if tensorboard_start:
         experiment_name = get_experiment_name(prefix=prefix)
         spot_tensorboard_path = get_spot_tensorboard_path(experiment_name)
         os.makedirs(spot_tensorboard_path, exist_ok=True)

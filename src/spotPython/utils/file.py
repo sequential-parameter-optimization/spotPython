@@ -115,6 +115,10 @@ def load_experiment(PKL_NAME):
     Notes:
         The corresponding save_experiment function is part of the class spot.
 
+    Examples:
+        >>> from spotPython.utils.file import load_experiment
+        >>> spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment("spot_branin_experiment.pickle")
+
     """
     with open(PKL_NAME, "rb") as handle:
         experiment = pickle.load(handle)
