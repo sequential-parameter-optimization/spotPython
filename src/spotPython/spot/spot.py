@@ -1894,6 +1894,8 @@ class Spot:
         dpi=200,
         title="",
         figsize=(12, 6),
+        use_min=False,
+        use_max=True,
     ) -> None:
         """Plot the contour of any dimension."""
 
@@ -1938,13 +1940,26 @@ class Spot:
         validate_types(self.var_type, self.lower, self.upper)
 
         z00 = np.array([self.lower, self.upper])
-        z0_min = self.process_z00(z00, use_min=True)
-        Z_min = predict_contour_values(X, Y, z0_min)
-        z0_max = self.process_z00(z00, use_min=False)
-        Z_max = predict_contour_values(X, Y, z0_max)
-        Z_combined = np.vstack((Z_min, Z_max))
-        X_combined = np.vstack((X, X))
-        Y_combined = np.vstack((Y, Y))
+        Z_list, X_list, Y_list = [], [], []
+
+        if use_min:
+            z0_min = self.process_z00(z00, use_min=True)
+            Z_min = predict_contour_values(X, Y, z0_min)
+            Z_list.append(Z_min)
+            X_list.append(X)
+            Y_list.append(Y)
+
+        if use_max:
+            z0_max = self.process_z00(z00, use_min=False)
+            Z_max = predict_contour_values(X, Y, z0_max)
+            Z_list.append(Z_max)
+            X_list.append(X)
+            Y_list.append(Y)
+
+        if Z_list:  # Ensure that there is at least one Z to stack
+            Z_combined = np.vstack(Z_list)
+            X_combined = np.vstack(X_list)
+            Y_combined = np.vstack(Y_list)
 
         if min_z is None:
             min_z = np.min(Z_combined)
@@ -2098,6 +2113,8 @@ class Spot:
                         n_grid=n_grid,
                         contour_levels=contour_levels,
                         dpi=dpi,
+                        use_max=use_max,
+                        use_min=use_min,
                     )
 
     def get_importance(self) -> list:
