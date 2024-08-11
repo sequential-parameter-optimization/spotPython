@@ -2007,7 +2007,7 @@ class Spot:
         n_grid=50,
         contour_levels=10,
         dpi=200,
-        use_min=True,
+        use_min=False,
         use_max=True,
     ) -> None:
         """
@@ -2040,7 +2040,7 @@ class Spot:
                 integer parameters.
                 In 3d-plots, only two variables can be independent. The remaining input variables are set
                 to their minimum value.
-                Default is `True`.
+                Default is `False`.
                 If use_min and use_max are both `True`, both values are used.
             use_max (bool):
                 Use the minimum value for determing the hidden dimensions in the plot for categorical and
