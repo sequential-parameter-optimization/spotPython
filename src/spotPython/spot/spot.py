@@ -21,9 +21,6 @@ from torch.utils.tensorboard import SummaryWriter
 from numpy import repeat
 from numpy import sqrt
 from numpy import spacing
-from numpy import meshgrid
-from numpy import ravel
-from numpy import array
 from numpy import append
 from numpy import min, max
 from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -1214,6 +1211,40 @@ class Spot:
             )
 
     def generate_design(self, size, repeats, lower, upper) -> np.array:
+        """Generate a design with `size` points in the interval [lower, upper].
+
+        Args:
+            size (int): number of points
+            repeats (int): number of repeats
+            lower (numpy.ndarray): lower bound of the design space
+            upper (numpy.ndarray): upper bound of the design space
+
+        Returns:
+            (numpy.ndarray): design points
+
+        Examples:
+            >>> import numpy as np
+                from spotPython.spot import spot
+                from spotPython.utils.init import design_control_init
+                from spotPython.fun.objectivefunctions import analytical
+                design_control = design_control_init(init_size=3)
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1]),
+                    fun_evals=fun_evals,
+                    tolerance_x = np.sqrt(np.spacing(1))
+                    )
+                S = spot.Spot(fun = analytical().fun_sphere,
+                            fun_control = fun_control,
+                            design_control = design_control)
+                X = S.generate_design(size=3, repeats=1, lower=np.array([0, 0]), upper=np.array([100, 1]))
+                assert X.shape[0] == 3
+                assert X.shape[1] == 2
+                print(X)
+                    array([[77.25493789,  0.31539299],
+                    [59.32133757,  0.93854273],
+                    [27.4698033 ,  0.3959685 ]])
+        """
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)
 
     def update_stats(self) -> None:
@@ -1811,6 +1842,45 @@ class Spot:
         z0[j] = y
         return z0
 
+    def process_z00(self, z00, use_min=True) -> list:
+        """Process each entry in the `z00` array according to the corresponding type
+        in the `self.var_type` list.
+        Specifically, if the type is "float", the function will calculate the mean of the two `z00` values.
+        If the type is not "float", the function will retrun the maximum of the two `z00` values.
+
+        Args:
+            z00 (numpy.ndarray):
+                Array of values to process.
+            use_min (bool):
+                If `True`, the minimum value is returned. If `False`, the maximum value is returned.
+
+        Returns:
+            (list): Processed values.
+
+        Examples:
+            from spotPython.spot import spot
+            import numpy as np
+            import random
+            z00 = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
+            spot.var_type = ["float", "int", "int", "float"]
+            spot.process_z00(z00)
+            [3, 6, 7, 6]
+
+        """
+        result = []
+        for i in range(len(self.var_type)):
+            if self.var_type[i] == "float":
+                mean_value = np.mean(z00[:, i])
+                result.append(mean_value)
+            else:  # var_type[i] == 'int'
+                if use_min:
+                    min_value = min(z00[:, i])
+                    result.append(min_value)
+                else:
+                    max_value = max(z00[:, i])
+                    result.append(max_value)
+        return result
+
     def plot_contour(
         self,
         i=0,
@@ -1819,107 +1889,111 @@ class Spot:
         max_z=None,
         show=True,
         filename=None,
-        n_grid=25,
+        n_grid=50,
         contour_levels=10,
         dpi=200,
         title="",
+        figsize=(12, 6),
     ) -> None:
-        """Plot the contour of any dimension.
+        """Plot the contour of any dimension."""
 
-        Args:
-            i (int):
-                the first dimension
-            j (int):
-                the second dimension
-            min_z (float):
-                the minimum value of z
-            max_z (float):
-                the maximum value of z
-            show (bool):
-                show the plot
-            filename (str):
-                save the plot to a file
-            n_grid (int):
-                number of grid points
-            contour_levels (int):
-                number of contour levels
-            dpi (int):
-                dpi of the plot. Default is 200.
-            title (str):
-                title of the plot
+        def generate_mesh_grid(lower, upper, grid_points):
+            """Generate a mesh grid for the given range."""
+            x = np.linspace(lower[i], upper[i], num=grid_points)
+            y = np.linspace(lower[j], upper[j], num=grid_points)
+            return np.meshgrid(x, y), x, y
 
-        Returns:
-            None
+        def validate_types(var_type, lower, upper):
+            """Validate if the dimensions of var_type, lower, and upper are the same."""
+            if var_type is not None:
+                if len(var_type) != len(lower) or len(var_type) != len(upper):
+                    raise ValueError("The dimensions of var_type, lower, and upper must be the same.")
 
-        Examples:
-            >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
-                    )
-                # number of initial points:
-                ni = 5
-                # number of points
-                fun_evals = 10
-                fun = analytical().fun_sphere
-                fun_control = fun_control_init(
-                    lower = np.array([-1, -1, -1]),
-                    upper = np.array([1, 1, 1]),
-                    fun_evals=fun_evals,
-                    tolerance_x = np.sqrt(np.spacing(1))
-                    )
-                design_control=design_control_init(init_size=ni)
-                surrogate_control=surrogate_control_init(n_theta=3)
-                S = spot.Spot(fun=fun,
-                            fun_control=fun_control,
-                            design_control=design_control,
-                            surrogate_control=surrogate_control,)
-                S.run()
-                S.plot_important_hyperparameter_contour()
-        """
-        fig = pylab.figure(figsize=(9, 6))
-        # lower and upper
-        x = np.linspace(self.lower[i], self.upper[i], num=n_grid)
-        y = np.linspace(self.lower[j], self.upper[j], num=n_grid)
-        X, Y = meshgrid(x, y)
-        # generate a numpy array with the X and Y values
-        z0 = np.mean(np.array([self.lower, self.upper]), axis=0)
-        # Predict based on the optimized results
-        zz = array([self.surrogate.predict(array([self.chg(x, y, z0, i, j)])) for x, y in zip(ravel(X), ravel(Y))])
-        zs = zz[:, 0]
-        Z = zs.reshape(X.shape)
+        def setup_plot():
+            """Setup the plot with specified figure size."""
+            fig = pylab.figure(figsize=figsize)
+            return fig
+
+        def predict_contour_values(X, Y, z0):
+            """Predict contour values based on the surrogate model."""
+            grid_points = np.c_[np.ravel(X), np.ravel(Y)]
+            predictions = []
+
+            for x, y in grid_points:
+                adjusted_z0 = self.chg(x, y, z0.copy(), i, j)
+                prediction = self.surrogate.predict(np.array([adjusted_z0]))
+                predictions.append(prediction[0])
+
+            Z = np.array(predictions).reshape(X.shape)
+            return Z
+
+        def plot_contour_subplots(X, Y, Z, ax, min_z, max_z, contour_levels):
+            """Plot the contour and 3D surface subplots."""
+            contour = ax.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
+            pylab.colorbar(contour, ax=ax)
+
+        fig = setup_plot()
+
+        (X, Y), x, y = generate_mesh_grid(self.lower, self.upper, n_grid)
+        validate_types(self.var_type, self.lower, self.upper)
+
+        z00 = np.array([self.lower, self.upper])
+        z0_min = self.process_z00(z00, use_min=True)
+        Z_min = predict_contour_values(X, Y, z0_min)
+        z0_max = self.process_z00(z00, use_min=False)
+        Z_max = predict_contour_values(X, Y, z0_max)
+        Z_combined = np.vstack((Z_min, Z_max))
+        X_combined = np.vstack((X, X))
+        Y_combined = np.vstack((Y, Y))
+
         if min_z is None:
-            min_z = np.min(Z)
+            min_z = np.min(Z_combined)
         if max_z is None:
-            max_z = np.max(Z)
-        ax = fig.add_subplot(221)
-        # plot predicted values:
-        plt.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
+            max_z = np.max(Z_combined)
+
+        ax_contour = fig.add_subplot(221)
+        plot_contour_subplots(X_combined, Y_combined, Z_combined, ax_contour, min_z, max_z, contour_levels)
+
         if self.var_name is None:
-            plt.xlabel("x" + str(i))
-            plt.ylabel("x" + str(j))
+            ax_contour.set_xlabel(f"x{i}")
+            ax_contour.set_ylabel(f"x{j}")
         else:
-            plt.xlabel("x" + str(i) + ": " + self.var_name[i])
-            plt.ylabel("x" + str(j) + ": " + self.var_name[j])
-        # plt.title("Surrogate")
-        pylab.colorbar()
-        ax = fig.add_subplot(222, projection="3d")
-        ax.plot_surface(X, Y, Z, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
+            ax_contour.set_xlabel(f"x{i}: {self.var_name[i]}")
+            ax_contour.set_ylabel(f"x{j}: {self.var_name[j]}")
+
+        ax_3d = fig.add_subplot(222, projection="3d")
+        ax_3d.plot_surface(
+            X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z
+        )
+
         if self.var_name is None:
-            plt.xlabel("x" + str(i))
-            plt.ylabel("x" + str(j))
+            ax_3d.set_xlabel(f"x{i}")
+            ax_3d.set_ylabel(f"x{j}")
         else:
-            plt.xlabel("x" + str(i) + ": " + self.var_name[i])
-            plt.ylabel("x" + str(j) + ": " + self.var_name[j])
+            ax_3d.set_xlabel(f"x{i}: {self.var_name[i]}")
+            ax_3d.set_ylabel(f"x{j}: {self.var_name[j]}")
+
         plt.title(title)
+
         if filename:
-            pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0),
+            pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0)
+
         if show:
             pylab.show()
 
     def plot_important_hyperparameter_contour(
-        self, threshold=0.0, filename=None, show=True, max_imp=None, title="", scale_global=False
+        self,
+        threshold=0.0,
+        filename=None,
+        show=True,
+        max_imp=None,
+        title="",
+        scale_global=False,
+        n_grid=50,
+        contour_levels=10,
+        dpi=200,
+        use_min=True,
+        use_max=True,
     ) -> None:
         """
         Plot the contour of important hyperparameters.
@@ -1938,6 +2012,28 @@ class Spot:
                 than `max_imp`, only the max_imp important ones are selected.
             title (str):
                 title of the plots
+            scale_global (bool):
+                scale the z-axis globally. Default is `False`.
+            n_grid (int):
+                number of grid points. Default is 50.
+            contour_levels (int):
+                number of contour levels. Default is 10.
+            dpi (int):
+                dpi of the plot. Default is 200.
+            use_min (bool):
+                Use the minimum value for determing the hidden dimensions in the plot for categorical and
+                integer parameters.
+                In 3d-plots, only two variables can be independent. The remaining input variables are set
+                to their minimum value.
+                Default is `True`.
+                If use_min and use_max are both `True`, both values are used.
+            use_max (bool):
+                Use the minimum value for determing the hidden dimensions in the plot for categorical and
+                integer parameters.
+                In 3d-plots, only two variables can be independent. The remaining input variables are set
+                to their minimum value.
+                Default is `True`.
+                If use_min and use_max are both `True`, both values are used.
 
         Returns:
             None.
@@ -1992,7 +2088,16 @@ class Spot:
                     else:
                         filename_full = None
                     self.plot_contour(
-                        i=i, j=j, min_z=min_z, max_z=max_z, filename=filename_full, show=show, title=title
+                        i=i,
+                        j=j,
+                        min_z=min_z,
+                        max_z=max_z,
+                        filename=filename_full,
+                        show=show,
+                        title=title,
+                        n_grid=n_grid,
+                        contour_levels=contour_levels,
+                        dpi=dpi,
                     )
 
     def get_importance(self) -> list:
