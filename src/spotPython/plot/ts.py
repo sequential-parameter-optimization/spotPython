@@ -34,10 +34,10 @@ def plot_friedman_drift_data(
     )
     data = [data for data in data_generator]
     indices = [i for _, _, i in data]
-    values = {f"x{i}": [] for i in range(5)}
+    values = {f"x{i}": [] for i in range(6)}
     values["y"] = []
     for x, y, _ in data:
-        for i in range(5):
+        for i in range(6):
             values[f"x{i}"].append(x[i])
         values["y"].append(y)
 
