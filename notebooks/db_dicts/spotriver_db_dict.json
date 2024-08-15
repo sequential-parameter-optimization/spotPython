@@ -1,0 +1,1018 @@
+{
+    "data": {
+        "id": "CH10_HATR_1723707544.425565",
+        "result": "\n                      Results for CH10_HATR_1723707544.425565: Finally, the best value is 212.68421812252612\n                      at [8.86000000e+02 4.00000000e+00 6.33016233e-07 5.29031575e-02\n 1.00000000e+00 0.00000000e+00 9.63009238e-01 0.00000000e+00\n 7.00000000e+00 1.00000000e+00 3.08000000e+02 9.95997648e-02\n 0.00000000e+00 8.87759488e+02 3.00000000e+00 0.00000000e+00\n 1.00000000e+00 0.00000000e+00].",
+        "fun_control": {
+            "PREFIX": "CH10_HATR",
+            "CHECKPOINT_PATH": "runs/saved_models/",
+            "DATASET_PATH": "data/",
+            "RESULTS_PATH": "results/",
+            "TENSORBOARD_PATH": "runs/",
+            "TENSORBOARD_CLEAN": false,
+            "accelerator": "auto",
+            "core_model_name": "tree.HoeffdingAdaptiveTreeRegressor",
+            "counter": 11,
+            "data_dir": "./data",
+            "db_dict_name": "spotriver_db_dict.json",
+            "devices": 1,
+            "enable_progress_bar": false,
+            "fun_evals": Infinity,
+            "fun_repeats": 1,
+            "horizon": 168,
+            "infill_criterion": "y",
+            "k_folds": 3,
+            "log_graph": false,
+            "log_level": 50,
+            "max_time": 1,
+            "max_surrogate_points": 30,
+            "metric_sklearn_name": "mean_absolute_error",
+            "metric_params": {},
+            "model_dict": {},
+            "noise": false,
+            "n_points": 1,
+            "num_workers": 0,
+            "ocba_delta": 0,
+            "oml_grace_period": 168,
+            "prep_model_name": "StandardScaler",
+            "save_model": false,
+            "seed": 123,
+            "show_batch_interval": 1000000,
+            "show_models": false,
+            "show_progress": true,
+            "sigma": 0.0,
+            "target_column": "y",
+            "tensorboard_start": false,
+            "tensorboard_stop": false,
+            "test_seed": 1234,
+            "test_size": 0.4,
+            "tolerance_x": 0,
+            "var_name": [
+                "grace_period",
+                "max_depth",
+                "delta",
+                "tau",
+                "leaf_prediction",
+                "leaf_model",
+                "model_selector_decay",
+                "splitter",
+                "min_samples_split",
+                "bootstrap_sampling",
+                "drift_window_threshold",
+                "switch_significance",
+                "binary_split",
+                "max_size",
+                "memory_estimate_period",
+                "stop_mem_management",
+                "remove_poor_attrs",
+                "merit_preprune"
+            ],
+            "var_type": [
+                "int",
+                "int",
+                "float",
+                "float",
+                "factor",
+                "factor",
+                "float",
+                "factor",
+                "int",
+                "factor",
+                "int",
+                "float",
+                "factor",
+                "float",
+                "int",
+                "factor",
+                "factor",
+                "factor"
+            ],
+            "verbosity": 0,
+            "weight_coeff": 0.0,
+            "core_model_hyper_dict": {
+                "grace_period": {
+                    "type": "int",
+                    "default": 200,
+                    "transform": "None",
+                    "lower": 10,
+                    "upper": 1000
+                },
+                "max_depth": {
+                    "type": "int",
+                    "default": 20,
+                    "transform": "transform_power_2_int",
+                    "lower": 2,
+                    "upper": 20
+                },
+                "delta": {
+                    "type": "float",
+                    "default": 1e-07,
+                    "transform": "None",
+                    "lower": 1e-10,
+                    "upper": 1e-06
+                },
+                "tau": {
+                    "type": "float",
+                    "default": 0.05,
+                    "transform": "None",
+                    "lower": 0.01,
+                    "upper": 0.1
+                },
+                "leaf_prediction": {
+                    "levels": [
+                        "mean",
+                        "model",
+                        "adaptive"
+                    ],
+                    "type": "factor",
+                    "default": "mean",
+                    "transform": "None",
+                    "core_model_parameter_type": "str",
+                    "lower": 0,
+                    "upper": 2
+                },
+                "leaf_model": {
+                    "levels": [
+                        "LinearRegression",
+                        "PARegressor",
+                        "Perceptron"
+                    ],
+                    "type": "factor",
+                    "default": "LinearRegression",
+                    "transform": "None",
+                    "class_name": "river.linear_model",
+                    "core_model_parameter_type": "instance()",
+                    "lower": 0,
+                    "upper": 2
+                },
+                "model_selector_decay": {
+                    "type": "float",
+                    "default": 0.95,
+                    "transform": "None",
+                    "lower": 0.9,
+                    "upper": 0.99
+                },
+                "splitter": {
+                    "levels": [
+                        "EBSTSplitter",
+                        "TEBSTSplitter",
+                        "QOSplitter"
+                    ],
+                    "type": "factor",
+                    "default": "EBSTSplitter",
+                    "transform": "None",
+                    "class_name": "river.tree.splitter",
+                    "core_model_parameter_type": "instance()",
+                    "lower": 0,
+                    "upper": 2
+                },
+                "min_samples_split": {
+                    "type": "int",
+                    "default": 5,
+                    "transform": "None",
+                    "lower": 2,
+                    "upper": 10
+                },
+                "bootstrap_sampling": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "drift_window_threshold": {
+                    "type": "int",
+                    "default": 300,
+                    "transform": "None",
+                    "lower": 100,
+                    "upper": 500
+                },
+                "switch_significance": {
+                    "type": "float",
+                    "default": 0.05,
+                    "transform": "None",
+                    "lower": 0.01,
+                    "upper": 0.1
+                },
+                "binary_split": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "max_size": {
+                    "type": "float",
+                    "default": 500.0,
+                    "transform": "None",
+                    "lower": 100.0,
+                    "upper": 1000.0
+                },
+                "memory_estimate_period": {
+                    "type": "int",
+                    "default": 6,
+                    "transform": "transform_power_10_int",
+                    "lower": 3,
+                    "upper": 8
+                },
+                "stop_mem_management": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "remove_poor_attrs": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "merit_preprune": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 1,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                }
+            },
+            "core_model_hyper_dict_default": {
+                "grace_period": {
+                    "type": "int",
+                    "default": 200,
+                    "transform": "None",
+                    "lower": 10,
+                    "upper": 1000
+                },
+                "max_depth": {
+                    "type": "int",
+                    "default": 20,
+                    "transform": "transform_power_2_int",
+                    "lower": 2,
+                    "upper": 20
+                },
+                "delta": {
+                    "type": "float",
+                    "default": 1e-07,
+                    "transform": "None",
+                    "lower": 1e-08,
+                    "upper": 1e-06
+                },
+                "tau": {
+                    "type": "float",
+                    "default": 0.05,
+                    "transform": "None",
+                    "lower": 0.01,
+                    "upper": 0.1
+                },
+                "leaf_prediction": {
+                    "levels": [
+                        "mean",
+                        "model",
+                        "adaptive"
+                    ],
+                    "type": "factor",
+                    "default": "mean",
+                    "transform": "None",
+                    "core_model_parameter_type": "str",
+                    "lower": 0,
+                    "upper": 2
+                },
+                "leaf_model": {
+                    "levels": [
+                        "LinearRegression",
+                        "PARegressor",
+                        "Perceptron"
+                    ],
+                    "type": "factor",
+                    "default": "LinearRegression",
+                    "transform": "None",
+                    "class_name": "river.linear_model",
+                    "core_model_parameter_type": "instance()",
+                    "lower": 0,
+                    "upper": 2
+                },
+                "model_selector_decay": {
+                    "type": "float",
+                    "default": 0.95,
+                    "transform": "None",
+                    "lower": 0.9,
+                    "upper": 0.99
+                },
+                "splitter": {
+                    "levels": [
+                        "EBSTSplitter",
+                        "TEBSTSplitter",
+                        "QOSplitter"
+                    ],
+                    "type": "factor",
+                    "default": "EBSTSplitter",
+                    "transform": "None",
+                    "class_name": "river.tree.splitter",
+                    "core_model_parameter_type": "instance()",
+                    "lower": 0,
+                    "upper": 2
+                },
+                "min_samples_split": {
+                    "type": "int",
+                    "default": 5,
+                    "transform": "None",
+                    "lower": 2,
+                    "upper": 10
+                },
+                "bootstrap_sampling": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "drift_window_threshold": {
+                    "type": "int",
+                    "default": 300,
+                    "transform": "None",
+                    "lower": 100,
+                    "upper": 500
+                },
+                "switch_significance": {
+                    "type": "float",
+                    "default": 0.05,
+                    "transform": "None",
+                    "lower": 0.01,
+                    "upper": 0.1
+                },
+                "binary_split": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "max_size": {
+                    "type": "float",
+                    "default": 500.0,
+                    "transform": "None",
+                    "lower": 100.0,
+                    "upper": 1000.0
+                },
+                "memory_estimate_period": {
+                    "type": "int",
+                    "default": 6,
+                    "transform": "transform_power_10_int",
+                    "lower": 3,
+                    "upper": 8
+                },
+                "stop_mem_management": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "remove_poor_attrs": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 0,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                },
+                "merit_preprune": {
+                    "levels": [
+                        0,
+                        1
+                    ],
+                    "type": "factor",
+                    "default": 1,
+                    "transform": "None",
+                    "core_model_parameter_type": "bool",
+                    "lower": 0,
+                    "upper": 1
+                }
+            }
+        },
+        "design_control": {
+            "init_size": 5,
+            "repeats": 1
+        },
+        "surrogate_control": {
+            "log_level": 50,
+            "noise": true,
+            "model_fun_evals": 10000,
+            "min_theta": -3.0,
+            "max_theta": 2.0,
+            "n_theta": 18,
+            "p_val": 2.0,
+            "n_p": 1,
+            "optim_p": false,
+            "min_Lambda": 0.001,
+            "max_Lambda": 100,
+            "seed": 124,
+            "theta_init_zero": true,
+            "var_type": [
+                "int",
+                "int",
+                "float",
+                "float",
+                "factor",
+                "factor",
+                "float",
+                "factor",
+                "int",
+                "factor",
+                "int",
+                "float",
+                "factor",
+                "float",
+                "int",
+                "factor",
+                "factor",
+                "factor"
+            ],
+            "metric_factorial": "canberra"
+        },
+        "optimizer_control": {
+            "max_iter": 1000,
+            "seed": 125
+        },
+        "spot_tuner_control": {
+            "eps": 1.4901161193847656e-08,
+            "lower": [
+                10.0,
+                2.0,
+                1e-10,
+                0.01,
+                0.0,
+                0.0,
+                0.9,
+                0.0,
+                2.0,
+                0.0,
+                100.0,
+                0.01,
+                0.0,
+                100.0,
+                3.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "k": 18,
+            "upper": [
+                1000.0,
+                20.0,
+                1e-06,
+                0.1,
+                2.0,
+                2.0,
+                0.99,
+                2.0,
+                10.0,
+                1.0,
+                500.0,
+                0.1,
+                1.0,
+                1000.0,
+                8.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "var_type": [
+                "int",
+                "int",
+                "float",
+                "float",
+                "factor",
+                "factor",
+                "float",
+                "factor",
+                "int",
+                "factor",
+                "int",
+                "float",
+                "factor",
+                "float",
+                "int",
+                "factor",
+                "factor",
+                "factor"
+            ],
+            "var_name": [
+                "grace_period",
+                "max_depth",
+                "delta",
+                "tau",
+                "leaf_prediction",
+                "leaf_model",
+                "model_selector_decay",
+                "splitter",
+                "min_samples_split",
+                "bootstrap_sampling",
+                "drift_window_threshold",
+                "switch_significance",
+                "binary_split",
+                "max_size",
+                "memory_estimate_period",
+                "stop_mem_management",
+                "remove_poor_attrs",
+                "merit_preprune"
+            ],
+            "all_lower": [
+                10.0,
+                2.0,
+                1e-10,
+                0.01,
+                0.0,
+                0.0,
+                0.9,
+                0.0,
+                2.0,
+                0.0,
+                100.0,
+                0.01,
+                0.0,
+                100.0,
+                3.0,
+                0.0,
+                0.0,
+                0.0
+            ],
+            "all_upper": [
+                1000.0,
+                20.0,
+                1e-06,
+                0.1,
+                2.0,
+                2.0,
+                0.99,
+                2.0,
+                10.0,
+                1.0,
+                500.0,
+                0.1,
+                1.0,
+                1000.0,
+                8.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "ident": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "red_dim": 0,
+            "all_var_type": [
+                "int",
+                "int",
+                "float",
+                "float",
+                "factor",
+                "factor",
+                "float",
+                "factor",
+                "int",
+                "factor",
+                "int",
+                "float",
+                "factor",
+                "float",
+                "int",
+                "factor",
+                "factor",
+                "factor"
+            ],
+            "all_var_name": [
+                "grace_period",
+                "max_depth",
+                "delta",
+                "tau",
+                "leaf_prediction",
+                "leaf_model",
+                "model_selector_decay",
+                "splitter",
+                "min_samples_split",
+                "bootstrap_sampling",
+                "drift_window_threshold",
+                "switch_significance",
+                "binary_split",
+                "max_size",
+                "memory_estimate_period",
+                "stop_mem_management",
+                "remove_poor_attrs",
+                "merit_preprune"
+            ],
+            "fun_evals": Infinity,
+            "fun_repeats": 1,
+            "max_time": 1,
+            "noise": false,
+            "tolerance_x": 0,
+            "ocba_delta": 0,
+            "log_level": 50,
+            "show_models": false,
+            "show_progress": true,
+            "infill_criterion": "y",
+            "n_points": 1,
+            "max_surrogate_points": 30,
+            "progress_file": null,
+            "spot_tensorboard_path": null,
+            "de_bounds": [
+                [
+                    10.0,
+                    1000.0
+                ],
+                [
+                    2.0,
+                    20.0
+                ],
+                [
+                    1e-10,
+                    1e-06
+                ],
+                [
+                    0.01,
+                    0.1
+                ],
+                [
+                    0.0,
+                    2.0
+                ],
+                [
+                    0.0,
+                    2.0
+                ],
+                [
+                    0.9,
+                    0.99
+                ],
+                [
+                    0.0,
+                    2.0
+                ],
+                [
+                    2.0,
+                    10.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    100.0,
+                    500.0
+                ],
+                [
+                    0.01,
+                    0.1
+                ],
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    100.0,
+                    1000.0
+                ],
+                [
+                    3.0,
+                    8.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ],
+                [
+                    0.0,
+                    1.0
+                ]
+            ],
+            "X": [
+                [
+                    271.0,
+                    13.0,
+                    1.560124326429332e-07,
+                    0.07868130740742395,
+                    1.0,
+                    0.0,
+                    0.973379790035513,
+                    2.0,
+                    9.0,
+                    1.0,
+                    379.0,
+                    0.023590637180761667,
+                    0.0,
+                    241.5226665924828,
+                    6.0,
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                [
+                    50.0,
+                    18.0,
+                    5.537335061490828e-07,
+                    0.0430137281216666,
+                    0.0,
+                    1.0,
+                    0.9146819162262874,
+                    1.0,
+                    6.0,
+                    0.0,
+                    427.0,
+                    0.05274038789676165,
+                    0.0,
+                    664.3557548031206,
+                    6.0,
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                [
+                    446.0,
+                    6.0,
+                    9.401184096304214e-07,
+                    0.018513242487454656,
+                    2.0,
+                    2.0,
+                    0.931717684806667,
+                    1.0,
+                    3.0,
+                    0.0,
+                    259.0,
+                    0.045414065411081395,
+                    1.0,
+                    555.7037438032163,
+                    8.0,
+                    1.0,
+                    0.0,
+                    1.0
+                ],
+                [
+                    886.0,
+                    4.0,
+                    6.330162325852322e-07,
+                    0.05290315747461659,
+                    1.0,
+                    0.0,
+                    0.9630092384945457,
+                    0.0,
+                    7.0,
+                    1.0,
+                    308.0,
+                    0.09959976481744219,
+                    0.0,
+                    887.759487611541,
+                    3.0,
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                [
+                    721.0,
+                    14.0,
+                    3.8599127235832044e-07,
+                    0.09120909103834197,
+                    2.0,
+                    1.0,
+                    0.9462630542321836,
+                    1.0,
+                    5.0,
+                    0.0,
+                    174.0,
+                    0.07318021532213956,
+                    1.0,
+                    308.652010808255,
+                    4.0,
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    507.0,
+                    11.0,
+                    9.170656104846687e-07,
+                    0.058182875947085336,
+                    1.0,
+                    1.0,
+                    0.914335963220094,
+                    1.0,
+                    8.0,
+                    1.0,
+                    237.0,
+                    0.05795667196772749,
+                    0.0,
+                    556.3343952163696,
+                    7.0,
+                    1.0,
+                    0.0,
+                    1.0
+                ],
+                [
+                    100.0,
+                    10.0,
+                    7.478216837776895e-07,
+                    0.05206115591713725,
+                    2.0,
+                    1.0,
+                    0.9865449587924603,
+                    1.0,
+                    3.0,
+                    0.0,
+                    429.0,
+                    0.09105504832833554,
+                    1.0,
+                    673.2514369774158,
+                    4.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                [
+                    68.0,
+                    12.0,
+                    3.457703643673305e-07,
+                    0.05526889949466108,
+                    1.0,
+                    1.0,
+                    0.9574081582087176,
+                    2.0,
+                    2.0,
+                    1.0,
+                    430.0,
+                    0.08775039934914697,
+                    1.0,
+                    724.6377625852584,
+                    5.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                [
+                    196.0,
+                    13.0,
+                    4.759371430577777e-08,
+                    0.020690659576551,
+                    0.0,
+                    0.0,
+                    0.9495692483879921,
+                    1.0,
+                    6.0,
+                    1.0,
+                    431.0,
+                    0.05777341269993361,
+                    1.0,
+                    689.7876780553823,
+                    7.0,
+                    0.0,
+                    1.0,
+                    1.0
+                ],
+                [
+                    859.0,
+                    6.0,
+                    2.548904749455749e-07,
+                    0.020586559212552584,
+                    0.0,
+                    1.0,
+                    0.9415633721349189,
+                    0.0,
+                    2.0,
+                    1.0,
+                    105.0,
+                    0.012951461476765149,
+                    1.0,
+                    111.90722289419347,
+                    5.0,
+                    1.0,
+                    0.0,
+                    1.0
+                ],
+                [
+                    35.0,
+                    11.0,
+                    6.391870030818837e-07,
+                    0.048139260922281116,
+                    1.0,
+                    2.0,
+                    0.9159499189031006,
+                    0.0,
+                    5.0,
+                    0.0,
+                    199.0,
+                    0.037887540709725165,
+                    1.0,
+                    441.5407018142013,
+                    7.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            ],
+            "y": [
+                222.8421803391371,
+                284.8245975060011,
+                326.2900008974454,
+                212.68421812252612,
+                331.43103788591566,
+                576.2610616911321,
+                302.75742975861823,
+                571.326235027433,
+                315.02914807172226,
+                336.85326412580724,
+                1347.9474713034797
+            ],
+            "counter": 11,
+            "min_y": 212.68421812252612,
+            "min_X": [
+                886.0,
+                4.0,
+                6.330162325852322e-07,
+                0.05290315747461659,
+                1.0,
+                0.0,
+                0.9630092384945457,
+                0.0,
+                7.0,
+                1.0,
+                308.0,
+                0.09959976481744219,
+                0.0,
+                887.759487611541,
+                3.0,
+                0.0,
+                1.0,
+                0.0
+            ],
+            "min_mean_X": null,
+            "min_mean_y": null,
+            "mean_X": null,
+            "mean_y": null,
+            "var_y": null
+        }
+    }
+}
