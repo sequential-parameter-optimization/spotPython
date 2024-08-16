@@ -693,14 +693,14 @@ class Spot:
         print("The following dictionaries are written to the json file spotPython_db.json:")
         print("fun_control:")
         pprint.pprint(fun_control)
-        
+
         # Iterate over a list of the keys to avoid modifying the dictionary during iteration
         for key in list(fun_control.keys()):
             if not isinstance(fun_control[key], (int, float, str, list, dict)):
                 # remove the key from the dictionary
                 print(f"Removing non-serializable key: {key}")
                 fun_control.pop(key)
-        
+
         print("fun_control after removing non-serializabel keys:")
         pprint.pprint(fun_control)
         pprint.pprint(fun_control)

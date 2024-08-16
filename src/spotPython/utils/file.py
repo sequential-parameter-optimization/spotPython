@@ -257,4 +257,5 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     spot_tuner.run()
     # # tensorboard --logdir="runs/"
     stop_tensorboard(p_open)
+    print(gen_design_table(fun_control=fun_control, spot=spot_tuner))
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control, p_open
