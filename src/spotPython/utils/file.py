@@ -6,7 +6,6 @@ import json
 import sys
 import importlib
 from spotPython.hyperparameters.values import get_tuned_architecture
-import pprint
 from spotPython.utils.eda import gen_design_table
 from spotPython.utils.tensorboard import start_tensorboard, stop_tensorboard
 from spotPython.utils.init import setup_paths
@@ -117,7 +116,7 @@ def load_experiment(PKL_NAME):
 
     Examples:
         >>> from spotPython.utils.file import load_experiment
-        >>> spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment("spot_branin_experiment.pickle")
+        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment("spot_0_experiment.pickle")
 
     """
     with open(PKL_NAME, "rb") as handle:
@@ -247,7 +246,7 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     p_open = None
     (spot_tuner, fun_control, design_control, surrogate_control, optimizer_control) = load_experiment(spot_pkl_name)
     print("\nLoaded fun_control in spotRun():")
-    pprint.pprint(fun_control)
+    # pprint.pprint(fun_control)
     print(gen_design_table(fun_control))
     setup_paths(fun_control["TENSORBOARD_CLEAN"])
     spot_tuner.init_spot_writer()
@@ -256,7 +255,6 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     else:
         p_open = None
     spot_tuner.run()
-    spot_tuner.save_experiment()
-    # tensorboard --logdir="runs/"
+    # # tensorboard --logdir="runs/"
     stop_tensorboard(p_open)
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control, p_open

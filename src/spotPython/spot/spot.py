@@ -842,7 +842,7 @@ class Spot:
             self.fit_surrogate()
             # progress bar:
             self.show_progress_if_needed(timeout_start)
-        if self.spot_writer is not None:
+        if hasattr(self, "spot_writer") and self.spot_writer is not None:
             self.spot_writer.flush()
             self.spot_writer.close()
         if self.fun_control["db_dict_name"] is not None:
@@ -2269,16 +2269,17 @@ class Spot:
         """
         Save the experiment to a file.
         """
-        design_control = copy.deepcopy(self.design_control)
-        fun_control = copy.deepcopy(self.fun_control)
-        optimizer_control = copy.deepcopy(self.optimizer_control)
-        spot_tuner = copy.deepcopy(self)
-        surrogate_control = copy.deepcopy(self.surrogate_control)
-
+        # check if the key "spot_writer" is in the fun_control dictionary
         # remove the key "spot_writer" from the fun_control dictionary,
         # because it is not serializable.
         # TODO: It will be re-added when the experiment is loaded.
-        fun_control.pop("spot_writer", None)
+        self.close_and_del_spot_writer()
+
+        fun_control = copy.deepcopy(self.fun_control)
+        optimizer_control = copy.deepcopy(self.optimizer_control)
+        surrogate_control = copy.deepcopy(self.surrogate_control)
+        design_control = copy.deepcopy(self.design_control)
+        spot_tuner = copy.deepcopy(self)
         experiment = {
             "design_control": design_control,
             "fun_control": fun_control,
@@ -2286,9 +2287,7 @@ class Spot:
             "spot_tuner": spot_tuner,
             "surrogate_control": surrogate_control,
         }
-        # check if the key "spot_writer" is in the fun_control dictionary
-        if "spot_writer" in fun_control and fun_control["spot_writer"] is not None:
-            fun_control["spot_writer"].close()
+
         PREFIX = fun_control["PREFIX"]
         if filename is None and PREFIX is not None:
             filename = get_experiment_filename(PREFIX)
@@ -2314,8 +2313,17 @@ class Spot:
         """
         Initialize the spot_writer for the current experiment.
         """
-        self.spot_tensorboard_path = self.fun_control["spot_tensorboard_path"]
-        if self.spot_tensorboard_path is not None:
-            self.spot_writer = SummaryWriter(log_dir=self.spot_tensorboard_path)
+        if self.fun_control["tensorboard_start"] and self.fun_control["spot_tensorboard_path"] is not None:
+            self.spot_writer = None
+            # self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
         else:
             self.spot_writer = None
+
+    def close_and_del_spot_writer(self) -> None:
+        """
+        Delete the spot_writer attribute from the object.
+        """
+        if hasattr(self, "spot_writer") and self.spot_writer is not None:
+            self.spot_writer.flush()
+            self.spot_writer.close()
+            del self.spot_writer

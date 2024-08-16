@@ -1,4 +1,3 @@
-import pickle
 import pytest
 from unittest.mock import patch, MagicMock
 
@@ -17,7 +16,6 @@ def mock_experiment_data():
 
 
 @patch("spotPython.utils.file.load_experiment")
-@patch("spotPython.utils.file.pprint.pprint")
 @patch("spotPython.utils.file.gen_design_table")
 @patch("spotPython.utils.file.setup_paths")
 @patch("spotPython.utils.file.start_tensorboard")
@@ -27,7 +25,6 @@ def test_load_and_run_spot_python_experiment(
         mock_start_tensorboard,
         mock_setup_paths,
         mock_gen_design_table,
-        mock_pprint,
         mock_load_experiment,
         mock_experiment_data
     ):
@@ -44,7 +41,6 @@ def test_load_and_run_spot_python_experiment(
     mock_setup_paths.assert_called_once_with(mock_experiment_data[1]["TENSORBOARD_CLEAN"])
     mock_experiment_data[0].init_spot_writer.assert_called_once()
     mock_experiment_data[0].run.assert_called_once()
-    mock_experiment_data[0].save_experiment.assert_called_once()
     mock_stop_tensorboard.assert_called_once_with(None)
 
     # Assert the returned tuple
