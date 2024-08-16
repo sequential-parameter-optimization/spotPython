@@ -2578,6 +2578,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotPython.spot.spot.Spot.close_and_del_spot_writer" class="md-nav__link">
+    <span class="md-ellipsis">
+      close_and_del_spot_writer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotPython.spot.spot.Spot.de_serialize_dicts" class="md-nav__link">
     <span class="md-ellipsis">
       de_serialize_dicts
@@ -3751,6 +3760,15 @@
   <a href="#spotPython.spot.spot.Spot.chg" class="md-nav__link">
     <span class="md-ellipsis">
       chg
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spotPython.spot.spot.Spot.close_and_del_spot_writer" class="md-nav__link">
+    <span class="md-ellipsis">
+      close_and_del_spot_writer
     </span>
   </a>
   
@@ -6600,7 +6618,15 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">2321</span>
 <span class="normal">2322</span>
 <span class="normal">2323</span>
-<span class="normal">2324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">2324</span>
+<span class="normal">2325</span>
+<span class="normal">2326</span>
+<span class="normal">2327</span>
+<span class="normal">2328</span>
+<span class="normal">2329</span>
+<span class="normal">2330</span>
+<span class="normal">2331</span>
+<span class="normal">2332</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -7393,7 +7419,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_surrogate</span><span class="p">()</span>
             <span class="c1"># progress bar:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">show_progress_if_needed</span><span class="p">(</span><span class="n">timeout_start</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;spot_writer&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;db_dict_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -8820,16 +8846,17 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save the experiment to a file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">design_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">)</span>
-        <span class="n">fun_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
-        <span class="n">optimizer_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_control</span><span class="p">)</span>
-        <span class="n">spot_tuner</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">)</span>
-
+        <span class="c1"># check if the key &quot;spot_writer&quot; is in the fun_control dictionary</span>
         <span class="c1"># remove the key &quot;spot_writer&quot; from the fun_control dictionary,</span>
         <span class="c1"># because it is not serializable.</span>
         <span class="c1"># TODO: It will be re-added when the experiment is loaded.</span>
-        <span class="n">fun_control</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;spot_writer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_and_del_spot_writer</span><span class="p">()</span>
+
+        <span class="n">fun_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
+        <span class="n">optimizer_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_control</span><span class="p">)</span>
+        <span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">)</span>
+        <span class="n">design_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">)</span>
+        <span class="n">spot_tuner</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">experiment</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;design_control&quot;</span><span class="p">:</span> <span class="n">design_control</span><span class="p">,</span>
             <span class="s2">&quot;fun_control&quot;</span><span class="p">:</span> <span class="n">fun_control</span><span class="p">,</span>
@@ -8837,9 +8864,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
             <span class="s2">&quot;spot_tuner&quot;</span><span class="p">:</span> <span class="n">spot_tuner</span><span class="p">,</span>
             <span class="s2">&quot;surrogate_control&quot;</span><span class="p">:</span> <span class="n">surrogate_control</span><span class="p">,</span>
         <span class="p">}</span>
-        <span class="c1"># check if the key &quot;spot_writer&quot; is in the fun_control dictionary</span>
-        <span class="k">if</span> <span class="s2">&quot;spot_writer&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span> <span class="ow">and</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_writer&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_writer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
         <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;PREFIX&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">PREFIX</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">get_experiment_filename</span><span class="p">(</span><span class="n">PREFIX</span><span class="p">)</span>
@@ -8865,11 +8890,20 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the spot_writer for the current experiment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spot_tensorboard_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_tensorboard_path&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_tensorboard_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="n">log_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spot_tensorboard_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;tensorboard_start&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_tensorboard_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># self.spot_writer = SummaryWriter(log_dir=self.fun_control[&quot;spot_tensorboard_path&quot;])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">close_and_del_spot_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete the spot_writer attribute from the object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;spot_writer&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -9128,6 +9162,42 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
     <span class="n">z0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
     <span class="n">z0</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">y</span>
     <span class="k">return</span> <span class="n">z0</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="spotPython.spot.spot.Spot.close_and_del_spot_writer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">close_and_del_spot_writer</span><span class="p">()</span></code>
+
+<a href="#spotPython.spot.spot.Spot.close_and_del_spot_writer" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Delete the spot_writer attribute from the object.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2325</span>
+<span class="normal">2326</span>
+<span class="normal">2327</span>
+<span class="normal">2328</span>
+<span class="normal">2329</span>
+<span class="normal">2330</span>
+<span class="normal">2331</span>
+<span class="normal">2332</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">close_and_del_spot_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete the spot_writer attribute from the object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;spot_writer&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -11072,21 +11142,21 @@ infill criterion is calculated in natural units.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotPython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2316</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2315</span>
+<span class="normal">2316</span>
 <span class="normal">2317</span>
 <span class="normal">2318</span>
 <span class="normal">2319</span>
 <span class="normal">2320</span>
 <span class="normal">2321</span>
 <span class="normal">2322</span>
-<span class="normal">2323</span>
-<span class="normal">2324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">init_spot_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2323</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">init_spot_writer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize the spot_writer for the current experiment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">spot_tensorboard_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_tensorboard_path&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_tensorboard_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="n">log_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spot_tensorboard_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;tensorboard_start&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_tensorboard_path&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># self.spot_writer = SummaryWriter(log_dir=self.fun_control[&quot;spot_tensorboard_path&quot;])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
@@ -14178,7 +14248,7 @@ S.y: [0.00000000e+00 1.00000000e+00 1.00000000e+00 2.00000000e+00
         <span class="bp">self</span><span class="o">.</span><span class="n">fit_surrogate</span><span class="p">()</span>
         <span class="c1"># progress bar:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">show_progress_if_needed</span><span class="p">(</span><span class="n">timeout_start</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;spot_writer&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;db_dict_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -14248,21 +14318,21 @@ S.y: [0.00000000e+00 1.00000000e+00 1.00000000e+00 2.00000000e+00
 <span class="normal">2310</span>
 <span class="normal">2311</span>
 <span class="normal">2312</span>
-<span class="normal">2313</span>
-<span class="normal">2314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save the experiment to a file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">design_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">)</span>
-    <span class="n">fun_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
-    <span class="n">optimizer_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_control</span><span class="p">)</span>
-    <span class="n">spot_tuner</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-    <span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">)</span>
-
+    <span class="c1"># check if the key &quot;spot_writer&quot; is in the fun_control dictionary</span>
     <span class="c1"># remove the key &quot;spot_writer&quot; from the fun_control dictionary,</span>
     <span class="c1"># because it is not serializable.</span>
     <span class="c1"># TODO: It will be re-added when the experiment is loaded.</span>
-    <span class="n">fun_control</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;spot_writer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">close_and_del_spot_writer</span><span class="p">()</span>
+
+    <span class="n">fun_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fun_control</span><span class="p">)</span>
+    <span class="n">optimizer_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer_control</span><span class="p">)</span>
+    <span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">)</span>
+    <span class="n">design_control</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">design_control</span><span class="p">)</span>
+    <span class="n">spot_tuner</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
     <span class="n">experiment</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;design_control&quot;</span><span class="p">:</span> <span class="n">design_control</span><span class="p">,</span>
         <span class="s2">&quot;fun_control&quot;</span><span class="p">:</span> <span class="n">fun_control</span><span class="p">,</span>
@@ -14270,9 +14340,7 @@ S.y: [0.00000000e+00 1.00000000e+00 1.00000000e+00 2.00000000e+00
         <span class="s2">&quot;spot_tuner&quot;</span><span class="p">:</span> <span class="n">spot_tuner</span><span class="p">,</span>
         <span class="s2">&quot;surrogate_control&quot;</span><span class="p">:</span> <span class="n">surrogate_control</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="c1"># check if the key &quot;spot_writer&quot; is in the fun_control dictionary</span>
-    <span class="k">if</span> <span class="s2">&quot;spot_writer&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span> <span class="ow">and</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_writer&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;spot_writer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
     <span class="n">PREFIX</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;PREFIX&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">PREFIX</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">get_experiment_filename</span><span class="p">(</span><span class="n">PREFIX</span><span class="p">)</span>
