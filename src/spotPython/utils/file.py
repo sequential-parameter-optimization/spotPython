@@ -250,12 +250,12 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     print(gen_design_table(fun_control))
     setup_paths(fun_control["TENSORBOARD_CLEAN"])
     spot_tuner.init_spot_writer()
-    if fun_control["tensorboard_start"]:
-        p_open = start_tensorboard()
-    else:
-        p_open = None
+    # if fun_control["tensorboard_start"]:
+    #     p_open = start_tensorboard()
+    # else:
+    #     p_open = None
     spot_tuner.run()
     # # tensorboard --logdir="runs/"
-    stop_tensorboard(p_open)
+    # stop_tensorboard(p_open)
     print(gen_design_table(fun_control=fun_control, spot=spot_tuner))
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control, p_open

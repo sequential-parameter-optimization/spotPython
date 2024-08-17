@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from torch.utils.tensorboard import SummaryWriter
 import pickle
 import pprint
 import os
@@ -14,10 +15,11 @@ import pandas as pd
 import pylab
 from scipy import optimize
 from math import isfinite
-import matplotlib.pyplot as plt
-from numpy import argmin
-from torch.utils.tensorboard import SummaryWriter
 
+import matplotlib
+import matplotlib.pyplot as plt
+
+from numpy import argmin
 from numpy import repeat
 from numpy import sqrt
 from numpy import spacing
@@ -40,6 +42,9 @@ from spotPython.hyperparameters.values import (
 import plotly.graph_objects as go
 from typing import Callable
 from spotPython.utils.numpy2json import NumpyEncoder
+
+# Setting up the backend to use QtAgg
+matplotlib.use("TkAgg")
 
 
 logger = logging.getLogger(__name__)
@@ -2317,8 +2322,8 @@ class Spot:
         Initialize the spot_writer for the current experiment.
         """
         if self.fun_control["tensorboard_start"] and self.fun_control["spot_tensorboard_path"] is not None:
-            self.spot_writer = None
-            # self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
+            # self.spot_writer = None
+            self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
         else:
             self.spot_writer = None
 
