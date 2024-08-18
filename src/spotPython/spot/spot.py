@@ -2319,17 +2319,20 @@ class Spot:
 
     def init_spot_writer(self) -> None:
         """
-        Initialize the spot_writer for the current experiment.
+        Initialize the spot_writer for the current experiment if in fun_control
+        the tensorboard_log is set to True
+        and the spot_tensorboard_path is not None.
+        Otherwise, the spot_writer is set to None.
         """
-        if self.fun_control["tensorboard_start"] and self.fun_control["spot_tensorboard_path"] is not None:
-            # self.spot_writer = None
+        if self.fun_control["tensorboard_log"] and self.fun_control["spot_tensorboard_path"] is not None:
             self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
         else:
             self.spot_writer = None
 
     def close_and_del_spot_writer(self) -> None:
         """
-        Delete the spot_writer attribute from the object.
+        Delete the spot_writer attribute from the object
+        if it exists and close the writer.
         """
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             self.spot_writer.flush()

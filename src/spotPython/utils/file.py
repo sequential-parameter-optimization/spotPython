@@ -236,7 +236,11 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
     Returns:
         tuple: A tuple containing the spot tuner, fun control,
                design control, surrogate control, optimizer control,
-               and the tensorboard process
+               and the tensorboard process object (p_popen).
+
+    Notes:
+        p_open is deprecated and should be removed in future versions.
+        It returns None.
 
     Examples:
         >>> from spotPython.utils.file import load_and_run_spot_python_experiment

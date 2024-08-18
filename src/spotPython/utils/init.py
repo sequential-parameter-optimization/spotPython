@@ -73,6 +73,7 @@ def fun_control_init(
     target_column=None,
     target_type=None,
     task=None,
+    tensorboard_log=False,
     tensorboard_start=False,
     tensorboard_stop=False,
     test=None,
@@ -134,9 +135,9 @@ def fun_control_init(
             evaluation method used in sklearn taintest.py.
             Can be "eval_test", "eval_oon_score", "train_cv" or None. Default is None.
         EXPERIMENT_NAME (str):
-            The name of the experiment. If EXPERIMENT_NAME is not None,
-            the spot_tensorboard_path is compiled and
-            a spot_writer is initialized as a SummaryWriter(spot_tensorboard_path). Default is None.
+            The name of the experiment.
+            Default is None. If None, the experiment name is generated based on the
+            current date and time.
         fun_evals (int):
             The number of function evaluations.
         fun_repeats (int):
@@ -225,6 +226,9 @@ def fun_control_init(
             Default is None.
         TENSORBOARD_CLEAN (bool):
             Whether to clean (delete) the tensorboard folder or not. Default is False.
+        tensorboard_log (bool):
+            Whether to log the tensorboard or not. Starts the SummaryWriter.
+            Default is False.
         tensorboard_start (bool):
             Whether to start the tensorboard or not. Default is False.
         tensorboard_stop (bool):
@@ -330,7 +334,7 @@ def fun_control_init(
     L.seed_everything(seed)
 
     CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH = setup_paths(TENSORBOARD_CLEAN)
-    spot_tensorboard_path = create_spot_tensorboard_path(tensorboard_start, PREFIX)
+    spot_tensorboard_path = create_spot_tensorboard_path(tensorboard_log, PREFIX)
 
     if metric_sklearn is None and metric_sklearn_name is not None:
         metric_sklearn = get_metric_sklearn(metric_sklearn_name)
@@ -405,6 +409,7 @@ def fun_control_init(
         "target_column": target_column,
         "target_type": target_type,
         "task": task,
+        "tensorboard_log": tensorboard_log,
         "tensorboard_start": tensorboard_start,
         "tensorboard_stop": tensorboard_stop,
         "test": test,
@@ -502,11 +507,11 @@ def setup_paths(tensorboard_clean) -> tuple:
     return CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH
 
 
-def create_spot_tensorboard_path(tensorboard_start, prefix) -> str:
+def create_spot_tensorboard_path(tensorboard_log, prefix) -> str:
     """Creates the spot_tensorboard_path and returns it.
 
     Args:
-        tensorboard_start (bool):
+        tensorboard_log (bool):
             If True, the path to the folder where the tensorboard files are saved is created.
         prefix (str):
             The prefix for the experiment name.
@@ -515,7 +520,7 @@ def create_spot_tensorboard_path(tensorboard_start, prefix) -> str:
         spot_tensorboard_path (str):
             The path to the folder where the tensorboard files are saved.
     """
-    if tensorboard_start:
+    if tensorboard_log:
         experiment_name = get_experiment_name(prefix=prefix)
         spot_tensorboard_path = get_spot_tensorboard_path(experiment_name)
         os.makedirs(spot_tensorboard_path, exist_ok=True)
