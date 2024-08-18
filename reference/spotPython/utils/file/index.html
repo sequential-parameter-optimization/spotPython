@@ -3999,13 +3999,19 @@ config = get_experiment_from_PREFIX(&ldquo;100&rdquo;)[&ldquo;config&rdquo;]</p>
               <div class="doc-md-description">
                 <p>A tuple containing the spot tuner, fun control,
    design control, surrogate control, optimizer control,
-   and the tensorboard process</p>
+   and the tensorboard process object (p_popen).</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
+
+<details class="notes" open>
+  <summary>Notes</summary>
+  <p>p_open is deprecated and should be removed in future versions.
+It returns None.</p>
+</details>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotPython.utils.file</span> <span class="kn">import</span> <span class="n">load_and_run_spot_python_experiment</span>
@@ -4046,7 +4052,11 @@ config = get_experiment_from_PREFIX(&ldquo;100&rdquo;)[&ldquo;config&rdquo;]</p>
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
-<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_and_run_spot_python_experiment</span><span class="p">(</span><span class="n">spot_pkl_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_and_run_spot_python_experiment</span><span class="p">(</span><span class="n">spot_pkl_name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads and runs a spot experiment.</span>
 
 <span class="sd">    Args:</span>
@@ -4056,7 +4066,11 @@ config = get_experiment_from_PREFIX(&ldquo;100&rdquo;)[&ldquo;config&rdquo;]</p>
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: A tuple containing the spot tuner, fun control,</span>
 <span class="sd">               design control, surrogate control, optimizer control,</span>
-<span class="sd">               and the tensorboard process</span>
+<span class="sd">               and the tensorboard process object (p_popen).</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        p_open is deprecated and should be removed in future versions.</span>
+<span class="sd">        It returns None.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotPython.utils.file import load_and_run_spot_python_experiment</span>
@@ -4070,13 +4084,13 @@ config = get_experiment_from_PREFIX(&ldquo;100&rdquo;)[&ldquo;config&rdquo;]</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">gen_design_table</span><span class="p">(</span><span class="n">fun_control</span><span class="p">))</span>
     <span class="n">setup_paths</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;TENSORBOARD_CLEAN&quot;</span><span class="p">])</span>
     <span class="n">spot_tuner</span><span class="o">.</span><span class="n">init_spot_writer</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;tensorboard_start&quot;</span><span class="p">]:</span>
-        <span class="n">p_open</span> <span class="o">=</span> <span class="n">start_tensorboard</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">p_open</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># if fun_control[&quot;tensorboard_start&quot;]:</span>
+    <span class="c1">#     p_open = start_tensorboard()</span>
+    <span class="c1"># else:</span>
+    <span class="c1">#     p_open = None</span>
     <span class="n">spot_tuner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
     <span class="c1"># # tensorboard --logdir=&quot;runs/&quot;</span>
-    <span class="n">stop_tensorboard</span><span class="p">(</span><span class="n">p_open</span><span class="p">)</span>
+    <span class="c1"># stop_tensorboard(p_open)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">gen_design_table</span><span class="p">(</span><span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">,</span> <span class="n">spot</span><span class="o">=</span><span class="n">spot_tuner</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">spot_tuner</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">design_control</span><span class="p">,</span> <span class="n">surrogate_control</span><span class="p">,</span> <span class="n">optimizer_control</span><span class="p">,</span> <span class="n">p_open</span>
 </code></pre></div></td></tr></table></div>
