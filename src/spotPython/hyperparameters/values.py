@@ -834,7 +834,7 @@ def get_one_core_model_from_X(
 
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            from spotriver.data.river_hyper_dict import RiverHyperDict
             fun_control = {}
             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
                 fun_control=fun_control,
@@ -866,7 +866,7 @@ def get_one_config_from_X(X, fun_control=None):
 
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            from spotriver.data.river_hyper_dict import RiverHyperDict
             fun_control = {}
             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
                 fun_control=func_control,
@@ -900,7 +900,7 @@ def get_one_sklearn_model_from_X(X, fun_control=None):
 
     Examples:
         >>> from sklearn.linear_model import LinearRegression
-            from spotRiver.data.sklearn_hyper_dict import SklearnHyperDict
+            from spotriver.data.sklearn_hyper_dict import SklearnHyperDict
             fun_control = {}
             add_core_model_to_fun_control(core_model=LinearRegression,
                 fun_control=func_control,
@@ -933,7 +933,7 @@ def get_one_river_model_from_X(X, fun_control=None):
 
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            from spotriver.data.river_hyper_dict import RiverHyperDict
             fun_control = {}
             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
                 fun_control=func_control,
@@ -964,7 +964,7 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
 
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotRiver.data.river_hyper_dict import RiverHyperDict
+            from spotriver.data.river_hyper_dict import RiverHyperDict
             from spotpython.hyperparameters.values import (
                 get_default_hyperparameters_as_array,
                 add_core_model_to_fun_control)
@@ -1000,7 +1000,7 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
 
 #     Examples:
 #         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-#             from spotRiver.data.river_hyper_dict import RiverHyperDict
+#             from spotriver.data.river_hyper_dict import RiverHyperDict
 #             fun_control = {}
 #             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
 #                 fun_control=func_control,
@@ -1499,7 +1499,7 @@ def set_int_hyperparameter_values(fun_control, key, lower, upper) -> None:
             The upper bound of the hyperparameter.
 
     Examples:
-        >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_int_hyperparameter_values
             from spotpython.utils.eda import gen_design_table
@@ -1555,7 +1555,7 @@ def set_float_hyperparameter_values(fun_control, key, lower, upper) -> None:
             The upper bound of the hyperparameter.
 
     Examples:
-        >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_float_hyperparameter_values
             from spotpython.utils.eda import gen_design_table
@@ -1595,7 +1595,7 @@ def set_boolean_hyperparameter_values(fun_control, key, lower, upper):
             The upper bound of the hyperparameter.
 
     Examples:
-        >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_boolean_hyperparameter_values
             from spotpython.utils.eda import gen_design_table
@@ -1649,7 +1649,7 @@ def set_factor_hyperparameter_values(fun_control, key, levels):
             The levels of the hyperparameter.
 
     Examples:
-        >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
+        >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_factor_hyperparameter_values
             from spotpython.utils.eda import gen_design_table

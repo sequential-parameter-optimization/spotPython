@@ -426,7 +426,7 @@ class FileConfig(Config):
 class FileDataset(Dataset):
     """Base class for datasets that are stored in a local file.
 
-    Small datasets that are part of the spotRiver package inherit from this class.
+    Small datasets that are part of the spotriver package inherit from this class.
 
     Args:
         filename (str): The file's name.
@@ -611,7 +611,7 @@ class RemoteDataset(FileDataset):
 class GenericFileDataset(Dataset):
     """Base class for datasets that are stored in a local file.
 
-    Small datasets that are part of the spotRiver package inherit from this class.
+    Small datasets that are part of the spotriver package inherit from this class.
 
     Args:
         filename (str): The file's name.
