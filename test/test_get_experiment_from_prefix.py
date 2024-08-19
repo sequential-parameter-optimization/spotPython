@@ -1,4 +1,4 @@
-from spotPython.utils.file import get_experiment_from_PREFIX
+from spotpython.utils.file import get_experiment_from_PREFIX
 import pytest
 from unittest.mock import patch
 
@@ -7,9 +7,9 @@ def test_get_experiment_from_PREFIX_invalid_prefix():
     PREFIX = "invalid"
 
     with patch(
-        "spotPython.utils.file.get_experiment_filename", return_value=None
+        "spotpython.utils.file.get_experiment_filename", return_value=None
     ) as mock_get_experiment_filename, patch(
-        "spotPython.utils.file.load_experiment", side_effect=FileNotFoundError("Experiment not found")
+        "spotpython.utils.file.load_experiment", side_effect=FileNotFoundError("Experiment not found")
     ) as mock_load_experiment:
         with pytest.raises(FileNotFoundError, match="Experiment not found"):
             get_experiment_from_PREFIX(PREFIX)

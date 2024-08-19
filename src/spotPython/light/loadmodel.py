@@ -1,4 +1,4 @@
-from spotPython.utils.eda import generate_config_id
+from spotpython.utils.eda import generate_config_id
 import os
 from typing import Any
 

@@ -2,7 +2,7 @@ from sys import stdout
 
 
 def progress_bar(
-    progress: float, bar_length: int = 10, message: str = "spotPython tuning:", y=None, filename=None
+    progress: float, bar_length: int = 10, message: str = "spotpython tuning:", y=None, filename=None
 ) -> None:
     """
     Displays or updates a console progress bar.

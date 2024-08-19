@@ -60,7 +60,7 @@ class analytical:
             np.ndarray: Noisy data.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
                 import numpy as np
                 y = np.array([1, 2, 3, 4, 5])
                 fun = analytical(sigma=1.0, seed=123)
@@ -100,7 +100,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
                 import numpy as np
                 X = np.array([[0, 0, 0], [0, 0, 1], [0, 0, 2]])
                 fun = analytical()
@@ -146,7 +146,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -180,7 +180,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -215,7 +215,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -253,7 +253,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -304,7 +304,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
                 pi = np.pi
                 X = np.array([[0,0],
                     [-pi, 12.275],
@@ -348,7 +348,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -392,7 +392,7 @@ class analytical:
             (np.ndarray): A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -433,7 +433,7 @@ class analytical:
             (np.ndarray): A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -497,7 +497,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
             >>> fun = analytical()
@@ -548,7 +548,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10, 11, 12]])
             >>> fun = analytical()
@@ -592,7 +592,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10, 11, 12]])
             >>> fun = analytical()
@@ -623,7 +623,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2,], [4, 5 ]])
             >>> fun = analytical()
@@ -656,7 +656,7 @@ class analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotPython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2,], [4, 5 ]])
             >>> fun = analytical()

@@ -12,7 +12,7 @@ def get_timestamp(only_int=True) -> str:
         str: the timestamp as a string.
 
     Examples:
-        >>> from spotPython.utils.time import get_timestamp
+        >>> from spotpython.utils.time import get_timestamp
         >>> get_timestamp()
         '2021-06-28 14:51:54.500000'
         >>> get_timestamp(only_int=True)

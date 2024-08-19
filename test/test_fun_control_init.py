@@ -1,4 +1,4 @@
-from spotPython.utils.init import fun_control_init
+from spotpython.utils.init import fun_control_init
 
 
 def test_fun_control_init():

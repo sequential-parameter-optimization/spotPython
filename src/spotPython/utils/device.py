@@ -12,7 +12,7 @@ def getDevice(device=None):
             Device for training.
 
     Examples:
-        >>> from spotPython.utils.device import getDevice
+        >>> from spotpython.utils.device import getDevice
         >>> getDevice()
         'cuda:0'
     """

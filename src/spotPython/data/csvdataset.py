@@ -106,8 +106,8 @@ class CSVDataset(Dataset):
             tuple: A tuple containing the feature and target at the given index.
 
         Examples:
-            >>> from spotPython.light.csvdataset import CSVDataset
-                dataset = CSVDataset(filename='./data/spotPython/data.csv', target_column='prognosis')
+            >>> from spotpython.light.csvdataset import CSVDataset
+                dataset = CSVDataset(filename='./data/spotpython/data.csv', target_column='prognosis')
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
                 torch.Size([11, 65])
@@ -125,7 +125,7 @@ class CSVDataset(Dataset):
             int: The length of the dataset.
 
         Examples:
-            >>> from spotPython.light import CSVDataset
+            >>> from spotpython.light import CSVDataset
             >>> dataset = CSVDataset()
             >>> print(len(dataset))
             60000
@@ -141,7 +141,7 @@ class CSVDataset(Dataset):
             str: A string representation of the dataset.
 
         Examples:
-            >>> from spotPython.light import CSVDataset
+            >>> from spotpython.light import CSVDataset
             >>> dataset = CSVDataset()
             >>> print(dataset)
             Split: Train
@@ -158,7 +158,7 @@ class CSVDataset(Dataset):
             int: The number of columns in the dataset.
 
         Examples:
-            >>> from spotPython.data.pkldataset import PKLDataset
+            >>> from spotpython.data.pkldataset import PKLDataset
                 import torch
                 from torch.utils.data import DataLoader
                 dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)

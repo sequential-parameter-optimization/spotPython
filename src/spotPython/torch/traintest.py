@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.model_selection import KFold
 import torch
-from spotPython.utils.device import getDevice
+from spotpython.utils.device import getDevice
 from torch.utils.data import random_split
-from spotPython.utils.classes import get_additional_attributes
-from spotPython.hyperparameters.optimizer import optimizer_handler
+from spotpython.utils.classes import get_additional_attributes
+from spotpython.hyperparameters.optimizer import optimizer_handler
 
 
 def remove_attributes(net, atttributes_to_remove):

@@ -1,4 +1,4 @@
-from spotPython.data.california_housing import CaliforniaHousing
+from spotpython.data.california_housing import CaliforniaHousing
 
 
 def test_california_housing():

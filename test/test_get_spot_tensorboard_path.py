@@ -1,7 +1,7 @@
 import os
 from unittest.mock import patch
 
-from spotPython.utils.init import get_spot_tensorboard_path
+from spotpython.utils.init import get_spot_tensorboard_path
 
 
 def test_get_spot_tensorboard_path():

@@ -3,9 +3,9 @@ def test_evaluate_new_X():
     Test evaluation of suggest_new_X points suggested by the surrogate
     """
     import numpy as np
-    from spotPython.spot import spot
-    from spotPython.fun.objectivefunctions import analytical
-    from spotPython.utils.init import (
+    from spotpython.spot import spot
+    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.utils.init import (
         fun_control_init,
     )
 

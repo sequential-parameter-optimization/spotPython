@@ -1,9 +1,9 @@
 import lightning as L
-from spotPython.data.lightcrossvalidationdatamodule import LightCrossValidationDataModule
-from spotPython.utils.eda import generate_config_id
+from spotpython.data.lightcrossvalidationdatamodule import LightCrossValidationDataModule
+from spotpython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from spotPython.torch.initialization import kaiming_init, xavier_init
+from spotpython.torch.initialization import kaiming_init, xavier_init
 import os
 
 

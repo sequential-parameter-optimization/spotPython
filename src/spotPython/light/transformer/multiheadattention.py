@@ -1,5 +1,5 @@
 import torch.nn as nn
-from spotPython.light.transformer.attention import scaled_dot_product
+from spotpython.light.transformer.attention import scaled_dot_product
 
 
 def expand_mask(mask):

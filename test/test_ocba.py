@@ -1,10 +1,10 @@
 import copy
 import numpy as np
-from spotPython.fun.objectivefunctions import analytical
-from spotPython.spot import spot
-from spotPython.budget.ocba import get_ocba, get_ocba_X
-from spotPython.utils.aggregate import aggregate_mean_var
-from spotPython.utils.init import fun_control_init, surrogate_control_init, design_control_init
+from spotpython.fun.objectivefunctions import analytical
+from spotpython.spot import spot
+from spotpython.budget.ocba import get_ocba, get_ocba_X
+from spotpython.utils.aggregate import aggregate_mean_var
+from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
 
 
 def test_ocba():

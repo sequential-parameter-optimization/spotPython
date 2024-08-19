@@ -33,7 +33,7 @@ class factorial(designs):
             numpy.ndarray: A 2D array representing the full factorial design.
 
         Examples:
-            >>> from spotPython.design.factorial import factorial
+            >>> from spotpython.design.factorial import factorial
                 factorial_design = factorial(k=2)
                 factorial_design.full_factorial(p=2)
                 array([[0., 0.],

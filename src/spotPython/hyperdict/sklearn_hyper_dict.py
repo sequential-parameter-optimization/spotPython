@@ -1,5 +1,5 @@
 import json
-from spotPython.data import base
+from spotpython.data import base
 import pathlib
 
 

@@ -1,5 +1,5 @@
 import numpy as np
-from spotPython.utils.transform import cod_to_nat_y, cod_to_nat_X
+from spotpython.utils.transform import cod_to_nat_y, cod_to_nat_X
 
 
 def test_cod_to_nat_y():

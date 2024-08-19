@@ -1,7 +1,7 @@
 import torch
-from spotPython.data.lightdatamodule import LightDataModule
-from spotPython.utils.scaler import TorchStandardScaler, TorchMinMaxScaler
-from spotPython.data.california_housing import CaliforniaHousing
+from spotpython.data.lightdatamodule import LightDataModule
+from spotpython.utils.scaler import TorchStandardScaler, TorchMinMaxScaler
+from spotpython.data.california_housing import CaliforniaHousing
 
 
 def test_standard_scaler():

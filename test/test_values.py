@@ -1,16 +1,16 @@
 import pytest
 import numpy as np
-from spotPython.utils.init import fun_control_init
-from spotPython.hyperparameters.values import get_bound_values
-from spotPython.hyperparameters.values import get_control_key_value, set_control_key_value
-from spotPython.hyperparameters.values import get_var_type_from_var_name
-from spotPython.hyperparameters.values import add_core_model_to_fun_control
-from spotPython.light.regression.netlightregression import NetLightRegression
-from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-from spotPython.utils.device import getDevice
-from spotPython.data.diabetes import Diabetes
-from spotPython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
-from spotPython.hyperparameters.values import set_control_hyperparameter_value
+from spotpython.utils.init import fun_control_init
+from spotpython.hyperparameters.values import get_bound_values
+from spotpython.hyperparameters.values import get_control_key_value, set_control_key_value
+from spotpython.hyperparameters.values import get_var_type_from_var_name
+from spotpython.hyperparameters.values import add_core_model_to_fun_control
+from spotpython.light.regression.netlightregression import NetLightRegression
+from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+from spotpython.utils.device import getDevice
+from spotpython.data.diabetes import Diabetes
+from spotpython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
+from spotpython.hyperparameters.values import set_control_hyperparameter_value
 
 
 def test_get_bound_values():

@@ -50,10 +50,10 @@ class PKLDataset(Dataset):
             The targets.
 
     Notes:
-        * `spotPython` comes with a sample pkl file, which is located at `spotPython/data/pkldataset.pkl`.
+        * `spotpython` comes with a sample pkl file, which is located at `spotpython/data/pkldataset.pkl`.
 
     Examples:
-        >>> from spotPython.data.pkldataset import PKLDataset
+        >>> from spotpython.data.pkldataset import PKLDataset
             import torch
             from torch.utils.data import DataLoader
             dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
@@ -89,10 +89,10 @@ class PKLDataset(Dataset):
             Targets: tensor([ 0,  1,  6,  9, 10])
         >>> # Load the data from a different directory:
         >>> # Similar to the above example, but with a different target column, full path, and different data type
-        >>> from spotPython.data.pkldataset import PKLDataset
+        >>> from spotpython.data.pkldataset import PKLDataset
             import torch
             from torch.utils.data import DataLoader
-            dataset = PKLDataset(directory="/Users/bartz/workspace/spotPython/notebooks/data/spotPython/",
+            dataset = PKLDataset(directory="/Users/bartz/workspace/spotpython/notebooks/data/spotpython/",
                                 filename="data_sensitive.pkl",
                                 target_column='N',
                                 feature_type=torch.float32,
@@ -183,7 +183,7 @@ class PKLDataset(Dataset):
             tuple: A tuple containing the feature and target at the given index.
 
         Examples:
-            >>> from spotPython.data.pkldataset import PKLDataset
+            >>> from spotpython.data.pkldataset import PKLDataset
                 import torch
                 from torch.utils.data import DataLoader
                 dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
@@ -204,7 +204,7 @@ class PKLDataset(Dataset):
             int: The length of the dataset.
 
         Examples:
-            >>> from spotPython.data.pkldataset import PKLDataset
+            >>> from spotpython.data.pkldataset import PKLDataset
                 import torch
                 from torch.utils.data import DataLoader
                 dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
@@ -221,7 +221,7 @@ class PKLDataset(Dataset):
             str: A string with the filename and directory of the dataset.
 
         Examples:
-            >>> from spotPython.data.pkldataset import PKLDataset
+            >>> from spotpython.data.pkldataset import PKLDataset
                 import torch
                 from torch.utils.data import DataLoader
                 dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)
@@ -237,7 +237,7 @@ class PKLDataset(Dataset):
             int: The number of columns in the dataset.
 
         Examples:
-            >>> from spotPython.data.pkldataset import PKLDataset
+            >>> from spotpython.data.pkldataset import PKLDataset
                 import torch
                 from torch.utils.data import DataLoader
                 dataset = PKLDataset(target_column='prognosis', feature_type=torch.long)

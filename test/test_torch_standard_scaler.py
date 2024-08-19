@@ -1,6 +1,6 @@
 import pytest
 import torch
-from spotPython.utils.scaler import TorchStandardScaler
+from spotpython.utils.scaler import TorchStandardScaler
 
 
 def test_fit():

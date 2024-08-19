@@ -4,8 +4,8 @@ import json
 from sklearn.pipeline import make_pipeline
 
 from typing import Union, List, Dict, Generator, Any
-from spotPython.utils.convert import class_for_name
-from spotPython.utils.transform import transform_hyper_parameter_values
+from spotpython.utils.convert import class_for_name
+from spotpython.utils.transform import transform_hyper_parameter_values
 
 # Begin Important, do not delete the following imports, they are needed for the function add_core_model_to_fun_control
 import river
@@ -25,8 +25,8 @@ import sklearn.neighbors
 import sklearn.svm
 import sklearn.preprocessing
 
-import spotPython
-from spotPython.light import regression
+import spotpython
+from spotpython.light import regression
 
 # End Important
 
@@ -56,7 +56,7 @@ def generate_one_config_from_var_dict(
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.hyperparameters.values import generate_one_config_from_var_dict
+        >>> from spotpython.hyperparameters.values import generate_one_config_from_var_dict
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {"var_type": ["int", "num"]}
         >>> list(generate_one_config_from_var_dict(var_dict, fun_control))
@@ -91,7 +91,7 @@ def return_conf_list_from_var_dict(
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.hyperparameters.values import return_conf_list_from_var_dict
+        >>> from spotpython.hyperparameters.values import return_conf_list_from_var_dict
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> fun_control = {'var_type': ['int', 'int']}
         >>> return_conf_list_from_var_dict(var_dict, fun_control)
@@ -117,7 +117,7 @@ def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, 
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.hyperparameters.values import iterate_dict_values
+        >>> from spotpython.hyperparameters.values import iterate_dict_values
         >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
         >>> list(iterate_dict_values(var_dict))
         [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
@@ -144,7 +144,7 @@ def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> D
         dict: The modified dictionary with values converted to integers based on `var_type`.
 
     Examples:
-        >>> from spotPython.hyperparameters.values import convert_keys
+        >>> from spotpython.hyperparameters.values import convert_keys
         >>> d = {'a': '1.1', 'b': '2', 'c': '3.1'}
         >>> var_type = ["int", "num", "int"]
         >>> convert_keys(d, var_type)
@@ -292,7 +292,7 @@ def assign_values(X: np.array, var_list: list) -> dict:
 
     Examples:
         >>> import numpy as np
-        >>> from spotPython.hyperparameters.values import assign_values
+        >>> from spotpython.hyperparameters.values import assign_values
         >>> X = np.array([[1, 2], [3, 4], [5, 6]])
         >>> var_list = ['a', 'b']
         >>> result = assign_values(X, var_list)
@@ -344,7 +344,7 @@ def modify_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
 
     Examples:
         >>> fun_control = {}
-            from spotPython.hyperparameters.values import modify_hyper_parameter_levels
+            from spotpython.hyperparameters.values import modify_hyper_parameter_levels
             core_model  = HoeffdingTreeRegressor
             fun_control.update({"core_model": core_model})
             fun_control.update({"core_model_hyper_dict": river_hyper_dict[core_model.__name__]})
@@ -373,7 +373,7 @@ def modify_hyper_parameter_bounds(fun_control, hyperparameter, bounds) -> None:
         None.
 
     Examples:
-        >>> from spotPython.hyperparameters.values import modify_hyper_parameter_levels
+        >>> from spotpython.hyperparameters.values import modify_hyper_parameter_levels
             fun_control = {}
             core_model  = HoeffdingTreeRegressor
             fun_control.update({"core_model": core_model})
@@ -398,7 +398,7 @@ def get_default_values(fun_control) -> dict:
             dictionary with default values
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_default_values
+        >>> from spotpython.hyperparameters.values import get_default_values
             d = {"core_model_hyper_dict":{
                 "leaf_prediction": {
                     "levels": ["mean", "model", "adaptive"],
@@ -458,7 +458,7 @@ def get_var_type(fun_control) -> list:
             list with types
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_var_type
+        >>> from spotpython.hyperparameters.values import get_var_type
             d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
@@ -508,7 +508,7 @@ def get_transform(fun_control) -> list:
             list with transformations
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_transform
+        >>> from spotpython.hyperparameters.values import get_transform
             d = {"core_model_hyper_dict":{
             "leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
@@ -561,7 +561,7 @@ def get_var_name(fun_control) -> list:
             ist with names
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_var_name
+        >>> from spotpython.hyperparameters.values import get_var_name
             fun_control = {"core_model_hyper_dict":{
                         "leaf_prediction": {
                             "levels": ["mean", "model", "adaptive"],
@@ -629,7 +629,7 @@ def get_bound_values(fun_control: dict, bound: str, as_list: bool = False) -> Un
             If bound is not "upper" or "lower".
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_bound_values
+        >>> from spotpython.hyperparameters.values import get_bound_values
         >>> fun_control = {"core_model_hyper_dict": {"a": {"upper": 1}, "b": {"upper": 2}}}
         >>> get_bound_values(fun_control, "upper", as_list=True)
         [1, 2]
@@ -677,7 +677,7 @@ def replace_levels_with_positions(hyper_dict, hyper_dict_values) -> dict:
             dictionary with values
 
     Examples:
-        >>> from spotPython.hyperparameters.values import replace_levels_with_positions
+        >>> from spotpython.hyperparameters.values import replace_levels_with_positions
             hyper_dict = {"leaf_prediction": {
                 "levels": ["mean", "model", "adaptive"],
                 "type": "factor",
@@ -744,7 +744,7 @@ def get_values_from_dict(dictionary) -> np.array:
             array with values
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_values_from_dict
+        >>> from spotpython.hyperparameters.values import get_values_from_dict
         >>> d = {"a": 1, "b": 2, "c": 3}
         >>> get_values_from_dict(d)
         array([1, 2, 3])
@@ -784,15 +784,15 @@ def add_core_model_to_fun_control(fun_control, core_model, hyper_dict=None, file
         These remain unmodified, while the "core_model_hyper_dict" key is modified during the tuning process.
 
     Examples:
-        >>> from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+        >>> from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
             add_core_model_to_fun_control(fun_control=fun_control,
                                         core_model=NetLightRegression,
                                         hyper_dict=LightHyperDict)
             # or, if a user wants to use a custom hyper_dict:
-        >>> from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+        >>> from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
             add_core_model_to_fun_control(fun_control=fun_control,
                                         core_model=NetLightRegression,
                                         filename="./hyperdict/user_hyper_dict.json")
@@ -965,7 +965,7 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
     Examples:
         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
             from spotRiver.data.river_hyper_dict import RiverHyperDict
-            from spotPython.hyperparameters.values import (
+            from spotpython.hyperparameters.values import (
                 get_default_hyperparameters_as_array,
                 add_core_model_to_fun_control)
             fun_control = {}
@@ -1087,8 +1087,8 @@ def set_control_key_value(control_dict, key, value, replace=False) -> None:
         value (Any): value
 
     Examples:
-        >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_control_key_value
+        >>> from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_control_key_value
             control_dict = fun_control_init()
             set_control_key_value(control_dict=control_dict,
                           key="key",
@@ -1152,8 +1152,8 @@ def get_control_key_value(control_dict=None, key=None) -> Any:
             value
 
     Examples:
-        >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import get_control_key_value
+        >>> from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import get_control_key_value
             control_dict = fun_control_init()
             get_control_key_value(control_dict=control_dict,
                             key="key")
@@ -1198,8 +1198,8 @@ def get_var_type_from_var_name(fun_control, var_name) -> str:
         (str): variable type
 
     Examples:
-        >>> from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import get_var_type_from_var_name
+        >>> from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import get_var_type_from_var_name
             control_dict = fun_control_init()
             get_var_type_from_var_name(var_name="max_depth",
                             fun_control=control_dict)
@@ -1247,17 +1247,17 @@ def get_ith_hyperparameter_name_from_fun_control(fun_control, key, i):
         (str): hyperparameter name
 
     Examples:
-        >>> from spotPython.utils.device import getDevice
-            from spotPython.utils.init import fun_control_init
-            from spotPython.utils.file import get_experiment_name
+        >>> from spotpython.utils.device import getDevice
+            from spotpython.utils.init import fun_control_init
+            from spotpython.utils.file import get_experiment_name
             import numpy as np
-            from spotPython.data.diabetes import Diabetes
-            from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            from spotPython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.hyperparameters.values import set_control_hyperparameter_value
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
+            from spotpython.hyperparameters.values import get_ith_hyperparameter_name_from_fun_control
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.hyperparameters.values import set_control_hyperparameter_value
             experiment_name = get_experiment_name(prefix="000")
             fun_control = fun_control_init(
                 _L_in=10,
@@ -1312,13 +1312,13 @@ def get_tuned_hyperparameters(spot_tuner, fun_control=None) -> dict:
             dictionary containing the tuned hyperparameters.
 
     Examples:
-        >>> from spotPython.utils.device import getDevice
+        >>> from spotpython.utils.device import getDevice
             from math import inf
-            from spotPython.utils.init import fun_control_init
+            from spotpython.utils.init import fun_control_init
             import numpy as np
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.data.diabetes import Diabetes
-            from spotPython.hyperparameters.values import get_tuned_hyperparameters
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.hyperparameters.values import get_tuned_hyperparameters
             MAX_TIME = 1
             FUN_EVALS = 10
             INIT_SIZE = 5
@@ -1346,13 +1346,13 @@ def get_tuned_hyperparameters(spot_tuner, fun_control=None) -> dict:
                 test_size=TEST_SIZE,
                 tolerance_x=np.sqrt(np.spacing(1)),
                 )
-            from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
+            from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
             add_core_model_to_fun_control(fun_control=fun_control,
                                         core_model=NetLightRegression,
                                         hyper_dict=LightHyperDict)
-            from spotPython.hyperparameters.values import set_control_hyperparameter_value
+            from spotpython.hyperparameters.values import set_control_hyperparameter_value
             set_control_hyperparameter_value(fun_control, "l1", [7, 8])
             set_control_hyperparameter_value(fun_control, "epochs", [3, 5])
             set_control_hyperparameter_value(fun_control, "batch_size", [4, 5])
@@ -1367,13 +1367,13 @@ def get_tuned_hyperparameters(spot_tuner, fun_control=None) -> dict:
                             "ReLU",
                             "LeakyReLU"
                         ] )
-            from spotPython.utils.init import design_control_init, surrogate_control_init
+            from spotpython.utils.init import design_control_init, surrogate_control_init
             design_control = design_control_init(init_size=INIT_SIZE)
             surrogate_control = surrogate_control_init(noise=True,
                                                         n_theta=2)
-            from spotPython.fun.hyperlight import HyperLight
+            from spotpython.fun.hyperlight import HyperLight
             fun = HyperLight(log_level=50).fun
-            from spotPython.spot import spot
+            from spotpython.spot import spot
             spot_tuner = spot.Spot(fun=fun,
                                 fun_control=fun_control,
                                 design_control=design_control,
@@ -1500,9 +1500,9 @@ def set_int_hyperparameter_values(fun_control, key, lower, upper) -> None:
 
     Examples:
         >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_int_hyperparameter_values
-            from spotPython.utils.eda import gen_design_table
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_int_hyperparameter_values
+            from spotpython.utils.eda import gen_design_table
             fun_control = fun_control_init(
                 core_model_name="forest.AMFRegressor",
                 hyperdict=RiverHyperDict,
@@ -1556,9 +1556,9 @@ def set_float_hyperparameter_values(fun_control, key, lower, upper) -> None:
 
     Examples:
         >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_float_hyperparameter_values
-            from spotPython.utils.eda import gen_design_table
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_float_hyperparameter_values
+            from spotpython.utils.eda import gen_design_table
             fun_control = fun_control_init(
                 core_model_name="forest.AMFRegressor",
                 hyperdict=RiverHyperDict,
@@ -1596,9 +1596,9 @@ def set_boolean_hyperparameter_values(fun_control, key, lower, upper):
 
     Examples:
         >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_boolean_hyperparameter_values
-            from spotPython.utils.eda import gen_design_table
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_boolean_hyperparameter_values
+            from spotpython.utils.eda import gen_design_table
             fun_control = fun_control_init(
                 core_model_name="forest.AMFRegressor",
                 hyperdict=RiverHyperDict,
@@ -1650,9 +1650,9 @@ def set_factor_hyperparameter_values(fun_control, key, levels):
 
     Examples:
         >>> from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_factor_hyperparameter_values
-            from spotPython.utils.eda import gen_design_table
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_factor_hyperparameter_values
+            from spotpython.utils.eda import gen_design_table
             fun_control = fun_control_init(
                 core_model_name="tree.HoeffdingTreeRegressor",
                 hyperdict=RiverHyperDict,
@@ -1727,7 +1727,7 @@ def get_river_core_model_from_name(core_model_name: str) -> tuple:
         (str, object): A tuple containing the core model name and an instance of the core model.
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_core_model_from_name
+        >>> from spotpython.hyperparameters.values import get_core_model_from_name
             model_name, model_instance = get_core_model_from_name('tree.HoeffdingTreeRegressor')
             print(f"Model Name: {model_name}, Model Instance: {model_instance}")
                 Model Name:
@@ -1751,7 +1751,7 @@ def get_river_core_model_from_name(core_model_name: str) -> tuple:
 
 def get_core_model_from_name(core_model_name: str) -> tuple:
     """
-    Returns the sklearn or spotPython lightning core model name and instance from a core model name.
+    Returns the sklearn or spotpython lightning core model name and instance from a core model name.
 
     Args:
         core_model_name (str): The full name of the core model in the format 'module.Model'.
@@ -1765,7 +1765,7 @@ def get_core_model_from_name(core_model_name: str) -> tuple:
                 Model Name:
                 NNLinearRegressor,
                 Model Instance:
-                <class 'spotPython.light.regression.nn_linear_regressor.NNLinearRegressor'>
+                <class 'spotpython.light.regression.nn_linear_regressor.NNLinearRegressor'>
     """
     # Split the model name into its components
     name_parts = core_model_name.split(".")
@@ -1779,17 +1779,17 @@ def get_core_model_from_name(core_model_name: str) -> tuple:
         return model_name, core_model_instance
     except AttributeError:
         try:
-            # Try to get the model from the spotPython library
+            # Try to get the model from the spotpython library
             submodule_name = name_parts[1]
             model_name = name_parts[2] if len(name_parts) == 3 else model_name
             print(f"module_name: {module_name}")
             print(f"submodule_name: {submodule_name}")
             print(f"model_name: {model_name}")
-            core_model_instance = getattr(getattr(getattr(spotPython, module_name), submodule_name), model_name)
+            core_model_instance = getattr(getattr(getattr(spotpython, module_name), submodule_name), model_name)
             return model_name, core_model_instance
         except AttributeError:
             raise ValueError(
-                f"Model '{core_model_name}' not found in either 'sklearn' or 'spotPython lightning' libraries."
+                f"Model '{core_model_name}' not found in either 'sklearn' or 'spotpython lightning' libraries."
             )
 
 
@@ -1877,7 +1877,7 @@ def set_hyperparameter(fun_control, key, values):
                 - For factor: a list of strings representing levels.
 
     Examples:
-        >>> from spotPython.hyperparameters.values import set_hyperparameter
+        >>> from spotpython.hyperparameters.values import set_hyperparameter
         >>> fun_control = {
                 "core_model_hyper_dict": {
                     "n_estimators": {"type": "int", "default": 10, "lower": 2, "upper": 1000},

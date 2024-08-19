@@ -1,5 +1,5 @@
 from torch import nn
-import spotPython.torch.netcore as netcore
+import spotpython.torch.netcore as netcore
 
 
 class Net_lin_reg(netcore.Net_Core):

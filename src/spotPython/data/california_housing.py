@@ -41,7 +41,7 @@ class CaliforniaHousing(Dataset):
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.data.california_housing import CaliforniaHousing
+            from spotpython.data.california_housing import CaliforniaHousing
             import torch
             dataset = CaliforniaHousing(feature_type=torch.float32, target_type=torch.float32)
             # Set batch size for DataLoader
@@ -74,7 +74,7 @@ class CaliforniaHousing(Dataset):
             tuple: A tuple containing the features and targets.
 
         Examples:
-            >>> from spotPython.data.california_housing import CaliforniaHousing
+            >>> from spotpython.data.california_housing import CaliforniaHousing
                 dataset = CaliforniaHousing()
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
@@ -99,7 +99,7 @@ class CaliforniaHousing(Dataset):
             tuple: A tuple containing the feature and target at the given index.
 
         Examples:
-            >>> from spotPython.data.california_housing import CaliforniaHousing
+            >>> from spotpython.data.california_housing import CaliforniaHousing
                 dataset = CaliforniaHousing()
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
@@ -118,7 +118,7 @@ class CaliforniaHousing(Dataset):
             int: The length of the dataset.
 
         Examples:
-            >>> from spotPython.data.california_housing import CaliforniaHousing
+            >>> from spotpython.data.california_housing import CaliforniaHousing
                 dataset = CaliforniaHousing()
                 print(len(dataset))
                 20640
@@ -133,7 +133,7 @@ class CaliforniaHousing(Dataset):
             str: A string representation of the dataset.
 
         Examples:
-            >>> from spotPython.light import CSVDataset
+            >>> from spotpython.light import CSVDataset
             >>> dataset = CSVDataset()
             >>> print(dataset)
             Split: Train
@@ -150,7 +150,7 @@ class CaliforniaHousing(Dataset):
             list: A list containing the names of the features.
 
         Examples:
-            >>> from spotPython.data.california_housing import CaliforniaHousing
+            >>> from spotpython.data.california_housing import CaliforniaHousing
                 dataset = CaliforniaHousing()
                 print(dataset.get_names())
                 ['MedInc', 'HouseAge', 'AveRooms', 'AveBedrms', 'Population', 'AveOccup', 'Latitude', 'Longitude']

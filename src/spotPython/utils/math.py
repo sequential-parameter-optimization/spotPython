@@ -13,7 +13,7 @@ def generate_div2_list(n, n_min) -> list:
         list: A list of numbers from n to n_min (inclusive).
 
     Examples:
-        from spotPython.utils.math import generate_div2_list
+        from spotpython.utils.math import generate_div2_list
         generate_div2_list(10, 1)
         [10, 5, 5, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         generate_div2_list(10, 2)

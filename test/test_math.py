@@ -1,4 +1,4 @@
-from spotPython.utils.math import generate_div2_list
+from spotpython.utils.math import generate_div2_list
 
 
 def test_generate_div2_list():

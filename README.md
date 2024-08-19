@@ -2,32 +2,32 @@
   <img height="200" src="img/spotLogo.png" alt="spot_logo">
 </p>
 
-# spotPython
+# spotpython
 
 Sequential Parameter Optimization in Python
 
-* spotPython is a Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade [bart21i].
-* spotPython is a sequential model-based optimization (SMBO) method [BLP05].
+* spotpython is a Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade [bart21i].
+* spotpython is a sequential model-based optimization (SMBO) method [BLP05].
 
 
 # Installation
 
 * Installation can be done with `pip`:
 
-`pip install spotPython`
+`pip install spotpython`
 
-# spotPython Documentation
+# spotpython Documentation
 
-* Hyperparameter-tuning Cookbook: A guide for scikit-learn, PyTorch, river, and spotPython. Available at [https://sequential-parameter-optimization.github.io/spotPython/](https://sequential-parameter-optimization.github.io/spotPython/).
+* Hyperparameter-tuning Cookbook: A guide for scikit-learn, PyTorch, river, and spotpython. Available at [https://sequential-parameter-optimization.github.io/spotpython/](https://sequential-parameter-optimization.github.io/spotpython/).
 
-* [Bartz-Beielstein (2023). PyTorch Hyperparameter Tuning --- A Tutorial for spotPython (Working Paper)](https://arxiv.org/abs/2305.11930).
+* [Bartz-Beielstein (2023). PyTorch Hyperparameter Tuning --- A Tutorial for spotpython (Working Paper)](https://arxiv.org/abs/2305.11930).
 
-    > **Abstract**: The goal of hyperparameter tuning (or hyperparameter optimization) is to optimize the hyperparameters to improve the performance of the machine or deep learning model. spotPython ("Sequential Parameter Optimization Toolbox in Python") is the Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade. PyTorch is an optimized tensor library for deep learning using GPUs and CPUs. This document shows how to integrate the spotPython hyperparameter tuner into the PyTorch training workflow.  As an example, the results of the CIFAR10 image classifier are used. In addition to an introduction to spotPython, this tutorial also includes a brief comparison with Ray Tune, a Python library for running experiments and tuning hyperparameters. This comparison is based on the PyTorch hyperparameter tuning tutorial. The advantages and disadvantages of both approaches are discussed. We show that spotPython achieves similar or even better results while being more flexible and transparent than Ray Tune.
+    > **Abstract**: The goal of hyperparameter tuning (or hyperparameter optimization) is to optimize the hyperparameters to improve the performance of the machine or deep learning model. spotpython ("Sequential Parameter Optimization Toolbox in Python") is the Python version of the well-known hyperparameter tuner SPOT, which has been developed in the R programming environment for statistical analysis for over a decade. PyTorch is an optimized tensor library for deep learning using GPUs and CPUs. This document shows how to integrate the spotpython hyperparameter tuner into the PyTorch training workflow.  As an example, the results of the CIFAR10 image classifier are used. In addition to an introduction to spotpython, this tutorial also includes a brief comparison with Ray Tune, a Python library for running experiments and tuning hyperparameters. This comparison is based on the PyTorch hyperparameter tuning tutorial. The advantages and disadvantages of both approaches are discussed. We show that spotpython achieves similar or even better results while being more flexible and transparent than Ray Tune.
 
 
-# spotPython Features
+# spotpython Features
 
-* Some of the advantages of `spotPython` are:
+* Some of the advantages of `spotpython` are:
 
   - Numerical and categorical hyperparameters.
   - Powerful surrogate models.
@@ -42,7 +42,7 @@ Sequential Parameter Optimization in Python
 ```bibtex
 @ARTICLE{bart23earxiv,
        author = {{Bartz-Beielstein}, Thomas},
-        title = "{PyTorch Hyperparameter Tuning -- A Tutorial for spotPython}",
+        title = "{PyTorch Hyperparameter Tuning -- A Tutorial for spotpython}",
       journal = {arXiv e-prints},
      keywords = {Computer Science - Machine Learning, Computer Science - Artificial Intelligence, Mathematics - Numerical Analysis, 68T07, A.1, B.8.0, G.1.6, G.4, I.2.8},
          year = 2023,
@@ -94,8 +94,8 @@ archivePrefix = {arXiv},
 
 # Appendix
 
-* This appendix contains some information on how to setup the development environment for spotPython.
-Information provided here is not required for the installation of spotPython.
+* This appendix contains some information on how to setup the development environment for spotpython.
+Information provided here is not required for the installation of spotpython.
 
 ## Styleguide
 
@@ -140,7 +140,7 @@ Follow the Google Python Style Guide from [https://google.github.io/styleguide/p
    * `pyproject.toml`: see [pyproject.toml](./pyproject.toml). 
    * Important: Follow the instructions from [https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html](https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html) for including data files (like *.csv, *.tar, etc.). These files can be specified in the following `MANIFEST` file:
      * `MANIFEST`: see [MANIFEST](MANIFEST.in). It describes the data files to be included, e.g.:
-       * `include src/spotPython/data/*.rst`
+       * `include src/spotpython/data/*.rst`
     * `LICENSE`: see [LICENSE](./LICENSE)
 
 ### Local Installation
@@ -150,7 +150,7 @@ Follow the Google Python Style Guide from [https://google.github.io/styleguide/p
     * `python3 -m pip install --upgrade build`
   * Start the package building process via:  `python3 -m build` 
   * This command should output a lot of text and once completed should generate two files in the `dist` directory.
-  * You can use the local `spotPython*.tar.gz` file from the `dist` folder for your package installation with `pip`, e.g.;
-  * `python3 -m pip install ./dist/spotPython-0.0.1.tar.gz`
+  * You can use the local `spotpython*.tar.gz` file from the `dist` folder for your package installation with `pip`, e.g.;
+  * `python3 -m pip install ./dist/spotpython-0.0.1.tar.gz`
 
 

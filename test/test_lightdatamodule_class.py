@@ -1,7 +1,7 @@
 import pytest
 import torch
-from spotPython.data.lightdatamodule import LightDataModule
-from spotPython.data.csvdataset import CSVDataset
+from spotpython.data.lightdatamodule import LightDataModule
+from spotpython.data.csvdataset import CSVDataset
 
 
 class TestLightDataModule:

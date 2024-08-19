@@ -1,6 +1,6 @@
 import pytest
 import torch
-from spotPython.utils.scaler import TorchMinMaxScaler
+from spotpython.utils.scaler import TorchMinMaxScaler
 
 
 def test_min_max_scaler_fit():

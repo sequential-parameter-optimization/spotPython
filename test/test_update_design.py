@@ -1,7 +1,7 @@
 import numpy as np
-from spotPython.fun.objectivefunctions import analytical
-from spotPython.spot import spot
-from spotPython.utils.init import fun_control_init, design_control_init
+from spotpython.fun.objectivefunctions import analytical
+from spotpython.spot import spot
+from spotpython.utils.init import fun_control_init, design_control_init
 
 
 def test_update_design():

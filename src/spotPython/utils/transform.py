@@ -28,7 +28,7 @@ def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
 
         >>> import numpy as np
         >>> from scipy.stats import qmc
-        >>> from spotPython.utils.transform import scale
+        >>> from spotpython.utils.transform import scale
         >>> lower = np.array([6, 0])
         >>> upper = np.array([6, 5])
         >>> sample = np.array([[0.5 , 0.75],
@@ -59,7 +59,7 @@ def transform_multby2_int(x: int) -> int:
             The result of multiplying x by 2.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_multby2_int
+        >>> from spotpython.utils.transform import transform_multby2_int
         >>> transform_multby2_int(3)
         6
     """
@@ -76,7 +76,7 @@ def transform_power_2_int(x: int) -> int:
         (int): The result of raising 2 to the power of x.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_power_2_int
+        >>> from spotpython.utils.transform import transform_power_2_int
         >>> transform_power_2_int(3)
         8
     """
@@ -92,7 +92,7 @@ def transform_power_10_int(x: int) -> int:
         (int): The result of raising 10 to the power of x.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_power_10_int
+        >>> from spotpython.utils.transform import transform_power_10_int
         >>> transform_power_10_int(3)
         1000
     """
@@ -109,7 +109,7 @@ def transform_power_2(x):
         (float): The result of raising 2 to the power of x.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_power_2
+        >>> from spotpython.utils.transform import transform_power_2
         >>> transform_power_2(3)
         8
     """
@@ -126,7 +126,7 @@ def transform_power_10(x):
         (float): The result of raising 10 to the power of x.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_power_10
+        >>> from spotpython.utils.transform import transform_power_10
         >>> transform_power_10(3)
         1000
     """
@@ -144,7 +144,7 @@ def transform_none_to_None(x):
         (str): The transformed string.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_none_to_None
+        >>> from spotpython.utils.transform import transform_none_to_None
         >>> transform_none_to_None("none")
         None
 
@@ -174,7 +174,7 @@ def transform_power(base: int, x: int, as_int: bool = False) -> float:
             The result of raising the base to the power of x.
 
     Examples:
-        >>> from spotPython.utils.transform import transform_power
+        >>> from spotpython.utils.transform import transform_power
         >>> transform_power(2, 3)
         8
     """
@@ -210,7 +210,7 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
 
     Examples:
         >>> import copy
-            from spotPython.utils.prepare import transform_hyper_parameter_values
+            from spotpython.utils.prepare import transform_hyper_parameter_values
             fun_control = {
             "core_model_hyper_dict": {
                 "leaf_prediction": {

@@ -1,6 +1,6 @@
 from spotRiver.hyperdict.river_hyper_dict import RiverHyperDict
-from spotPython.utils.init import fun_control_init
-from spotPython.hyperparameters.values import (
+from spotpython.utils.init import fun_control_init
+from spotpython.hyperparameters.values import (
     set_int_hyperparameter_values,
     set_float_hyperparameter_values,
     set_boolean_hyperparameter_values,

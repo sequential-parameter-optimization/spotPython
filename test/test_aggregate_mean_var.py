@@ -18,7 +18,7 @@ def test_aggregate_mean_var_var():
 
     """
     import numpy as np
-    from spotPython.utils.aggregate import aggregate_mean_var
+    from spotpython.utils.aggregate import aggregate_mean_var
 
     X_1 = np.ones((2, 3))
     y_1 = np.sum(X_1, axis=1)

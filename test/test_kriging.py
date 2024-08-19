@@ -1,4 +1,4 @@
-from spotPython.build.kriging import Kriging
+from spotpython.build.kriging import Kriging
 import numpy as np
 from math import erf
 from numpy import log, var
@@ -11,7 +11,7 @@ def test_interpolation_property():
     check if the difference between the mean prediction
     and the true value in the training points is smaller than 1e-6.
     """
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
     import numpy as np
     from numpy import linspace, arange
 
@@ -224,7 +224,7 @@ def test_initialize_matrices():
 
 
 def test_fun_likelihood():
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
     import numpy as np
 
     nat_X = np.array([[0], [1]])

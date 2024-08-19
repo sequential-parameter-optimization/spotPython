@@ -2,11 +2,11 @@ from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
-from spotPython.hyperparameters.values import assign_values
-from spotPython.hyperparameters.values import (
+from spotpython.hyperparameters.values import assign_values
+from spotpython.hyperparameters.values import (
     generate_one_config_from_var_dict,
 )
-from spotPython.sklearn.traintest import evaluate_cv, evaluate_model_oob, evaluate_hold_out, evaluate_model
+from spotpython.sklearn.traintest import evaluate_cv, evaluate_model_oob, evaluate_hold_out, evaluate_model
 import logging
 from sklearn.metrics import mean_absolute_error
 
@@ -33,7 +33,7 @@ class HyperSklearn:
         log_level (int): log level for logger.
 
     Examples:
-        >>> from spotPython.fun.hypersklearn import HyperSklearn
+        >>> from spotpython.fun.hypersklearn import HyperSklearn
         >>> hyper_sklearn = HyperSklearn(seed=126, log_level=50)
         >>> print(hyper_sklearn.seed)
         126
@@ -73,7 +73,7 @@ class HyperSklearn:
             Exception: if the second dimension of X does not match the length of var_name in fun_control.
 
         Examples:
-            >>> from spotPython.fun.hypersklearn import HyperSklearn
+            >>> from spotpython.fun.hypersklearn import HyperSklearn
             >>> hyper_sklearn = HyperSklearn(seed=126, log_level=50)
             >>> hyper_sklearn.fun_control["var_name"] = ["a", "b", "c"]
             >>> hyper_sklearn.check_X_shape(X=np.array([[1, 2, 3]]))

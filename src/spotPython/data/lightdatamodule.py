@@ -51,9 +51,9 @@ class LightDataModule(L.LightningDataModule):
             Returns a DataLoader instance for the test set.
 
     Examples:
-        >>> from spotPython.data.lightdatamodule import LightDataModule
-            from spotPython.data.csvdataset import CSVDataset
-            from spotPython.utils.scaler import TorchStandardScaler
+        >>> from spotpython.data.lightdatamodule import LightDataModule
+            from spotpython.data.csvdataset import CSVDataset
+            from spotpython.utils.scaler import TorchStandardScaler
             import torch
             # data.csv is simple csv file with 11 samples
             dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
@@ -104,7 +104,7 @@ class LightDataModule(L.LightningDataModule):
         Uses torch.utils.data.random_split() to split the data.
         Splitting is based on the test_size and test_seed.
         The test_size can be a float or an int.
-        If a spotPython scaler object is defined, the data will be scaled.
+        If a spotpython scaler object is defined, the data will be scaled.
 
         Args:
             stage (Optional[str]):
@@ -112,8 +112,8 @@ class LightDataModule(L.LightningDataModule):
                 or None (for all three stages). Defaults to None.
 
         Examples:
-            >>> from spotPython.data.lightdatamodule import LightDataModule
-                from spotPython.data.csvdataset import CSVDataset
+            >>> from spotpython.data.lightdatamodule import LightDataModule
+                from spotpython.data.csvdataset import CSVDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -213,8 +213,8 @@ class LightDataModule(L.LightningDataModule):
             DataLoader: The training dataloader.
 
         Examples:
-            >>> from spotPython.data.lightdatamodule import LightDataModule
-                from spotPython.data.csvdataset import CSVDataset
+            >>> from spotpython.data.lightdatamodule import LightDataModule
+                from spotpython.data.csvdataset import CSVDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -238,8 +238,8 @@ class LightDataModule(L.LightningDataModule):
             DataLoader: The validation dataloader.
 
         Examples:
-            >>> from spotPython.data.lightdatamodule import LightDataModule
-                from spotPython.data.csvdataset import CSVDataset
+            >>> from spotpython.data.lightdatamodule import LightDataModule
+                from spotpython.data.csvdataset import CSVDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -262,8 +262,8 @@ class LightDataModule(L.LightningDataModule):
             DataLoader: The test dataloader.
 
         Examples:
-            >>> from spotPython.data.lightdatamodule import LightDataModule
-                from spotPython.data.csvdataset import CSVDataset
+            >>> from spotpython.data.lightdatamodule import LightDataModule
+                from spotpython.data.csvdataset import CSVDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)
@@ -287,8 +287,8 @@ class LightDataModule(L.LightningDataModule):
             DataLoader: The predict dataloader.
 
         Examples:
-            >>> from spotPython.data.lightdatamodule import LightDataModule
-                from spotPython.data.csvdataset import CSVDataset
+            >>> from spotpython.data.lightdatamodule import LightDataModule
+                from spotpython.data.csvdataset import CSVDataset
                 import torch
                 dataset = CSVDataset(csv_file='data.csv', target_column='prognosis', feature_type=torch.long)
                 data_module = LightDataModule(dataset=dataset, batch_size=5, test_size=0.5)

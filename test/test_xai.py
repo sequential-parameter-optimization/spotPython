@@ -1,6 +1,6 @@
 import numpy as np
 import pprint
-from spotPython.plot.xai import plot_nn_values_scatter
+from spotpython.plot.xai import plot_nn_values_scatter
 
 
 def test_plot_nn_values_scatter_reshaped_values():

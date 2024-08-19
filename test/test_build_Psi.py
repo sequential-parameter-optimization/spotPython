@@ -2,18 +2,18 @@ def test_build_Psi():
     """
     Test build_Psi
     """
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
     import numpy as np
     import copy
     from numpy import argmin
     from numpy import ones, zeros, log, var, float64
     from numpy import empty_like
     from numpy import array
-    from spotPython.design.spacefilling import spacefilling
-    from spotPython.fun.objectivefunctions import analytical
-    from spotPython.spot import spot
-    from spotPython.utils.repair import repair_non_numeric
-    from spotPython.utils.init import (
+    from spotpython.design.spacefilling import spacefilling
+    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.spot import spot
+    from spotpython.utils.repair import repair_non_numeric
+    from spotpython.utils.init import (
         fun_control_init,
         surrogate_control_init,
         design_control_init,

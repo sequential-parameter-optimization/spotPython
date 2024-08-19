@@ -2,8 +2,8 @@ import logging
 import numpy as np
 import pprint
 from numpy.random import default_rng
-from spotPython.light.trainmodel import train_model
-from spotPython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
+from spotpython.light.trainmodel import train_model
+from spotpython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
 
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -59,12 +59,12 @@ class HyperLight:
 
         Examples:
             >>> import numpy as np
-                from spotPython.utils.init import fun_control_init
-                from spotPython.light.regression.netlightregression import NetLightRegression
-                from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-                from spotPython.hyperparameters.values import add_core_model_to_fun_control
-                from spotPython.fun.hyperlight import HyperLight
-                from spotPython.hyperparameters.values import get_var_name
+                from spotpython.utils.init import fun_control_init
+                from spotpython.light.regression.netlightregression import NetLightRegression
+                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.hyperparameters.values import add_core_model_to_fun_control
+                from spotpython.fun.hyperlight import HyperLight
+                from spotpython.hyperparameters.values import get_var_name
                 fun_control = fun_control_init()
                 add_core_model_to_fun_control(core_model=NetLightRegression,
                                             fun_control=fun_control,
@@ -101,14 +101,14 @@ class HyperLight:
                 array containing the evaluation results.
 
         Examples:
-            >>> from spotPython.utils.init import fun_control_init
-                from spotPython.light.regression.netlightregression import NetLightRegression
-                from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-                from spotPython.hyperparameters.values import (add_core_model_to_fun_control,
+            >>> from spotpython.utils.init import fun_control_init
+                from spotpython.light.regression.netlightregression import NetLightRegression
+                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.hyperparameters.values import (add_core_model_to_fun_control,
                     get_default_hyperparameters_as_array)
-                from spotPython.fun.hyperlight import HyperLight
-                from spotPython.data.diabetes import Diabetes
-                from spotPython.hyperparameters.values import set_control_key_value
+                from spotpython.fun.hyperlight import HyperLight
+                from spotpython.data.diabetes import Diabetes
+                from spotpython.hyperparameters.values import set_control_key_value
                 import numpy as np
                 fun_control = fun_control_init(
                     _L_in=10,

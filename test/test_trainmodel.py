@@ -1,11 +1,11 @@
-from spotPython.utils.init import fun_control_init
-from spotPython.light.regression.netlightregression import NetLightRegression
-from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-from spotPython.hyperparameters.values import add_core_model_to_fun_control, get_default_hyperparameters_as_array
-from spotPython.data.diabetes import Diabetes
-from spotPython.hyperparameters.values import set_control_key_value
-from spotPython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict
-from spotPython.light.trainmodel import train_model
+from spotpython.utils.init import fun_control_init
+from spotpython.light.regression.netlightregression import NetLightRegression
+from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+from spotpython.hyperparameters.values import add_core_model_to_fun_control, get_default_hyperparameters_as_array
+from spotpython.data.diabetes import Diabetes
+from spotpython.hyperparameters.values import set_control_key_value
+from spotpython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict
+from spotpython.light.trainmodel import train_model
 
 
 def test_trainmodel():

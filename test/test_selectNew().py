@@ -1,4 +1,4 @@
-from spotPython.utils.compare import selectNew
+from spotpython.utils.compare import selectNew
 import numpy as np
 
 

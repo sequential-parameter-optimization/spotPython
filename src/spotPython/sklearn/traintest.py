@@ -1,8 +1,8 @@
 import numpy as np
-from spotPython.utils.convert import get_Xy_from_df
+from spotpython.utils.convert import get_Xy_from_df
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import make_scorer
-from spotPython.utils.metrics import mapk_scorer
+from spotpython.utils.metrics import mapk_scorer
 import pandas as pd
 
 

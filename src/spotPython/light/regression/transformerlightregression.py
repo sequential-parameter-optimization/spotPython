@@ -2,10 +2,10 @@ import lightning as L
 import torch
 import torch.nn.functional as F
 from torch import nn
-from spotPython.hyperparameters.optimizer import optimizer_handler
-from spotPython.light.transformer.skiplinear import SkipLinear
-from spotPython.light.transformer.positionalEncoding import PositionalEncoding
-from spotPython.utils.math import generate_div2_list
+from spotpython.hyperparameters.optimizer import optimizer_handler
+from spotpython.light.transformer.skiplinear import SkipLinear
+from spotpython.light.transformer.positionalEncoding import PositionalEncoding
+from spotpython.utils.math import generate_div2_list
 import torchmetrics.functional.regression
 
 
@@ -43,7 +43,7 @@ class TransformerLightRegression(L.LightningModule):
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.data.diabetes import Diabetes
+            from spotpython.data.diabetes import Diabetes
             from torch import nn
             import lightning as L
             PATH_DATASETS = './data'
@@ -329,9 +329,9 @@ class TransformerLightRegression(L.LightningModule):
         Notes:
             The default Lightning way is to define an optimizer as
             `optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)`.
-            spotPython uses an optimizer handler to create the optimizer, which
+            spotpython uses an optimizer handler to create the optimizer, which
             adapts the learning rate according to the lr_mult hyperparameter as
-            well as other hyperparameters. See `spotPython.hyperparameters.optimizer.py` for details.
+            well as other hyperparameters. See `spotpython.hyperparameters.optimizer.py` for details.
 
         Returns:
             torch.optim.Optimizer: The optimizer to use during training.

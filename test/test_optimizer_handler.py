@@ -1,6 +1,6 @@
 from torch.utils.data import DataLoader
-from spotPython.data.diabetes import Diabetes
-from spotPython.light.regression.netlightregression import NetLightRegression
+from spotpython.data.diabetes import Diabetes
+from spotpython.light.regression.netlightregression import NetLightRegression
 from torch import nn
 import lightning as L
 

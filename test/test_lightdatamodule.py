@@ -1,6 +1,6 @@
 import torch
-from spotPython.data.lightdatamodule import LightDataModule
-from spotPython.data.csvdataset import CSVDataset
+from spotpython.data.lightdatamodule import LightDataModule
+from spotpython.data.csvdataset import CSVDataset
 
 
 def test_light_data_module():

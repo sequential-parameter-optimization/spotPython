@@ -1,5 +1,5 @@
 import pytest
-from spotPython.hyperparameters.values import set_hyperparameter
+from spotpython.hyperparameters.values import set_hyperparameter
 
 
 def test_set_hyperparameter_int():

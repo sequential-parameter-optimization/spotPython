@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from spotPython.data.csvdataset import CSVDataset
+from spotpython.data.csvdataset import CSVDataset
 
 
 def test_csv_dataset():

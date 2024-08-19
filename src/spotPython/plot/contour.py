@@ -30,7 +30,7 @@ def simple_contour(
     Examples:
         >>> import matplotlib.pyplot as plt
             import numpy as np
-            from spotPython.fun.objectivefunctions import analytical
+            from spotpython.fun.objectivefunctions import analytical
             fun = analytical().fun_branin
             simple_contour(fun=fun, n_levels=30, min_x=-5, max_x=10, min_y=0, max_y=15)
 

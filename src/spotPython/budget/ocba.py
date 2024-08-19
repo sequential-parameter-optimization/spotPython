@@ -2,7 +2,7 @@
 OCBA: Optimal Computing Budget Allocation
 """
 
-from spotPython.utils.aggregate import get_ranks
+from spotpython.utils.aggregate import get_ranks
 from numpy import int32, float64
 from numpy import argpartition, repeat
 from numpy import zeros, square, sqrt, full, around, array
@@ -44,9 +44,9 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
     Examples:
         >>> import copy
             import numpy as np
-            from spotPython.fun.objectivefunctions import analytical
-            from spotPython.spot import spot
-            from spotPython.budget.ocba import get_ocba
+            from spotpython.fun.objectivefunctions import analytical
+            from spotpython.spot import spot
+            from spotpython.budget.ocba import get_ocba
             # Example is based on the example from the book:
             # Chun-Hung Chen and Loo Hay Lee:
             #     Stochastic Simulation Optimization: An Optimal Computer Budget Allocation,
@@ -81,11 +81,11 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
             assert sum(o) == 50
             assert (o == np.array([[11, 9, 19, 9, 2]])).all()
             o
-            spotPython tuning: -1.000367786651468 [####------] 45.00%
-            spotPython tuning: -1.000989121350348 [######----] 60.00%
-            spotPython tuning: -1.000989121350348 [########--] 75.00%
-            spotPython tuning: -1.000989121350348 [#########-] 90.00%
-            spotPython tuning: -1.000989121350348 [##########] 100.00% Done...
+            spotpython tuning: -1.000367786651468 [####------] 45.00%
+            spotpython tuning: -1.000989121350348 [######----] 60.00%
+            spotpython tuning: -1.000989121350348 [########--] 75.00%
+            spotpython tuning: -1.000989121350348 [#########-] 90.00%
+            spotpython tuning: -1.000989121350348 [##########] 100.00% Done...
             array([11,  9, 19,  9,  2])
     """
     if np.all(vars > 0) and (means.shape[0] > 2):
@@ -162,8 +162,8 @@ def get_ocba_X(X, means, vars, delta, verbose=False) -> float64:
         (numpy.ndarray): Repeated array of X along the specified axis based on the OCBA allocation.
 
     Examples:
-        >>> from spotPython.budget.ocba import get_ocba_X
-            from spotPython.utils.aggregate import aggregate_mean_var
+        >>> from spotpython.budget.ocba import get_ocba_X
+            from spotpython.utils.aggregate import aggregate_mean_var
             import numpy as np
             X = np.array([[1,2,3],
                         [1,2,3],

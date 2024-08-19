@@ -1,7 +1,7 @@
 import pytest
 import river
-import spotPython
-from spotPython.hyperparameters.values import get_river_core_model_from_name
+import spotpython
+from spotpython.hyperparameters.values import get_river_core_model_from_name
 
 
 def test_valid_river_model():

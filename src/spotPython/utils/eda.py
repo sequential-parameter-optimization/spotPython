@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from spotPython.hyperparameters.values import (
+from spotpython.hyperparameters.values import (
     get_default_values,
     get_bound_values,
     get_var_name,
@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from spotPython.utils.time import get_timestamp
+from spotpython.utils.time import get_timestamp
 
 
 def get_stars(input_list) -> list:
@@ -26,7 +26,7 @@ def get_stars(input_list) -> list:
             A list of strings.
 
     Examples:
-        >>> from spotPython.utils.eda import convert_list
+        >>> from spotpython.utils.eda import convert_list
         >>> get_stars([100, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
         [***, '', '', '', '', '', '', '', '']
     """
@@ -60,8 +60,8 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
             Use the `print` function to display the table.
 
     Examples:
-        >>> from spotPython.utils.eda import gen_design_table
-        >>> from spotPython.hyperparameters.values import get_default_values
+        >>> from spotpython.utils.eda import gen_design_table
+        >>> from spotpython.hyperparameters.values import get_default_values
         >>> fun_control = {
         ...     "x1": {"type": "int", "default": 1, "lower": 1, "upper": 10},
         ...     "x2": {"type": "int", "default": 1, "lower": 1, "upper": 10},
@@ -132,8 +132,8 @@ def compare_two_tree_models(model1, model2, headers=["Parameter", "Default", "Sp
             A table with the comparison of the two models.
 
     Examples:
-        >>> from spotPython.utils.eda import compare_two_tree_models
-        >>> from spotPython.hyperparameters.values import get_default_values
+        >>> from spotpython.utils.eda import compare_two_tree_models
+        >>> from spotpython.hyperparameters.values import get_default_values
         >>> fun_control = {
         ...     "x1": {"type": "int", "default": 1, "lower": 1, "upper": 10},
         ...     "x2": {"type": "int", "default": 1, "lower": 1, "upper": 10},
@@ -176,7 +176,7 @@ def generate_config_id(config, hash=False, timestamp=False):
             A unique id for the configuration.
 
     Examples:
-        >>> from spotPython.hyperparameters.values import get_one_config_from_X
+        >>> from spotpython.hyperparameters.values import get_one_config_from_X
         >>> X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1,-1))
         >>> config = get_one_config_from_X(X, fun_control)
         >>> generate_config_id(config)

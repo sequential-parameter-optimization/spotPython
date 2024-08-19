@@ -6,7 +6,7 @@ import numpy as np
 import socket
 import datetime
 from dateutil.tz import tzlocal
-from spotPython.hyperparameters.values import (
+from spotpython.hyperparameters.values import (
     add_core_model_to_fun_control,
     get_core_model_from_name,
     get_river_core_model_from_name,
@@ -273,7 +273,7 @@ def fun_control_init(
             loss function, metrics, and the hyperparameters.
 
     Examples:
-        >>> from spotPython.utils.init import fun_control_init
+        >>> from spotpython.utils.init import fun_control_init
             fun_control = fun_control_init(_L_in=64, _L_out=11, num_workers=0, device=None)
             fun_control
             {'CHECKPOINT_PATH': 'saved_models/',
@@ -470,7 +470,7 @@ def setup_paths(tensorboard_clean) -> tuple:
             The path to the folder where the tensorboard files are saved.
 
     Examples:
-        >>> from spotPython.utils.init import setup_paths
+        >>> from spotpython.utils.init import setup_paths
         >>> setup_paths(tensorboard_clean=True)
         ('runs/saved_models/', 'data/', 'results/', 'runs/')
 
@@ -734,7 +734,7 @@ def get_experiment_name(prefix: str = "00") -> str:
         str: Unique experiment name.
 
     Examples:
-        >>> from spotPython.utils.init import get_experiment_name
+        >>> from spotpython.utils.init import get_experiment_name
         >>> get_experiment_name(prefix="00")
         00_ubuntu_2021-08-31_14-30-00
     """
@@ -755,7 +755,7 @@ def get_spot_tensorboard_path(experiment_name) -> str:
         spot_tensorboard_path (str): The path to the folder where the spot tensorboard files are saved.
 
     Examples:
-        >>> from spotPython.utils.init import get_spot_tensorboard_path
+        >>> from spotpython.utils.init import get_spot_tensorboard_path
         >>> get_spot_tensorboard_path("00_ubuntu_2021-08-31_14-30-00")
         runs/spot_logs/00_ubuntu_2021-08-31_14-30-00
 
@@ -775,7 +775,7 @@ def get_tensorboard_path(fun_control) -> str:
         tensorboard_path (str): The path to the folder where the tensorboard files are saved.
 
     Examples:
-        >>> from spotPython.utils.init import get_tensorboard_path
+        >>> from spotpython.utils.init import get_tensorboard_path
         >>> get_tensorboard_path(fun_control)
         runs/
     """
@@ -797,7 +797,7 @@ def get_feature_names(fun_control: Dict[str, Any]) -> List[str]:
         ValueError: If "data_set" is None.
 
     Examples:
-        >>> from spotPython.utils.init import get_feature_names
+        >>> from spotpython.utils.init import get_feature_names
             get_feature_names(fun_control)
     """
     data_set = fun_control.get("data_set")

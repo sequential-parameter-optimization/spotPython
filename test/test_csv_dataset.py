@@ -1,4 +1,4 @@
-from spotPython.data.csvdataset import CSVDataset
+from spotpython.data.csvdataset import CSVDataset
 import pytest
 import torch
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder

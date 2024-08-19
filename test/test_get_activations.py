@@ -1,12 +1,12 @@
 from torch.utils.data import DataLoader
-from spotPython.utils.init import fun_control_init
-from spotPython.data.diabetes import Diabetes
-from spotPython.light.regression.netlightregression import NetLightRegression
-from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-from spotPython.hyperparameters.values import get_default_hyperparameters_as_array, get_one_config_from_X
-from spotPython.hyperparameters.values import set_control_key_value
-from spotPython.plot.xai import get_activations
-from spotPython.hyperparameters.values import add_core_model_to_fun_control
+from spotpython.utils.init import fun_control_init
+from spotpython.data.diabetes import Diabetes
+from spotpython.light.regression.netlightregression import NetLightRegression
+from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+from spotpython.hyperparameters.values import get_default_hyperparameters_as_array, get_one_config_from_X
+from spotpython.hyperparameters.values import set_control_key_value
+from spotpython.plot.xai import get_activations
+from spotpython.hyperparameters.values import add_core_model_to_fun_control
 import numpy as np
 
 

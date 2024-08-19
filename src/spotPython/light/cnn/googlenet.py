@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 import torch.nn as nn
-from spotPython.light.cnn.inceptionblock import InceptionBlock
+from spotpython.light.cnn.inceptionblock import InceptionBlock
 
 
 class GoogleNet(nn.Module):
@@ -29,7 +29,7 @@ class GoogleNet(nn.Module):
             Output tensor of the GoogleNet architecture
 
     Examples:
-        >>> from spotPython.light.cnn.googlenet import GoogleNet
+        >>> from spotpython.light.cnn.googlenet import GoogleNet
             import torch
             import torch.nn as nn
             model = GoogleNet()

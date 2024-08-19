@@ -3,7 +3,7 @@ def test_set_de_bounds():
     Test set_de_bounds
     """
     import numpy as np
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
 
     X_train = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
     y_train = np.array([1.0, 2.0, 3.0])
@@ -59,14 +59,14 @@ def test_set_de_bounds():
     assert S.Lambda == res_Lambda
 
     # 2nd Test Series
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
     import numpy as np
     import copy
     from numpy import linspace
     from numpy import ones, zeros, log, var, float64
     from numpy import empty_like
     from numpy import array
-    from spotPython.design.spacefilling import spacefilling
+    from spotpython.design.spacefilling import spacefilling
 
     # One-dim objective function
     ni = 11

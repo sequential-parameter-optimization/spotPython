@@ -8,7 +8,7 @@ def start_tensorboard() -> subprocess.Popen:
         process: The process of the tensorboard server.
 
     Examples:
-        >>> from spotPython.utils.tensorboard import start_tensorboard
+        >>> from spotpython.utils.tensorboard import start_tensorboard
         >>> process = start_tensorboard()
 
     """
@@ -28,7 +28,7 @@ def stop_tensorboard(process) -> None:
         None
 
     Examples:
-        >>> from spotPython.utils.tensorboard import start_tensorboard, stop_tensorboard
+        >>> from spotpython.utils.tensorboard import start_tensorboard, stop_tensorboard
         >>> process = start_tensorboard()
         >>> stop_tensorboard(process)
     """

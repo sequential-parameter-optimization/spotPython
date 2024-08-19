@@ -1,7 +1,7 @@
-from spotPython.light.regression.netlightregression import NetLightRegression
-from spotPython.utils.init import fun_control_init
-from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-from spotPython.hyperparameters.values import add_core_model_to_fun_control
+from spotpython.light.regression.netlightregression import NetLightRegression
+from spotpython.utils.init import fun_control_init
+from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+from spotpython.hyperparameters.values import add_core_model_to_fun_control
 
 
 def test_add_core_model_to_fun_control():

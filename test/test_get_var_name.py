@@ -1,4 +1,4 @@
-from spotPython.hyperparameters.values import get_var_name
+from spotpython.hyperparameters.values import get_var_name
 
 
 def test_get_var_name():

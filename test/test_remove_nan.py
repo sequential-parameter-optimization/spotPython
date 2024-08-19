@@ -1,5 +1,5 @@
 import numpy as np
-from spotPython.utils.repair import remove_nan
+from spotpython.utils.repair import remove_nan
 import pytest
 import warnings
 

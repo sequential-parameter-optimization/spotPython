@@ -19,7 +19,7 @@ class SkipLinear(torch.nn.Module):
             the output dimension
 
     Examples:
-        >>> from spotPython.light.transformer.skiplinear import SkipLinear
+        >>> from spotpython.light.transformer.skiplinear import SkipLinear
             import torch
             n_in = 2
             n_out = 4

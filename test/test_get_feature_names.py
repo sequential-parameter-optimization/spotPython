@@ -1,5 +1,5 @@
 import pytest
-from spotPython.utils.init import get_feature_names  # Replace 'your_module_name' with the actual module name
+from spotpython.utils.init import get_feature_names  # Replace 'your_module_name' with the actual module name
 
 
 class MockDataSet:

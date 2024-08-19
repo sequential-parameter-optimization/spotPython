@@ -2,7 +2,7 @@ import lightning as L
 import torch
 from torch import nn
 import torch.optim as optim
-from spotPython.light.cnn.googlenet import GoogleNet
+from spotpython.light.cnn.googlenet import GoogleNet
 
 
 class NetCNNBase(L.LightningModule):
@@ -20,8 +20,8 @@ class NetCNNBase(L.LightningModule):
             (object): model object.
 
         Examples:
-            >>> from spotPython.light.cnn.netcnnbase import NetCNNBase
-                from spotPython.light.cnn.googlenet import GoogleNet
+            >>> from spotpython.light.cnn.netcnnbase import NetCNNBase
+                from spotpython.light.cnn.googlenet import GoogleNet
                 import torch
                 import torch.nn as nn
                 model_hparams = {"c_in": 3, "c_out": 10, "act_fn": nn.ReLU, "optimizer_name": "Adam"}

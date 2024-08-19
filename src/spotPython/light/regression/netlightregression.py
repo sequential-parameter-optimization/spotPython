@@ -1,7 +1,7 @@
 import lightning as L
 import torch
 from torch import nn
-from spotPython.hyperparameters.optimizer import optimizer_handler
+from spotpython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
 
 
@@ -40,8 +40,8 @@ class NetLightRegression(L.LightningModule):
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.data.diabetes import Diabetes
-            from spotPython.light.netlightregression import NetLightRegression
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.netlightregression import NetLightRegression
             from torch import nn
             import lightning as L
             PATH_DATASETS = './data'
@@ -298,9 +298,9 @@ class NetLightRegression(L.LightningModule):
         Notes:
             The default Lightning way is to define an optimizer as
             `optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)`.
-            spotPython uses an optimizer handler to create the optimizer, which
+            spotpython uses an optimizer handler to create the optimizer, which
             adapts the learning rate according to the lr_mult hyperparameter as
-            well as other hyperparameters. See `spotPython.hyperparameters.optimizer.py` for details.
+            well as other hyperparameters. See `spotpython.hyperparameters.optimizer.py` for details.
 
         Returns:
             torch.optim.Optimizer: The optimizer to use during training.

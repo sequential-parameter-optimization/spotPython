@@ -7,10 +7,10 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.colors as colors
-from spotPython.hyperparameters.values import get_tuned_architecture
-from spotPython.light.trainmodel import train_model
-from spotPython.light.loadmodel import load_light_from_checkpoint
-from spotPython.utils.classes import get_removed_attributes_and_base_net
+from spotpython.hyperparameters.values import get_tuned_architecture
+from spotpython.light.trainmodel import train_model
+from spotpython.light.loadmodel import load_light_from_checkpoint
+from spotpython.utils.classes import get_removed_attributes_and_base_net
 import pandas as pd
 from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradients
 from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
@@ -36,16 +36,16 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.data.diabetes import Diabetes
-            from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            from spotPython.hyperparameters.values import (
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
+            from spotpython.hyperparameters.values import (
                     get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.plot.xai import get_activations
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.plot.xai import get_activations
             fun_control = fun_control_init(
                 _L_in=10, # 10: diabetes
                 _L_out=1,
@@ -106,16 +106,16 @@ def get_weights(net, return_index=False) -> dict:
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.data.diabetes import Diabetes
-            from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            from spotPython.hyperparameters.values import (
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
+            from spotpython.hyperparameters.values import (
                     get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.plot.xai import get_activations
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.plot.xai import get_activations
             fun_control = fun_control_init(
                 _L_in=10, # 10: diabetes
                 _L_out=1,
@@ -190,16 +190,16 @@ def get_gradients(net, fun_control, batch_size, device="cpu") -> dict:
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.utils.init import fun_control_init
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.data.diabetes import Diabetes
-            from spotPython.light.regression.netlightregression import NetLightRegression
-            from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotPython.hyperparameters.values import add_core_model_to_fun_control
-            from spotPython.hyperparameters.values import (
+            from spotpython.utils.init import fun_control_init
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import add_core_model_to_fun_control
+            from spotpython.hyperparameters.values import (
                     get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotPython.hyperparameters.values import set_control_key_value
-            from spotPython.plot.xai import get_activations
+            from spotpython.hyperparameters.values import set_control_key_value
+            from spotpython.plot.xai import get_activations
             fun_control = fun_control_init(
                 _L_in=10, # 10: diabetes
                 _L_out=1,

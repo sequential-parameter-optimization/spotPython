@@ -36,7 +36,7 @@ class Diabetes(Dataset):
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotPython.data.diabetes import Diabetes
+            from spotpython.data.diabetes import Diabetes
             import torch
             dataset = Diabetes(feature_type=torch.float32, target_type=torch.float32)
             # Set batch size for DataLoader
@@ -69,7 +69,7 @@ class Diabetes(Dataset):
             tuple: A tuple containing the features and targets.
 
         Examples:
-            >>> from spotPython.data.diabetes import Diabetes
+            >>> from spotpython.data.diabetes import Diabetes
                 dataset = Diabetes()
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
@@ -94,8 +94,8 @@ class Diabetes(Dataset):
             tuple: A tuple containing the feature and target at the given index.
 
         Examples:
-            >>> from spotPython.light.csvdataset import CSVDataset
-                dataset = CSVDataset(filename='./data/spotPython/data.csv', target_column='prognosis')
+            >>> from spotpython.light.csvdataset import CSVDataset
+                dataset = CSVDataset(filename='./data/spotpython/data.csv', target_column='prognosis')
                 print(dataset.data.shape)
                 print(dataset.targets.shape)
                 torch.Size([11, 65])
@@ -113,7 +113,7 @@ class Diabetes(Dataset):
             int: The length of the dataset.
 
         Examples:
-            >>> from spotPython.light import CSVDataset
+            >>> from spotpython.light import CSVDataset
             >>> dataset = CSVDataset()
             >>> print(len(dataset))
             60000
@@ -129,7 +129,7 @@ class Diabetes(Dataset):
             str: A string representation of the dataset.
 
         Examples:
-            >>> from spotPython.light import CSVDataset
+            >>> from spotpython.light import CSVDataset
             >>> dataset = CSVDataset()
             >>> print(dataset)
             Split: Train
@@ -146,7 +146,7 @@ class Diabetes(Dataset):
             list: A list containing the names of the features.
 
         Examples:
-            >>> from spotPython.data.diabetes import Diabetes
+            >>> from spotpython.data.diabetes import Diabetes
                 dataset = Diabetes()
                 print(dataset.get_names())
                 ["age", "sex", "bmi", "bp", "tc", "ldl", "hdl", "tch", "ltg", "glu"]

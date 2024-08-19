@@ -13,7 +13,7 @@ class TorchStandardScaler:
 
     Examples:
         >>> import torch
-        >>> from spotPython.utils.scaler import TorchStandardScaler
+        >>> from spotpython.utils.scaler import TorchStandardScaler
         # Create a sample tensor
         >>> tensor = torch.rand((10, 3))  # Random tensor with shape (10, 3)
         >>> scaler = TorchStandardScaler()
@@ -99,7 +99,7 @@ class TorchMinMaxScaler:
 
     Examples:
         >>> import torch
-        >>> from spotPython.utils.scaler import TorchMinMaxScaler
+        >>> from spotpython.utils.scaler import TorchMinMaxScaler
         >>> scaler = TorchMinMaxScaler()
         # Given a tensor
         >>> tensor = torch.tensor([[1.0, 2.0], [3.0, 4.0]])

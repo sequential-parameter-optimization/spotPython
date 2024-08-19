@@ -16,7 +16,7 @@ def class_for_name(module_name, class_name) -> object:
         object: The class.
 
     Examples:
-        >>> from spotPython.utils.convert import class_for_name
+        >>> from spotpython.utils.convert import class_for_name
             from scipy.optimize import rosen
             bounds = [(0,2), (0, 2), (0, 2), (0, 2), (0, 2)]
             shgo_class = class_for_name("scipy.optimize", "shgo")
@@ -38,7 +38,7 @@ def get_Xy_from_df(df, target_column) -> tuple:
         tuple: The tuple (X, y).
 
     Examples:
-        >>> from spotPython.utils.convert import get_Xy_from_df
+        >>> from spotpython.utils.convert import get_Xy_from_df
         >>> import pandas as pd
         >>> df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9]})
         >>> X, y = get_Xy_from_df(df, "c")
@@ -68,7 +68,7 @@ def series_to_array(series):
         (numpy.ndarray): The output array.
 
     Examples:
-        >>> from spotPython.utils.convert import series_to_array
+        >>> from spotpython.utils.convert import series_to_array
         >>> import pandas as pd
         >>> series = pd.Series([1, 2, 3])
         >>> series_to_array(series)
@@ -132,7 +132,7 @@ def map_to_True_False(value):
             True if the value is "True" or "true", False otherwise.
 
     Examples:
-    >>> from spotPython.utils.convert import map_to_True_False
+    >>> from spotpython.utils.convert import map_to_True_False
         map_to_True_False("True")
         True
     """
@@ -159,7 +159,7 @@ def sort_by_kth_and_return_indices(array, k) -> list:
             `k+1` elements, or if k is out of bounds for any sub-array.
 
     Examples:
-        >>> from spotPython.utils.convert import sort_by_kth_and_return_indices
+        >>> from spotpython.utils.convert import sort_by_kth_and_return_indices
             try:
                 array = [['x0', 85.50983192204619], ['x1', 100.0], ['x2', 81.35712613549178]]
                 k = 1  # Sort by the second element in each sub-array
@@ -195,7 +195,7 @@ def check_type(value) -> str:
             Checks for numpy types as well, i.e., np.integer, np.floating, np.str_, np.bool_.
 
     Examples:
-        >>> from spotPython.utils.convert import check_type
+        >>> from spotpython.utils.convert import check_type
         >>> check_type(5)
         "int"
 
@@ -224,7 +224,7 @@ def set_dataset_target_type(dataset, target="y") -> pd.DataFrame:
             The dataset with boolean and string target column values set to 0 and 1.
 
     Examples:
-    >>> from spotPython.utils.convert import set_dataset_target_type
+    >>> from spotpython.utils.convert import set_dataset_target_type
         import pandas as pd
         dataset = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6], "c": [7, 8, 9], "y": [True, False, True]})
         print(dataset)

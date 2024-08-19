@@ -3,8 +3,8 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 from torchmetrics.functional import accuracy
-from spotPython.torch.mapk import MAPK
-from spotPython.hyperparameters.optimizer import optimizer_handler
+from spotpython.torch.mapk import MAPK
+from spotpython.hyperparameters.optimizer import optimizer_handler
 
 
 class NetLightBaseMAPK(L.LightningModule):

@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 from unittest.mock import Mock
-from spotPython.spot import spot
-from spotPython.utils.init import fun_control_init
+from spotpython.spot import spot
+from spotpython.utils.init import fun_control_init
 
 
 @pytest.fixture

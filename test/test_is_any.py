@@ -1,4 +1,4 @@
-from spotPython.build.kriging import Kriging
+from spotpython.build.kriging import Kriging
 from numpy import power
 import numpy as np
 

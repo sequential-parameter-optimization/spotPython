@@ -1,3 +1,3 @@
-# Install spotPython
+# Install spotpython
 
-    pip install spotPython
+    pip install spotpython

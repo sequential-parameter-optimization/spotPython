@@ -23,7 +23,7 @@ class MAPK(torchmetrics.Metric):
             The number of batches processed.
 
     Examples:
-        >>> from spotPython.torch.mapk import MAPK
+        >>> from spotpython.torch.mapk import MAPK
             import torch
             mapk = MAPK(k=2)
             target = torch.tensor([0, 1, 2, 2])
@@ -58,7 +58,7 @@ class MAPK(torchmetrics.Metric):
             (NoneType): None
 
         Examples:
-            >>> from spotPython.torch.mapk import MAPK
+            >>> from spotpython.torch.mapk import MAPK
             >>> import torch
             >>> mapk = MAPK(k=2)
             >>> target = torch.tensor([0, 1, 2, 2])

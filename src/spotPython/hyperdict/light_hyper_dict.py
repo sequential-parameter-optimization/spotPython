@@ -1,5 +1,5 @@
 import json
-from spotPython.data import base
+from spotpython.data import base
 import pathlib
 
 
@@ -36,7 +36,7 @@ class LightHyperDict(base.FileConfig):
             dict: A dictionary containing the hyperparameters.
 
         Examples:
-            >>> from spotPython.hyperdict.light_hyper_dict import LightHyperDict
+            >>> from spotpython.hyperdict.light_hyper_dict import LightHyperDict
                 lhd = LightHyperDict()
                 lhd.hyper_dict
                 {'NetLightRegression': {'l1': {'type': 'int',

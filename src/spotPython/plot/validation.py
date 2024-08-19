@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.metrics import PredictionErrorDisplay
 from sklearn.metrics import RocCurveDisplay
 from sklearn.metrics import ConfusionMatrixDisplay
-from spotPython.utils.convert import get_Xy_from_df
+from spotpython.utils.convert import get_Xy_from_df
 from typing import Any, Dict, List, Union
 import pandas as pd
 
@@ -153,7 +153,7 @@ def plot_roc_from_dataframes(
 
     Examples:
         >>> import pandas as pd
-            from spotPython.plot.validation import plot_roc_from_dataframes
+            from spotpython.plot.validation import plot_roc_from_dataframes
             df1 = pd.DataFrame({"y": [1, 0, 0, 1], "Prediction": [1,0,0,0]})
             df2 = pd.DataFrame({"y": [1, 0, 0, 1], "Prediction": [1,0,1,1]})
             df_list = [df1, df2]
@@ -260,7 +260,7 @@ def plot_actual_vs_predicted(y_test, y_pred, title=None, show=True, filename=Non
     Examples:
         >>> from sklearn.datasets import load_diabetes
             from sklearn.linear_model import LinearRegression
-            from spotPython.plot.validation import plot_actual_vs_predicted
+            from spotpython.plot.validation import plot_actual_vs_predicted
             X, y = load_diabetes(return_X_y=True)
             lr = LinearRegression()
             lr.fit(X, y)

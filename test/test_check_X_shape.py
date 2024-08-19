@@ -1,10 +1,10 @@
 import numpy as np
-from spotPython.utils.init import fun_control_init
-from spotPython.light.regression.netlightregression import NetLightRegression
-from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-from spotPython.hyperparameters.values import add_core_model_to_fun_control
-from spotPython.fun.hyperlight import HyperLight
-from spotPython.hyperparameters.values import get_var_name
+from spotpython.utils.init import fun_control_init
+from spotpython.light.regression.netlightregression import NetLightRegression
+from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+from spotpython.hyperparameters.values import add_core_model_to_fun_control
+from spotpython.fun.hyperlight import HyperLight
+from spotpython.hyperparameters.values import get_var_name
 
 
 def test_check_X_shape():

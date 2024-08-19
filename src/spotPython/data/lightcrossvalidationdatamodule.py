@@ -24,7 +24,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         data_val (Optional[Dataset]): The validation dataset.
 
     Examples:
-        >>> from spotPython.light import LightCrossValidationDataModule
+        >>> from spotpython.light import LightCrossValidationDataModule
         >>> data_module = LightCrossValidationDataModule()
         >>> data_module.setup()
         >>> print(f"Training set size: {len(data_module.data_train)}")
@@ -112,7 +112,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
             DataLoader: The training dataloader.
 
         Examples:
-            >>> from spotPython.light import LightCrossValidationDataModule
+            >>> from spotpython.light import LightCrossValidationDataModule
             >>> data_module = LightCrossValidationDataModule()
             >>> data_module.setup()
             >>> train_dataloader = data_module.train_dataloader()
@@ -136,7 +136,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
             DataLoader: The validation dataloader.
 
         Examples:
-            >>> from spotPython.light import LightCrossValidationDataModule
+            >>> from spotpython.light import LightCrossValidationDataModule
             >>> data_module = LightCrossValidationDataModule()
             >>> data_module.setup()
             >>> val_dataloader = data_module.val_dataloader()

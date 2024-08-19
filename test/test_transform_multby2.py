@@ -1,4 +1,4 @@
-from spotPython.utils.transform import transform_multby2_int
+from spotpython.utils.transform import transform_multby2_int
 
 
 def test_transform_multby2_int():

@@ -35,7 +35,7 @@ class PositionalEncoding(nn.Module):
         https://pytorch.org/tutorials/beginner/transformer_tutorial.html#positional-encoding
 
     Examples:
-        >>> from spotPython.light.transformer.positionalEncoding import PositionalEncoding
+        >>> from spotpython.light.transformer.positionalEncoding import PositionalEncoding
             import torch
             # number of tensors
             n = 3

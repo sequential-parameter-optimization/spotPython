@@ -5,10 +5,10 @@ import os
 import json
 import sys
 import importlib
-from spotPython.hyperparameters.values import get_tuned_architecture
-from spotPython.utils.eda import gen_design_table
-from spotPython.utils.tensorboard import start_tensorboard, stop_tensorboard
-from spotPython.utils.init import setup_paths
+from spotpython.hyperparameters.values import get_tuned_architecture
+from spotpython.utils.eda import gen_design_table
+from spotpython.utils.tensorboard import start_tensorboard, stop_tensorboard
+from spotpython.utils.init import setup_paths
 
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -24,7 +24,7 @@ def load_cifar10_data(data_dir="./data"):
         trainset (torchvision.datasets.CIFAR10): Training dataset.
 
     Examples:
-        >>> from spotPython.utils.file import load_cifar10_data
+        >>> from spotpython.utils.file import load_cifar10_data
         >>> trainset = load_cifar10_data(data_dir="./data")
 
     """
@@ -43,7 +43,7 @@ def save_pickle(obj, filename: str):
         filename (str): Name of the pickle file.
 
     Examples:
-        >>> from spotPython.utils.file import save_pickle
+        >>> from spotpython.utils.file import save_pickle
         >>> save_pickle(obj, filename="obj.pkl")
     """
     filename = filename + ".pkl"
@@ -62,7 +62,7 @@ def load_pickle(filename: str):
         (object): Loaded object.
 
     Examples:
-        >>> from spotPython.utils.file import load_pickle
+        >>> from spotpython.utils.file import load_pickle
         >>> obj = load_pickle(filename="obj.pkl")
     """
     filename = filename + ".pkl"
@@ -81,8 +81,8 @@ def get_experiment_filename(PREFIX):
         filename (str): Name of the experiment.
 
     Examples:
-        >>> from spotPython.utils.file import get_experiment_name
-        >>> from spotPython.utils.init import fun_control_init
+        >>> from spotpython.utils.file import get_experiment_name
+        >>> from spotpython.utils.init import fun_control_init
         >>> fun_control = fun_control_init(PREFIX="branin")
         >>> PREFIX = fun_control["PREFIX"]
         >>> filename = get_experiment_filename(PREFIX)
@@ -115,7 +115,7 @@ def load_experiment(PKL_NAME):
         The corresponding save_experiment function is part of the class spot.
 
     Examples:
-        >>> from spotPython.utils.file import load_experiment
+        >>> from spotpython.utils.file import load_experiment
         >>> spot_tuner, fun_control, design_control, _, _ = load_experiment("spot_0_experiment.pickle")
 
     """
@@ -207,7 +207,7 @@ def get_experiment_from_PREFIX(PREFIX, return_dict=True) -> dict:
         dict: Dictionary containing the configuration and control objects.
 
     Example:
-        >>> from spotPython.utils.file import get_experiment_from_PREFIX
+        >>> from spotpython.utils.file import get_experiment_from_PREFIX
         >>> config = get_experiment_from_PREFIX("100")["config"]
 
     """
@@ -243,7 +243,7 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
         It returns None.
 
     Examples:
-        >>> from spotPython.utils.file import load_and_run_spot_python_experiment
+        >>> from spotpython.utils.file import load_and_run_spot_python_experiment
         >>> spot_tuner = load_and_run_spot_python_experiment("spot_branin_experiment.pickle")
 
     """

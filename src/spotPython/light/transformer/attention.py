@@ -16,7 +16,7 @@ def scaled_dot_product(q, k, v, mask=None):
         Tuple of (Values, Attention weights)
 
     Examples:
-    >>> from spotPython.light.transformer.attention import scaled_dot_product
+    >>> from spotpython.light.transformer.attention import scaled_dot_product
         seq_len, d_k = 1, 2
         pl.seed_everything(42)
         q = torch.randn(seq_len, d_k)

@@ -25,7 +25,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
-from spotPython.utils.convert import series_to_array
+from spotpython.utils.convert import series_to_array
 
 
 def apk(actual, predicted, k=10):
@@ -155,7 +155,7 @@ def get_metric_sign(metric_name):
         ValueError: If the metric is not found.
 
     Examples:
-        >>> from spotPython.metrics import get_metric_sign
+        >>> from spotpython.metrics import get_metric_sign
         >>> get_metric_sign("accuracy_score")
         -1
         >>> get_metric_sign("hamming_loss")

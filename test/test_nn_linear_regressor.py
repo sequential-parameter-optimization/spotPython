@@ -3,7 +3,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from torch import nn
 import lightning as L
-from spotPython.light.regression import NNLinearRegressor
+from spotpython.light.regression import NNLinearRegressor
 
 # Explanation of the Tests:
 #

@@ -1,6 +1,6 @@
 from numpy import ones, repeat, zeros, ndarray
 from scipy.stats.qmc import LatinHypercube
-from spotPython.utils.transform import scale
+from spotpython.utils.transform import scale
 from typing import Optional, Union
 
 from .designs import designs
@@ -40,7 +40,7 @@ class spacefilling(designs):
             (ndarray): Latin hypercube design.
 
         Examples:
-            >>> from spotPython.design.spacefilling import spacefilling
+            >>> from spotpython.design.spacefilling import spacefilling
                 import numpy as np
                 lhd = spacefilling(k=2, seed=123)
                 lhd.scipy_lhd(n=5, repeats=2, lower=np.array([0,0]), upper=np.array([1,1]))

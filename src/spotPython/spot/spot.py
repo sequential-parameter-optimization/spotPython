@@ -7,9 +7,9 @@ import os
 import copy
 import json
 from numpy.random import default_rng
-from spotPython.design.spacefilling import spacefilling
-from spotPython.build.kriging import Kriging
-from spotPython.utils.repair import repair_non_numeric
+from spotpython.design.spacefilling import spacefilling
+from spotpython.build.kriging import Kriging
+from spotpython.utils.repair import repair_non_numeric
 import numpy as np
 import pandas as pd
 import pylab
@@ -25,23 +25,23 @@ from numpy import sqrt
 from numpy import spacing
 from numpy import append
 from numpy import min, max
-from spotPython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
-from spotPython.utils.compare import selectNew
-from spotPython.utils.aggregate import aggregate_mean_var, select_distant_points
-from spotPython.utils.repair import remove_nan
-from spotPython.utils.file import get_experiment_filename
-from spotPython.budget.ocba import get_ocba_X
+from spotpython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+from spotpython.utils.compare import selectNew
+from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points
+from spotpython.utils.repair import remove_nan
+from spotpython.utils.file import get_experiment_filename
+from spotpython.budget.ocba import get_ocba_X
 import logging
 import time
-from spotPython.utils.progress import progress_bar
-from spotPython.utils.convert import find_indices, sort_by_kth_and_return_indices
-from spotPython.hyperparameters.values import (
+from spotpython.utils.progress import progress_bar
+from spotpython.utils.convert import find_indices, sort_by_kth_and_return_indices
+from spotpython.hyperparameters.values import (
     get_control_key_value,
     get_ith_hyperparameter_name_from_fun_control,
 )
 import plotly.graph_objects as go
 from typing import Callable
-from spotPython.utils.numpy2json import NumpyEncoder
+from spotpython.utils.numpy2json import NumpyEncoder
 
 # Setting up the backend to use QtAgg
 matplotlib.use("TkAgg")
@@ -85,7 +85,7 @@ class Spot:
             objective function information stored as a dictionary.
             Default value is `fun_control_init()`.
         design (object):
-            experimental design. If `None`, spotPython's `spacefilling` is used.
+            experimental design. If `None`, spotpython's `spacefilling` is used.
             Default value is `None`.
         design_control (Dict[str, Union[int, float]]):
             experimental design information stored as a dictionary.
@@ -97,7 +97,7 @@ class Spot:
             information about the optimizer stored as a dictionary.
             Default value is `optimizer_control_init()`.
         surrogate (object):
-            surrogate model. If `None`, spotPython's `kriging` is used. Default value is `None`.
+            surrogate model. If `None`, spotpython's `kriging` is used. Default value is `None`.
         surrogate_control (Dict[str, Union[int, float]]):
             surrogate model information stored as a dictionary.
             Default value is `surrogate_control_init()`.
@@ -114,8 +114,8 @@ class Spot:
     Examples:
         >>> import numpy as np
             from math import inf
-            from spotPython.spot import spot
-            from spotPython.utils.init import (
+            from spotpython.spot import spot
+            from spotpython.utils.init import (
                 fun_control_init,
                 design_control_init,
                 surrogate_control_init,
@@ -309,7 +309,7 @@ class Spot:
             surrogate_control.update({"n_theta": 1})
 
         # If no surrogate model is specified, use the internal
-        # spotPython kriging surrogate:
+        # spotpython kriging surrogate:
         if self.surrogate is None:
             # Call kriging with surrogate_control parameters:
             self.surrogate = Kriging(
@@ -379,9 +379,9 @@ class Spot:
         Examples:
             >>> import numpy as np
                 from math import inf
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:
@@ -408,7 +408,7 @@ class Spot:
                 4        all_var_type                                              [num]
                 5             counter                                                 10
                 6           de_bounds                                          [[-1, 1]]
-                7              design  <spotPython.design.spacefilling.spacefilling o...
+                7              design  <spotpython.design.spacefilling.spacefilling o...
                 8      design_control                     {'init_size': 7, 'repeats': 1}
                 9                 eps                                                0.0
                 10        fun_control                         {'sigma': 0, 'seed': None}
@@ -436,7 +436,7 @@ class Spot:
                 32        show_models                                              False
                 33      show_progress                                               True
                 34        spot_writer                                               None
-                35          surrogate  <spotPython.build.kriging.Kriging object at 0x...
+                35          surrogate  <spotpython.build.kriging.Kriging object at 0x...
                 36  surrogate_control  {'noise': False, 'model_optimizer': <function ...
                 37        tolerance_x                                                  0
                 38              upper                                                [1]
@@ -472,9 +472,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:
@@ -563,12 +563,12 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                               from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                               from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
-                from spotPython.spot import spot
-                from spotPython.utils.init import fun_control_init
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
                 # number of initial points:
                 ni = 3
                 X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
@@ -674,7 +674,7 @@ class Spot:
         return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
 
     def write_db_dict(self) -> None:
-        """Writes a dictionary with the experiment parameters to the json file spotPython_db.json.
+        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
 
         Args:
             self (object): Spot object
@@ -695,7 +695,7 @@ class Spot:
             surrogate_control,
         ) = self.de_serialize_dicts()
         print("\n**")
-        print("The following dictionaries are written to the json file spotPython_db.json:")
+        print("The following dictionaries are written to the json file spotpython_db.json:")
         print("fun_control:")
         pprint.pprint(fun_control)
 
@@ -778,9 +778,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:
@@ -800,10 +800,10 @@ class Spot:
                 print(f"S.y: {S.y}")
                 Seed set to 123
                 Seed set to 123
-                spotPython tuning: 0.0 [########--] 80.00%
-                spotPython tuning: 0.0 [#########-] 86.67%
-                spotPython tuning: 0.0 [#########-] 93.33%
-                spotPython tuning: 0.0 [##########] 100.00% Done...
+                spotpython tuning: 0.0 [########--] 80.00%
+                spotpython tuning: 0.0 [#########-] 86.67%
+                spotpython tuning: 0.0 [#########-] 93.33%
+                spotpython tuning: 0.0 [##########] 100.00% Done...
 
                 S.X: [[ 0.00000000e+00  0.00000000e+00]
                 [ 0.00000000e+00  1.00000000e+00]
@@ -880,9 +880,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:
@@ -966,9 +966,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import fun_control_init
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
                 fun = analytical().fun_sphere
                 fun_control = fun_control_init(
                     lower = np.array([-1, -1]),
@@ -1023,11 +1023,11 @@ class Spot:
         Examples:
             >>> # 1. Without OCBA points:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
-                from spotPython.spot import spot
+                from spotpython.spot import spot
                 # number of initial points:
                 ni = 0
                 X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
@@ -1058,9 +1058,9 @@ class Spot:
             >>> #
             >>> # 2. Using the OCBA points:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import fun_control_init
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
                 # number of initial points:
                 ni = 3
                 X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
@@ -1141,7 +1141,7 @@ class Spot:
         is fitted to the data stored in `self.X` and `self.y`.
         It uses the generic `fit()` method of the
         surrogate model `surrogate`. The default surrogate model is
-        an instance from spotPython's `Kriging` class.
+        an instance from spotpython's `Kriging` class.
         Args:
             self (object): Spot object
 
@@ -1157,9 +1157,9 @@ class Spot:
 
         Examples:
                 >>> import numpy as np
-                    from spotPython.fun.objectivefunctions import analytical
-                    from spotPython.spot import spot
-                    from spotPython.utils.init import (
+                    from spotpython.fun.objectivefunctions import analytical
+                    from spotpython.spot import spot
+                    from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                     # number of initial points:
@@ -1232,9 +1232,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.spot import spot
-                from spotPython.utils.init import design_control_init
-                from spotPython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import design_control_init
+                from spotpython.fun.objectivefunctions import analytical
                 design_control = design_control_init(init_size=3)
                 fun_control = fun_control_init(
                     lower = np.array([-1, -1]),
@@ -1351,9 +1351,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.spot import spot
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.utils.init import (
+                from spotpython.spot import spot
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 nn = 3
@@ -1469,9 +1469,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:
@@ -1544,11 +1544,11 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.utils.init import (
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
                 # number of initial points:
                 ni = 3
                 # number of points
@@ -1702,12 +1702,12 @@ class Spot:
             (dict): dictionary of tuned hyperparameters.
 
         Examples:
-            >>> from spotPython.utils.device import getDevice
+            >>> from spotpython.utils.device import getDevice
                 from math import inf
-                from spotPython.utils.init import fun_control_init
+                from spotpython.utils.init import fun_control_init
                 import numpy as np
-                from spotPython.hyperparameters.values import set_control_key_value
-                from spotPython.data.diabetes import Diabetes
+                from spotpython.hyperparameters.values import set_control_key_value
+                from spotpython.data.diabetes import Diabetes
                 MAX_TIME = 1
                 FUN_EVALS = 10
                 INIT_SIZE = 5
@@ -1735,13 +1735,13 @@ class Spot:
                     test_size=TEST_SIZE,
                     tolerance_x=np.sqrt(np.spacing(1)),
                     )
-                from spotPython.light.regression.netlightregression import NetLightRegression
-                from spotPython.hyperdict.light_hyper_dict import LightHyperDict
-                from spotPython.hyperparameters.values import add_core_model_to_fun_control
+                from spotpython.light.regression.netlightregression import NetLightRegression
+                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.hyperparameters.values import add_core_model_to_fun_control
                 add_core_model_to_fun_control(fun_control=fun_control,
                                             core_model=NetLightRegression,
                                             hyper_dict=LightHyperDict)
-                from spotPython.hyperparameters.values import set_control_hyperparameter_value
+                from spotpython.hyperparameters.values import set_control_hyperparameter_value
                 set_control_hyperparameter_value(fun_control, "l1", [7, 8])
                 set_control_hyperparameter_value(fun_control, "epochs", [3, 5])
                 set_control_hyperparameter_value(fun_control, "batch_size", [4, 5])
@@ -1756,13 +1756,13 @@ class Spot:
                                 "ReLU",
                                 "LeakyReLU"
                             ] )
-                from spotPython.utils.init import design_control_init, surrogate_control_init
+                from spotpython.utils.init import design_control_init, surrogate_control_init
                 design_control = design_control_init(init_size=INIT_SIZE)
                 surrogate_control = surrogate_control_init(noise=True,
                                                             n_theta=2)
-                from spotPython.fun.hyperlight import HyperLight
+                from spotpython.fun.hyperlight import HyperLight
                 fun = HyperLight(log_level=50).fun
-                from spotPython.spot import spot
+                from spotpython.spot import spot
                 spot_tuner = spot.Spot(fun=fun,
                                     fun_control=fun_control,
                                     design_control=design_control,
@@ -1823,9 +1823,9 @@ class Spot:
 
         Examples:
                 >>> import numpy as np
-                    from spotPython.fun.objectivefunctions import analytical
-                    from spotPython.spot import spot
-                    from spotPython.utils.init import (
+                    from spotpython.fun.objectivefunctions import analytical
+                    from spotpython.spot import spot
+                    from spotpython.utils.init import (
                         fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                     fun = analytical().fun_sphere
@@ -1866,7 +1866,7 @@ class Spot:
             (list): Processed values.
 
         Examples:
-            from spotPython.spot import spot
+            from spotpython.spot import spot
             import numpy as np
             import random
             z00 = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
@@ -2025,7 +2025,7 @@ class Spot:
 
         Args:
             threshold (float):
-                threshold for the importance. Not used any more in spotPython >= 0.13.2.
+                threshold for the importance. Not used any more in spotpython >= 0.13.2.
             filename (str):
                 filename of the plot
             show (bool):
@@ -2063,9 +2063,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:
@@ -2228,9 +2228,9 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
-                from spotPython.utils.init import (
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
                 # number of initial points:

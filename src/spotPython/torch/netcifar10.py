@@ -1,6 +1,6 @@
 from torch import nn
 import torch.nn.functional as F
-import spotPython.torch.netcore as netcore
+import spotpython.torch.netcore as netcore
 
 
 class Net_CIFAR10(netcore.Net_Core):

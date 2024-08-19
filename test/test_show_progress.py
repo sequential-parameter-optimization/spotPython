@@ -3,10 +3,10 @@ def test_show_progress():
     Test show_progress
     """
     import numpy as np
-    from spotPython.fun.objectivefunctions import analytical
-    from spotPython.spot import spot
+    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.spot import spot
     from math import inf
-    from spotPython.utils.init import (
+    from spotpython.utils.init import (
         fun_control_init,
         design_control_init,
     )

@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from spotPython.utils.init import get_experiment_name
+from spotpython.utils.init import get_experiment_name
 import datetime
 
 

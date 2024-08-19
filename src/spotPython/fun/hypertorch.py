@@ -3,12 +3,12 @@ from numpy.random import default_rng
 import numpy as np
 from numpy import array
 from sklearn.pipeline import make_pipeline
-from spotPython.torch.traintest import evaluate_cv, evaluate_hold_out
-from spotPython.hyperparameters.values import (
+from spotpython.torch.traintest import evaluate_cv, evaluate_hold_out
+from spotpython.hyperparameters.values import (
     assign_values,
     generate_one_config_from_var_dict,
 )
-from spotPython.utils.eda import generate_config_id
+from spotpython.utils.eda import generate_config_id
 
 logger = logging.getLogger(__name__)
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -65,7 +65,7 @@ class HyperTorch:
             Exception: if the second dimension of X does not match the length of var_name in fun_control.
 
         Examples:
-            >>> from spotPython.fun.hypertorch import HyperTorch
+            >>> from spotpython.fun.hypertorch import HyperTorch
             >>> import numpy as np
             >>> hyper_torch = HyperTorch(seed=126, log_level=50)
             >>> hyper_torch.fun_control["var_name"] = ["x1", "x2"]
@@ -94,7 +94,7 @@ class HyperTorch:
             np.ndarray: output array.
 
         Examples:
-            >>> from spotPython.fun.hypertorch import HyperTorch
+            >>> from spotpython.fun.hypertorch import HyperTorch
             >>> import numpy as np
             >>> hyper_torch = HyperTorch(seed=126, log_level=50)
             >>> hyper_torch.fun_control["var_name"] = ["x1", "x2"]

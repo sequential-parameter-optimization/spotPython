@@ -19,7 +19,7 @@ class FriedmanDriftDataset:
             None (None): None
 
         Examples:
-            >>> from spotPython.data.friedman import FriedmanDriftDataset
+            >>> from spotpython.data.friedman import FriedmanDriftDataset
                 data_generator = FriedmanDriftDataset(n_samples=100,
                     seed=42, change_point1=50, change_point2=75, constant=False)
                 data = [data for data in data_generator]

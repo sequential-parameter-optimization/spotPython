@@ -3,7 +3,7 @@ def test_build_psi_vec():
     Test build_psi_vec, based on (2.34) in [Forrester et al. (2008)]
     """
     import numpy as np
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
 
     X_train = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
     y_train = np.array([1.0, 2.0, 3.0])

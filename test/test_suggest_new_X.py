@@ -3,10 +3,10 @@ def test_suggest_new_X():
     Test suggest_new_X method
     """
     import numpy as np
-    from spotPython.fun.objectivefunctions import analytical
-    from spotPython.spot.spot import Spot
-    from spotPython.utils.repair import repair_non_numeric
-    from spotPython.utils.init import (
+    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.spot.spot import Spot
+    from spotpython.utils.repair import repair_non_numeric
+    from spotpython.utils.init import (
         fun_control_init,
     )
 

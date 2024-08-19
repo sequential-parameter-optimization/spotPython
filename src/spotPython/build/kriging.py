@@ -19,13 +19,13 @@ from numpy.linalg import cholesky, solve, LinAlgError, cond
 from scipy.optimize import differential_evolution
 from scipy.linalg import cholesky as scipy_cholesky
 import pylab
-from spotPython.design.spacefilling import spacefilling
-from spotPython.build.surrogates import surrogates
+from spotpython.design.spacefilling import spacefilling
+from spotpython.build.surrogates import surrogates
 from scipy.spatial.distance import squareform
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import cdist
-from spotPython.utils.repair import repair_non_numeric
-from spotPython.utils.aggregate import aggregate_mean_var
+from spotpython.utils.repair import repair_non_numeric
+from spotpython.utils.aggregate import aggregate_mean_var
 import logging
 import numpy as np
 from typing import List, Union, Tuple, Any, Optional
@@ -114,7 +114,7 @@ class Kriging(surrogates):
                 "chebyshev", "canberra", "braycurtis", "mahalanobis", "matching".
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 import matplotlib.pyplot as plt
                 from numpy import linspace, arange
@@ -212,12 +212,12 @@ class Kriging(surrogates):
             float: The expected improvement value.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 S = Kriging(name='kriging', seed=124)
                 S.aggregated_mean_y = [0.0, 0.0, 0.0, 0.0, 0.0]
                 S.exp_imp(1.0, 0.0)
                 0.0
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 S = Kriging(name='kriging', seed=124)
                 S.aggregated_mean_y = [0.0, 0.0, 0.0, 0.0, 0.0]
                 # assert S.exp_imp(0.0, 1.0) == 1/np.sqrt(2*np.pi)
@@ -254,7 +254,7 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 S = Kriging(name='kriging', seed=124)
                 S.set_de_bounds()
                 print(S.de_bounds)
@@ -296,7 +296,7 @@ class Kriging(surrogates):
 
         Examples:
             >>> import numpy as np
-                from spotPython.build.kriging import Kriging
+                from spotpython.build.kriging import Kriging
                 n=2
                 p=4
                 S = Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
@@ -337,7 +337,7 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[1, 2], [3, 4]])
                 nat_y = np.array([1, 2])
@@ -403,7 +403,7 @@ class Kriging(surrogates):
             None
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[1, 2], [3, 4]])
                 nat_y = np.array([1, 2])
@@ -477,7 +477,7 @@ class Kriging(surrogates):
             Lambda (float): lambda noise value.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[1, 0], [1, 0]])
                 nat_y = np.array([1, 2])
@@ -528,7 +528,7 @@ class Kriging(surrogates):
             None
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[1, 2], [3, 4]])
                 nat_y = np.array([1, 2])
@@ -576,7 +576,7 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 nat_X = np.array([[1, 2], [3, 4]])
                 nat_y = np.array([1, 2])
                 n=2
@@ -629,7 +629,7 @@ class Kriging(surrogates):
             None
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 from numpy import array
                 nat_X = np.array([[1, 2], [3, 4]])
@@ -674,7 +674,7 @@ class Kriging(surrogates):
             self (object): The Kriging object.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 from numpy import log, var
                 nat_X = np.array([[1, 2], [3, 4], [5, 6]])
@@ -759,7 +759,7 @@ class Kriging(surrogates):
             pen_val (float): Penalty value.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[0], [1]])
                 nat_y = np.array([0, 1])
@@ -825,7 +825,7 @@ class Kriging(surrogates):
                 True if any element in `x` is equal to `v`, False otherwise.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 from numpy import power
                 import numpy as np
                 nat_X = np.array([[0], [1]])
@@ -871,7 +871,7 @@ class Kriging(surrogates):
             inf_Psi (bool): True if Psi is infinite, False otherwise.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[0], [1]])
                 nat_y = np.array([0, 1])
@@ -954,7 +954,7 @@ class Kriging(surrogates):
             U (np.matrix): Kriging U matrix, Cholesky decomposition. Shape (n,n).
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[0], [1]])
                 nat_y = np.array([0, 1])
@@ -1017,7 +1017,7 @@ class Kriging(surrogates):
             negLnLike (float): Negative log likelihood of the surface at the specified hyperparameters.
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 nat_X = np.array([[1], [2]])
                 nat_y = np.array([5, 10])
@@ -1072,8 +1072,8 @@ class Kriging(surrogates):
 
         Examples:
             >>> import numpy as np
-                from spotPython.fun.objectivefunctions import analytical
-                from spotPython.spot import spot
+                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.spot import spot
                 # 1-dimensional example
                 fun = analytical().fun_sphere
                 lower = np.array([-1])
@@ -1191,7 +1191,7 @@ class Kriging(surrogates):
                 and expected improvement if return_val is "all".
 
         Examples:
-            >>> from spotPython.build.kriging import Kriging
+            >>> from spotpython.build.kriging import Kriging
                 import numpy as np
                 import matplotlib.pyplot as plt
                 from numpy import linspace, arange
@@ -1295,7 +1295,7 @@ class Kriging(surrogates):
 
         Examples:
             >>> import numpy as np
-                from spotPython.build.kriging import Kriging
+                from spotpython.build.kriging import Kriging
                 X_train = np.array([[1., 2.],
                                     [2., 4.],
                                     [3., 6.]])

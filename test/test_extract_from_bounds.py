@@ -2,15 +2,15 @@ def test_extract_from_bounds():
     """
     Test extract_from_bounds
     """
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
     import numpy as np
     import copy
     from numpy import linspace, argmin
     from numpy import ones, zeros, log, var, float64
     from numpy import empty_like
     from numpy import array
-    from spotPython.design.spacefilling import spacefilling
-    from spotPython.utils.init import (
+    from spotpython.design.spacefilling import spacefilling
+    from spotpython.utils.init import (
         fun_control_init,
         design_control_init,
     )
@@ -76,11 +76,11 @@ def test_extract_from_bounds():
     assert new_theta_p_Lambda.shape[0] == 1
 
     # 2nd Example:
-    from spotPython.build.kriging import Kriging
+    from spotpython.build.kriging import Kriging
     import numpy as np
-    from spotPython.fun.objectivefunctions import analytical
-    from spotPython.spot import spot
-    from spotPython.utils.repair import repair_non_numeric
+    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.spot import spot
+    from spotpython.utils.repair import repair_non_numeric
 
     fun = analytical().fun_sphere
     fun_control = fun_control_init(

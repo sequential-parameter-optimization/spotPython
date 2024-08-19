@@ -30,7 +30,7 @@ class InceptionBlock(nn.Module):
 
 
     Examples:
-        >>> from spotPython.light.cnn.googlenet import InceptionBlock
+        >>> from spotpython.light.cnn.googlenet import InceptionBlock
             import torch
             import torch.nn as nn
             block = InceptionBlock(3,

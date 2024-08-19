@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from spotPython.data.pkldataset import PKLDataset
+from spotpython.data.pkldataset import PKLDataset
 
 
 def test_pkl_dataset():

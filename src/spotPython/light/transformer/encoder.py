@@ -1,5 +1,5 @@
 import torch.nn as nn
-from spotPython.light.transformer.encoderblock import EncoderBlock
+from spotpython.light.transformer.encoderblock import EncoderBlock
 
 
 class TransformerEncoder(nn.Module):
@@ -17,7 +17,7 @@ class TransformerEncoder(nn.Module):
             None
 
         Example:
-            >>> from spotPython.light.transformer.encoder import TransformerEncoder
+            >>> from spotpython.light.transformer.encoder import TransformerEncoder
             >>> encoder = TransformerEncoder(num_layers=3,
                                             model_dim=512,
                                             num_heads=8,

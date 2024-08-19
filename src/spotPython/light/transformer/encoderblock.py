@@ -1,5 +1,5 @@
 import torch.nn as nn
-from spotPython.light.transformer.multiheadattention import MultiheadAttention
+from spotpython.light.transformer.multiheadattention import MultiheadAttention
 
 
 class EncoderBlock(nn.Module):

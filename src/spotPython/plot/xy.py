@@ -24,7 +24,7 @@ def plot_y_vs_X(X, y, nrows=5, ncols=2, figsize=(30, 20), ylabel="y", feature_na
 
     Examples:
         >>> from sklearn.datasets import load_diabetes
-        >>> from spotPython.plot.xy import plot_y_vs_X
+        >>> from spotpython.plot.xy import plot_y_vs_X
         >>> data = load_diabetes()
         >>> X, y = data.data, data.target
         >>> plot_y_vs_X(X, y, nrows=5, ncols=2, figsize=(20, 15))

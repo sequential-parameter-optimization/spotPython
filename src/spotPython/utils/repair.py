@@ -48,7 +48,7 @@ def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) 
 
     Examples:
         >>> import numpy as np
-            from spotPython.utils.repair import remove_nan
+            from spotpython.utils.repair import remove_nan
             X = np.array([[1, 2], [3, 4], [5, 6]])
             y = np.array([1, np.nan, 2])
             X_cleaned, y_cleaned = remove_nan(X, y)

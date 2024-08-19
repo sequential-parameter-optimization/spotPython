@@ -2,7 +2,7 @@ def test_branin():
     """
     Test branin function
     """
-    from spotPython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import analytical
     import numpy as np
 
     pi = np.pi

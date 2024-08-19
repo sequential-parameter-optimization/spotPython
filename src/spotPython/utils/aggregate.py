@@ -91,7 +91,7 @@ def select_distant_points(X, y, k):
             selected `y` values, shape `(k,)`.
 
     Examples:
-        >>> from spotPython.utils.aggregate import select_distant_points
+        >>> from spotpython.utils.aggregate import select_distant_points
             X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
             y = np.array([1, 2, 3, 4, 5])
             selected_points, selected_y = select_distant_points(X, y, 3)

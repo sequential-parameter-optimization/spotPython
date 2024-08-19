@@ -1,4 +1,4 @@
-from spotPython.data.friedman import FriedmanDriftDataset
+from spotpython.data.friedman import FriedmanDriftDataset
 import matplotlib.pyplot as plt
 
 
@@ -25,7 +25,7 @@ def plot_friedman_drift_data(
         None
 
     Examples:
-        >>> from spotPython.plot.ts import plot_friedman_drift_data
+        >>> from spotpython.plot.ts import plot_friedman_drift_data
         >>> plot_friedman_drift_data(n_samples=100, seed=42, change_point1=50, change_point2=75, constant=False)
         >>> plot_friedman_drift_data(n_samples=100, seed=42, change_point1=50, change_point2=75, constant=True)
     """

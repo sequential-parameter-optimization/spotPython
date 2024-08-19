@@ -1,4 +1,4 @@
-from spotPython.utils.metrics import get_metric_sign
+from spotpython.utils.metrics import get_metric_sign
 import pytest
 
 

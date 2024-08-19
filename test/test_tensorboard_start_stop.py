@@ -1,4 +1,4 @@
-from spotPython.utils.tensorboard import start_tensorboard, stop_tensorboard
+from spotpython.utils.tensorboard import start_tensorboard, stop_tensorboard
 
 import subprocess
 from unittest.mock import patch, MagicMock

@@ -5,10 +5,10 @@ import torch.nn.functional as F
 # import torch.nn.functional as F
 from torch import nn
 
-# from spotPython.hyperparameters.optimizer import optimizer_handler
-from spotPython.light.transformer.positionalEncodingBasic import PositionalEncodingBasic
-from spotPython.light.transformer.encoder import TransformerEncoder
-from spotPython.light.transformer.cosinewarmupscheduler import CosineWarmupScheduler
+# from spotpython.hyperparameters.optimizer import optimizer_handler
+from spotpython.light.transformer.positionalEncodingBasic import PositionalEncodingBasic
+from spotpython.light.transformer.encoder import TransformerEncoder
+from spotpython.light.transformer.cosinewarmupscheduler import CosineWarmupScheduler
 from torch import optim
 
 
