@@ -20,4 +20,9 @@ jobs:
     - run: python -m pip install --upgrade pip build pytest
     - run: python -m build .
     - run: python -m pip install .
-    - run: pytest test/
+    - run: |
+        echo "import matplotlib" > set_backend.py
+        echo "matplotlib.use('Agg')" >> set_backend.py
+        echo "import pytest" >> set_backend.py
+        echo "pytest.main(['test/'])" >> set_backend.py
+        python set_backend.py
