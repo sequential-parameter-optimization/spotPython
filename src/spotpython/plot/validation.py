@@ -1,5 +1,6 @@
 from sklearn.model_selection import cross_val_predict
 import matplotlib.pyplot as plt
+import matplotlib
 from sklearn.base import BaseEstimator
 from sklearn.metrics import PredictionErrorDisplay
 from sklearn.metrics import RocCurveDisplay
@@ -130,6 +131,7 @@ def plot_roc_from_dataframes(
     target_column: str = None,
     show: bool = True,
     title: str = "",
+    tkagg: bool = False,
 ) -> None:
     """
     Plot ROC curve for a list of dataframes from model evaluations.
@@ -147,6 +149,9 @@ def plot_roc_from_dataframes(
             If True, the plot is shown.
         title:
             Title of the plot.
+        tkagg:
+            If True, the TkAgg backend is used.
+            Default is False.
 
     Returns:
         None
@@ -161,6 +166,8 @@ def plot_roc_from_dataframes(
             plot_roc_from_dataframes(df_list, model_names=model_names, target_column="y")
 
     """
+    if tkagg:
+        matplotlib.use("TkAgg")
     fig, ax = plt.subplots(figsize=(10, 5))
     for i, df in enumerate(df_list):
         y_test = df[target_column]
