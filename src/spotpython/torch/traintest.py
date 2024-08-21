@@ -129,7 +129,7 @@ def evaluate_cv(
             best_val_loss = float("inf")
             counter = 0
             for epoch in range(epochs_instance):
-                print(f"Epoch: {epoch +1}", end=" | ")
+                print(f"Epoch: {epoch+1}", end=" | ")
                 # training loss from one epoch:
                 training_loss = train_one_epoch(
                     net=net,

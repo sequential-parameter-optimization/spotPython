@@ -44,7 +44,8 @@ from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
 
 # Setting up the backend to use QtAgg
-matplotlib.use("TkAgg")
+# matplotlib.use("TkAgg")
+# matplotlib.use("Agg")
 
 
 logger = logging.getLogger(__name__)
@@ -259,6 +260,9 @@ class Spot:
         self.n_points = self.fun_control["n_points"]
         self.max_surrogate_points = self.fun_control["max_surrogate_points"]
         self.progress_file = self.fun_control["progress_file"]
+        self.tkagg = self.fun_control["tkagg"]
+        if self.tkagg:
+            matplotlib.use("TkAgg")
 
         # Tensorboard:
         self.init_spot_writer()
@@ -1447,7 +1451,7 @@ class Spot:
             return self.surrogate.predict(X)
 
     def plot_progress(
-        self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300
+        self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300, tkagg=False
     ) -> None:
         """Plot the progress of the hyperparameter tuning (optimization).
 
@@ -1495,6 +1499,8 @@ class Spot:
                 S.plot_progress(log_y=True)
 
         """
+        if tkagg:
+            matplotlib.use("TkAgg")
         fig = pylab.figure(figsize=(9, 6))
         s_y = pd.Series(self.y)
         s_c = s_y.cummin()
@@ -1904,6 +1910,7 @@ class Spot:
         figsize=(12, 6),
         use_min=False,
         use_max=True,
+        tkagg=False,
     ) -> None:
         """Plot the contour of any dimension."""
 
@@ -1942,6 +1949,8 @@ class Spot:
             contour = ax.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
             pylab.colorbar(contour, ax=ax)
 
+        if tkagg:
+            matplotlib.use("TkAgg")
         fig = setup_plot()
 
         (X, Y), x, y = generate_mesh_grid(self.lower, self.upper, n_grid)
@@ -2017,6 +2026,7 @@ class Spot:
         dpi=200,
         use_min=False,
         use_max=True,
+        tkagg=False,
     ) -> None:
         """
         Plot the contour of important hyperparameters.
@@ -2123,6 +2133,7 @@ class Spot:
                         dpi=dpi,
                         use_max=use_max,
                         use_min=use_min,
+                        tkagg=tkagg,
                     )
 
     def get_importance(self) -> list:
@@ -2181,7 +2192,7 @@ class Spot:
             print("Importance requires more than one theta values (n_theta>1).")
         return output
 
-    def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True) -> None:
+    def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True, tkagg=False) -> None:
         """Plot the importance of each variable.
 
         Args:
@@ -2198,6 +2209,8 @@ class Spot:
             None
         """
         if self.surrogate.n_theta > 1:
+            if tkagg:
+                matplotlib.use("TkAgg")
             theta = np.power(10, self.surrogate.theta)
             imp = 100 * theta / np.max(theta)
             idx = np.where(imp > threshold)[0]
