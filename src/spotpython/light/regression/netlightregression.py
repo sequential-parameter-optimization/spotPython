@@ -68,8 +68,7 @@ class NetLightRegression(L.LightningModule):
             trainer.fit(net_light_base, train_loader)
             trainer.validate(net_light_base, val_loader)
             trainer.test(net_light_base, test_loader)
-
-              | Name   | Type       | Params | In sizes | Out sizes
+            | Name   | Type       | Params | In sizes | Out sizes
             -------------------------------------------------------------
             0 | layers | Sequential | 15.9 K | [8, 10]  | [8, 1]
             -------------------------------------------------------------

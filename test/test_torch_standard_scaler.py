@@ -12,8 +12,8 @@ def test_fit():
     scaler = TorchStandardScaler()
     scaler.fit(tensor)
 
-    torch.testing.assert_allclose(scaler.mean, expected_mean)
-    torch.testing.assert_allclose(scaler.std, expected_std, atol=1e-7, rtol=1e-7)
+    torch.testing.assert_close(scaler.mean, expected_mean)
+    torch.testing.assert_close(scaler.std, expected_std, atol=1e-7, rtol=1e-7)
 
 
 def test_transform():
@@ -25,7 +25,7 @@ def test_transform():
 
     expected_transformed = torch.tensor([[-1.0, -1.0], [1.0, 1.0]])
 
-    torch.testing.assert_allclose(transformed, expected_transformed)
+    torch.testing.assert_close(transformed, expected_transformed)
 
 
 def test_fit_transform():
@@ -36,7 +36,7 @@ def test_fit_transform():
 
     expected_transformed = torch.tensor([[-1.0, -1.0], [1.0, 1.0]])
 
-    torch.testing.assert_allclose(transformed, expected_transformed)
+    torch.testing.assert_close(transformed, expected_transformed)
 
 
 def test_input_not_tensor():

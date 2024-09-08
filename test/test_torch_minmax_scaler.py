@@ -12,8 +12,8 @@ def test_min_max_scaler_fit():
     scaler = TorchMinMaxScaler()
     scaler.fit(tensor)
 
-    torch.testing.assert_allclose(scaler.min, expected_min)
-    torch.testing.assert_allclose(scaler.max, expected_max)
+    torch.testing.assert_close(scaler.min, expected_min)
+    torch.testing.assert_close(scaler.max, expected_max)
 
 
 def test_min_max_scaler_transform():
@@ -25,7 +25,7 @@ def test_min_max_scaler_transform():
 
     expected_transformed = torch.tensor([[0.5, 0.0], [0.0, 0.5], [1.0, 1.0]])
 
-    torch.testing.assert_allclose(transformed, expected_transformed)
+    torch.testing.assert_close(transformed, expected_transformed)
 
 
 def test_min_max_scaler_fit_transform():
@@ -36,7 +36,7 @@ def test_min_max_scaler_fit_transform():
 
     expected_transformed = torch.tensor([[0.5, 0.0], [0.0, 0.5], [1.0, 1.0]])
 
-    torch.testing.assert_allclose(transformed, expected_transformed)
+    torch.testing.assert_close(transformed, expected_transformed)
 
 
 def test_input_validation():

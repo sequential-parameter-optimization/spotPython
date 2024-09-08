@@ -1,12 +1,15 @@
 """Generate the code reference pages and navigation."""
 
 from pathlib import Path
-
 import mkdocs_gen_files
 
 nav = mkdocs_gen_files.Nav()
 
 for path in sorted(Path("src").rglob("*.py")):
+    # Ignore __init__.py files
+    if path.name == "__init__.py":
+        continue
+    
     module_path = path.relative_to("src").with_suffix("")
     doc_path = path.relative_to("src").with_suffix(".md")
     full_doc_path = Path("reference", doc_path)
