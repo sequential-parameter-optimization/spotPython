@@ -69,8 +69,7 @@ class NNLinearRegressor(L.LightningModule):
             trainer.fit(net_light_base, train_loader)
             trainer.validate(net_light_base, val_loader)
             trainer.test(net_light_base, test_loader)
-
-              | Name   | Type       | Params | In sizes | Out sizes
+            | Name   | Type       | Params | In sizes | Out sizes
             -------------------------------------------------------------
             0 | layers | Sequential | 15.9 K | [8, 10]  | [8, 1]
             -------------------------------------------------------------
@@ -78,7 +77,6 @@ class NNLinearRegressor(L.LightningModule):
             0         Non-trainable params
             15.9 K    Total params
             0.064     Total estimated model params size (MB)
-
             ─────────────────────────────────────────────────────────────
                 Validate metric           DataLoader 0
             ─────────────────────────────────────────────────────────────
@@ -91,7 +89,6 @@ class NNLinearRegressor(L.LightningModule):
                     hp_metric              29010.7734375
                     val_loss               29010.7734375
             ─────────────────────────────────────────────────────────────
-
             [{'val_loss': 28981.529296875, 'hp_metric': 28981.529296875}]
     """
 
@@ -114,17 +111,28 @@ class NNLinearRegressor(L.LightningModule):
         Initializes the NNLinearRegressor object.
 
         Args:
-            l1 (int): The number of neurons in the first hidden layer.
-            epochs (int): The number of epochs to train the model for.
-            batch_size (int): The batch size to use during training.
-            initialization (str): The initialization method to use for the weights.
-            act_fn (nn.Module): The activation function to use in the hidden layers.
-            optimizer (str): The optimizer to use during training.
-            dropout_prob (float): The probability of dropping out a neuron during training.
-            lr_mult (float): The learning rate multiplier for the optimizer.
-            patience (int): The number of epochs to wait before early stopping.
-            _L_in (int): The number of input features. Not a hyperparameter, but needed to create the network.
-            _L_out (int): The number of output classes. Not a hyperparameter, but needed to create the network.
+            l1 (int):
+                The number of neurons in the first hidden layer.
+            epochs (int):
+                The number of epochs to train the model for.
+            batch_size (int):
+                The batch size to use during training.
+            initialization (str):
+                The initialization method to use for the weights.
+            act_fn (nn.Module):
+                The activation function to use in the hidden layers.
+            optimizer (str):
+                The optimizer to use during training.
+            dropout_prob (float):
+                The probability of dropping out a neuron during training.
+            lr_mult (float):
+                The learning rate multiplier for the optimizer.
+            patience (int):
+                The number of epochs to wait before early stopping.
+            _L_in (int):
+                The number of input features. Not a hyperparameter, but needed to create the network.
+            _L_out (int):
+                The number of output classes. Not a hyperparameter, but needed to create the network.
             _torchmetric (str):
                 The metric to use for the loss function. If `None`,
                 then "mean_squared_error" is used.

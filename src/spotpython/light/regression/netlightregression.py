@@ -8,6 +8,8 @@ import torchmetrics.functional.regression
 class NetLightRegression(L.LightningModule):
     """
     A LightningModule class for a regression neural network model.
+    This is a very simple basic class. An enhanced version of this class is available
+    as nn_linear_regression.py in the same directory.
 
     Attributes:
         l1 (int):
@@ -76,7 +78,6 @@ class NetLightRegression(L.LightningModule):
             0         Non-trainable params
             15.9 K    Total params
             0.064     Total estimated model params size (MB)
-
             ─────────────────────────────────────────────────────────────
                 Validate metric           DataLoader 0
             ─────────────────────────────────────────────────────────────
@@ -89,7 +90,6 @@ class NetLightRegression(L.LightningModule):
                     hp_metric              29010.7734375
                     val_loss               29010.7734375
             ─────────────────────────────────────────────────────────────
-
             [{'val_loss': 28981.529296875, 'hp_metric': 28981.529296875}]
     """
 
@@ -155,7 +155,9 @@ class NetLightRegression(L.LightningModule):
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
 
-        # TODO: Implement a hidden_sizes generator function
+        # TODO: Implement a hidden_sizes generator function. 
+        # This function is implemented in the updadated version of this class which
+        # is available as nn_linear_regression.py in the same directory.
         hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
         # n_low = _L_in // 4
         # # ensure that n_high is larger than n_low
