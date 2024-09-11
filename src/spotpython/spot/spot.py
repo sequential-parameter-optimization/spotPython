@@ -2141,7 +2141,7 @@ class Spot:
 
         Returns:
             output (list):
-                list of results
+                list of results. If the surrogate has more than one theta values, the importance is calculated. Otherwise, a list of zeros is returned.
 
         """
         if self.surrogate.n_theta > 1 and self.var_name is not None:
@@ -2156,6 +2156,8 @@ class Spot:
             return output
         else:
             print("Importance requires more than one theta values (n_theta>1).")
+            # return a list of zeros of length len(all_var_name)
+            return [0] * len(self.all_var_name)
 
     def print_importance(self, threshold=0.1, print_screen=True) -> list:
         """Print importance of each variable and return the results as a list.
