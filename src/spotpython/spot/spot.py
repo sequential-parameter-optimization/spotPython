@@ -306,11 +306,16 @@ class Spot:
         if self.surrogate_control["model_optimizer"] is None or optimizer is not None:
             self.surrogate_control.update({"model_optimizer": self.optimizer})
 
-        # If self.surrogate_control["n_theta"] > 1, use k theta values:
-        if self.surrogate_control["n_theta"] > 1:
-            surrogate_control.update({"n_theta": self.k})
-        else:
-            surrogate_control.update({"n_theta": 1})
+        # if self.surrogate_control["n_theta"] is a string and == isotropic, use 1 theta value:
+        if isinstance(self.surrogate_control["n_theta"], str):
+            if self.surrogate_control["n_theta"] == "anisotropic":
+                surrogate_control.update({"n_theta": self.k})
+            else:
+            # case "isotropic":
+                surrogate_control.update({"n_theta": 1})
+        if isinstance(self.surrogate_control["n_theta"], int):
+            if self.surrogate_control["n_theta"] > 1:
+                surrogate_control.update({"n_theta": self.k})
 
         # If no surrogate model is specified, use the internal
         # spotpython kriging surrogate:

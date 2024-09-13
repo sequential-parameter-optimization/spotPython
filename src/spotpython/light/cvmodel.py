@@ -101,7 +101,8 @@ def cv_model(config: dict, fun_control: dict) -> float:
         trainer.fit(model=model, datamodule=dm)
         # Test best model on validation and test set
         # result = trainer.validate(model=model, datamodule=dm, ckpt_path="last")
-        score = trainer.validate(model=model, datamodule=dm)
+        verbose = fun_control["verbosity"] > 0
+        score = trainer.validate(model=model, datamodule=dm, verbose=verbose)
         # unlist the result (from a list of one dict)
         score = score[0]
         print(f"train_model result: {score}")

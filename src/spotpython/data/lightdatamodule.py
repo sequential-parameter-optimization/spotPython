@@ -84,6 +84,7 @@ class LightDataModule(L.LightningDataModule):
         test_seed: int = 42,
         num_workers: int = 0,
         scaler: Optional[object] = None,
+        verbosity: int = 0,
     ):
         super().__init__()
         self.batch_size = batch_size
@@ -92,6 +93,7 @@ class LightDataModule(L.LightningDataModule):
         self.test_seed = test_seed
         self.num_workers = num_workers
         self.scaler = scaler
+        self.verbosity = verbosity
 
     def prepare_data(self) -> None:
         """Prepares the data for use."""
@@ -134,15 +136,18 @@ class LightDataModule(L.LightningDataModule):
             val_size = int(full_train_size * test_size / len(self.data_full))
             train_size = full_train_size - val_size
 
-        print(f"LightDataModule.setup(): stage: {stage}")
-        # print(f"LightDataModule setup(): full_train_size: {full_train_size}")
-        # print(f"LightDataModule setup(): val_size: {val_size}")
-        # print(f"LightDataModule setup(): train_size: {train_size}")
-        # print(f"LightDataModule setup(): test_size: {test_size}")
+        if self.verbosity > 0:
+            print(f"LightDataModule.setup(): stage: {stage}")
+        if self.verbosity > 1:
+            print(f"LightDataModule setup(): full_train_size: {full_train_size}")
+            print(f"LightDataModule setup(): val_size: {val_size}")
+            print(f"LightDataModule setup(): train_size: {train_size}")
+            print(f"LightDataModule setup(): test_size: {test_size}")
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
-            print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
+            if self.verbosity > 0:
+                print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
             generator_fit = torch.Generator().manual_seed(self.test_seed)
             self.data_train, self.data_val, _ = random_split(
                 self.data_full, [train_size, val_size, test_size], generator=generator_fit
@@ -151,7 +156,8 @@ class LightDataModule(L.LightningDataModule):
                 # Fit the scaler on training data and transform both train and val data
                 scaler_train_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))]).squeeze(1)
                 # train_val_data = self.data_train[:,0]
-                print(scaler_train_data.shape)
+                if self.verbosity > 0:
+                    print(scaler_train_data.shape)
                 self.scaler.fit(scaler_train_data)
                 self.data_train = [(self.scaler.transform(data), target) for data, target in self.data_train]
                 data_tensors_train = [data.clone().detach() for data, target in self.data_train]
@@ -167,7 +173,8 @@ class LightDataModule(L.LightningDataModule):
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
-            print(f"test_size: {test_size} used for test dataset.")
+            if self.verbosity > 0:
+                print(f"test_size: {test_size} used for test dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
@@ -190,7 +197,8 @@ class LightDataModule(L.LightningDataModule):
 
         # Assign pred dataset for use in dataloader(s)
         if stage == "predict" or stage is None:
-            print(f"test_size: {test_size} used for predict dataset.")
+            if self.verbosity > 0:
+                print(f"test_size: {test_size} used for predict dataset.")
             # get test data set as test_abs percent of the full dataset
             generator_predict = torch.Generator().manual_seed(self.test_seed)
             self.data_predict, _ = random_split(
@@ -223,7 +231,8 @@ class LightDataModule(L.LightningDataModule):
                 Training set size: 3
 
         """
-        print(f"LightDataModule.train_dataloader(). data_train size: {len(self.data_train)}")
+        if self.verbosity > 0:
+            print(f"LightDataModule.train_dataloader(). data_train size: {len(self.data_train)}")
         # print(f"LightDataModule: train_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: train_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the training data
@@ -247,7 +256,8 @@ class LightDataModule(L.LightningDataModule):
                 print(f"Training set size: {len(data_module.data_val)}")
                 Training set size: 3
         """
-        print(f"LightDataModule.val_dataloader(). Val. set size: {len(self.data_val)}")
+        if self.verbosity > 0:
+            print(f"LightDataModule.val_dataloader(). Val. set size: {len(self.data_val)}")
         # print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
@@ -272,7 +282,8 @@ class LightDataModule(L.LightningDataModule):
                 Test set size: 6
 
         """
-        print(f"LightDataModule.test_dataloader(). Test set size: {len(self.data_test)}")
+        if self.verbosity > 0:
+            print(f"LightDataModule.test_dataloader(). Test set size: {len(self.data_test)}")
         # print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data
@@ -297,7 +308,8 @@ class LightDataModule(L.LightningDataModule):
                 Predict set size: 6
 
         """
-        print(f"LightDataModule.predict_dataloader(). Predict set size: {len(self.data_predict)}")
+        if self.verbosity > 0:
+            print(f"LightDataModule.predict_dataloader(). Predict set size: {len(self.data_predict)}")
         # print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
         # apply fit_transform to the val data

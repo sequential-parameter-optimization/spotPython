@@ -599,7 +599,7 @@ def surrogate_control_init(
     model_fun_evals=10000,
     min_theta=-3.0,
     max_theta=2.0,
-    n_theta=1,
+    n_theta="anisotropic",
     p_val=2.0,
     n_p=1,
     optim_p=False,
@@ -628,8 +628,9 @@ def surrogate_control_init(
             Whether the objective function is noisy or not. If Kriging, then a nugget is added.
             Default is False. Note: Will be set in the Spot class.
         n_theta (int):
-            The number of theta values. If larger than 1, then the k theta values are
-            used, where k is the problem dimension. Default is 1.
+            The number of theta values. If larger than 1 or set to the string "anisotropic",
+            then the k theta values are used, where k is the problem dimension.
+            This is handled in spot.py. Default is "anisotropic".
         p_val (float):
                 p value. Used as an initial value if optim_p = True. Otherwise as a constant. Defaults to 2.0.
         n_p (int):
