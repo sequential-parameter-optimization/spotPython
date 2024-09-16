@@ -155,7 +155,7 @@ class NetLightRegression(L.LightningModule):
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
 
-        # TODO: Implement a hidden_sizes generator function. 
+        # TODO: Implement a hidden_sizes generator function.
         # This function is implemented in the updadated version of this class which
         # is available as nn_linear_regression.py in the same directory.
         hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]

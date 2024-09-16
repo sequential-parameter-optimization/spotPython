@@ -311,7 +311,7 @@ class Spot:
             if self.surrogate_control["n_theta"] == "anisotropic":
                 surrogate_control.update({"n_theta": self.k})
             else:
-            # case "isotropic":
+                # case "isotropic":
                 surrogate_control.update({"n_theta": 1})
         if isinstance(self.surrogate_control["n_theta"], int):
             if self.surrogate_control["n_theta"] > 1:
@@ -2146,7 +2146,8 @@ class Spot:
 
         Returns:
             output (list):
-                list of results. If the surrogate has more than one theta values, the importance is calculated. Otherwise, a list of zeros is returned.
+                list of results. If the surrogate has more than one theta values,
+                the importance is calculated. Otherwise, a list of zeros is returned.
 
         """
         if self.surrogate.n_theta > 1 and self.var_name is not None:

@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from spotpython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
+from spotpython.utils.math import generate_div2_list
 
 
 class NNLinearRegressor(L.LightningModule):
@@ -164,14 +165,7 @@ class NNLinearRegressor(L.LightningModule):
         self.example_input_array = torch.zeros((batch_size, self._L_in))
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
-
-        # TODO: Implement a hidden_sizes generator function
-        hidden_sizes = [self.hparams.l1, self.hparams.l1 // 2, self.hparams.l1 // 2, self.hparams.l1 // 4]
-        # n_low = _L_in // 4
-        # # ensure that n_high is larger than n_low
-        # n_high = max(self.hparams.l1, 2 * n_low)
-        # hidden_sizes = generate_div2_list(n_high, n_low)
-
+        hidden_sizes = self._get_hidden_sizes()
         # Create the network based on the specified hidden sizes
         layers = []
         layer_sizes = [self._L_in] + hidden_sizes
@@ -186,6 +180,19 @@ class NNLinearRegressor(L.LightningModule):
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
         # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
         self.layers = nn.Sequential(*layers)
+
+    def _get_hidden_sizes(self):
+        """
+        Generate the hidden layer sizes for the network.
+
+        Returns:
+            list: A list of hidden layer sizes.
+
+        """
+        n_low = self._L_in // 4
+        n_high = max(self.hparams.l1, 2 * n_low)
+        hidden_sizes = generate_div2_list(n_high, n_low)
+        return hidden_sizes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """

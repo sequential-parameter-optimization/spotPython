@@ -7,7 +7,6 @@ import sys
 import importlib
 from spotpython.hyperparameters.values import get_tuned_architecture
 from spotpython.utils.eda import gen_design_table
-from spotpython.utils.tensorboard import start_tensorboard, stop_tensorboard
 from spotpython.utils.init import setup_paths
 
 
