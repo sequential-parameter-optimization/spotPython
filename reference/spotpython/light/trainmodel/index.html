@@ -1948,6 +1948,8 @@
       
         
       
+        
+      
     
     
       
@@ -2012,6 +2014,27 @@
   
   <span class="md-ellipsis">
     nn_linear_regressor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regression/nn_resnet_regressor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_resnet_regressor
   </span>
   
 
@@ -2741,8 +2764,6 @@
       
         
       
-        
-      
     
     
       
@@ -2828,27 +2849,6 @@
   
   <span class="md-ellipsis">
     dataframedataset
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../torch/initialization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    initialization
   </span>
   
 
@@ -3772,7 +3772,8 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/light/trainmodel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 11</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 10</span>
+<span class="normal"> 11</span>
 <span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
@@ -3901,14 +3902,7 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">137</span>
 <span class="normal">138</span>
 <span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters.</span>
 
@@ -3988,13 +3982,6 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
         <span class="c1"># the config id is generated here without a timestamp.</span>
         <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_TRAIN&quot;</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
-    <span class="n">initialization</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;initialization&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Xavier&quot;</span><span class="p">:</span>
-        <span class="n">xavier_init</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Kaiming&quot;</span><span class="p">:</span>
-        <span class="n">kaiming_init</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">pass</span>
 
     <span class="n">dm</span> <span class="o">=</span> <span class="n">LightDataModule</span><span class="p">(</span>
         <span class="n">dataset</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_set&quot;</span><span class="p">],</span>
@@ -4040,7 +4027,8 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">)</span>
     <span class="c1"># Test best model on validation and test set</span>
     <span class="c1"># result = trainer.validate(model=model, datamodule=dm, ckpt_path=&quot;last&quot;)</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">)</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;verbosity&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
     <span class="c1"># unlist the result (from a list of one dict)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_model result: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

@@ -2002,6 +2002,8 @@
       
         
       
+        
+      
     
     
       
@@ -2066,6 +2068,27 @@
   
   <span class="md-ellipsis">
     nn_linear_regressor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regression/nn_resnet_regressor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_resnet_regressor
   </span>
   
 
@@ -2741,8 +2764,6 @@
       
         
       
-        
-      
     
     
       
@@ -2828,27 +2849,6 @@
   
   <span class="md-ellipsis">
     dataframedataset
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../torch/initialization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    initialization
   </span>
   
 
@@ -3747,7 +3747,8 @@
 
             <details class="quote">
               <summary>Source code in <code>spotpython/light/predictmodel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 12</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 11</span>
+<span class="normal"> 12</span>
 <span class="normal"> 13</span>
 <span class="normal"> 14</span>
 <span class="normal"> 15</span>
@@ -3845,16 +3846,7 @@
 <span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predicts using the given configuration and function control parameters.</span>
 
@@ -3921,15 +3913,7 @@
     <span class="c1"># dm.setup(stage=&quot;train&quot;)</span>
     <span class="c1"># Init model from datamodule&#39;s attributes</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
-    <span class="n">initialization</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;initialization&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Xavier&quot;</span><span class="p">:</span>
-        <span class="n">xavier_init</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">initialization</span> <span class="o">==</span> <span class="s2">&quot;Kaiming&quot;</span><span class="p">:</span>
-        <span class="n">kaiming_init</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">pass</span>
-    <span class="c1"># print(f&quot;model: {model}&quot;)</span>
-    <span class="c1"># Init trainer</span>
+
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
         <span class="c1"># Where to save models</span>
         <span class="n">default_root_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">),</span>

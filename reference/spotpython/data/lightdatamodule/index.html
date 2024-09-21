@@ -2062,6 +2062,8 @@
       
         
       
+        
+      
     
     
       
@@ -2126,6 +2128,27 @@
   
   <span class="md-ellipsis">
     nn_linear_regressor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../light/regression/nn_resnet_regressor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_resnet_regressor
   </span>
   
 
@@ -2801,8 +2824,6 @@
       
         
       
-        
-      
     
     
       
@@ -2888,27 +2909,6 @@
   
   <span class="md-ellipsis">
     dataframedataset
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../torch/initialization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    initialization
   </span>
   
 
@@ -4354,7 +4354,19 @@ Performs the training, validation, and test split.</p>
 <span class="normal">302</span>
 <span class="normal">303</span>
 <span class="normal">304</span>
-<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningDataModule for handling data.</span>
 
@@ -4434,6 +4446,7 @@ Performs the training, validation, and test split.</p>
         <span class="n">test_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">scaler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
@@ -4442,6 +4455,7 @@ Performs the training, validation, and test split.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span> <span class="o">=</span> <span class="n">test_seed</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">scaler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">=</span> <span class="n">verbosity</span>
 
     <span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepares the data for use.&quot;&quot;&quot;</span>
@@ -4484,15 +4498,18 @@ Performs the training, validation, and test split.</p>
             <span class="n">val_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">full_train_size</span> <span class="o">*</span> <span class="n">test_size</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">))</span>
             <span class="n">train_size</span> <span class="o">=</span> <span class="n">full_train_size</span> <span class="o">-</span> <span class="n">val_size</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.setup(): stage: </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="c1"># print(f&quot;LightDataModule setup(): full_train_size: {full_train_size}&quot;)</span>
-        <span class="c1"># print(f&quot;LightDataModule setup(): val_size: {val_size}&quot;)</span>
-        <span class="c1"># print(f&quot;LightDataModule setup(): train_size: {train_size}&quot;)</span>
-        <span class="c1"># print(f&quot;LightDataModule setup(): test_size: {test_size}&quot;)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.setup(): stage: </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): full_train_size: </span><span class="si">{</span><span class="n">full_train_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): val_size: </span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): train_size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Assign train/val datasets for use in dataloaders</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">, val_size: </span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2"> used for train &amp; val data.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">, val_size: </span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2"> used for train &amp; val data.&quot;</span><span class="p">)</span>
             <span class="n">generator_fit</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">,</span> <span class="n">test_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_fit</span>
@@ -4501,7 +4518,8 @@ Performs the training, validation, and test split.</p>
                 <span class="c1"># Fit the scaler on training data and transform both train and val data</span>
                 <span class="n">scaler_train_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">))])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
                 <span class="c1"># train_val_data = self.data_train[:,0]</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">scaler_train_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">scaler_train_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">scaler_train_data</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
                 <span class="n">data_tensors_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
@@ -4517,7 +4535,8 @@ Performs the training, validation, and test split.</p>
 
         <span class="c1"># Assign test dataset for use in dataloader(s)</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for test dataset.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for test dataset.&quot;</span><span class="p">)</span>
             <span class="c1"># get test data set as test_abs percent of the full dataset</span>
             <span class="n">generator_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
@@ -4540,7 +4559,8 @@ Performs the training, validation, and test split.</p>
 
         <span class="c1"># Assign pred dataset for use in dataloader(s)</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;predict&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for predict dataset.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for predict dataset.&quot;</span><span class="p">)</span>
             <span class="c1"># get test data set as test_abs percent of the full dataset</span>
             <span class="n">generator_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
@@ -4573,7 +4593,8 @@ Performs the training, validation, and test split.</p>
 <span class="sd">                Training set size: 3</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.train_dataloader(). data_train size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.train_dataloader(). data_train size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># print(f&quot;LightDataModule: train_dataloader(). batch_size: {self.batch_size}&quot;)</span>
         <span class="c1"># print(f&quot;LightDataModule: train_dataloader(). num_workers: {self.num_workers}&quot;)</span>
         <span class="c1"># apply fit_transform to the training data</span>
@@ -4597,7 +4618,8 @@ Performs the training, validation, and test split.</p>
 <span class="sd">                print(f&quot;Training set size: {len(data_module.data_val)}&quot;)</span>
 <span class="sd">                Training set size: 3</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.val_dataloader(). Val. set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.val_dataloader(). Val. set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># print(f&quot;LightDataModule: val_dataloader(). batch_size: {self.batch_size}&quot;)</span>
         <span class="c1"># print(f&quot;LightDataModule: val_dataloader(). num_workers: {self.num_workers}&quot;)</span>
         <span class="c1"># apply fit_transform to the val data</span>
@@ -4622,7 +4644,8 @@ Performs the training, validation, and test split.</p>
 <span class="sd">                Test set size: 6</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.test_dataloader(). Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.test_dataloader(). Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># print(f&quot;LightDataModule: test_dataloader(). batch_size: {self.batch_size}&quot;)</span>
         <span class="c1"># print(f&quot;LightDataModule: test_dataloader(). num_workers: {self.num_workers}&quot;)</span>
         <span class="c1"># apply fit_transform to the val data</span>
@@ -4647,7 +4670,8 @@ Performs the training, validation, and test split.</p>
 <span class="sd">                Predict set size: 6</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.predict_dataloader(). Predict set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.predict_dataloader(). Predict set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># print(f&quot;LightDataModule: predict_dataloader(). batch_size: {self.batch_size}&quot;)</span>
         <span class="c1"># print(f&quot;LightDataModule: predict_dataloader(). num_workers: {self.num_workers}&quot;)</span>
         <span class="c1"># apply fit_transform to the val data</span>
@@ -4719,18 +4743,7 @@ using the predict dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">292</span>
 <span class="normal">293</span>
 <span class="normal">294</span>
 <span class="normal">295</span>
@@ -4743,7 +4756,19 @@ using the predict dataset.</p>
 <span class="normal">302</span>
 <span class="normal">303</span>
 <span class="normal">304</span>
-<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the predict dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the predict dataset.</span>
@@ -4762,7 +4787,8 @@ using the predict dataset.</p>
 <span class="sd">            Predict set size: 6</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.predict_dataloader(). Predict set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.predict_dataloader(). Predict set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># print(f&quot;LightDataModule: predict_dataloader(). batch_size: {self.batch_size}&quot;)</span>
     <span class="c1"># print(f&quot;LightDataModule: predict_dataloader(). num_workers: {self.num_workers}&quot;)</span>
     <span class="c1"># apply fit_transform to the val data</span>
@@ -4789,10 +4815,10 @@ using the predict dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">96</span>
-<span class="normal">97</span>
-<span class="normal">98</span>
-<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepares the data for use.&quot;&quot;&quot;</span>
     <span class="c1"># download</span>
     <span class="k">pass</span>
@@ -4863,9 +4889,7 @@ or None (for all three stages). Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
 <span class="normal">104</span>
 <span class="normal">105</span>
 <span class="normal">106</span>
@@ -4967,7 +4991,15 @@ or None (for all three stages). Defaults to None.</p>
 <span class="normal">202</span>
 <span class="normal">203</span>
 <span class="normal">204</span>
-<span class="normal">205</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Splits the data for use in training, validation, and testing.</span>
 <span class="sd">    Uses torch.utils.data.random_split() to split the data.</span>
@@ -5003,15 +5035,18 @@ or None (for all three stages). Defaults to None.</p>
         <span class="n">val_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">full_train_size</span> <span class="o">*</span> <span class="n">test_size</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">))</span>
         <span class="n">train_size</span> <span class="o">=</span> <span class="n">full_train_size</span> <span class="o">-</span> <span class="n">val_size</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.setup(): stage: </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="c1"># print(f&quot;LightDataModule setup(): full_train_size: {full_train_size}&quot;)</span>
-    <span class="c1"># print(f&quot;LightDataModule setup(): val_size: {val_size}&quot;)</span>
-    <span class="c1"># print(f&quot;LightDataModule setup(): train_size: {train_size}&quot;)</span>
-    <span class="c1"># print(f&quot;LightDataModule setup(): test_size: {test_size}&quot;)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.setup(): stage: </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): full_train_size: </span><span class="si">{</span><span class="n">full_train_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): val_size: </span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): train_size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule setup(): test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Assign train/val datasets for use in dataloaders</span>
     <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">, val_size: </span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2"> used for train &amp; val data.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_size: </span><span class="si">{</span><span class="n">train_size</span><span class="si">}</span><span class="s2">, val_size: </span><span class="si">{</span><span class="n">val_size</span><span class="si">}</span><span class="s2"> used for train &amp; val data.&quot;</span><span class="p">)</span>
         <span class="n">generator_fit</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">,</span> <span class="n">test_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_fit</span>
@@ -5020,7 +5055,8 @@ or None (for all three stages). Defaults to None.</p>
             <span class="c1"># Fit the scaler on training data and transform both train and val data</span>
             <span class="n">scaler_train_data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">))])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># train_val_data = self.data_train[:,0]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">scaler_train_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">scaler_train_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">scaler_train_data</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">target</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
             <span class="n">data_tensors_train</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">data</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">]</span>
@@ -5036,7 +5072,8 @@ or None (for all three stages). Defaults to None.</p>
 
     <span class="c1"># Assign test dataset for use in dataloader(s)</span>
     <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for test dataset.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for test dataset.&quot;</span><span class="p">)</span>
         <span class="c1"># get test data set as test_abs percent of the full dataset</span>
         <span class="n">generator_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
@@ -5059,7 +5096,8 @@ or None (for all three stages). Defaults to None.</p>
 
     <span class="c1"># Assign pred dataset for use in dataloader(s)</span>
     <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;predict&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for predict dataset.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for predict dataset.&quot;</span><span class="p">)</span>
         <span class="c1"># get test data set as test_abs percent of the full dataset</span>
         <span class="n">generator_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
@@ -5129,17 +5167,7 @@ using the test dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
 <span class="normal">269</span>
@@ -5152,7 +5180,18 @@ using the test dataset.</p>
 <span class="normal">276</span>
 <span class="normal">277</span>
 <span class="normal">278</span>
-<span class="normal">279</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the test dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the test dataset.</span>
@@ -5171,7 +5210,8 @@ using the test dataset.</p>
 <span class="sd">            Test set size: 6</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.test_dataloader(). Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.test_dataloader(). Test set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># print(f&quot;LightDataModule: test_dataloader(). batch_size: {self.batch_size}&quot;)</span>
     <span class="c1"># print(f&quot;LightDataModule: test_dataloader(). num_workers: {self.num_workers}&quot;)</span>
     <span class="c1"># apply fit_transform to the val data</span>
@@ -5233,15 +5273,7 @@ using the training dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">215</span>
 <span class="normal">216</span>
 <span class="normal">217</span>
 <span class="normal">218</span>
@@ -5256,7 +5288,16 @@ using the training dataset.</p>
 <span class="normal">227</span>
 <span class="normal">228</span>
 <span class="normal">229</span>
-<span class="normal">230</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the training dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the training dataset.</span>
@@ -5275,7 +5316,8 @@ using the training dataset.</p>
 <span class="sd">            Training set size: 3</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.train_dataloader(). data_train size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.train_dataloader(). data_train size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_train</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># print(f&quot;LightDataModule: train_dataloader(). batch_size: {self.batch_size}&quot;)</span>
     <span class="c1"># print(f&quot;LightDataModule: train_dataloader(). num_workers: {self.num_workers}&quot;)</span>
     <span class="c1"># apply fit_transform to the training data</span>
@@ -5337,16 +5379,7 @@ using the validation dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span>
-<span class="normal">240</span>
-<span class="normal">241</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
 <span class="normal">244</span>
@@ -5359,7 +5392,17 @@ using the validation dataset.</p>
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
-<span class="normal">254</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the validation dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the validation dataset.</span>
@@ -5377,7 +5420,8 @@ using the validation dataset.</p>
 <span class="sd">            print(f&quot;Training set size: {len(data_module.data_val)}&quot;)</span>
 <span class="sd">            Training set size: 3</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.val_dataloader(). Val. set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LightDataModule.val_dataloader(). Val. set size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_val</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># print(f&quot;LightDataModule: val_dataloader(). batch_size: {self.batch_size}&quot;)</span>
     <span class="c1"># print(f&quot;LightDataModule: val_dataloader(). num_workers: {self.num_workers}&quot;)</span>
     <span class="c1"># apply fit_transform to the val data</span>
