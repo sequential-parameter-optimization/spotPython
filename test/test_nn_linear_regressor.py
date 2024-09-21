@@ -122,5 +122,7 @@ def test_predict_step(nn_linear_regressor):
 
 
 def test_configure_optimizers(nn_linear_regressor):
-    optimizer = nn_linear_regressor.configure_optimizers()
+    res  = nn_linear_regressor.configure_optimizers()
+    # res is a dictionary containing the optimizer and the scheduler
+    optimizer = res["optimizer"]
     assert isinstance(optimizer, torch.optim.Optimizer)

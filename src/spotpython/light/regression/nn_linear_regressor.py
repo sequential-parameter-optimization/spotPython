@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from spotpython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
-from spotpython.utils.math import generate_div2_list
+import torch.optim as optim
 
 
 class NNLinearRegressor(L.LightningModule):
@@ -166,32 +166,57 @@ class NNLinearRegressor(L.LightningModule):
         if self.hparams.l1 < 4:
             raise ValueError("l1 must be at least 4")
         hidden_sizes = self._get_hidden_sizes()
+
         # Create the network based on the specified hidden sizes
         layers = []
         layer_sizes = [self._L_in] + hidden_sizes
-        layer_size_last = layer_sizes[0]
-        for layer_size in layer_sizes[1:]:
+        for i in range(len(layer_sizes) - 1):
+            current_layer_size = layer_sizes[i]
+            next_layer_size = layer_sizes[i + 1]
             layers += [
-                nn.Linear(layer_size_last, layer_size),
+                nn.Linear(current_layer_size, next_layer_size),
+                nn.BatchNorm1d(next_layer_size),  # Add Batch Normalization here
                 self.hparams.act_fn,
                 nn.Dropout(self.hparams.dropout_prob),
             ]
-            layer_size_last = layer_size
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
-        # nn.Sequential summarizes a list of modules into a single module, applying them in sequence
+
+        # Wrap the layers into a sequential container
         self.layers = nn.Sequential(*layers)
 
+        # Initialization (Xavier, Kaiming, or Default)
+        self.apply(self._init_weights)
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            if self.hparams.initialization == "xavier_uniform":
+                nn.init.xavier_uniform_(module.weight)
+            elif self.hparams.initialization == "xavier_normal":
+                nn.init.xavier_normal_(module.weight)
+            elif self.hparams.initialization == "kaiming_uniform":
+                nn.init.kaiming_uniform_(module.weight)
+            elif self.hparams.initialization == "kaiming_normal":
+                nn.init.kaiming_normal_(module.weight)
+            else:  # "Default"
+                nn.init.uniform_(module.weight)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+
+    def _generate_div2_list(self, n, n_min) -> list:
+        result = []
+        current = n
+        repeats = 1
+        max_repeats = 4
+        while current >= n_min:
+            result.extend([current] * min(repeats, max_repeats))
+            current = current // 2
+            repeats = repeats + 1
+        return result
+
     def _get_hidden_sizes(self):
-        """
-        Generate the hidden layer sizes for the network.
-
-        Returns:
-            list: A list of hidden layer sizes.
-
-        """
         n_low = self._L_in // 4
         n_high = max(self.hparams.l1, 2 * n_low)
-        hidden_sizes = generate_div2_list(n_high, n_low)
+        hidden_sizes = self._generate_div2_list(n_high, n_low)
         return hidden_sizes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -326,4 +351,18 @@ class NNLinearRegressor(L.LightningModule):
         optimizer = optimizer_handler(
             optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
         )
-        return optimizer
+
+        num_milestones = 3  # Number of milestones to divide the epochs
+        milestones = [int(self.hparams.epochs / (num_milestones + 1) * (i + 1)) for i in range(num_milestones)]
+
+        print(f"Milestones: {milestones}")
+
+        scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=0.1)  # Decay factor
+
+        lr_scheduler_config = {
+            "scheduler": scheduler,
+            "interval": "epoch",
+            "frequency": 1,
+        }
+
+        return {"optimizer": optimizer, "lr_scheduler": lr_scheduler_config}
