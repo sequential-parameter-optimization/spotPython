@@ -3,7 +3,6 @@ from spotpython.data.lightdatamodule import LightDataModule
 from spotpython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from spotpython.torch.initialization import kaiming_init, xavier_init
 from lightning.pytorch.callbacks import ModelCheckpoint
 import os
 
@@ -88,13 +87,6 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         # the config id is generated here without a timestamp.
         config_id = generate_config_id(config, timestamp=False) + "_TRAIN"
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
-    initialization = config["initialization"]
-    if initialization == "Xavier":
-        xavier_init(model)
-    elif initialization == "Kaiming":
-        kaiming_init(model)
-    else:
-        pass
 
     dm = LightDataModule(
         dataset=fun_control["data_set"],

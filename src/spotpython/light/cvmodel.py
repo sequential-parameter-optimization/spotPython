@@ -3,7 +3,6 @@ from spotpython.data.lightcrossvalidationdatamodule import LightCrossValidationD
 from spotpython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from spotpython.torch.initialization import kaiming_init, xavier_init
 import os
 
 
@@ -54,14 +53,6 @@ def cv_model(config: dict, fun_control: dict) -> float:
         print("k:", k)
 
         model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
-        initialization = config["initialization"]
-        if initialization == "Xavier":
-            xavier_init(model)
-        elif initialization == "Kaiming":
-            kaiming_init(model)
-        else:
-            pass
-        # print(f"model: {model}")
 
         dm = LightCrossValidationDataModule(
             k=k,

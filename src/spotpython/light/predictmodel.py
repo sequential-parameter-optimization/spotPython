@@ -4,7 +4,6 @@ from spotpython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from spotpython.torch.initialization import kaiming_init, xavier_init
 import os
 from typing import Tuple
 
@@ -76,15 +75,7 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     # dm.setup(stage="train")
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
-    initialization = config["initialization"]
-    if initialization == "Xavier":
-        xavier_init(model)
-    elif initialization == "Kaiming":
-        kaiming_init(model)
-    else:
-        pass
-    # print(f"model: {model}")
-    # Init trainer
+
     trainer = L.Trainer(
         # Where to save models
         default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
