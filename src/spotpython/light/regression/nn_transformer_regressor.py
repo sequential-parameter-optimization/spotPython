@@ -32,6 +32,7 @@ class NNTransformerRegressor(L.LightningModule):
 
         self.d_model = d_model_mult * nhead
         self.dim_feedforward = dim_feedforward_mult * self.d_model
+        print(f"d_model: {self.d_model}, dim_feedforward: {self.dim_feedforward}")
 
         if _torchmetric is None:
             _torchmetric = "mean_squared_error"
