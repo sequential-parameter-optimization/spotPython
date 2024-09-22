@@ -2308,7 +2308,13 @@ class Spot:
         optimizer_control = copy.deepcopy(self.optimizer_control)
         surrogate_control = copy.deepcopy(self.surrogate_control)
         design_control = copy.deepcopy(self.design_control)
-        spot_tuner = copy.deepcopy(self)
+        # try to copy the spot_tuner object. If not possible,issue a warning and set spot_tuner to None.
+        try:
+            spot_tuner = copy.deepcopy(self)
+        except Exception as e:
+            logger.warning("Warning: Could not copy/save spot_tuner object!")
+            logger.warning(f"Error: {e}")
+            spot_tuner = None
         experiment = {
             "design_control": design_control,
             "fun_control": fun_control,
