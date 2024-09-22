@@ -10,10 +10,10 @@ from spotpython.light.regression.pos_enc import PositionalEncoding
 class NNTransformerRegressor(L.LightningModule):
     def __init__(
         self,
-        d_model: int,
+        d_model_mult: int,
         nhead: int,
         num_encoder_layers: int,
-        dim_feedforward: int,
+        dim_feedforward_mult: int,
         dropout: float,
         epochs: int,
         batch_size: int,
@@ -30,25 +30,30 @@ class NNTransformerRegressor(L.LightningModule):
         self._L_in = _L_in
         self._L_out = _L_out
 
+        self.d_model = d_model_mult * nhead
+        self.dim_feedforward = dim_feedforward_mult * self.d_model
+
         if _torchmetric is None:
             _torchmetric = "mean_squared_error"
         self._torchmetric = _torchmetric
         self.metric = getattr(torchmetrics.functional.regression, _torchmetric)
 
         # Embedding layer to convert input features to d_model dimensions
-        self.input_proj = nn.Linear(_L_in, d_model)
+        self.input_proj = nn.Linear(_L_in, self.d_model)
 
         # Positional encoding
-        self.positional_encoding = PositionalEncoding(d_model)
+        self.positional_encoding = PositionalEncoding(self.d_model)
 
         # Transformer encoder
         self.transformer_encoder = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(d_model=d_model, nhead=nhead, dim_feedforward=dim_feedforward, dropout=dropout),
+            nn.TransformerEncoderLayer(
+                d_model=self.d_model, nhead=nhead, dim_feedforward=self.dim_feedforward, dropout=dropout
+            ),
             num_layers=num_encoder_layers,
         )
 
         # Final regression layer
-        self.fc_out = nn.Linear(d_model, _L_out)
+        self.fc_out = nn.Linear(self.d_model, _L_out)
 
         # Store hyperparameters
         self.save_hyperparameters(ignore=["_L_in", "_L_out", "_torchmetric"])
