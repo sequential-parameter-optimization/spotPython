@@ -864,7 +864,8 @@ class Spot:
             self.spot_writer.close()
         if self.fun_control["db_dict_name"] is not None:
             self.write_db_dict()
-        self.save_experiment()
+        if self.fun_control["save_experiment"]:
+            self.save_experiment()
         return self
 
     def initialize_design(self, X_start=None) -> None:
