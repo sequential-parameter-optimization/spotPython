@@ -2299,24 +2299,27 @@ class Spot:
         """
         Save the experiment to a file.
         """
-        # check if the key "spot_writer" is in the fun_control dictionary
-        # remove the key "spot_writer" from the fun_control dictionary,
-        # because it is not serializable.
-        # TODO: It will be re-added when the experiment is loaded.
+        # Remove or close any unpickleable objects, e.g., the spot_writer
         self.close_and_del_spot_writer()
 
+        # Remove the logger handler before pickling
+        self.remove_logger_handlers()
+
+        # Create deep copies of control dictionaries
         fun_control = copy.deepcopy(self.fun_control)
         optimizer_control = copy.deepcopy(self.optimizer_control)
         surrogate_control = copy.deepcopy(self.surrogate_control)
         design_control = copy.deepcopy(self.design_control)
-        # try to copy the spot_tuner object. If not possible,issue a warning and set spot_tuner to None.
+
+        # Deep copy the spot object itself (except unpickleable components)
         try:
             spot_tuner = copy.deepcopy(self)
         except Exception as e:
             print("Warning: Could not copy spot_tuner object!")
-            logger.warning("Warning: Could not copy spot_tuner object!")
-            logger.warning(f"Error: {e}")
+            print(f"Error: {e}")
             spot_tuner = self
+
+        # Prepare the experiment dictionary
         experiment = {
             "design_control": design_control,
             "fun_control": fun_control,
@@ -2325,26 +2328,41 @@ class Spot:
             "surrogate_control": surrogate_control,
         }
 
-        PREFIX = fun_control["PREFIX"]
+        # Determine the filename based on PREFIX if not provided
+        PREFIX = fun_control.get("PREFIX")
         if filename is None and PREFIX is not None:
             filename = get_experiment_filename(PREFIX)
+
+        # Serialize the experiment dictionary to the pickle file
         if filename is not None:
             with open(filename, "wb") as handle:
                 try:
                     pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 except Exception as e:
-                    logger.error(f"Error: {e}")
-                    pprint.pprint(fun_control)
-                    print("design_control:")
-                    pprint.pprint(design_control)
-                    print("optimizer_control:")
-                    pprint.pprint(optimizer_control)
-                    print("surrogate_control:")
-                    pprint.pprint(surrogate_control)
-                    print("spot_tuner:")
-                    pprint.pprint(spot_tuner)
+                    print(f"Error: {e}")
                     raise e
-        print(f"Experiment saved to {filename}")
+            print(f"Experiment saved to {filename}")
+
+    def remove_logger_handlers(self) -> None:
+        """
+        Remove handlers from the logger to avoid pickling issues.
+        """
+        logger = logging.getLogger(__name__)
+        for handler in logger.handlers[:]:  # Copy the list to avoid modification during iteration
+            logger.removeHandler(handler)
+
+    def reattach_logger_handlers(self) -> None:
+        """
+        Reattach handlers to the logger after unpickling.
+        """
+        logger = logging.getLogger(__name__)
+        # configure the handler and formatter as needed
+        py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
+        py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+        # add formatter to the handler
+        py_handler.setFormatter(py_formatter)
+        # add handler to the logger
+        logger.addHandler(py_handler)
 
     def init_spot_writer(self) -> None:
         """
