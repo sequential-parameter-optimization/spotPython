@@ -2313,9 +2313,10 @@ class Spot:
         try:
             spot_tuner = copy.deepcopy(self)
         except Exception as e:
-            logger.warning("Warning: Could not copy/save spot_tuner object!")
+            print("Warning: Could not copy spot_tuner object!")
+            logger.warning("Warning: Could not copy spot_tuner object!")
             logger.warning(f"Error: {e}")
-            spot_tuner = copy(self)
+            spot_tuner = self
         experiment = {
             "design_control": design_control,
             "fun_control": fun_control,
@@ -2342,8 +2343,8 @@ class Spot:
                     pprint.pprint(surrogate_control)
                     print("spot_tuner:")
                     pprint.pprint(spot_tuner)
-
                     raise e
+        print(f"Experiment saved to {filename}")
 
     def init_spot_writer(self) -> None:
         """
