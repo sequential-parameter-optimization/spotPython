@@ -2314,7 +2314,7 @@ class Spot:
         except Exception as e:
             logger.warning("Warning: Could not copy/save spot_tuner object!")
             logger.warning(f"Error: {e}")
-            spot_tuner = None
+            spot_tuner = copy(self)
         experiment = {
             "design_control": design_control,
             "fun_control": fun_control,

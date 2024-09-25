@@ -618,7 +618,10 @@ def get_attributions(
     model = model.to("cpu")
     model.eval()
     dataset = fun_control["data_set"]
-    n_features = dataset.data.shape[1]
+    try:
+        n_features = dataset.data.shape[1]
+    except AttributeError:
+        n_features = dataset.tensors[0].shape[1]
     if feature_names is None:
         feature_names = [f"x{i}" for i in range(n_features)]
     batch_size = config["batch_size"]
@@ -745,7 +748,10 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx) -> np.ndarray:
     model.eval()
 
     dataset = fun_control["data_set"]
-    n_features = dataset.data.shape[1]
+    try:
+        n_features = dataset.data.shape[1]
+    except AttributeError:
+        n_features = dataset.tensors[0].shape[1]
     if feature_names is None:
         feature_names = [f"x{i}" for i in range(n_features)]
     batch_size = config["batch_size"]
