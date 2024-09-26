@@ -2295,9 +2295,18 @@ class Spot:
             fig.show()
         return fig
 
-    def save_experiment(self, filename=None) -> None:
+    def save_experiment(self, filename=None, overwrite=True) -> None:
         """
         Save the experiment to a file.
+
+        Args:
+            filename (str):
+                The filename of the experiment file.
+            overwrite (bool):
+                If `True`, the file will be overwritten if it already exists. Default is `True`.
+
+        Returns:
+            None
         """
         # Remove or close any unpickleable objects, e.g., the spot_writer
         self.close_and_del_spot_writer()
@@ -2332,6 +2341,11 @@ class Spot:
         PREFIX = fun_control.get("PREFIX")
         if filename is None and PREFIX is not None:
             filename = get_experiment_filename(PREFIX)
+
+        # Check if the file already exists
+        if filename is not None and os.path.exists(filename) and not overwrite:
+            print(f"Error: File {filename} already exists. Use overwrite=True to overwrite the file.")
+            return
 
         # Serialize the experiment dictionary to the pickle file
         if filename is not None:
