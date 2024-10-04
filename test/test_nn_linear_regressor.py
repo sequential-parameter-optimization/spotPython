@@ -45,6 +45,7 @@ params = {
     "dropout_prob": 0.1,
     "lr_mult": 0.1,
     "patience": 5,
+    "batch_norm": 0,
     "_L_in": 10,
     "_L_out": 1,
     "_torchmetric": "mean_squared_error",

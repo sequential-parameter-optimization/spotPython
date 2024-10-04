@@ -29,6 +29,8 @@ class NNLinearRegressor(L.LightningModule):
             The learning rate multiplier for the optimizer.
         patience (int):
             The number of epochs to wait before early stopping.
+        batch_norm (bool):
+            Whether to use batch normalization or not.
         _L_in (int):
             The number of input features.
         _L_out (int):
@@ -104,6 +106,7 @@ class NNLinearRegressor(L.LightningModule):
         dropout_prob: float,
         lr_mult: float,
         patience: int,
+        batch_norm: bool,
         _L_in: int,
         _L_out: int,
         _torchmetric: str,
@@ -130,6 +133,8 @@ class NNLinearRegressor(L.LightningModule):
                 The learning rate multiplier for the optimizer.
             patience (int):
                 The number of epochs to wait before early stopping.
+            batch_norm (bool):
+                Whether to use batch normalization or not.
             _L_in (int):
                 The number of input features. Not a hyperparameter, but needed to create the network.
             _L_out (int):
@@ -173,12 +178,19 @@ class NNLinearRegressor(L.LightningModule):
         for i in range(len(layer_sizes) - 1):
             current_layer_size = layer_sizes[i]
             next_layer_size = layer_sizes[i + 1]
-            layers += [
-                nn.Linear(current_layer_size, next_layer_size),
-                nn.BatchNorm1d(next_layer_size),  # Add Batch Normalization here
-                self.hparams.act_fn,
-                nn.Dropout(self.hparams.dropout_prob),
-            ]
+            if self.hparams.initialization:
+                layers += [
+                    nn.Linear(current_layer_size, next_layer_size),
+                    nn.BatchNorm1d(next_layer_size),  # Add Batch Normalization here
+                    self.hparams.act_fn,
+                    nn.Dropout(self.hparams.dropout_prob),
+                ]
+            else:
+                layers += [
+                    nn.Linear(current_layer_size, next_layer_size),
+                    self.hparams.act_fn,
+                    nn.Dropout(self.hparams.dropout_prob),
+                ]
         layers += [nn.Linear(layer_sizes[-1], self._L_out)]
 
         # Wrap the layers into a sequential container
