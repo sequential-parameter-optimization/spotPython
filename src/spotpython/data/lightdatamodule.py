@@ -96,12 +96,28 @@ class LightDataModule(L.LightningDataModule):
         self.scaler = scaler
         self.verbosity = verbosity
 
-    def transform_dataset(self, dataset):
-        """Applies the scaler transformation to the dataset."""
-        transformed_data = [(self.scaler.transform(data), target) for data, target in dataset]
-        data_tensors = [data.clone().detach() for data, target in transformed_data]
-        target_tensors = [target.clone().detach() for data, target in transformed_data]
-        return TensorDataset(torch.stack(data_tensors).squeeze(1), torch.stack(target_tensors))
+    def transform_dataset(self, dataset)->TensorDataset:
+        """Applies the scaler transformation to the dataset.
+
+        Args:
+            dataset (List[Tuple[torch.Tensor, Any]]): The dataset to transform, consisting of data and target pairs.
+
+        Returns:
+            TensorDataset: A PyTorch TensorDataset containing the transformed and cloned data and targets.
+
+        Raises:
+            ValueError: If the input data is not correctly formatted for transformation.
+        """
+        try:
+            # Perform transformations on the data in a single iteration
+            transformed_data = [(self.scaler.transform(data), target) for data, target in dataset]
+            # Clone and detach data tensors
+            data_tensors = [data.clone().detach() for data, _ in transformed_data]
+            target_tensors = [target.clone().detach() for _, target in transformed_data]
+            # Create a TensorDataset from the processed data
+            return TensorDataset(torch.stack(data_tensors).squeeze(1), torch.stack(target_tensors))
+        except Exception as e:
+            raise ValueError(f"Error transforming dataset: {e}")
 
     def prepare_data(self) -> None:
         """Prepares the data for use."""
