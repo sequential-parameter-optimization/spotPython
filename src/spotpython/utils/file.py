@@ -93,15 +93,18 @@ def get_experiment_filename(PREFIX):
     return filename
 
 
-def load_experiment(PKL_NAME):
+def load_experiment(PKL_NAME=None, PREFIX=None):
     """
     Loads the experiment from a pickle file.
+    If PKL_NAME is None and PREFIX is not None, the experiment is loaded based on the PREFIX
+    using the get_experiment_filename function.
     If the spot tuner object and the fun control dictionary do not exist, an error is thrown.
     If the design control, surrogate control, and optimizer control dictionaries do not exist, a warning is issued
     and `None` is assigned to the corresponding variables.
 
     Args:
-        PKL_NAME (str): Name of the pickle file.
+        PKL_NAME (str): Name of the pickle file. Defaults to None.
+        PREFIX (str, optional): Prefix of the experiment. Defaults to None.
 
     Returns:
         spot_tuner (object): The spot tuner object.
@@ -118,8 +121,11 @@ def load_experiment(PKL_NAME):
         >>> spot_tuner, fun_control, design_control, _, _ = load_experiment("spot_0_experiment.pickle")
 
     """
+    if PKL_NAME is None and PREFIX is not None:
+        PKL_NAME = get_experiment_filename(PREFIX)
     with open(PKL_NAME, "rb") as handle:
         experiment = pickle.load(handle)
+        print(f"Loaded experiment from {PKL_NAME}")
     # assign spot_tuner and fun_control only if they exist otherwise throw an error
     if "spot_tuner" not in experiment:
         raise ValueError("The spot tuner object does not exist in the pickle file.")
