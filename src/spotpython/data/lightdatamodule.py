@@ -96,7 +96,7 @@ class LightDataModule(L.LightningDataModule):
         self.scaler = scaler
         self.verbosity = verbosity
 
-    def transform_dataset(self, dataset)->TensorDataset:
+    def transform_dataset(self, dataset) -> TensorDataset:
         """Applies the scaler transformation to the dataset.
 
         Args:

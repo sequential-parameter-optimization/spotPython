@@ -172,26 +172,32 @@ class NNLinearRegressor(L.LightningModule):
             raise ValueError("l1 must be at least 4")
         hidden_sizes = self._get_hidden_sizes()
 
-        # Create the network based on the specified hidden sizes
-        layers = []
-        layer_sizes = [self._L_in] + hidden_sizes
-        for i in range(len(layer_sizes) - 1):
-            current_layer_size = layer_sizes[i]
-            next_layer_size = layer_sizes[i + 1]
-            if self.hparams.initialization:
+        if batch_norm:
+            # Add batch normalization layers
+            layers = []
+            layer_sizes = [self._L_in] + hidden_sizes
+            for i in range(len(layer_sizes) - 1):
+                current_layer_size = layer_sizes[i]
+                next_layer_size = layer_sizes[i + 1]
                 layers += [
                     nn.Linear(current_layer_size, next_layer_size),
-                    nn.BatchNorm1d(next_layer_size),  # Add Batch Normalization here
+                    nn.BatchNorm1d(next_layer_size),
                     self.hparams.act_fn,
                     nn.Dropout(self.hparams.dropout_prob),
                 ]
-            else:
+            layers += [nn.Linear(layer_sizes[-1], self._L_out)]
+        else:
+            layers = []
+            layer_sizes = [self._L_in] + hidden_sizes
+            for i in range(len(layer_sizes) - 1):
+                current_layer_size = layer_sizes[i]
+                next_layer_size = layer_sizes[i + 1]
                 layers += [
                     nn.Linear(current_layer_size, next_layer_size),
                     self.hparams.act_fn,
                     nn.Dropout(self.hparams.dropout_prob),
                 ]
-        layers += [nn.Linear(layer_sizes[-1], self._L_out)]
+            layers += [nn.Linear(layer_sizes[-1], self._L_out)]
 
         # Wrap the layers into a sequential container
         self.layers = nn.Sequential(*layers)
