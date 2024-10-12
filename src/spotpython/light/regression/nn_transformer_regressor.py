@@ -120,9 +120,6 @@ class NNTransformerRegressor(L.LightningModule):
         num_milestones = 3  # Number of milestones to divide the epochs
         milestones = [int(self.hparams.epochs / (num_milestones + 1) * (i + 1)) for i in range(num_milestones)]
 
-        # Print milestones for debug purposes
-        print(f"Milestones: {milestones}")
-
         # Create MultiStepLR scheduler with dynamic milestones and learning rate multiplier.
         scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=0.1)  # Decay factor
 

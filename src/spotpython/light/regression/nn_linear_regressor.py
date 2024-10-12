@@ -372,9 +372,6 @@ class NNLinearRegressor(L.LightningModule):
 
         num_milestones = 3  # Number of milestones to divide the epochs
         milestones = [int(self.hparams.epochs / (num_milestones + 1) * (i + 1)) for i in range(num_milestones)]
-
-        print(f"Milestones: {milestones}")
-
         scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=0.1)  # Decay factor
 
         lr_scheduler_config = {

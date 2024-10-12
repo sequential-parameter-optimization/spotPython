@@ -2295,13 +2295,15 @@ class Spot:
             fig.show()
         return fig
 
-    def save_experiment(self, filename=None, overwrite=True) -> None:
+    def save_experiment(self, filename=None, path=None, overwrite=True) -> None:
         """
         Save the experiment to a file.
 
         Args:
             filename (str):
                 The filename of the experiment file.
+            path (str):
+                The path to the experiment file.
             overwrite (bool):
                 If `True`, the file will be overwritten if it already exists. Default is `True`.
 
@@ -2341,6 +2343,11 @@ class Spot:
         PREFIX = fun_control.get("PREFIX")
         if filename is None and PREFIX is not None:
             filename = get_experiment_filename(PREFIX)
+
+        if path is not None:
+            filename = os.path.join(path, filename)
+            if not os.path.exists(path):
+                os.makedirs(path)
 
         # Check if the file already exists
         if filename is not None and os.path.exists(filename) and not overwrite:
