@@ -20,6 +20,52 @@ from spotpython.data.lightdatamodule import LightDataModule
 
 def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
     """
+    Get the average activations of each neuron in the neural network's linear layers.
+
+    Args:
+        net (object): A neural network.
+        fun_control (dict): A dictionary with the function control.
+        batch_size (int, optional): The batch size.
+        device (str, optional): The device to use. Defaults to "cpu".
+
+    Returns:
+        dict: A dictionary with the average activations of the neurons in the network.
+    """
+    activations = {}
+    net.eval()
+
+    dataset = fun_control["data_set"]
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+
+    layer_sums = {}
+    layer_counts = {}
+
+    with torch.no_grad():
+        for inputs, _ in dataloader:
+            inputs = inputs.to(device)
+
+            for layer_index, layer in enumerate(net.layers):  # Iterate over layers
+                inputs = layer(inputs)
+
+                if isinstance(layer, nn.Linear):
+                    n_neurons = inputs.size(1)
+                    if layer_index not in layer_sums:
+                        layer_sums[layer_index] = torch.zeros(n_neurons, device=device)
+                        layer_counts[layer_index] = 0
+
+                    # Sum activation for each neuron
+                    layer_sums[layer_index] += inputs.sum(dim=0)
+                    layer_counts[layer_index] += inputs.size(0)  # Add up batch size
+
+    # Compute average activations
+    for layer_index, total_sum in layer_sums.items():
+        activations[layer_index] = (total_sum / layer_counts[layer_index]).cpu().numpy()
+
+    return activations
+
+
+def get_activations_full(net, fun_control, batch_size, device="cpu") -> dict:
+    """
     Get the activations of a neural network.
 
     Args:
@@ -73,7 +119,6 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
     """
     activations = {}
     net.eval()
-    # print(f"net: {net}")
     dataset = fun_control["data_set"]
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     inputs, _ = next(iter(dataloader))
@@ -85,7 +130,6 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
             inputs = layer(inputs)
             if isinstance(layer, nn.Linear):
                 activations[layer_index] = inputs.view(-1).cpu().numpy()
-    # print(f"activations:{activations}")
     return activations
 
 
@@ -315,6 +359,8 @@ def old_plot_nn_values_scatter(
         cmap = "gray"
     elif cmap == "BlueWhiteRed":
         cmap = colors.LinearSegmentedColormap.from_list("", ["blue", "white", "red"])
+    elif cmap == "GreenYellowRed":
+        cmap = colors.LinearSegmentedColormap.from_list("", ["green", "yellow", "red"])
     else:
         cmap = "viridis"
 
@@ -379,6 +425,8 @@ def plot_nn_values_scatter(
         cmap = "gray"
     elif cmap == "BlueWhiteRed":
         cmap = colors.LinearSegmentedColormap.from_list("", ["blue", "white", "red"])
+    elif cmap == "GreenYellowRed":
+        cmap = colors.LinearSegmentedColormap.from_list("", ["green", "yellow", "red"])
     else:
         cmap = "viridis"
 
@@ -440,7 +488,7 @@ def visualize_activations_distributions(net, fun_control, batch_size, device="cp
         None
 
     """
-    activations = get_activations(net, fun_control, batch_size, device)
+    activations = get_activations_full(net, fun_control, batch_size, device)
     plot_nn_values_hist(activations, net, nn_values_names="Activations", color=color, columns=columns)
 
 
@@ -524,7 +572,7 @@ def visualize_activations(net, fun_control, batch_size, device, absolute=True, c
     """
     activations = get_activations(net, fun_control, batch_size, device)
     plot_nn_values_scatter(
-        nn_values=activations, nn_values_names="Activations", absolute=absolute, cmap=cmap, figsize=figsize
+        nn_values=activations, nn_values_names="Average Activations", absolute=absolute, cmap=cmap, figsize=figsize
     )
 
 
@@ -641,7 +689,7 @@ def get_attributions(
         batch_size=batch_size,
         test_size=fun_control["test_size"],
         scaler=fun_control["scaler"],
-        verbosity=10
+        verbosity=10,
     )
     data_module.setup(stage="test")
     test_loader = data_module.test_dataloader()
@@ -665,107 +713,6 @@ def get_attributions(
         )
     for inputs, _ in test_loader:
         inputs.requires_grad_()
-        attributions = attr.attribute(inputs, return_convergence_delta=False, baselines=baseline)
-        if total_attributions is None:
-            total_attributions = attributions
-        else:
-            if len(attributions) == len(total_attributions):
-                total_attributions += attributions
-
-    # Calculation of average attribution across all batches
-    avg_attributions = total_attributions.mean(dim=0).detach().numpy()
-
-    # Transformation to the absolute attribution values if abs_attr is True
-    # Get indices of the n most important features
-    if abs_attr is True:
-        abs_avg_attributions = abs(avg_attributions)
-        top_n_indices = abs_avg_attributions.argsort()[-n_rel:][::-1]
-    else:
-        top_n_indices = avg_attributions.argsort()[-n_rel:][::-1]
-
-    # Get the importance values for the top n features
-    top_n_importances = avg_attributions[top_n_indices]
-
-    df = pd.DataFrame(
-        {
-            "Feature Index": top_n_indices,
-            "Feature": [feature_names[i] for i in top_n_indices],
-            attr_method + "Attribution": top_n_importances,
-        }
-    )
-    return df
-
-
-def get_attributions_old(
-    spot_tuner,
-    fun_control,
-    attr_method="IntegratedGradients",
-    baseline=None,
-    abs_attr=True,
-    n_rel=5,
-    device="cpu",
-) -> pd.DataFrame:
-    """Get the attributions of a neural network.
-
-    Args:
-        spot_tuner (object):
-            The spot tuner object.
-        fun_control (dict):
-            A dictionary with the function control.
-        attr_method (str, optional):
-            The attribution method. Defaults to "IntegratedGradients".
-        baseline (torch.Tensor, optional):
-            The baseline for the attribution methods. Defaults to None.
-        abs_attr (bool, optional):
-            Whether the method should sort by the absolute attribution values. Defaults to True.
-        n_rel (int, optional):
-            The number of relevant features. Defaults to 5.
-        device (str, optional):
-            The device to use. Defaults to "cpu".
-
-    Returns:
-        pd.DataFrame (object): A DataFrame with the attributions.
-    """
-    try:
-        fun_control["data_set"].names
-    except AttributeError:
-        fun_control["data_set"].names = None
-    feature_names = fun_control["data_set"].names
-    total_attributions = None
-    config = get_tuned_architecture(spot_tuner, fun_control)
-    train_model(config, fun_control, timestamp=False)
-    model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
-    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
-    model = model.to(device)
-    model.eval()
-    dataset = fun_control["data_set"]
-    try:
-        n_features = dataset.data.shape[1]
-    except AttributeError:
-        n_features = dataset.tensors[0].shape[1]
-    if feature_names is None:
-        feature_names = [f"x{i}" for i in range(n_features)]
-    batch_size = config["batch_size"]
-    # train_loader = DataLoader(dataset, batch_size=batch_size)
-    test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-    if attr_method == "IntegratedGradients":
-        attr = IntegratedGradients(model)
-    elif attr_method == "DeepLift":
-        attr = DeepLift(model)
-    elif attr_method == "GradientShap":  # Todo: would need a baseline
-        if baseline is None:
-            raise ValueError("baseline cannot be 'None' for GradientShap")
-        attr = GradientShap(model)
-    elif attr_method == "FeatureAblation":
-        attr = FeatureAblation(model)
-    else:
-        raise ValueError(
-            """
-            Unsupported attribution method.
-            Please choose from 'IntegratedGradients', 'DeepLift', 'GradientShap', or 'FeatureAblation'.
-            """
-        )
-    for inputs, labels in test_loader:
         attributions = attr.attribute(inputs, return_convergence_delta=False, baselines=baseline)
         if total_attributions is None:
             total_attributions = attributions
