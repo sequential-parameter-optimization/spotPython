@@ -15,6 +15,7 @@ import pandas as pd
 from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradients
 from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
 from matplotlib.ticker import MaxNLocator
+from spotpython.data.lightdatamodule import LightDataModule
 
 
 def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
@@ -72,7 +73,7 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
     """
     activations = {}
     net.eval()
-    print(f"net: {net}")
+    # print(f"net: {net}")
     dataset = fun_control["data_set"]
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     inputs, _ = next(iter(dataloader))
@@ -549,7 +550,7 @@ def visualize_weights(net, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
     plot_nn_values_scatter(nn_values=weights, nn_values_names="Weights", absolute=absolute, cmap=cmap, figsize=figsize)
 
 
-def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
+def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray", figsize=(6, 6), device="cpu") -> None:
     """
     Scatter plots the gradients of a neural network.
 
@@ -566,6 +567,8 @@ def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray"
             The colormap to use. Defaults to "gray".
         figsize (tuple, optional):
             The figure size. Defaults to (6, 6).
+        device (str, optional):
+            The device to use. Defaults to "cpu".
 
     Returns:
         None
@@ -574,6 +577,7 @@ def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray"
         net,
         fun_control,
         batch_size=batch_size,
+        device=device,
     )
     plot_nn_values_scatter(nn_values=grads, nn_values_names="Gradients", absolute=absolute, cmap=cmap, figsize=figsize)
 
@@ -585,6 +589,7 @@ def get_attributions(
     baseline=None,
     abs_attr=True,
     n_rel=5,
+    device="cpu",
 ) -> pd.DataFrame:
     """Get the attributions of a neural network.
 
@@ -601,6 +606,8 @@ def get_attributions(
             Whether the method should sort by the absolute attribution values. Defaults to True.
         n_rel (int, optional):
             The number of relevant features. Defaults to 5.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
 
     Returns:
         pd.DataFrame (object): A DataFrame with the attributions.
@@ -615,7 +622,121 @@ def get_attributions(
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
     removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
-    model = model.to("cpu")
+    model = model.to(device)
+    model.eval()
+    # get feature names
+    dataset = fun_control["data_set"]
+    try:
+        n_features = dataset.data.shape[1]
+    except AttributeError:
+        n_features = dataset.tensors[0].shape[1]
+    if feature_names is None:
+        feature_names = [f"x{i}" for i in range(n_features)]
+    # get batch size
+    batch_size = config["batch_size"]
+    # test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+
+    data_module = LightDataModule(
+        dataset=dataset,
+        batch_size=batch_size,
+        test_size=fun_control["test_size"],
+        scaler=fun_control["scaler"],
+        verbosity=10
+    )
+    data_module.setup(stage="test")
+    test_loader = data_module.test_dataloader()
+
+    if attr_method == "IntegratedGradients":
+        attr = IntegratedGradients(model)
+    elif attr_method == "DeepLift":
+        attr = DeepLift(model)
+    elif attr_method == "GradientShap":  # Todo: would need a baseline
+        if baseline is None:
+            raise ValueError("baseline cannot be 'None' for GradientShap")
+        attr = GradientShap(model)
+    elif attr_method == "FeatureAblation":
+        attr = FeatureAblation(model)
+    else:
+        raise ValueError(
+            """
+            Unsupported attribution method.
+            Please choose from 'IntegratedGradients', 'DeepLift', 'GradientShap', or 'FeatureAblation'.
+            """
+        )
+    for inputs, _ in test_loader:
+        inputs.requires_grad_()
+        attributions = attr.attribute(inputs, return_convergence_delta=False, baselines=baseline)
+        if total_attributions is None:
+            total_attributions = attributions
+        else:
+            if len(attributions) == len(total_attributions):
+                total_attributions += attributions
+
+    # Calculation of average attribution across all batches
+    avg_attributions = total_attributions.mean(dim=0).detach().numpy()
+
+    # Transformation to the absolute attribution values if abs_attr is True
+    # Get indices of the n most important features
+    if abs_attr is True:
+        abs_avg_attributions = abs(avg_attributions)
+        top_n_indices = abs_avg_attributions.argsort()[-n_rel:][::-1]
+    else:
+        top_n_indices = avg_attributions.argsort()[-n_rel:][::-1]
+
+    # Get the importance values for the top n features
+    top_n_importances = avg_attributions[top_n_indices]
+
+    df = pd.DataFrame(
+        {
+            "Feature Index": top_n_indices,
+            "Feature": [feature_names[i] for i in top_n_indices],
+            attr_method + "Attribution": top_n_importances,
+        }
+    )
+    return df
+
+
+def get_attributions_old(
+    spot_tuner,
+    fun_control,
+    attr_method="IntegratedGradients",
+    baseline=None,
+    abs_attr=True,
+    n_rel=5,
+    device="cpu",
+) -> pd.DataFrame:
+    """Get the attributions of a neural network.
+
+    Args:
+        spot_tuner (object):
+            The spot tuner object.
+        fun_control (dict):
+            A dictionary with the function control.
+        attr_method (str, optional):
+            The attribution method. Defaults to "IntegratedGradients".
+        baseline (torch.Tensor, optional):
+            The baseline for the attribution methods. Defaults to None.
+        abs_attr (bool, optional):
+            Whether the method should sort by the absolute attribution values. Defaults to True.
+        n_rel (int, optional):
+            The number of relevant features. Defaults to 5.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
+
+    Returns:
+        pd.DataFrame (object): A DataFrame with the attributions.
+    """
+    try:
+        fun_control["data_set"].names
+    except AttributeError:
+        fun_control["data_set"].names = None
+    feature_names = fun_control["data_set"].names
+    total_attributions = None
+    config = get_tuned_architecture(spot_tuner, fun_control)
+    train_model(config, fun_control, timestamp=False)
+    model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
+    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    model = model.to(device)
     model.eval()
     dataset = fun_control["data_set"]
     try:
@@ -626,7 +747,7 @@ def get_attributions(
         feature_names = [f"x{i}" for i in range(n_features)]
     batch_size = config["batch_size"]
     # train_loader = DataLoader(dataset, batch_size=batch_size)
-    test_loader = DataLoader(dataset, batch_size=batch_size)
+    test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     if attr_method == "IntegratedGradients":
         attr = IntegratedGradients(model)
     elif attr_method == "DeepLift":
@@ -717,7 +838,7 @@ def is_square(n) -> bool:
     return n == int(math.sqrt(n)) ** 2
 
 
-def get_layer_conductance(spot_tuner, fun_control, layer_idx) -> np.ndarray:
+def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu") -> np.ndarray:
     """
     Compute the average layer conductance attributions for a specified layer in the model.
 
@@ -728,6 +849,8 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx) -> np.ndarray:
             The fun_control dictionary containing the hyperparameters used to train the model.
         layer_idx (int):
             Index of the layer for which to compute layer conductance attributions.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
 
     Returns:
         numpy.ndarray:
@@ -744,7 +867,7 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx) -> np.ndarray:
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
     removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
-    model = model.to("cpu")
+    model = model.to(device)
     model.eval()
 
     dataset = fun_control["data_set"]
@@ -776,15 +899,23 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx) -> np.ndarray:
     return avg_layer_attributions
 
 
-def get_weights_conductance_last_layer(spot_tuner, fun_control):
+def get_weights_conductance_last_layer(spot_tuner, fun_control, device="cpu") -> tuple:
     """
     Get the weights and the conductance of the last layer.
+
+    Args:
+        spot_tuner (object):
+            The spot tuner object.
+        fun_control (dict):
+            A dictionary with the function control.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
     """
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
     removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
-    model = model.to("cpu")
+    model = model.to(device)
     model.eval()
 
     weights, index = get_weights(model, return_index=True)
@@ -796,11 +927,28 @@ def get_weights_conductance_last_layer(spot_tuner, fun_control):
     return weights_last, layer_conductance_last
 
 
-def plot_conductance_last_layer(weights_last, layer_conductance_last, show=True):
+def plot_conductance_last_layer(weights_last, layer_conductance_last, figsize=(12, 6), show=True) -> None:
     """
     Plot the conductance of the last layer.
+
+    Args:
+        weights_last (np.ndarray):
+            The weights of the last layer.
+        layer_conductance_last (np.ndarray):
+            The conductance of the last layer.
+        figsize (tuple, optional):
+            The figure size. Defaults to (12, 6).
+        show (bool, optional):
+            Whether to show the plot. Defaults
+
+    Examples:
+        >>> import numpy as np
+            from spotpython.plot.xai import plot_conductance_last_layer
+            weights_last = np.random.rand(10)
+            layer_conductance_last = np.random.rand(10)
+            plot_conductance_last_layer(weights_last, layer_conductance_last, show=True)
     """
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=figsize)
     ax.bar(range(len(weights_last)), weights_last / weights_last.max(), label="Weights", alpha=0.5)
     ax.bar(
         range(len(layer_conductance_last)),
@@ -817,15 +965,55 @@ def plot_conductance_last_layer(weights_last, layer_conductance_last, show=True)
         plt.show()
 
 
-def get_all_layers_conductance(spot_tuner, fun_control):
+def get_all_layers_conductance(spot_tuner, fun_control, device="cpu") -> dict:
+    """
+    Get the conductance of all layers.
+
+    Args:
+        spot_tuner (object):
+            The spot tuner object.
+        fun_control (dict):
+            A dictionary with the function control.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
+    """
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
     removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
-    model = model.to("cpu")
+    model = model.to(device)
     model.eval()
     _, index = get_weights(model, return_index=True)
     layer_conductance = {}
     for i in index:
         layer_conductance[i] = get_layer_conductance(spot_tuner, fun_control, layer_idx=i)
     return layer_conductance
+
+
+def sort_layers(data_dict) -> dict:
+    """
+    Sorts a dictionary with keys in the format "Layer X" based on the numerical value X.
+
+    Args:
+        data_dict (dict): A dictionary with keys in the format "Layer X".
+
+    Returns:
+        dict: A dictionary with the keys sorted based on the numerical value X.
+
+    Examples:
+        >>> data_dict = {
+        ...     "Layer 1": [1, 2, 3],
+        ...     "Layer 3": [4, 5, 6],
+        ...     "Layer 2": [7, 8, 9]
+        ... }
+        >>> sort_layers(data_dict)
+        {'Layer 1': [1, 2, 3], 'Layer 2': [7, 8, 9], 'Layer 3': [4,
+
+    """
+    # Use a lambda function to extract the number X from "Layer X" and sort based on that number
+    sorted_items = sorted(data_dict.items(), key=lambda item: int(item[0].split()[1]))
+
+    # Create a new dictionary from the sorted items
+    sorted_dict = dict(sorted_items)
+
+    return sorted_dict
