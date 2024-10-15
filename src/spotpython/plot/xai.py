@@ -18,119 +18,94 @@ from matplotlib.ticker import MaxNLocator
 from spotpython.data.lightdatamodule import LightDataModule
 
 
-def get_activations(net, fun_control, batch_size, device="cpu") -> dict:
-    """
-    Get the average activations of each neuron in the neural network's linear layers.
+def check_for_nans(data, layer_index):
+    """Checks for NaN values in the tensor data.
 
     Args:
-        net (object): A neural network.
-        fun_control (dict): A dictionary with the function control.
-        batch_size (int, optional): The batch size.
-        device (str, optional): The device to use. Defaults to "cpu".
+        data (torch.Tensor): The tensor to check for NaN values.
+        layer_index (int): The index of the layer for logging purposes.
 
     Returns:
-        dict: A dictionary with the average activations of the neurons in the network.
+        bool: True if NaNs are found, False otherwise.
     """
-    activations = {}
-    net.eval()
-
-    dataset = fun_control["data_set"]
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-
-    layer_sums = {}
-    layer_counts = {}
-
-    with torch.no_grad():
-        for inputs, _ in dataloader:
-            inputs = inputs.to(device)
-
-            for layer_index, layer in enumerate(net.layers):  # Iterate over layers
-                inputs = layer(inputs)
-
-                if isinstance(layer, nn.Linear):
-                    n_neurons = inputs.size(1)
-                    if layer_index not in layer_sums:
-                        layer_sums[layer_index] = torch.zeros(n_neurons, device=device)
-                        layer_counts[layer_index] = 0
-
-                    # Sum activation for each neuron
-                    layer_sums[layer_index] += inputs.sum(dim=0)
-                    layer_counts[layer_index] += inputs.size(0)  # Add up batch size
-
-    # Compute average activations
-    for layer_index, total_sum in layer_sums.items():
-        activations[layer_index] = (total_sum / layer_counts[layer_index]).cpu().numpy()
-
-    return activations
+    if torch.isnan(data).any():
+        print(f"NaN detected after layer {layer_index}")
+        return True
+    return False
 
 
-def get_activations_full(net, fun_control, batch_size, device="cpu") -> dict:
-    """
-    Get the activations of a neural network.
+def get_activations(net, fun_control, batch_size, device="cpu") -> tuple:
+    """Computes the activations for each layer of the network and
+    the mean activations for each layer. Both are returned as a dictionary.
 
     Args:
-        net (object):
-            A neural network.
-        fun_control (dict):
-            A dictionary with the function control.
-        batch_size (int, optional):
-            The batch size.
-        device (str, optional):
-            The device to use. Defaults to "cpu".
+        net (nn.Module): The neural network model.
+        fun_control (dict): A dictionary containing the dataset.
+        device (str): The device to run the model on. Defaults to "cpu".
 
     Returns:
-        dict: A dictionary with the activations of the neural network.
+        tuple: A tuple containing the activations and mean activations for each layer.
 
     Examples:
-        >>> from torch.utils.data import DataLoader
-            from spotpython.utils.init import fun_control_init
-            from spotpython.hyperparameters.values import set_control_key_value
-            from spotpython.data.diabetes import Diabetes
-            from spotpython.light.regression.netlightregression import NetLightRegression
-            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotpython.hyperparameters.values import add_core_model_to_fun_control
-            from spotpython.hyperparameters.values import (
-                    get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotpython.hyperparameters.values import set_control_key_value
-            from spotpython.plot.xai import get_activations
-            fun_control = fun_control_init(
-                _L_in=10, # 10: diabetes
-                _L_out=1,
-                )
-            dataset = Diabetes()
-            set_control_key_value(control_dict=fun_control,
-                                    key="data_set",
-                                    value=dataset,
-                                    replace=True)
-            add_core_model_to_fun_control(fun_control=fun_control,
-                                        core_model=NetLightRegression,
-                                        hyper_dict=LightHyperDict)
-            X = get_default_hyperparameters_as_array(fun_control)
-            config = get_one_config_from_X(X, fun_control)
-            _L_in = fun_control["_L_in"]
-            _L_out = fun_control["_L_out"]
-            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
-            batch_size= config["batch_size"]
-            dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-            get_activations(model, fun_control=fun_control, batch_size=batch_size, device = "cpu")
-            {0: array([ 1.43207282e-01,  6.29711570e-03,  1.04200505e-01, -3.79187055e-03,
-                        -1.74976081e-01, -7.97475874e-02, -2.00860098e-01,  2.48444706e-01, ...
-
+        >>> from spotpython.plot.xai import get_activations
+            activations, mean_activations = get_activations(net, fun_control)
     """
     activations = {}
-    net.eval()
+    mean_activations = {}
+    net.eval()  # Set the model to evaluation mode
     dataset = fun_control["data_set"]
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     inputs, _ = next(iter(dataloader))
+    inputs = inputs.to(device)
+
+    # Normalize input data
+    inputs = (inputs - inputs.mean()) / inputs.std()
+
     with torch.no_grad():
-        layer_index = 0
-        inputs = inputs.to(device)
         inputs = inputs.view(inputs.size(0), -1)
-        for layer_index, layer in enumerate(net.layers):
-            inputs = layer(inputs)
+        # Loop through all layers
+        for layer_index, layer in enumerate(net.layers[:-1]):
+            inputs = layer(inputs)  # Forward pass through the layer
+
+            # Check for NaNs
+            if check_for_nans(inputs, layer_index):
+                break
+
+            # Collect activations for Linear layers
             if isinstance(layer, nn.Linear):
                 activations[layer_index] = inputs.view(-1).cpu().numpy()
-    return activations
+                mean_activations[layer_index] = inputs.mean(dim=0).cpu().numpy()
+    return activations, mean_activations
+
+
+def visualize_activations_distributions(activations, net, color="C0", columns=4, bins=50, show=True) -> None:
+    """Plots the distribution of activations for each layer
+        that were determined via the get_activations function.
+
+    Args:
+        activations (dict): A dictionary containing activations for each layer.
+        net (nn.Module): The neural network model.
+        color (str): The color for the plot histogram. Defaults to "C0".
+        columns (int): The number of columns for the subplots. Defaults to 4.
+        bins (int): The number of bins for the histogram. Defaults to 50.
+        show (bool): Whether to show the plot. Defaults to True.
+
+    Returns:
+        None
+    """
+    rows = math.ceil(len(activations) / columns)
+    fig, ax = plt.subplots(rows, columns, figsize=(columns * 2.7, rows * 2.5))
+    fig_index = 0
+    for key in activations:
+        key_ax = ax[fig_index // columns][fig_index % columns]
+        sns.histplot(data=activations[key], bins=bins, ax=key_ax, color=color, kde=True, stat="density")
+        key_ax.set_title(f"Layer {key} - {net.layers[key].__class__.__name__}")
+        fig_index += 1
+    fig.suptitle("Activation distribution", fontsize=14)
+    fig.subplots_adjust(hspace=0.4, wspace=0.4)
+    if show:
+        plt.show()
+    plt.close()
 
 
 def get_weights(net, return_index=False) -> dict:
@@ -209,7 +184,6 @@ def get_weights(net, return_index=False) -> dict:
         index.append(int(name.split(".")[1]))
         key_name = f"Layer {name.split('.')[1]}"
         weights[key_name] = param.detach().view(-1).cpu().numpy()
-    # print(f"weights: {weights}")
     if return_index:
         return weights, index
     else:
@@ -269,19 +243,15 @@ def get_gradients(net, fun_control, batch_size, device="cpu") -> dict:
                     0.02890352,  0.0114617 ,  0.08183316,  0.2495192 ,  0.5108763 ,
                     0.14668094, -0.07902834,  0.00912531,  0.02640062,  0.14108546, ...
     """
-    grads = {}
     net.eval()
     dataset = fun_control["data_set"]
-    # Create DataLoader
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-    # for batch in dataloader:
-    #     inputs, targets = batch
-    # small_loader = data.DataLoader(train_set, batch_size=1024)
     inputs, targets = next(iter(dataloader))
     inputs, targets = inputs.to(device), targets.to(device)
     # Pass one batch through the network, and calculate the gradients for the weights
     net.zero_grad()
     preds = net(inputs)
+    preds = preds.squeeze(-1)  # Remove the last dimension if it's 1
     # TODO: Add more loss functions
     loss = F.mse_loss(preds, targets)
     # loss = F.cross_entropy(preds, labels)  # Same as nn.CrossEntropyLoss, but as a function instead of module
@@ -330,67 +300,6 @@ def plot_nn_values_hist(nn_values, net, nn_values_names="", color="C0", columns=
     fig.suptitle(f"{nn_values_names} distribution for activation function {net.hparams.act_fn}", fontsize=14)
     fig.subplots_adjust(hspace=0.4, wspace=0.4)
     plt.show()
-
-
-def old_plot_nn_values_scatter(
-    nn_values, nn_values_names="", absolute=True, cmap="gray", figsize=(6, 6), return_reshaped=False
-):
-    """
-    Plot the values of a neural network.
-    Can be used to plot the weights, gradients, or activations of a neural network.
-
-    Args:
-        nn_values (dict):
-            A dictionary with the values of the neural network. For example,
-            the weights, gradients, or activations.
-        nn_values_names (str, optional):
-            The name of the values. Defaults to "".
-        absolute (bool, optional):
-            Whether to use the absolute values. Defaults to True.
-        cmap (str, optional):
-            The colormap to use. Defaults to "gray".
-        figsize (tuple, optional):
-            The figure size. Defaults to (6, 6).
-        return_reshaped (bool, optional):
-            Whether to return the reshaped values. Defaults to False.
-
-    """
-    if cmap == "gray":
-        cmap = "gray"
-    elif cmap == "BlueWhiteRed":
-        cmap = colors.LinearSegmentedColormap.from_list("", ["blue", "white", "red"])
-    elif cmap == "GreenYellowRed":
-        cmap = colors.LinearSegmentedColormap.from_list("", ["green", "yellow", "red"])
-    else:
-        cmap = "viridis"
-
-    res = {}
-    for layer, values in nn_values.items():
-        k = len(values)
-        print(f"{k} values in Layer {layer}.")
-        if is_square(k):
-            n = int(math.sqrt(k))
-        else:
-            n = int(math.sqrt(len(values)) + 1)
-            padding = np.zeros(n * n - len(values))  # create a zero array for padding
-            print(f"{len(padding)} padding values added.")
-            values = np.concatenate((values, padding))  # append the padding to the values
-
-        print(f"{len(values)} values in Layer {layer}.")
-        if absolute:
-            reshaped_values = np.abs(values.reshape((n, n)))
-        else:
-            reshaped_values = values.reshape((n, n))
-
-        plt.figure(figsize=figsize)
-        plt.imshow(reshaped_values, cmap=cmap)  # use colormap to indicate the values
-        plt.colorbar(label="Value")
-        plt.title(f"{nn_values_names} Plot for {layer}")
-        plt.show()
-        # add reshaped_values to the dictionary res
-        res[layer] = reshaped_values
-    if return_reshaped:
-        return res
 
 
 def plot_nn_values_scatter(
@@ -466,32 +375,6 @@ def plot_nn_values_scatter(
         return res
 
 
-def visualize_activations_distributions(net, fun_control, batch_size, device="cpu", color="C0", columns=2) -> None:
-    """
-    Plots a histogram of the activations of a neural network.
-
-    Args:
-        net (object):
-            A neural network.
-        fun_control (dict):
-            A dictionary with the function control.
-        batch_size (int, optional):
-            The batch size.
-        device (str, optional):
-            The device to use. Defaults to "cpu".
-        color (str, optional):
-            The color to use. Defaults to "C0".
-        columns (int, optional):
-            The number of columns. Defaults to 2.
-
-    Returns:
-        None
-
-    """
-    activations = get_activations_full(net, fun_control, batch_size, device)
-    plot_nn_values_hist(activations, net, nn_values_names="Activations", color=color, columns=columns)
-
-
 def visualize_weights_distributions(net, color="C0", columns=2) -> None:
     """
     Plot the weights distributions of a neural network.
@@ -546,17 +429,15 @@ def visualize_gradient_distributions(
     plot_nn_values_hist(grads, net, nn_values_names="Gradients", color=color, columns=columns)
 
 
-def visualize_activations(net, fun_control, batch_size, device, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
+def visualize_mean_activations(mean_activations, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
     """
-    Scatter plots the activations of a neural network.
+    Scatter plots the mean activations of a neural network for each layer.
+    means_activations is a dictionary with the mean activations of the neural network computed via
+    the get_activations function.
 
     Args:
-        net (object):
-            A neural network.
-        fun_control (dict):
-            A dictionary with the function control.
-        batch_size (int, optional):
-            The batch size.
+        mean_activations (dict):
+            A dictionary with the mean activations of the neural network.
         device (str, optional):
             The device to use.
         absolute (bool, optional):
@@ -569,10 +450,14 @@ def visualize_activations(net, fun_control, batch_size, device, absolute=True, c
     Returns:
         None
 
+    Examples:
+        >>> from spotpython.plot.xai import get_activations
+            activations, mean_activations = get_activations(net, fun_control)
+            visualize_mean_activations(mean_activations
+
     """
-    activations = get_activations(net, fun_control, batch_size, device)
     plot_nn_values_scatter(
-        nn_values=activations, nn_values_names="Average Activations", absolute=absolute, cmap=cmap, figsize=figsize
+        nn_values=mean_activations, nn_values_names="Average Activations", absolute=absolute, cmap=cmap, figsize=figsize
     )
 
 
