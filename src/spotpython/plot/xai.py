@@ -18,7 +18,7 @@ from matplotlib.ticker import MaxNLocator
 from spotpython.data.lightdatamodule import LightDataModule
 
 
-def check_for_nans(data, layer_index):
+def check_for_nans(data, layer_index) -> bool:
     """Checks for NaN values in the tensor data.
 
     Args:
@@ -34,7 +34,7 @@ def check_for_nans(data, layer_index):
     return False
 
 
-def get_activations(net, fun_control, batch_size, device="cpu") -> tuple:
+def get_activations(net, fun_control, batch_size, device="cpu", normalize=True) -> tuple:
     """Computes the activations for each layer of the network and
     the mean activations for each layer. Both are returned as a dictionary.
 
@@ -42,6 +42,8 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> tuple:
         net (nn.Module): The neural network model.
         fun_control (dict): A dictionary containing the dataset.
         device (str): The device to run the model on. Defaults to "cpu".
+        batch_size (int): The batch size for the data loader.
+        normalize (bool): Whether to normalize the input data. Defaults to True.
 
     Returns:
         tuple: A tuple containing the activations and mean activations for each layer.
@@ -54,12 +56,19 @@ def get_activations(net, fun_control, batch_size, device="cpu") -> tuple:
     mean_activations = {}
     net.eval()  # Set the model to evaluation mode
     dataset = fun_control["data_set"]
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-    inputs, _ = next(iter(dataloader))
+    data_module = LightDataModule(
+        dataset=dataset,
+        batch_size=batch_size,
+        test_size=fun_control["test_size"],
+        scaler=fun_control["scaler"],
+        verbosity=10,
+    )
+    data_module.setup(stage="test")
+    test_loader = data_module.test_dataloader()
+    inputs, _ = next(iter(test_loader))
     inputs = inputs.to(device)
-
-    # Normalize input data
-    inputs = (inputs - inputs.mean()) / inputs.std()
+    if normalize:
+        inputs = (inputs - inputs.mean()) / inputs.std()
 
     with torch.no_grad():
         inputs = inputs.view(inputs.size(0), -1)
@@ -190,7 +199,7 @@ def get_weights(net, return_index=False) -> dict:
         return weights
 
 
-def get_gradients(net, fun_control, batch_size, device="cpu") -> dict:
+def get_gradients(net, fun_control, batch_size, device="cpu", normalize=True) -> dict:
     """
     Get the gradients of a neural network.
 
@@ -203,6 +212,8 @@ def get_gradients(net, fun_control, batch_size, device="cpu") -> dict:
             The batch size.
         device (str, optional):
             The device to use. Defaults to "cpu".
+        normalize (bool, optional):
+            Whether to normalize the input data. Defaults to True.
 
     Returns:
         dict: A dictionary with the gradients of the neural network.
@@ -245,8 +256,18 @@ def get_gradients(net, fun_control, batch_size, device="cpu") -> dict:
     """
     net.eval()
     dataset = fun_control["data_set"]
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-    inputs, targets = next(iter(dataloader))
+    data_module = LightDataModule(
+        dataset=dataset,
+        batch_size=batch_size,
+        test_size=fun_control["test_size"],
+        scaler=fun_control["scaler"],
+        verbosity=10,
+    )
+    data_module.setup(stage="test")
+    test_loader = data_module.test_dataloader()
+    inputs, targets = next(iter(test_loader))
+    if normalize:
+        inputs = (inputs - inputs.mean()) / inputs.std()
     inputs, targets = inputs.to(device), targets.to(device)
     # Pass one batch through the network, and calculate the gradients for the weights
     net.zero_grad()
@@ -396,7 +417,16 @@ def visualize_weights_distributions(net, color="C0", columns=2) -> None:
 
 
 def visualize_gradient_distributions(
-    net, fun_control, batch_size, device="cpu", color="C0", xlabel=None, stat="count", use_kde=True, columns=2
+    net,
+    fun_control,
+    batch_size,
+    device="cpu",
+    color="C0",
+    xlabel=None,
+    stat="count",
+    use_kde=True,
+    columns=2,
+    normalize=True,
 ) -> None:
     """
     Plot the gradients distributions of a neural network.
@@ -420,12 +450,14 @@ def visualize_gradient_distributions(
             Whether to use kde. Defaults to True.
         columns (int, optional):
             The number of columns. Defaults to 2.
+        normalize (bool, optional):
+            Whether to normalize the input data. Defaults to True.
 
     Returns:
         None
 
     """
-    grads = get_gradients(net, fun_control, batch_size, device)
+    grads = get_gradients(net, fun_control, batch_size, device, normalize=normalize)
     plot_nn_values_hist(grads, net, nn_values_names="Gradients", color=color, columns=columns)
 
 
@@ -438,8 +470,6 @@ def visualize_mean_activations(mean_activations, absolute=True, cmap="gray", fig
     Args:
         mean_activations (dict):
             A dictionary with the mean activations of the neural network.
-        device (str, optional):
-            The device to use.
         absolute (bool, optional):
             Whether to use the absolute values. Defaults to True.
         cmap (str, optional):
@@ -483,7 +513,9 @@ def visualize_weights(net, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
     plot_nn_values_scatter(nn_values=weights, nn_values_names="Weights", absolute=absolute, cmap=cmap, figsize=figsize)
 
 
-def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray", figsize=(6, 6), device="cpu") -> None:
+def visualize_gradients(
+    net, fun_control, batch_size, absolute=True, cmap="gray", figsize=(6, 6), device="cpu", normalize=True
+) -> None:
     """
     Scatter plots the gradients of a neural network.
 
@@ -502,15 +534,18 @@ def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray"
             The figure size. Defaults to (6, 6).
         device (str, optional):
             The device to use. Defaults to "cpu".
+        normalize (bool, optional):
+            Whether to normalize the input data. Defaults to True.
 
     Returns:
         None
     """
     grads = get_gradients(
-        net,
-        fun_control,
+        net=net,
+        fun_control=fun_control,
         batch_size=batch_size,
         device=device,
+        normalize=normalize,
     )
     plot_nn_values_scatter(nn_values=grads, nn_values_names="Gradients", absolute=absolute, cmap=cmap, figsize=figsize)
 
@@ -523,6 +558,7 @@ def get_attributions(
     abs_attr=True,
     n_rel=5,
     device="cpu",
+    normalize=True,
 ) -> pd.DataFrame:
     """Get the attributions of a neural network.
 
@@ -541,6 +577,8 @@ def get_attributions(
             The number of relevant features. Defaults to 5.
         device (str, optional):
             The device to use. Defaults to "cpu".
+        normalize (bool, optional):
+            Whether to normalize the input data. Defaults to True.
 
     Returns:
         pd.DataFrame (object): A DataFrame with the attributions.
@@ -597,6 +635,8 @@ def get_attributions(
             """
         )
     for inputs, _ in test_loader:
+        if normalize:
+            inputs = (inputs - inputs.mean()) / inputs.std()
         inputs.requires_grad_()
         attributions = attr.attribute(inputs, return_convergence_delta=False, baselines=baseline)
         if total_attributions is None:
@@ -670,7 +710,7 @@ def is_square(n) -> bool:
     return n == int(math.sqrt(n)) ** 2
 
 
-def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu") -> np.ndarray:
+def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu", normalize=True) -> np.ndarray:
     """
     Compute the average layer conductance attributions for a specified layer in the model.
 
@@ -683,6 +723,8 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu") -> n
             Index of the layer for which to compute layer conductance attributions.
         device (str, optional):
             The device to use. Defaults to "cpu".
+        normalize (bool, optional):
+            Whether to normalize the input data. Defaults to True.
 
     Returns:
         numpy.ndarray:
@@ -710,15 +752,15 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu") -> n
     if feature_names is None:
         feature_names = [f"x{i}" for i in range(n_features)]
     batch_size = config["batch_size"]
-    # train_loader = DataLoader(dataset, batch_size=batch_size)
     test_loader = DataLoader(dataset, batch_size=batch_size)
-
     total_layer_attributions = None
     layers = model.layers
     print("Conductance analysis for layer: ", layers[layer_idx])
     lc = LayerConductance(model, layers[layer_idx])
 
     for inputs, labels in test_loader:
+        if normalize:
+            inputs = (inputs - inputs.mean()) / inputs.std()
         lc_attr_test = lc.attribute(inputs, n_steps=10, attribute_to_layer_input=True)
         if total_layer_attributions is None:
             total_layer_attributions = lc_attr_test
@@ -844,8 +886,6 @@ def sort_layers(data_dict) -> dict:
     """
     # Use a lambda function to extract the number X from "Layer X" and sort based on that number
     sorted_items = sorted(data_dict.items(), key=lambda item: int(item[0].split()[1]))
-
     # Create a new dictionary from the sorted items
     sorted_dict = dict(sorted_items)
-
     return sorted_dict
