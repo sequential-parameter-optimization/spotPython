@@ -35,7 +35,7 @@ def fun_control_init(
     db_dict_name=None,
     design=None,
     device=None,
-    devices=1,
+    devices="auto",
     enable_progress_bar=False,
     EXPERIMENT_NAME=None,
     eval=None,
@@ -55,9 +55,11 @@ def fun_control_init(
     n_samples=None,
     n_total=None,
     num_workers=0,
+    num_nodes=1,
     ocba_delta=0,
     oml_grace_period=None,
     optimizer=None,
+    precision="32",
     prep_model=None,
     prep_model_name=None,
     progress_file=None,
@@ -70,6 +72,7 @@ def fun_control_init(
     show_progress=True,
     shuffle=None,
     sigma=0.0,
+    strategy="auto",
     surrogate=None,
     target_column=None,
     target_type=None,
@@ -181,6 +184,8 @@ def fun_control_init(
             The number of samples in the dataset. Default is None.
         n_total (int):
             The total number of samples in the dataset. Default is None.
+        num_nodes (int):
+            The number of GPU nodes to use for the training/validation/testing. Default is 1.
         num_workers (int):
             The number of workers to use for the data loading. Default is 0.
         ocba_delta (int):
@@ -190,6 +195,8 @@ def fun_control_init(
             The grace period for the OML algorithm. Default is None.
         optimizer (object):
             The optimizer object used for the search on surrogate. Default is None.
+        precision (str):
+            The precision of the data. Default is "32". Can be e.g., "16-mixed" or "16-true".
         PREFIX (str):
             The prefix of the experiment name. If the PREFIX is not None, a spotWriter
             that us an instance of a SummaryWriter(), is created. Default is "00".
@@ -221,6 +228,8 @@ def fun_control_init(
             Whether the data were shuffled or not. Default is None.
         surrogate (object):
             The surrogate model object. Default is None.
+        strategy (str):
+            The strategy to use. Default is "auto".
         target_column (str):
             The name of the target column. Default is None.
         target_type (str):
@@ -393,11 +402,13 @@ def fun_control_init(
         "n_points": n_points,
         "n_samples": n_samples,
         "n_total": n_total,
+        "num_nodes": num_nodes,
         "num_workers": num_workers,
         "ocba_delta": ocba_delta,
         "oml_grace_period": oml_grace_period,
         "optimizer": optimizer,
         "path": None,
+        "precision": precision,
         "prep_model": prep_model,
         "prep_model_name": prep_model_name,
         "progress_file": progress_file,
@@ -413,6 +424,7 @@ def fun_control_init(
         "shuffle": shuffle,
         "sigma": sigma,
         "spot_tensorboard_path": spot_tensorboard_path,
+        "strategy": strategy,
         "target_column": target_column,
         "target_type": target_type,
         "task": task,

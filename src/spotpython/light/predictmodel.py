@@ -82,6 +82,9 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         max_epochs=model.hparams.epochs,
         accelerator=fun_control["accelerator"],
         devices=fun_control["devices"],
+        strategy=fun_control["strategy"],
+        num_nodes=fun_control["num_nodes"],
+        precision=fun_control["precision"],
         logger=TensorBoardLogger(
             save_dir=fun_control["TENSORBOARD_PATH"],
             version=config_id,

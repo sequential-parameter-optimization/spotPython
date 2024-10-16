@@ -47,7 +47,7 @@ def test_get_activations():
     _ = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
     # Get the activations
-    activations = get_activations(model, fun_control=fun_control, batch_size=batch_size, device="cpu")
+    activations, _ = get_activations(model, fun_control=fun_control, batch_size=batch_size, device="cpu")
 
     # Assert that the activations dictionary is not empty
     assert len(activations) > 0
