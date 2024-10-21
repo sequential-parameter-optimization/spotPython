@@ -43,20 +43,27 @@ class NNLinearRegressor(L.LightningModule):
 
     Examples:
         >>> from torch.utils.data import DataLoader
-            from spotpython.data.diabetes import Diabetes
             from spotpython.light.regression import NNLinearRegressor
             from torch import nn
             import lightning as L
+            import torch
+            from torch.utils.data import TensorDataset
             PATH_DATASETS = './data'
-            BATCH_SIZE = 8
-            dataset = Diabetes()
-            train_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
-            test_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
-            val_loader = DataLoader(dataset, batch_size=BATCH_SIZE)
+            BATCH_SIZE = 128
+            # generate data
+            num_samples = 1_000
+            input_dim = 10
+            X = torch.randn(num_samples, input_dim)  # random data for example
+            Y = torch.randn(num_samples, 1)  # random target for example
+            data_set = TensorDataset(X, Y)
+            train_loader = DataLoader(dataset=data_set, batch_size=BATCH_SIZE)
+            test_loader = DataLoader(dataset=data_set, batch_size=BATCH_SIZE)
+            val_loader = DataLoader(dataset=data_set, batch_size=BATCH_SIZE)
             batch_x, batch_y = next(iter(train_loader))
             print(batch_x.shape)
             print(batch_y.shape)
             net_light_base = NNLinearRegressor(l1=128,
+                                            batch_norm=True,
                                                 epochs=10,
                                                 batch_size=BATCH_SIZE,
                                                 initialization='xavier',
@@ -65,34 +72,43 @@ class NNLinearRegressor(L.LightningModule):
                                                 dropout_prob=0.1,
                                                 lr_mult=0.1,
                                                 patience=5,
-                                                _L_in=10,
+                                                _L_in=input_dim,
                                                 _L_out=1,
                                                 _torchmetric="mean_squared_error",)
             trainer = L.Trainer(max_epochs=2,  enable_progress_bar=True)
             trainer.fit(net_light_base, train_loader)
+            # validation and test should give the same result, because the data is the same
             trainer.validate(net_light_base, val_loader)
             trainer.test(net_light_base, test_loader)
-            | Name   | Type       | Params | In sizes | Out sizes
-            -------------------------------------------------------------
-            0 | layers | Sequential | 15.9 K | [8, 10]  | [8, 1]
-            -------------------------------------------------------------
-            15.9 K    Trainable params
-            0         Non-trainable params
-            15.9 K    Total params
-            0.064     Total estimated model params size (MB)
-            ─────────────────────────────────────────────────────────────
-                Validate metric           DataLoader 0
-            ─────────────────────────────────────────────────────────────
-                    hp_metric              29010.7734375
-                    val_loss               29010.7734375
-            ─────────────────────────────────────────────────────────────
-            ─────────────────────────────────────────────────────────────
-                Test metric             DataLoader 0
-            ─────────────────────────────────────────────────────────────
-                    hp_metric              29010.7734375
-                    val_loss               29010.7734375
-            ─────────────────────────────────────────────────────────────
-            [{'val_loss': 28981.529296875, 'hp_metric': 28981.529296875}]
+                GPU available: True (mps), used: True
+                TPU available: False, using: 0 TPU cores
+                HPU available: False, using: 0 HPUs
+
+                | Name   | Type       | Params | Mode  | In sizes  | Out sizes
+                ----------------------------------------------------------------------
+                0 | layers | Sequential | 20.8 K | train | [128, 10] | [128, 1] 
+                ----------------------------------------------------------------------
+                20.8 K    Trainable params
+                0         Non-trainable params
+                20.8 K    Total params
+                0.083     Total estimated model params size (MB)
+                69        Modules in train mode
+                0         Modules in eval mode
+                torch.Size([128, 10])
+                torch.Size([128, 1])
+                ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+                ┃      Validate metric      ┃       DataLoader 0        ┃
+                ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+                │         hp_metric         │     81.1978988647461      │
+                │         val_loss          │     81.1978988647461      │
+                └───────────────────────────┴───────────────────────────┘
+                ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+                ┃        Test metric        ┃       DataLoader 0        ┃
+                ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+                │         hp_metric         │     81.1978988647461      │
+                │         val_loss          │     81.1978988647461      │
+                └───────────────────────────┴───────────────────────────┘
+                [{'val_loss': 81.1978988647461, 'hp_metric': 81.1978988647461}]
     """
 
     def __init__(
