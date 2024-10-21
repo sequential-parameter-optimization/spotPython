@@ -34,7 +34,7 @@ def check_for_nans(data, layer_index) -> bool:
     return False
 
 
-def get_activations(net, fun_control, batch_size, device="cpu", normalize=True) -> tuple:
+def get_activations(net, fun_control, batch_size, device="cpu", normalize=False) -> tuple:
     """Computes the activations for each layer of the network and
     the mean activations for each layer. Both are returned as a dictionary.
 
@@ -43,7 +43,7 @@ def get_activations(net, fun_control, batch_size, device="cpu", normalize=True) 
         fun_control (dict): A dictionary containing the dataset.
         device (str): The device to run the model on. Defaults to "cpu".
         batch_size (int): The batch size for the data loader.
-        normalize (bool): Whether to normalize the input data. Defaults to True.
+        normalize (bool): Whether to normalize the input data. Defaults to False.
 
     Returns:
         tuple: A tuple containing the activations and mean activations for each layer.
@@ -63,9 +63,9 @@ def get_activations(net, fun_control, batch_size, device="cpu", normalize=True) 
         scaler=fun_control["scaler"],
         verbosity=10,
     )
-    data_module.setup(stage="test")
-    test_loader = data_module.test_dataloader()
-    inputs, _ = next(iter(test_loader))
+    data_module.setup(stage="fit")
+    train_loader = data_module.train_dataloader()
+    inputs, _ = next(iter(train_loader))
     inputs = inputs.to(device)
     if normalize:
         inputs = (inputs - inputs.mean()) / inputs.std()
@@ -199,7 +199,7 @@ def get_weights(net, return_index=False) -> dict:
         return weights
 
 
-def get_gradients(net, fun_control, batch_size, device="cpu", normalize=True) -> dict:
+def get_gradients(net, fun_control, batch_size, device="cpu", normalize=False) -> dict:
     """
     Get the gradients of a neural network.
 
@@ -213,46 +213,67 @@ def get_gradients(net, fun_control, batch_size, device="cpu", normalize=True) ->
         device (str, optional):
             The device to use. Defaults to "cpu".
         normalize (bool, optional):
-            Whether to normalize the input data. Defaults to True.
+            Whether to normalize the input data. Defaults to False.
 
     Returns:
         dict: A dictionary with the gradients of the neural network.
 
     Examples:
-        >>> from torch.utils.data import DataLoader
-            from spotpython.utils.init import fun_control_init
-            from spotpython.hyperparameters.values import set_control_key_value
+        >>> from spotpython.utils.init import fun_control_init
             from spotpython.data.diabetes import Diabetes
-            from spotpython.light.regression.netlightregression import NetLightRegression
+            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
             from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotpython.hyperparameters.values import add_core_model_to_fun_control
             from spotpython.hyperparameters.values import (
                     get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotpython.hyperparameters.values import set_control_key_value
-            from spotpython.plot.xai import get_activations
+            from spotpython.plot.xai import get_gradients
             fun_control = fun_control_init(
                 _L_in=10, # 10: diabetes
                 _L_out=1,
-                )
-            dataset = Diabetes()
-            set_control_key_value(control_dict=fun_control,
-                                    key="data_set",
-                                    value=dataset,
-                                    replace=True)
-            add_core_model_to_fun_control(fun_control=fun_control,
-                                        core_model=NetLightRegression,
-                                        hyper_dict=LightHyperDict)
+                _torchmetric="mean_squared_error",
+                data_set=Diabetes(),
+                core_model=NNLinearRegressor,
+                hyperdict=LightHyperDict)
             X = get_default_hyperparameters_as_array(fun_control)
             config = get_one_config_from_X(X, fun_control)
             _L_in = fun_control["_L_in"]
             _L_out = fun_control["_L_out"]
-            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
-            batch_size= config["batch_size"]
-            dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
+            _torchmetric = fun_control["_torchmetric"]
+            batch_size = 16
+            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
             get_gradients(model, fun_control=fun_control, batch_size=batch_size, device = "cpu")
-            {'layers.0.weight': array([ 0.10417588, -0.04161512,  0.10597267,  0.02180895,  0.12001498,
-                    0.02890352,  0.0114617 ,  0.08183316,  0.2495192 ,  0.5108763 ,
-                    0.14668094, -0.07902834,  0.00912531,  0.02640062,  0.14108546, ...
+                {'layers.0.weight': array([-18.91906  , -15.034285 ,  -9.014692 , -11.67453  , -17.93505  ,
+                -18.900719 ,   3.181451 ,  -7.079934 ,  -8.781589 , -19.415773 ,
+                -31.762537 , -25.240526 , -15.134445 , -19.59995  , -30.110514 ,
+                -31.731745 ,   5.3412247, -11.88625  , -14.743096 , -32.596447 ,
+                -16.250072 , -19.540495 , -12.840339 , -12.497604 , -24.44074  ,
+                -26.738008 ,   7.0891356, -14.540221 , -12.63131  , -20.33385  ,
+                -16.617418 , -19.537054 , -12.366335 , -11.95286  , -22.170914 ,
+                -24.224556 ,   7.333409 , -13.811482 , -12.374348 , -19.54898  ,
+                -12.489107 , -14.683411 ,  -9.294134 ,  -8.983377 , -16.662935 ,
+                -18.20638  ,   5.5115504, -10.380258 ,  -9.300154 , -14.692373 ,
+                -10.237142 , -12.03578  ,  -7.618267 ,  -7.363545 , -13.658367 ,
+                -14.92351  ,   4.517738 ,  -8.508549 ,  -7.6232023, -12.043128 ,
+                -20.709038 , -26.502258 , -16.64915  , -14.087446 , -28.602673 ,
+                -31.098864 ,   8.91061  , -17.756905 , -15.304844 , -24.48614  ,
+                -31.866945 , -25.78516  , -15.80128  , -16.71967  , -30.365    ,
+                -30.903124 ,   1.2193708, -10.1255665, -12.155798 , -31.34386  ],
+            dtype=float32),
+            'layers.3.weight': array([-33.59704 , -30.819086, -28.372812, -27.846645, -34.799633,
+                    -31.002586, -30.067335, -39.82912 , -54.281433, -49.7932  ,
+                    -45.840855, -44.99075 , -56.22442 , -50.089676, -48.578625,
+                    -64.350365, -26.605227, -24.405384, -22.4682  , -22.051537,
+                    -27.557549, -24.550695, -23.810078, -31.540358, -31.579184,
+                    -28.968073, -26.668724, -26.174164, -32.709553, -29.140554,
+                    -28.261475, -37.436962], dtype=float32),
+            'layers.6.weight': array([ -68.05522 ,  -74.10879 ,  -77.15874 ,  -43.79848 , -102.948906,
+                    -112.10627 , -116.72002 ,  -66.25509 ,  -75.09263 ,  -81.77218 ,
+                    -85.13751 ,  -48.327564,  -48.758083,  -53.09515 ,  -55.280285,
+                    -31.379366], dtype=float32),
+            'layers.9.weight': array([-104.8834  , -129.18658 , -136.66594 , -120.37764 ,  -92.72068 ,
+                    -114.20557 , -120.817566, -106.41813 ], dtype=float32),
+            'layers.12.weight': array([-424.17743, -439.30273, -263.17206, -272.55627], dtype=float32),
+            'layers.15.weight': array([-516.952   , -194.23613 , -154.84027 ,  -58.178665], dtype=float32),
+            'layers.18.weight': array([-489.72256, -405.1883 ], dtype=float32)}
     """
     net.eval()
     dataset = fun_control["data_set"]
@@ -263,9 +284,9 @@ def get_gradients(net, fun_control, batch_size, device="cpu", normalize=True) ->
         scaler=fun_control["scaler"],
         verbosity=10,
     )
-    data_module.setup(stage="test")
-    test_loader = data_module.test_dataloader()
-    inputs, targets = next(iter(test_loader))
+    data_module.setup(stage="fit")
+    train_loader = data_module.train_dataloader()
+    inputs, targets = next(iter(train_loader))
     if normalize:
         inputs = (inputs - inputs.mean()) / inputs.std()
     inputs, targets = inputs.to(device), targets.to(device)

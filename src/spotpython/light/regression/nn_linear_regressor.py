@@ -86,7 +86,7 @@ class NNLinearRegressor(L.LightningModule):
 
                 | Name   | Type       | Params | Mode  | In sizes  | Out sizes
                 ----------------------------------------------------------------------
-                0 | layers | Sequential | 20.8 K | train | [128, 10] | [128, 1] 
+                0 | layers | Sequential | 20.8 K | train | [128, 10] | [128, 1]
                 ----------------------------------------------------------------------
                 20.8 K    Trainable params
                 0         Non-trainable params

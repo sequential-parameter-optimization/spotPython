@@ -466,6 +466,13 @@ def fun_control_init(
             hyper_dict=hyperdict,
             filename=None,
         )
+    if hyperdict is not None and core_model is not None:
+        add_core_model_to_fun_control(
+            core_model=core_model,
+            fun_control=fun_control,
+            hyper_dict=hyperdict,
+            filename=None,
+        )
     return fun_control
 
 
