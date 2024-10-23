@@ -211,6 +211,9 @@ class NNCondNetRegressor(L.LightningModule):
             raise ValueError("l1 must be at least 4")
         hidden_sizes = self._get_hidden_sizes()
 
+        # Conditional Layer
+        self.cond_layer = ConditionalLayer(self._L_in, self._L_cond, self._L_in)
+        
         if batch_norm:
             # Add batch normalization layers
             layers = []
@@ -241,8 +244,7 @@ class NNCondNetRegressor(L.LightningModule):
         # Wrap the layers into a sequential container
         self.layers = nn.Sequential(*layers)
 
-        # Conditional Layer
-        self.cond_layer = ConditionalLayer(self._L_in, self._L_cond, self._L_in)
+
 
         # Initialization (Xavier, Kaiming, or Default)
         self.apply(self._init_weights)
