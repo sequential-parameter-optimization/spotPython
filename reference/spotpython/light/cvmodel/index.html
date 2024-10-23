@@ -2008,6 +2008,8 @@
       
         
       
+        
+      
     
     
       
@@ -2051,6 +2053,27 @@
   
   <span class="md-ellipsis">
     netlightregression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regression/nn_condnet_regressor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_condnet_regressor
   </span>
   
 
@@ -3786,6 +3809,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fun_control</span> <span class="o">=</span> <span class="p">{</span>
 <span class="gp">... </span>    <span class="s2">&quot;_L_in&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;_L_out&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;_L_cond&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;enable_progress_bar&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;core_model&quot;</span><span class="p">:</span> <span class="n">MyModel</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
@@ -3898,7 +3922,11 @@
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
-<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cv_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cv_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Performs k-fold cross-validation on a model using the given configuration and function control parameters.</span>
 
@@ -3918,6 +3946,7 @@
 <span class="sd">        &gt;&gt;&gt; fun_control = {</span>
 <span class="sd">        ...     &quot;_L_in&quot;: 10,</span>
 <span class="sd">        ...     &quot;_L_out&quot;: 1,</span>
+<span class="sd">        ...     &quot;_L_cond&quot;: 0,</span>
 <span class="sd">        ...     &quot;enable_progress_bar&quot;: True,</span>
 <span class="sd">        ...     &quot;core_model&quot;: MyModel,</span>
 <span class="sd">        ...     &quot;num_workers&quot;: 4,</span>
@@ -3930,6 +3959,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_L_in</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">]</span>
     <span class="n">_L_out</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_out&quot;</span><span class="p">]</span>
+    <span class="n">_L_cond</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_cond&quot;</span><span class="p">]</span>
     <span class="n">_torchmetric</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_torchmetric&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;enable_progress_bar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="kc">False</span>
@@ -3944,7 +3974,9 @@
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_folds</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;k:&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
 
-        <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span>
+            <span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_L_cond</span><span class="o">=</span><span class="n">_L_cond</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span>
+        <span class="p">)</span>
 
         <span class="n">dm</span> <span class="o">=</span> <span class="n">LightCrossValidationDataModule</span><span class="p">(</span>
             <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>

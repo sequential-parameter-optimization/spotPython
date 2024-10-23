@@ -1954,6 +1954,8 @@
       
         
       
+        
+      
     
     
       
@@ -1997,6 +1999,27 @@
   
   <span class="md-ellipsis">
     netlightregression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regression/nn_condnet_regressor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_condnet_regressor
   </span>
   
 
@@ -3915,7 +3938,8 @@
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">109</span>
+<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tests a model using the given configuration and function control parameters.</span>
 
@@ -3961,6 +3985,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_L_in</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_in&quot;</span><span class="p">]</span>
     <span class="n">_L_out</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_out&quot;</span><span class="p">]</span>
+    <span class="n">_L_cond</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_L_cond&quot;</span><span class="p">]</span>
     <span class="n">_torchmetric</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;_torchmetric&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;enable_progress_bar&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">enable_progress_bar</span> <span class="o">=</span> <span class="kc">False</span>
@@ -3982,7 +4007,7 @@
     <span class="c1"># TODO: Check if this is necessary:</span>
     <span class="c1"># dm.setup()</span>
     <span class="c1"># Init model from datamodule&#39;s attributes</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_L_cond</span><span class="o">=</span><span class="n">_L_cond</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
 
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
         <span class="c1"># Where to save models</span>
