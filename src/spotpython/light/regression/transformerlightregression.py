@@ -114,6 +114,8 @@ class TransformerLightRegression(L.LightningModule):
         _L_in: int,
         _L_out: int,
         _torchmetric: str,
+        *args,
+        **kwargs,
     ):
         """
         Initializes the TransformerLightRegression object.

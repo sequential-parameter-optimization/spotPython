@@ -73,6 +73,8 @@ class NetLightBaseMAPK(L.LightningModule):
         patience: int,
         _L_in: int,
         _L_out: int,
+        *args,
+        **kwargs,
     ):
         """
         Initializes the NetLightBase object.

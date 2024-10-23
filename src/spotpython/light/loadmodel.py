@@ -51,6 +51,7 @@ def load_light_from_checkpoint(config: dict, fun_control: dict, postfix: str = "
         default_root_dir,
         _L_in=fun_control["_L_in"],
         _L_out=fun_control["_L_out"],
+        _L_cond=fun_control["_L_cond"],
         _torchmetric=fun_control["_torchmetric"],
     )
     # disable randomness, dropout, etc...

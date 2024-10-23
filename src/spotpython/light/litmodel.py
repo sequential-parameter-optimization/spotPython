@@ -47,6 +47,8 @@ class LitModel(L.LightningModule):
         learning_rate: float = 2e-4,
         _L_in: int = 28 * 28,
         _L_out: int = 10,
+        *args,
+        **kwargs,
     ):
         """
         Initializes the LitModel object.

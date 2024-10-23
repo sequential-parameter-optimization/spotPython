@@ -20,6 +20,7 @@ from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
 def fun_control_init(
     _L_in=None,
     _L_out=None,
+    _L_cond=None,
     _torchmetric=None,
     PREFIX="00",
     TENSORBOARD_CLEAN=False,
@@ -101,6 +102,8 @@ def fun_control_init(
             The number of input features.
         _L_out (int):
             The number of output features.
+        _L_cond (int):
+            The number of conditional features.
         _torchmetric (str):
             The metric to be used by the Lighting Trainer.
             For example "mean_squared_error",
@@ -297,6 +300,7 @@ def fun_control_init(
                 'TENSORBOARD_PATH': 'runs/',
                 '_L_in': 64,
                 '_L_out': 11,
+                '_L_cond': None,
                 'accelerator': "auto",
                 'core_model': None,
                 'core_model_name': None,
@@ -363,6 +367,7 @@ def fun_control_init(
         "TENSORBOARD_CLEAN": TENSORBOARD_CLEAN,
         "_L_in": _L_in,
         "_L_out": _L_out,
+        "_L_cond": _L_cond,
         "_torchmetric": _torchmetric,
         "accelerator": accelerator,
         "converters": converters,

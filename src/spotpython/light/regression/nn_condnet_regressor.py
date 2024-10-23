@@ -146,6 +146,8 @@ class NNCondNetRegressor(L.LightningModule):
         _L_in: int,
         _L_out: int,
         _torchmetric: str,
+        *args,
+        **kwargs,
     ):
         """
         Initializes the NNLinearRegressor object.
@@ -212,12 +214,12 @@ class NNCondNetRegressor(L.LightningModule):
         hidden_sizes = self._get_hidden_sizes()
 
         # Conditional Layer
-        self.cond_layer = ConditionalLayer(self._L_in, self._L_cond, self._L_in)
-        
+        self.cond_layer = ConditionalLayer(self._L_in, self._L_cond, self.hparams.l1)
+
         if batch_norm:
             # Add batch normalization layers
             layers = []
-            layer_sizes = [self._L_in] + hidden_sizes
+            layer_sizes = [self.hparams.l1] + hidden_sizes
             for i in range(len(layer_sizes) - 1):
                 current_layer_size = layer_sizes[i]
                 next_layer_size = layer_sizes[i + 1]
@@ -230,7 +232,7 @@ class NNCondNetRegressor(L.LightningModule):
             layers += [nn.Linear(layer_sizes[-1], self._L_out)]
         else:
             layers = []
-            layer_sizes = [self._L_in] + hidden_sizes
+            layer_sizes = [self.hparams.l1] + hidden_sizes
             for i in range(len(layer_sizes) - 1):
                 current_layer_size = layer_sizes[i]
                 next_layer_size = layer_sizes[i + 1]
@@ -243,8 +245,6 @@ class NNCondNetRegressor(L.LightningModule):
 
         # Wrap the layers into a sequential container
         self.layers = nn.Sequential(*layers)
-
-
 
         # Initialization (Xavier, Kaiming, or Default)
         self.apply(self._init_weights)

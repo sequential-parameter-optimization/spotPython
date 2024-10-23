@@ -37,6 +37,8 @@ class TransformerLightPredictor(L.LightningModule):
         max_iters: int,
         input_dropout: float,
         dropout: float,
+        *args,
+        **kwargs,
     ):
         """
         Initializes the TransformerLightRegression object.

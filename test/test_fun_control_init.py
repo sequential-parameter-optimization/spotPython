@@ -6,6 +6,7 @@ def test_fun_control_init():
     fun_control = fun_control_init(_L_in=64, _L_out=11, num_workers=0, device=None)
     assert fun_control["_L_in"] == 64
     assert fun_control["_L_out"] == 11
+    assert fun_control["_L_cond"] is None
     assert fun_control["num_workers"] == 0
     assert fun_control["device"] is None
     assert fun_control["task"] is None
