@@ -2106,13 +2106,10 @@ class Spot:
 
         """
         impo = self.print_importance(threshold=threshold, print_screen=True)
-        print(f"impo: {impo}")
         indices = sort_by_kth_and_return_indices(array=impo, k=1)
-        print(f"indices: {indices}")
         # take the first max_imp values from the indices array
         if max_imp is not None:
             indices = indices[:max_imp]
-        print(f"indices after max_imp selection: {indices}")
         if scale_global:
             min_z = min(self.y)
             max_z = max(self.y)
