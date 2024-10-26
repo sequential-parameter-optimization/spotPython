@@ -580,6 +580,7 @@ def get_attributions(
     n_rel=5,
     device="cpu",
     normalize=True,
+    remove_spot_attributes=False,
 ) -> pd.DataFrame:
     """Get the attributions of a neural network.
 
@@ -600,6 +601,9 @@ def get_attributions(
             The device to use. Defaults to "cpu".
         normalize (bool, optional):
             Whether to normalize the input data. Defaults to True.
+        remove_spot_attributes (bool, optional):
+            Whether to remove the spot attributes.
+            If True, a torch model is created via `get_removed_attributes`. Defaults to False.
 
     Returns:
         pd.DataFrame (object): A DataFrame with the attributions.
@@ -613,7 +617,10 @@ def get_attributions(
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
-    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    if remove_spot_attributes:
+        removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    else:
+        model = model_loaded
     model = model.to(device)
     model.eval()
     # get feature names
@@ -731,7 +738,9 @@ def is_square(n) -> bool:
     return n == int(math.sqrt(n)) ** 2
 
 
-def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu", normalize=True) -> np.ndarray:
+def get_layer_conductance(
+    spot_tuner, fun_control, layer_idx, device="cpu", normalize=True, remove_spot_attributes=False
+) -> np.ndarray:
     """
     Compute the average layer conductance attributions for a specified layer in the model.
 
@@ -746,6 +755,8 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu", norm
             The device to use. Defaults to "cpu".
         normalize (bool, optional):
             Whether to normalize the input data. Defaults to True.
+        remove_spot_attributes (bool, optional):
+            Whether to remove the spot attributes. Defaults to False.
 
     Returns:
         numpy.ndarray:
@@ -761,7 +772,10 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu", norm
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
-    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    if remove_spot_attributes:
+        removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    else:
+        model = model_loaded
     model = model.to(device)
     model.eval()
 
@@ -794,7 +808,7 @@ def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu", norm
     return avg_layer_attributions
 
 
-def get_weights_conductance_last_layer(spot_tuner, fun_control, device="cpu") -> tuple:
+def get_weights_conductance_last_layer(spot_tuner, fun_control, device="cpu", remove_spot_attributes=False) -> tuple:
     """
     Get the weights and the conductance of the last layer.
 
@@ -805,11 +819,16 @@ def get_weights_conductance_last_layer(spot_tuner, fun_control, device="cpu") ->
             A dictionary with the function control.
         device (str, optional):
             The device to use. Defaults to "cpu".
+        remove_spot_attributes (bool, optional):
+            Whether to remove the spot attributes. Defaults to False.
     """
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
-    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    if remove_spot_attributes:
+        removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    else:
+        model = model_loaded
     model = model.to(device)
     model.eval()
 
@@ -860,7 +879,7 @@ def plot_conductance_last_layer(weights_last, layer_conductance_last, figsize=(1
         plt.show()
 
 
-def get_all_layers_conductance(spot_tuner, fun_control, device="cpu") -> dict:
+def get_all_layers_conductance(spot_tuner, fun_control, device="cpu", remove_spot_attributes=False) -> dict:
     """
     Get the conductance of all layers.
 
@@ -871,11 +890,16 @@ def get_all_layers_conductance(spot_tuner, fun_control, device="cpu") -> dict:
             A dictionary with the function control.
         device (str, optional):
             The device to use. Defaults to "cpu".
+        remove_spot_attributes (bool, optional):
+            Whether to remove the spot attributes. Defaults to False.
     """
     config = get_tuned_architecture(spot_tuner, fun_control)
     train_model(config, fun_control, timestamp=False)
     model_loaded = load_light_from_checkpoint(config, fun_control, postfix="_TRAIN")
-    removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    if remove_spot_attributes:
+        removed_attributes, model = get_removed_attributes_and_base_net(net=model_loaded)
+    else:
+        model = model_loaded
     model = model.to(device)
     model.eval()
     _, index = get_weights(model, return_index=True)
