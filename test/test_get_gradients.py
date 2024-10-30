@@ -33,7 +33,7 @@ def test_gradients_computation():
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
     
     # Compute gradients using the defined function
-    gradients = get_gradients(
+    gradients,_ = get_gradients(
         model, 
         fun_control=fun_control, 
         batch_size=batch_size, 

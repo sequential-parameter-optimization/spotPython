@@ -35,26 +35,56 @@ def check_for_nans(data, layer_index) -> bool:
 
 
 def get_activations(net, fun_control, batch_size, device="cpu", normalize=False) -> tuple:
-    """Computes the activations for each layer of the network and
-    the mean activations for each layer. Both are returned as a dictionary.
+    """
+    Computes the activations for each layer of the network, the mean activations,
+    and the sizes of the activations for each layer.
 
     Args:
         net (nn.Module): The neural network model.
         fun_control (dict): A dictionary containing the dataset.
-        device (str): The device to run the model on. Defaults to "cpu".
         batch_size (int): The batch size for the data loader.
+        device (str): The device to run the model on. Defaults to "cpu".
         normalize (bool): Whether to normalize the input data. Defaults to False.
 
     Returns:
-        tuple: A tuple containing the activations and mean activations for each layer.
+        tuple: A tuple containing the activations, mean activations, and layer sizes for each layer.
 
     Examples:
         >>> from spotpython.plot.xai import get_activations
-            activations, mean_activations = get_activations(net, fun_control)
+            import torch
+            import numpy as np
+            import torch.nn as nn
+            from spotpython.utils.init import fun_control_init
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import (
+                    get_default_hyperparameters_as_array, get_one_config_from_X)
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.data.lightdatamodule import LightDataModule
+            from spotpython.plot.xai import get_gradients
+            fun_control = fun_control_init(
+                _L_in=10, # 10: diabetes
+                _L_out=1,
+                _torchmetric="mean_squared_error",
+                data_set=Diabetes(),
+                core_model=NNLinearRegressor,
+                hyperdict=LightHyperDict)
+            X = get_default_hyperparameters_as_array(fun_control)
+            config = get_one_config_from_X(X, fun_control)
+            _L_in = fun_control["_L_in"]
+            _L_out = fun_control["_L_out"]
+            _torchmetric = fun_control["_torchmetric"]
+            batch_size = 16
+            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
+            activations, mean_activations, layer_sizes = get_activations(net=model, fun_control=fun_control, batch_size=batch_size, device = "cpu")
+            plot_nn_values_scatter(nn_values=activations, layer_sizes=layer_sizes, nn_values_names="Activations")
     """
     activations = {}
     mean_activations = {}
+    layer_sizes = {}
     net.eval()  # Set the model to evaluation mode
+
     dataset = fun_control["data_set"]
     data_module = LightDataModule(
         dataset=dataset,
@@ -67,8 +97,9 @@ def get_activations(net, fun_control, batch_size, device="cpu", normalize=False)
     train_loader = data_module.train_dataloader()
     inputs, _ = next(iter(train_loader))
     inputs = inputs.to(device)
+
     if normalize:
-        inputs = (inputs - inputs.mean()) / inputs.std()
+        inputs = (inputs - inputs.mean(dim=0, keepdim=True)) / inputs.std(dim=0, keepdim=True)
 
     with torch.no_grad():
         inputs = inputs.view(inputs.size(0), -1)
@@ -84,7 +115,10 @@ def get_activations(net, fun_control, batch_size, device="cpu", normalize=False)
             if isinstance(layer, nn.Linear):
                 activations[layer_index] = inputs.view(-1).cpu().numpy()
                 mean_activations[layer_index] = inputs.mean(dim=0).cpu().numpy()
-    return activations, mean_activations
+                # Record the size of the activations
+                layer_sizes[layer_index] = np.array(inputs.size())
+
+    return activations, mean_activations, layer_sizes
 
 
 def visualize_activations_distributions(activations, net, color="C0", columns=4, bins=50, show=True) -> None:
@@ -117,9 +151,9 @@ def visualize_activations_distributions(activations, net, color="C0", columns=4,
     plt.close()
 
 
-def get_weights(net, return_index=False) -> dict:
+def get_weights(net, return_index=False) -> tuple:
     """
-    Get the weights of a neural network.
+    Get the weights of a neural network and the size of each layer.
 
     Args:
         net (object):
@@ -128,103 +162,25 @@ def get_weights(net, return_index=False) -> dict:
             Whether to return the index. Defaults to False.
 
     Returns:
-        dict:
-            A dictionary with the weights of the neural network.
-        index (list):
-            The layer index list.
+        tuple:
+            A tuple containing:
+            - weights: A dictionary with the weights of the neural network.
+            - index: The layer index list (only if return_index is True).
+            - layer_sizes: A dictionary with layer names as keys and their sizes as entries in NumPy array format.
 
     Examples:
-        >>> from torch.utils.data import DataLoader
+        >>> from spotpython.plot.xai import get_weights
+            import torch
+            import numpy as np
+            import torch.nn as nn
             from spotpython.utils.init import fun_control_init
-            from spotpython.hyperparameters.values import set_control_key_value
-            from spotpython.data.diabetes import Diabetes
-            from spotpython.light.regression.netlightregression import NetLightRegression
-            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotpython.hyperparameters.values import add_core_model_to_fun_control
-            from spotpython.hyperparameters.values import (
-                    get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotpython.hyperparameters.values import set_control_key_value
-            from spotpython.plot.xai import get_activations
-            fun_control = fun_control_init(
-                _L_in=10, # 10: diabetes
-                _L_out=1,
-                )
-            dataset = Diabetes()
-            set_control_key_value(control_dict=fun_control,
-                                    key="data_set",
-                                    value=dataset,
-                                    replace=True)
-            add_core_model_to_fun_control(fun_control=fun_control,
-                                        core_model=NetLightRegression,
-                                        hyper_dict=LightHyperDict)
-            X = get_default_hyperparameters_as_array(fun_control)
-            config = get_one_config_from_X(X, fun_control)
-            _L_in = fun_control["_L_in"]
-            _L_out = fun_control["_L_out"]
-            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out)
-            batch_size= config["batch_size"]
-            dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
-            get_weights(model)
-            {'Layer 0': array([-0.12895013,  0.01047492, -0.15705723,  0.11925378, -0.26944348,
-                                0.23180881, -0.22984707, -0.25141433, -0.19982024,  0.1432175 ,
-                                -0.11684369,  0.11833665, -0.2683918 , -0.19186287, -0.11611126,
-                                -0.06214499, -0.2412386 ,  0.20706299, -0.07457635,  0.10150522,
-                                0.22361842,  0.05891514,  0.08647272,  0.3052416 , -0.1426217 ,
-                                0.10016555, -0.14069483,  0.22599205,  0.25255737, -0.29155323,
-                                0.2699465 ,  0.1510033 ,  0.13780165,  0.13018301,  0.26287982,
-                                -0.04175457, -0.26743335, -0.09074122, -0.2227112 ,  0.02090478,
-                                -0.0590421 , -0.16961981, -0.02875188,  0.2995954 , -0.02494261,
-                                0.01004025, -0.04931906,  0.04971322,  0.28176293,  0.19337103,
-                                0.11224869,  0.06871963,  0.07456425,  0.12216929, -0.04086405,
-                                -0.29390487, -0.19555901,  0.26992753,  0.01890203, -0.25616774,
-                                0.04987782,  0.26129004, -0.29883513, -0.21289697, -0.12594265,
-                                0.0126926 , -0.07375361, -0.03475064, -0.30828732,  0.14808285,
-                                0.27756676,  0.19329056, -0.22393112, -0.25491226,  0.13131431,
-                                0.00710201,  0.12963155, -0.3090024 , -0.01885444,  0.22301766],
-                            dtype=float32),
-
-    """
-    weights = {}
-    index = []
-    for name, param in net.named_parameters():
-        if name.endswith(".bias"):
-            continue
-        # add (int(name.split(".")[1])) to the index list
-        index.append(int(name.split(".")[1]))
-        key_name = f"Layer {name.split('.')[1]}"
-        weights[key_name] = param.detach().view(-1).cpu().numpy()
-    if return_index:
-        return weights, index
-    else:
-        return weights
-
-
-def get_gradients(net, fun_control, batch_size, device="cpu", normalize=False) -> dict:
-    """
-    Get the gradients of a neural network.
-
-    Args:
-        net (object):
-            A neural network.
-        fun_control (dict):
-            A dictionary with the function control.
-        batch_size (int, optional):
-            The batch size.
-        device (str, optional):
-            The device to use. Defaults to "cpu".
-        normalize (bool, optional):
-            Whether to normalize the input data. Defaults to False.
-
-    Returns:
-        dict: A dictionary with the gradients of the neural network.
-
-    Examples:
-        >>> from spotpython.utils.init import fun_control_init
             from spotpython.data.diabetes import Diabetes
             from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
             from spotpython.hyperdict.light_hyper_dict import LightHyperDict
             from spotpython.hyperparameters.values import (
                     get_default_hyperparameters_as_array, get_one_config_from_X)
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.data.lightdatamodule import LightDataModule
             from spotpython.plot.xai import get_gradients
             fun_control = fun_control_init(
                 _L_in=10, # 10: diabetes
@@ -240,40 +196,87 @@ def get_gradients(net, fun_control, batch_size, device="cpu", normalize=False) -
             _torchmetric = fun_control["_torchmetric"]
             batch_size = 16
             model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
-            get_gradients(model, fun_control=fun_control, batch_size=batch_size, device = "cpu")
-                {'layers.0.weight': array([-18.91906  , -15.034285 ,  -9.014692 , -11.67453  , -17.93505  ,
-                -18.900719 ,   3.181451 ,  -7.079934 ,  -8.781589 , -19.415773 ,
-                -31.762537 , -25.240526 , -15.134445 , -19.59995  , -30.110514 ,
-                -31.731745 ,   5.3412247, -11.88625  , -14.743096 , -32.596447 ,
-                -16.250072 , -19.540495 , -12.840339 , -12.497604 , -24.44074  ,
-                -26.738008 ,   7.0891356, -14.540221 , -12.63131  , -20.33385  ,
-                -16.617418 , -19.537054 , -12.366335 , -11.95286  , -22.170914 ,
-                -24.224556 ,   7.333409 , -13.811482 , -12.374348 , -19.54898  ,
-                -12.489107 , -14.683411 ,  -9.294134 ,  -8.983377 , -16.662935 ,
-                -18.20638  ,   5.5115504, -10.380258 ,  -9.300154 , -14.692373 ,
-                -10.237142 , -12.03578  ,  -7.618267 ,  -7.363545 , -13.658367 ,
-                -14.92351  ,   4.517738 ,  -8.508549 ,  -7.6232023, -12.043128 ,
-                -20.709038 , -26.502258 , -16.64915  , -14.087446 , -28.602673 ,
-                -31.098864 ,   8.91061  , -17.756905 , -15.304844 , -24.48614  ,
-                -31.866945 , -25.78516  , -15.80128  , -16.71967  , -30.365    ,
-                -30.903124 ,   1.2193708, -10.1255665, -12.155798 , -31.34386  ],
-            dtype=float32),
-            'layers.3.weight': array([-33.59704 , -30.819086, -28.372812, -27.846645, -34.799633,
-                    -31.002586, -30.067335, -39.82912 , -54.281433, -49.7932  ,
-                    -45.840855, -44.99075 , -56.22442 , -50.089676, -48.578625,
-                    -64.350365, -26.605227, -24.405384, -22.4682  , -22.051537,
-                    -27.557549, -24.550695, -23.810078, -31.540358, -31.579184,
-                    -28.968073, -26.668724, -26.174164, -32.709553, -29.140554,
-                    -28.261475, -37.436962], dtype=float32),
-            'layers.6.weight': array([ -68.05522 ,  -74.10879 ,  -77.15874 ,  -43.79848 , -102.948906,
-                    -112.10627 , -116.72002 ,  -66.25509 ,  -75.09263 ,  -81.77218 ,
-                    -85.13751 ,  -48.327564,  -48.758083,  -53.09515 ,  -55.280285,
-                    -31.379366], dtype=float32),
-            'layers.9.weight': array([-104.8834  , -129.18658 , -136.66594 , -120.37764 ,  -92.72068 ,
-                    -114.20557 , -120.817566, -106.41813 ], dtype=float32),
-            'layers.12.weight': array([-424.17743, -439.30273, -263.17206, -272.55627], dtype=float32),
-            'layers.15.weight': array([-516.952   , -194.23613 , -154.84027 ,  -58.178665], dtype=float32),
-            'layers.18.weight': array([-489.72256, -405.1883 ], dtype=float32)}
+            weights, layer_sizes = get_weights(net=model)
+            weights, layer_sizes
+    """
+    weights = {}
+    index = []
+    layer_sizes = {}
+
+    for name, param in net.named_parameters():
+        if name.endswith(".bias"):
+            continue
+
+        # Extract layer number
+        layer_number = int(name.split(".")[1])
+        index.append(layer_number)
+
+        # Create dictionary key for this layer
+        key_name = f"Layer {layer_number}"
+
+        # Store weight information
+        weights[key_name] = param.detach().view(-1).cpu().numpy()
+
+        # Store layer size as a NumPy array
+        layer_sizes[key_name] = np.array(param.size())
+
+    if return_index:
+        return weights, index, layer_sizes
+    else:
+        return weights, layer_sizes
+
+
+def get_gradients(net, fun_control, batch_size, device="cpu", normalize=False) -> tuple:
+    """
+    Get the gradients of a neural network and the size of each layer.
+
+    Args:
+        net (object):
+            A neural network.
+        fun_control (dict):
+            A dictionary with the function control.
+        batch_size (int, optional):
+            The batch size.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
+        normalize (bool, optional):
+            Whether to normalize the input data. Defaults to False.
+
+    Returns:
+        tuple: A tuple containing:
+            - grads: A dictionary with the gradients of the neural network.
+            - layer_sizes: A dictionary with layer names as keys and their sizes as entries in NumPy array format.
+
+    Examples:
+        >>> from spotpython.plot.xai import get_gradients
+            import torch
+            import numpy as np
+            import torch.nn as nn
+            from spotpython.utils.init import fun_control_init
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import (
+                    get_default_hyperparameters_as_array, get_one_config_from_X)
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.data.lightdatamodule import LightDataModule
+            # from spotpython.plot.xai import get_gradients
+            fun_control = fun_control_init(
+                _L_in=10, # 10: diabetes
+                _L_out=1,
+                _torchmetric="mean_squared_error",
+                data_set=Diabetes(),
+                core_model=NNLinearRegressor,
+                hyperdict=LightHyperDict)
+            X = get_default_hyperparameters_as_array(fun_control)
+            config = get_one_config_from_X(X, fun_control)
+            _L_in = fun_control["_L_in"]
+            _L_out = fun_control["_L_out"]
+            _torchmetric = fun_control["_torchmetric"]
+            batch_size = 16
+            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
+            gradients, layer_sizes = get_gradients(net=model)
+            gradients, layer_sizes
     """
     net.eval()
     dataset = fun_control["data_set"]
@@ -288,22 +291,27 @@ def get_gradients(net, fun_control, batch_size, device="cpu", normalize=False) -
     train_loader = data_module.train_dataloader()
     inputs, targets = next(iter(train_loader))
     if normalize:
-        inputs = (inputs - inputs.mean()) / inputs.std()
+        inputs = (inputs - inputs.mean(dim=0, keepdim=True)) / inputs.std(dim=0, keepdim=True)
     inputs, targets = inputs.to(device), targets.to(device)
+
     # Pass one batch through the network, and calculate the gradients for the weights
     net.zero_grad()
     preds = net(inputs)
     preds = preds.squeeze(-1)  # Remove the last dimension if it's 1
-    # TODO: Add more loss functions
     loss = F.mse_loss(preds, targets)
-    # loss = F.cross_entropy(preds, labels)  # Same as nn.CrossEntropyLoss, but as a function instead of module
     loss.backward()
-    # We limit our visualization to the weight parameters and exclude the bias to reduce the number of plots
-    grads = {
-        name: params.grad.view(-1).cpu().clone().numpy() for name, params in net.named_parameters() if "weight" in name
-    }
+
+    grads = {}
+    layer_sizes = {}
+    for name, params in net.named_parameters():
+        if "weight" in name:
+            # Collect gradient information
+            grads[name] = params.grad.view(-1).cpu().clone().numpy()
+            # Collect size information
+            layer_sizes[name] = np.array(params.size())
+
     net.zero_grad()
-    return grads
+    return grads, layer_sizes
 
 
 def plot_nn_values_hist(nn_values, net, nn_values_names="", color="C0", columns=2) -> None:
@@ -345,7 +353,14 @@ def plot_nn_values_hist(nn_values, net, nn_values_names="", color="C0", columns=
 
 
 def plot_nn_values_scatter(
-    nn_values, nn_values_names="", absolute=True, cmap="gray", figsize=(6, 6), return_reshaped=False, show=True
+    nn_values,
+    layer_sizes,
+    nn_values_names="",
+    absolute=True,
+    cmap="gray",
+    figsize=(6, 6),
+    return_reshaped=False,
+    show=True,
 ) -> dict:
     """
     Plot the values of a neural network including a marker for padding values.
@@ -356,6 +371,8 @@ def plot_nn_values_scatter(
         nn_values (dict):
             A dictionary with the values of the neural network. For example,
             the weights, gradients, or activations.
+        layer_sizes (dict):
+            A dictionary with layer names as keys and their sizes as entries in NumPy array format.
         nn_values_names (str, optional):
             The name of the values. Defaults to "".
         absolute (bool, optional):
@@ -371,6 +388,32 @@ def plot_nn_values_scatter(
 
     Returns:
         dict: A dictionary with the reshaped values.
+
+    Examples:
+        >>> from spotpython.utils.init import fun_control_init
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import (
+                    get_default_hyperparameters_as_array, get_one_config_from_X)
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            # from spotpython.plot.xai import get_gradients
+            fun_control = fun_control_init(
+                _L_in=10, # 10: diabetes
+                _L_out=1,
+                _torchmetric="mean_squared_error",
+                data_set=Diabetes(),
+                core_model=NNLinearRegressor,
+                hyperdict=LightHyperDict)
+            X = get_default_hyperparameters_as_array(fun_control)
+            config = get_one_config_from_X(X, fun_control)
+            _L_in = fun_control["_L_in"]
+            _L_out = fun_control["_L_out"]
+            _torchmetric = fun_control["_torchmetric"]
+            batch_size = 16
+            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
+            gradients, layer_sizes = get_gradients(model, fun_control=fun_control, batch_size=batch_size, device = "cpu")
+            plot_nn_values_scatter(nn_values=gradients, layer_sizes=layer_sizes, nn_values_names="Weights")
     """
     if cmap == "gray":
         cmap = "gray"
@@ -384,33 +427,41 @@ def plot_nn_values_scatter(
     res = {}
     padding_marker = np.nan  # Use NaN as a special marker for padding
     for layer, values in nn_values.items():
-        k = len(values)
-        print(f"{k} values in Layer {layer}.")
-        n = int(math.sqrt(k))
-        if n * n != k:  # if the length is not a perfect square
-            n += 1  # Adjust n for padding
-            print(f"{n*n-k} padding values added.")
-            values = np.append(values, [padding_marker] * (n * n - k))  # Append padding values
+        if layer not in layer_sizes:
+            print(f"Layer {layer} size not defined, skipping.")
+            continue
 
-        print(f"{len(values)} values now in Layer {layer}.")
+        layer_shape = layer_sizes[layer]
+        height, width = layer_shape if len(layer_shape) == 2 else (layer_shape[0], 1)  # Support linear layers
+
+        print(f"{len(values)} values in Layer {layer}. Geometry: ({height}, {width})")
+
+        total_size = height * width
+        if len(values) < total_size:
+            padding_needed = total_size - len(values)
+            print(f"{padding_needed} padding values added to Layer {layer}.")
+            values = np.append(values, [padding_marker] * padding_needed)  # Append padding values
 
         if absolute:
-            reshaped_values = np.abs(values).reshape((n, n))
+            reshaped_values = np.abs(values).reshape((height, width))
             # Mark padding values distinctly by setting them back to NaN
             reshaped_values[reshaped_values == np.abs(padding_marker)] = np.nan
         else:
-            reshaped_values = values.reshape((n, n))
+            reshaped_values = values.reshape((height, width))
 
-        _, ax = plt.figure(figsize=figsize), plt.gca()
+        _, ax = plt.subplots(figsize=figsize)
         cax = ax.imshow(reshaped_values, cmap=cmap, interpolation="nearest")
-        for i in range(n):
-            for j in range(n):
+
+        for i in range(height):
+            for j in range(width):
                 if np.isnan(reshaped_values[i, j]):
                     ax.text(j, i, "P", ha="center", va="center", color="red")
+
         plt.colorbar(cax, label="Value")
         plt.title(f"{nn_values_names} Plot for {layer}")
         if show:
             plt.show()
+
         # Add reshaped_values to the dictionary res
         res[layer] = reshaped_values
     if return_reshaped:
@@ -433,7 +484,7 @@ def visualize_weights_distributions(net, color="C0", columns=2) -> None:
         None
 
     """
-    weights = get_weights(net)
+    weights, _ = get_weights(net)
     plot_nn_values_hist(weights, net, nn_values_names="Weights", color=color, columns=columns)
 
 
@@ -478,7 +529,7 @@ def visualize_gradient_distributions(
         None
 
     """
-    grads = get_gradients(net, fun_control, batch_size, device, normalize=normalize)
+    grads, _ = get_gradients(net, fun_control, batch_size, device, normalize=normalize)
     plot_nn_values_hist(grads, net, nn_values_names="Gradients", color=color, columns=columns)
 
 
@@ -503,8 +554,8 @@ def visualize_mean_activations(mean_activations, absolute=True, cmap="gray", fig
 
     Examples:
         >>> from spotpython.plot.xai import get_activations
-            activations, mean_activations = get_activations(net, fun_control)
-            visualize_mean_activations(mean_activations
+            activations, mean_activations, _ = get_activations(net, fun_control)
+            visualize_mean_activations(mean_activations)
 
     """
     plot_nn_values_scatter(
@@ -529,9 +580,39 @@ def visualize_weights(net, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
     Returns:
         None
 
+    Examples:
+        >>> from spotpython.utils.init import fun_control_init
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import (
+                    get_default_hyperparameters_as_array, get_one_config_from_X)
+            from spotpython.plot.xai import visualize_weights
+            fun_control = fun_control_init(
+                _L_in=10, # 10: diabetes
+                _L_out=1,
+                _torchmetric="mean_squared_error",
+                data_set=Diabetes(),
+                core_model=NNLinearRegressor,
+                hyperdict=LightHyperDict)
+            X = get_default_hyperparameters_as_array(fun_control)
+            config = get_one_config_from_X(X, fun_control)
+            _L_in = fun_control["_L_in"]
+            _L_out = fun_control["_L_out"]
+            _torchmetric = fun_control["_torchmetric"]
+            batch_size = 16
+            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
+            visualize_weights(net=model, absolute=True, cmap="gray", figsize=(6, 6))
     """
-    weights = get_weights(net)
-    plot_nn_values_scatter(nn_values=weights, nn_values_names="Weights", absolute=absolute, cmap=cmap, figsize=figsize)
+    weights, layer_sizes = get_weights(net)
+    plot_nn_values_scatter(
+        nn_values=weights,
+        layer_sizes=layer_sizes,
+        nn_values_names="Weights",
+        absolute=absolute,
+        cmap=cmap,
+        figsize=figsize,
+    )
 
 
 def visualize_gradients(
@@ -561,14 +642,21 @@ def visualize_gradients(
     Returns:
         None
     """
-    grads = get_gradients(
+    grads, layer_sizes = get_gradients(
         net=net,
         fun_control=fun_control,
         batch_size=batch_size,
         device=device,
         normalize=normalize,
     )
-    plot_nn_values_scatter(nn_values=grads, nn_values_names="Gradients", absolute=absolute, cmap=cmap, figsize=figsize)
+    plot_nn_values_scatter(
+        nn_values=grads,
+        layer_sizes=layer_sizes,
+        nn_values_names="Gradients",
+        absolute=absolute,
+        cmap=cmap,
+        figsize=figsize,
+    )
 
 
 def get_attributions(
@@ -832,7 +920,7 @@ def get_weights_conductance_last_layer(spot_tuner, fun_control, device="cpu", re
     model = model.to(device)
     model.eval()
 
-    weights, index = get_weights(model, return_index=True)
+    weights, index, _ = get_weights(model, return_index=True)
     layer_idx = index[-1]
     weights_last = weights[f"Layer {layer_idx}"]
     weights_last
@@ -902,7 +990,7 @@ def get_all_layers_conductance(spot_tuner, fun_control, device="cpu", remove_spo
         model = model_loaded
     model = model.to(device)
     model.eval()
-    _, index = get_weights(model, return_index=True)
+    _, index, _ = get_weights(model, return_index=True)
     layer_conductance = {}
     for i in index:
         layer_conductance[i] = get_layer_conductance(spot_tuner, fun_control, layer_idx=i)
