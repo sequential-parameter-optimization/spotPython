@@ -444,26 +444,27 @@ def plot_nn_values_scatter(
 
         if absolute:
             reshaped_values = np.abs(values).reshape((height, width))
-            # Mark padding values distinctly by setting them back to NaN
             reshaped_values[reshaped_values == np.abs(padding_marker)] = np.nan
         else:
             reshaped_values = values.reshape((height, width))
 
-        _, ax = plt.subplots(figsize=figsize)
+        fig, ax = plt.subplots(figsize=figsize)
         cax = ax.imshow(reshaped_values, cmap=cmap, interpolation="nearest")
+
+        # Adjust the position and size of the colorbar
+        cbar = fig.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
 
         for i in range(height):
             for j in range(width):
                 if np.isnan(reshaped_values[i, j]):
                     ax.text(j, i, "P", ha="center", va="center", color="red")
 
-        plt.colorbar(cax, label="Value")
         plt.title(f"{nn_values_names} Plot for {layer}")
         if show:
             plt.show()
 
-        # Add reshaped_values to the dictionary res
         res[layer] = reshaped_values
+
     if return_reshaped:
         return res
 
