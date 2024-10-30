@@ -115,8 +115,10 @@ def get_activations(net, fun_control, batch_size, device="cpu", normalize=False)
             if isinstance(layer, nn.Linear):
                 activations[layer_index] = inputs.view(-1).cpu().numpy()
                 mean_activations[layer_index] = inputs.mean(dim=0).cpu().numpy()
-                # Record the size of the activations
-                layer_sizes[layer_index] = np.array(inputs.size())
+                # Record the size of the activations and set the first dimension to 1
+                layer_size = np.array(inputs.size())
+                layer_size[0] = 1  # Set the first dimension to 1
+                layer_sizes[layer_index] = layer_size
 
     return activations, mean_activations, layer_sizes
 
@@ -444,27 +446,26 @@ def plot_nn_values_scatter(
 
         if absolute:
             reshaped_values = np.abs(values).reshape((height, width))
+            # Mark padding values distinctly by setting them back to NaN
             reshaped_values[reshaped_values == np.abs(padding_marker)] = np.nan
         else:
             reshaped_values = values.reshape((height, width))
 
-        fig, ax = plt.subplots(figsize=figsize)
+        _, ax = plt.subplots(figsize=figsize)
         cax = ax.imshow(reshaped_values, cmap=cmap, interpolation="nearest")
-
-        # Adjust the position and size of the colorbar
-        cbar = fig.colorbar(cax, ax=ax, fraction=0.046, pad=0.04)
 
         for i in range(height):
             for j in range(width):
                 if np.isnan(reshaped_values[i, j]):
                     ax.text(j, i, "P", ha="center", va="center", color="red")
 
+        plt.colorbar(cax, label="Value")
         plt.title(f"{nn_values_names} Plot for {layer}")
         if show:
             plt.show()
 
+        # Add reshaped_values to the dictionary res
         res[layer] = reshaped_values
-
     if return_reshaped:
         return res
 
@@ -534,7 +535,7 @@ def visualize_gradient_distributions(
     plot_nn_values_hist(grads, net, nn_values_names="Gradients", color=color, columns=columns)
 
 
-def visualize_mean_activations(mean_activations, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
+def visualize_mean_activations(mean_activations, layer_sizes, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
     """
     Scatter plots the mean activations of a neural network for each layer.
     means_activations is a dictionary with the mean activations of the neural network computed via
@@ -543,6 +544,8 @@ def visualize_mean_activations(mean_activations, absolute=True, cmap="gray", fig
     Args:
         mean_activations (dict):
             A dictionary with the mean activations of the neural network.
+        layer_sizes (dict):
+            A dictionary with layer names as keys and their sizes as entries in NumPy array format.
         absolute (bool, optional):
             Whether to use the absolute values. Defaults to True.
         cmap (str, optional):
@@ -555,12 +558,17 @@ def visualize_mean_activations(mean_activations, absolute=True, cmap="gray", fig
 
     Examples:
         >>> from spotpython.plot.xai import get_activations
-            activations, mean_activations, _ = get_activations(net, fun_control)
-            visualize_mean_activations(mean_activations)
+            activations, mean_activations, layer_sizes = get_activations(net, fun_control)
+            visualize_mean_activations(mean_activations, layer_sizes)
 
     """
     plot_nn_values_scatter(
-        nn_values=mean_activations, nn_values_names="Average Activations", absolute=absolute, cmap=cmap, figsize=figsize
+        nn_values=mean_activations,
+        layer_sizes=layer_sizes,
+        nn_values_names="Average Activations",
+        absolute=absolute,
+        cmap=cmap,
+        figsize=figsize,
     )
 
 
