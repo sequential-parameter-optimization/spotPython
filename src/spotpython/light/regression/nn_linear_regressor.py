@@ -249,10 +249,13 @@ class NNLinearRegressor(L.LightningModule):
             repeats = repeats + 1
         return result
 
-    def _get_hidden_sizes(self):
+    def _get_hidden_sizes(self, n=10) -> list:
         n_low = self._L_in // 4
         n_high = max(self.hparams.l1, 2 * n_low)
         hidden_sizes = self._generate_div2_list(n_high, n_low)
+        # keep only the first 10 values of hidden_sizes list
+        if len(hidden_sizes) > n:
+            hidden_sizes = hidden_sizes[:n]
         return hidden_sizes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
