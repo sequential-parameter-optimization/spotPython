@@ -363,11 +363,10 @@ def plot_nn_values_scatter(
     figsize=(6, 6),
     return_reshaped=False,
     show=True,
+    colorbar_orientation="auto",
 ) -> dict:
     """
     Plot the values of a neural network including a marker for padding values.
-    For simplicity, this example will annotate 'P' directly on the plot for padding values
-    using a unique marker value approach.
 
     Args:
         nn_values (dict):
@@ -387,35 +386,14 @@ def plot_nn_values_scatter(
             Whether to return the reshaped values. Defaults to False.
         show (bool, optional):
             Whether to show the plot. Defaults to True.
+        colorbar_orientation (str, optional):
+            The orientation of the colorbar. Can be "auto", "horizontal", "vertical", or "none".
+            "auto" will choose the orientation based on the geometry of the plot.
+            "none" will not show the colorbar.
+            Defaults to "auto".
 
     Returns:
         dict: A dictionary with the reshaped values.
-
-    Examples:
-        >>> from spotpython.utils.init import fun_control_init
-            from spotpython.data.diabetes import Diabetes
-            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
-            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotpython.hyperparameters.values import (
-                    get_default_hyperparameters_as_array, get_one_config_from_X)
-            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-            # from spotpython.plot.xai import get_gradients
-            fun_control = fun_control_init(
-                _L_in=10, # 10: diabetes
-                _L_out=1,
-                _torchmetric="mean_squared_error",
-                data_set=Diabetes(),
-                core_model=NNLinearRegressor,
-                hyperdict=LightHyperDict)
-            X = get_default_hyperparameters_as_array(fun_control)
-            config = get_one_config_from_X(X, fun_control)
-            _L_in = fun_control["_L_in"]
-            _L_out = fun_control["_L_out"]
-            _torchmetric = fun_control["_torchmetric"]
-            batch_size = 16
-            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
-            gradients, layer_sizes = get_gradients(model, fun_control=fun_control, batch_size=batch_size, device = "cpu")
-            plot_nn_values_scatter(nn_values=gradients, layer_sizes=layer_sizes, nn_values_names="Weights")
     """
     if cmap == "gray":
         cmap = "gray"
@@ -459,13 +437,21 @@ def plot_nn_values_scatter(
                 if np.isnan(reshaped_values[i, j]):
                     ax.text(j, i, "P", ha="center", va="center", color="red")
 
-        plt.colorbar(cax, label="Value")
+        if colorbar_orientation == "auto":
+            if height < width:
+                plt.colorbar(cax, orientation="horizontal", label="Value")
+            else:
+                plt.colorbar(cax, orientation="vertical", label="Value")
+
+        if colorbar_orientation in ["horizontal", "vertical"]:
+            plt.colorbar(cax, orientation=colorbar_orientation, label="Value")
         plt.title(f"{nn_values_names} Plot for {layer}")
         if show:
             plt.show()
 
         # Add reshaped_values to the dictionary res
         res[layer] = reshaped_values
+
     if return_reshaped:
         return res
 
