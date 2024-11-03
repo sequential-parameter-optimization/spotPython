@@ -1,4 +1,5 @@
 import torch
+from torchviz import make_dot
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import math
@@ -16,6 +17,7 @@ from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradie
 from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
 from matplotlib.ticker import MaxNLocator
 from spotpython.data.lightdatamodule import LightDataModule
+from spotpython.torch.dimensions import extract_linear_dims
 
 
 def check_for_nans(data, layer_index) -> bool:
@@ -1017,3 +1019,101 @@ def sort_layers(data_dict) -> dict:
     # Create a new dictionary from the sorted items
     sorted_dict = dict(sorted_items)
     return sorted_dict
+
+
+def viz_net(
+    net,
+    device="cpu",
+    show_attrs=False,
+    show_saved=False,
+    max_attr_chars=50,
+    filename="model_architecture",
+    format="png",
+) -> None:
+    """
+    Visualize the architecture of a linear neural network.
+    Produces Graphviz representation of PyTorch autograd graph.
+    If a node represents a backward function, it is gray. Otherwise, the node represents a tensor and is either blue, orange, or green:
+    - Blue: reachable leaf tensors that requires grad (tensors whose .grad fields will be populated during .backward())
+    - Orange: saved tensors of custom autograd functions as well as those saved by built-in backward nodes
+    - Green: tensor passed in as outputs
+    - Dark green: if any output is a view, we represent its base tensor with a dark green node.
+    If `show_attrs`=True and `show_saved`=True it is shown what autograd saves for the backward pass.
+
+    Args:
+        net (nn.Module):
+            The neural network model.
+        device (str, optional):
+            The device to use. Defaults to "cpu".
+        show_attrs (bool, optional):
+            whether to display non-tensor attributes of backward nodes (Requires PyTorch version >= 1.9)
+        show_saved (bool, optional):
+            whether to display saved tensor nodes that are not by custom autograd functions. Saved tensor nodes for custom functions, if present, are always displayed. (Requires PyTorch version >= 1.9)
+        max_attr_chars (int, optional):
+            if show_attrs is True, sets max number of characters to display for any given attribute. Defaults to 50.
+        filename (str, optional):
+            The filename. Defaults to "model_architecture".
+        format (str, optional):
+            The output format. Defaults to "png".
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If the model does not have a linear layer.
+        TypeError: If the network structure or parameters are invalid.
+        RuntimeError: If an unexpected error occurs.
+
+    Examples:
+        >>> from spotpython.plot.xai import viz_net
+            from spotpython.utils.init import fun_control_init
+            from spotpython.data.diabetes import Diabetes
+            from spotpython.light.regression.nn_linear_regressor import NNLinearRegressor
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import (
+                    get_default_hyperparameters_as_array, get_one_config_from_X)
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            _L_in=10
+            _L_out=1
+            _torchmetric="mean_squared_error"
+            fun_control = fun_control_init(
+                _L_in=_L_in,
+                _L_out=_L_out,
+                _torchmetric=_torchmetric,
+                data_set=Diabetes(),
+                core_model=NNLinearRegressor,
+                hyperdict=LightHyperDict)
+            X = get_default_hyperparameters_as_array(fun_control)
+            config = get_one_config_from_X(X, fun_control)
+            # _L_in = fun_control["_L_in"]
+            # _L_out = fun_control["_L_out"]
+            # _torchmetric = fun_control["_torchmetric"]
+            model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
+            viz_net(net=model, device="cpu", show_attrs=True, show_saved=True, filename="model_architecture3", format="png")
+
+    """
+    try:
+        dim = extract_linear_dims(net)
+    except ValueError as ve:
+        error_message = "The model does not have a linear layer: " + str(ve)
+        raise ValueError(error_message)
+    except TypeError as te:
+        error_message = "Invalid network structure or parameters: " + str(te)
+        raise TypeError(error_message)
+    except Exception as e:
+        # Catch any other unforeseen exceptions and log them for debugging purposes
+        error_message = "An unexpected error occurred: " + str(e)
+        raise RuntimeError(error_message)
+
+    # Proceed with the rest of the logic if dimensions were extracted successfully
+    x = torch.randn(1, dim[0]).requires_grad_(True)
+    x = x.to(device)
+    output = net(x)
+    dot = make_dot(
+        output,
+        params=dict(net.named_parameters()),
+        show_attrs=show_attrs,
+        show_saved=show_saved,
+        max_attr_chars=max_attr_chars,
+    )
+    dot.render(filename, format=format)
