@@ -1085,9 +1085,6 @@ def viz_net(
                 hyperdict=LightHyperDict)
             X = get_default_hyperparameters_as_array(fun_control)
             config = get_one_config_from_X(X, fun_control)
-            # _L_in = fun_control["_L_in"]
-            # _L_out = fun_control["_L_out"]
-            # _torchmetric = fun_control["_torchmetric"]
             model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _torchmetric=_torchmetric)
             viz_net(net=model, device="cpu", show_attrs=True, show_saved=True, filename="model_architecture3", format="png")
 
