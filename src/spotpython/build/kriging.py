@@ -243,7 +243,6 @@ class Kriging(surrogates):
     def set_de_bounds(self) -> None:
         """
         Determine search bounds for model_optimizer, e.g., differential evolution.
-
         This method sets the attribute `de_bounds` of the object to a list of lists,
         where each inner list represents the lower and upper bounds for a parameter
         being optimized. The number of inner lists is determined by the number of
@@ -258,6 +257,7 @@ class Kriging(surrogates):
                 S = Kriging(name='kriging', seed=124)
                 S.set_de_bounds()
                 print(S.de_bounds)
+                [[-3.0, 2.0]]
 
         Returns:
             None
@@ -351,6 +351,7 @@ class Kriging(surrogates):
                 S.set_de_bounds()
                 new_theta_p_Lambda = S.optimize_model()
                 print(new_theta_p_Lambda)
+                [0.12167915 1.49467909 1.82808259 1.69648798 0.79564346]
 
         Returns:
             result["x"] (Union[List[float], Tuple[float]]):
