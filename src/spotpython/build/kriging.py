@@ -297,14 +297,28 @@ class Kriging(surrogates):
         Examples:
             >>> import numpy as np
                 from spotpython.build.kriging import Kriging
-                n=2
-                p=4
-                S = Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S.extract_from_bounds(np.array([1, 2, 3]))
-                print(S.theta)
-                print(S.p)
-                [1 2]
-                [3]
+                # Define the number of theta and p parameters
+                num_theta = 2
+                num_p = 3
+                # Initialize the Kriging model
+                kriging_model = Kriging(
+                    name='kriging',
+                    seed=124,
+                    n_theta=num_theta,
+                    n_p=num_p,
+                    optim_p=True,
+                    noise=False
+                )
+                # Extract parameters from given bounds
+                # Assumes 'extract_from_bounds' will split the array into `theta` and `p` based on `n_theta`.
+                bounds_array = np.array([1, 2, 3, 4, 5])
+                kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)
+                # Validate the expected values for theta and p
+                # Convert theta and p to lists if they are numpy arrays
+                theta_list = list(kriging_model.theta)
+                p_list = list(kriging_model.p)
+                assert theta_list == [1, 2], f"Expected theta to be [1, 2] but got {theta_list}"
+                assert p_list == [3, 4, 5], f"Expected p to be [3] but got {p_list}"
 
         Returns:
             None
@@ -446,13 +460,13 @@ class Kriging(surrogates):
                 self.spot_writer.add_scalar("spot_Lambda", Lambda, self.counter+self.log_length)
             if self.optim_p:
                 p = self.p.copy()
-                self.spot_writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
+                self.spot_writer.add_scalars("spot_p",
+                                             {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
             self.spot_writer.flush()
 
     def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
         """
         Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
-
         The function computes the following internal values:
         1. `theta`, `p`, and `Lambda` values via optimization of the function `fun_likelihood()`.
         2. Correlation matrix `Psi` via `rebuildPsi()`.
@@ -510,7 +524,6 @@ class Kriging(surrogates):
     def initialize_variables(self, nat_X: np.ndarray, nat_y: np.ndarray) -> None:
         """
         Initialize variables for the class instance.
-
         This method takes in the independent and dependent variable data as input
         and initializes the class instance variables.
         It creates deep copies of the input data and stores them in the
@@ -565,7 +578,6 @@ class Kriging(surrogates):
     def set_variable_types(self) -> None:
         """
         Set the variable types for the class instance.
-
         This method sets the variable types for the class instance based
         on the `var_type` attribute. If the length of `var_type` is less
         than `k`, all variable types are forced to 'num' and a warning is logged.
@@ -769,8 +781,8 @@ class Kriging(surrogates):
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S.initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
-                print(S.cod_X)
-                print(S.cod_y)
+                print(S.nat_X)
+                print(S.nat_y)
                 S.set_theta_values()
                 print(f"S.theta: {S.theta}")
                 S.initialize_matrices()
@@ -784,7 +796,16 @@ class Kriging(surrogates):
                 print(f"S.U:{S.U}")
                 S.likelihood()
                 S.negLnLike
-
+                    [[0]
+                    [1]]
+                    [0 1]
+                    S.theta: [0.]
+                    S.theta: [1.60036366]
+                    S.Psi: [[1.00000001e+00 4.96525625e-18]
+                    [4.96525625e-18 1.00000001e+00]]
+                    S.U:[[1.00000001e+00 4.96525622e-18]
+                    [0.00000000e+00 1.00000001e+00]]
+                    -1.3862943611198906
         """
         self.extract_from_bounds(new_theta_p_Lambda)
         if self.__is_any__(power(10.0, self.theta), 0):
@@ -840,9 +861,9 @@ class Kriging(surrogates):
                 print(f"S.theta: {S.theta}")
                 print(S.__is_any__(power(10.0, S.theta), 0))
                 print(S.__is_any__(S.theta, 0))
-                S.theta: [0.]
-                False
-                True
+                    S.theta: [0.]
+                    False
+                    True
 
         """
         if not isinstance(x, ndarray):
@@ -892,13 +913,13 @@ class Kriging(surrogates):
                 print(f"S.theta: {S.theta}")
                 S.build_Psi()
                 print(f"S.Psi: {S.Psi}")
-                [[0]
-                [1]]
-                [0 1]
-                S.theta: [0.]
-                S.theta: [1.72284258]
-                S.Psi: [[1.00000001e+00 1.14348852e-23]
-                [1.14348852e-23 1.00000001e+00]]
+                    [[0]
+                    [1]]
+                    [0 1]
+                    S.theta: [0.]
+                    S.theta: [1.60036366]
+                    S.Psi: [[1.00000001e+00 4.96525625e-18]
+                    [4.96525625e-18 1.00000001e+00]]
 
         """
         self.Psi = zeros((self.n, self.n), dtype=float64)
@@ -977,15 +998,15 @@ class Kriging(surrogates):
                 print(f"S.Psi: {S.Psi}")
                 S.build_U()
                 print(f"S.U:{S.U}")
-                [[0]
-                [1]]
-                [0 1]
-                S.theta: [0.]
-                S.theta: [1.72284258]
-                S.Psi: [[1.00000001e+00 1.14348852e-23]
-                [1.14348852e-23 1.00000001e+00]]
-                S.U:[[1.00000001e+00 1.14348851e-23]
-                [0.00000000e+00 1.00000001e+00]]
+                    [[0]
+                    [1]]
+                    [0 1]
+                    S.theta: [0.]
+                    S.theta: [1.60036366]
+                    S.Psi: [[1.00000001e+00 4.96525625e-18]
+                    [4.96525625e-18 1.00000001e+00]]
+                    S.U:[[1.00000001e+00 4.96525622e-18]
+                    [0.00000000e+00 1.00000001e+00]]
         """
         try:
             self.U = scipy_cholesky(self.Psi, lower=True) if scipy else cholesky(self.Psi)
@@ -1040,6 +1061,8 @@ class Kriging(surrogates):
                 assert np.allclose(S.SigmaSqr, sigma2, atol=1e-6)
                 print(f"S.LnDetPsi:{S.LnDetPsi}")
                 print(f"S.self.negLnLike:{S.negLnLike}")
+                    S.LnDetPsi:-0.1454134234019476
+                    S.self.negLnLike:2.2185498738611282
         """
         # (2.20) in [Forr08a]:
         U_T_inv_one = solve(self.U.T, self.one)
@@ -1075,30 +1098,29 @@ class Kriging(surrogates):
             >>> import numpy as np
                 from spotpython.fun.objectivefunctions import analytical
                 from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init, design_control_init
                 # 1-dimensional example
                 fun = analytical().fun_sphere
-                lower = np.array([-1])
-                upper = np.array([1])
-                design_control={"init_size": 10}
+                fun_control=fun_control_init(lower = np.array([-1]),
+                                            upper = np.array([1]),
+                                            noise=False)
+                design_control=design_control_init(init_size=10)
                 S = spot.Spot(fun=fun,
-                            noise=False,
-                            lower = lower,
-                            upper= upper,
-                            design_control=design_control,)
+                            fun_control=fun_control,
+                            design_control=design_control)
                 S.initialize_design()
                 S.update_stats()
                 S.fit_surrogate()
                 S.surrogate.plot()
                 # 2-dimensional example
                 fun = analytical().fun_sphere
-                lower = np.array([-1, -1])
-                upper = np.array([1, 1])
-                design_control={"init_size": 10}
+                fun_control=fun_control_init(lower = np.array([-1, -1]),
+                                            upper = np.array([1, 1]),
+                                            noise=False)
+                design_control=design_control_init(init_size=10)
                 S = spot.Spot(fun=fun,
-                            noise=False,
-                            lower = lower,
-                            upper= upper,
-                            design_control=design_control,)
+                            fun_control=fun_control,
+                            design_control=design_control)
                 S.initialize_design()
                 S.update_stats()
                 S.fit_surrogate()
@@ -1247,6 +1269,7 @@ class Kriging(surrogates):
         """
         Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].
         The error is returned as well.
+        The method is used in `predict`.
 
         Args:
             self (object):
@@ -1262,6 +1285,38 @@ class Kriging(surrogates):
         Note:
             `self.mu` and `self.SigmaSqr` are computed in `likelihood`, not here.
             See also [Forr08a, p.60].
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                import matplotlib.pyplot as plt
+                from numpy import linspace, arange, empty
+                rng = np.random.RandomState(1)
+                X = linspace(start=0, stop=10, num=10).reshape(-1, 1)
+                y = np.squeeze(X * np.sin(X))
+                training_indices = rng.choice(arange(y.size), size=6, replace=False)
+                X_train, y_train = X[training_indices], y[training_indices]
+                S = Kriging(name='kriging', seed=124)
+                S.fit(X_train, y_train)
+                n = X.shape[0]
+                y = empty(n, dtype=float)
+                s = empty(n, dtype=float)
+                ei = empty(n, dtype=float)
+                for i in range(n):
+                    x = X[i, :]
+                    y[i], s[i], ei[i] = S.predict_coded(x)
+                print(f"y: {y}")
+                print(f"s: {s}")
+                print(f"ei: {-1.0*ei}")
+                    y: [-1.41991223e-08  6.48310075e-01  1.76715565e+00 -6.35226564e-01
+                    -4.28585379e+00 -1.22301201e+00  2.49434148e+00  5.61900546e-01
+                    -3.04558209e+00 -5.44021104e+00]
+                    s: [3.69706810e-04 2.07958781e+00 3.69706812e-04 3.69706808e-04
+                    3.69706812e-04 2.07958578e+00 3.69706810e-04 2.60615406e+00
+                    2.60837032e+00 3.69706813e-04]
+                    ei: [-0.00000000e+00 -1.02341195e-03 -0.00000000e+00 -0.00000000e+00
+                    -0.00000000e+00 -1.63799157e-02 -0.00000000e+00 -9.45766188e-03
+                    -2.53405668e-01 -1.47459348e-04]
         """
         self.build_psi_vec(cod_x)
         U_T_inv = solve(self.U.T, self.nat_y - self.one.dot(self.mu))
@@ -1356,7 +1411,7 @@ class Kriging(surrogates):
 
     def weighted_exp_imp(self, cod_x: np.ndarray, w: float) -> float:
         """
-        Weighted expected improvement.
+        Weighted expected improvement. Currently not used in `spotpython`
 
         Args:
             self (object): The Kriging object.
