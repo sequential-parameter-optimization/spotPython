@@ -1,7 +1,7 @@
 import copy
 from math import erf
 import matplotlib.pyplot as plt
-from numpy import max, min, var
+from numpy import min, var
 from numpy import sqrt
 from numpy import exp
 from numpy import array
@@ -436,13 +436,11 @@ class Kriging(surrogates):
     def update_log(self) -> None:
         """
         Update the log with the current values of negLnLike, theta, p, and Lambda.
-
         This method appends the current values of negLnLike, theta, p (if optim_p is True),
         and Lambda (if noise is True)
         to their respective lists in the log dictionary.
         It also updates the log_length attribute with the current length
         of the negLnLike list in the log.
-
         If spot_writer is not None, this method also writes the current values of
         negLnLike, theta, p (if optim_p is True),
         and Lambda (if noise is True) to the spot_writer object.
@@ -505,7 +503,8 @@ class Kriging(surrogates):
         Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
         The function computes the following internal values:
         1. `theta`, `p`, and `Lambda` values via optimization of the function `fun_likelihood()`.
-        2. Correlation matrix `Psi` via `rebuildPsi()`.
+        2. Correlation matrix `Psi` via `buildPsi()`.
+        3. U matrix via `buildU()`.
 
         Args:
             self (object): The Kriging object.
@@ -591,25 +590,33 @@ class Kriging(surrogates):
                 S.nat_y: [1 2]
 
         """
+        # Validate input dimensions
+        if nat_X.ndim != 2 or nat_y.ndim != 1:
+            raise ValueError("nat_X must be a 2D array and nat_y must be a 1D array.")
+        if nat_X.shape[0] != nat_y.shape[0]:
+            raise ValueError("The number of samples in nat_X and nat_y must be equal.")
+
+        # Initialize instance variables
         self.nat_X = copy.deepcopy(nat_X)
         self.nat_y = copy.deepcopy(nat_y)
-        self.n = self.nat_X.shape[0]
-        self.k = self.nat_X.shape[1]
+        self.n, self.k = self.nat_X.shape
 
-        self.min_X = min(self.nat_X, axis=0)
-        self.max_X = max(self.nat_X, axis=0)
+        # Calculate and store min and max of X
+        self.min_X = np.min(self.nat_X, axis=0)
+        self.max_X = np.max(self.nat_X, axis=0)
 
-        Z = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
-        # aggregated y values:
-        mu = Z[1]
-        self.aggregated_mean_y = np.copy(mu)
+        # Calculate the aggregated mean of y
+        _, aggregated_mean_y, _ = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
+        self.aggregated_mean_y = np.copy(aggregated_mean_y)
+
+        # Logging the initialized variables
         logger.debug("In initialize_variables(): self.nat_X: %s", self.nat_X)
         logger.debug("In initialize_variables(): self.nat_y: %s", self.nat_y)
         logger.debug("In initialize_variables(): self.aggregated_mean_y: %s", self.aggregated_mean_y)
         logger.debug("In initialize_variables(): self.min_X: %s", self.min_X)
         logger.debug("In initialize_variables(): self.max_X: %s", self.max_X)
-        logger.debug("In initialize_variables(): self.n: %s", self.n)
-        logger.debug("In initialize_variables(): self.k: %s", self.k)
+        logger.debug("In initialize_variables(): self.n: %d", self.n)
+        logger.debug("In initialize_variables(): self.k: %d", self.k)
 
     def set_variable_types(self) -> None:
         """
@@ -645,16 +652,18 @@ class Kriging(surrogates):
         """
         logger.debug("In set_variable_types(): self.k: %s", self.k)
         logger.debug("In set_variable_types(): self.var_type: %s", self.var_type)
-        # assume all variable types are "num" if "num" is
-        # specified once:
+
+        # Ensure var_type has appropriate length by defaulting to 'num'
         if len(self.var_type) < self.k:
-            self.var_type = self.var_type * self.k
+            self.var_type = ['num'] * self.k  # Corrected to fill with 'num' instead of duplicating
             logger.warning("In set_variable_types(): All variable types forced to 'num'.")
             logger.debug("In set_variable_types(): self.var_type: %s", self.var_type)
-        self.num_mask = np.array(list(map(lambda x: x == "num", self.var_type)))
-        self.factor_mask = np.array(list(map(lambda x: x == "factor", self.var_type)))
-        self.int_mask = np.array(list(map(lambda x: x == "int", self.var_type)))
-        self.ordered_mask = np.array(list(map(lambda x: x == "int" or x == "num" or x == "float", self.var_type)))
+        # Create masks for each type using numpy vectorized operations
+        var_type_array = np.array(self.var_type)
+        self.num_mask = (var_type_array == "num")
+        self.factor_mask = (var_type_array == "factor")
+        self.int_mask = (var_type_array == "int")
+        self.ordered_mask = np.isin(var_type_array, ["int", "num", "float"])
         logger.debug("In set_variable_types(): self.num_mask: %s", self.num_mask)
         logger.debug("In set_variable_types(): self.factor_mask: %s", self.factor_mask)
         logger.debug("In set_variable_types(): self.int_mask: %s", self.int_mask)

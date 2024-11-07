@@ -1,3 +1,21 @@
+spotpython-0.16.14:
+
+- spotpython.utils.aggregate.py: aggregate_mean_var() updated:
+    1. Imports: Ensured that necessary imports (`numpy` and `pandas`) are included.
+    2. Input Validation: Added checks to ensure that `X` and `y` are `numpy` arrays, `X` is 2D, `y` is 1D, and they have matching shapes, helping prevent common input errors.
+    3. Use of Pandas Group Functionality: Improved grouping and aggregation by explicitly handling multi-index resulting from `agg`.
+    4. Return Type Consistency: Ensured that the description in the documentation matches the actual operation and expected shapes for return arrays `y_mean` and `y_var`.
+
+- initialize_variables:
+    1. Input Validation: Added checks to ensure correct shapes for `nat_X` and `nat_y`, which prevent unexpected errors during execution.
+    2. Proper Initialization Instead of Assigning in Tuples: Decomposed the tuple assignment directly for clarity.
+
+- set_variable_types:
+    1. Corrected Initialization of `var_type`: If the length of `var_type` is less than `k`, the variable types are now all set to `'num'` consistently, rather than attempting to multiply the list.
+    2. NumPy Vectorization: Moved from `map` and list comprehension to NumPy vectorized operations, which are more efficient and readable when handling large data.
+    3. Simplified Ordered Mask Logic: Used NumPy's `isin` function, which directly checks membership in a list of types relevant for `ordered_mask`.
+
+
 spotpython-0.16.12:
 
 - kriging.py: method extract_from_bounds() updated.

@@ -21,7 +21,8 @@ def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray)
             aggregated (variance per group) `y` values, shape `(1,)`, if `m` duplicates in `X`.
 
     Examples:
-        >>> X = np.array([[1, 2], [3, 4], [1, 2]])
+        >>> from spotpython.utils.aggregate import aggregate_mean_var
+            X = np.array([[1, 2], [3, 4], [1, 2]])
             y = np.array([1, 2, 3])
             X_agg, y_mean, y_var = aggregate_mean_var(X, y)
             print(X_agg)
@@ -32,23 +33,28 @@ def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray)
             print(y_var)
             [1. 0.]
     """
-    # Create a DataFrame from X and y
+    if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray):
+        raise TypeError("X and y must be numpy arrays.")
+
+    if X.ndim != 2 or y.ndim != 1:
+        raise ValueError("X must be a 2D array and y must be a 1D array.")
+
+    if X.shape[0] != y.shape[0]:
+        raise ValueError("The number of rows in X must match the length of y.")
+
+    # Create a DataFrame from X with y as the group target
     df = pd.DataFrame(X)
     df["y"] = y
 
-    # Group by all columns except 'y' and calculate the mean and variance of 'y' for each group
-    grouped = df.groupby(list(df.columns.difference(["y"])), as_index=False, sort=sort)
-    df_mean = grouped.mean()
-    df_var = grouped.var()
+    # Group by all X columns, calculating the mean and variance of y for each group
+    grouped = df.groupby(list(df.columns[:-1]), as_index=False, sort=sort).agg({"y": ["mean", "var"]})
 
-    # Convert the resulting DataFrames to numpy arrays
-    mean_array = df_mean.to_numpy()
-    var_array = df_var.to_numpy()
+    # Extract mean and variance results from the multi-index DataFrame columns
+    y_mean = grouped[("y", "mean")].to_numpy()
+    y_var = grouped[("y", "var")].to_numpy()
 
-    # Split the resulting arrays into separate arrays for X and y
-    X_agg = np.delete(mean_array, -1, 1)
-    y_mean = mean_array[:, -1]
-    y_var = var_array[:, -1]
+    # Extract the unique X values
+    X_agg = grouped.iloc[:, :-2].to_numpy()
 
     return X_agg, y_mean, y_var
 
