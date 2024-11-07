@@ -1,7 +1,7 @@
 import copy
 from math import erf
 import matplotlib.pyplot as plt
-from numpy import max, min, var, mean
+from numpy import max, min, var
 from numpy import sqrt
 from numpy import exp
 from numpy import array
@@ -28,7 +28,7 @@ from spotpython.utils.repair import repair_non_numeric
 from spotpython.utils.aggregate import aggregate_mean_var
 import logging
 import numpy as np
-from typing import List, Union, Tuple, Any, Optional
+from typing import List, Union, Tuple, Any, Optional, Dict
 
 
 logger = logging.getLogger(__name__)
@@ -386,31 +386,52 @@ class Kriging(surrogates):
             result["x"] (Union[List[float], Tuple[float]]):
                 A list or tuple of optimized parameter values.
         """
-        logger.debug("In optimize_model(): self.de_bounds passed to optimizer: %s", self.de_bounds)
-        if self.model_optimizer.__name__ == 'dual_annealing':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds)
-        elif self.model_optimizer.__name__ == 'differential_evolution':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds,
-                                          maxiter=self.model_fun_evals,
-                                          seed=self.seed)
-        elif self.model_optimizer.__name__ == 'direct':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds,
-                                          # maxfun=self.model_fun_evals,
-                                          eps=1e-2)
-        elif self.model_optimizer.__name__ == 'shgo':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          bounds=self.de_bounds)
-        elif self.model_optimizer.__name__ == 'basinhopping':
-            result = self.model_optimizer(func=self.fun_likelihood,
-                                          x0=mean(self.de_bounds, axis=1))
+        logger.debug("Entering optimize_model.")
+        if not callable(self.model_optimizer):
+            logger.error("model_optimizer is not callable.")
+            raise ValueError("model_optimizer must be a callable function or method.")
+
+        optimizer_strategies: Dict[str, Dict] = {
+            'dual_annealing': {'func': self.fun_likelihood, 'bounds': self.de_bounds},
+            'differential_evolution': {
+                'func': self.fun_likelihood,
+                'bounds': self.de_bounds,
+                'maxiter': self.model_fun_evals,
+                'seed': self.seed
+            },
+            'direct': {
+                'func': self.fun_likelihood,
+                'bounds': self.de_bounds,
+                'eps': 1e-2
+            },
+            'shgo': {'func': self.fun_likelihood, 'bounds': self.de_bounds},
+            'basinhopping': {'func': self.fun_likelihood, 'x0': np.mean(self.de_bounds, axis=1)}
+        }
+
+        optimizer_name = self.model_optimizer.__name__
+        logger.debug("Optimizer selected: %s", optimizer_name)
+
+        if optimizer_name not in optimizer_strategies:
+            logger.info("Using default options for optimizer: %s", optimizer_name)
+            optimizer_args = {'func': self.fun_likelihood, 'bounds': self.de_bounds}
         else:
-            result = self.model_optimizer(func=self.fun_likelihood, bounds=self.de_bounds)
-        logger.debug("In optimize_model(): result: %s", result)
-        logger.debug('In optimize_model(): returned result["x"]: %s', result["x"])
-        return result["x"]
+            optimizer_args = optimizer_strategies[optimizer_name]
+
+        logger.debug("Parameters for optimization: %s", optimizer_args)
+
+        try:
+            result = self.model_optimizer(**optimizer_args)
+        except Exception as e:
+            logger.error("Optimization failed due to error: %s", str(e))
+            raise
+
+        if "x" not in result:
+            logger.error("Optimization result does not contain 'x'. Result: %s", result)
+            raise ValueError("The optimization result does not contain the expected 'x' key.")
+        logger.debug("Optimization result: %s", result)
+        optimized_parameters = list(result["x"])
+        logger.debug("Extracted optimized parameters: %s", optimized_parameters)
+        return optimized_parameters
 
     def update_log(self) -> None:
         """
