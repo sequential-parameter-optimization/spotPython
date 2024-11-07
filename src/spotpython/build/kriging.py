@@ -782,7 +782,6 @@ class Kriging(surrogates):
         self.Lambda = None
 
         # Initialize generator
-        # Assuming spacefilling is a correctly defined function elsewhere in the code
         self.gen = spacefilling(k=self.k, seed=self.seed)
         logger.debug("In initialize_matrices(): self.gen: %s", self.gen)
 
@@ -802,26 +801,15 @@ class Kriging(surrogates):
         Compute log likelihood for a set of hyperparameters (theta, p, Lambda).
 
         This method computes the log likelihood for a set of hyperparameters
-        (theta, p, Lambda) by performing the following steps:
-        1. Extracts the hyperparameters from the input array using `extract_from_bounds()`.
-        2. Checks if any element in `10^theta` is equal to 0. If so, logs a warning and
-        returns the penalty value (`pen_val`).
-        3. Builds the `Psi` matrix using `build_Psi()`.
-        4. Checks if `Psi` is ill-conditioned or infinite. If so, logs a warning and returns
-        the penalty value (`pen_val`).
-        5. Builds the `U` matrix using `build_U()`. If an exception occurs, logs an error and
-        returns the penalty value (`pen_val`).
-        6. Computes the negative log likelihood using `likelihood()`.
-        7. Returns the computed negative log likelihood (`negLnLike`).
+        (theta, p, Lambda) using several internal methods for matrix construction
+        and likelihood evaluation. It handles potential errors by returning a
+        penalty value for non-computable states.
 
         Args:
-            self (object): The Kriging object.
-            new_theta_p_Lambda (np.ndarray):
-                An array containing the `theta`, `p`, and `Lambda` values.
+            new_theta_p_Lambda (np.ndarray): An array containing `theta`, `p`, and `Lambda` values.
 
         Returns:
-            float:
-                The negative log likelihood of the surface at the specified hyperparameters.
+            float: The negative log likelihood or the penalty value if computation fails.
 
         Attributes:
             theta (np.ndarray): Kriging theta values. Shape (k,).
@@ -868,44 +856,44 @@ class Kriging(surrogates):
                     [0.00000000e+00 1.00000001e+00]]
                     -1.3862943611198906
         """
+        # Extract hyperparameters
         self.extract_from_bounds(new_theta_p_Lambda)
-        if self.__is_any__(power(10.0, self.theta), 0):
+        # Check transformed theta values
+        theta_scaled = np.power(10.0, self.theta)
+        if self.__is_any__(theta_scaled, 0):
             logger.warning("Failure in fun_likelihood: 10^theta == 0. Setting negLnLike to %s", self.pen_val)
             return self.pen_val
+        # Build Psi matrix and check its condition
         self.build_Psi()
-        if (self.inf_Psi or self.cnd_Psi > 1e9):
-            logger.warning("Failure in fun_likelihood: Psi is ill conditioned: %s", self.cnd_Psi)
+        if getattr(self, 'inf_Psi', False) or getattr(self, 'cnd_Psi', float('inf')) > 1e9:
+            logger.warning("Failure in fun_likelihood: Psi is ill-conditioned: %s", getattr(self, 'cnd_Psi', 'unknown'))
             logger.warning("Setting negLnLike to: %s", self.pen_val)
             return self.pen_val
-
+        # Build U matrix and handle exceptions
         try:
             self.build_U()
         except Exception as error:
-            penalty_value = self.pen_val
-            print("Error in fun_likelihood(). Call to build_U() failed.")
-            print("error=%s, type(error)=%s" % (error, type(error)))
-            print("Setting negLnLike to %.2f." % self.pen_val)
-            return penalty_value
+            logger.error("Error in fun_likelihood(). Call to build_U() failed: %s", error)
+            logger.error("Setting negLnLike to %.2f.", self.pen_val)
+            return self.pen_val
+
+        # Calculate likelihood
         self.likelihood()
         return self.negLnLike
 
     def __is_any__(self, x: Union[np.ndarray, Any], v: Any) -> bool:
         """
         Check if any element in `x` is equal to `v`.
-        This method checks if any element in the input array `x` is equal to the value `v`.
-        If `x` is not an instance of `ndarray`, it is first converted to a numpy array using
-        the `array()` function.
+
+        This method checks if any element in the input array-like `x`
+        is equal to the given value `v`. Converts inputs to numpy arrays as necessary.
 
         Args:
-            self (object): The Kriging object.
-            x (np.ndarray or array-like):
-                The input array to check for the presence of value `v`.
-            v (scalar):
-                The value to check for in the input array `x`.
+            x (Union[np.ndarray, Any]): The input array-like object to check.
+            v (Any): The value to check for in `x`.
 
         Returns:
-            bool:
-                True if any element in `x` is equal to `v`, False otherwise.
+            bool: True if any element in `x` is equal to `v`, False otherwise.
 
         Examples:
             >>> from spotpython.build.kriging import Kriging
@@ -925,11 +913,11 @@ class Kriging(surrogates):
                     S.theta: [0.]
                     False
                     True
-
         """
-        if not isinstance(x, ndarray):
-            x = array([x])
-        return any(x == v)
+
+        if not isinstance(x, np.ndarray):
+            x = np.array([x])  # Wrap scalar x in an array
+        return np.any(x == v)
 
     def build_Psi(self) -> None:
         """
