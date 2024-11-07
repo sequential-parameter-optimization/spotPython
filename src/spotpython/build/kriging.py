@@ -9,7 +9,6 @@ from numpy import log
 from numpy import power
 from numpy import abs
 from numpy import sum
-from numpy import diag
 from numpy import pi
 from numpy import ones, zeros
 from numpy import spacing
@@ -1076,27 +1075,21 @@ class Kriging(surrogates):
 
     def likelihood(self) -> None:
         """
-        Calculates the negative of the concentrated log-likelihood.
-
-        This method implements equation (2.32) in [Forr08a] to calculate
-        the negative of the concentrated log-likelihood. It also modifies `mu`,
-        `SigmaSqr`, `LnDetPsi`, and `negLnLike`.
+        Calculate the negative concentrated log-likelihood.
+        Implements equation (2.32) from [Forr08a] to compute the negative of the
+        concentrated log-likelihood. Updates `mu`, `SigmaSqr`, `LnDetPsi`, and `negLnLike`.
 
         Note:
-            `build_Psi` and `build_U` should be called first.
-
-        Args:
-            self (object):
-                The Kriging object.
-
-        Returns:
-            None
+            Requires prior calls to `build_Psi` and `build_U`.
 
         Attributes:
             mu (np.float64): Kriging expected mean value mu.
             SigmaSqr (np.float64): Sigma squared value.
-            LnDetPsi (np.float64): Determinant Psi matrix.
+            LnDetPsi (np.float64): Logarithm of the determinant of Psi matrix.
             negLnLike (float): Negative log likelihood of the surface at the specified hyperparameters.
+
+        Raises:
+            LinAlgError: If matrix operations fail.
 
         Examples:
             >>> from spotpython.build.kriging import Kriging
@@ -1113,28 +1106,34 @@ class Kriging(surrogates):
                 S.build_Psi()
                 S.build_U()
                 S.likelihood()
-                # assert S.mu is close to 7.5 with a tolerance of 1e-6
                 assert np.allclose(S.mu, 7.5, atol=1e-6)
                 E = np.exp(1)
-                sigma2 = E/(E**2 -1) * (25/4 + 25/4*E)
-                # asssert S.SigmaSqr is close to sigma2 with a tolerance of 1e-6
+                sigma2 = E / (E**2 - 1) * (25/4 + 25/4*E)
                 assert np.allclose(S.SigmaSqr, sigma2, atol=1e-6)
                 print(f"S.LnDetPsi:{S.LnDetPsi}")
-                print(f"S.self.negLnLike:{S.negLnLike}")
+                print(f"S.negLnLike:{S.negLnLike}")
                     S.LnDetPsi:-0.1454134234019476
-                    S.self.negLnLike:2.2185498738611282
+                    S.negLnLike:2.2185498738611282
         """
-        # (2.20) in [Forr08a]:
-        U_T_inv_one = solve(self.U.T, self.one)
-        U_T_inv_cod_y = solve(self.U.T, self.nat_y)
-        mu = self.one.T.dot(solve(self.U, U_T_inv_cod_y)) / self.one.T.dot(solve(self.U, U_T_inv_one))
-        self.mu = mu
-        # (2.31) in [Forr08a]
-        cod_y_minus_mu = self.nat_y - self.one.dot(self.mu)
-        self.SigmaSqr = cod_y_minus_mu.T.dot(solve(self.U, solve(self.U.T, cod_y_minus_mu))) / self.n
-        # (2.32) in [Forr08a]
-        self.LnDetPsi = 2.0 * sum(log(abs(diag(self.U))))
-        self.negLnLike = -1.0 * (-(self.n / 2.0) * log(self.SigmaSqr) - 0.5 * self.LnDetPsi)
+        try:
+            # Solving linear equations for needed components
+            U_T_inv_one = solve(self.U.T, self.one)
+            U_T_inv_nat_y = solve(self.U.T, self.nat_y)
+            # Mean calculation: (2.20) in [Forr08a]
+            self.mu = (self.one.T @ solve(self.U, U_T_inv_nat_y)) / (self.one.T @ solve(self.U, U_T_inv_one))
+            # Residuals
+            cod_y_minus_mu = self.nat_y - self.one * self.mu
+            # Sigma squared calculation: (2.31) in [Forr08a]
+            self.SigmaSqr = (cod_y_minus_mu.T @ solve(self.U, solve(self.U.T, cod_y_minus_mu))) / self.n
+            # Log determinant of Psi: (2.32) in [Forr08a]
+            self.LnDetPsi = 2.0 * np.sum(np.log(np.abs(np.diag(self.U))))
+            # Negative log-likelihood calculation: simplified from (2.32)
+            self.negLnLike = 0.5 * (self.n * np.log(self.SigmaSqr) + self.LnDetPsi)
+            logger.debug("Likelihood calculated: mu=%s, SigmaSqr=%s, LnDetPsi=%s, negLnLike=%s",
+                         self.mu, self.SigmaSqr, self.LnDetPsi, self.negLnLike)
+        except LinAlgError as error:
+            logger.error("LinAlgError in likelihood calculation: %s", error)
+            raise
 
     def plot(self, show: Optional[bool] = True) -> None:
         """
