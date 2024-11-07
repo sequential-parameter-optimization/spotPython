@@ -702,17 +702,21 @@ class Kriging(surrogates):
         """
         logger.debug("In set_theta_values(): self.k: %s", self.k)
         logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
-        if ((self.n_theta > 1) or (self.n_theta > self.k)) and (self.n_theta != self.k):
+
+        # Adjust `n_theta` if it exceeds `k`
+        if self.n_theta > self.k:
             self.n_theta = self.k
             logger.warning("Too few theta values or more theta values than dimensions. `n_theta` set to `k`.")
-            logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
-        if self.theta_init_zero:
-            self.theta: List[float] = zeros(self.n_theta)
-            logger.debug("In set_theta_values(): self.theta: %s", self.theta)
+            logger.debug("In set_theta_values(): self.n_theta reset to: %s", self.n_theta)
+
+        # Initialize theta values
+        if hasattr(self, "theta_init_zero") and self.theta_init_zero:
+            self.theta = np.zeros(self.n_theta, dtype=float)
+            logger.debug("Theta initialized to zeros: %s", self.theta)
         else:
             logger.debug("In set_theta_values(): self.n: %s", self.n)
-            self.theta: List[float] = ones((self.n_theta,)) * self.n / (100 * self.k)
-            logger.debug("In set_theta_values(): self.theta: %s", self.theta)
+            self.theta = np.ones(self.n_theta, dtype=float) * self.n / (100 * self.k)
+            logger.debug("Theta initialized based on n and k: %s", self.theta)
 
     def initialize_matrices(self) -> None:
         """
@@ -753,33 +757,45 @@ class Kriging(surrogates):
             None
         """
         logger.debug("In initialize_matrices(): self.n_p: %s", self.n_p)
-        self.p = ones(self.n_p) * self.p_val
+
+        # Initialize p
+        self.p = np.ones(self.n_p) * self.p_val
         logger.debug("In initialize_matrices(): self.p: %s", self.p)
-        # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
-        # else self.pen_val = self.n * var(self.nat_y) + 1e4
-        logger.debug("In initialize_matrices(): var(self.nat_y): %s", var(self.nat_y))
-        logger.debug("In initialize_matrices(): self.n: %s", self.n)
-        if var(self.nat_y) > 0:
-            self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+
+        # Calculate variance of nat_y
+        y_variance = var(self.nat_y)
+        logger.debug("In initialize_matrices(): var(self.nat_y): %s", y_variance)
+
+        # Set penalty value based on variance
+        if y_variance > 0:
+            self.pen_val = self.n * log(y_variance) + 1e4
         else:
-            self.pen_val = self.n * var(self.nat_y) + 1e4
+            self.pen_val = self.n * y_variance + 1e4
         logger.debug("In initialize_matrices(): self.pen_val: %s", self.pen_val)
+
+        # Initialize other attributes
         self.negLnLike = None
-        logger.debug("In initialize_matrices(): self.k: %s", self.k)
-        logger.debug("In initialize_matrices(): self.seed: %s", self.seed)
-        self.gen = spacefilling(k=self.k, seed=self.seed)
-        logger.debug("In initialize_matrices(): self.gen: %s", self.gen)
         self.LnDetPsi = None
-        self.Psi = zeros((self.n, self.n), dtype=float64)
-        logger.debug("In initialize_matrices(): self.Psi: %s", self.Psi)
-        self.psi = zeros((self.n, 1))
-        logger.debug("In initialize_matrices(): self.psi: %s", self.psi)
-        self.one = ones(self.n)
-        logger.debug("In initialize_matrices(): self.one: %s", self.one)
         self.mu = None
         self.U = None
         self.SigmaSqr = None
         self.Lambda = None
+
+        # Initialize generator
+        # Assuming spacefilling is a correctly defined function elsewhere in the code
+        self.gen = spacefilling(k=self.k, seed=self.seed)
+        logger.debug("In initialize_matrices(): self.gen: %s", self.gen)
+
+        # Initialize matrix Psi and vector psi
+        self.Psi = np.zeros((self.n, self.n), dtype=np.float64)
+        logger.debug("In initialize_matrices(): self.Psi shape: %s", self.Psi.shape)
+
+        self.psi = np.zeros((self.n, 1), dtype=np.float64)
+        logger.debug("In initialize_matrices(): self.psi shape: %s", self.psi.shape)
+
+        # Initialize one
+        self.one = np.ones(self.n, dtype=np.float64)
+        logger.debug("In initialize_matrices(): self.one: %s", self.one)
 
     def fun_likelihood(self, new_theta_p_Lambda: np.ndarray) -> float:
         """
