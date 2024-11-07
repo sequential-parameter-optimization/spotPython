@@ -13,8 +13,7 @@ from numpy import diag
 from numpy import pi
 from numpy import ones, zeros
 from numpy import spacing
-from numpy import float64
-from numpy import append, ndarray, isinf, linspace, meshgrid, ravel, diag_indices_from, empty
+from numpy import append, ndarray, linspace, meshgrid, ravel, empty
 from numpy.linalg import cholesky, solve, LinAlgError, cond
 from scipy.optimize import differential_evolution
 from scipy.linalg import cholesky as scipy_cholesky
@@ -923,23 +922,16 @@ class Kriging(surrogates):
         """
         Constructs a new (n x n) correlation matrix Psi to reflect new data
         or a change in hyperparameters.
-
         This method uses `theta`, `p`, and coded `X` values to construct the
         correlation matrix as described in [Forr08a, p.57].
-
-        Args:
-            self (object): The Kriging object.
-
-        Returns:
-            None
-
-        Raises:
-            LinAlgError: If building Psi fails.
 
         Attributes:
             Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
             cnd_Psi (float): Condition number of Psi.
             inf_Psi (bool): True if Psi is infinite, False otherwise.
+
+        Raises:
+            LinAlgError: If building Psi fails.
 
         Examples:
             >>> from spotpython.build.kriging import Kriging
@@ -969,37 +961,56 @@ class Kriging(surrogates):
                     S.theta: [1.60036366]
                     S.Psi: [[1.00000001e+00 4.96525625e-18]
                     [4.96525625e-18 1.00000001e+00]]
-
         """
-        self.Psi = zeros((self.n, self.n), dtype=float64)
-        theta = power(10.0, self.theta)
-        if self.n_theta == 1:
-            theta = theta * ones(self.k)
         try:
-            D = zeros((self.n, self.n))
+            n = self.n
+            k = self.k
+            theta = np.power(10.0, self.theta)
+
+            # Ensure theta has the correct length
+            if self.n_theta == 1:
+                theta = theta * np.ones(k)
+
+            # Initialize the Psi matrix
+            self.Psi = np.zeros((n, n), dtype=np.float64)
+
+            # Calculate the distance matrix using ordered variables
             if self.ordered_mask.any():
                 X_ordered = self.nat_X[:, self.ordered_mask]
-                D = squareform(
-                    pdist(
-                        X_ordered, metric='sqeuclidean', out=None, w=theta[self.ordered_mask]))
+                D_ordered = squareform(
+                    pdist(X_ordered, metric='sqeuclidean', w=theta[self.ordered_mask])
+                )
+                self.Psi += D_ordered
+
+            # Add the contribution of factor variables to the distance matrix
             if self.factor_mask.any():
                 X_factor = self.nat_X[:, self.factor_mask]
-                D = (D + squareform(
-                    pdist(X_factor,
-                          metric=self.metric_factorial,
-                          out=None,
-                          w=theta[self.factor_mask])))
-            self.Psi = exp(-D)
+                D_factor = squareform(
+                    pdist(X_factor, metric=self.metric_factorial, w=theta[self.factor_mask])
+                )
+                self.Psi += D_factor
+
+            # Calculate correlation from distance
+            self.Psi = np.exp(-self.Psi)
+
+            # Adjust diagonal elements for noise or minimum epsilon
+            diag_indices = np.diag_indices_from(self.Psi)
+            if self.noise:
+                self.Psi[diag_indices] += self.Lambda
+                logger.debug("Noise level Lambda applied to diagonal: %s", self.Lambda)
+            else:
+                self.Psi[diag_indices] += self.eps
+
+            # Check for infinite values
+            self.inf_Psi = np.isinf(self.Psi).any()
+
+            # Calculate condition number
+            self.cnd_Psi = cond(self.Psi)
+            logger.debug("Condition number of Psi: %f", self.cnd_Psi)
+
         except LinAlgError as err:
-            print(f"Building Psi failed:\n {self.Psi}. {err=}, {type(err)=}")
-        if self.noise:
-            logger.debug("In build_Psi(): self.Lambda: %s", self.Lambda)
-            self.Psi[diag_indices_from(self.Psi)] += self.Lambda
-        else:
-            self.Psi[diag_indices_from(self.Psi)] += self.eps
-        if (isinf(self.Psi)).any():
-            self.inf_Psi = True
-        self.cnd_Psi = cond(self.Psi)
+            logger.error("Building Psi failed. Error: %s, Type: %s", err, type(err))
+            raise
 
     def build_U(self, scipy: bool = True) -> None:
         """
