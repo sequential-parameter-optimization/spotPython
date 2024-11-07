@@ -70,7 +70,7 @@ def test_extract_from_bounds():
     n = 2
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-    S.extract_from_bounds(np.array([1, 2, 3]))
+    S.extract_from_bounds(np.array([1, 2, 3, 4]))
     assert len(S.theta) == n
 
 

@@ -293,10 +293,14 @@ class Kriging(surrogates):
             self (object): The Kriging object.
             new_theta_p_Lambda (np.ndarray):
                 1d-array with theta, p, and Lambda values. Order is important.
+        Returns:
+            None
 
         Examples:
             >>> import numpy as np
                 from spotpython.build.kriging import Kriging
+                import logging
+                logging.basicConfig(level=logging.DEBUG)
                 # Define the number of theta and p parameters
                 num_theta = 2
                 num_p = 3
@@ -307,35 +311,46 @@ class Kriging(surrogates):
                     n_theta=num_theta,
                     n_p=num_p,
                     optim_p=True,
-                    noise=False
+                    noise=True
                 )
+                # Create bounds array
+                bounds_array = np.array([1, 2, 3, 4, 5, 6])
                 # Extract parameters from given bounds
-                # Assumes 'extract_from_bounds' will split the array into `theta` and `p` based on `n_theta`.
-                bounds_array = np.array([1, 2, 3, 4, 5])
                 kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)
-                # Validate the expected values for theta and p
-                # Convert theta and p to lists if they are numpy arrays
-                theta_list = list(kriging_model.theta)
-                p_list = list(kriging_model.p)
-                assert theta_list == [1, 2], f"Expected theta to be [1, 2] but got {theta_list}"
-                assert p_list == [3, 4, 5], f"Expected p to be [3] but got {p_list}"
-
-        Returns:
-            None
+                # Assertions to check if parameters are correctly extracted
+                assert np.array_equal(kriging_model.theta, [1, 2]), f"Expected theta to be [1, 2] but got {kriging_model.theta}"
+                assert np.array_equal(kriging_model.p, [3, 4, 5]), f"Expected p to be [3, 4, 5] but got {kriging_model.p}"
+                assert kriging_model.Lambda == 6, f"Expected Lambda to be 6 but got {kriging_model.Lambda}"
+                print("All assertions passed!")
         """
-        logger.debug("In extract_from_bounds(): new_theta_p_Lambda: %s", new_theta_p_Lambda)
-        self.theta = new_theta_p_Lambda[:self.n_theta]
-        logger.debug("In extract_from_bounds(): self.n_theta: %s", self.n_theta)
+        logger.debug("Extracting parameters from: %s", new_theta_p_Lambda)
+
+        # Validate array length
+        expected_length = self.n_theta
         if self.optim_p:
+            expected_length += self.n_p
+        if self.noise:
+            expected_length += 1
+
+        if len(new_theta_p_Lambda) < expected_length:
+            logger.error("Input array is too short. Expected at least %d elements, got %d.",
+                         expected_length, len(new_theta_p_Lambda))
+            raise ValueError(f"Input array must have at least {expected_length} elements.")
+
+        # Extract theta
+        self.theta = new_theta_p_Lambda[:self.n_theta]
+        logger.debug("Extracted theta: %s", self.theta)
+
+        if self.optim_p:
+            # Extract p if optim_p is True
             self.p = new_theta_p_Lambda[self.n_theta:self.n_theta + self.n_p]
-            logger.debug("In extract_from_bounds(): self.p: %s", self.p)
-            if self.noise:
-                self.Lambda = new_theta_p_Lambda[self.n_theta + self.n_p]
-                logger.debug("In extract_from_bounds(): self.Lambda: %s", self.Lambda)
-        else:
-            if self.noise:
-                self.Lambda = new_theta_p_Lambda[self.n_theta]
-                logger.debug("In extract_from_bounds(): self.Lambda: %s", self.Lambda)
+            logger.debug("Extracted p: %s", self.p)
+
+        if self.noise:
+            # Extract Lambda
+            lambda_index = self.n_theta + (self.n_p if self.optim_p else 0)
+            self.Lambda = new_theta_p_Lambda[lambda_index]
+            logger.debug("Extracted Lambda: %s", self.Lambda)
 
     def optimize_model(self) -> Union[List[float], Tuple[float]]:
         """
