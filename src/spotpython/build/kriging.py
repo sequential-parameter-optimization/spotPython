@@ -8,11 +8,9 @@ from numpy import array
 from numpy import log
 from numpy import power
 from numpy import abs
-from numpy import sum
 from numpy import pi
-from numpy import ones, zeros
 from numpy import spacing
-from numpy import append, ndarray, linspace, meshgrid, ravel, empty
+from numpy import append, ndarray, linspace, meshgrid, ravel
 from numpy.linalg import cholesky, solve, LinAlgError, cond
 from scipy.optimize import differential_evolution
 from scipy.linalg import cholesky as scipy_cholesky
@@ -316,8 +314,10 @@ class Kriging(surrogates):
                 # Extract parameters from given bounds
                 kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)
                 # Assertions to check if parameters are correctly extracted
-                assert np.array_equal(kriging_model.theta, [1, 2]), f"Expected theta to be [1, 2] but got {kriging_model.theta}"
-                assert np.array_equal(kriging_model.p, [3, 4, 5]), f"Expected p to be [3, 4, 5] but got {kriging_model.p}"
+                assert np.array_equal(kriging_model.theta,
+                    [1, 2]), f"Expected theta to be [1, 2] but got {kriging_model.theta}"
+                assert np.array_equal(kriging_model.p,
+                    [3, 4, 5]), f"Expected p to be [3, 4, 5] but got {kriging_model.p}"
                 assert kriging_model.Lambda == 6, f"Expected Lambda to be 6 but got {kriging_model.Lambda}"
                 print("All assertions passed!")
         """
@@ -1244,38 +1244,25 @@ class Kriging(surrogates):
             #
             pylab.show()
 
-    def predict(self, nat_X: ndarray, return_val: str = "y") -> Union[float,
-                                                                      Tuple[float, float]]:
+    def predict(self, nat_X: ndarray, return_val: str = "y") -> Union[float, Tuple[float, float]]:
         """
         This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.
 
         Args:
-            self (object):
-                The Kriging object.
-            nat_X (ndarray):
-                Design variable to evaluate in natural units.
-            return_val (str):
-                whether `y`, `s`, neg. `ei` (negative expected improvement),
-                or all three values are returned.
-                Default is (for compatibility with sklearn) "y". To return `s`, select "s",
-                to return neg. `ei`, select "ei".
-                To return the tuple `(y, s, ei)`, select "all".
+            self (object): The Kriging object.
+            nat_X (ndarray): Design variable to evaluate in natural units.
+            return_val (str): Specifies which prediction values to return. It can be "y", "s", "ei", or "all".
 
         Returns:
-            float:
-                The predicted value in natural units if return_val is "y".
-            float:
-                predicted error if return_val is "s".
-            float:
-                expected improvement if return_val is "ei".
-            Tuple[float, float, float]:
-                The predicted value in natural units, predicted error
-                and expected improvement if return_val is "all".
+            Union[float, Tuple[float, float, float]]: Depending on `return_val`, returns the predicted value,
+            predicted error, expected improvement, or all.
+
+        Raises:
+            TypeError: If `nat_X` is not an ndarray or doesn't match expected dimensions.
 
         Examples:
             >>> from spotpython.build.kriging import Kriging
                 import numpy as np
-                import matplotlib.pyplot as plt
                 from numpy import linspace, arange
                 rng = np.random.RandomState(1)
                 X = linspace(start=0, stop=10, num=1_0).reshape(-1, 1)
@@ -1288,67 +1275,48 @@ class Kriging(surrogates):
                 print(f"mean_prediction: {mean_prediction}")
                 print(f"std_prediction: {std_prediction}")
                 print(f"s_ei: {s_ei}")
-                mean_prediction: [-1.41991225e-08  6.48310037e-01  1.76715565e+00 -6.35226564e-01
-                                  -4.28585379e+00 -1.22301198e+00  2.49434148e+00  5.61900501e-01
-                                  -3.04558205e+00 -5.44021104e+00]
-                std_prediction: [3.69706811e-04 2.07958787e+00 3.69706810e-04 3.69706807e-04
-                                3.69706809e-04 2.07958584e+00 3.69706811e-04 2.60615408e+00
-                                2.60837033e+00 3.69706811e-04]
-                s_ei: [-0.00000000e+00 -1.02341235e-03 -0.00000000e+00 -0.00000000e+00
-                       -0.00000000e+00 -1.63799181e-02 -0.00000000e+00 -9.45766290e-03
-                       -2.53405666e-01 -1.47459347e-04]
-
         """
-        # Check for the shape and the type of the Input
-        if isinstance(nat_X, ndarray):
-            try:
-                X = nat_X.reshape(-1, self.nat_X.shape[1])
-                X = repair_non_numeric(X, self.var_type)
-            except Exception:
-                raise TypeError("13.1: Input to predict was not convertible to the size of X")
-        else:
-            raise TypeError(f"type of the given input is an {type(nat_X)} instead of an ndarray")
-        n = X.shape[0]
-        y = empty(n, dtype=float)
-        s = empty(n, dtype=float)
-        ei = empty(n, dtype=float)
-        for i in range(n):
-            x = X[i, :]
-            y[i], s[i], ei[i] = self.predict_coded(x)
+        if not isinstance(nat_X, ndarray):
+            raise TypeError(f"Expected an ndarray, got {type(nat_X)} instead.")
+
+        try:
+            X = nat_X.reshape(-1, self.nat_X.shape[1])
+            X = repair_non_numeric(X, self.var_type)
+        except Exception as e:
+            raise TypeError("Input to predict was not convertible to the size of X") from e
+
+        y, s, ei = self.predict_coded_batch(X)
+
         if return_val == "y":
             return y
         elif return_val == "s":
             return s
         elif return_val == "ei":
-            return -1.0 * ei
+            return -ei
+        elif return_val == "all":
+            return y, s, -ei
         else:
-            return y, s, -1.0 * ei
+            raise ValueError(f"Invalid return_val: {return_val}. Supported values are 'y', 's', 'ei', 'all'.")
 
     def predict_coded(self, cod_x: np.ndarray) -> Tuple[float, float, float]:
         """
-        Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].
-        The error is returned as well.
-        The method is used in `predict`.
+        Kriging prediction of one point in coded units as described in (2.20) in [Forr08a].
+        The error is returned as well. The method is used in `predict`.
 
         Args:
-            self (object):
-                The Kriging object.
-            cod_x (np.ndarray):
-                Point in coded units to make prediction at.
+            self (object): The Kriging object.
+            cod_x (np.ndarray): Point in coded units to make prediction at.
 
         Returns:
-            f (float): Predicted value in coded units.
-            SSqr (float): Predicted error.
-            EI (float): Expected improvement.
+            Tuple[float, float, float]: Predicted value, predicted error, and expected improvement.
 
         Note:
-            `self.mu` and `self.SigmaSqr` are computed in `likelihood`, not here.
-            See also [Forr08a, p.60].
+            Uses attributes such as `self.mu` and `self.SigmaSqr` that are expected
+            to be calculated by `likelihood`.
 
         Examples:
             >>> from spotpython.build.kriging import Kriging
                 import numpy as np
-                import matplotlib.pyplot as plt
                 from numpy import linspace, arange, empty
                 rng = np.random.RandomState(1)
                 X = linspace(start=0, stop=10, num=10).reshape(-1, 1)
@@ -1362,51 +1330,69 @@ class Kriging(surrogates):
                 s = empty(n, dtype=float)
                 ei = empty(n, dtype=float)
                 for i in range(n):
-                    x = X[i, :]
-                    y[i], s[i], ei[i] = S.predict_coded(x)
+                    y_coded, s_coded, ei_coded = S.predict_coded(X[i, :])
+                    y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()
+                    s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()
+                    ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()
                 print(f"y: {y}")
                 print(f"s: {s}")
                 print(f"ei: {-1.0*ei}")
-                    y: [-1.41991223e-08  6.48310075e-01  1.76715565e+00 -6.35226564e-01
-                    -4.28585379e+00 -1.22301201e+00  2.49434148e+00  5.61900546e-01
-                    -3.04558209e+00 -5.44021104e+00]
-                    s: [3.69706810e-04 2.07958781e+00 3.69706812e-04 3.69706808e-04
-                    3.69706812e-04 2.07958578e+00 3.69706810e-04 2.60615406e+00
-                    2.60837032e+00 3.69706813e-04]
-                    ei: [-0.00000000e+00 -1.02341195e-03 -0.00000000e+00 -0.00000000e+00
-                    -0.00000000e+00 -1.63799157e-02 -0.00000000e+00 -9.45766188e-03
-                    -2.53405668e-01 -1.47459348e-04]
         """
         self.build_psi_vec(cod_x)
-        U_T_inv = solve(self.U.T, self.nat_y - self.one.dot(self.mu))
-        f = self.mu + self.psi.T.dot(solve(self.U, U_T_inv))
-        if self.noise:
-            Lambda = self.Lambda
-        else:
-            Lambda = 0.0
-        # Error in [Forr08a, p.87]:
-        SSqr = self.SigmaSqr * (1 + Lambda - self.psi.T.dot(solve(self.U, solve(self.U.T, self.psi))))
-        SSqr = power(abs(SSqr[0]), 0.5)[0]
-        EI = self.exp_imp(y0=f[0], s0=SSqr)
-        return f[0], SSqr, EI
+        mu_adj = self.mu
+        psi = self.psi
 
-    def build_psi_vec(self, cod_x: ndarray) -> None:
+        # Calculate the prediction
+        U_T_inv = solve(self.U.T, self.nat_y - self.one.dot(mu_adj))
+        f = mu_adj + psi.T.dot(solve(self.U, U_T_inv))[0]
+
+        Lambda = self.Lambda if self.noise else 0.0
+
+        # Calculate the estimated error
+        SSqr = self.SigmaSqr * (1 + Lambda - psi.T.dot(solve(self.U, solve(self.U.T, psi))))
+        SSqr = power(abs(SSqr), 0.5)[0]
+
+        # Calculate expected improvement
+        EI = self.exp_imp(y0=f, s0=SSqr)
+
+        return f, SSqr, EI
+
+    def predict_coded_batch(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
-        Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,
-        `regression_predict_coded`. Modifies `self.psi`.
+        Vectorized prediction for batch input using coded units.
 
         Args:
-            self (object):
-                The Kriging object.
-            cod_x (ndarray):
-                point to calculate psi
+            X (np.ndarray): Input array of coded points.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                Arrays of predicted values, predicted errors, and expected improvements.
+        """
+        n = X.shape[0]
+        y = np.empty(n, dtype=float)
+        s = np.empty(n, dtype=float)
+        ei = np.empty(n, dtype=float)
+
+        for i in range(n):
+            y_coded, s_coded, ei_coded = self.predict_coded(X[i, :])
+            y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()
+            s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()
+            ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()
+
+        return y, s, ei
+
+    def build_psi_vec(self, cod_x: np.ndarray) -> None:
+        """
+        Build the psi vector required for predictive methods.
+
+        Args:
+            cod_x (ndarray): Point to calculate the psi vector for.
 
         Returns:
             None
 
-        Attributes:
-            self.psi (ndarray):
-                psi vector
+        Modifies:
+            self.psi (np.ndarray): Updates the psi vector.
 
         Examples:
             >>> import numpy as np
@@ -1433,40 +1419,39 @@ class Kriging(surrogates):
                 assert np.array_equal(S.psi, res)
                 print(f"S.psi: {S.psi}")
                 print(f"Control value res: {res}")
-                S.psi:
-                [[1.83156389e-02]
-                [4.13993772e-08]
-                [4.24835426e-18]]
-                Control value res:
-                [[1.83156389e-02]
-                [4.13993772e-08]
-                [4.24835426e-18]]
         """
-        self.psi = zeros((self.n))
-        theta = power(10.0, self.theta)
-        if self.n_theta == 1:
-            theta = theta * ones(self.k)
+        logger.debug("Building psi vector for point: %s", cod_x)
         try:
-            D = zeros((self.n))
+            self.psi = np.zeros((self.n, 1))
+            theta_scaled = np.power(10.0, self.theta)
+            if self.n_theta == 1:
+                theta_scaled = theta_scaled * np.ones(self.k)
+
+            D = np.zeros(self.n)
+
+            # Compute ordered distance contributions
             if self.ordered_mask.any():
                 X_ordered = self.nat_X[:, self.ordered_mask]
                 x_ordered = cod_x[self.ordered_mask]
-                D = cdist(x_ordered.reshape(-1, sum(self.ordered_mask)),
-                          X_ordered.reshape(-1, sum(self.ordered_mask)),
-                          metric='sqeuclidean',
-                          out=None,
-                          w=theta[self.ordered_mask])
+                D += cdist(x_ordered.reshape(1, -1),
+                           X_ordered,
+                           metric='sqeuclidean',
+                           w=theta_scaled[self.ordered_mask]).ravel()
+            logger.debug("Distance D after ordered mask: %s", D)
+            # Compute factor distance contributions
             if self.factor_mask.any():
                 X_factor = self.nat_X[:, self.factor_mask]
                 x_factor = cod_x[self.factor_mask]
-                D = (D + cdist(x_factor.reshape(-1, sum(self.factor_mask)),
-                               X_factor.reshape(-1, sum(self.factor_mask)),
-                               metric=self.metric_factorial,
-                               out=None,
-                               w=theta[self.factor_mask]))
-            self.psi = exp(-D).T
-        except LinAlgError as err:
-            print(f"Building psi failed:\n {self.psi}. {err=}, {type(err)=}")
+                D += cdist(x_factor.reshape(1, -1),
+                           X_factor,
+                           metric=self.metric_factorial,
+                           w=theta_scaled[self.factor_mask]).ravel()
+            logger.debug("Distance D after factor mask: %s", D)
+
+            self.psi = np.exp(-D).reshape(-1, 1)
+
+        except np.linalg.LinAlgError as err:
+            logger.error("Building psi failed due to a linear algebra error: %s. Error type: %s", err, type(err))
 
     def weighted_exp_imp(self, cod_x: np.ndarray, w: float) -> float:
         """
