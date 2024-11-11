@@ -343,11 +343,7 @@ def plot_nn_values_hist(nn_values, net, nn_values_names="", color="C0", columns=
     for key in nn_values:
         key_ax = ax[fig_index // columns][fig_index % columns]
         sns.histplot(data=nn_values[key], bins=50, ax=key_ax, color=color, kde=True, stat="density")
-        hidden_dim_str = (
-            r"(%i $\to$ %i)" % (nn_values[key].shape[1], nn_values[key].shape[0])
-            if len(nn_values[key].shape) > 1
-            else ""
-        )
+        hidden_dim_str = r"(%i $\to$ %i)" % (nn_values[key].shape[1], nn_values[key].shape[0]) if len(nn_values[key].shape) > 1 else ""
         key_ax.set_title(f"{key} {hidden_dim_str}")
         # key_ax.set_title(f"Layer {key} - {net.layers[key].__class__.__name__}")
         fig_index += 1
@@ -612,9 +608,7 @@ def visualize_weights(net, absolute=True, cmap="gray", figsize=(6, 6)) -> None:
     )
 
 
-def visualize_gradients(
-    net, fun_control, batch_size, absolute=True, cmap="gray", figsize=(6, 6), device="cpu", normalize=True
-) -> None:
+def visualize_gradients(net, fun_control, batch_size, absolute=True, cmap="gray", figsize=(6, 6), device="cpu", normalize=True) -> None:
     """
     Scatter plots the gradients of a neural network.
 
@@ -823,9 +817,7 @@ def is_square(n) -> bool:
     return n == int(math.sqrt(n)) ** 2
 
 
-def get_layer_conductance(
-    spot_tuner, fun_control, layer_idx, device="cpu", normalize=True, remove_spot_attributes=False
-) -> np.ndarray:
+def get_layer_conductance(spot_tuner, fun_control, layer_idx, device="cpu", normalize=True, remove_spot_attributes=False) -> np.ndarray:
     """
     Compute the average layer conductance attributions for a specified layer in the model.
 

@@ -15,7 +15,7 @@ from numpy.linalg import cholesky, solve, LinAlgError, cond
 from scipy.optimize import differential_evolution
 from scipy.linalg import cholesky as scipy_cholesky
 import pylab
-from spotpython.design.spacefilling import spacefilling
+from spotpython.design.spacefilling import SpaceFilling
 from spotpython.build.surrogates import surrogates
 from scipy.spatial.distance import squareform
 from scipy.spatial.distance import pdist
@@ -725,7 +725,7 @@ class Kriging(surrogates):
         The `pen_val` attribute is initialized as the natural logarithm of the
         variance of `nat_y`, multiplied by `n`, plus 1e4.
         The `negLnLike`, `LnDetPsi`, `mu`, `U`, `SigmaSqr`, and `Lambda` attributes are all set to None.
-        The `gen` attribute is initialized using the `spacefilling` function with arguments `k` and `seed`.
+        The `gen` attribute is initialized using the `SpaceFilling` function with arguments `k` and `seed`.
         The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.
         The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.
         The `one` attribute is initialized as a list of ones with length `n`.
@@ -780,7 +780,7 @@ class Kriging(surrogates):
         self.Lambda = None
 
         # Initialize generator
-        self.gen = spacefilling(k=self.k, seed=self.seed)
+        self.gen = SpaceFilling(k=self.k, seed=self.seed)
         logger.debug("In initialize_matrices(): self.gen: %s", self.gen)
 
         # Initialize matrix Psi and vector psi

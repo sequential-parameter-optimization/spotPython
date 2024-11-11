@@ -54,9 +54,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
     for k in range(num_folds):
         print("k:", k)
 
-        model = fun_control["core_model"](
-            **config, _L_in=_L_in, _L_out=_L_out, _L_cond=_L_cond, _torchmetric=_torchmetric
-        )
+        model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _L_cond=_L_cond, _torchmetric=_torchmetric)
 
         dm = LightCrossValidationDataModule(
             k=k,
@@ -90,9 +88,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
                 default_hp_metric=True,
                 log_graph=fun_control["log_graph"],
             ),
-            callbacks=[
-                EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
-            ],
+            callbacks=[EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)],
             enable_progress_bar=enable_progress_bar,
         )
         # Pass the datamodule as arg to trainer.fit to override model hooks :)

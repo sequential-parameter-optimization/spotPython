@@ -66,7 +66,7 @@ def test_set_de_bounds():
     from numpy import ones, zeros, log, var, float64
     from numpy import empty_like
     from numpy import array
-    from spotpython.design.spacefilling import spacefilling
+    from spotpython.design.spacefilling import SpaceFilling
 
     # One-dim objective function
     ni = 11
@@ -95,7 +95,7 @@ def test_set_de_bounds():
     S.pen_val = S.n * log(var(S.nat_y)) + 1e4
     S.negLnLike = None
 
-    S.gen = spacefilling(k=S.k, seed=S.seed)
+    S.gen = SpaceFilling(k=S.k, seed=S.seed)
 
     # matrix related
     S.LnDetPsi = None

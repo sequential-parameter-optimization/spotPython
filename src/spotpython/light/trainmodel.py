@@ -104,14 +104,10 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     # print(f"train_model(): Batch size: {config['batch_size']}")
 
     # Callbacks
-    callbacks = [
-        EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)
-    ]
+    callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False
-        callbacks.append(
-            ModelCheckpoint(dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True)
-        )  # Save the last checkpoint
+        callbacks.append(ModelCheckpoint(dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True))  # Save the last checkpoint
 
     # Init trainer
     trainer = L.Trainer(

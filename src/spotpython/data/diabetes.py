@@ -52,9 +52,7 @@ class Diabetes(Dataset):
                 print(f"Targets: {targets}")
     """
 
-    def __init__(
-        self, feature_type: torch.dtype = torch.float, target_type: torch.dtype = torch.float, train: bool = True
-    ) -> None:
+    def __init__(self, feature_type: torch.dtype = torch.float, target_type: torch.dtype = torch.float, train: bool = True) -> None:
         super().__init__()
         self.feature_type = feature_type
         self.target_type = target_type

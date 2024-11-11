@@ -240,9 +240,7 @@ class Dataset(abc.ABC):
         l_len = max(map(len, self._repr_content.keys()))
         r_len = max(map(len, self._repr_content.values()))
 
-        out = f"{self.desc}\n\n" + "\n".join(
-            k.rjust(l_len) + "  " + v.ljust(r_len) for k, v in self._repr_content.items()
-        )
+        out = f"{self.desc}\n\n" + "\n".join(k.rjust(l_len) + "  " + v.ljust(r_len) for k, v in self._repr_content.items())
 
         if "Parameters\n    ----------" in self.__doc__:
             params = re.split(
@@ -361,11 +359,7 @@ class SyntheticDataset(Dataset):
              'n_outputs': 1,
              'sparse': False}
         """
-        return {
-            name: getattr(self, name)
-            for name, param in inspect.signature(self.__init__).parameters.items()  # type: ignore
-            if param.kind != param.VAR_KEYWORD
-        }
+        return {name: getattr(self, name) for name, param in inspect.signature(self.__init__).parameters.items() if param.kind != param.VAR_KEYWORD}  # type: ignore
 
 
 class FileConfig(Config):

@@ -414,9 +414,7 @@ class NNCondNetRegressor(L.LightningModule):
 
         """
         # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        optimizer = optimizer_handler(
-            optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
-        )
+        optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
 
         num_milestones = 3  # Number of milestones to divide the epochs
         milestones = [int(self.hparams.epochs / (num_milestones + 1) * (i + 1)) for i in range(num_milestones)]

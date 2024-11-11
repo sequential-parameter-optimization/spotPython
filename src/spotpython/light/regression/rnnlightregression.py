@@ -305,7 +305,5 @@ class RNNLightRegression(L.LightningModule):
             torch.optim.Optimizer: The optimizer to use during training.
 
         """
-        optimizer = optimizer_handler(
-            optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
-        )
+        optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
         return optimizer

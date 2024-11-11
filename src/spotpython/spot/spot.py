@@ -7,7 +7,7 @@ import os
 import copy
 import json
 from numpy.random import default_rng
-from spotpython.design.spacefilling import spacefilling
+from spotpython.design.spacefilling import SpaceFilling
 from spotpython.build.kriging import Kriging
 from spotpython.utils.repair import repair_non_numeric
 import numpy as np
@@ -86,7 +86,7 @@ class Spot:
             objective function information stored as a dictionary.
             Default value is `fun_control_init()`.
         design (object):
-            experimental design. If `None`, spotpython's `spacefilling` is used.
+            experimental design. If `None`, spotpython's `SpaceFilling` is used.
             Default value is `None`.
         design_control (Dict[str, Union[int, float]]):
             experimental design information stored as a dictionary.
@@ -277,7 +277,7 @@ class Spot:
         # Design related information:
         self.design = design
         if design is None:
-            self.design = spacefilling(k=self.lower.size, seed=self.fun_control["seed"])
+            self.design = SpaceFilling(k=self.lower.size, seed=self.fun_control["seed"])
         # self.design_control = {"init_size": 10, "repeats": 1}
         # self.design_control.update(design_control)
 
@@ -417,7 +417,7 @@ class Spot:
                 4        all_var_type                                              [num]
                 5             counter                                                 10
                 6           de_bounds                                          [[-1, 1]]
-                7              design  <spotpython.design.spacefilling.spacefilling o...
+                7              design  <spotpython.design.spacefilling.SpaceFilling o...
                 8      design_control                     {'init_size': 7, 'repeats': 1}
                 9                 eps                                                0.0
                 10        fun_control                         {'sigma': 0, 'seed': None}
@@ -623,10 +623,8 @@ class Spot:
             return X0
         # 2. No X0 found. Then generate self.n_points new solutions:
         else:
-            self.design = spacefilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
-            X0 = self.generate_design(
-                size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper
-            )
+            self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
+            X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
             X0 = repair_non_numeric(X0, self.var_type)
             logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
             return X0
@@ -1224,9 +1222,7 @@ class Spot:
         if isfinite(self.fun_evals):
             progress_bar(progress=self.counter / self.fun_evals, y=self.min_y, filename=self.progress_file)
         else:
-            progress_bar(
-                progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y, filename=self.progress_file
-            )
+            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y, filename=self.progress_file)
 
     def generate_design(self, size, repeats, lower, upper) -> np.array:
         """Generate a design with `size` points in the interval [lower, upper].
@@ -1330,13 +1326,9 @@ class Spot:
                 # y_min_mean: best mean y value so far (see above)
                 self.spot_writer.add_scalar("spot_y", y_min_mean, self.counter)
                 # last n y values (noisy):
-                self.spot_writer.add_scalars(
-                    "spot_y", {f"y_last_n{i}": y_last_n[i] for i in range(self.fun_repeats)}, self.counter
-                )
+                self.spot_writer.add_scalars("spot_y", {f"y_last_n{i}": y_last_n[i] for i in range(self.fun_repeats)}, self.counter)
                 # X_min_mean: X value of the best mean y value so far (see above)
-                self.spot_writer.add_scalars(
-                    "spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter
-                )
+                self.spot_writer.add_scalars("spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter)
             # get last value of self.X and convert to dict. take the values from self.var_name as keys:
             X_last = self.X[-1].copy()
             config = {self.var_name[i]: X_last[i] for i in range(self.k)}
@@ -1456,9 +1448,7 @@ class Spot:
         else:
             return self.surrogate.predict(X)
 
-    def plot_progress(
-        self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300, tkagg=False
-    ) -> None:
+    def plot_progress(self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300, tkagg=False) -> None:
         """Plot the progress of the hyperparameter tuning (optimization).
 
         Args:
@@ -1606,14 +1596,7 @@ class Spot:
             plt.legend(loc="best")
             # plt.title(self.surrogate.__class__.__name__ + ". " + str(self.counter) + ": " + str(self.min_y))
             if self.noise:
-                plt.title(
-                    "fun_evals: "
-                    + str(self.counter)
-                    + ". min_y (noise): "
-                    + str(np.round(self.min_y, 6))
-                    + " min_mean_y: "
-                    + str(np.round(self.min_mean_y, 6))
-                )
+                plt.title("fun_evals: " + str(self.counter) + ". min_y (noise): " + str(np.round(self.min_y, 6)) + " min_mean_y: " + str(np.round(self.min_mean_y, 6)))
             else:
                 plt.title("fun_evals: " + str(self.counter) + ". min_y: " + str(np.round(self.min_y, 6)))
             plt.show()
@@ -1804,9 +1787,7 @@ class Spot:
                 var_name = self.all_var_name[i]
                 var_type = self.all_var_type[i]
                 if var_type == "factor" and fun_control is not None:
-                    val = get_ith_hyperparameter_name_from_fun_control(
-                        fun_control=fun_control, key=var_name, i=int(res[0][i])
-                    )
+                    val = get_ith_hyperparameter_name_from_fun_control(fun_control=fun_control, key=var_name, i=int(res[0][i]))
                 else:
                     val = res[0][i]
             output.append([var_name, val])
@@ -2000,9 +1981,7 @@ class Spot:
             ax_contour.set_ylabel(f"x{j}: {self.var_name[j]}")
 
         ax_3d = fig.add_subplot(222, projection="3d")
-        ax_3d.plot_surface(
-            X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z
-        )
+        ax_3d.plot_surface(X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
 
         if self.var_name is None:
             ax_3d.set_xlabel(f"x{i}")
@@ -2280,12 +2259,7 @@ class Spot:
         fig = go.Figure(
             data=go.Parcoords(
                 line=dict(color=df["y"], colorscale="Jet", showscale=True, cmin=min(df["y"]), cmax=max(df["y"])),
-                dimensions=list(
-                    [
-                        dict(range=[min(df.iloc[:, i]), max(df.iloc[:, i])], label=df.columns[i], values=df.iloc[:, i])
-                        for i in range(len(df.columns) - 1)
-                    ]
-                ),
+                dimensions=list([dict(range=[min(df.iloc[:, i]), max(df.iloc[:, i])], label=df.columns[i], values=df.iloc[:, i]) for i in range(len(df.columns) - 1)]),
             )
         )
         if show:

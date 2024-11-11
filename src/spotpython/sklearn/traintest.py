@@ -85,9 +85,7 @@ def evaluate_hold_out(model, fun_control) -> np.ndarray:
         if fun_control["scaler"] is not None:
             scaler = fun_control["scaler"]()
             X_train = scaler.fit_transform(X_train)
-            X_train = pd.DataFrame(
-                X_train, columns=train_df.drop(target_column, axis=1).columns
-            )  # Maintain column names
+            X_train = pd.DataFrame(X_train, columns=train_df.drop(target_column, axis=1).columns)  # Maintain column names
         model.fit(X_train, y_train)
     except Exception as err:
         print(f"Error in evaluate_hold_out(). Call to fit() failed. {err=}, {type(err)=}")

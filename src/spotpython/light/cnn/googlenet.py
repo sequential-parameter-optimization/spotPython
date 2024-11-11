@@ -43,17 +43,13 @@ class GoogleNet(nn.Module):
         super().__init__()
         # TODO: Replace this by act_fn handlers specified in the config file:
         act_fn_by_name = {"tanh": nn.Tanh, "relu": nn.ReLU, "leakyrelu": nn.LeakyReLU, "gelu": nn.GELU}
-        self.hparams = SimpleNamespace(
-            num_classes=num_classes, act_fn_name=act_fn_name, act_fn=act_fn_by_name[act_fn_name]
-        )
+        self.hparams = SimpleNamespace(num_classes=num_classes, act_fn_name=act_fn_name, act_fn=act_fn_by_name[act_fn_name])
         self._create_network()
         self._init_params()
 
     def _create_network(self):
         # A first convolution on the original image to scale up the channel size
-        self.input_net = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=3, padding=1), nn.BatchNorm2d(64), self.hparams.act_fn()
-        )
+        self.input_net = nn.Sequential(nn.Conv2d(3, 64, kernel_size=3, padding=1), nn.BatchNorm2d(64), self.hparams.act_fn())
         # Stacking inception blocks
         self.inception_blocks = nn.Sequential(
             InceptionBlock(
@@ -108,9 +104,7 @@ class GoogleNet(nn.Module):
             ),
         )
         # Mapping to classification output
-        self.output_net = nn.Sequential(
-            nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(), nn.Linear(128, self.hparams.num_classes)
-        )
+        self.output_net = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)), nn.Flatten(), nn.Linear(128, self.hparams.num_classes))
 
     def _init_params(self):
         # We should initialize the

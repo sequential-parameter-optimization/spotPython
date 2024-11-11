@@ -49,9 +49,7 @@ class NNTransformerRegressor(L.LightningModule):
 
         # Transformer encoder
         self.transformer_encoder = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(
-                d_model=self.d_model, nhead=nhead, dim_feedforward=self.dim_feedforward, dropout=dropout
-            ),
+            nn.TransformerEncoderLayer(d_model=self.d_model, nhead=nhead, dim_feedforward=self.dim_feedforward, dropout=dropout),
             num_layers=num_encoder_layers,
         )
 
@@ -114,9 +112,7 @@ class NNTransformerRegressor(L.LightningModule):
         return (x, y, yhat)
 
     def configure_optimizers(self):
-        optimizer = optimizer_handler(
-            optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
-        )
+        optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
 
         # Dynamic creation of milestones based on the number of epochs.
         num_milestones = 3  # Number of milestones to divide the epochs

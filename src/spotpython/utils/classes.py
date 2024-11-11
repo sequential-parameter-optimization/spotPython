@@ -10,9 +10,9 @@ def get_additional_attributes(b):
 
 def get_additional_methods(b):
     a = nn.Module()
-    additional_methods = set(
-        [method_name for method_name, method in inspect.getmembers(b, predicate=inspect.ismethod)]
-    ) - set([method_name for method_name, method in inspect.getmembers(a, predicate=inspect.ismethod)])
+    additional_methods = set([method_name for method_name, method in inspect.getmembers(b, predicate=inspect.ismethod)]) - set(
+        [method_name for method_name, method in inspect.getmembers(a, predicate=inspect.ismethod)]
+    )
     return additional_methods
 
 

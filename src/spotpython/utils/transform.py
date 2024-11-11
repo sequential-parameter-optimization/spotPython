@@ -231,10 +231,7 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
     """
     hyper_parameter_values = copy.deepcopy(hyper_parameter_values)
     for key, value in hyper_parameter_values.items():
-        if (
-            fun_control["core_model_hyper_dict"][key]["type"] in ["int", "float", "num", "factor"]
-            and fun_control["core_model_hyper_dict"][key]["transform"] != "None"
-        ):
+        if fun_control["core_model_hyper_dict"][key]["type"] in ["int", "float", "num", "factor"] and fun_control["core_model_hyper_dict"][key]["transform"] != "None":
             hyper_parameter_values[key] = eval(fun_control["core_model_hyper_dict"][key]["transform"])(value)
     return hyper_parameter_values
 

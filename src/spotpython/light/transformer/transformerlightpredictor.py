@@ -94,9 +94,7 @@ class TransformerLightPredictor(L.LightningModule):
 
     def _create_model(self):
         # Input dim -> Model dim
-        self.input_net = nn.Sequential(
-            nn.Dropout(self.hparams.input_dropout), nn.Linear(self.hparams.input_dim, self.hparams.model_dim)
-        )
+        self.input_net = nn.Sequential(nn.Dropout(self.hparams.input_dropout), nn.Linear(self.hparams.input_dim, self.hparams.model_dim))
         # Positional encoding for sequences
         self.positional_encoding = PositionalEncodingBasic(d_model=self.hparams.model_dim)
         # Transformer

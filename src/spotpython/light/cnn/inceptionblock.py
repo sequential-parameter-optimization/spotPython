@@ -48,9 +48,7 @@ class InceptionBlock(nn.Module):
         super().__init__()
 
         # 1x1 convolution branch
-        self.conv_1x1 = nn.Sequential(
-            nn.Conv2d(c_in, c_out["1x1"], kernel_size=1), nn.BatchNorm2d(c_out["1x1"]), act_fn()
-        )
+        self.conv_1x1 = nn.Sequential(nn.Conv2d(c_in, c_out["1x1"], kernel_size=1), nn.BatchNorm2d(c_out["1x1"]), act_fn())
 
         # 3x3 convolution branch
         self.conv_3x3 = nn.Sequential(

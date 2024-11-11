@@ -9,7 +9,7 @@ def test_extract_from_bounds():
     from numpy import ones, zeros, log, var, float64
     from numpy import empty_like
     from numpy import array
-    from spotpython.design.spacefilling import spacefilling
+    from spotpython.design.spacefilling import SpaceFilling
     from spotpython.utils.init import (
         fun_control_init,
         design_control_init,
@@ -41,7 +41,7 @@ def test_extract_from_bounds():
     S.p = ones(S.n_p) * 2.0
     S.pen_val = S.n * log(var(S.nat_y)) + 1e4
     S.negLnLike = None
-    S.gen = spacefilling(k=S.k, seed=S.seed)
+    S.gen = SpaceFilling(k=S.k, seed=S.seed)
     # matrix related
     S.LnDetPsi = None
     S.Psi = zeros((S.n, S.n), dtype=float64)
@@ -129,7 +129,7 @@ def test_extract_from_bounds():
     S.p = ones(S.n_p) * 2.0
     S.pen_val = S.n * log(var(S.nat_y)) + 1e4
     S.negLnLike = None
-    S.gen = spacefilling(k=S.k, seed=S.seed)
+    S.gen = SpaceFilling(k=S.k, seed=S.seed)
     # matrix related
     S.LnDetPsi = None
     S.Psi = zeros((S.n, S.n), dtype=float64)
@@ -187,7 +187,7 @@ def test_extract_from_bounds():
     S.p = ones(S.n_p) * 2.0
     S.pen_val = S.n * log(var(S.nat_y)) + 1e4
     S.negLnLike = None
-    S.gen = spacefilling(k=S.k, seed=S.seed)
+    S.gen = SpaceFilling(k=S.k, seed=S.seed)
     # matrix related
     S.LnDetPsi = None
     S.Psi = zeros((S.n, S.n), dtype=float64)

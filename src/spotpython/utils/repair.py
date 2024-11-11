@@ -69,10 +69,7 @@ def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) 
     # Check if dimensions have been reduced
     returned_dim = y_cleaned.shape[0]
     if returned_dim < original_dim:
-        warnings.warn(
-            f"\n!!! The dimension of the returned y array is {y_cleaned.shape[0]}, "
-            f"which is smaller than the original dimension {original_dim}."
-        )
+        warnings.warn(f"\n!!! The dimension of the returned y array is {y_cleaned.shape[0]}, " f"which is smaller than the original dimension {original_dim}.")
         warnings.warn("\n!!! Check whether to continue with the reduced dimension is useful.")
     # throw an error if the returned dimension is smaller than one
     if returned_dim < 1 and stop_on_zero_return:

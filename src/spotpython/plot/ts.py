@@ -2,9 +2,7 @@ from spotpython.data.friedman import FriedmanDriftDataset
 import matplotlib.pyplot as plt
 
 
-def plot_friedman_drift_data(
-    n_samples, seed, change_point1, change_point2, constant=True, show=True, filename=None
-) -> None:
+def plot_friedman_drift_data(n_samples, seed, change_point1, change_point2, constant=True, show=True, filename=None) -> None:
     """Plot the Friedman dataset with drifts at change_point1 and change_point2.
 
     Args:
@@ -29,9 +27,7 @@ def plot_friedman_drift_data(
         >>> plot_friedman_drift_data(n_samples=100, seed=42, change_point1=50, change_point2=75, constant=False)
         >>> plot_friedman_drift_data(n_samples=100, seed=42, change_point1=50, change_point2=75, constant=True)
     """
-    data_generator = FriedmanDriftDataset(
-        n_samples=n_samples, seed=seed, change_point1=change_point1, change_point2=change_point2, constant=constant
-    )
+    data_generator = FriedmanDriftDataset(n_samples=n_samples, seed=seed, change_point1=change_point1, change_point2=change_point2, constant=constant)
     data = [data for data in data_generator]
     indices = [i for _, _, i in data]
     values = {f"x{i}": [] for i in range(6)}

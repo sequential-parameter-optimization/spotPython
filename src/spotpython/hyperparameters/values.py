@@ -491,9 +491,7 @@ def get_var_type(fun_control) -> list:
     if "core_model_hyper_dict" not in fun_control.keys():
         return None
     else:
-        return list(
-            fun_control["core_model_hyper_dict"][key]["type"] for key in fun_control["core_model_hyper_dict"].keys()
-        )
+        return list(fun_control["core_model_hyper_dict"][key]["type"] for key in fun_control["core_model_hyper_dict"].keys())
 
 
 def get_transform(fun_control) -> list:
@@ -543,9 +541,7 @@ def get_transform(fun_control) -> list:
             get_transform(d)
             ['None', 'None', 'None', 'None', 'None']
     """
-    return list(
-        fun_control["core_model_hyper_dict"][key]["transform"] for key in fun_control["core_model_hyper_dict"].keys()
-    )
+    return list(fun_control["core_model_hyper_dict"][key]["transform"] for key in fun_control["core_model_hyper_dict"].keys())
 
 
 def get_var_name(fun_control) -> list:
@@ -1225,10 +1221,7 @@ def get_core_model_parameter_type_from_var_name(fun_control, var_name) -> str:
             The core_model_parameter_type value if available, else None.
     """
     # Check if the key exists in the dictionary and it has a 'core_model_parameter_type' entry
-    if (
-        var_name in fun_control["core_model_hyper_dict"]
-        and "core_model_parameter_type" in fun_control["core_model_hyper_dict"][var_name]
-    ):
+    if var_name in fun_control["core_model_hyper_dict"] and "core_model_parameter_type" in fun_control["core_model_hyper_dict"][var_name]:
         return fun_control["core_model_hyper_dict"][var_name]["core_model_parameter_type"]
     else:
         return None
@@ -1788,9 +1781,7 @@ def get_core_model_from_name(core_model_name: str) -> tuple:
             core_model_instance = getattr(getattr(getattr(spotpython, module_name), submodule_name), model_name)
             return model_name, core_model_instance
         except AttributeError:
-            raise ValueError(
-                f"Model '{core_model_name}' not found in either 'sklearn' or 'spotpython lightning' libraries."
-            )
+            raise ValueError(f"Model '{core_model_name}' not found in either 'sklearn' or 'spotpython lightning' libraries.")
 
 
 def get_river_prep_model(prepmodel_name) -> object:

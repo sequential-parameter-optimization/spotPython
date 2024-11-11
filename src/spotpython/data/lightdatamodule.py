@@ -160,9 +160,7 @@ class LightDataModule(L.LightningDataModule):
             if self.verbosity > 0:
                 print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
             generator_fit = torch.Generator().manual_seed(self.test_seed)
-            self.data_train, self.data_val, _ = random_split(
-                self.data_full, [train_size, val_size, test_size], generator=generator_fit
-            )
+            self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size], generator=generator_fit)
             if self.scaler is not None:
                 # Fit the scaler on training data
                 scaler_train_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))]).squeeze(1)
@@ -189,9 +187,7 @@ class LightDataModule(L.LightningDataModule):
             if self.verbosity > 0:
                 print(f"test_size: {test_size} used for predict dataset.")
             generator_predict = torch.Generator().manual_seed(self.test_seed)
-            self.data_predict, _ = random_split(
-                self.data_full, [test_size, full_train_size], generator=generator_predict
-            )
+            self.data_predict, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_predict)
             if self.scaler is not None:
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)

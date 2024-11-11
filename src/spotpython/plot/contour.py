@@ -36,9 +36,7 @@ def simple_contour(
 
     """
     XX, YY = np.meshgrid(np.linspace(min_x, max_x, n_samples), np.linspace(min_y, max_y, n_samples))
-    zz = np.array([fun(np.array([xi, yi]).reshape(-1, 2)) for xi, yi in zip(np.ravel(XX), np.ravel(YY))]).reshape(
-        n_samples, n_samples
-    )
+    zz = np.array([fun(np.array([xi, yi]).reshape(-1, 2)) for xi, yi in zip(np.ravel(XX), np.ravel(YY))]).reshape(n_samples, n_samples)
     fig, ax = plt.subplots(figsize=(5, 2.7), layout="constrained")
     if min_z is None:
         min_z = np.min(zz)

@@ -96,9 +96,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
             self.data_train = [(self.scaler.transform(data), target) for data, target in self.data_train]
             data_tensors_train = [data.clone().detach() for data, target in self.data_train]
             target_tensors_train = [target.clone().detach() for data, target in self.data_train]
-            self.data_train = TensorDataset(
-                torch.stack(data_tensors_train).squeeze(1), torch.stack(target_tensors_train)
-            )
+            self.data_train = TensorDataset(torch.stack(data_tensors_train).squeeze(1), torch.stack(target_tensors_train))
             self.data_val = [(self.scaler.transform(data), target) for data, target in self.data_val]
             data_tensors_val = [data.clone().detach() for data, target in self.data_val]
             target_tensors_val = [target.clone().detach() for data, target in self.data_val]

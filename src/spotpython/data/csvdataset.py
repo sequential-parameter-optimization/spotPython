@@ -69,10 +69,7 @@ class CSVDataset(Dataset):
         # Apply OrdinalEncoder to non-numerical feature columns
         if non_numerical_columns:
             if self.oe is None:
-                raise ValueError(
-                    f"\n!!! non_numerical_columns in data: {non_numerical_columns}"
-                    "\nOrdinalEncoder object oe must be provided for encoding non-numerical columns"
-                )
+                raise ValueError(f"\n!!! non_numerical_columns in data: {non_numerical_columns}" "\nOrdinalEncoder object oe must be provided for encoding non-numerical columns")
             feature_df[non_numerical_columns] = self.oe.fit_transform(feature_df[non_numerical_columns])
 
         target_df = df[self.target_column]
@@ -80,10 +77,7 @@ class CSVDataset(Dataset):
         # Check if the target column is non-numerical using dtype
         if not pd.api.types.is_numeric_dtype(target_df):
             if self.le is None:
-                raise ValueError(
-                    f"\n!!! The target column '{self.target_column}' is non-numerical"
-                    "\nLabelEncoder object le must be provided for encoding non-numerical target"
-                )
+                raise ValueError(f"\n!!! The target column '{self.target_column}' is non-numerical" "\nLabelEncoder object le must be provided for encoding non-numerical target")
             target_df = self.le.fit_transform(target_df)
 
         # Convert DataFrames to NumPy arrays and then to PyTorch tensors

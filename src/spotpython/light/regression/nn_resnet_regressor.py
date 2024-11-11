@@ -76,9 +76,7 @@ class NNResNetRegressor(L.LightningModule):
         # Construct the layers with Residual Blocks and Linear Layer at the end
         layers = []
         for i in range(len(layer_sizes) - 1):
-            layers.append(
-                ResidualBlock(layer_sizes[i], layer_sizes[i + 1], self.hparams.act_fn, self.hparams.dropout_prob)
-            )
+            layers.append(ResidualBlock(layer_sizes[i], layer_sizes[i + 1], self.hparams.act_fn, self.hparams.dropout_prob))
         layers.append(nn.Linear(layer_sizes[-1], self._L_out))
 
         self.layers = nn.Sequential(*layers)
@@ -153,9 +151,7 @@ class NNResNetRegressor(L.LightningModule):
         return (x, y, yhat)
 
     def configure_optimizers(self):
-        optimizer = optimizer_handler(
-            optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
-        )
+        optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
 
         # Dynamic creation of milestones based on the number of epochs.
         num_milestones = 3  # Number of milestones to divide the epochs

@@ -310,7 +310,5 @@ class NetLightRegression(L.LightningModule):
 
         """
         # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
-        optimizer = optimizer_handler(
-            optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult
-        )
+        optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
         return optimizer

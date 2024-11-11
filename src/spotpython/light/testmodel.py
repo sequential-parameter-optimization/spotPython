@@ -95,9 +95,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         ),
         callbacks=[
             EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False),
-            ModelCheckpoint(
-                dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True
-            ),  # Save the last checkpoint
+            ModelCheckpoint(dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True),  # Save the last checkpoint
         ],
         enable_progress_bar=enable_progress_bar,
     )

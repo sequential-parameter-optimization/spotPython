@@ -14,9 +14,7 @@ class Net_fashionMNIST(netcore.Net_Core):
             sgd_momentum=sgd_momentum,
         )
         self.flatten = nn.Flatten()
-        self.linear_relu_stack = nn.Sequential(
-            nn.Linear(28 * 28, l1), nn.ReLU(), nn.Linear(l1, l2), nn.ReLU(), nn.Linear(l2, 10)
-        )
+        self.linear_relu_stack = nn.Sequential(nn.Linear(28 * 28, l1), nn.ReLU(), nn.Linear(l1, l2), nn.ReLU(), nn.Linear(l2, 10))
 
     def forward(self, x):
         x = self.flatten(x)

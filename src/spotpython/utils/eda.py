@@ -314,9 +314,7 @@ def count_missing_data(df) -> pd.DataFrame:
     return missing_df
 
 
-def plot_missing_data(
-    df, relative=False, figsize=(7, 5), color="grey", xlabel="Missing Data", title="Missing Data"
-) -> None:
+def plot_missing_data(df, relative=False, figsize=(7, 5), color="grey", xlabel="Missing Data", title="Missing Data") -> None:
     """
     Plots a horizontal bar chart of the number of missing values in each column of the given DataFrame.
 

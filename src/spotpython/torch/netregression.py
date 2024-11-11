@@ -3,9 +3,7 @@ import spotpython.torch.netcore as netcore
 
 
 class Net_lin_reg(netcore.Net_Core):
-    def __init__(
-        self, _L_in, _L_out, l1, dropout_prob, lr_mult, batch_size, epochs, k_folds, patience, optimizer, sgd_momentum
-    ):
+    def __init__(self, _L_in, _L_out, l1, dropout_prob, lr_mult, batch_size, epochs, k_folds, patience, optimizer, sgd_momentum):
         super(Net_lin_reg, self).__init__(
             lr_mult=lr_mult,
             batch_size=batch_size,

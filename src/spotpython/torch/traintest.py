@@ -117,12 +117,8 @@ def evaluate_cv(
             print(f"Fold: {fold + 1}")
             train_subsampler = torch.utils.data.SubsetRandomSampler(train_ids)
             val_subsampler = torch.utils.data.SubsetRandomSampler(val_ids)
-            trainloader = torch.utils.data.DataLoader(
-                dataset, batch_size=batch_size_instance, sampler=train_subsampler, num_workers=num_workers
-            )
-            valloader = torch.utils.data.DataLoader(
-                dataset, batch_size=batch_size_instance, sampler=val_subsampler, num_workers=num_workers
-            )
+            trainloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size_instance, sampler=train_subsampler, num_workers=num_workers)
+            valloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size_instance, sampler=val_subsampler, num_workers=num_workers)
             # each fold starts with new weights:
             reset_weights(net)
             # Early stopping parameters
@@ -143,9 +139,7 @@ def evaluate_cv(
                 )
                 # TODO: scheduler.step()
                 # Early stopping check. Calculate validation loss from one epoch:
-                metric_values[fold], loss_values[fold] = validate_one_epoch(
-                    net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
-                )
+                metric_values[fold], loss_values[fold] = validate_one_epoch(net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task)
                 # Log the running loss averaged per batch
                 metric_name = "Metric"
                 if metric is not None:
@@ -214,13 +208,9 @@ def evaluate_hold_out(
             sgd_momentum=sgd_momentum_instance,
         )
         if test_dataset is None:
-            trainloader, valloader = create_train_val_data_loaders(
-                dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle
-            )
+            trainloader, valloader = create_train_val_data_loaders(dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle)
         else:
-            trainloader, valloader = create_train_test_data_loaders(
-                dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle, test_dataset=test_dataset
-            )
+            trainloader, valloader = create_train_test_data_loaders(dataset=train_dataset, batch_size=batch_size_instance, shuffle=shuffle, test_dataset=test_dataset)
         # TODO: scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
         # Early stopping parameters
         best_val_loss = float("inf")
@@ -242,9 +232,7 @@ def evaluate_hold_out(
             )
             # TODO: scheduler.step()
             # Early stopping check. Calculate validation loss from one epoch:
-            metric_val, val_loss = validate_one_epoch(
-                net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
-            )
+            metric_val, val_loss = validate_one_epoch(net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task)
             # Log the running loss averaged per batch
             metric_name = "Metric"
             if metric is not None:
@@ -283,22 +271,14 @@ def evaluate_hold_out(
 def create_train_val_data_loaders(dataset, batch_size, shuffle, num_workers=0):
     test_abs = int(len(dataset) * 0.6)
     train_subset, val_subset = random_split(dataset, [test_abs, len(dataset) - test_abs])
-    trainloader = torch.utils.data.DataLoader(
-        train_subset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
-    )
-    valloader = torch.utils.data.DataLoader(
-        val_subset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
-    )
+    trainloader = torch.utils.data.DataLoader(train_subset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers)
+    valloader = torch.utils.data.DataLoader(val_subset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers)
     return trainloader, valloader
 
 
 def create_train_test_data_loaders(dataset, batch_size, shuffle, test_dataset, num_workers=0):
-    trainloader = torch.utils.data.DataLoader(
-        dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
-    )
-    testloader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers
-    )
+    trainloader = torch.utils.data.DataLoader(dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers)
+    testloader = torch.utils.data.DataLoader(test_dataset, batch_size=int(batch_size), shuffle=shuffle, num_workers=num_workers)
     return trainloader, testloader
 
 
@@ -335,10 +315,7 @@ def train_one_epoch(
         running_loss += loss.item()
         epoch_steps += 1
         if batch_nr % show_batch_interval == (show_batch_interval - 1):  # print every show_batch_interval mini-batches
-            print(
-                "Batch: %5d. Batch Size: %d. Training Loss (running): %.3f"
-                % (batch_nr + 1, int(batch_size), running_loss / epoch_steps)
-            )
+            print("Batch: %5d. Batch Size: %d. Training Loss (running): %.3f" % (batch_nr + 1, int(batch_size), running_loss / epoch_steps))
             running_loss = 0.0
     return loss.item()
 
@@ -379,12 +356,8 @@ def test_tuned(net, shuffle, test_dataset=None, loss_function=None, metric=None,
     try:
         device = getDevice(device=device)
         net.to(device)
-        valloader = torch.utils.data.DataLoader(
-            test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0
-        )
-        metric_value, loss = validate_one_epoch(
-            net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task
-        )
+        valloader = torch.utils.data.DataLoader(test_dataset, batch_size=int(batch_size_instance), shuffle=shuffle, num_workers=0)
+        metric_value, loss = validate_one_epoch(net, valloader=valloader, loss_function=loss_function, metric=metric, device=device, task=task)
         df_eval = loss
         df_metric = metric_value
         df_preds = np.nan

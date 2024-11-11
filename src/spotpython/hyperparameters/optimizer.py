@@ -2,9 +2,7 @@ import torch.optim
 from typing import Any, Union
 
 
-def optimizer_handler(
-    optimizer_name: str, params: Union[list, torch.Tensor], lr_mult: float = 1.0, **kwargs: Any
-) -> torch.optim.Optimizer:
+def optimizer_handler(optimizer_name: str, params: Union[list, torch.Tensor], lr_mult: float = 1.0, **kwargs: Any) -> torch.optim.Optimizer:
     """Returns an instance of the specified optimizer. See Notes below for supported optimizers.
 
     Args:
