@@ -4,6 +4,7 @@ from torch import nn
 from spotpython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
 import torch.optim as optim
+from spotpython.hyperparameters.architecture import get_hidden_sizes
 
 
 class NNLinearRegressor(L.LightningModule):
@@ -186,9 +187,7 @@ class NNLinearRegressor(L.LightningModule):
         # set dummy input array for Tensorboard Graphs
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
-        if self.hparams.l1 < 4:
-            raise ValueError("l1 must be at least 4")
-        hidden_sizes = self._get_hidden_sizes()
+        hidden_sizes = get_hidden_sizes(_L_in=self._L_in, l1=l1, n=10)
 
         if batch_norm:
             # Add batch normalization layers
@@ -237,26 +236,6 @@ class NNLinearRegressor(L.LightningModule):
                 nn.init.uniform_(module.weight)
             if module.bias is not None:
                 nn.init.zeros_(module.bias)
-
-    def _generate_div2_list(self, n, n_min) -> list:
-        result = []
-        current = n
-        repeats = 1
-        max_repeats = 4
-        while current >= n_min:
-            result.extend([current] * min(repeats, max_repeats))
-            current = current // 2
-            repeats = repeats + 1
-        return result
-
-    def _get_hidden_sizes(self, n=10) -> list:
-        n_low = self._L_in // 4
-        n_high = max(self.hparams.l1, 2 * n_low)
-        hidden_sizes = self._generate_div2_list(n_high, n_low)
-        # keep only the first 10 values of hidden_sizes list
-        if len(hidden_sizes) > n:
-            hidden_sizes = hidden_sizes[:n]
-        return hidden_sizes
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
