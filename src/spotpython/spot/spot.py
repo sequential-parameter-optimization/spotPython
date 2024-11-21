@@ -42,6 +42,7 @@ from spotpython.hyperparameters.values import (
 import plotly.graph_objects as go
 from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
+from spotpython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -224,7 +225,6 @@ class Spot:
 
         # 4. var_type attribute updates:
         # -----------------------
-        # self.set_self_attribute("var_type", var_type, self.fun_control)
         self.var_type = self.fun_control["var_type"]
         # Force numeric type as default in every dim:
         # assume all variable types are "num" if "num" is
@@ -235,7 +235,6 @@ class Spot:
 
         # 5. var_name attribute updates:
         # -----------------------
-        # self.set_self_attribute("var_name", var_name, self.fun_control)
         self.var_name = self.fun_control["var_name"]
         # use x0, x1, ... as default variable names:
         if self.var_name is None:
@@ -363,21 +362,6 @@ class Spot:
         logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
         logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
         logger.debug("In Spot() init(): self.get_spot_attributes_as_df(): %s", self.get_spot_attributes_as_df())
-
-    def set_self_attribute(self, attribute, value, dict):
-        """
-        This function sets the attribute of the 'self' object to the provided value.
-        If the key exists in the provided dictionary, it updates the attribute with the value from the dictionary.
-
-        Args:
-            self (object): the object whose attribute is to be set
-            attribute (str): the attribute to set
-            value (Any): the value to set the attribute to
-            dict (dict): the dictionary to check for the key
-        """
-        setattr(self, attribute, value)
-        if get_control_key_value(control_dict=dict, key=attribute) is not None:
-            setattr(self, attribute, get_control_key_value(control_dict=dict, key=attribute))
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
         """Get all attributes of the spot object as a pandas dataframe.
@@ -834,28 +818,14 @@ class Spot:
 
         """
         self.initialize_design(X_start)
-        # New: self.update_stats() moved here:
-        # changed in 0.5.9:
         self.update_stats()
-        # (S-4): Imputation:
-        # Not implemented yet.
-        # (S-11) Surrogate Fit:
         self.fit_surrogate()
-        # (S-5) Calling the spotLoop Function
-        # and
-        # (S-9) Termination Criteria, Conditions:
         timeout_start = time.time()
         while self.should_continue(timeout_start):
             self.update_design()
-            # (S-10): Subset Selection for the Surrogate:
-            # Not implemented yet.
-            # Update stats
             self.update_stats()
-            # Update writer:
             self.update_writer()
-            # (S-11) Surrogate Fit:
             self.fit_surrogate()
-            # progress bar:
             self.show_progress_if_needed(timeout_start)
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             self.spot_writer.flush()
@@ -949,9 +919,11 @@ class Spot:
                 X_j = self.X[j].copy()
                 y_j = self.y[j].copy()
                 config = {self.var_name[i]: X_j[i] for i in range(self.k)}
+                # var_dict = assign_values(X, get_var_name(fun_control))
+                # config = list(generate_one_config_from_var_dict(var_dict, fun_control))[0]
                 # see: https://github.com/pytorch/pytorch/issues/32651
                 # self.spot_writer.add_hparams(config, {"spot_y": y_j}, run_name=self.spot_tensorboard_path)
-                self.spot_writer.add_hparams(config, {"spot_y": y_j})
+                self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
         #
         self.X, self.y = remove_nan(self.X, self.y, stop_on_zero_return=True)
@@ -1302,6 +1274,7 @@ class Spot:
             self.min_mean_y = self.mean_y[argmin(self.mean_y)]
 
     def update_writer(self) -> None:
+        print("In update_writer().")
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             # get the last y value:
             y_last = self.y[-1].copy()
@@ -1332,11 +1305,16 @@ class Spot:
             # get last value of self.X and convert to dict. take the values from self.var_name as keys:
             X_last = self.X[-1].copy()
             config = {self.var_name[i]: X_last[i] for i in range(self.k)}
+            # var_dict = assign_values(X, get_var_name(fun_control))
+            # config = list(generate_one_config_from_var_dict(var_dict, fun_control))[0]
             # hyperparameters X and value y of the last configuration:
             # see: https://github.com/pytorch/pytorch/issues/32651
             # self.spot_writer.add_hparams(config, {"spot_y": y_last}, run_name=self.spot_tensorboard_path)
-            self.spot_writer.add_hparams(config, {"spot_y": y_last})
+            self.spot_writer.add_hparams(config, {"hp_metric": y_last})
             self.spot_writer.flush()
+            print("update_writer(): Done.")
+        else:
+            print("No spot_writer available.")
 
     def suggest_new_X(self) -> np.array:
         """

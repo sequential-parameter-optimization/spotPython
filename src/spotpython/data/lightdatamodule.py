@@ -119,6 +119,24 @@ class LightDataModule(L.LightningDataModule):
         except Exception as e:
             raise ValueError(f"Error transforming dataset: {e}")
 
+    def handle_scaling_and_transform(self) -> None:
+        """
+        Fits the scaler on the training data and transforms both training and validation datasets.
+        This function is only called when self.scaler is not None.
+        """
+        # Ensure self.scaler is not None before proceeding
+        if self.scaler is None:
+            raise ValueError("Scaler object is required to perform scaling and transformation.")
+        # Fit the scaler on training data
+        scaler_train_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))]).squeeze(1)
+        if self.verbosity > 0:
+            print(scaler_train_data.shape)
+        self.scaler.fit(scaler_train_data)
+        # Transform the training data
+        self.data_train = self.transform_dataset(self.data_train)
+        # Transform the validation data
+        self.data_val = self.transform_dataset(self.data_val)
+
     def prepare_data(self) -> None:
         """Prepares the data for use."""
         # download
@@ -161,16 +179,9 @@ class LightDataModule(L.LightningDataModule):
                 print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
             generator_fit = torch.Generator().manual_seed(self.test_seed)
             self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size], generator=generator_fit)
+            # Handle scaling and transformation if scaler is provided
             if self.scaler is not None:
-                # Fit the scaler on training data
-                scaler_train_data = torch.stack([self.data_train[i][0] for i in range(len(self.data_train))]).squeeze(1)
-                if self.verbosity > 0:
-                    print(scaler_train_data.shape)
-                self.scaler.fit(scaler_train_data)
-                # Transform the training data
-                self.data_train = self.transform_dataset(self.data_train)
-                # Transform the validation data
-                self.data_val = self.transform_dataset(self.data_val)
+                self.handle_scaling_and_transform()
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
@@ -264,7 +275,6 @@ class LightDataModule(L.LightningDataModule):
             print(f"LightDataModule.test_dataloader(). Test set size: {len(self.data_test)}")
         # print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
-        # apply fit_transform to the val data
         return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
 
     def predict_dataloader(self) -> DataLoader:

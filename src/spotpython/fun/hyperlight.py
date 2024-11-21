@@ -89,6 +89,8 @@ class HyperLight:
     def fun(self, X: np.ndarray, fun_control: dict = None) -> np.ndarray:
         """
         Evaluates the function for the given input array X and control parameters.
+        Calls the train_model function from spotpython.light.trainmodel
+        to train the model and evaluate the results.
 
         Args:
             X (np.ndarray):
@@ -143,7 +145,7 @@ class HyperLight:
         var_dict = assign_values(X, get_var_name(fun_control))
         # type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, fun_control):
-            if fun_control["verbosity"] > 0:
+            if fun_control["show_config"]:
                 print("\nIn fun(): config:")
                 pprint.pprint(config)
             logger.debug(f"\nconfig: {config}")
@@ -162,6 +164,9 @@ class HyperLight:
                 logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                 logger.error("Setting df_eval to np.nan")
                 df_eval = np.nan
+            # Multiply results by the weights. Positive weights mean that the result is to be minimized.
+            # Negative weights mean that the result is to be maximized, e.g., accuracy.
             z_val = fun_control["weights"] * df_eval
+            # Append, since several configurations can be evaluated at once.
             z_res = np.append(z_res, z_val)
         return z_res

@@ -7,6 +7,47 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 import os
 
 
+def generate_config_id_with_timestamp(config: dict, timestamp: bool) -> str:
+    """
+    Generates a configuration ID based on the given config and timestamp flag.
+
+    Args:
+        config (dict): The configuration parameters.
+        timestamp (bool): Indicates whether to include a timestamp in the config ID.
+
+    Returns:
+        str: The generated configuration ID.
+    """
+    if timestamp:
+        # config id is unique. Since the model is not loaded from a checkpoint,
+        # the config id is generated here with a timestamp.
+        config_id = generate_config_id(config, timestamp=True)
+    else:
+        # config id is not time-dependent and therefore unique,
+        # so that the model can be loaded from a checkpoint,
+        # the config id is generated here without a timestamp.
+        config_id = generate_config_id(config, timestamp=False) + "_TRAIN"
+    return config_id
+
+
+def build_model_instance(config: dict, fun_control: dict) -> L.LightningModule:
+    """
+    Builds the core model using the configuration and function control parameters.
+
+    Args:
+        config (dict): Model configuration parameters.
+        fun_control (dict): Function control parameters.
+
+    Returns:
+        The constructed core model.
+    """
+    _L_in = fun_control["_L_in"]
+    _L_out = fun_control["_L_out"]
+    _L_cond = fun_control["_L_cond"]
+    _torchmetric = fun_control["_torchmetric"]
+    return fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _L_cond=_L_cond, _torchmetric=_torchmetric)
+
+
 def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> float:
     """
     Trains a model using the given configuration and function control parameters.
@@ -24,71 +65,48 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         float: The validation loss of the trained model.
 
     Examples:
-        >>> from spotpython.utils.init import fun_control_init
-            from spotpython.light.netlightregression import NetLightRegression
-            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-            from spotpython.hyperparameters.values import (
-                add_core_model_to_fun_control,
-                get_default_hyperparameters_as_array)
+        >>> from math import inf
+            import numpy as np
             from spotpython.data.diabetes import Diabetes
-            from spotpython.hyperparameters.values import set_control_key_value
-            from spotpython.hyperparameters.values import get_var_name, assign_values, generate_one_config_from_var_dict
-            from spotpython.light.traintest import train_model
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.utils.init import fun_control_init
+            from spotpython.utils.eda import gen_design_table
+            from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
+            from spotpython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
+            from spotpython.light.trainmodel import train_model
+            import pprint
+            PREFIX="000"
+            data_set = Diabetes()
             fun_control = fun_control_init(
+                PREFIX=PREFIX,
+                save_experiment=True,
+                fun_evals=inf,
+                max_time=1,
+                data_set = data_set,
+                core_model_name="light.regression.NNLinearRegressor",
+                hyperdict=LightHyperDict,
                 _L_in=10,
-                _L_out=1,)
-            # Select a dataset
-            dataset = Diabetes()
-            set_control_key_value(control_dict=fun_control,
-                                key="data_set",
-                                value=dataset)
-            # Select a model
-            add_core_model_to_fun_control(core_model=NetLightRegression,
-                                        fun_control=fun_control,
-                                        hyper_dict=LightHyperDict)
-            # Select hyperparameters
+                _L_out=1,
+                TENSORBOARD_CLEAN=True,
+                tensorboard_log=True,
+                seed=42,)
+            print(gen_design_table(fun_control))
             X = get_default_hyperparameters_as_array(fun_control)
+            # set epochs to 2^8:
+            # X[0, 1] = 8
+            # set patience to 2^10:
+            # X[0, 7] = 10
+            print(f"X: {X}")
+            # combine X and X to a np.array with shape (2, n_hyperparams)
+            # so that two values are returned
+            X = np.vstack((X, X))
             var_dict = assign_values(X, get_var_name(fun_control))
             for config in generate_one_config_from_var_dict(var_dict, fun_control):
+                pprint.pprint(config)
                 y = train_model(config, fun_control)
-                break
-            | Name   | Type       | Params | In sizes | Out sizes
-            -------------------------------------------------------------
-            0 | layers | Sequential | 157    | [16, 10] | [16, 1]
-            -------------------------------------------------------------
-            157       Trainable params
-            0         Non-trainable params
-            157       Total params
-            0.001     Total estimated model params size (MB)
-            Train_model(): Test set size: 266
-            ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-                Validate metric           DataLoader 0
-            ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-                    hp_metric             27462.841796875
-                    val_loss              27462.841796875
-            ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-            train_model result: {'val_loss': 27462.841796875, 'hp_metric': 27462.841796875}
-
     """
-    _L_in = fun_control["_L_in"]
-    _L_out = fun_control["_L_out"]
-    _L_cond = fun_control["_L_cond"]
-    _torchmetric = fun_control["_torchmetric"]
-    if fun_control["enable_progress_bar"] is None:
-        enable_progress_bar = False
-    else:
-        enable_progress_bar = fun_control["enable_progress_bar"]
-    if timestamp:
-        # config id is unique. Since the model is not loaded from a checkpoint,
-        # the config id is generated here with a timestamp.
-        config_id = generate_config_id(config, timestamp=True)
-    else:
-        # config id is not time-dependent and therefore unique,
-        # so that the model can be loaded from a checkpoint,
-        # the config id is generated here without a timestamp.
-        config_id = generate_config_id(config, timestamp=False) + "_TRAIN"
-    model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _L_cond=_L_cond, _torchmetric=_torchmetric)
-
+    config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
+    model = build_model_instance(config, fun_control)
     dm = LightDataModule(
         dataset=fun_control["data_set"],
         batch_size=config["batch_size"],
@@ -97,7 +115,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         test_seed=fun_control["test_seed"],
         scaler=fun_control["scaler"],
     )
-    # TODO: Check if this is necessary:
+    # TODO: Check if this is necessary or if this is handled by the trainer
     # dm.setup()
     # print(f"train_model(): Test set size: {len(dm.data_test)}")
     # print(f"train_model(): Train set size: {len(dm.data_train)}")
@@ -221,6 +239,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   and gradient_clip_algorithm="norm" to clip by norm.
     #   By default it will be set to "norm".
 
+    enable_progress_bar = fun_control["enable_progress_bar"] or False
     trainer = L.Trainer(
         # Where to save models
         default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),

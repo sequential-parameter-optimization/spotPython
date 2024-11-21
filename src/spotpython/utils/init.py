@@ -71,6 +71,7 @@ def fun_control_init(
     scaler_name=None,
     scenario=None,
     seed=123,
+    show_config=False,
     show_models=False,
     show_progress=True,
     shuffle=None,
@@ -235,6 +236,8 @@ def fun_control_init(
         show_models (bool):
             Plot model each generation.
             Currently only 1-dim functions are supported. Default is `False`.
+        show_config (bool):
+            Whether to show the configuration or not. Default is `False`.
         shuffle (bool):
             Whether the data were shuffled or not. Default is None.
         surrogate (object):
@@ -434,6 +437,7 @@ def fun_control_init(
         "scenario": scenario,
         "seed": seed,
         "show_batch_interval": 1_000_000,
+        "show_config": show_config,
         "show_models": show_models,
         "show_progress": show_progress,
         "shuffle": shuffle,

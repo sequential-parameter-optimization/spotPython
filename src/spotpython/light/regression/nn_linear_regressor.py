@@ -130,45 +130,6 @@ class NNLinearRegressor(L.LightningModule):
         *args,
         **kwargs,
     ):
-        """
-        Initializes the NNLinearRegressor object.
-
-        Args:
-            l1 (int):
-                The number of neurons in the first hidden layer.
-            epochs (int):
-                The number of epochs to train the model for.
-            batch_size (int):
-                The batch size to use during training.
-            initialization (str):
-                The initialization method to use for the weights.
-            act_fn (nn.Module):
-                The activation function to use in the hidden layers.
-            optimizer (str):
-                The optimizer to use during training.
-            dropout_prob (float):
-                The probability of dropping out a neuron during training.
-            lr_mult (float):
-                The learning rate multiplier for the optimizer.
-            patience (int):
-                The number of epochs to wait before early stopping.
-            batch_norm (bool):
-                Whether to use batch normalization or not.
-            _L_in (int):
-                The number of input features. Not a hyperparameter, but needed to create the network.
-            _L_out (int):
-                The number of output classes. Not a hyperparameter, but needed to create the network.
-            _torchmetric (str):
-                The metric to use for the loss function. If `None`,
-                then "mean_squared_error" is used.
-
-        Returns:
-            (NoneType): None
-
-        Raises:
-            ValueError: If l1 is less than 4.
-
-        """
         super().__init__()
         # Attribute 'act_fn' is an instance of `nn.Module` and is already saved during
         # checkpointing. It is recommended to ignore them
@@ -187,6 +148,8 @@ class NNLinearRegressor(L.LightningModule):
         # set dummy input array for Tensorboard Graphs
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
+        if self.hparams.l1 < 4:
+            raise ValueError("l1 must be at least 4")
         hidden_sizes = get_hidden_sizes(_L_in=self._L_in, l1=l1, n=10)
 
         if batch_norm:
@@ -280,10 +243,9 @@ class NNLinearRegressor(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
 
         """
-        val_loss = self._calculate_loss(batch)
-        # self.log("train_loss", val_loss, on_step=True, on_epoch=True, prog_bar=True)
-        # self.log("train_mae_loss", mae_loss, on_step=True, on_epoch=True, prog_bar=True)
-        return val_loss
+        loss = self._calculate_loss(batch)
+        # self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+        return loss
 
     def validation_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
@@ -298,11 +260,10 @@ class NNLinearRegressor(L.LightningModule):
             torch.Tensor: A tensor containing the loss for this batch.
 
         """
-        val_loss = self._calculate_loss(batch)
-        # self.log("val_loss", val_loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
-        self.log("val_loss", val_loss, prog_bar=prog_bar)
-        self.log("hp_metric", val_loss, prog_bar=prog_bar)
-        return val_loss
+        loss = self._calculate_loss(batch)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
+        self.log("hp_metric", loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
+        return loss
 
     def test_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
@@ -316,10 +277,10 @@ class NNLinearRegressor(L.LightningModule):
         Returns:
             torch.Tensor: A tensor containing the loss for this batch.
         """
-        val_loss = self._calculate_loss(batch)
-        self.log("val_loss", val_loss, prog_bar=prog_bar)
-        self.log("hp_metric", val_loss, prog_bar=prog_bar)
-        return val_loss
+        loss = self._calculate_loss(batch)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
+        self.log("hp_metric", loss, on_step=False, on_epoch=True, prog_bar=prog_bar)
+        return loss
 
     def predict_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
         """
