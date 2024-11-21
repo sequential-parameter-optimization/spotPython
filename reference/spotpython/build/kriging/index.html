@@ -850,6 +850,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotpython.build.kriging.Kriging.predict_coded_batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_coded_batch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotpython.build.kriging.Kriging.set_de_bounds" class="md-nav__link">
     <span class="md-ellipsis">
       set_de_bounds
@@ -1652,6 +1661,8 @@
       
         
       
+        
+      
     
     
       
@@ -1682,6 +1693,27 @@
             hyperparameters
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hyperparameters/architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4045,6 +4077,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#spotpython.build.kriging.Kriging.predict_coded_batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      predict_coded_batch
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#spotpython.build.kriging.Kriging.set_de_bounds" class="md-nav__link">
     <span class="md-ellipsis">
       set_de_bounds
@@ -4152,7 +4193,9 @@
 
               <details class="quote">
                 <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  42</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">  40</span>
+<span class="normal">  41</span>
+<span class="normal">  42</span>
 <span class="normal">  43</span>
 <span class="normal">  44</span>
 <span class="normal">  45</span>
@@ -5597,22 +5640,7 @@
 <span class="normal">1484</span>
 <span class="normal">1485</span>
 <span class="normal">1486</span>
-<span class="normal">1487</span>
-<span class="normal">1488</span>
-<span class="normal">1489</span>
-<span class="normal">1490</span>
-<span class="normal">1491</span>
-<span class="normal">1492</span>
-<span class="normal">1493</span>
-<span class="normal">1494</span>
-<span class="normal">1495</span>
-<span class="normal">1496</span>
-<span class="normal">1497</span>
-<span class="normal">1498</span>
-<span class="normal">1499</span>
-<span class="normal">1500</span>
-<span class="normal">1501</span>
-<span class="normal">1502</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Kriging</span><span class="p">(</span><span class="n">surrogates</span><span class="p">):</span>
+<span class="normal">1487</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Kriging</span><span class="p">(</span><span class="n">surrogates</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Kriging surrogate.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -5889,8 +5917,10 @@
 <span class="sd">                # Extract parameters from given bounds</span>
 <span class="sd">                kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)</span>
 <span class="sd">                # Assertions to check if parameters are correctly extracted</span>
-<span class="sd">                assert np.array_equal(kriging_model.theta, [1, 2]), f&quot;Expected theta to be [1, 2] but got {kriging_model.theta}&quot;</span>
-<span class="sd">                assert np.array_equal(kriging_model.p, [3, 4, 5]), f&quot;Expected p to be [3, 4, 5] but got {kriging_model.p}&quot;</span>
+<span class="sd">                assert np.array_equal(kriging_model.theta,</span>
+<span class="sd">                    [1, 2]), f&quot;Expected theta to be [1, 2] but got {kriging_model.theta}&quot;</span>
+<span class="sd">                assert np.array_equal(kriging_model.p,</span>
+<span class="sd">                    [3, 4, 5]), f&quot;Expected p to be [3, 4, 5] but got {kriging_model.p}&quot;</span>
 <span class="sd">                assert kriging_model.Lambda == 6, f&quot;Expected Lambda to be 6 but got {kriging_model.Lambda}&quot;</span>
 <span class="sd">                print(&quot;All assertions passed!&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -6298,7 +6328,7 @@
 <span class="sd">        The `pen_val` attribute is initialized as the natural logarithm of the</span>
 <span class="sd">        variance of `nat_y`, multiplied by `n`, plus 1e4.</span>
 <span class="sd">        The `negLnLike`, `LnDetPsi`, `mu`, `U`, `SigmaSqr`, and `Lambda` attributes are all set to None.</span>
-<span class="sd">        The `gen` attribute is initialized using the `spacefilling` function with arguments `k` and `seed`.</span>
+<span class="sd">        The `gen` attribute is initialized using the `SpaceFilling` function with arguments `k` and `seed`.</span>
 <span class="sd">        The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.</span>
 <span class="sd">        The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.</span>
 <span class="sd">        The `one` attribute is initialized as a list of ones with length `n`.</span>
@@ -6353,7 +6383,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Initialize generator</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gen</span> <span class="o">=</span> <span class="n">spacefilling</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gen</span> <span class="o">=</span> <span class="n">SpaceFilling</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In initialize_matrices(): self.gen: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen</span><span class="p">)</span>
 
         <span class="c1"># Initialize matrix Psi and vector psi</span>
@@ -6817,38 +6847,25 @@
             <span class="c1">#</span>
             <span class="n">pylab</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span>
-                                                                      <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            self (object):</span>
-<span class="sd">                The Kriging object.</span>
-<span class="sd">            nat_X (ndarray):</span>
-<span class="sd">                Design variable to evaluate in natural units.</span>
-<span class="sd">            return_val (str):</span>
-<span class="sd">                whether `y`, `s`, neg. `ei` (negative expected improvement),</span>
-<span class="sd">                or all three values are returned.</span>
-<span class="sd">                Default is (for compatibility with sklearn) &quot;y&quot;. To return `s`, select &quot;s&quot;,</span>
-<span class="sd">                to return neg. `ei`, select &quot;ei&quot;.</span>
-<span class="sd">                To return the tuple `(y, s, ei)`, select &quot;all&quot;.</span>
+<span class="sd">            self (object): The Kriging object.</span>
+<span class="sd">            nat_X (ndarray): Design variable to evaluate in natural units.</span>
+<span class="sd">            return_val (str): Specifies which prediction values to return. It can be &quot;y&quot;, &quot;s&quot;, &quot;ei&quot;, or &quot;all&quot;.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            float:</span>
-<span class="sd">                The predicted value in natural units if return_val is &quot;y&quot;.</span>
-<span class="sd">            float:</span>
-<span class="sd">                predicted error if return_val is &quot;s&quot;.</span>
-<span class="sd">            float:</span>
-<span class="sd">                expected improvement if return_val is &quot;ei&quot;.</span>
-<span class="sd">            Tuple[float, float, float]:</span>
-<span class="sd">                The predicted value in natural units, predicted error</span>
-<span class="sd">                and expected improvement if return_val is &quot;all&quot;.</span>
+<span class="sd">            Union[float, Tuple[float, float, float]]: Depending on `return_val`, returns the predicted value,</span>
+<span class="sd">            predicted error, expected improvement, or all.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If `nat_X` is not an ndarray or doesn&#39;t match expected dimensions.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from spotpython.build.kriging import Kriging</span>
 <span class="sd">                import numpy as np</span>
-<span class="sd">                import matplotlib.pyplot as plt</span>
 <span class="sd">                from numpy import linspace, arange</span>
 <span class="sd">                rng = np.random.RandomState(1)</span>
 <span class="sd">                X = linspace(start=0, stop=10, num=1_0).reshape(-1, 1)</span>
@@ -6861,67 +6878,48 @@
 <span class="sd">                print(f&quot;mean_prediction: {mean_prediction}&quot;)</span>
 <span class="sd">                print(f&quot;std_prediction: {std_prediction}&quot;)</span>
 <span class="sd">                print(f&quot;s_ei: {s_ei}&quot;)</span>
-<span class="sd">                mean_prediction: [-1.41991225e-08  6.48310037e-01  1.76715565e+00 -6.35226564e-01</span>
-<span class="sd">                                  -4.28585379e+00 -1.22301198e+00  2.49434148e+00  5.61900501e-01</span>
-<span class="sd">                                  -3.04558205e+00 -5.44021104e+00]</span>
-<span class="sd">                std_prediction: [3.69706811e-04 2.07958787e+00 3.69706810e-04 3.69706807e-04</span>
-<span class="sd">                                3.69706809e-04 2.07958584e+00 3.69706811e-04 2.60615408e+00</span>
-<span class="sd">                                2.60837033e+00 3.69706811e-04]</span>
-<span class="sd">                s_ei: [-0.00000000e+00 -1.02341235e-03 -0.00000000e+00 -0.00000000e+00</span>
-<span class="sd">                       -0.00000000e+00 -1.63799181e-02 -0.00000000e+00 -9.45766290e-03</span>
-<span class="sd">                       -2.53405666e-01 -1.47459347e-04]</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check for the shape and the type of the Input</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nat_X</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">X</span> <span class="o">=</span> <span class="n">nat_X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                <span class="n">X</span> <span class="o">=</span> <span class="n">repair_non_numeric</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;13.1: Input to predict was not convertible to the size of X&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;type of the given input is an </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">nat_X</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead of an ndarray&quot;</span><span class="p">)</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="n">ei</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
-            <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ei</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_coded</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nat_X</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected an ndarray, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">nat_X</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">nat_X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">repair_non_numeric</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input to predict was not convertible to the size of X&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+        <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ei</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_coded_batch</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">y</span>
         <span class="k">elif</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;s&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">s</span>
         <span class="k">elif</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;ei&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">ei</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">ei</span>
+        <span class="k">elif</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">-</span><span class="n">ei</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">ei</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid return_val: </span><span class="si">{</span><span class="n">return_val</span><span class="si">}</span><span class="s2">. Supported values are &#39;y&#39;, &#39;s&#39;, &#39;ei&#39;, &#39;all&#39;.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">predict_coded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].</span>
-<span class="sd">        The error is returned as well.</span>
-<span class="sd">        The method is used in `predict`.</span>
+<span class="sd">        Kriging prediction of one point in coded units as described in (2.20) in [Forr08a].</span>
+<span class="sd">        The error is returned as well. The method is used in `predict`.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            self (object):</span>
-<span class="sd">                The Kriging object.</span>
-<span class="sd">            cod_x (np.ndarray):</span>
-<span class="sd">                Point in coded units to make prediction at.</span>
+<span class="sd">            self (object): The Kriging object.</span>
+<span class="sd">            cod_x (np.ndarray): Point in coded units to make prediction at.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            f (float): Predicted value in coded units.</span>
-<span class="sd">            SSqr (float): Predicted error.</span>
-<span class="sd">            EI (float): Expected improvement.</span>
+<span class="sd">            Tuple[float, float, float]: Predicted value, predicted error, and expected improvement.</span>
 
 <span class="sd">        Note:</span>
-<span class="sd">            `self.mu` and `self.SigmaSqr` are computed in `likelihood`, not here.</span>
-<span class="sd">            See also [Forr08a, p.60].</span>
+<span class="sd">            Uses attributes such as `self.mu` and `self.SigmaSqr` that are expected</span>
+<span class="sd">            to be calculated by `likelihood`.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from spotpython.build.kriging import Kriging</span>
 <span class="sd">                import numpy as np</span>
-<span class="sd">                import matplotlib.pyplot as plt</span>
 <span class="sd">                from numpy import linspace, arange, empty</span>
 <span class="sd">                rng = np.random.RandomState(1)</span>
 <span class="sd">                X = linspace(start=0, stop=10, num=10).reshape(-1, 1)</span>
@@ -6935,51 +6933,69 @@
 <span class="sd">                s = empty(n, dtype=float)</span>
 <span class="sd">                ei = empty(n, dtype=float)</span>
 <span class="sd">                for i in range(n):</span>
-<span class="sd">                    x = X[i, :]</span>
-<span class="sd">                    y[i], s[i], ei[i] = S.predict_coded(x)</span>
+<span class="sd">                    y_coded, s_coded, ei_coded = S.predict_coded(X[i, :])</span>
+<span class="sd">                    y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()</span>
+<span class="sd">                    s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()</span>
+<span class="sd">                    ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()</span>
 <span class="sd">                print(f&quot;y: {y}&quot;)</span>
 <span class="sd">                print(f&quot;s: {s}&quot;)</span>
 <span class="sd">                print(f&quot;ei: {-1.0*ei}&quot;)</span>
-<span class="sd">                    y: [-1.41991223e-08  6.48310075e-01  1.76715565e+00 -6.35226564e-01</span>
-<span class="sd">                    -4.28585379e+00 -1.22301201e+00  2.49434148e+00  5.61900546e-01</span>
-<span class="sd">                    -3.04558209e+00 -5.44021104e+00]</span>
-<span class="sd">                    s: [3.69706810e-04 2.07958781e+00 3.69706812e-04 3.69706808e-04</span>
-<span class="sd">                    3.69706812e-04 2.07958578e+00 3.69706810e-04 2.60615406e+00</span>
-<span class="sd">                    2.60837032e+00 3.69706813e-04]</span>
-<span class="sd">                    ei: [-0.00000000e+00 -1.02341195e-03 -0.00000000e+00 -0.00000000e+00</span>
-<span class="sd">                    -0.00000000e+00 -1.63799157e-02 -0.00000000e+00 -9.45766188e-03</span>
-<span class="sd">                    -2.53405668e-01 -1.47459348e-04]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">build_psi_vec</span><span class="p">(</span><span class="n">cod_x</span><span class="p">)</span>
-        <span class="n">U_T_inv</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">one</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">U_T_inv</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span><span class="p">:</span>
-            <span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">Lambda</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="c1"># Error in [Forr08a, p.87]:</span>
-        <span class="n">SSqr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SigmaSqr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">Lambda</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">))))</span>
-        <span class="n">SSqr</span> <span class="o">=</span> <span class="n">power</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">SSqr</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">0.5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">EI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_imp</span><span class="p">(</span><span class="n">y0</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s0</span><span class="o">=</span><span class="n">SSqr</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SSqr</span><span class="p">,</span> <span class="n">EI</span>
+        <span class="n">mu_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
+        <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span>
 
-    <span class="k">def</span> <span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Calculate the prediction</span>
+        <span class="n">U_T_inv</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">one</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu_adj</span><span class="p">))</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">mu_adj</span> <span class="o">+</span> <span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">U_T_inv</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Calculate the estimated error</span>
+        <span class="n">SSqr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SigmaSqr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">Lambda</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">psi</span><span class="p">))))</span>
+        <span class="n">SSqr</span> <span class="o">=</span> <span class="n">power</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">SSqr</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Calculate expected improvement</span>
+        <span class="n">EI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_imp</span><span class="p">(</span><span class="n">y0</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">s0</span><span class="o">=</span><span class="n">SSqr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">SSqr</span><span class="p">,</span> <span class="n">EI</span>
+
+    <span class="k">def</span> <span class="nf">predict_coded_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,</span>
-<span class="sd">        `regression_predict_coded`. Modifies `self.psi`.</span>
+<span class="sd">        Vectorized prediction for batch input using coded units.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            self (object):</span>
-<span class="sd">                The Kriging object.</span>
-<span class="sd">            cod_x (ndarray):</span>
-<span class="sd">                point to calculate psi</span>
+<span class="sd">            X (np.ndarray): Input array of coded points.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">                Arrays of predicted values, predicted errors, and expected improvements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">ei</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">y_coded</span><span class="p">,</span> <span class="n">s_coded</span><span class="p">,</span> <span class="n">ei_coded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_coded</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+            <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_coded</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">y_coded</span><span class="p">)</span> <span class="k">else</span> <span class="n">y_coded</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">s_coded</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">s_coded</span><span class="p">)</span> <span class="k">else</span> <span class="n">s_coded</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">ei</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ei_coded</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">ei_coded</span><span class="p">)</span> <span class="k">else</span> <span class="n">ei_coded</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ei</span>
+
+    <span class="k">def</span> <span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the psi vector required for predictive methods.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cod_x (ndarray): Point to calculate the psi vector for.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 
-<span class="sd">        Attributes:</span>
-<span class="sd">            self.psi (ndarray):</span>
-<span class="sd">                psi vector</span>
+<span class="sd">        Modifies:</span>
+<span class="sd">            self.psi (np.ndarray): Updates the psi vector.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; import numpy as np</span>
@@ -7006,40 +7022,39 @@
 <span class="sd">                assert np.array_equal(S.psi, res)</span>
 <span class="sd">                print(f&quot;S.psi: {S.psi}&quot;)</span>
 <span class="sd">                print(f&quot;Control value res: {res}&quot;)</span>
-<span class="sd">                S.psi:</span>
-<span class="sd">                [[1.83156389e-02]</span>
-<span class="sd">                [4.13993772e-08]</span>
-<span class="sd">                [4.24835426e-18]]</span>
-<span class="sd">                Control value res:</span>
-<span class="sd">                [[1.83156389e-02]</span>
-<span class="sd">                [4.13993772e-08]</span>
-<span class="sd">                [4.24835426e-18]]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
-        <span class="n">theta</span> <span class="o">=</span> <span class="n">power</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">*</span> <span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Building psi vector for point: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">D</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">theta_scaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">theta_scaled</span> <span class="o">=</span> <span class="n">theta_scaled</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+
+            <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+            <span class="c1"># Compute ordered distance contributions</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="n">X_ordered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">]</span>
                 <span class="n">x_ordered</span> <span class="o">=</span> <span class="n">cod_x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">]</span>
-                <span class="n">D</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_ordered</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">)),</span>
-                          <span class="n">X_ordered</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">)),</span>
-                          <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;sqeuclidean&#39;</span><span class="p">,</span>
-                          <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                          <span class="n">w</span><span class="o">=</span><span class="n">theta</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">])</span>
+                <span class="n">D</span> <span class="o">+=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_ordered</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                           <span class="n">X_ordered</span><span class="p">,</span>
+                           <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;sqeuclidean&#39;</span><span class="p">,</span>
+                           <span class="n">w</span><span class="o">=</span><span class="n">theta_scaled</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Distance D after ordered mask: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+            <span class="c1"># Compute factor distance contributions</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="n">X_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">]</span>
                 <span class="n">x_factor</span> <span class="o">=</span> <span class="n">cod_x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">]</span>
-                <span class="n">D</span> <span class="o">=</span> <span class="p">(</span><span class="n">D</span> <span class="o">+</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_factor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">)),</span>
-                               <span class="n">X_factor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">)),</span>
-                               <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_factorial</span><span class="p">,</span>
-                               <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                               <span class="n">w</span><span class="o">=</span><span class="n">theta</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">]))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-        <span class="k">except</span> <span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building psi failed:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">err</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">D</span> <span class="o">+=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_factor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                           <span class="n">X_factor</span><span class="p">,</span>
+                           <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_factorial</span><span class="p">,</span>
+                           <span class="n">w</span><span class="o">=</span><span class="n">theta_scaled</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Distance D after factor mask: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Building psi failed due to a linear algebra error: </span><span class="si">%s</span><span class="s2">. Error type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">weighted_exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -7426,7 +7441,9 @@ scikit-learn: Gaussian Processes regression: basic introductory example</p>
 </details>
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 45</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
 <span class="normal"> 46</span>
 <span class="normal"> 47</span>
 <span class="normal"> 48</span>
@@ -7577,9 +7594,7 @@ scikit-learn: Gaussian Processes regression: basic introductory example</p>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
-<span class="normal">196</span>
-<span class="normal">197</span>
-<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
         <span class="n">noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">var_type</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">],</span>
@@ -8537,8 +8552,7 @@ Defaults to True.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Build the psi vector. Needed by <code>predict_cod</code>, <code>predict_err_coded</code>,
-<code>regression_predict_coded</code>. Modifies <code>self.psi</code>.</p>
+      <p>Build the psi vector required for predictive methods.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -8553,27 +8567,13 @@ Defaults to True.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>self</code></td>
-            <td>
-                  <code>object</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The Kriging object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code>cod_x</code></td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>point to calculate psi</p>
+                <p>Point to calculate the psi vector for.</p>
               </div>
             </td>
             <td>
@@ -8607,30 +8607,10 @@ Defaults to True.</p>
     </table>
 
 
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="spotpython.build.kriging.Kriging.build_psi_vec.self.psi">self.psi</span></code></td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>psi vector</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
+<details class="modifies" open>
+  <summary>Modifies</summary>
+  <p>self.psi (np.ndarray): Updates the psi vector.</p>
+</details>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -8657,19 +8637,20 @@ Defaults to True.</p>
 <span class="go">    assert np.array_equal(S.psi, res)</span>
 <span class="go">    print(f&quot;S.psi: {S.psi}&quot;)</span>
 <span class="go">    print(f&quot;Control value res: {res}&quot;)</span>
-<span class="go">    S.psi:</span>
-<span class="go">    [[1.83156389e-02]</span>
-<span class="go">    [4.13993772e-08]</span>
-<span class="go">    [4.24835426e-18]]</span>
-<span class="go">    Control value res:</span>
-<span class="go">    [[1.83156389e-02]</span>
-<span class="go">    [4.13993772e-08]</span>
-<span class="go">    [4.24835426e-18]]</span>
 </code></pre></div>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1393</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1384</span>
+<span class="normal">1385</span>
+<span class="normal">1386</span>
+<span class="normal">1387</span>
+<span class="normal">1388</span>
+<span class="normal">1389</span>
+<span class="normal">1390</span>
+<span class="normal">1391</span>
+<span class="normal">1392</span>
+<span class="normal">1393</span>
 <span class="normal">1394</span>
 <span class="normal">1395</span>
 <span class="normal">1396</span>
@@ -8730,38 +8711,18 @@ Defaults to True.</p>
 <span class="normal">1451</span>
 <span class="normal">1452</span>
 <span class="normal">1453</span>
-<span class="normal">1454</span>
-<span class="normal">1455</span>
-<span class="normal">1456</span>
-<span class="normal">1457</span>
-<span class="normal">1458</span>
-<span class="normal">1459</span>
-<span class="normal">1460</span>
-<span class="normal">1461</span>
-<span class="normal">1462</span>
-<span class="normal">1463</span>
-<span class="normal">1464</span>
-<span class="normal">1465</span>
-<span class="normal">1466</span>
-<span class="normal">1467</span>
-<span class="normal">1468</span>
-<span class="normal">1469</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1454</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Build the psi vector. Needed by `predict_cod`, `predict_err_coded`,</span>
-<span class="sd">    `regression_predict_coded`. Modifies `self.psi`.</span>
+<span class="sd">    Build the psi vector required for predictive methods.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        self (object):</span>
-<span class="sd">            The Kriging object.</span>
-<span class="sd">        cod_x (ndarray):</span>
-<span class="sd">            point to calculate psi</span>
+<span class="sd">        cod_x (ndarray): Point to calculate the psi vector for.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
 
-<span class="sd">    Attributes:</span>
-<span class="sd">        self.psi (ndarray):</span>
-<span class="sd">            psi vector</span>
+<span class="sd">    Modifies:</span>
+<span class="sd">        self.psi (np.ndarray): Updates the psi vector.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
@@ -8788,40 +8749,39 @@ Defaults to True.</p>
 <span class="sd">            assert np.array_equal(S.psi, res)</span>
 <span class="sd">            print(f&quot;S.psi: {S.psi}&quot;)</span>
 <span class="sd">            print(f&quot;Control value res: {res}&quot;)</span>
-<span class="sd">            S.psi:</span>
-<span class="sd">            [[1.83156389e-02]</span>
-<span class="sd">            [4.13993772e-08]</span>
-<span class="sd">            [4.24835426e-18]]</span>
-<span class="sd">            Control value res:</span>
-<span class="sd">            [[1.83156389e-02]</span>
-<span class="sd">            [4.13993772e-08]</span>
-<span class="sd">            [4.24835426e-18]]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
-    <span class="n">theta</span> <span class="o">=</span> <span class="n">power</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span> <span class="o">*</span> <span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Building psi vector for point: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">D</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">theta_scaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">theta_scaled</span> <span class="o">=</span> <span class="n">theta_scaled</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># Compute ordered distance contributions</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="n">X_ordered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">]</span>
             <span class="n">x_ordered</span> <span class="o">=</span> <span class="n">cod_x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">]</span>
-            <span class="n">D</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_ordered</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">)),</span>
-                      <span class="n">X_ordered</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">)),</span>
-                      <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;sqeuclidean&#39;</span><span class="p">,</span>
-                      <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                      <span class="n">w</span><span class="o">=</span><span class="n">theta</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">])</span>
+            <span class="n">D</span> <span class="o">+=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_ordered</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                       <span class="n">X_ordered</span><span class="p">,</span>
+                       <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;sqeuclidean&#39;</span><span class="p">,</span>
+                       <span class="n">w</span><span class="o">=</span><span class="n">theta_scaled</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ordered_mask</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Distance D after ordered mask: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+        <span class="c1"># Compute factor distance contributions</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="n">X_factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">]</span>
             <span class="n">x_factor</span> <span class="o">=</span> <span class="n">cod_x</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">]</span>
-            <span class="n">D</span> <span class="o">=</span> <span class="p">(</span><span class="n">D</span> <span class="o">+</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_factor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">)),</span>
-                           <span class="n">X_factor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">)),</span>
-                           <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_factorial</span><span class="p">,</span>
-                           <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                           <span class="n">w</span><span class="o">=</span><span class="n">theta</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">]))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">except</span> <span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building psi failed:</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">err</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">D</span> <span class="o">+=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x_factor</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                       <span class="n">X_factor</span><span class="p">,</span>
+                       <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_factorial</span><span class="p">,</span>
+                       <span class="n">w</span><span class="o">=</span><span class="n">theta_scaled</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">factor_mask</span><span class="p">])</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Distance D after factor mask: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">D</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">psi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Building psi failed due to a linear algebra error: </span><span class="si">%s</span><span class="s2">. Error type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -8939,7 +8899,9 @@ Defaults to True.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
 <span class="normal">201</span>
 <span class="normal">202</span>
 <span class="normal">203</span>
@@ -8976,9 +8938,7 @@ Defaults to True.</p>
 <span class="normal">234</span>
 <span class="normal">235</span>
 <span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
-<span class="normal">239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s0</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">s0</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the expected improvement for a given function value and error in coded units.</span>
 
@@ -9106,15 +9066,19 @@ Defaults to True.</p>
 <span class="go">    # Extract parameters from given bounds</span>
 <span class="go">    kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)</span>
 <span class="go">    # Assertions to check if parameters are correctly extracted</span>
-<span class="go">    assert np.array_equal(kriging_model.theta, [1, 2]), f&quot;Expected theta to be [1, 2] but got {kriging_model.theta}&quot;</span>
-<span class="go">    assert np.array_equal(kriging_model.p, [3, 4, 5]), f&quot;Expected p to be [3, 4, 5] but got {kriging_model.p}&quot;</span>
+<span class="go">    assert np.array_equal(kriging_model.theta,</span>
+<span class="go">        [1, 2]), f&quot;Expected theta to be [1, 2] but got {kriging_model.theta}&quot;</span>
+<span class="go">    assert np.array_equal(kriging_model.p,</span>
+<span class="go">        [3, 4, 5]), f&quot;Expected p to be [3, 4, 5] but got {kriging_model.p}&quot;</span>
 <span class="go">    assert kriging_model.Lambda == 6, f&quot;Expected Lambda to be 6 but got {kriging_model.Lambda}&quot;</span>
 <span class="go">    print(&quot;All assertions passed!&quot;)</span>
 </code></pre></div>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">285</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
 <span class="normal">286</span>
 <span class="normal">287</span>
 <span class="normal">288</span>
@@ -9214,8 +9178,10 @@ Defaults to True.</p>
 <span class="sd">            # Extract parameters from given bounds</span>
 <span class="sd">            kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)</span>
 <span class="sd">            # Assertions to check if parameters are correctly extracted</span>
-<span class="sd">            assert np.array_equal(kriging_model.theta, [1, 2]), f&quot;Expected theta to be [1, 2] but got {kriging_model.theta}&quot;</span>
-<span class="sd">            assert np.array_equal(kriging_model.p, [3, 4, 5]), f&quot;Expected p to be [3, 4, 5] but got {kriging_model.p}&quot;</span>
+<span class="sd">            assert np.array_equal(kriging_model.theta,</span>
+<span class="sd">                [1, 2]), f&quot;Expected theta to be [1, 2] but got {kriging_model.theta}&quot;</span>
+<span class="sd">            assert np.array_equal(kriging_model.p,</span>
+<span class="sd">                [3, 4, 5]), f&quot;Expected p to be [3, 4, 5] but got {kriging_model.p}&quot;</span>
 <span class="sd">            assert kriging_model.Lambda == 6, f&quot;Expected Lambda to be 6 but got {kriging_model.Lambda}&quot;</span>
 <span class="sd">            print(&quot;All assertions passed!&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -9998,7 +9964,7 @@ The <code>p</code> attribute is initialized as a list of ones with length <code>
 The <code>pen_val</code> attribute is initialized as the natural logarithm of the
 variance of <code>nat_y</code>, multiplied by <code>n</code>, plus 1e4.
 The <code>negLnLike</code>, <code>LnDetPsi</code>, <code>mu</code>, <code>U</code>, <code>SigmaSqr</code>, and <code>Lambda</code> attributes are all set to None.
-The <code>gen</code> attribute is initialized using the <code>spacefilling</code> function with arguments <code>k</code> and <code>seed</code>.
+The <code>gen</code> attribute is initialized using the <code>SpaceFilling</code> function with arguments <code>k</code> and <code>seed</code>.
 The <code>Psi</code> attribute is initialized as a zero matrix with shape <code>(n, n)</code> and dtype <code>float64</code>.
 The <code>psi</code> attribute is initialized as a zero matrix with shape <code>(n, 1)</code>.
 The <code>one</code> attribute is initialized as a list of ones with length <code>n</code>.</p>
@@ -10162,7 +10128,7 @@ The <code>one</code> attribute is initialized as a list of ones with length <cod
 <span class="sd">    The `pen_val` attribute is initialized as the natural logarithm of the</span>
 <span class="sd">    variance of `nat_y`, multiplied by `n`, plus 1e4.</span>
 <span class="sd">    The `negLnLike`, `LnDetPsi`, `mu`, `U`, `SigmaSqr`, and `Lambda` attributes are all set to None.</span>
-<span class="sd">    The `gen` attribute is initialized using the `spacefilling` function with arguments `k` and `seed`.</span>
+<span class="sd">    The `gen` attribute is initialized using the `SpaceFilling` function with arguments `k` and `seed`.</span>
 <span class="sd">    The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.</span>
 <span class="sd">    The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.</span>
 <span class="sd">    The `one` attribute is initialized as a list of ones with length `n`.</span>
@@ -10217,7 +10183,7 @@ The <code>one</code> attribute is initialized as a list of ones with length <cod
     <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># Initialize generator</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">gen</span> <span class="o">=</span> <span class="n">spacefilling</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">gen</span> <span class="o">=</span> <span class="n">SpaceFilling</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;In initialize_matrices(): self.gen: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen</span><span class="p">)</span>
 
     <span class="c1"># Initialize matrix Psi and vector psi</span>
@@ -11399,11 +11365,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
             </td>
             <td>
               <div class="doc-md-description">
-                <p>whether <code>y</code>, <code>s</code>, neg. <code>ei</code> (negative expected improvement),
-or all three values are returned.
-Default is (for compatibility with sklearn) &ldquo;y&rdquo;. To return <code>s</code>, select &ldquo;s&rdquo;,
-to return neg. <code>ei</code>, select &ldquo;ei&rdquo;.
-To return the tuple <code>(y, s, ei)</code>, select &ldquo;all&rdquo;.</p>
+                <p>Specifies which prediction values to return. It can be &ldquo;y&rdquo;, &ldquo;s&rdquo;, &ldquo;ei&rdquo;, or &ldquo;all&rdquo;.</p>
               </div>
             </td>
             <td>
@@ -11418,50 +11380,51 @@ To return the tuple <code>(y, s, ei)</code>, select &ldquo;all&rdquo;.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>float</code></td>            <td>
+            <td>
                   <code><span title="typing.Union">Union</span>[float, <span title="typing.Tuple">Tuple</span>[float, float]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The predicted value in natural units if return_val is &ldquo;y&rdquo;.</p>
+                <p>Union[float, Tuple[float, float, float]]: Depending on <code>return_val</code>, returns the predicted value,</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-<td><code>float</code></td>            <td>
+            <td>
                   <code><span title="typing.Union">Union</span>[float, <span title="typing.Tuple">Tuple</span>[float, float]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>predicted error if return_val is &ldquo;s&rdquo;.</p>
+                <p>predicted error, expected improvement, or all.</p>
               </div>
             </td>
           </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
           <tr class="doc-section-item">
-<td><code>float</code></td>            <td>
-                  <code><span title="typing.Union">Union</span>[float, <span title="typing.Tuple">Tuple</span>[float, float]]</code>
+            <td>
+                  <code>TypeError</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>expected improvement if return_val is &ldquo;ei&rdquo;.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-<td></td>            <td>
-                  <code><span title="typing.Union">Union</span>[float, <span title="typing.Tuple">Tuple</span>[float, float]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tuple[float, float, float]:
-The predicted value in natural units, predicted error
-and expected improvement if return_val is &ldquo;all&rdquo;.</p>
+                <p>If <code>nat_X</code> is not an ndarray or doesn&rsquo;t match expected dimensions.</p>
               </div>
             </td>
           </tr>
@@ -11472,7 +11435,6 @@ and expected improvement if return_val is &ldquo;all&rdquo;.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpython.build.kriging</span> <span class="kn">import</span> <span class="n">Kriging</span>
 <span class="go">    import numpy as np</span>
-<span class="go">    import matplotlib.pyplot as plt</span>
 <span class="go">    from numpy import linspace, arange</span>
 <span class="go">    rng = np.random.RandomState(1)</span>
 <span class="go">    X = linspace(start=0, stop=10, num=1_0).reshape(-1, 1)</span>
@@ -11485,15 +11447,6 @@ and expected improvement if return_val is &ldquo;all&rdquo;.</p>
 <span class="go">    print(f&quot;mean_prediction: {mean_prediction}&quot;)</span>
 <span class="go">    print(f&quot;std_prediction: {std_prediction}&quot;)</span>
 <span class="go">    print(f&quot;s_ei: {s_ei}&quot;)</span>
-<span class="go">    mean_prediction: [-1.41991225e-08  6.48310037e-01  1.76715565e+00 -6.35226564e-01</span>
-<span class="go">                      -4.28585379e+00 -1.22301198e+00  2.49434148e+00  5.61900501e-01</span>
-<span class="go">                      -3.04558205e+00 -5.44021104e+00]</span>
-<span class="go">    std_prediction: [3.69706811e-04 2.07958787e+00 3.69706810e-04 3.69706807e-04</span>
-<span class="go">                    3.69706809e-04 2.07958584e+00 3.69706811e-04 2.60615408e+00</span>
-<span class="go">                    2.60837033e+00 3.69706811e-04]</span>
-<span class="go">    s_ei: [-0.00000000e+00 -1.02341235e-03 -0.00000000e+00 -0.00000000e+00</span>
-<span class="go">           -0.00000000e+00 -1.63799181e-02 -0.00000000e+00 -9.45766290e-03</span>
-<span class="go">           -2.53405666e-01 -1.47459347e-04]</span>
 </code></pre></div>
 
             <details class="quote">
@@ -11550,64 +11503,25 @@ and expected improvement if return_val is &ldquo;all&rdquo;.</p>
 <span class="normal">1296</span>
 <span class="normal">1297</span>
 <span class="normal">1298</span>
-<span class="normal">1299</span>
-<span class="normal">1300</span>
-<span class="normal">1301</span>
-<span class="normal">1302</span>
-<span class="normal">1303</span>
-<span class="normal">1304</span>
-<span class="normal">1305</span>
-<span class="normal">1306</span>
-<span class="normal">1307</span>
-<span class="normal">1308</span>
-<span class="normal">1309</span>
-<span class="normal">1310</span>
-<span class="normal">1311</span>
-<span class="normal">1312</span>
-<span class="normal">1313</span>
-<span class="normal">1314</span>
-<span class="normal">1315</span>
-<span class="normal">1316</span>
-<span class="normal">1317</span>
-<span class="normal">1318</span>
-<span class="normal">1319</span>
-<span class="normal">1320</span>
-<span class="normal">1321</span>
-<span class="normal">1322</span>
-<span class="normal">1323</span>
-<span class="normal">1324</span>
-<span class="normal">1325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span>
-                                                                  <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="normal">1299</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nat_X</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        self (object):</span>
-<span class="sd">            The Kriging object.</span>
-<span class="sd">        nat_X (ndarray):</span>
-<span class="sd">            Design variable to evaluate in natural units.</span>
-<span class="sd">        return_val (str):</span>
-<span class="sd">            whether `y`, `s`, neg. `ei` (negative expected improvement),</span>
-<span class="sd">            or all three values are returned.</span>
-<span class="sd">            Default is (for compatibility with sklearn) &quot;y&quot;. To return `s`, select &quot;s&quot;,</span>
-<span class="sd">            to return neg. `ei`, select &quot;ei&quot;.</span>
-<span class="sd">            To return the tuple `(y, s, ei)`, select &quot;all&quot;.</span>
+<span class="sd">        self (object): The Kriging object.</span>
+<span class="sd">        nat_X (ndarray): Design variable to evaluate in natural units.</span>
+<span class="sd">        return_val (str): Specifies which prediction values to return. It can be &quot;y&quot;, &quot;s&quot;, &quot;ei&quot;, or &quot;all&quot;.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        float:</span>
-<span class="sd">            The predicted value in natural units if return_val is &quot;y&quot;.</span>
-<span class="sd">        float:</span>
-<span class="sd">            predicted error if return_val is &quot;s&quot;.</span>
-<span class="sd">        float:</span>
-<span class="sd">            expected improvement if return_val is &quot;ei&quot;.</span>
-<span class="sd">        Tuple[float, float, float]:</span>
-<span class="sd">            The predicted value in natural units, predicted error</span>
-<span class="sd">            and expected improvement if return_val is &quot;all&quot;.</span>
+<span class="sd">        Union[float, Tuple[float, float, float]]: Depending on `return_val`, returns the predicted value,</span>
+<span class="sd">        predicted error, expected improvement, or all.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If `nat_X` is not an ndarray or doesn&#39;t match expected dimensions.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from spotpython.build.kriging import Kriging</span>
 <span class="sd">            import numpy as np</span>
-<span class="sd">            import matplotlib.pyplot as plt</span>
 <span class="sd">            from numpy import linspace, arange</span>
 <span class="sd">            rng = np.random.RandomState(1)</span>
 <span class="sd">            X = linspace(start=0, stop=10, num=1_0).reshape(-1, 1)</span>
@@ -11620,41 +11534,28 @@ and expected improvement if return_val is &ldquo;all&rdquo;.</p>
 <span class="sd">            print(f&quot;mean_prediction: {mean_prediction}&quot;)</span>
 <span class="sd">            print(f&quot;std_prediction: {std_prediction}&quot;)</span>
 <span class="sd">            print(f&quot;s_ei: {s_ei}&quot;)</span>
-<span class="sd">            mean_prediction: [-1.41991225e-08  6.48310037e-01  1.76715565e+00 -6.35226564e-01</span>
-<span class="sd">                              -4.28585379e+00 -1.22301198e+00  2.49434148e+00  5.61900501e-01</span>
-<span class="sd">                              -3.04558205e+00 -5.44021104e+00]</span>
-<span class="sd">            std_prediction: [3.69706811e-04 2.07958787e+00 3.69706810e-04 3.69706807e-04</span>
-<span class="sd">                            3.69706809e-04 2.07958584e+00 3.69706811e-04 2.60615408e+00</span>
-<span class="sd">                            2.60837033e+00 3.69706811e-04]</span>
-<span class="sd">            s_ei: [-0.00000000e+00 -1.02341235e-03 -0.00000000e+00 -0.00000000e+00</span>
-<span class="sd">                   -0.00000000e+00 -1.63799181e-02 -0.00000000e+00 -9.45766290e-03</span>
-<span class="sd">                   -2.53405666e-01 -1.47459347e-04]</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check for the shape and the type of the Input</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nat_X</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">nat_X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">X</span> <span class="o">=</span> <span class="n">repair_non_numeric</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;13.1: Input to predict was not convertible to the size of X&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;type of the given input is an </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">nat_X</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead of an ndarray&quot;</span><span class="p">)</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">ei</span> <span class="o">=</span> <span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ei</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_coded</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nat_X</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected an ndarray, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">nat_X</span><span class="p">)</span><span class="si">}</span><span class="s2"> instead.&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">nat_X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">repair_non_numeric</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input to predict was not convertible to the size of X&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ei</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_coded_batch</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">y</span>
     <span class="k">elif</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;s&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">s</span>
     <span class="k">elif</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;ei&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">ei</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">ei</span>
+    <span class="k">elif</span> <span class="n">return_val</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">-</span><span class="n">ei</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">ei</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid return_val: </span><span class="si">{</span><span class="n">return_val</span><span class="si">}</span><span class="s2">. Supported values are &#39;y&#39;, &#39;s&#39;, &#39;ei&#39;, &#39;all&#39;.&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -11672,9 +11573,8 @@ and expected improvement if return_val is &ldquo;all&rdquo;.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].
-The error is returned as well.
-The method is used in <code>predict</code>.</p>
+      <p>Kriging prediction of one point in coded units as described in (2.20) in [Forr08a].
+The error is returned as well. The method is used in <code>predict</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -11724,38 +11624,18 @@ The method is used in <code>predict</code>.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>f</code></td>            <td>
-                  <code>float</code>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[float, float, float]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Predicted value in coded units.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-<td><code>SSqr</code></td>            <td>
-                  <code>float</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Predicted error.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-<td><code>EI</code></td>            <td>
-                  <code>float</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Expected improvement.</p>
+                <p>Tuple[float, float, float]: Predicted value, predicted error, and expected improvement.</p>
               </div>
             </td>
           </tr>
@@ -11765,14 +11645,13 @@ The method is used in <code>predict</code>.</p>
 
 <details class="note" open>
   <summary>Note</summary>
-  <p><code>self.mu</code> and <code>self.SigmaSqr</code> are computed in <code>likelihood</code>, not here.
-See also [Forr08a, p.60].</p>
+  <p>Uses attributes such as <code>self.mu</code> and <code>self.SigmaSqr</code> that are expected
+to be calculated by <code>likelihood</code>.</p>
 </details>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpython.build.kriging</span> <span class="kn">import</span> <span class="n">Kriging</span>
 <span class="go">    import numpy as np</span>
-<span class="go">    import matplotlib.pyplot as plt</span>
 <span class="go">    from numpy import linspace, arange, empty</span>
 <span class="go">    rng = np.random.RandomState(1)</span>
 <span class="go">    X = linspace(start=0, stop=10, num=10).reshape(-1, 1)</span>
@@ -11786,25 +11665,44 @@ See also [Forr08a, p.60].</p>
 <span class="go">    s = empty(n, dtype=float)</span>
 <span class="go">    ei = empty(n, dtype=float)</span>
 <span class="go">    for i in range(n):</span>
-<span class="go">        x = X[i, :]</span>
-<span class="go">        y[i], s[i], ei[i] = S.predict_coded(x)</span>
+<span class="go">        y_coded, s_coded, ei_coded = S.predict_coded(X[i, :])</span>
+<span class="go">        y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()</span>
+<span class="go">        s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()</span>
+<span class="go">        ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()</span>
 <span class="go">    print(f&quot;y: {y}&quot;)</span>
 <span class="go">    print(f&quot;s: {s}&quot;)</span>
 <span class="go">    print(f&quot;ei: {-1.0*ei}&quot;)</span>
-<span class="go">        y: [-1.41991223e-08  6.48310075e-01  1.76715565e+00 -6.35226564e-01</span>
-<span class="go">        -4.28585379e+00 -1.22301201e+00  2.49434148e+00  5.61900546e-01</span>
-<span class="go">        -3.04558209e+00 -5.44021104e+00]</span>
-<span class="go">        s: [3.69706810e-04 2.07958781e+00 3.69706812e-04 3.69706808e-04</span>
-<span class="go">        3.69706812e-04 2.07958578e+00 3.69706810e-04 2.60615406e+00</span>
-<span class="go">        2.60837032e+00 3.69706813e-04]</span>
-<span class="go">        ei: [-0.00000000e+00 -1.02341195e-03 -0.00000000e+00 -0.00000000e+00</span>
-<span class="go">        -0.00000000e+00 -1.63799157e-02 -0.00000000e+00 -9.45766188e-03</span>
-<span class="go">        -2.53405668e-01 -1.47459348e-04]</span>
 </code></pre></div>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1327</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1301</span>
+<span class="normal">1302</span>
+<span class="normal">1303</span>
+<span class="normal">1304</span>
+<span class="normal">1305</span>
+<span class="normal">1306</span>
+<span class="normal">1307</span>
+<span class="normal">1308</span>
+<span class="normal">1309</span>
+<span class="normal">1310</span>
+<span class="normal">1311</span>
+<span class="normal">1312</span>
+<span class="normal">1313</span>
+<span class="normal">1314</span>
+<span class="normal">1315</span>
+<span class="normal">1316</span>
+<span class="normal">1317</span>
+<span class="normal">1318</span>
+<span class="normal">1319</span>
+<span class="normal">1320</span>
+<span class="normal">1321</span>
+<span class="normal">1322</span>
+<span class="normal">1323</span>
+<span class="normal">1324</span>
+<span class="normal">1325</span>
+<span class="normal">1326</span>
+<span class="normal">1327</span>
 <span class="normal">1328</span>
 <span class="normal">1329</span>
 <span class="normal">1330</span>
@@ -11835,9 +11733,139 @@ See also [Forr08a, p.60].</p>
 <span class="normal">1355</span>
 <span class="normal">1356</span>
 <span class="normal">1357</span>
-<span class="normal">1358</span>
-<span class="normal">1359</span>
-<span class="normal">1360</span>
+<span class="normal">1358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_coded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Kriging prediction of one point in coded units as described in (2.20) in [Forr08a].</span>
+<span class="sd">    The error is returned as well. The method is used in `predict`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        self (object): The Kriging object.</span>
+<span class="sd">        cod_x (np.ndarray): Point in coded units to make prediction at.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple[float, float, float]: Predicted value, predicted error, and expected improvement.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        Uses attributes such as `self.mu` and `self.SigmaSqr` that are expected</span>
+<span class="sd">        to be calculated by `likelihood`.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from spotpython.build.kriging import Kriging</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from numpy import linspace, arange, empty</span>
+<span class="sd">            rng = np.random.RandomState(1)</span>
+<span class="sd">            X = linspace(start=0, stop=10, num=10).reshape(-1, 1)</span>
+<span class="sd">            y = np.squeeze(X * np.sin(X))</span>
+<span class="sd">            training_indices = rng.choice(arange(y.size), size=6, replace=False)</span>
+<span class="sd">            X_train, y_train = X[training_indices], y[training_indices]</span>
+<span class="sd">            S = Kriging(name=&#39;kriging&#39;, seed=124)</span>
+<span class="sd">            S.fit(X_train, y_train)</span>
+<span class="sd">            n = X.shape[0]</span>
+<span class="sd">            y = empty(n, dtype=float)</span>
+<span class="sd">            s = empty(n, dtype=float)</span>
+<span class="sd">            ei = empty(n, dtype=float)</span>
+<span class="sd">            for i in range(n):</span>
+<span class="sd">                y_coded, s_coded, ei_coded = S.predict_coded(X[i, :])</span>
+<span class="sd">                y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()</span>
+<span class="sd">                s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()</span>
+<span class="sd">                ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()</span>
+<span class="sd">            print(f&quot;y: {y}&quot;)</span>
+<span class="sd">            print(f&quot;s: {s}&quot;)</span>
+<span class="sd">            print(f&quot;ei: {-1.0*ei}&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">build_psi_vec</span><span class="p">(</span><span class="n">cod_x</span><span class="p">)</span>
+    <span class="n">mu_adj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span>
+    <span class="n">psi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span>
+
+    <span class="c1"># Calculate the prediction</span>
+    <span class="n">U_T_inv</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">one</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mu_adj</span><span class="p">))</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">mu_adj</span> <span class="o">+</span> <span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">U_T_inv</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Calculate the estimated error</span>
+    <span class="n">SSqr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SigmaSqr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">Lambda</span> <span class="o">-</span> <span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">psi</span><span class="p">))))</span>
+    <span class="n">SSqr</span> <span class="o">=</span> <span class="n">power</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">SSqr</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Calculate expected improvement</span>
+    <span class="n">EI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_imp</span><span class="p">(</span><span class="n">y0</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">s0</span><span class="o">=</span><span class="n">SSqr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">SSqr</span><span class="p">,</span> <span class="n">EI</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="spotpython.build.kriging.Kriging.predict_coded_batch" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">predict_coded_batch</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></code>
+
+<a href="#spotpython.build.kriging.Kriging.predict_coded_batch" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Vectorized prediction for batch input using coded units.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>X</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Input array of coded points.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.ndarray">ndarray</span>, <span title="numpy.ndarray">ndarray</span>, <span title="numpy.ndarray">ndarray</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tuple[np.ndarray, np.ndarray, np.ndarray]:
+Arrays of predicted values, predicted errors, and expected improvements.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1360</span>
 <span class="normal">1361</span>
 <span class="normal">1362</span>
 <span class="normal">1363</span>
@@ -11859,80 +11887,29 @@ See also [Forr08a, p.60].</p>
 <span class="normal">1379</span>
 <span class="normal">1380</span>
 <span class="normal">1381</span>
-<span class="normal">1382</span>
-<span class="normal">1383</span>
-<span class="normal">1384</span>
-<span class="normal">1385</span>
-<span class="normal">1386</span>
-<span class="normal">1387</span>
-<span class="normal">1388</span>
-<span class="normal">1389</span>
-<span class="normal">1390</span>
-<span class="normal">1391</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_coded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">1382</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_coded_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Kriging prediction of one point in the coded units as described in (2.20) in [Forr08a].</span>
-<span class="sd">    The error is returned as well.</span>
-<span class="sd">    The method is used in `predict`.</span>
+<span class="sd">    Vectorized prediction for batch input using coded units.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        self (object):</span>
-<span class="sd">            The Kriging object.</span>
-<span class="sd">        cod_x (np.ndarray):</span>
-<span class="sd">            Point in coded units to make prediction at.</span>
+<span class="sd">        X (np.ndarray): Input array of coded points.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        f (float): Predicted value in coded units.</span>
-<span class="sd">        SSqr (float): Predicted error.</span>
-<span class="sd">        EI (float): Expected improvement.</span>
-
-<span class="sd">    Note:</span>
-<span class="sd">        `self.mu` and `self.SigmaSqr` are computed in `likelihood`, not here.</span>
-<span class="sd">        See also [Forr08a, p.60].</span>
-
-<span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from spotpython.build.kriging import Kriging</span>
-<span class="sd">            import numpy as np</span>
-<span class="sd">            import matplotlib.pyplot as plt</span>
-<span class="sd">            from numpy import linspace, arange, empty</span>
-<span class="sd">            rng = np.random.RandomState(1)</span>
-<span class="sd">            X = linspace(start=0, stop=10, num=10).reshape(-1, 1)</span>
-<span class="sd">            y = np.squeeze(X * np.sin(X))</span>
-<span class="sd">            training_indices = rng.choice(arange(y.size), size=6, replace=False)</span>
-<span class="sd">            X_train, y_train = X[training_indices], y[training_indices]</span>
-<span class="sd">            S = Kriging(name=&#39;kriging&#39;, seed=124)</span>
-<span class="sd">            S.fit(X_train, y_train)</span>
-<span class="sd">            n = X.shape[0]</span>
-<span class="sd">            y = empty(n, dtype=float)</span>
-<span class="sd">            s = empty(n, dtype=float)</span>
-<span class="sd">            ei = empty(n, dtype=float)</span>
-<span class="sd">            for i in range(n):</span>
-<span class="sd">                x = X[i, :]</span>
-<span class="sd">                y[i], s[i], ei[i] = S.predict_coded(x)</span>
-<span class="sd">            print(f&quot;y: {y}&quot;)</span>
-<span class="sd">            print(f&quot;s: {s}&quot;)</span>
-<span class="sd">            print(f&quot;ei: {-1.0*ei}&quot;)</span>
-<span class="sd">                y: [-1.41991223e-08  6.48310075e-01  1.76715565e+00 -6.35226564e-01</span>
-<span class="sd">                -4.28585379e+00 -1.22301201e+00  2.49434148e+00  5.61900546e-01</span>
-<span class="sd">                -3.04558209e+00 -5.44021104e+00]</span>
-<span class="sd">                s: [3.69706810e-04 2.07958781e+00 3.69706812e-04 3.69706808e-04</span>
-<span class="sd">                3.69706812e-04 2.07958578e+00 3.69706810e-04 2.60615406e+00</span>
-<span class="sd">                2.60837032e+00 3.69706813e-04]</span>
-<span class="sd">                ei: [-0.00000000e+00 -1.02341195e-03 -0.00000000e+00 -0.00000000e+00</span>
-<span class="sd">                -0.00000000e+00 -1.63799157e-02 -0.00000000e+00 -9.45766188e-03</span>
-<span class="sd">                -2.53405668e-01 -1.47459348e-04]</span>
+<span class="sd">        Tuple[np.ndarray, np.ndarray, np.ndarray]:</span>
+<span class="sd">            Arrays of predicted values, predicted errors, and expected improvements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">build_psi_vec</span><span class="p">(</span><span class="n">cod_x</span><span class="p">)</span>
-    <span class="n">U_T_inv</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nat_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">one</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mu</span><span class="p">))</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">U_T_inv</span><span class="p">))</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise</span><span class="p">:</span>
-        <span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">Lambda</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="c1"># Error in [Forr08a, p.87]:</span>
-    <span class="n">SSqr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SigmaSqr</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">Lambda</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">psi</span><span class="p">))))</span>
-    <span class="n">SSqr</span> <span class="o">=</span> <span class="n">power</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">SSqr</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">0.5</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">EI</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp_imp</span><span class="p">(</span><span class="n">y0</span><span class="o">=</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s0</span><span class="o">=</span><span class="n">SSqr</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SSqr</span><span class="p">,</span> <span class="n">EI</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">ei</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">y_coded</span><span class="p">,</span> <span class="n">s_coded</span><span class="p">,</span> <span class="n">ei_coded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_coded</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_coded</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">y_coded</span><span class="p">)</span> <span class="k">else</span> <span class="n">y_coded</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">s_coded</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">s_coded</span><span class="p">)</span> <span class="k">else</span> <span class="n">s_coded</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">ei</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ei_coded</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">ei_coded</span><span class="p">)</span> <span class="k">else</span> <span class="n">ei_coded</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ei</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -12020,7 +11997,9 @@ being considered (<code>noise</code>).</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">241</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
 <span class="normal">242</span>
 <span class="normal">243</span>
 <span class="normal">244</span>
@@ -12060,9 +12039,7 @@ being considered (<code>noise</code>).</p>
 <span class="normal">278</span>
 <span class="normal">279</span>
 <span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_de_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_de_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Determine search bounds for model_optimizer, e.g., differential evolution.</span>
 <span class="sd">    This method sets the attribute `de_bounds` of the object to a list of lists,</span>
@@ -12808,7 +12785,22 @@ and Lambda (if noise is True) to the spot_writer object.</p>
 </details>
             <details class="quote">
               <summary>Source code in <code>spotpython/build/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1471</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1456</span>
+<span class="normal">1457</span>
+<span class="normal">1458</span>
+<span class="normal">1459</span>
+<span class="normal">1460</span>
+<span class="normal">1461</span>
+<span class="normal">1462</span>
+<span class="normal">1463</span>
+<span class="normal">1464</span>
+<span class="normal">1465</span>
+<span class="normal">1466</span>
+<span class="normal">1467</span>
+<span class="normal">1468</span>
+<span class="normal">1469</span>
+<span class="normal">1470</span>
+<span class="normal">1471</span>
 <span class="normal">1472</span>
 <span class="normal">1473</span>
 <span class="normal">1474</span>
@@ -12824,22 +12816,7 @@ and Lambda (if noise is True) to the spot_writer object.</p>
 <span class="normal">1484</span>
 <span class="normal">1485</span>
 <span class="normal">1486</span>
-<span class="normal">1487</span>
-<span class="normal">1488</span>
-<span class="normal">1489</span>
-<span class="normal">1490</span>
-<span class="normal">1491</span>
-<span class="normal">1492</span>
-<span class="normal">1493</span>
-<span class="normal">1494</span>
-<span class="normal">1495</span>
-<span class="normal">1496</span>
-<span class="normal">1497</span>
-<span class="normal">1498</span>
-<span class="normal">1499</span>
-<span class="normal">1500</span>
-<span class="normal">1501</span>
-<span class="normal">1502</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">weighted_exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">1487</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">weighted_exp_imp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cod_x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Weighted expected improvement. Currently not used in `spotpython`</span>
 

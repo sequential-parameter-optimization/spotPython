@@ -1401,6 +1401,8 @@
       
         
       
+        
+      
     
     
       
@@ -1431,6 +1433,27 @@
             hyperparameters
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hyperparameters/architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3944,9 +3967,7 @@ It can be selected by setting <code>fun_control["eval"] = "evaluate_hold_out"</c
 <span class="normal">102</span>
 <span class="normal">103</span>
 <span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_hold_out</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_hold_out</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate a model using hold-out validation.</span>
 <span class="sd">    A validation set is created from the training set.</span>
 <span class="sd">    The test set is not used in this evaluation.</span>
@@ -3984,9 +4005,7 @@ It can be selected by setting <code>fun_control["eval"] = "evaluate_hold_out"</c
         <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;scaler&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">scaler</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;scaler&quot;</span><span class="p">]()</span>
             <span class="n">X_train</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
-            <span class="n">X_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-                <span class="n">X_train</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">target_column</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
-            <span class="p">)</span>  <span class="c1"># Maintain column names</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">train_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">target_column</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>  <span class="c1"># Maintain column names</span>
         <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in evaluate_hold_out(). Call to fit() failed. </span><span class="si">{</span><span class="n">err</span><span class="si">=}</span><span class="s2">, </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">err</span><span class="p">)</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -4199,7 +4218,9 @@ If fun_control[&ldquo;eval&rdquo;] == &ldquo;eval_oob_score&rdquo;.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/sklearn/traintest.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">134</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
@@ -4210,9 +4231,7 @@ If fun_control[&ldquo;eval&rdquo;] == &ldquo;eval_oob_score&rdquo;.</p>
 <span class="normal">142</span>
 <span class="normal">143</span>
 <span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_model_oob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">):</span>
+<span class="normal">145</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_model_oob</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Out-of-bag evaluation (Only for RandomForestClassifier).</span>
 <span class="sd">    If fun_control[&quot;eval&quot;] == &quot;eval_oob_score&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

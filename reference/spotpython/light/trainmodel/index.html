@@ -1401,6 +1401,8 @@
       
         
       
+        
+      
     
     
       
@@ -1431,6 +1433,27 @@
             hyperparameters
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hyperparameters/architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4021,7 +4044,139 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
-<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters.</span>
 
@@ -4118,16 +4273,123 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="c1"># print(f&quot;train_model(): Batch size: {config[&#39;batch_size&#39;]}&quot;)</span>
 
     <span class="c1"># Callbacks</span>
-    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="p">]</span>
+    <span class="c1">#</span>
+    <span class="c1"># EarlyStopping:</span>
+    <span class="c1"># Stop training when a monitored quantity has stopped improving.</span>
+    <span class="c1"># The EarlyStopping callback runs at the end of every validation epoch by default.</span>
+    <span class="c1"># However, the frequency of validation can be modified by setting various parameters</span>
+    <span class="c1"># in the Trainer, for example check_val_every_n_epoch and val_check_interval.</span>
+    <span class="c1"># It must be noted that the patience parameter counts the number of validation checks</span>
+    <span class="c1"># with no improvement, and not the number of training epochs.</span>
+    <span class="c1"># Therefore, with parameters check_val_every_n_epoch=10 and patience=3,</span>
+    <span class="c1"># the trainer will perform at least 40 training epochs before being stopped.</span>
+    <span class="c1"># Args:</span>
+    <span class="c1"># - monitor:</span>
+    <span class="c1">#   Quantity to be monitored. Default: &#39;val_loss&#39;.</span>
+    <span class="c1"># - patience:</span>
+    <span class="c1">#   Number of validation checks with no improvement after which training will be stopped.</span>
+    <span class="c1">#   In spotpython, this is a hyperparameter.</span>
+    <span class="c1"># - mode (str):</span>
+    <span class="c1">#   one of {min, max}. If save_top_k != 0, the decision to overwrite the current save file</span>
+    <span class="c1">#   is made based on either the maximization or the minimization of the monitored quantity.</span>
+    <span class="c1">#   For &#39;val_acc&#39;, this should be &#39;max&#39;, for &#39;val_loss&#39; this should be &#39;min&#39;, etc.</span>
+    <span class="c1"># - strict:</span>
+    <span class="c1">#   Set to False.</span>
+    <span class="c1"># - verbose:</span>
+    <span class="c1">#   If True, prints a message to the logger.</span>
+    <span class="c1">#</span>
+    <span class="c1"># ModelCheckpoint:</span>
+    <span class="c1"># Save the model periodically by monitoring a quantity.</span>
+    <span class="c1"># Every metric logged with log() or log_dict() is a candidate for the monitor key.</span>
+    <span class="c1"># spotpython uses ModelCheckpoint if timestamp is set to False. In this case, the</span>
+    <span class="c1"># config_id has no timestamp and ends with the unique string &quot;_TRAIN&quot;. This</span>
+    <span class="c1"># enables loading the model from a checkpoint, because the config_id is unique.</span>
+    <span class="c1"># Args:</span>
+    <span class="c1"># - dirpath:</span>
+    <span class="c1">#   Path to the directory where the checkpoints will be saved.</span>
+    <span class="c1"># - monitor (str):</span>
+    <span class="c1">#   Quantity to monitor.</span>
+    <span class="c1">#   By default it is None which saves a checkpoint only for the last epoch.</span>
+    <span class="c1"># - verbose (bool):</span>
+    <span class="c1">#   If True, prints a message to the logger.</span>
+    <span class="c1"># - save_last (Union[bool, Literal[&#39;link&#39;], None]):</span>
+    <span class="c1">#   When True, saves a last.ckpt copy whenever a checkpoint file gets saved.</span>
+    <span class="c1">#   Can be set to &#39;link&#39; on a local filesystem to create a symbolic link.</span>
+    <span class="c1">#   This allows accessing the latest checkpoint in a deterministic manner.</span>
+    <span class="c1">#   Default: None.</span>
+
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">timestamp</span><span class="p">:</span>
         <span class="c1"># add ModelCheckpoint only if timestamp is False</span>
-        <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">ModelCheckpoint</span><span class="p">(</span><span class="n">dirpath</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">),</span> <span class="n">save_last</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="p">)</span>  <span class="c1"># Save the last checkpoint</span>
+        <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">)</span>
+        <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ModelCheckpoint</span><span class="p">(</span><span class="n">dirpath</span><span class="o">=</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">save_last</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>  <span class="c1"># Save the last checkpoint</span>
 
-    <span class="c1"># Init trainer</span>
+    <span class="c1"># Tensorboard logger. The tensorboard is passed to the trainer.</span>
+    <span class="c1"># See: https://lightning.ai/docs/pytorch/stable/extensions/generated/lightning.pytorch.loggers.TensorBoardLogger.html</span>
+    <span class="c1"># It uses the following arguments:</span>
+    <span class="c1"># Args:</span>
+    <span class="c1"># - save_dir:</span>
+    <span class="c1">#   Where to save logs. Can be specified via fun_control[&quot;TENSORBOARD_PATH&quot;]</span>
+    <span class="c1"># - name:</span>
+    <span class="c1">#   Experiment name. Defaults to &#39;default&#39;.</span>
+    <span class="c1">#   If it is the empty string then no per-experiment subdirectory is used.</span>
+    <span class="c1">#   Changed in spotpython 0.17.2 to the empty string.</span>
+    <span class="c1"># - version:</span>
+    <span class="c1">#   Experiment version. If version is not specified the logger inspects the save directory</span>
+    <span class="c1">#   for existing versions, then automatically assigns the next available version.</span>
+    <span class="c1">#   If it is a string then it is used as the run-specific subdirectory name,</span>
+    <span class="c1">#   otherwise &#39;version_${version}&#39; is used. spotpython uses the config_id as version.</span>
+    <span class="c1"># - log_graph (bool):</span>
+    <span class="c1">#   Adds the computational graph to tensorboard.</span>
+    <span class="c1">#   This requires that the user has defined the self.example_input_array</span>
+    <span class="c1">#   attribute in their model. Set in spotpython to fun_control[&quot;log_graph&quot;].</span>
+    <span class="c1"># - default_hp_metric (bool):</span>
+    <span class="c1">#   Enables a placeholder metric with key hp_metric when log_hyperparams is called</span>
+    <span class="c1">#   without a metric (otherwise calls to log_hyperparams without a metric are ignored).</span>
+    <span class="c1">#   spotpython sets this to True.</span>
+
+    <span class="c1"># Init trainer. See: https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.trainer.trainer.Trainer.html#lightning.pytorch.trainer.trainer.Trainer</span>
+    <span class="c1"># Args used by spotpython (there are more):</span>
+    <span class="c1"># - default_root_dir: Default path for logs and weights when no logger/ckpt_callback passed.</span>
+    <span class="c1">#   Default: os.getcwd(). Can be remote file paths such as s3://mybucket/path or ‘hdfs://path/’</span>
+    <span class="c1"># - max_epochs: Stop training once this number of epochs is reached.</span>
+    <span class="c1">#   Disabled by default (None).</span>
+    <span class="c1">#   If both max_epochs and max_steps are not specified, defaults to max_epochs = 1000.</span>
+    <span class="c1">#   To enable infinite training, set max_epochs = -1.</span>
+    <span class="c1"># - accelerator: Supports passing different accelerator types</span>
+    <span class="c1">#   (“cpu”, “gpu”, “tpu”, “hpu”, “mps”, “auto”) as well as custom accelerator instances.</span>
+    <span class="c1"># - devices: The devices to use. Can be set to a positive number (int or str),</span>
+    <span class="c1">#   a sequence of device indices (list or str), the value -1 to indicate all available devices</span>
+    <span class="c1">#   should be used, or &quot;auto&quot; for automatic selection based on the chosen accelerator.</span>
+    <span class="c1">#   Default: &quot;auto&quot;.</span>
+    <span class="c1"># - strategy: Supports different training strategies with aliases as well custom strategies.</span>
+    <span class="c1">#   Default: &quot;auto&quot;.</span>
+    <span class="c1"># - num_nodes: Number of GPU nodes for distributed training. Default: 1.</span>
+    <span class="c1"># - precision: Double precision (64, ‘64’ or ‘64-true’), full precision (32, ‘32’ or ‘32-true’),</span>
+    <span class="c1">#   16bit mixed precision (16, ‘16’, ‘16-mixed’) or bfloat16 mixed precision (‘bf16’, ‘bf16-mixed’).</span>
+    <span class="c1">#   Can be used on CPU, GPU, TPUs, or HPUs. Default: &#39;32-true&#39;.</span>
+    <span class="c1"># - logger: Logger (or iterable collection of loggers) for experiment tracking.</span>
+    <span class="c1">#   A True value uses the default TensorBoardLogger if it is installed, otherwise CSVLogger.</span>
+    <span class="c1">#   False will disable logging. If multiple loggers are provided, local files (checkpoints,</span>
+    <span class="c1">#   profiler traces, etc.) are saved in the log_dir of the first logger. Default: True.</span>
+    <span class="c1"># - callbacks: List of callbacks to enable during training.Default: None.</span>
+    <span class="c1"># - enable_progress_bar: If True, enables the progress bar.</span>
+    <span class="c1">#   Whether to enable to progress bar by default. Default: True.</span>
+    <span class="c1"># - num_sanity_val_steps:</span>
+    <span class="c1">#   Sanity check runs n validation batches before starting the training routine.</span>
+    <span class="c1">#   Set it to -1 to run all batches in all validation dataloaders. Default: 2.</span>
+    <span class="c1"># - log_every_n_steps:</span>
+    <span class="c1">#   How often to log within steps. Default: 50.</span>
+    <span class="c1"># - gradient_clip_val:</span>
+    <span class="c1">#   The value at which to clip gradients. Passing gradient_clip_val=None</span>
+    <span class="c1">#   disables gradient clipping. If using Automatic Mixed Precision (AMP),</span>
+    <span class="c1">#   the gradients will be unscaled before. Default: None.</span>
+    <span class="c1"># - gradient_clip_algorithm (str):</span>
+    <span class="c1">#   The gradient clipping algorithm to use.</span>
+    <span class="c1">#   Pass gradient_clip_algorithm=&quot;value&quot; to clip by value,</span>
+    <span class="c1">#   and gradient_clip_algorithm=&quot;norm&quot; to clip by norm.</span>
+    <span class="c1">#   By default it will be set to &quot;norm&quot;.</span>
+
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">Trainer</span><span class="p">(</span>
         <span class="c1"># Where to save models</span>
         <span class="n">default_root_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">),</span>
@@ -4137,21 +4399,46 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
         <span class="n">strategy</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;strategy&quot;</span><span class="p">],</span>
         <span class="n">num_nodes</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;num_nodes&quot;</span><span class="p">],</span>
         <span class="n">precision</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;precision&quot;</span><span class="p">],</span>
-        <span class="n">logger</span><span class="o">=</span><span class="n">TensorBoardLogger</span><span class="p">(</span>
-            <span class="n">save_dir</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;TENSORBOARD_PATH&quot;</span><span class="p">],</span>
-            <span class="n">version</span><span class="o">=</span><span class="n">config_id</span><span class="p">,</span>
-            <span class="n">default_hp_metric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">log_graph</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;log_graph&quot;</span><span class="p">],</span>
-        <span class="p">),</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">TensorBoardLogger</span><span class="p">(</span><span class="n">save_dir</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;TENSORBOARD_PATH&quot;</span><span class="p">],</span> <span class="n">version</span><span class="o">=</span><span class="n">config_id</span><span class="p">,</span> <span class="n">default_hp_metric</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_graph</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;log_graph&quot;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
         <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
         <span class="n">enable_progress_bar</span><span class="o">=</span><span class="n">enable_progress_bar</span><span class="p">,</span>
+        <span class="n">num_sanity_val_steps</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;num_sanity_val_steps&quot;</span><span class="p">],</span>
+        <span class="n">log_every_n_steps</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;log_every_n_steps&quot;</span><span class="p">],</span>
+        <span class="n">gradient_clip_val</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gradient_clip_algorithm</span><span class="o">=</span><span class="s2">&quot;norm&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="c1"># Pass the datamodule as arg to trainer.fit to override model hooks :)</span>
-    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">)</span>
+
+    <span class="c1"># Fit the model</span>
+    <span class="c1"># Args:</span>
+    <span class="c1"># - model: Model to fit</span>
+    <span class="c1"># - datamodule: A LightningDataModule that defines the train_dataloader</span>
+    <span class="c1">#   hook. Pass the datamodule as arg to trainer.fit to override model hooks # :)</span>
+    <span class="c1"># - ckpt_path: Path/URL of the checkpoint from which training is resumed.</span>
+    <span class="c1">#   Could also be one of two special keywords &quot;last&quot; and &quot;hpc&quot;.</span>
+    <span class="c1">#   If there is no checkpoint file at the path, an exception is raised.</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
     <span class="c1"># Test best model on validation and test set</span>
-    <span class="c1"># result = trainer.validate(model=model, datamodule=dm, ckpt_path=&quot;last&quot;)</span>
+
     <span class="n">verbose</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;verbosity&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># Validate the model</span>
+    <span class="c1"># Perform one evaluation epoch over the validation set.</span>
+    <span class="c1"># Args:</span>
+    <span class="c1"># - model: The model to validate.</span>
+    <span class="c1"># - datamodule: A LightningDataModule that defines the val_dataloader hook.</span>
+    <span class="c1"># - verbose: If True, prints the validation results.</span>
+    <span class="c1"># - ckpt_path: Path to a specific checkpoint to load for validation.</span>
+    <span class="c1">#   Either &quot;best&quot;, &quot;last&quot;, &quot;hpc&quot; or path to the checkpoint you wish to validate.</span>
+    <span class="c1">#   If None and the model instance was passed, use the current weights.</span>
+    <span class="c1">#   Otherwise, the best model checkpoint from the previous trainer.fit call will</span>
+    <span class="c1">#   be loaded if a checkpoint callback is configured.</span>
+    <span class="c1"># Returns:</span>
+    <span class="c1"># - List of dictionaries with metrics logged during the validation phase,</span>
+    <span class="c1">#   e.g., in model- or callback hooks like validation_step() etc.</span>
+    <span class="c1">#   The length of the list corresponds to the number of validation dataloaders used.</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
     <span class="c1"># unlist the result (from a list of one dict)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train_model result: </span><span class="si">{</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

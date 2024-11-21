@@ -1481,6 +1481,8 @@
       
         
       
+        
+      
     
     
       
@@ -1511,6 +1513,27 @@
             hyperparameters
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../hyperparameters/architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    architecture
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -4058,7 +4081,17 @@
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Lightning.</span>
 
@@ -4147,32 +4180,42 @@
 <span class="sd">                array containing the evaluation results.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from spotpython.utils.init import fun_control_init</span>
-<span class="sd">                from spotpython.light.regression.netlightregression import NetLightRegression</span>
-<span class="sd">                from spotpython.hyperdict.light_hyper_dict import LightHyperDict</span>
-<span class="sd">                from spotpython.hyperparameters.values import (add_core_model_to_fun_control,</span>
-<span class="sd">                    get_default_hyperparameters_as_array)</span>
-<span class="sd">                from spotpython.fun.hyperlight import HyperLight</span>
-<span class="sd">                from spotpython.data.diabetes import Diabetes</span>
-<span class="sd">                from spotpython.hyperparameters.values import set_control_key_value</span>
+<span class="sd">            &gt;&gt;&gt; from math import inf</span>
 <span class="sd">                import numpy as np</span>
+<span class="sd">                from spotpython.data.diabetes import Diabetes</span>
+<span class="sd">                from spotpython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">                from spotpython.fun.hyperlight import HyperLight</span>
+<span class="sd">                from spotpython.utils.init import fun_control_init</span>
+<span class="sd">                from spotpython.utils.eda import gen_design_table</span>
+<span class="sd">                from spotpython.spot import spot</span>
+<span class="sd">                from spotpython.hyperparameters.values import get_default_hyperparameters_as_array</span>
+<span class="sd">                PREFIX=&quot;000&quot;</span>
+<span class="sd">                data_set = Diabetes()</span>
 <span class="sd">                fun_control = fun_control_init(</span>
+<span class="sd">                    PREFIX=PREFIX,</span>
+<span class="sd">                    save_experiment=True,</span>
+<span class="sd">                    fun_evals=inf,</span>
+<span class="sd">                    max_time=1,</span>
+<span class="sd">                    data_set = data_set,</span>
+<span class="sd">                    core_model_name=&quot;light.regression.NNLinearRegressor&quot;,</span>
+<span class="sd">                    hyperdict=LightHyperDict,</span>
 <span class="sd">                    _L_in=10,</span>
-<span class="sd">                    _L_out=1,)</span>
-<span class="sd">                dataset = Diabetes()</span>
-<span class="sd">                set_control_key_value(control_dict=fun_control,</span>
-<span class="sd">                          key=&quot;data_set&quot;,</span>
-<span class="sd">                          value=dataset)</span>
-<span class="sd">                add_core_model_to_fun_control(core_model=NetLightRegression,</span>
-<span class="sd">                                            fun_control=fun_control,</span>
-<span class="sd">                                            hyper_dict=LightHyperDict)</span>
-<span class="sd">                hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="sd">                    _L_out=1,</span>
+<span class="sd">                    TENSORBOARD_CLEAN=True,</span>
+<span class="sd">                    tensorboard_log=True,</span>
+<span class="sd">                    seed=42,)</span>
+<span class="sd">                print(gen_design_table(fun_control))</span>
 <span class="sd">                X = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="sd">                # set epochs to 2^8:</span>
+<span class="sd">                X[0, 1] = 8</span>
+<span class="sd">                # set patience to 2^10:</span>
+<span class="sd">                X[0, 7] = 10</span>
+<span class="sd">                print(f&quot;X: {X}&quot;)</span>
 <span class="sd">                # combine X and X to a np.array with shape (2, n_hyperparams)</span>
 <span class="sd">                # so that two values are returned</span>
 <span class="sd">                X = np.vstack((X, X))</span>
+<span class="sd">                hyper_light = HyperLight(seed=125, log_level=50)</span>
 <span class="sd">                hyper_light.fun(X, fun_control)</span>
-<span class="sd">                array([27462.84179688, 20990.08007812])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">)</span>
@@ -4521,32 +4564,42 @@ input array with valid shape.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpython.utils.init</span> <span class="kn">import</span> <span class="n">fun_control_init</span>
-<span class="go">    from spotpython.light.regression.netlightregression import NetLightRegression</span>
-<span class="go">    from spotpython.hyperdict.light_hyper_dict import LightHyperDict</span>
-<span class="go">    from spotpython.hyperparameters.values import (add_core_model_to_fun_control,</span>
-<span class="go">        get_default_hyperparameters_as_array)</span>
-<span class="go">    from spotpython.fun.hyperlight import HyperLight</span>
-<span class="go">    from spotpython.data.diabetes import Diabetes</span>
-<span class="go">    from spotpython.hyperparameters.values import set_control_key_value</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">inf</span>
 <span class="go">    import numpy as np</span>
+<span class="go">    from spotpython.data.diabetes import Diabetes</span>
+<span class="go">    from spotpython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="go">    from spotpython.fun.hyperlight import HyperLight</span>
+<span class="go">    from spotpython.utils.init import fun_control_init</span>
+<span class="go">    from spotpython.utils.eda import gen_design_table</span>
+<span class="go">    from spotpython.spot import spot</span>
+<span class="go">    from spotpython.hyperparameters.values import get_default_hyperparameters_as_array</span>
+<span class="go">    PREFIX=&quot;000&quot;</span>
+<span class="go">    data_set = Diabetes()</span>
 <span class="go">    fun_control = fun_control_init(</span>
+<span class="go">        PREFIX=PREFIX,</span>
+<span class="go">        save_experiment=True,</span>
+<span class="go">        fun_evals=inf,</span>
+<span class="go">        max_time=1,</span>
+<span class="go">        data_set = data_set,</span>
+<span class="go">        core_model_name=&quot;light.regression.NNLinearRegressor&quot;,</span>
+<span class="go">        hyperdict=LightHyperDict,</span>
 <span class="go">        _L_in=10,</span>
-<span class="go">        _L_out=1,)</span>
-<span class="go">    dataset = Diabetes()</span>
-<span class="go">    set_control_key_value(control_dict=fun_control,</span>
-<span class="go">              key=&quot;data_set&quot;,</span>
-<span class="go">              value=dataset)</span>
-<span class="go">    add_core_model_to_fun_control(core_model=NetLightRegression,</span>
-<span class="go">                                fun_control=fun_control,</span>
-<span class="go">                                hyper_dict=LightHyperDict)</span>
-<span class="go">    hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="go">        _L_out=1,</span>
+<span class="go">        TENSORBOARD_CLEAN=True,</span>
+<span class="go">        tensorboard_log=True,</span>
+<span class="go">        seed=42,)</span>
+<span class="go">    print(gen_design_table(fun_control))</span>
 <span class="go">    X = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="go">    # set epochs to 2^8:</span>
+<span class="go">    X[0, 1] = 8</span>
+<span class="go">    # set patience to 2^10:</span>
+<span class="go">    X[0, 7] = 10</span>
+<span class="go">    print(f&quot;X: {X}&quot;)</span>
 <span class="go">    # combine X and X to a np.array with shape (2, n_hyperparams)</span>
 <span class="go">    # so that two values are returned</span>
 <span class="go">    X = np.vstack((X, X))</span>
+<span class="go">    hyper_light = HyperLight(seed=125, log_level=50)</span>
 <span class="go">    hyper_light.fun(X, fun_control)</span>
-<span class="go">    array([27462.84179688, 20990.08007812])</span>
 </code></pre></div>
 
             <details class="quote">
@@ -4619,7 +4672,17 @@ input array with valid shape.</p>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates the function for the given input array X and control parameters.</span>
 
@@ -4634,32 +4697,42 @@ input array with valid shape.</p>
 <span class="sd">            array containing the evaluation results.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from spotpython.utils.init import fun_control_init</span>
-<span class="sd">            from spotpython.light.regression.netlightregression import NetLightRegression</span>
-<span class="sd">            from spotpython.hyperdict.light_hyper_dict import LightHyperDict</span>
-<span class="sd">            from spotpython.hyperparameters.values import (add_core_model_to_fun_control,</span>
-<span class="sd">                get_default_hyperparameters_as_array)</span>
-<span class="sd">            from spotpython.fun.hyperlight import HyperLight</span>
-<span class="sd">            from spotpython.data.diabetes import Diabetes</span>
-<span class="sd">            from spotpython.hyperparameters.values import set_control_key_value</span>
+<span class="sd">        &gt;&gt;&gt; from math import inf</span>
 <span class="sd">            import numpy as np</span>
+<span class="sd">            from spotpython.data.diabetes import Diabetes</span>
+<span class="sd">            from spotpython.hyperdict.light_hyper_dict import LightHyperDict</span>
+<span class="sd">            from spotpython.fun.hyperlight import HyperLight</span>
+<span class="sd">            from spotpython.utils.init import fun_control_init</span>
+<span class="sd">            from spotpython.utils.eda import gen_design_table</span>
+<span class="sd">            from spotpython.spot import spot</span>
+<span class="sd">            from spotpython.hyperparameters.values import get_default_hyperparameters_as_array</span>
+<span class="sd">            PREFIX=&quot;000&quot;</span>
+<span class="sd">            data_set = Diabetes()</span>
 <span class="sd">            fun_control = fun_control_init(</span>
+<span class="sd">                PREFIX=PREFIX,</span>
+<span class="sd">                save_experiment=True,</span>
+<span class="sd">                fun_evals=inf,</span>
+<span class="sd">                max_time=1,</span>
+<span class="sd">                data_set = data_set,</span>
+<span class="sd">                core_model_name=&quot;light.regression.NNLinearRegressor&quot;,</span>
+<span class="sd">                hyperdict=LightHyperDict,</span>
 <span class="sd">                _L_in=10,</span>
-<span class="sd">                _L_out=1,)</span>
-<span class="sd">            dataset = Diabetes()</span>
-<span class="sd">            set_control_key_value(control_dict=fun_control,</span>
-<span class="sd">                      key=&quot;data_set&quot;,</span>
-<span class="sd">                      value=dataset)</span>
-<span class="sd">            add_core_model_to_fun_control(core_model=NetLightRegression,</span>
-<span class="sd">                                        fun_control=fun_control,</span>
-<span class="sd">                                        hyper_dict=LightHyperDict)</span>
-<span class="sd">            hyper_light = HyperLight(seed=126, log_level=50)</span>
+<span class="sd">                _L_out=1,</span>
+<span class="sd">                TENSORBOARD_CLEAN=True,</span>
+<span class="sd">                tensorboard_log=True,</span>
+<span class="sd">                seed=42,)</span>
+<span class="sd">            print(gen_design_table(fun_control))</span>
 <span class="sd">            X = get_default_hyperparameters_as_array(fun_control)</span>
+<span class="sd">            # set epochs to 2^8:</span>
+<span class="sd">            X[0, 1] = 8</span>
+<span class="sd">            # set patience to 2^10:</span>
+<span class="sd">            X[0, 7] = 10</span>
+<span class="sd">            print(f&quot;X: {X}&quot;)</span>
 <span class="sd">            # combine X and X to a np.array with shape (2, n_hyperparams)</span>
 <span class="sd">            # so that two values are returned</span>
 <span class="sd">            X = np.vstack((X, X))</span>
+<span class="sd">            hyper_light = HyperLight(seed=125, log_level=50)</span>
 <span class="sd">            hyper_light.fun(X, fun_control)</span>
-<span class="sd">            array([27462.84179688, 20990.08007812])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">check_X_shape</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">)</span>
