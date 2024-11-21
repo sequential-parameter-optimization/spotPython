@@ -49,6 +49,7 @@ class NNLinearRegressor(L.LightningModule):
             import lightning as L
             import torch
             from torch.utils.data import TensorDataset
+            torch.manual_seed(0)
             PATH_DATASETS = './data'
             BATCH_SIZE = 128
             # generate data
@@ -244,7 +245,7 @@ class NNLinearRegressor(L.LightningModule):
 
         """
         loss = self._calculate_loss(batch)
-        # self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("train_loss", loss, on_step=False, on_epoch=True, prog_bar=False)
         return loss
 
     def validation_step(self, batch: tuple, batch_idx: int, prog_bar: bool = False) -> torch.Tensor:
