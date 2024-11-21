@@ -101,32 +101,42 @@ class HyperLight:
                 array containing the evaluation results.
 
         Examples:
-            >>> from spotpython.utils.init import fun_control_init
-                from spotpython.light.regression.netlightregression import NetLightRegression
-                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-                from spotpython.hyperparameters.values import (add_core_model_to_fun_control,
-                    get_default_hyperparameters_as_array)
-                from spotpython.fun.hyperlight import HyperLight
-                from spotpython.data.diabetes import Diabetes
-                from spotpython.hyperparameters.values import set_control_key_value
+            >>> from math import inf
                 import numpy as np
+                from spotpython.data.diabetes import Diabetes
+                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.fun.hyperlight import HyperLight
+                from spotpython.utils.init import fun_control_init
+                from spotpython.utils.eda import gen_design_table
+                from spotpython.spot import spot
+                from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
+                PREFIX="000"
+                data_set = Diabetes()
                 fun_control = fun_control_init(
+                    PREFIX=PREFIX,
+                    save_experiment=True,
+                    fun_evals=inf,
+                    max_time=1,
+                    data_set = data_set,
+                    core_model_name="light.regression.NNLinearRegressor",
+                    hyperdict=LightHyperDict,
                     _L_in=10,
-                    _L_out=1,)
-                dataset = Diabetes()
-                set_control_key_value(control_dict=fun_control,
-                          key="data_set",
-                          value=dataset)
-                add_core_model_to_fun_control(core_model=NetLightRegression,
-                                            fun_control=fun_control,
-                                            hyper_dict=LightHyperDict)
-                hyper_light = HyperLight(seed=126, log_level=50)
+                    _L_out=1,
+                    TENSORBOARD_CLEAN=True,
+                    tensorboard_log=True,
+                    seed=42,)
+                print(gen_design_table(fun_control))
                 X = get_default_hyperparameters_as_array(fun_control)
+                # set epochs to 2^8:
+                X[0, 1] = 8
+                # set patience to 2^10:
+                X[0, 7] = 10
+                print(f"X: {X}")
                 # combine X and X to a np.array with shape (2, n_hyperparams)
                 # so that two values are returned
                 X = np.vstack((X, X))
+                hyper_light = HyperLight(seed=125, log_level=50)
                 hyper_light.fun(X, fun_control)
-                array([27462.84179688, 20990.08007812])
         """
         z_res = np.array([], dtype=float)
         self.check_X_shape(X=X, fun_control=fun_control)

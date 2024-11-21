@@ -104,12 +104,123 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     # print(f"train_model(): Batch size: {config['batch_size']}")
 
     # Callbacks
+    #
+    # EarlyStopping:
+    # Stop training when a monitored quantity has stopped improving.
+    # The EarlyStopping callback runs at the end of every validation epoch by default.
+    # However, the frequency of validation can be modified by setting various parameters
+    # in the Trainer, for example check_val_every_n_epoch and val_check_interval.
+    # It must be noted that the patience parameter counts the number of validation checks
+    # with no improvement, and not the number of training epochs.
+    # Therefore, with parameters check_val_every_n_epoch=10 and patience=3,
+    # the trainer will perform at least 40 training epochs before being stopped.
+    # Args:
+    # - monitor:
+    #   Quantity to be monitored. Default: 'val_loss'.
+    # - patience:
+    #   Number of validation checks with no improvement after which training will be stopped.
+    #   In spotpython, this is a hyperparameter.
+    # - mode (str):
+    #   one of {min, max}. If save_top_k != 0, the decision to overwrite the current save file
+    #   is made based on either the maximization or the minimization of the monitored quantity.
+    #   For 'val_acc', this should be 'max', for 'val_loss' this should be 'min', etc.
+    # - strict:
+    #   Set to False.
+    # - verbose:
+    #   If True, prints a message to the logger.
+    #
+    # ModelCheckpoint:
+    # Save the model periodically by monitoring a quantity.
+    # Every metric logged with log() or log_dict() is a candidate for the monitor key.
+    # spotpython uses ModelCheckpoint if timestamp is set to False. In this case, the
+    # config_id has no timestamp and ends with the unique string "_TRAIN". This
+    # enables loading the model from a checkpoint, because the config_id is unique.
+    # Args:
+    # - dirpath:
+    #   Path to the directory where the checkpoints will be saved.
+    # - monitor (str):
+    #   Quantity to monitor.
+    #   By default it is None which saves a checkpoint only for the last epoch.
+    # - verbose (bool):
+    #   If True, prints a message to the logger.
+    # - save_last (Union[bool, Literal['link'], None]):
+    #   When True, saves a last.ckpt copy whenever a checkpoint file gets saved.
+    #   Can be set to 'link' on a local filesystem to create a symbolic link.
+    #   This allows accessing the latest checkpoint in a deterministic manner.
+    #   Default: None.
+
     callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False
-        callbacks.append(ModelCheckpoint(dirpath=os.path.join(fun_control["CHECKPOINT_PATH"], config_id), save_last=True))  # Save the last checkpoint
+        dirpath = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
+        callbacks.append(ModelCheckpoint(dirpath=dirpath, monitor=None, verbose=False, save_last=True))  # Save the last checkpoint
 
-    # Init trainer
+    # Tensorboard logger. The tensorboard is passed to the trainer.
+    # See: https://lightning.ai/docs/pytorch/stable/extensions/generated/lightning.pytorch.loggers.TensorBoardLogger.html
+    # It uses the following arguments:
+    # Args:
+    # - save_dir:
+    #   Where to save logs. Can be specified via fun_control["TENSORBOARD_PATH"]
+    # - name:
+    #   Experiment name. Defaults to 'default'.
+    #   If it is the empty string then no per-experiment subdirectory is used.
+    #   Changed in spotpython 0.17.2 to the empty string.
+    # - version:
+    #   Experiment version. If version is not specified the logger inspects the save directory
+    #   for existing versions, then automatically assigns the next available version.
+    #   If it is a string then it is used as the run-specific subdirectory name,
+    #   otherwise 'version_${version}' is used. spotpython uses the config_id as version.
+    # - log_graph (bool):
+    #   Adds the computational graph to tensorboard.
+    #   This requires that the user has defined the self.example_input_array
+    #   attribute in their model. Set in spotpython to fun_control["log_graph"].
+    # - default_hp_metric (bool):
+    #   Enables a placeholder metric with key hp_metric when log_hyperparams is called
+    #   without a metric (otherwise calls to log_hyperparams without a metric are ignored).
+    #   spotpython sets this to True.
+
+    # Init trainer. See: https://lightning.ai/docs/pytorch/stable/api/lightning.pytorch.trainer.trainer.Trainer.html#lightning.pytorch.trainer.trainer.Trainer
+    # Args used by spotpython (there are more):
+    # - default_root_dir: Default path for logs and weights when no logger/ckpt_callback passed.
+    #   Default: os.getcwd(). Can be remote file paths such as s3://mybucket/path or ‘hdfs://path/’
+    # - max_epochs: Stop training once this number of epochs is reached.
+    #   Disabled by default (None).
+    #   If both max_epochs and max_steps are not specified, defaults to max_epochs = 1000.
+    #   To enable infinite training, set max_epochs = -1.
+    # - accelerator: Supports passing different accelerator types
+    #   (“cpu”, “gpu”, “tpu”, “hpu”, “mps”, “auto”) as well as custom accelerator instances.
+    # - devices: The devices to use. Can be set to a positive number (int or str),
+    #   a sequence of device indices (list or str), the value -1 to indicate all available devices
+    #   should be used, or "auto" for automatic selection based on the chosen accelerator.
+    #   Default: "auto".
+    # - strategy: Supports different training strategies with aliases as well custom strategies.
+    #   Default: "auto".
+    # - num_nodes: Number of GPU nodes for distributed training. Default: 1.
+    # - precision: Double precision (64, ‘64’ or ‘64-true’), full precision (32, ‘32’ or ‘32-true’),
+    #   16bit mixed precision (16, ‘16’, ‘16-mixed’) or bfloat16 mixed precision (‘bf16’, ‘bf16-mixed’).
+    #   Can be used on CPU, GPU, TPUs, or HPUs. Default: '32-true'.
+    # - logger: Logger (or iterable collection of loggers) for experiment tracking.
+    #   A True value uses the default TensorBoardLogger if it is installed, otherwise CSVLogger.
+    #   False will disable logging. If multiple loggers are provided, local files (checkpoints,
+    #   profiler traces, etc.) are saved in the log_dir of the first logger. Default: True.
+    # - callbacks: List of callbacks to enable during training.Default: None.
+    # - enable_progress_bar: If True, enables the progress bar.
+    #   Whether to enable to progress bar by default. Default: True.
+    # - num_sanity_val_steps:
+    #   Sanity check runs n validation batches before starting the training routine.
+    #   Set it to -1 to run all batches in all validation dataloaders. Default: 2.
+    # - log_every_n_steps:
+    #   How often to log within steps. Default: 50.
+    # - gradient_clip_val:
+    #   The value at which to clip gradients. Passing gradient_clip_val=None
+    #   disables gradient clipping. If using Automatic Mixed Precision (AMP),
+    #   the gradients will be unscaled before. Default: None.
+    # - gradient_clip_algorithm (str):
+    #   The gradient clipping algorithm to use.
+    #   Pass gradient_clip_algorithm="value" to clip by value,
+    #   and gradient_clip_algorithm="norm" to clip by norm.
+    #   By default it will be set to "norm".
+
     trainer = L.Trainer(
         # Where to save models
         default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
@@ -119,21 +230,46 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         strategy=fun_control["strategy"],
         num_nodes=fun_control["num_nodes"],
         precision=fun_control["precision"],
-        logger=TensorBoardLogger(
-            save_dir=fun_control["TENSORBOARD_PATH"],
-            version=config_id,
-            default_hp_metric=True,
-            log_graph=fun_control["log_graph"],
-        ),
+        logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=fun_control["log_graph"], name=""),
         callbacks=callbacks,
         enable_progress_bar=enable_progress_bar,
+        num_sanity_val_steps=fun_control["num_sanity_val_steps"],
+        log_every_n_steps=fun_control["log_every_n_steps"],
+        gradient_clip_val=None,
+        gradient_clip_algorithm="norm",
     )
-    # Pass the datamodule as arg to trainer.fit to override model hooks :)
-    trainer.fit(model=model, datamodule=dm)
+
+    # Fit the model
+    # Args:
+    # - model: Model to fit
+    # - datamodule: A LightningDataModule that defines the train_dataloader
+    #   hook. Pass the datamodule as arg to trainer.fit to override model hooks # :)
+    # - ckpt_path: Path/URL of the checkpoint from which training is resumed.
+    #   Could also be one of two special keywords "last" and "hpc".
+    #   If there is no checkpoint file at the path, an exception is raised.
+    trainer.fit(model=model, datamodule=dm, ckpt_path=None)
+
     # Test best model on validation and test set
-    # result = trainer.validate(model=model, datamodule=dm, ckpt_path="last")
+
     verbose = fun_control["verbosity"] > 0
-    result = trainer.validate(model=model, datamodule=dm, verbose=verbose)
+
+    # Validate the model
+    # Perform one evaluation epoch over the validation set.
+    # Args:
+    # - model: The model to validate.
+    # - datamodule: A LightningDataModule that defines the val_dataloader hook.
+    # - verbose: If True, prints the validation results.
+    # - ckpt_path: Path to a specific checkpoint to load for validation.
+    #   Either "best", "last", "hpc" or path to the checkpoint you wish to validate.
+    #   If None and the model instance was passed, use the current weights.
+    #   Otherwise, the best model checkpoint from the previous trainer.fit call will
+    #   be loaded if a checkpoint callback is configured.
+    # Returns:
+    # - List of dictionaries with metrics logged during the validation phase,
+    #   e.g., in model- or callback hooks like validation_step() etc.
+    #   The length of the list corresponds to the number of validation dataloaders used.
+    result = trainer.validate(model=model, datamodule=dm, ckpt_path=None, verbose=verbose)
+
     # unlist the result (from a list of one dict)
     result = result[0]
     print(f"train_model result: {result}")
