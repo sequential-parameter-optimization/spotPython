@@ -71,7 +71,7 @@ def fun_control_init(
     scaler_name=None,
     scenario=None,
     seed=123,
-    show_config=False,
+    show_config=True,
     show_models=False,
     show_progress=True,
     shuffle=None,
