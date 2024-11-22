@@ -262,6 +262,7 @@ class Spot:
         self.tkagg = self.fun_control["tkagg"]
         if self.tkagg:
             matplotlib.use("TkAgg")
+        self.verbosity = self.fun_control["verbosity"]
 
         # Tensorboard:
         self.init_spot_writer()
@@ -1274,7 +1275,6 @@ class Spot:
             self.min_mean_y = self.mean_y[argmin(self.mean_y)]
 
     def update_writer(self) -> None:
-        print("In update_writer().")
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             # get the last y value:
             y_last = self.y[-1].copy()
@@ -1312,7 +1312,8 @@ class Spot:
             # self.spot_writer.add_hparams(config, {"spot_y": y_last}, run_name=self.spot_tensorboard_path)
             self.spot_writer.add_hparams(config, {"hp_metric": y_last})
             self.spot_writer.flush()
-            print("update_writer(): Done.")
+            if self.verbosity > 0:
+                print("update_writer(): Done.")
         else:
             print("No spot_writer available.")
 
