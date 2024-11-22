@@ -4525,7 +4525,14 @@ Performs the training, validation, and test split.</p>
 <span class="normal">300</span>
 <span class="normal">301</span>
 <span class="normal">302</span>
-<span class="normal">303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">LightDataModule</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A LightningDataModule for handling data.</span>
 
@@ -4686,12 +4693,19 @@ Performs the training, validation, and test split.</p>
 <span class="sd">                Training set size: 3</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">full_train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="n">calculate_data_split</span><span class="p">(</span>
-            <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
-            <span class="n">full_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">),</span>
-            <span class="n">verbosity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span><span class="p">,</span>
-            <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">full_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">)</span>
+        <span class="n">test_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+
+        <span class="c1"># consider the case when test_size is a float</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="n">full_train_size</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+            <span class="n">val_size</span> <span class="o">=</span> <span class="n">full_train_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+            <span class="n">train_size</span> <span class="o">=</span> <span class="n">full_train_size</span> <span class="o">-</span> <span class="n">val_size</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># test_size is an int, training size calculation directly based on it</span>
+            <span class="n">full_train_size</span> <span class="o">=</span> <span class="n">full_size</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+            <span class="n">val_size</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">full_train_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">/</span> <span class="n">full_size</span><span class="p">)</span>
+            <span class="n">train_size</span> <span class="o">=</span> <span class="n">full_size</span> <span class="o">-</span> <span class="n">val_size</span> <span class="o">-</span> <span class="n">test_size</span>
 
         <span class="c1"># Assign train/val datasets for use in dataloaders</span>
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4708,7 +4722,7 @@ Performs the training, validation, and test split.</p>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for test dataset.&quot;</span><span class="p">)</span>
             <span class="n">generator_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Transform the test data</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span>
@@ -4718,7 +4732,7 @@ Performs the training, validation, and test split.</p>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for predict dataset.&quot;</span><span class="p">)</span>
             <span class="n">generator_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_predict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_predict</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Transform the predict data</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">)</span>
@@ -4942,14 +4956,7 @@ using the predict dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">287</span>
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span>
@@ -4965,7 +4972,14 @@ using the predict dataset.</p>
 <span class="normal">300</span>
 <span class="normal">301</span>
 <span class="normal">302</span>
-<span class="normal">303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the predict dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the predict dataset.</span>
@@ -5143,7 +5157,14 @@ or None (for all three stages). Defaults to None.</p>
 <span class="normal">201</span>
 <span class="normal">202</span>
 <span class="normal">203</span>
-<span class="normal">204</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Splits the data for use in training, validation, and testing.</span>
 <span class="sd">    Uses torch.utils.data.random_split() to split the data.</span>
@@ -5167,12 +5188,19 @@ or None (for all three stages). Defaults to None.</p>
 <span class="sd">            Training set size: 3</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">full_train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">test_size</span> <span class="o">=</span> <span class="n">calculate_data_split</span><span class="p">(</span>
-        <span class="n">test_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span>
-        <span class="n">full_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">),</span>
-        <span class="n">verbosity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span><span class="p">,</span>
-        <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">full_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">)</span>
+    <span class="n">test_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+
+    <span class="c1"># consider the case when test_size is a float</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">full_train_size</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+        <span class="n">val_size</span> <span class="o">=</span> <span class="n">full_train_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+        <span class="n">train_size</span> <span class="o">=</span> <span class="n">full_train_size</span> <span class="o">-</span> <span class="n">val_size</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># test_size is an int, training size calculation directly based on it</span>
+        <span class="n">full_train_size</span> <span class="o">=</span> <span class="n">full_size</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span>
+        <span class="n">val_size</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">full_train_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_size</span> <span class="o">/</span> <span class="n">full_size</span><span class="p">)</span>
+        <span class="n">train_size</span> <span class="o">=</span> <span class="n">full_size</span> <span class="o">-</span> <span class="n">val_size</span> <span class="o">-</span> <span class="n">test_size</span>
 
     <span class="c1"># Assign train/val datasets for use in dataloaders</span>
     <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;fit&quot;</span> <span class="ow">or</span> <span class="n">stage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -5189,7 +5217,7 @@ or None (for all three stages). Defaults to None.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for test dataset.&quot;</span><span class="p">)</span>
         <span class="n">generator_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_test</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Transform the test data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_test</span><span class="p">)</span>
@@ -5199,7 +5227,7 @@ or None (for all three stages). Defaults to None.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;test_size: </span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> used for predict dataset.&quot;</span><span class="p">)</span>
         <span class="n">generator_predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_seed</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">full_train_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_predict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_full</span><span class="p">,</span> <span class="p">[</span><span class="n">test_size</span><span class="p">,</span> <span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">],</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator_predict</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Transform the predict data</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_predict</span><span class="p">)</span>
@@ -5260,14 +5288,7 @@ using the test dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
 <span class="normal">265</span>
@@ -5283,7 +5304,14 @@ using the test dataset.</p>
 <span class="normal">275</span>
 <span class="normal">276</span>
 <span class="normal">277</span>
-<span class="normal">278</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the test dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the test dataset.</span>
@@ -5364,14 +5392,7 @@ using the training dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
@@ -5387,7 +5408,14 @@ using the training dataset.</p>
 <span class="normal">226</span>
 <span class="normal">227</span>
 <span class="normal">228</span>
-<span class="normal">229</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the training dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the training dataset.</span>
@@ -5607,14 +5635,7 @@ using the validation dataset.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/data/lightdatamodule.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">231</span>
-<span class="normal">232</span>
-<span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
-<span class="normal">236</span>
-<span class="normal">237</span>
-<span class="normal">238</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">238</span>
 <span class="normal">239</span>
 <span class="normal">240</span>
 <span class="normal">241</span>
@@ -5629,7 +5650,14 @@ using the validation dataset.</p>
 <span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
-<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the validation dataloader, i.e., a pytorch DataLoader instance</span>
 <span class="sd">    using the validation dataset.</span>
