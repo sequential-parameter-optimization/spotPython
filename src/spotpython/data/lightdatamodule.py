@@ -2,7 +2,7 @@ import lightning as L
 import torch
 from torch.utils.data import DataLoader, random_split, TensorDataset
 from typing import Optional
-from spotpython.utils.split import calculate_data_split
+from math import floor
 
 
 class LightDataModule(L.LightningDataModule):
@@ -166,12 +166,19 @@ class LightDataModule(L.LightningDataModule):
                 Training set size: 3
 
         """
-        full_train_size, val_size, train_size, test_size = calculate_data_split(
-            test_size=self.test_size,
-            full_size=len(self.data_full),
-            verbosity=self.verbosity,
-            stage=stage,
-        )
+        full_size = len(self.data_full)
+        test_size = self.test_size
+
+        # consider the case when test_size is a float
+        if isinstance(self.test_size, float):
+            full_train_size = 1.0 - self.test_size
+            val_size = full_train_size * self.test_size
+            train_size = full_train_size - val_size
+        else:
+            # test_size is an int, training size calculation directly based on it
+            full_train_size = full_size - self.test_size
+            val_size = floor(full_train_size * self.test_size / full_size)
+            train_size = full_size - val_size - test_size
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
@@ -188,7 +195,7 @@ class LightDataModule(L.LightningDataModule):
             if self.verbosity > 0:
                 print(f"test_size: {test_size} used for test dataset.")
             generator_test = torch.Generator().manual_seed(self.test_seed)
-            self.data_test, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_test)
+            self.data_test, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_test)
             if self.scaler is not None:
                 # Transform the test data
                 self.data_test = self.transform_dataset(self.data_test)
@@ -198,7 +205,7 @@ class LightDataModule(L.LightningDataModule):
             if self.verbosity > 0:
                 print(f"test_size: {test_size} used for predict dataset.")
             generator_predict = torch.Generator().manual_seed(self.test_seed)
-            self.data_predict, _ = random_split(self.data_full, [test_size, full_train_size], generator=generator_predict)
+            self.data_predict, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_predict)
             if self.scaler is not None:
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)

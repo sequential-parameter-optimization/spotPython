@@ -1,3 +1,68 @@
+import math
+import warnings
+from typing import List
+
+
+def compute_lengths_from_fractions(fractions: List[float], dataset_length: int) -> List[int]:
+    """Compute lengths of dataset splits from given fractions.
+
+    Given a list of fractions that sum up to 1, compute the lengths of each
+    corresponding partition of a dataset with a specified length. Each length is
+    determined as `floor(frac * dataset_length)`. Any remaining items (due to flooring)
+    are distributed among the partitions in a round-robin fashion.
+
+    Args:
+        fractions (List[float]): A list of fractions that should sum to 1.
+        dataset_length (int): The length of the dataset.
+
+    Returns:
+        List[int]: A list of lengths corresponding to each fraction.
+
+    Raises:
+        ValueError: If the fractions do not sum to 1.
+        ValueError: If any fraction is outside the range [0, 1].
+        ValueError: If the sum of computed lengths does not equal the dataset length.
+
+    Examples:
+        >>> from spotpython.utils.split import compute_lengths_from_fractions
+        >>> dataset_length = 5
+        >>> fractions = [0.2, 0.3, 0.5]
+        >>> compute_lengths_from_fractions(fractions, dataset_length)
+        [1, 1, 3]
+
+        In this example, 'dataset_length' is 5 and the 'fractions' specify the
+        desired size distribution. The function calculates partitions of lengths
+        [1, 1, 3] based on the given fractions.
+
+    """
+    if not math.isclose(sum(fractions), 1) or sum(fractions) > 1:
+        raise ValueError("Fractions must sum up to 1.")
+
+    subset_lengths: List[int] = []
+    for i, frac in enumerate(fractions):
+        if frac < 0 or frac > 1:
+            raise ValueError(f"Fraction at index {i} is not between 0 and 1")
+        n_items_in_split = int(math.floor(dataset_length * frac))
+        subset_lengths.append(n_items_in_split)
+
+    remainder = dataset_length - sum(subset_lengths)
+
+    # Add 1 to all the lengths in a round-robin fashion until the remainder is 0
+    for i in range(remainder):
+        idx_to_add_at = i % len(subset_lengths)
+        subset_lengths[idx_to_add_at] += 1
+
+    lengths = subset_lengths
+    for i, length in enumerate(lengths):
+        if length == 0:
+            warnings.warn(f"Length of split at index {i} is 0. " f"This might result in an empty dataset.")
+
+    if sum(lengths) != dataset_length:
+        raise ValueError("Sum of computed lengths does not equal the input dataset length!")
+
+    return lengths
+
+
 def calculate_data_split(test_size, full_size, verbosity=0, stage=None) -> tuple:
     """
     Calculates the split sizes for training, validation, and test datasets.
@@ -52,7 +117,7 @@ def calculate_data_split(test_size, full_size, verbosity=0, stage=None) -> tuple
         val_size = int(full_train_size * test_size / full_size)
         train_size = full_train_size - val_size
         # check if the sizes are correct, i.e., full_size = train_size + val_size + test_size
-        if full_train_size + test_size != full_size:
+        if train_size + val_size + test_size != full_size:
             raise ValueError(f"full_size ({full_size}) != full_train_size ({full_train_size}) + test_size ({test_size})")
 
     if verbosity > 0:
