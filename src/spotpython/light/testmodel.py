@@ -74,6 +74,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
         test_size=fun_control["test_size"],
         test_seed=fun_control["test_seed"],
         scaler=fun_control["scaler"],
+        verbosity=fun_control["verbosity"],
     )
     # TODO: Check if this is necessary:
     # dm.setup()

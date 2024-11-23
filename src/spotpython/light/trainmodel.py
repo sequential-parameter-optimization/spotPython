@@ -105,18 +105,21 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
                 pprint.pprint(config)
                 y = train_model(config, fun_control)
     """
-    config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
+    if fun_control["data_module"] is None:
+        dm = LightDataModule(
+            dataset=fun_control["data_set"],
+            data_full_train=fun_control["data_full_train"],
+            data_test=fun_control["data_test"],
+            batch_size=config["batch_size"],
+            num_workers=fun_control["num_workers"],
+            test_size=fun_control["test_size"],
+            test_seed=fun_control["test_seed"],
+            scaler=fun_control["scaler"],
+            verbosity=fun_control["verbosity"],
+        )
+    else:
+        dm = fun_control["data_module"]
     model = build_model_instance(config, fun_control)
-    dm = LightDataModule(
-        dataset=fun_control["data_set"],
-        data_full_train=fun_control["data_full_train"],
-        data_test=fun_control["data_test"],
-        batch_size=config["batch_size"],
-        num_workers=fun_control["num_workers"],
-        test_size=fun_control["test_size"],
-        test_seed=fun_control["test_seed"],
-        scaler=fun_control["scaler"],
-    )
     # TODO: Check if this is necessary or if this is handled by the trainer
     # dm.setup()
     # print(f"train_model(): Test set size: {len(dm.data_test)}")
@@ -168,7 +171,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   Can be set to 'link' on a local filesystem to create a symbolic link.
     #   This allows accessing the latest checkpoint in a deterministic manner.
     #   Default: None.
-
+    config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
     callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False

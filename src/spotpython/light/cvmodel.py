@@ -67,6 +67,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
             batch_size=config["batch_size"],
             data_dir=fun_control["DATASET_PATH"],
             scaler=fun_control["scaler"],
+            verbosity=fun_control["verbosity"],
         )
         dm.setup()
         dm.prepare_data()

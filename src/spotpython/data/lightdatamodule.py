@@ -28,6 +28,8 @@ class LightDataModule(L.LightningDataModule):
             The number of workers. Defaults to 0.
         scaler (object, optional):
             The spot scaler object (e.g. TorchStandardScaler). Defaults to None.
+        verbosity (int):
+            The verbosity level. Defaults to 0.
 
     Examples:
         >>> from spotpython.data.lightdatamodule import LightDataModule
