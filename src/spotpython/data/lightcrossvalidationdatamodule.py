@@ -12,6 +12,13 @@ class LightCrossValidationDataModule(L.LightningDataModule):
 
     Args:
         batch_size (int): The size of the batch. Defaults to 64.
+        dataset (torch.utils.data.Dataset, optional):
+            The dataset from the torch.utils.data Dataset class.
+            It must implement three functions: __init__, __len__, and __getitem__.
+        data_full_train (torch.utils.data.Dataset, optional):
+            The full training dataset from which training and validation sets will be derived.
+        data_test (torch.utils.data.Dataset, optional):
+            The separate test dataset that will be used for testing.
         k (int): The fold number. Defaults to 1.
         split_seed (int): The random seed for splitting the data. Defaults to 42.
         num_splits (int): The number of splits for cross-validation. Defaults to 10.
@@ -38,7 +45,9 @@ class LightCrossValidationDataModule(L.LightningDataModule):
     def __init__(
         self,
         batch_size=64,
-        dataset=None,
+        dataset: Optional[object] = None,
+        data_full_train: Optional[object] = None,
+        data_test: Optional[object] = None,
         k: int = 1,
         split_seed: int = 42,
         num_splits: int = 10,
@@ -50,6 +59,8 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.data_full = dataset
+        self.data_full_train = data_full_train
+        self.data_test = data_test
         self.data_dir = data_dir
         self.num_workers = num_workers
         self.k = k

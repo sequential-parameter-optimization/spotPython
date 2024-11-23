@@ -12,44 +12,22 @@ class LightDataModule(L.LightningDataModule):
     Args:
         batch_size (int):
             The batch size. Required.
-        dataset (torch.utils.data.Dataset):
+        dataset (torch.utils.data.Dataset, optional):
             The dataset from the torch.utils.data Dataset class.
-            It  must implement three functions: __init__, __len__, and __getitem__.
-            Required.
-        test_size (float):
-            The test size. if test_size is float, then train_size is 1 - test_size.
+            It must implement three functions: __init__, __len__, and __getitem__.
+        data_full_train (torch.utils.data.Dataset, optional):
+            The full training dataset from which training and validation sets will be derived.
+        data_test (torch.utils.data.Dataset, optional):
+            The separate test dataset that will be used for testing.
+        test_size (float, optional):
+            The test size. If test_size is float, then train_size is 1 - test_size.
             If test_size is int, then train_size is len(data_full) - test_size.
-            Train size will be split into train and validation sets.
-            So if test size is 0.7, the 0.7 train size will be split into 0.7 * 0.7 = 0.49 train set
-            amd 0.7 * 0.3 = 0.21 validation set.
         test_seed (int):
             The test seed. Defaults to 42.
         num_workers (int):
             The number of workers. Defaults to 0.
-        scaler (object):
+        scaler (object, optional):
             The spot scaler object (e.g. TorchStandardScaler). Defaults to None.
-
-    Attributes:
-        batch_size (int): The batch size.
-        data_full (Dataset): The full dataset.
-        data_test (Dataset): The test dataset.
-        data_train (Dataset): The training dataset.
-        data_val (Dataset): The validation dataset.
-        num_workers (int): The number of workers.
-        test_seed (int): The test seed.
-        test_size (float): The test size.
-
-    Methods:
-        prepare_data(self):
-            Usually used for downloading the data. Here: Does nothing, i.e., pass.
-        setup(self, stage: Optional[str] = None):
-            Performs the training, validation, and test split.
-        train_dataloader():
-            Returns a DataLoader instance for the training set.
-        val_dataloader():
-            Returns a DataLoader instance for the validation set.
-        test_dataloader():
-            Returns a DataLoader instance for the test set.
 
     Examples:
         >>> from spotpython.data.lightdatamodule import LightDataModule
@@ -80,8 +58,10 @@ class LightDataModule(L.LightningDataModule):
     def __init__(
         self,
         batch_size: int,
-        dataset: object,
-        test_size: float,
+        dataset: Optional[object] = None,
+        data_full_train: Optional[object] = None,
+        data_test: Optional[object] = None,
+        test_size: Optional[float] = None,
         test_seed: int = 42,
         num_workers: int = 0,
         scaler: Optional[object] = None,
@@ -90,6 +70,8 @@ class LightDataModule(L.LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.data_full = dataset
+        self.data_full_train = data_full_train
+        self.data_test = data_test
         self.test_size = test_size
         self.test_seed = test_seed
         self.num_workers = num_workers
@@ -166,49 +148,92 @@ class LightDataModule(L.LightningDataModule):
                 Training set size: 3
 
         """
-        full_size = len(self.data_full)
-        test_size = self.test_size
+        if self.data_full is not None:
+            full_size = len(self.data_full)
+            test_size = self.test_size
 
-        # consider the case when test_size is a float
-        if isinstance(self.test_size, float):
-            full_train_size = 1.0 - self.test_size
-            val_size = full_train_size * self.test_size
-            train_size = full_train_size - val_size
+            # consider the case when test_size is a float
+            if isinstance(self.test_size, float):
+                full_train_size = 1.0 - self.test_size
+                val_size = full_train_size * self.test_size
+                train_size = full_train_size - val_size
+            else:
+                # test_size is an int, training size calculation directly based on it
+                full_train_size = full_size - self.test_size
+                val_size = floor(full_train_size * self.test_size / full_size)
+                train_size = full_size - val_size - test_size
+
+            # Assign train/val datasets for use in dataloaders
+            if stage == "fit" or stage is None:
+                if self.verbosity > 0:
+                    print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
+                generator_fit = torch.Generator().manual_seed(self.test_seed)
+                self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size], generator=generator_fit)
+                # Handle scaling and transformation if scaler is provided
+                if self.scaler is not None:
+                    self.handle_scaling_and_transform()
+
+            # Assign test dataset for use in dataloader(s)
+            if stage == "test" or stage is None:
+                if self.verbosity > 0:
+                    print(f"test_size: {test_size} used for test dataset.")
+                generator_test = torch.Generator().manual_seed(self.test_seed)
+                self.data_test, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_test)
+                if self.scaler is not None:
+                    # Transform the test data
+                    self.data_test = self.transform_dataset(self.data_test)
+
+            # Assign pred dataset for use in dataloader(s)
+            if stage == "predict" or stage is None:
+                if self.verbosity > 0:
+                    print(f"test_size: {test_size} used for predict dataset.")
+                generator_predict = torch.Generator().manual_seed(self.test_seed)
+                self.data_predict, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_predict)
+                if self.scaler is not None:
+                    # Transform the predict data
+                    self.data_predict = self.transform_dataset(self.data_predict)
         else:
-            # test_size is an int, training size calculation directly based on it
-            full_train_size = full_size - self.test_size
-            val_size = floor(full_train_size * self.test_size / full_size)
-            train_size = full_size - val_size - test_size
+            # New functionality with separate full_train and test datasets. Use these datasets directly.
+            full_train_size = len(self.data_full_train)
+            test_size = self.test_size
+            # consider the case when test_size is a float
+            if isinstance(self.test_size, float):
+                val_size = self.test_size
+                train_size = 1 - self.test_size
+            else:
+                # test_size is an int, training size calculation directly based on it
+                full_size = len(self.data_full_train) + len(self.data_test)
+                full_train_size = len(self.data_full_train)
+                val_size = floor(full_train_size * self.test_size / full_size)
+                train_size = full_train_size - val_size
 
-        # Assign train/val datasets for use in dataloaders
-        if stage == "fit" or stage is None:
-            if self.verbosity > 0:
-                print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
-            generator_fit = torch.Generator().manual_seed(self.test_seed)
-            self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size], generator=generator_fit)
-            # Handle scaling and transformation if scaler is provided
-            if self.scaler is not None:
-                self.handle_scaling_and_transform()
+            # Assign train/val datasets for use in dataloaders
+            if stage == "fit" or stage is None:
+                if self.verbosity > 0:
+                    print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
+                generator_fit = torch.Generator().manual_seed(self.test_seed)
+                self.data_train, self.data_val = random_split(self.data_full_train, [train_size, val_size], generator=generator_fit)
+                # Handle scaling and transformation if scaler is provided
+                if self.scaler is not None:
+                    self.handle_scaling_and_transform()
 
-        # Assign test dataset for use in dataloader(s)
-        if stage == "test" or stage is None:
-            if self.verbosity > 0:
-                print(f"test_size: {test_size} used for test dataset.")
-            generator_test = torch.Generator().manual_seed(self.test_seed)
-            self.data_test, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_test)
-            if self.scaler is not None:
-                # Transform the test data
-                self.data_test = self.transform_dataset(self.data_test)
+            # Assign test dataset for use in dataloader(s)
+            if stage == "test" or stage is None:
+                if self.verbosity > 0:
+                    print(f"test_size: {test_size} used for test dataset.")
+                self.data_test = self.data_test
+                if self.scaler is not None:
+                    # Transform the test data
+                    self.data_test = self.transform_dataset(self.data_test)
 
-        # Assign pred dataset for use in dataloader(s)
-        if stage == "predict" or stage is None:
-            if self.verbosity > 0:
-                print(f"test_size: {test_size} used for predict dataset.")
-            generator_predict = torch.Generator().manual_seed(self.test_seed)
-            self.data_predict, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_predict)
-            if self.scaler is not None:
-                # Transform the predict data
-                self.data_predict = self.transform_dataset(self.data_predict)
+            # Assign pred dataset for use in dataloader(s)
+            if stage == "predict" or stage is None:
+                if self.verbosity > 0:
+                    print(f"test_size: {test_size} used for predict dataset.")
+                self.data_predict = self.data_test
+                if self.scaler is not None:
+                    # Transform the predict data
+                    self.data_predict = self.transform_dataset(self.data_predict)
 
     def train_dataloader(self) -> DataLoader:
         """
