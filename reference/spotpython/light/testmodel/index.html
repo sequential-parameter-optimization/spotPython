@@ -3983,7 +3983,9 @@
 <span class="normal">105</span>
 <span class="normal">106</span>
 <span class="normal">107</span>
-<span class="normal">108</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">test_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Tests a model using the given configuration and function control parameters.</span>
 
@@ -4042,6 +4044,8 @@
     <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_TEST&quot;</span>
     <span class="n">dm</span> <span class="o">=</span> <span class="n">LightDataModule</span><span class="p">(</span>
         <span class="n">dataset</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_set&quot;</span><span class="p">],</span>
+        <span class="n">data_full_train</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_full_train&quot;</span><span class="p">],</span>
+        <span class="n">data_test</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_test&quot;</span><span class="p">],</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">],</span>
         <span class="n">test_size</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">],</span>

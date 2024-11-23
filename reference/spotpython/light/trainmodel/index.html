@@ -4431,7 +4431,9 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">292</span>
 <span class="normal">293</span>
 <span class="normal">294</span>
-<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters.</span>
 
@@ -4492,6 +4494,8 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="n">model</span> <span class="o">=</span> <span class="n">build_model_instance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span>
     <span class="n">dm</span> <span class="o">=</span> <span class="n">LightDataModule</span><span class="p">(</span>
         <span class="n">dataset</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_set&quot;</span><span class="p">],</span>
+        <span class="n">data_full_train</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_full_train&quot;</span><span class="p">],</span>
+        <span class="n">data_test</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_test&quot;</span><span class="p">],</span>
         <span class="n">batch_size</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">],</span>
         <span class="n">num_workers</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">],</span>
         <span class="n">test_size</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;test_size&quot;</span><span class="p">],</span>
