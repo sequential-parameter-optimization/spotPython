@@ -25,6 +25,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         data_dir (str): The path to the dataset. Defaults to "./data".
         num_workers (int): The number of workers for data loading. Defaults to 0.
         pin_memory (bool): Whether to pin memory for data loading. Defaults to False.
+        verbosity (int): The verbosity level. Defaults to 0.
 
     Attributes:
         data_train (Optional[Dataset]): The training dataset.
@@ -55,6 +56,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         num_workers: int = 0,
         pin_memory: bool = False,
         scaler: Optional[object] = None,
+        verbosity: int = 0,
     ):
         super().__init__()
         self.batch_size = batch_size
@@ -70,6 +72,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         self.scaler = scaler
         self.save_hyperparameters(logger=False)
         assert 0 <= self.k < self.num_splits, "incorrect fold number"
+        self.verbosity = verbosity
 
         # no data transformations
         self.transforms = None
@@ -96,9 +99,10 @@ class LightCrossValidationDataModule(L.LightningDataModule):
             train_indexes, val_indexes = all_splits[self.hparams.k]
             train_indexes, val_indexes = train_indexes.tolist(), val_indexes.tolist()
             self.data_train = Subset(dataset_full, train_indexes)
-            print(f"Train Dataset Size: {len(self.data_train)}")
             self.data_val = Subset(dataset_full, val_indexes)
-            print(f"Val Dataset Size: {len(self.data_val)}")
+            if self.verbosity > 0:
+                print(f"Train Dataset Size: {len(self.data_train)}")
+                print(f"Val Dataset Size: {len(self.data_val)}")
 
         if self.scaler is not None:
             # Fit the scaler on training data and transform both train and val data
