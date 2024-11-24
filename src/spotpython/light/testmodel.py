@@ -65,17 +65,20 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     # the config id is generated here without a timestamp. This differs from
     # the config id generated in cvmodel.py and trainmodel.py.
     config_id = generate_config_id(config, timestamp=False) + "_TEST"
-    dm = LightDataModule(
-        dataset=fun_control["data_set"],
-        data_full_train=fun_control["data_full_train"],
-        data_test=fun_control["data_test"],
-        batch_size=config["batch_size"],
-        num_workers=fun_control["num_workers"],
-        test_size=fun_control["test_size"],
-        test_seed=fun_control["test_seed"],
-        scaler=fun_control["scaler"],
-        verbosity=fun_control["verbosity"],
-    )
+    if fun_control["data_module"] is None:
+        dm = LightDataModule(
+            dataset=fun_control["data_set"],
+            data_full_train=fun_control["data_full_train"],
+            data_test=fun_control["data_test"],
+            batch_size=config["batch_size"],
+            num_workers=fun_control["num_workers"],
+            test_size=fun_control["test_size"],
+            test_seed=fun_control["test_seed"],
+            scaler=fun_control["scaler"],
+            verbosity=fun_control["verbosity"],
+        )
+    else:
+        dm = fun_control["data_module"]
     # TODO: Check if this is necessary:
     # dm.setup()
     # Init model from datamodule's attributes

@@ -56,19 +56,22 @@ def cv_model(config: dict, fun_control: dict) -> float:
 
         model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _L_cond=_L_cond, _torchmetric=_torchmetric)
 
-        dm = LightCrossValidationDataModule(
-            k=k,
-            num_splits=num_folds,
-            split_seed=split_seed,
-            dataset=fun_control["data_set"],
-            data_full_train=fun_control["data_full_train"],
-            data_test=fun_control["data_test"],
-            num_workers=fun_control["num_workers"],
-            batch_size=config["batch_size"],
-            data_dir=fun_control["DATASET_PATH"],
-            scaler=fun_control["scaler"],
-            verbosity=fun_control["verbosity"],
-        )
+        if fun_control["data_module"] is None:
+            dm = LightCrossValidationDataModule(
+                k=k,
+                num_splits=num_folds,
+                split_seed=split_seed,
+                dataset=fun_control["data_set"],
+                data_full_train=fun_control["data_full_train"],
+                data_test=fun_control["data_test"],
+                num_workers=fun_control["num_workers"],
+                batch_size=config["batch_size"],
+                data_dir=fun_control["DATASET_PATH"],
+                scaler=fun_control["scaler"],
+                verbosity=fun_control["verbosity"],
+            )
+        else:
+            dm = fun_control["data_module"]
         dm.setup()
         dm.prepare_data()
 
