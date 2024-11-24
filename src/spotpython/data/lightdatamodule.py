@@ -143,30 +143,33 @@ class LightDataModule(L.LightningDataModule):
 
         # Assign train/val datasets for use in dataloaders
         if stage == "fit" or stage is None:
-            if self.verbosity > 0:
-                print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
             generator_fit = torch.Generator().manual_seed(self.test_seed)
             self.data_train, self.data_val, _ = random_split(self.data_full, [train_size, val_size, test_size], generator=generator_fit)
+            if self.verbosity > 0:
+                print(f"train_size: {train_size}, val_size: {val_size}, test_sie: {test_size} for splitting train & val data.")
+                print(f"train samples: {len(self.data_train)}, val samples: {len(self.data_val)} generated for train & val data.")
             # Handle scaling and transformation if scaler is provided
             if self.scaler is not None:
                 self.handle_scaling_and_transform()
 
         # Assign test dataset for use in dataloader(s)
         if stage == "test" or stage is None:
-            if self.verbosity > 0:
-                print(f"test_size: {test_size} used for test dataset.")
             generator_test = torch.Generator().manual_seed(self.test_seed)
             self.data_test, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_test)
+            if self.verbosity > 0:
+                print(f"train_size: {train_size}, val_size: {val_size}, test_sie: {test_size} for splitting test data.")
+                print(f"test samples: {len(self.data_test)} generated for test data.")
             if self.scaler is not None:
                 # Transform the test data
                 self.data_test = self.transform_dataset(self.data_test)
 
         # Assign pred dataset for use in dataloader(s)
         if stage == "predict" or stage is None:
-            if self.verbosity > 0:
-                print(f"test_size: {test_size} used for predict dataset.")
             generator_predict = torch.Generator().manual_seed(self.test_seed)
             self.data_predict, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_predict)
+            if self.verbosity > 0:
+                print(f"train_size: {train_size}, val_size: {val_size}, test_size (= predict_size): {test_size} for splitting predict data.")
+                print(f"predict samples: {len(self.data_predict)} generated for train & val data.")
             if self.scaler is not None:
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)
