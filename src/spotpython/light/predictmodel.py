@@ -38,7 +38,8 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
             import spotpython.light.testmodel as tm
             fun_control = fun_control_init(
                 _L_in=10,
-                _L_out=1,)
+                _L_out=1,
+                _torchmetric="mean_squared_error")
             dataset = Diabetes()
             set_control_key_value(control_dict=fun_control,
                                     key="data_set",
@@ -107,9 +108,12 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
 
-    dm.setup(stage="predict")
-    predictions = trainer.predict(model=model, datamodule=dm)
-    # predictions = trainer.predict(datamodule=dm)
+    # Changed in spotpython 0.18.12: commented out the following line
+    # dm.setup(stage="predict")
+
+    # predictions = trainer.predict(model=model, datamodule=dm)
+    # Changed in spotpython 0.18.12: use ckpt_path="last" to load the last checkpoint and not the model
+    predictions = trainer.predict(datamodule=dm, ckpt_path="last")
 
     # # Load the last checkpoint
     # test_result = trainer.test(datamodule=dm, ckpt_path="last")
