@@ -107,7 +107,7 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     )
     # Pass the datamodule as arg to trainer.fit to override model hooks :)
     trainer.fit(model=model, datamodule=dm)
-    
+
     # Load the last checkpoint
     test_result = trainer.test(datamodule=dm, ckpt_path="last")
     test_result = test_result[0]
