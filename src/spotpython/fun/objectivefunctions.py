@@ -203,7 +203,7 @@ class analytical:
             return y
 
     def fun_cubed(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
-        """Cubed function.
+        """Cubed function. Implements the function f(x) = sum((x_i - offset)^3).
 
         Args:
             X (array):
@@ -217,10 +217,10 @@ class analytical:
         Examples:
             >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
-            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
+            >>> X = np.array([[1, 2, 3], [4, 5, 6], [-1, -1, -1]])
             >>> fun = analytical()
             >>> fun.fun_cubed(X)
-            array([ 0., 27.])
+            array([ 36., 405., -3.])
         """
 
         if fun_control is None:
@@ -455,36 +455,6 @@ class analytical:
         else:
             return y
 
-    # def fun_forrester_2(self, X):
-    #     """
-    #     Function used by [Forr08a, p.83].
-    #     f(x) = (6x- 2)^2 sin(12x-4) for x in [0,1].
-    #     Starts with three sample points at x=0, x=0.5, and x=1.
-
-    #     Args:
-    #         X (flooat): input values (1-dim)
-
-    #     Returns:
-    #         float: function value
-    #     """
-    #     try:
-    #         X.shape[1]
-    #     except ValueError:
-    #         X = np.array(X)
-
-    # X = np.atleast_2d(X)
-    #     # y = X[:, 1]
-    #     y = (6.0 * X - 2) ** 2 * np.sin(12 * X - 4)
-    #     if self.sigma != 0:
-    #         noise_y = np.array([], dtype=float)
-    #         for i in y:
-    #             noise_y = np.append(
-    #                 noise_y, i + np.random.normal(loc=0, scale=self.sigma, size=1)
-    #             )
-    #         return noise_y
-    #     else:
-    #         return y
-
     def fun_runge(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Runge function. Formula: f(x) = 1/ (1 + sum(x_i) - offset)^2. Dim: k >= 1.
            Interval: -5 <= x <= 5
@@ -522,39 +492,61 @@ class analytical:
             return y
 
     def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
-        r"""Wing weight function. Example from Forrester et al. to understand the weight
-            of an unpainted light aircraft wing as a function of nine design and operational parameters:
-            $W=0.036 S_W^{0.758}  Wfw^{0.0035} ( A / (\cos^2 \Lambda))^{0.6} q^{0.006}  \lambda^{0.04} ( (100 Rtc)/(\cos
-              \Lambda) ))^{-0.3} (Nz Wdg)^{0.49}$
+        r"""Wing weight function.
+        Calculate the weight of an unpainted light aircraft wing based on design and operational parameters.
+        This function implements the wing weight model from Forrester et al., which aims to predict
+        the wing weight \( W \) using the following formula:
+
+        \[
+        W = 0.036 \times S_W^{0.758} \times W_{fw}^{0.0035} \times \left( \frac{A}{\cos^2 \Lambda} \right)^{0.6} \times q^{0.006} \times \lambda^{0.04} \times \left( \frac{100 \times R_{tc}}{\cos \Lambda} \right)^{-0.3} \times (N_z \times W_{dg})^{0.49} + S_W \times W_p
+        \]
+
+        where:
+
+        - \( S_W \): Wing area \((\text{ft}^2)\)
+        - \( W_{fw} \): Weight of fuel in the wing (lb)
+        - \( A \): Aspect ratio
+        - \( \Lambda \): Quarter-chord sweep (degrees)
+        - \( q \): Dynamic pressure at cruise \((\text{lb/ft}^2)\)
+        - \( \lambda \): Taper ratio
+        - \( R_{tc} \): Aerofoil thickness to chord ratio
+        - \( N_z \): Ultimate load factor
+        - \( W_{dg} \): Flight design gross weight (lb)
+        - \( W_p \): Paint weight \((\text{lb/ft}^2)\)
+
+        Parameter Overview:
 
         | Symbol    | Parameter                              | Baseline | Minimum | Maximum |
         |-----------|----------------------------------------|----------|---------|---------|
-        | $S_W$     | Wing area ($ft^2$)                     | 174      | 150     | 200     |
-        | $W_{fw}$  | Weight of fuel in wing (lb)            | 252      | 220     | 300     |
-        | $A$       | Aspect ratio                          | 7.52     | 6       | 10      |
-        | $\Lambda$ | Quarter-chord sweep (deg)              | 0        | -10     | 10      |
-        | $q$       | Dynamic pressure at cruise ($lb/ft^2$) | 34       | 16      | 45      |
-        | $\lambda$ | Taper ratio                            | 0.672    | 0.5     | 1       |
-        | $R_{tc}$  | Aerofoil thickness to chord ratio      | 0.12     | 0.08    | 0.18    |
-        | $N_z$     | Ultimate load factor                   | 3.8      | 2.5     | 6       |
-        | $W_{dg}$  | Flight design gross weight (lb)         | 2000     | 1700    | 2500    |
-        | $W_p$     | paint weight (lb/ft^2)                   | 0.064 |   0.025  | 0.08    |
+        | \( S_W \)     | Wing area \((\text{ft}^2)\)                     | 174      | 150     | 200     |
+        | \( W_{fw} \)  | Weight of fuel in wing (lb)            | 252      | 220     | 300     |
+        | \( A \)       | Aspect ratio                          | 7.52     | 6       | 10      |
+        | \( \Lambda \) | Quarter-chord sweep (deg)              | 0        | -10     | 10      |
+        | \( q \)       | Dynamic pressure at cruise \((\text{lb/ft}^2)\) | 34       | 16      | 45      |
+        | \( \lambda \) | Taper ratio                            | 0.672    | 0.5     | 1       |
+        | \( R_{tc} \)  | Aerofoil thickness to chord ratio      | 0.12     | 0.08    | 0.18    |
+        | \( N_z \)     | Ultimate load factor                   | 3.8      | 2.5     | 6       |
+        | \( W_{dg} \)  | Flight design gross weight (lb)         | 2000     | 1700    | 2500    |
+        | \( W_p \)     | Paint weight \((\text{lb/ft}^2)\)                  | 0.064 |   0.025  | 0.08    |
 
         Args:
-            X (array): input
-            fun_control (dict): dict with entries `sigma` (noise level) and `seed` (random seed).
+            X (np.ndarray):
+                A 2D numpy array where each row contains 10 parameters for which the wing weight will be calculated.
+            fun_control (Optional[Dict]):
+                A dictionary with keys `sigma` (noise level) and `seed` (random seed)
+                for incorporating randomness if required. Default is `None`.
 
         Returns:
-            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+            np.ndarray:
+            A 1D numpy array with shape (n,) containing the calculated wing weight values.
 
         Examples:
             >>> from spotpython.fun.objectivefunctions import analytical
             >>> import numpy as np
-            >>> X = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10, 11, 12]])
+            >>> X = np.array([np.zeros(10), np.ones(10)])
             >>> fun = analytical()
             >>> fun.fun_wingwt(X)
-            array([0.0625    , 0.015625  , 0.00390625])
-
+            array([158.28245046, 409.33182691])
         """
         if fun_control is None:
             fun_control = self.fun_control
