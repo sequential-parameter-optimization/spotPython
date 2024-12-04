@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.random import default_rng
-from random import random
 from typing import List, Optional, Dict
 
 
@@ -11,8 +10,6 @@ class Analytical:
     Args:
         offset (float):
             Offset value. Defaults to 0.0.
-        hz (float):
-            Horizontal value. Defaults to 0.
         seed (int):
             Seed value for random number generation. Defaults to 126.
 
@@ -22,8 +19,6 @@ class Analytical:
     Attributes:
         offset (float):
             Offset value.
-        hz (float):
-            Horizontal value.
         sigma (float):
             Noise level.
         seed (int):
@@ -34,16 +29,15 @@ class Analytical:
             Dictionary containing control parameters for the function.
     """
 
-    def __init__(self, offset: float = 0.0, hz: float = 0, sigma=0.0, seed: int = 126) -> None:
+    def __init__(self, offset: float = 0.0, sigma=0.0, seed: int = 126) -> None:
         self.offset = offset
-        self.hz = hz
         self.sigma = sigma
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
         self.fun_control = {"sigma": sigma, "seed": None, "sel_var": None}
 
     def __repr__(self) -> str:
-        return f"analytical(offset={self.offset}, hz={self.hz}, seed={self.seed})"
+        return f"analytical(offset={self.offset}, sigma={self.sigma}, seed={self.seed})"
 
     def _prepare_input_data(self, X, fun_control):
         if fun_control is not None:
@@ -53,7 +47,7 @@ class Analytical:
         X = np.atleast_2d(X)
         return X
 
-    def add_noise(self, y: List[float]) -> np.ndarray:
+    def _add_noise(self, y: List[float]) -> np.ndarray:
         """
         Adds noise to the input data.
         This method takes in a list of float values y as input and adds noise to
@@ -72,7 +66,7 @@ class Analytical:
                 import numpy as np
                 y = np.array([1, 2, 3, 4, 5])
                 fun = analytical(sigma=1.0, seed=123)
-                fun.add_noise(y)
+                fun._add_noise(y)
             array([0.01087865, 1.63221335, 4.28792526, 4.19397442, 5.9202309 ])
 
         """
@@ -136,7 +130,7 @@ class Analytical:
                 y[j] = y[j] + 10
             elif x3[j] == 2:
                 y[j] = y[j] - 10
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_linear(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Linear function.
@@ -160,10 +154,8 @@ class Analytical:
 
         """
         X = self._prepare_input_data(X, fun_control)
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, np.sum(X[i]))
-        return self.add_noise(y)
+        y = np.sum(X, axis=1)
+        return self._add_noise(y)
 
     def fun_sphere(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Sphere function.
@@ -189,7 +181,7 @@ class Analytical:
         X = self._prepare_input_data(X, fun_control)
         offset = np.ones(X.shape[1]) * self.offset
         y = np.sum((X - offset) ** 2, axis=1)
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_cubed(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Cubed function. Implements the function f(x) = sum((x_i - offset)^3).
@@ -214,7 +206,7 @@ class Analytical:
         X = self._prepare_input_data(X, fun_control)
         offset = np.ones(X.shape[1]) * self.offset
         y = np.sum((X - offset) ** 3, axis=1)
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_forrester(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Forrester function. Function used by [Forr08a, p.83].
@@ -240,7 +232,7 @@ class Analytical:
         """
         X = self._prepare_input_data(X, fun_control)
         y = ((6.0 * X - 2) ** 2) * np.sin(12 * X - 4)
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_branin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         r"""Branin function. The 2-dim Branin function is defined as
@@ -295,7 +287,7 @@ class Analytical:
         s = 10
         t = 1 / (8 * np.pi)
         y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_branin_modified(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Modified Branin function.
@@ -332,7 +324,7 @@ class Analytical:
         e = 10
         ff = 1 / (8 * np.pi)
         y = (a * (X2 - b * X1**2 + c * X1 - d) ** 2 + e * (1 - ff) * np.cos(X1) + e) + 5 * x
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_sin_cos(self, X, fun_control=None):
         """Sinusoidal function.
@@ -358,8 +350,8 @@ class Analytical:
             raise Exception
         x0 = X[:, 0]
         x1 = X[:, 1]
-        y = 2.0 * np.sin(x0 + self.hz) + 0.5 * np.cos(x1 + self.hz)
-        return self.add_noise(y)
+        y = 2.0 * np.sin(x0 - self.offset) + 0.5 * np.cos(x1 - self.offset)
+        return self._add_noise(y)
 
     def fun_runge(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Runge function. Formula: f(x) = 1/ (1 + sum(x_i) - offset)^2. Dim: k >= 1.
@@ -386,7 +378,7 @@ class Analytical:
         squared_diff = (X - offset) ** 2
         sum_squared_diff = np.sum(squared_diff, axis=1)
         y = 1 / (1 + sum_squared_diff)
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         r"""Wing weight function.
@@ -460,7 +452,7 @@ class Analytical:
         W = 0.036 * Sw**0.758 * Wfw**0.0035 * (A / np.cos(L) ** 2) ** 0.6 * q**0.006
         W *= la**0.04 * (100 * Rtc / np.cos(L)) ** (-0.3) * (Nz * Wdg) ** (0.49)
         W += Sw * Wp
-        return self.add_noise(y=W)
+        return self._add_noise(y=W)
 
     def fun_xsin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Example function.
@@ -482,7 +474,7 @@ class Analytical:
         """
         X = self._prepare_input_data(X, fun_control)
         y = X * np.sin(1.0 / X)
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_rosen(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Rosenbrock function.
@@ -508,7 +500,7 @@ class Analytical:
         x1 = X[:, 1]
         b = 10
         y = (x0 - 1) ** 2 + b * (x1 - x0**2) ** 2
-        return self.add_noise(y)
+        return self._add_noise(y)
 
     def fun_random_error(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Return errors for testing spot stability.
@@ -531,9 +523,8 @@ class Analytical:
         X = self._prepare_input_data(X, fun_control)
         # Compute the sum of rows of X
         y = np.sum(X, axis=1)
-
         # Determine which elements to set to np.nan
-        nan_mask = random(y.shape) < 0.1
+        nan_mask = self.rng.random(size=y.shape) < 0.1
         y[nan_mask] = np.nan
 
-        return self.add_noise(y)
+        return self._add_noise(y)
