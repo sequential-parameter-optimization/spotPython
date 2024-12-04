@@ -45,6 +45,14 @@ class Analytical:
     def __repr__(self) -> str:
         return f"analytical(offset={self.offset}, hz={self.hz}, seed={self.seed})"
 
+    def _prepare_input_data(self, X, fun_control):
+        if fun_control is not None:
+            self.fun_control = fun_control
+        if not isinstance(X, np.ndarray):
+            X = np.array(X)
+        X = np.atleast_2d(X)
+        return X
+
     def add_noise(self, y: List[float]) -> np.ndarray:
         """
         Adds noise to the input data.
@@ -68,19 +76,22 @@ class Analytical:
             array([0.01087865, 1.63221335, 4.28792526, 4.19397442, 5.9202309 ])
 
         """
-        # Use own rng:
-        if self.fun_control["seed"] is not None:
-            rng = default_rng(seed=self.fun_control["seed"])
-        # Use class rng:
+        if self.fun_control["sigma"] > 0:
+            # Use own rng:
+            if self.fun_control["seed"] is not None:
+                rng = default_rng(seed=self.fun_control["seed"])
+            # Use class rng:
+            else:
+                rng = self.rng
+            noise_y = np.array([], dtype=float)
+            for y_i in y:
+                noise_y = np.append(
+                    noise_y,
+                    y_i + rng.normal(loc=0, scale=self.fun_control["sigma"], size=1),
+                )
+            return noise_y
         else:
-            rng = self.rng
-        noise_y = np.array([], dtype=float)
-        for y_i in y:
-            noise_y = np.append(
-                noise_y,
-                y_i + rng.normal(loc=0, scale=self.fun_control["sigma"], size=1),
-            )
-        return noise_y
+            return y
 
     def fun_branin_factor(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """
@@ -107,10 +118,7 @@ class Analytical:
                 fun.fun_branin_factor(X)
                 array([55.60211264, 65.60211264, 45.60211264])
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if len(X.shape) == 1:
-            X = np.array([X])
+        X = self._prepare_input_data(X, fun_control)
         if X.shape[1] != 3:
             raise Exception("X must have shape (n, 3)")
         x1 = X[:, 0]
@@ -128,10 +136,7 @@ class Analytical:
                 y[j] = y[j] + 10
             elif x3[j] == 2:
                 y[j] = y[j] - 10
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        return self.add_noise(y)
 
     def fun_linear(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Linear function.
@@ -154,18 +159,11 @@ class Analytical:
             array([ 6., 15.])
 
         """
-        if fun_control is not None:
-            self.fun_control = fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-        X = np.atleast_2d(X)
+        X = self._prepare_input_data(X, fun_control)
         y = np.array([], dtype=float)
         for i in range(X.shape[0]):
             y = np.append(y, np.sum(X[i]))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        return self.add_noise(y)
 
     def fun_sphere(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Sphere function.
@@ -188,19 +186,10 @@ class Analytical:
             array([14., 77.])
 
         """
-        if fun_control is not None:
-            self.fun_control = fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-        X = np.atleast_2d(X)
+        X = self._prepare_input_data(X, fun_control)
         offset = np.ones(X.shape[1]) * self.offset
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, np.sum((X[i] - offset) ** 2))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        y = np.sum((X - offset) ** 2, axis=1)
+        return self.add_noise(y)
 
     def fun_cubed(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Cubed function. Implements the function f(x) = sum((x_i - offset)^3).
@@ -222,21 +211,10 @@ class Analytical:
             >>> fun.fun_cubed(X)
             array([ 36., 405., -3.])
         """
-
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-
-        X = np.atleast_2d(X)
+        X = self._prepare_input_data(X, fun_control)
         offset = np.ones(X.shape[1]) * self.offset
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, np.sum((X[i] - offset) ** 3))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        y = np.sum((X - offset) ** 3, axis=1)
+        return self.add_noise(y)
 
     def fun_forrester(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Forrester function. Function used by [Forr08a, p.83].
@@ -260,19 +238,9 @@ class Analytical:
             >>> fun.fun_forrester(X)
             array([  0.        ,  11.99999999])
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-
-        X = np.atleast_2d(X)
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, (6.0 * X[i] - 2) ** 2 * np.sin(12 * X[i] - 4))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        X = self._prepare_input_data(X, fun_control)
+        y = ((6.0 * X - 2) ** 2) * np.sin(12 * X - 4)
+        return self.add_noise(y)
 
     def fun_branin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         r"""Branin function. The 2-dim Branin function is defined as
@@ -315,10 +283,7 @@ class Analytical:
                 array([55.60211264,  0.39788736,  0.39788736,  0.39788736])
 
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
+        X = self._prepare_input_data(X, fun_control)
         if X.shape[1] != 2:
             raise Exception
         x1 = X[:, 0]
@@ -330,10 +295,7 @@ class Analytical:
         s = 10
         t = 1 / (8 * np.pi)
         y = a * (x2 - b * x1**2 + c * x1 - r) ** 2 + s * (1 - t) * np.cos(x1) + s
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        return self.add_noise(y)
 
     def fun_branin_modified(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Modified Branin function.
@@ -356,11 +318,7 @@ class Analytical:
             array([  0.        ,  11.99999999])
 
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-
+        X = self._prepare_input_data(X, fun_control)
         if X.shape[1] != 2:
             raise Exception
         x = X[:, 0]
@@ -374,52 +332,7 @@ class Analytical:
         e = 10
         ff = 1 / (8 * np.pi)
         y = (a * (X2 - b * X1**2 + c * X1 - d) ** 2 + e * (1 - ff) * np.cos(X1) + e) + 5 * x
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
-
-    def branin_noise(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
-        """Branin function with noise.
-
-        Args:
-            X (array):
-                input
-            fun_control (dict):
-                dict with entries `sigma` (noise level) and `seed` (random seed).
-
-        Returns:
-            (np.ndarray): A 1D numpy array with shape (n,) containing the calculated values.
-
-        Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
-            >>> import numpy as np
-            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
-            >>> fun.branin_noise(X)
-            array([  0.        ,  11.99999999])
-
-        """
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-
-        if X.shape[1] != 2:
-            raise Exception
-        x = X[:, 0]
-        y = X[:, 1]
-        X1 = 15 * x - 5
-        X2 = 15 * y
-        a = 1
-        b = 5.1 / (4 * np.pi**2)
-        c = 5 / np.pi
-        d = 6
-        e = 10
-        ff = 1 / (8 * np.pi)
-        noiseFree = (a * (X2 - b * X1**2 + c * X1 - d) ** 2 + e * (1 - ff) * np.cos(X1) + e) + 5 * x
-        noise_y = []
-        for i in noiseFree:
-            noise_y.append(i + np.random.standard_normal() * 15)
-        return np.array(noise_y)
+        return self.add_noise(y)
 
     def fun_sin_cos(self, X, fun_control=None):
         """Sinusoidal function.
@@ -440,20 +353,13 @@ class Analytical:
             >>> fun.fun_sin_cos(X)
             array([-1.        , -0.41614684])
         """
-
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
+        X = self._prepare_input_data(X, fun_control)
         if X.shape[1] != 2:
             raise Exception
         x0 = X[:, 0]
         x1 = X[:, 1]
         y = 2.0 * np.sin(x0 + self.hz) + 0.5 * np.cos(x1 + self.hz)
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        return self.add_noise(y)
 
     def fun_runge(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Runge function. Formula: f(x) = 1/ (1 + sum(x_i) - offset)^2. Dim: k >= 1.
@@ -475,21 +381,12 @@ class Analytical:
             array([0.0625    , 0.015625  , 0.00390625])
 
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
+        X = self._prepare_input_data(X, fun_control)
         offset = np.ones(X.shape[1]) * self.offset
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, (1 / (1 + np.sum((X[i] - offset) ** 2))))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        squared_diff = (X - offset) ** 2
+        sum_squared_diff = np.sum(squared_diff, axis=1)
+        y = 1 / (1 + sum_squared_diff)
+        return self.add_noise(y)
 
     def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         r"""Wing weight function.
@@ -548,31 +445,22 @@ class Analytical:
             >>> fun.fun_wingwt(X)
             array([158.28245046, 409.33182691])
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-        #
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            Sw = X[i, 0] * (200 - 150) + 150
-            Wfw = X[i, 1] * (300 - 220) + 220
-            A = X[i, 2] * (10 - 6) + 6
-            L = (X[i, 3] * (10 - (-10)) - 10) * np.pi / 180
-            q = X[i, 4] * (45 - 16) + 16
-            la = X[i, 5] * (1 - 0.5) + 0.5
-            Rtc = X[i, 6] * (0.18 - 0.08) + 0.08
-            Nz = X[i, 7] * (6 - 2.5) + 2.5
-            Wdg = X[i, 8] * (2500 - 1700) + 1700
-            Wp = X[i, 9] * (0.08 - 0.025) + 0.025
-            # calculation on natural scale
-            W = 0.036 * Sw**0.758 * Wfw**0.0035 * (A / np.cos(L) ** 2) ** 0.6 * q**0.006
-            W = W * la**0.04 * (100 * Rtc / np.cos(L)) ** (-0.3) * (Nz * Wdg) ** (0.49) + Sw * Wp
-            y = np.append(y, W)
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        X = self._prepare_input_data(X, fun_control)
+        Sw = X[:, 0] * 50 + 150  # equivalent to (200 - 150) + 150
+        Wfw = X[:, 1] * 80 + 220  # equivalent to (300 - 220) + 220
+        A = X[:, 2] * 4 + 6  # equivalent to (10 - 6) + 6
+        L = (X[:, 3] * 20 - 10) * np.pi / 180  # equivalent to (10 - (-10)) - 10
+        q = X[:, 4] * 29 + 16  # equivalent to (45 - 16) + 16
+        la = X[:, 5] * 0.5 + 0.5  # equivalent to (1 - 0.5) + 0.5
+        Rtc = X[:, 6] * 0.1 + 0.08  # equivalent to (0.18 - 0.08) + 0.08
+        Nz = X[:, 7] * 3.5 + 2.5  # equivalent to (6 - 2.5) + 2.5
+        Wdg = X[:, 8] * 800 + 1700  # equivalent to (2500 - 1700) + 1700
+        Wp = X[:, 9] * 0.055 + 0.025  # equivalent to (0.08 - 0.025) + 0.025
+        # Calculate W for all rows in a vectorized manner
+        W = 0.036 * Sw**0.758 * Wfw**0.0035 * (A / np.cos(L) ** 2) ** 0.6 * q**0.006
+        W *= la**0.04 * (100 * Rtc / np.cos(L)) ** (-0.3) * (Nz * Wdg) ** (0.49)
+        W += Sw * Wp
+        return self.add_noise(y=W)
 
     def fun_xsin(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Example function.
@@ -592,18 +480,9 @@ class Analytical:
             array([0.84147098, 0.90929743, 0.14112001])
 
         """
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
-        X = np.atleast_2d(X)
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            y = np.append(y, X[i] * np.sin(1.0 / X[i]))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        X = self._prepare_input_data(X, fun_control)
+        y = X * np.sin(1.0 / X)
+        return self.add_noise(y)
 
     def fun_rosen(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Rosenbrock function.
@@ -622,21 +501,14 @@ class Analytical:
             >>> fun.fun_rosen(X)
             array([24,  0])
         """
-
-        if fun_control is None:
-            fun_control = self.fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
+        X = self._prepare_input_data(X, fun_control)
         if X.shape[1] != 2:
             raise Exception
         x0 = X[:, 0]
         x1 = X[:, 1]
         b = 10
         y = (x0 - 1) ** 2 + b * (x1 - x0**2) ** 2
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            return y
+        return self.add_noise(y)
 
     def fun_random_error(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         """Return errors for testing spot stability.
@@ -656,22 +528,12 @@ class Analytical:
             array([24,  0])
 
         """
-        if fun_control is not None:
-            self.fun_control = fun_control
-        if not isinstance(X, np.ndarray):
-            X = np.array(X)
+        X = self._prepare_input_data(X, fun_control)
+        # Compute the sum of rows of X
+        y = np.sum(X, axis=1)
 
-        if X.ndim == 1:
-            X = X.reshape(-1, 1)
-        y = np.array([], dtype=float)
-        for i in range(X.shape[0]):
-            # provoke error:
-            if random() < 0.1:
-                y = np.append(y, np.nan)
-            else:
-                y = np.append(y, np.sum(X[i]))
-        if self.fun_control["sigma"] > 0:
-            return self.add_noise(y)
-        else:
-            print(y)
-            return y
+        # Determine which elements to set to np.nan
+        nan_mask = random(y.shape) < 0.1
+        y[nan_mask] = np.nan
+
+        return self.add_noise(y)
