@@ -1,5 +1,5 @@
 import numpy as np
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, design_control_init
 
@@ -8,7 +8,7 @@ def test_update_design():
     # number of initial points:
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
     S = spot.Spot(
@@ -32,7 +32,7 @@ def test_update_design_with_repeats_and_ocba():
     # number of initial points:
     ni = 3
     X_start = np.array([[1, 0], [1, 0], [1, 1], [1, 1]])
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         sigma=0.02,
         seed=123,
@@ -40,7 +40,6 @@ def test_update_design_with_repeats_and_ocba():
         fun_repeats=2,
         n_points=1,
         ocba_delta=1,
-        show_progress=True,
         lower=np.array([-1, -1]),
         upper=np.array([1, 1]),
     )
@@ -62,7 +61,7 @@ def test_update_design_with_repeats_and_ocba_no_var():
     ni = 3
     # The first two X_start points have no repeats and therefore no variance
     X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         sigma=0.02,
         seed=123,

@@ -3,10 +3,10 @@ def test_generate_design():
     Test generate_design method
     """
     import numpy as np
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot.spot import Spot
 
-    fun = analytical().fun_branin_factor
+    fun = Analytical().fun_branin_factor
     from spotpython.utils.init import (
         fun_control_init,
         design_control_init,

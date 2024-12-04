@@ -221,19 +221,20 @@ class Kriging(surrogates):
                 S.exp_imp(0.0, 1.0)
                 0.3989422804014327
         """
-        # We do not use the min y values, but the aggragated mean values
+        # We do not use the min y values, but the aggregated mean values
         # y_min = min(self.nat_y)
         y_min = min(self.aggregated_mean_y)
         if s0 <= 0.0:
             EI = 0.0
         elif s0 > 0.0:
-            EI_one = (y_min - y0) * (
-                    0.5 + 0.5 * erf((1.0 / sqrt(2.0)) * ((y_min - y0) / s0))
-            )
-            EI_two = (s0 * (1.0 / sqrt(2.0 * pi))) * (
-                exp(-(1.0 / 2.0) * ((y_min - y0) ** 2.0 / s0 ** 2.0))
-            )
+            # Ensure (y_min - y0) / s0 is a scalar
+            diff_scaled = (y_min - y0) / s0
+            # Calculate expected improvement components
+            EI_one = (y_min - y0) * (0.5 + 0.5 * erf((1.0 / sqrt(2.0)) * diff_scaled))
+            EI_two = (s0 * (1.0 / sqrt(2.0 * pi))) * exp(-(1.0 / 2.0) * diff_scaled ** 2)
+
             EI = EI_one + EI_two
+
         return EI
 
     def set_de_bounds(self) -> None:
@@ -1155,7 +1156,7 @@ class Kriging(surrogates):
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import fun_control_init, design_control_init
                 # 1-dimensional example

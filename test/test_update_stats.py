@@ -1,5 +1,5 @@
 import numpy as np
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, design_control_init
 
@@ -8,7 +8,7 @@ def update_stats_no_duplicates():
     # number of initial points:
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
 
@@ -35,7 +35,7 @@ def test_update_stats_duplicates_and_noise():
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
     S = spot.Spot(
@@ -64,7 +64,7 @@ def test_update_stats_duplicates_nonoise():
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
 

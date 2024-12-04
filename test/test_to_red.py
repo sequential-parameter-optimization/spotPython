@@ -1,5 +1,5 @@
 import numpy as np
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
 
@@ -16,7 +16,7 @@ def test_to_red():
     ni = 10
     # number of points
     fun_evals = 10
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     lower = np.array([-1, -1, -1])
     upper = np.array([-1, 1, 1])
     spot_1 = spot.Spot(

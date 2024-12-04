@@ -4,7 +4,7 @@ from random import random
 from typing import List, Optional, Dict
 
 
-class analytical:
+class Analytical:
     """
     Class for analytical test functions.
 

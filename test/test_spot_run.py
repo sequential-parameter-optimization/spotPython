@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, design_control_init
 
@@ -13,7 +13,7 @@ def setup_spot():
     ni = 7  # number of initial points
     ne = 20  # number of evaluations
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=ne)
     design_control = design_control_init(init_size=ni)
 

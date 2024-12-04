@@ -3,12 +3,12 @@ def test_evaluate_new_solutions():
     Test evaluate new solutions method
     """
     import numpy as np
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot.spot import Spot
     from spotpython.utils.repair import repair_non_numeric
     from spotpython.utils.init import fun_control_init, design_control_init
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
 
     nn = 3
     ni = 4

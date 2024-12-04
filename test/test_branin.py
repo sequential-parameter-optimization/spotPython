@@ -2,7 +2,7 @@ def test_branin():
     """
     Test branin function
     """
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     import numpy as np
 
     pi = np.pi
@@ -14,7 +14,7 @@ def test_branin():
     # first of the three points should be identical to X_0, the
     # other two should be shifted by 10 in y-direction (plus and minus)
     X_2 = np.array([[0, 0, 0], [0, 0, 1], [0, 0, 2]])
-    fun = analytical()
+    fun = Analytical()
     y_0 = fun.fun_branin(X_0)
     y_1 = fun.fun_branin(X_1)
     y_2 = fun.fun_branin_factor(X_2)

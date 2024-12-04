@@ -1,5 +1,5 @@
 import numpy as np
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, design_control_init
 
@@ -8,7 +8,7 @@ def test_fit_surrogate():
     # number of initial points:
     ni = 0
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         noise=False,
         lower=np.array([-1, -1]),

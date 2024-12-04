@@ -3,7 +3,7 @@ def test_show_progress():
     Test show_progress
     """
     import numpy as np
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot import spot
     from math import inf
     from spotpython.utils.init import (
@@ -16,7 +16,7 @@ def test_show_progress():
     # number of points
     n = 10
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     lower = np.array([-1])
     upper = np.array([1])
 

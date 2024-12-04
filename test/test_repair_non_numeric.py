@@ -3,7 +3,7 @@ def test_repair_non_numeric():
     Test repair_non_numeric method
     """
     import numpy as np
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot.spot import Spot
     from spotpython.utils.repair import repair_non_numeric
     from spotpython.utils.init import (
@@ -11,7 +11,7 @@ def test_repair_non_numeric():
         design_control_init,
     )
 
-    fun = analytical().fun_branin_factor
+    fun = Analytical().fun_branin_factor
     ni = 12
     spot_test = Spot(
         fun=fun,

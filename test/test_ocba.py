@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.budget.ocba import get_ocba, get_ocba_X
 from spotpython.utils.aggregate import aggregate_mean_var
@@ -24,7 +24,7 @@ def test_ocba():
 #     get_ocba(mean_y, var_y, 50)
 #     [11  9 19  9  2]
 
-fun = analytical().fun_linear
+fun = Analytical().fun_linear
 surrogate_control = surrogate_control_init(noise=True)
 design_control = design_control_init(init_size=3, repeats=2)
 fun_control = fun_control_init(

@@ -373,7 +373,7 @@ class Spot:
         Examples:
             >>> import numpy as np
                 from math import inf
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -466,7 +466,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -557,7 +557,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                                from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
@@ -770,7 +770,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -859,7 +859,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -947,7 +947,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import fun_control_init
                 fun = analytical().fun_sphere
@@ -1004,7 +1004,7 @@ class Spot:
         Examples:
             >>> # 1. Without OCBA points:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
@@ -1039,7 +1039,7 @@ class Spot:
             >>> #
             >>> # 2. Using the OCBA points:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import fun_control_init
                 # number of initial points:
@@ -1138,7 +1138,7 @@ class Spot:
 
         Examples:
                 >>> import numpy as np
-                    from spotpython.fun.objectivefunctions import analytical
+                    from spotpython.fun.objectivefunctions import Analytical
                     from spotpython.spot import spot
                     from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -1213,7 +1213,7 @@ class Spot:
             >>> import numpy as np
                 from spotpython.spot import spot
                 from spotpython.utils.init import design_control_init
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 design_control = design_control_init(init_size=3)
                 fun_control = fun_control_init(
                     lower = np.array([-1, -1]),
@@ -1315,7 +1315,8 @@ class Spot:
             if self.verbosity > 0:
                 print("update_writer(): Done.")
         else:
-            print("No spot_writer available.")
+            if self.verbosity > 0:
+                print("No spot_writer available.")
 
     def suggest_new_X(self) -> np.array:
         """
@@ -1333,7 +1334,7 @@ class Spot:
         Examples:
             >>> import numpy as np
                 from spotpython.spot import spot
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
@@ -1448,7 +1449,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -1528,7 +1529,7 @@ class Spot:
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
                     )
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 # number of initial points:
                 ni = 3
@@ -1795,7 +1796,7 @@ class Spot:
 
         Examples:
                 >>> import numpy as np
-                    from spotpython.fun.objectivefunctions import analytical
+                    from spotpython.fun.objectivefunctions import Analytical
                     from spotpython.spot import spot
                     from spotpython.utils.init import (
                         fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -2037,7 +2038,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
@@ -2205,7 +2206,7 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.fun.objectivefunctions import analytical
+                from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
                     fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init

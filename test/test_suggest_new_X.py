@@ -3,14 +3,14 @@ def test_suggest_new_X():
     Test suggest_new_X method
     """
     import numpy as np
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot.spot import Spot
     from spotpython.utils.repair import repair_non_numeric
     from spotpython.utils.init import (
         fun_control_init,
     )
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     nn = 3
     spot_test = Spot(
         fun=fun, fun_control=fun_control_init(lower=np.array([-10, -1]), upper=np.array([10, 1]), n_points=nn)

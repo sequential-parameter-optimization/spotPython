@@ -78,11 +78,11 @@ def test_extract_from_bounds():
     # 2nd Example:
     from spotpython.build.kriging import Kriging
     import numpy as np
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot import spot
     from spotpython.utils.repair import repair_non_numeric
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         lower=np.array([-1, -1]),
         upper=np.array([1, 1]),

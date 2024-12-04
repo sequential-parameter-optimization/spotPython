@@ -1,5 +1,5 @@
 import numpy as np
-from spotpython.fun.objectivefunctions import analytical
+from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
 
@@ -9,7 +9,7 @@ def test_plot_progress():
     ni = 7
     # number of points
     fun_evals = 10
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=fun_evals, tolerance_x=np.sqrt(np.spacing(1))
     )
@@ -38,7 +38,7 @@ def test_plot_progress_n_init():
     ni = 7
     # number of points
     fun_evals = 10
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=fun_evals, tolerance_x=np.sqrt(np.spacing(1))
     )

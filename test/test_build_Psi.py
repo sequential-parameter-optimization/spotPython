@@ -10,7 +10,7 @@ def test_build_Psi():
     from numpy import empty_like
     from numpy import array
     from spotpython.design.spacefilling import SpaceFilling
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot import spot
     from spotpython.utils.repair import repair_non_numeric
     from spotpython.utils.init import (
@@ -22,7 +22,7 @@ def test_build_Psi():
     # number of points:
     ni = 7
 
-    fun = analytical().fun_sphere
+    fun = Analytical().fun_sphere
     fun_control = fun_control_init(
         lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=25, noise=False, log_level=50
     )

@@ -4,13 +4,13 @@ def test_evaluate_new_X():
     """
     import numpy as np
     from spotpython.spot import spot
-    from spotpython.fun.objectivefunctions import analytical
+    from spotpython.fun.objectivefunctions import Analytical
     from spotpython.utils.init import (
         fun_control_init,
     )
 
     nn = 3
-    fun_sphere = analytical().fun_sphere
+    fun_sphere = Analytical().fun_sphere
     fun_control = fun_control_init(lower=np.array([-1, -1]), upper=np.array([1, 1]), n_points=nn)
     spot_1 = spot.Spot(
         fun=fun_sphere,
