@@ -113,7 +113,9 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
 
     # predictions = trainer.predict(model=model, datamodule=dm)
     # Changed in spotpython 0.18.12: use ckpt_path="last" to load the last checkpoint and not the model
-    predictions = trainer.predict(datamodule=dm, ckpt_path="last")
+    # predictions = trainer.predict(datamodule=dm, ckpt_path="last")
+    # Changed in spotpython 0.19.5: use ckpt_path="best" to load the best checkpoint and not the model
+    predictions = trainer.predict(datamodule=dm, ckpt_path="best")
 
     # # Load the last checkpoint
     # test_result = trainer.test(datamodule=dm, ckpt_path="last")

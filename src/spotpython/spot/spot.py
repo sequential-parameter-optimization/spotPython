@@ -9,7 +9,7 @@ import json
 from numpy.random import default_rng
 from spotpython.design.spacefilling import SpaceFilling
 from spotpython.build.kriging import Kriging
-from spotpython.utils.repair import repair_non_numeric
+from spotpython.utils.repair import repair_non_numeric, apply_penalty_NA
 import numpy as np
 import pandas as pd
 import pylab
@@ -907,6 +907,7 @@ class Spot:
         logger.debug("In Spot() initialize_design(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() initialize_design(), before calling self.fun: fun_control: %s", self.fun_control)
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
+        self.y = apply_penalty_NA(self.y, self.fun_control["penalty_NA"])
         logger.debug("In Spot() initialize_design(), after calling self.fun: self.y: %s", self.y)
         # TODO: Error if only nan values are returned
         logger.debug("New y value: %s", self.y)
@@ -978,6 +979,7 @@ class Spot:
         logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         return X0, y0
 
@@ -1105,6 +1107,7 @@ class Spot:
         )
         # (S-18): Evaluating New Solutions:
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         # Append New Solutions (only if they are not nan):
         if y0.shape[0] > 0:
@@ -1553,6 +1556,7 @@ class Spot:
         if self.k == 1:
             X_test = np.linspace(self.lower[0], self.upper[0], 100)
             y_test = self.fun(X=X_test.reshape(-1, 1), fun_control=self.fun_control)
+            y_test = apply_penalty_NA(y_test, self.fun_control["penalty_NA"])
             if isinstance(self.surrogate, Kriging):
                 y_hat = self.surrogate.predict(X_test[:, np.newaxis], return_val="y")
             else:

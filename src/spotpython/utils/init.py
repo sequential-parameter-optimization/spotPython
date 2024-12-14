@@ -65,6 +65,7 @@ def fun_control_init(
     ocba_delta=0,
     oml_grace_period=None,
     optimizer=None,
+    penalty_NA=None,
     precision="32",
     prep_model=None,
     prep_model_name=None,
@@ -218,6 +219,9 @@ def fun_control_init(
             The grace period for the OML algorithm. Default is None.
         optimizer (object):
             The optimizer object used for the search on surrogate. Default is None.
+        penalty_NA (float):
+            The penalty for NA values. Default is None. If None, the values are ignored, e.g., the
+            initial design size used for the surrogate is reduced by the number of NA values.
         precision (str):
             The precision of the data. Default is "32". Can be e.g., "16-mixed" or "16-true".
         PREFIX (str):
@@ -440,6 +444,7 @@ def fun_control_init(
         "oml_grace_period": oml_grace_period,
         "optimizer": optimizer,
         "path": None,
+        "penalty_NA": penalty_NA,
         "precision": precision,
         "prep_model": prep_model,
         "prep_model_name": prep_model_name,
