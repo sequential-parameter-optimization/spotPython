@@ -4094,7 +4094,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">dm</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;data_module&quot;</span><span class="p">]</span>
     <span class="c1"># TODO: Check if this is necessary:</span>
-    <span class="c1"># dm.setup(stage=&quot;train&quot;)</span>
+    <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
     <span class="c1"># Init model from datamodule&#39;s attributes</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;core_model&quot;</span><span class="p">](</span><span class="o">**</span><span class="n">config</span><span class="p">,</span> <span class="n">_L_in</span><span class="o">=</span><span class="n">_L_in</span><span class="p">,</span> <span class="n">_L_out</span><span class="o">=</span><span class="n">_L_out</span><span class="p">,</span> <span class="n">_L_cond</span><span class="o">=</span><span class="n">_L_cond</span><span class="p">,</span> <span class="n">_torchmetric</span><span class="o">=</span><span class="n">_torchmetric</span><span class="p">)</span>
 
@@ -4123,7 +4123,7 @@
     <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">dm</span><span class="p">)</span>
 
     <span class="c1"># Changed in spotpython 0.18.12: commented out the following line</span>
-    <span class="c1"># dm.setup(stage=&quot;predict&quot;)</span>
+    <span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;predict&quot;</span><span class="p">)</span>
 
     <span class="c1"># predictions = trainer.predict(model=model, datamodule=dm)</span>
     <span class="c1"># Changed in spotpython 0.18.12: use ckpt_path=&quot;last&quot; to load the last checkpoint and not the model</span>
