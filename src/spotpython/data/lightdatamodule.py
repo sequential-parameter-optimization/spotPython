@@ -217,7 +217,7 @@ class LightDataModule(L.LightningDataModule):
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)
 
-    def _setup_data_val_provided(self, stage) -> None:
+    def _setup_val_data_provided(self, stage) -> None:
         # New functionality for predefined train, validation and test data in the fun_control
         # Get the data set sizes
         if self.data_full_train is None:
@@ -229,7 +229,6 @@ class LightDataModule(L.LightningDataModule):
         if stage == "fit" or stage is None:
             if self.verbosity > 0:
                 print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
-            generator_fit = torch.Generator().manual_seed(self.test_seed)
             # Use all data from data_full_train as training data
             self.data_train = self.data_full_train
             # Handle scaling and transformation if scaler is provided
@@ -281,7 +280,7 @@ class LightDataModule(L.LightningDataModule):
         if self.data_full is not None:
             self._setup_full_data_provided(stage)
         elif self.data_val is not None:
-            self._setup_data_val_provided(stage)
+            self._setup_val_data_provided(stage)
         else:
             self._setup_test_data_provided(stage)
 
