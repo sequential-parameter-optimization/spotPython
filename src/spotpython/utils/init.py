@@ -30,6 +30,7 @@ def fun_control_init(
     core_model_name=None,
     data=None,
     data_full_train=None,
+    data_val=None,
     data_dir="./data",
     data_module=None,
     data_set=None,
@@ -128,8 +129,11 @@ def fun_control_init(
         data_dir (str):
             The directory to save the data. Default is "./data".
         data_full_train (torch.utils.data.Dataset, optional):
-            The full training dataset from which training and validation sets will be derived.
+            The full training dataset from which training and validation sets will be derived if data_val is None.
             Default is None.
+        data_val (torch.utils.data.Dataset, optional):
+            The validation dataset. Default is None. If not None, the training and validation sets are derived from
+            the full training dataset (data_full_train)  and the validation dataset (data_val).
         data_module (object):
             The data module object. Default is None.
         data_set (object):
@@ -399,6 +403,7 @@ def fun_control_init(
         "data_set": data_set,
         "data_set_name": data_set_name,
         "data_test": data_test,
+        "data_val": data_val,
         "db_dict_name": db_dict_name,
         "design": design,
         "device": device,
