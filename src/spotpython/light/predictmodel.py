@@ -80,7 +80,7 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     else:
         dm = fun_control["data_module"]
     # TODO: Check if this is necessary:
-    # dm.setup(stage="train")
+    dm.setup(stage="train")
     # Init model from datamodule's attributes
     model = fun_control["core_model"](**config, _L_in=_L_in, _L_out=_L_out, _L_cond=_L_cond, _torchmetric=_torchmetric)
 
@@ -109,7 +109,7 @@ def predict_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     trainer.fit(model=model, datamodule=dm)
 
     # Changed in spotpython 0.18.12: commented out the following line
-    # dm.setup(stage="predict")
+    dm.setup(stage="predict")
 
     # predictions = trainer.predict(model=model, datamodule=dm)
     # Changed in spotpython 0.18.12: use ckpt_path="last" to load the last checkpoint and not the model
