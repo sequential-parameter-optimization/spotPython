@@ -217,6 +217,43 @@ class LightDataModule(L.LightningDataModule):
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)
 
+    def _setup_data_val_provided(self, stage) -> None:
+        # New functionality for predefined train, validation and test data in the fun_control
+        # Get the data set sizes
+        if self.data_full_train is None:
+            raise ValueError("If data_val is defined, data_full_train must also be defined.")
+        train_size = len(self.data_full_train)
+        val_size = len(self.data_val)
+        test_size = len(self.data_test)
+        # Assign train and validation data sets
+        if stage == "fit" or stage is None:
+            if self.verbosity > 0:
+                print(f"train_size: {train_size}, val_size: {val_size} used for train & val data.")
+            generator_fit = torch.Generator().manual_seed(self.test_seed)
+            # Use all data from data_full_train as training data
+            self.data_train = self.data_full_train
+            # Handle scaling and transformation if scaler is provided
+            if self.scaler is not None:
+                self.handle_scaling_and_transform()
+
+        # Assign test dataset for use in dataloader(s)
+        if stage == "test" or stage is None:
+            if self.verbosity > 0:
+                print(f"test_size: {test_size} used for test dataset.")
+            self.data_test = self.data_test
+            if self.scaler is not None:
+                # Transform the test data
+                self.data_test = self.transform_dataset(self.data_test)
+
+        # Assign pred dataset for use in dataloader(s)
+        if stage == "predict" or stage is None:
+            if self.verbosity > 0:
+                print(f"test_size: {test_size} used for predict dataset.")
+            self.data_predict = self.data_test
+            if self.scaler is not None:
+                # Transform the predict data
+                self.data_predict = self.transform_dataset(self.data_predict)
+
     def setup(self, stage: Optional[str] = None) -> None:
         """
         Splits the data for use in training, validation, and testing.
@@ -243,6 +280,8 @@ class LightDataModule(L.LightningDataModule):
         """
         if self.data_full is not None:
             self._setup_full_data_provided(stage)
+        elif self.data_val is not None:
+            self._setup_data_val_provided(stage)
         else:
             self._setup_test_data_provided(stage)
 
