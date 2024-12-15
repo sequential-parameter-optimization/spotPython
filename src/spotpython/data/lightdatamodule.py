@@ -63,6 +63,7 @@ class LightDataModule(L.LightningDataModule):
         dataset: Optional[object] = None,
         data_full_train: Optional[object] = None,
         data_test: Optional[object] = None,
+        data_val: Optional[object] = None,
         test_size: Optional[float] = None,
         test_seed: int = 42,
         num_workers: int = 0,
@@ -74,6 +75,7 @@ class LightDataModule(L.LightningDataModule):
         self.data_full = dataset
         self.data_full_train = data_full_train
         self.data_test = data_test
+        self.data_val = data_val
         self.test_size = test_size
         self.test_seed = test_seed
         self.num_workers = num_workers
