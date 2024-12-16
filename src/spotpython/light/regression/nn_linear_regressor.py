@@ -4,7 +4,7 @@ from torch import nn
 from spotpython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
 import torch.optim as optim
-from spotpython.hyperparameters.architecture import get_hidden_sizes
+from spotpython.hyperparameters.architecture import get_three_layers
 
 
 class NNLinearRegressor(L.LightningModule):
@@ -149,9 +149,7 @@ class NNLinearRegressor(L.LightningModule):
         # set dummy input array for Tensorboard Graphs
         # set log_graph=True in Trainer to see the graph (in traintest.py)
         self.example_input_array = torch.zeros((batch_size, self._L_in))
-        if self.hparams.l1 < 4:
-            raise ValueError("l1 must be at least 4")
-        hidden_sizes = get_hidden_sizes(_L_in=self._L_in, l1=l1, n=10)
+        hidden_sizes = get_three_layers(self._L_in, self.hparams.l1)
 
         if batch_norm:
             # Add batch normalization layers

@@ -3,7 +3,7 @@ class ListGenerator:
     Generates a list of hidden layer sizes based on the input/output layer sizes and specified network shape.
 
     Args:
-        hparams: An object containing network hyperparameters such as the layer sizes and the shape of the network.
+        hparams (object): An object containing network hyperparameters such as the layer sizes and the shape of the network.
         L_in (int): The size of the input layer.
         L_out (int): The size of the output layer.
 
