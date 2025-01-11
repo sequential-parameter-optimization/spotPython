@@ -42,7 +42,6 @@ from spotpython.hyperparameters.values import (
 import plotly.graph_objects as go
 from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
-from spotpython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -375,17 +374,17 @@ class Spot:
                 from math import inf
                 from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
-                                from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                from spotpython.utils.init import (
+                    fun_control_init, design_control_init
                     )
                 # number of initial points:
                 ni = 7
                 # number of points
                 n = 10
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control = fun_control_init(
                     lower = np.array([-1]),
-                    upper = np.array([1])
+                    upper = np.array([1]),
                     fun_evals=n)
                 design_control=design_control_init(init_size=ni)
                 spot_1 = spot.Spot(fun=fun,
@@ -393,6 +392,7 @@ class Spot:
                             design_control=design_control,)
                 spot_1.run()
                 df = spot_1.get_spot_attributes_as_df()
+            df
                 df
                     Attribute Name                                    Attribute Value
                 0                   X  [[-0.3378148180708981], [0.698908280342222], [...
@@ -448,10 +448,11 @@ class Spot:
 
     def to_red_dim(self) -> None:
         """
-        Reduce dimension if lower == upper.
-        This is done by removing the corresponding entries from
-        lower, upper, var_type, and var_name.
-        k is modified accordingly.
+        Reduces the dimensionality of the optimization problem by removing dimensions
+        where lower and upper bounds are equal, indicating that those variables are fixed.
+        This function modifies the lower bounds, upper bounds, variable types, and variable names
+        by filtering out the non-varying dimensions. If any dimension is reduced, the `red_dim` attribute
+        is set to True, and the count of dimensions (`k`) is updated accordingly.
 
         Args:
             self (object): Spot object
@@ -460,43 +461,54 @@ class Spot:
             (NoneType): None
 
         Attributes:
-            self.lower (numpy.ndarray): lower bound
-            self.upper (numpy.ndarray): upper bound
-            self.var_type (List[str]): list of variable types
+            self.lower (numpy.ndarray):
+                lower bound
+            self.upper (numpy.ndarray):
+                upper bound
+            self.var_type (List[str]):
+                list of variable types
+            self.ident (numpy.ndarray):
+                array of boolean values indicating fixed dimensions
+            self.red_dim (bool):
+                True if dimensions are reduced, False otherwise. Checks if any dimension is fixed.
+            self.all_lower (numpy.ndarray):
+                backup of the original lower bounds
+            self.all_upper (numpy.ndarray):
+                backup of the original upper bounds
 
         Examples:
             >>> import numpy as np
                 from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
-                                from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
-                    )
-                # number of initial points:
-                ni = 3
-                # number of points
-                n = 10
-                fun = analytical().fun_sphere
-                fun_control = fun_control_init(
-                    lower = np.array([-1, -1]),
-                    upper = np.array([1, 1]),
-                    fun_evals = n)
-                design_control=design_control_init(init_size=ni)
-                spot_1 = spot.Spot(fun=fun,
-                            fun_control=fun_control,
-                            design_control=design_control,)
-                spot_1.run()
-                assert spot_1.lower.size == 2
-                assert spot_1.upper.size == 2
-                assert len(spot_1.var_type) == 2
-                assert spot_1.red_dim == False
-                spot_1.lower = np.array([-1, -1])
-                spot_1.upper = np.array([-1, -1])
-                spot_1.to_red_dim()
-                assert spot_1.lower.size == 0
-                assert spot_1.upper.size == 0
-                assert len(spot_1.var_type) == 0
-                assert spot_1.red_dim == True
-
+                from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
+                lower = np.array([-1, -1, 0, 0])
+                upper = np.array([1, -1, 0, 5])  # Second and third dimensions are fixed
+                fun_evals = 10
+                var_type = ['float', 'int', 'float', 'int']
+                var_name = ['x1', 'x2', 'x3', 'x4']
+                spot_instance = spot.Spot(
+                    # Assuming Spot takes fun, fun_control, design_control as arguments
+                    fun = Analytical().fun_sphere,  # Replace with appropriate function
+                    fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=fun_evals, show_progress=True, log_level=50),
+                )
+                spot_instance.var_type = var_type
+                spot_instance.var_name = var_name
+                spot_instance.to_red_dim()
+                # Assert: Check if dimensions were reduced correctly
+                assert spot_instance.lower.size == 2, "Expected size of lower to be 2 after reduction"
+                assert spot_instance.upper.size == 2, "Expected size of upper to be 2 after reduction"
+                assert len(spot_instance.var_type) == 2, "Expected size of var_type to be 2 after reduction"
+                assert spot_instance.k == 2, "Expected k to reflect the reduced dimensions"
+                # Check remaining values
+                expected_lower = np.array([-1, 0])
+                expected_upper = np.array([1, 5])
+                expected_var_type = ['float', 'int']
+                # there are two remaining variables, they are named x1 and x2
+                expected_var_name = ['x1', 'x2']
+                np.testing.assert_array_equal(spot_instance.lower, expected_lower)
+                np.testing.assert_array_equal(spot_instance.upper, expected_upper)
+                assert spot_instance.var_type == expected_var_type
+                assert spot_instance.var_name == expected_var_name
         """
         # Backup of the original values:
         self.all_lower = self.lower
@@ -509,31 +521,102 @@ class Spot:
         # Modify lower and upper:
         self.lower = self.lower[~self.ident]
         self.upper = self.upper[~self.ident]
-        # Modify k (dim):
+        # Modify k (number of dim):
         self.k = self.lower.size
-        # Modify var_type:
+        # Filter out types and names corresponding to non-varying dimensions
         if self.var_type is not None:
-            self.all_var_type = self.var_type
-            self.var_type = [x for x, y in zip(self.all_var_type, self.ident) if not y]
-        # Modify var_name:
-        if self.var_name is not None:
-            self.all_var_name = self.var_name
-            self.var_name = [x for x, y in zip(self.all_var_name, self.ident) if not y]
+            self.all_var_type = self.var_type.copy()
+            self.var_type = [vtype for vtype, fixed in zip(self.all_var_type, self.ident) if not fixed]
 
-    def to_all_dim(self, X0) -> np.array:
+        if self.var_name is not None:
+            self.all_var_name = self.var_name.copy()
+            self.var_name = [vname for vname, fixed in zip(self.all_var_name, self.ident) if not fixed]
+
+    def to_all_dim(self, X0: np.ndarray) -> np.ndarray:
+        """
+        Expands reduced-dimensional design points back to their full-dimensional representation
+        by reinserting fixed values for dimensions that were removed during the dimensionality
+        reduction process.
+        When `to_red_dim()` is called, dimensions where the lower and upper bounds are equal are
+        removed from the design points. `to_all_dim()` reverses this process by adding back these fixed
+        dimensions with their respective fixed values.
+
+        Args:
+            X0 (numpy.ndarray): reduced dimension design points
+
+        Returns:
+            (numpy.ndarray): full dimension design points
+
+        Atributes:
+            self.ident (numpy.ndarray):
+                array of boolean values indicating fixed dimensions
+            self.all_lower (numpy.ndarray):
+                backup of the original lower bounds.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
+                lower = np.array([-1, -1, 0, 0])
+                upper = np.array([1, -1, 0, 5])  # Second and third dimensions are fixed
+                fun_evals = 10
+                var_type = ['float', 'int', 'float', 'int']
+                var_name = ['x1', 'x2', 'x3', 'x4']
+                spot_instance = spot.Spot(
+                    fun = Analytical().fun_sphere,
+                    fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=fun_evals)
+                )
+                X0 = np.array([[2.5, 3.5], [4.5, 5.5]])
+                X_full_dim = spot_instance.to_all_dim(X0)
+                print(X_full_dim)
+                    [[ 2.5 -1.   0.   3.5]
+                    [ 4.5 -1.   0.   5.5]]
+        """
+        # Number of design points (samples):
         n = X0.shape[0]
+        # Number of dimensions:
         k = len(self.ident)
+        # Initialize full dimension design points:
         X = np.zeros((n, k))
-        j = 0
+        # The following code was modified in 0.20.5:
+        # Index for navigating X0's compressed dimension
+        reduced_index = 0
+        # Iterate through each dimension, reconstructing full dimensionality
         for i in range(k):
             if self.ident[i]:
+                # Assign fixed dimension values using stored lower bounds
                 X[:, i] = self.all_lower[i]
-                j += 1
             else:
-                X[:, i] = X0[:, i - j]
+                # Assign variable dimension values from the reduced array
+                X[:, i] = X0[:, reduced_index]
+                # Move to the next variable dimension in the compact X0 array
+                reduced_index += 1
         return X
 
-    def to_all_dim_if_needed(self, X) -> np.array:
+    def to_all_dim_if_needed(self, X: np.ndarray) -> np.array:
+        """
+        Conditionally expand reduced-dimensional design points back to their full-dimensional representation,
+        if dimensionality reduction was performed.
+        This method checks whether dimensionality reduction occurred (i.e., whether some dimensions were
+        fixed and thus removed). If so, it uses `to_all_dim()` to restore the full-dimensional representation
+        by reinserting the fixed dimensions. Otherwise, it returns the input design points unaltered.
+
+        Args:
+            X (np.ndarray): A 2D numpy array of shape (n, m), where `n` is the number of samples, and `m`
+                            corresponds to the reduced or full number of dimensions depending on the
+                            `red_dim` status.
+
+        Returns:
+            np.ndarray: A 2D numpy array of shape (n, k). If `red_dim` is True, `k` will be the full number
+                        of dimensions (including both fixed and variable). If `red_dim` is False, `k` is
+                        identical to `m`.
+
+        Attributes:
+            self.red_dim (bool): A boolean attribute indicating if dimensionality was reduced
+                                (True if dimensions were reduced, False otherwise).
+        """
+
         if self.red_dim:
             return self.to_all_dim(X)
         else:
@@ -541,32 +624,44 @@ class Spot:
 
     def get_new_X0(self) -> np.array:
         """
-        Get new design points.
+        Generate new design points for the optimization process.
+        This method attempts to suggest and repair new design points using the surrogate model
+        and experimental design techniques. If no valid new points are found within the specified
+        tolerance, a new experimental design is generated.
+
         Calls `suggest_new_X()` and repairs the new design points, e.g.,
         by `repair_non_numeric()` and `selectNew()`.
 
-        Args:
-            self (object): Spot object
-
         Returns:
-            (numpy.ndarray): new design points
+            np.ndarray: New design points, possibly repeated according to `self.fun_repeats`.
+
+        Attributes:
+            self.design (object): An experimental design object used to generate new points
+            self.n_points (int): The expected number of new points
+            self.fun_repeats (int): The number of times to repeat new points
+            self.tolerance_x (float): Minimum distance required between new and existing solutions
+            self.var_type (List[str]): Variable types for the design points
+            self.X (np.ndarray): Existing solution points
+            self.k (int): Number of dimensions
+            self.fun_control (Dict): Control parameters for the function
+            self.counter (int): Iteration counter
 
         Notes:
-            * self.design (object): an experimental design is used to generate new design points
-            if no new design points are found, a new experimental design is generated.
+            - If no new valid design points are suggested, the function resorts
+              to a space-filling design technique to generate the required points.
 
         Examples:
             >>> import numpy as np
                 from spotpython.fun.objectivefunctions import Analytical
-                               from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                from spotpython.utils.init import (
+                    fun_control_init,  design_control_init
                     )
                 from spotpython.spot import spot
                 from spotpython.utils.init import fun_control_init
                 # number of initial points:
                 ni = 3
                 X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control = fun_control_init(
                             n_points=10,
                             ocba_delta=0,
@@ -575,13 +670,12 @@ class Spot:
                 )
                 design_control=design_control_init(init_size=ni)
                 S = spot.Spot(fun=fun,
-                                fun_control=fun_control
-                                design_control=design_control,
+                            fun_control=fun_control,
+                            design_control=design_control,
                 )
                 S.initialize_design(X_start=X_start)
                 S.update_stats()
                 S.fit_surrogate()
-                X_ocba = None
                 X0 = S.get_new_X0()
                 assert X0.shape[0] == S.n_points
                 assert X0.shape[1] == S.lower.size
@@ -591,22 +685,31 @@ class Spot:
                 # print using 20 digits precision
                 np.set_printoptions(precision=20)
                 print(f"X0: {X0}")
-
+                X0: [[-0.43905273463270317 -0.20947824142606025]
+                    [-0.4390526520612617  -0.20947735118625146]
+                    [-0.4390526516559971  -0.20947735345727678]
+                    [-0.4390526491133424  -0.20947735153559494]
+                    [-0.43905264887606393 -0.209477347335596  ]
+                    [-0.43905264815296263 -0.20947734884431773]
+                    [-0.4390526481478378  -0.2094773501907511 ]
+                    [-0.43905264791185933 -0.20947734931732975]
+                    [-0.43905264783691894 -0.20947734910961185]
+                    [-0.4390526473921517  -0.2094773511154602 ]]
         """
         # Try to generate self.fun_repeats new X0 points:
         X0 = self.suggest_new_X()
+        # Repair non-numeric variables based on their types
         X0 = repair_non_numeric(X0, self.var_type)
-        # (S-16) Duplicate Handling:
-        # Condition: select only X= that have min distance
+        # Condition: select only X0 that have min distance self.tolerance_x
         # to existing solutions
         X0, X0_ind = selectNew(A=X0, X=self.X, tolerance=self.tolerance_x)
         if X0.shape[0] > 0:
-            # 1. There are X0 that fullfil the condition.
+            # If valid new points are found, repeat them as specified
+            # There are X0 that fullfil the condition.
             # Note: The number of new X0 can be smaller than self.n_points!
             logger.debug("XO values are new: %s %s", X0_ind, X0)
             return repeat(X0, self.fun_repeats, axis=0)
-            return X0
-        # 2. No X0 found. Then generate self.n_points new solutions:
+        # If no X0 found, then generate self.n_points new solutions:
         else:
             self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
             X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
@@ -614,141 +717,7 @@ class Spot:
             logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
             return X0
 
-    def de_serialize_dicts(self) -> tuple:
-        """
-        Deserialize the spot object and return the dictionaries.
-
-        Args:
-            self (object):
-                Spot object
-
-        Returns:
-            (tuple):
-                tuple containing dictionaries of spot object:
-                fun_control (dict): function control dictionary,
-                design_control (dict): design control dictionary,
-                optimizer_control (dict): optimizer control dictionary,
-                spot_tuner_control (dict): spot tuner control dictionary, and
-                surrogate_control (dict): surrogate control dictionary
-        """
-        spot_tuner = copy.deepcopy(self)
-        spot_tuner_control = vars(spot_tuner)
-
-        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
-        design_control = copy.deepcopy(spot_tuner_control["design_control"])
-        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
-        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
-
-        # remove keys from the dictionaries:
-        spot_tuner_control.pop("fun_control", None)
-        spot_tuner_control.pop("design_control", None)
-        spot_tuner_control.pop("optimizer_control", None)
-        spot_tuner_control.pop("surrogate_control", None)
-        spot_tuner_control.pop("spot_writer", None)
-        spot_tuner_control.pop("design", None)
-        spot_tuner_control.pop("fun", None)
-        spot_tuner_control.pop("optimizer", None)
-        spot_tuner_control.pop("rng", None)
-        spot_tuner_control.pop("surrogate", None)
-
-        fun_control.pop("core_model", None)
-        fun_control.pop("metric_river", None)
-        fun_control.pop("metric_sklearn", None)
-        fun_control.pop("metric_torch", None)
-        fun_control.pop("prep_model", None)
-        fun_control.pop("spot_writer", None)
-        fun_control.pop("test", None)
-        fun_control.pop("train", None)
-
-        surrogate_control.pop("model_optimizer", None)
-        surrogate_control.pop("surrogate", None)
-
-        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
-
-    def write_db_dict(self) -> None:
-        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
-
-        Args:
-            self (object): Spot object
-
-        Returns:
-            (NoneType): None
-
-        """
-        # get the time in seconds from 1.1.1970 and convert the time to a string
-        t_str = str(time.time())
-        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
-
-        (
-            fun_control,
-            design_control,
-            optimizer_control,
-            spot_tuner_control,
-            surrogate_control,
-        ) = self.de_serialize_dicts()
-        print("\n**")
-        print("The following dictionaries are written to the json file spotpython_db.json:")
-        print("fun_control:")
-        pprint.pprint(fun_control)
-
-        # Iterate over a list of the keys to avoid modifying the dictionary during iteration
-        for key in list(fun_control.keys()):
-            if not isinstance(fun_control[key], (int, float, str, list, dict)):
-                # remove the key from the dictionary
-                print(f"Removing non-serializable key: {key}")
-                fun_control.pop(key)
-
-        print("fun_control after removing non-serializabel keys:")
-        pprint.pprint(fun_control)
-        pprint.pprint(fun_control)
-        print("design_control:")
-        pprint.pprint(design_control)
-        print("optimizer_control:")
-        pprint.pprint(optimizer_control)
-        print("spot_tuner_control:")
-        pprint.pprint(spot_tuner_control)
-        print("surrogate_control:")
-        pprint.pprint(surrogate_control)
-        #
-        # Generate a description of the results:
-        # if spot_tuner_control['min_y'] exists:
-        try:
-            result = f"""
-                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
-                      at {spot_tuner_control['min_X']}."""
-            #
-            db_dict = {
-                "data": {
-                    "id": str(ident),
-                    "result": result,
-                    "fun_control": fun_control,
-                    "design_control": design_control,
-                    "surrogate_control": surrogate_control,
-                    "optimizer_control": optimizer_control,
-                    "spot_tuner_control": spot_tuner_control,
-                }
-            }
-            # Check if the directory "db_dicts" exists.
-            if not os.path.exists("db_dicts"):
-                try:
-                    os.makedirs("db_dicts")
-                except OSError as e:
-                    raise Exception(f"Error creating directory: {e}")
-
-            if os.path.exists("db_dicts"):
-                try:
-                    # Open the file in append mode to add each new dict as a new line
-                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
-                        # Using json.dumps to convert the dict to a JSON formatted string
-                        # We then write this string to the file followed by a newline character
-                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
-                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
-                except OSError as e:
-                    raise Exception(f"Error writing to file: {e}")
-        except KeyError:
-            print("No results to write.")
-
-    def run(self, X_start=None) -> Spot:
+    def run(self, X_start: np.ndarray = None) -> Spot:
         """
         Run the surrogate based optimization.
         The optimization process is controlled by the following steps:
@@ -762,24 +731,23 @@ class Spot:
             8. Show progress if needed
 
         Args:
-            self (object): Spot object
             X_start (numpy.ndarray, optional): initial design. Defaults to None.
 
         Returns:
-            (object): Spot object
+            Spot: The `Spot` instance configured and updated based on the optimization process.
 
         Examples:
             >>> import numpy as np
                 from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                    fun_control_init, design_control_init
                     )
                 # number of initial points:
                 ni = 7
                 # start point X_0
                 X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control = fun_control_init(
                     lower = np.array([-1, -1]),
                     upper = np.array([1, 1]))
@@ -788,34 +756,39 @@ class Spot:
                             fun_control=fun_control,
                             design_control=design_control,)
                 S.run(X_start=X_start)
-                print(f"S.X: {S.X}")
-                print(f"S.y: {S.y}")
-                Seed set to 123
-                Seed set to 123
-                spotpython tuning: 0.0 [########--] 80.00%
-                spotpython tuning: 0.0 [#########-] 86.67%
-                spotpython tuning: 0.0 [#########-] 93.33%
-                spotpython tuning: 0.0 [##########] 100.00% Done...
-
-                S.X: [[ 0.00000000e+00  0.00000000e+00]
-                [ 0.00000000e+00  1.00000000e+00]
-                [ 1.00000000e+00  0.00000000e+00]
-                [ 1.00000000e+00  1.00000000e+00]
-                [-9.09243389e-01 -1.58234577e-01]
-                [-2.05817107e-01 -4.81249089e-01]
-                [ 9.49741171e-01 -9.46312716e-01]
-                [-1.20955714e-01  6.38358863e-02]
-                [-6.62787018e-01  1.74316373e-01]
-                [ 2.82008441e-01  9.30010114e-01]
-                [ 4.78788115e-01  6.53210582e-01]
-                [ 2.64764215e-04  4.00803185e-03]
-                [-1.66363820e-05  4.65001027e-03]
-                [-2.60995680e-04  5.46114194e-03]
-                [ 3.74504308e-03  1.86731890e-02]]
-                S.y: [0.00000000e+00 1.00000000e+00 1.00000000e+00 2.00000000e+00
-                8.51761723e-01 2.73961367e-01 1.79751605e+00 1.87053051e-02
-                4.69672829e-01 9.44447573e-01 6.55922124e-01 1.61344194e-05
-                2.16228723e-05 2.98921900e-05 3.62713334e-04]
+                    spotpython tuning: 0.0 [########--] 80.00%
+                    spotpython tuning: 0.0 [#########-] 86.67%
+                    spotpython tuning: 0.0 [#########-] 93.33%
+                    spotpython tuning: 0.0 [##########] 100.00% Done...
+            >>> S.print_results()
+                min y: 0.0
+                x0: 0.0
+                x1: 0.0
+            >>> S.X
+                array([[ 0.0000000000000000e+00,  0.0000000000000000e+00],
+                [ 0.0000000000000000e+00,  1.0000000000000000e+00],
+                [ 1.0000000000000000e+00,  0.0000000000000000e+00],
+                [ 1.0000000000000000e+00,  1.0000000000000000e+00],
+                [-9.0924338949946959e-01, -1.5823457680063502e-01],
+                [-2.0581710650646035e-01, -4.8124908877104844e-01],
+                [ 9.4974117111856260e-01, -9.4631271618736390e-01],
+                [-1.2095571372201608e-01,  6.3835886343683867e-02],
+                [-6.6278701759800063e-01,  1.7431637339680406e-01],
+                [ 2.8200844136299108e-01,  9.3001011398034406e-01],
+                [ 4.7878811540073962e-01,  6.5321058189282999e-01],
+                [ 1.5404061268479530e-04,  4.1895410759355553e-03],
+                [-1.7027205448129213e-04,  4.7698567182254507e-03],
+                [-4.4080972128058849e-04,  5.2785168039883147e-03],
+                [ 3.7700880321788425e-03,  1.8909833144458731e-02]])
+            >>> S.y
+                array([0.0000000000000000e+00, 1.0000000000000000e+00,
+                1.0000000000000000e+00, 2.0000000000000000e+00,
+                8.5176172264376016e-01, 2.7396136677365612e-01,
+                1.7975160489355650e+00, 1.8705305067286033e-02,
+                4.6967282873066640e-01, 9.4444757310571603e-01,
+                6.5592212374576153e-01, 1.7575982937307560e-05,
+                2.2780525684937748e-05, 2.8057052860362483e-05,
+                3.7179535332164810e-04])
 
         """
         self.initialize_design(X_start)
@@ -831,9 +804,10 @@ class Spot:
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             self.spot_writer.flush()
             self.spot_writer.close()
-        if self.fun_control["db_dict_name"] is not None:
+        if self.fun_control.get("db_dict_name") is not None:
             self.write_db_dict()
-        if self.fun_control["save_experiment"]:
+
+        if self.fun_control.get("save_experiment"):
             self.save_experiment()
         return self
 
@@ -1625,50 +1599,6 @@ class Spot:
             output.append([var_name, val])
         return output
 
-    def print_results_old(self, print_screen=True, dict=None) -> list[str]:
-        """Print results from the run:
-            1. min y
-            2. min X
-            If `noise == True`, additionally the following values are printed:
-            3. min mean y
-            4. min mean X
-
-        Args:
-            print_screen (bool, optional):
-                print results to screen
-
-        Returns:
-            output (list):
-                list of results
-        """
-        output = []
-        if print_screen:
-            print(f"min y: {self.min_y}")
-        res = self.to_all_dim(self.min_X.reshape(1, -1))
-        for i in range(res.shape[1]):
-            if self.all_var_name is None:
-                var_name = "x" + str(i)
-            else:
-                var_name = self.all_var_name[i]
-                var_type = self.all_var_type[i]
-                if var_type == "factor" and dict is not None:
-                    val = get_ith_hyperparameter_name_from_fun_control(fun_control=dict, key=var_name, i=int(res[0][i]))
-                else:
-                    val = res[0][i]
-            if print_screen:
-                print(var_name + ":", val)
-            output.append([var_name, val])
-        if self.noise:
-            res = self.to_all_dim(self.min_mean_X.reshape(1, -1))
-            if print_screen:
-                print(f"min mean y: {self.min_mean_y}")
-            for i in range(res.shape[1]):
-                var_name = "x" + str(i) if self.all_var_name is None else self.all_var_name[i]
-                if print_screen:
-                    print(var_name + ":", res[0][i])
-                output.append([var_name, res[0][i]])
-        return output
-
     def get_tuned_hyperparameters(self, fun_control=None) -> dict:
         """Return the tuned hyperparameter values from the run.
         If `noise == True`, the mean values are returned.
@@ -2361,3 +2291,137 @@ class Spot:
             self.spot_writer.flush()
             self.spot_writer.close()
             del self.spot_writer
+
+    def de_serialize_dicts(self) -> tuple:
+        """
+        Deserialize the spot object and return the dictionaries.
+
+        Args:
+            self (object):
+                Spot object
+
+        Returns:
+            (tuple):
+                tuple containing dictionaries of spot object:
+                fun_control (dict): function control dictionary,
+                design_control (dict): design control dictionary,
+                optimizer_control (dict): optimizer control dictionary,
+                spot_tuner_control (dict): spot tuner control dictionary, and
+                surrogate_control (dict): surrogate control dictionary
+        """
+        spot_tuner = copy.deepcopy(self)
+        spot_tuner_control = vars(spot_tuner)
+
+        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
+        design_control = copy.deepcopy(spot_tuner_control["design_control"])
+        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
+        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
+
+        # remove keys from the dictionaries:
+        spot_tuner_control.pop("fun_control", None)
+        spot_tuner_control.pop("design_control", None)
+        spot_tuner_control.pop("optimizer_control", None)
+        spot_tuner_control.pop("surrogate_control", None)
+        spot_tuner_control.pop("spot_writer", None)
+        spot_tuner_control.pop("design", None)
+        spot_tuner_control.pop("fun", None)
+        spot_tuner_control.pop("optimizer", None)
+        spot_tuner_control.pop("rng", None)
+        spot_tuner_control.pop("surrogate", None)
+
+        fun_control.pop("core_model", None)
+        fun_control.pop("metric_river", None)
+        fun_control.pop("metric_sklearn", None)
+        fun_control.pop("metric_torch", None)
+        fun_control.pop("prep_model", None)
+        fun_control.pop("spot_writer", None)
+        fun_control.pop("test", None)
+        fun_control.pop("train", None)
+
+        surrogate_control.pop("model_optimizer", None)
+        surrogate_control.pop("surrogate", None)
+
+        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
+
+    def write_db_dict(self) -> None:
+        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        """
+        # get the time in seconds from 1.1.1970 and convert the time to a string
+        t_str = str(time.time())
+        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
+
+        (
+            fun_control,
+            design_control,
+            optimizer_control,
+            spot_tuner_control,
+            surrogate_control,
+        ) = self.de_serialize_dicts()
+        print("\n**")
+        print("The following dictionaries are written to the json file spotpython_db.json:")
+        print("fun_control:")
+        pprint.pprint(fun_control)
+
+        # Iterate over a list of the keys to avoid modifying the dictionary during iteration
+        for key in list(fun_control.keys()):
+            if not isinstance(fun_control[key], (int, float, str, list, dict)):
+                # remove the key from the dictionary
+                print(f"Removing non-serializable key: {key}")
+                fun_control.pop(key)
+
+        print("fun_control after removing non-serializabel keys:")
+        pprint.pprint(fun_control)
+        pprint.pprint(fun_control)
+        print("design_control:")
+        pprint.pprint(design_control)
+        print("optimizer_control:")
+        pprint.pprint(optimizer_control)
+        print("spot_tuner_control:")
+        pprint.pprint(spot_tuner_control)
+        print("surrogate_control:")
+        pprint.pprint(surrogate_control)
+        #
+        # Generate a description of the results:
+        # if spot_tuner_control['min_y'] exists:
+        try:
+            result = f"""
+                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
+                      at {spot_tuner_control['min_X']}."""
+            #
+            db_dict = {
+                "data": {
+                    "id": str(ident),
+                    "result": result,
+                    "fun_control": fun_control,
+                    "design_control": design_control,
+                    "surrogate_control": surrogate_control,
+                    "optimizer_control": optimizer_control,
+                    "spot_tuner_control": spot_tuner_control,
+                }
+            }
+            # Check if the directory "db_dicts" exists.
+            if not os.path.exists("db_dicts"):
+                try:
+                    os.makedirs("db_dicts")
+                except OSError as e:
+                    raise Exception(f"Error creating directory: {e}")
+
+            if os.path.exists("db_dicts"):
+                try:
+                    # Open the file in append mode to add each new dict as a new line
+                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
+                        # Using json.dumps to convert the dict to a JSON formatted string
+                        # We then write this string to the file followed by a newline character
+                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
+                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
+                except OSError as e:
+                    raise Exception(f"Error writing to file: {e}")
+        except KeyError:
+            print("No results to write.")

@@ -1,5 +1,6 @@
 from math import ceil
 
+
 def generate_div2_list(input_size, n_min, max_repeats=2) -> list:
     """
     Generates a list of integers starting from `n` and repeatedly dividing by 2 until `n_min` is reached.
@@ -107,5 +108,5 @@ def get_three_layers(_L_in, l1) -> list:
     """
     a = 2 * l1 * _L_in
     b = l1 * _L_in
-    c = ceil(l1/2) * _L_in
-    return [a, b, a, b, b, c, c] 
+    c = ceil(l1 / 2) * _L_in
+    return [a, b, a, b, b, c, c]
