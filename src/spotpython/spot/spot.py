@@ -805,7 +805,7 @@ class Spot:
             self.spot_writer.flush()
             self.spot_writer.close()
         if self.fun_control.get("db_dict_name") is not None:
-            self.write_db_dict()
+            self._write_db_dict()
 
         if self.fun_control.get("save_experiment"):
             self.save_experiment()
@@ -1057,21 +1057,16 @@ class Spot:
         Save the experiment to a file.
 
         Args:
-            filename (str):
-                The filename of the experiment file.
-            path (str):
-                The path to the experiment file.
-            overwrite (bool):
-                If `True`, the file will be overwritten if it already exists. Default is `True`.
+            filename (str): The filename of the experiment file.
+            path (str): The path to the experiment file.
+            overwrite (bool): If `True`, the file will be overwritten if it already exists. Default is `True`.
 
         Returns:
             None
         """
-        # Remove or close any unpickleable objects, e.g., the spot_writer
-        self.close_and_del_spot_writer()
-
-        # Remove the logger handler before pickling
-        self.remove_logger_handlers()
+        # Ensure we don't accidentally try to pickle unpicklable components
+        self._close_and_del_spot_writer()
+        self._remove_logger_handlers()
 
         # Create deep copies of control dictionaries
         fun_control = copy.deepcopy(self.fun_control)
@@ -1079,27 +1074,19 @@ class Spot:
         surrogate_control = copy.deepcopy(self.surrogate_control)
         design_control = copy.deepcopy(self.design_control)
 
-        # Deep copy the spot object itself (except unpickleable components)
-        try:
-            spot_tuner = copy.deepcopy(self)
-        except Exception as e:
-            print("Warning: Could not copy spot_tuner object!")
-            print(f"Error: {e}")
-            spot_tuner = self
-
-        # Prepare the experiment dictionary
+        # Prepare an experiment dictionary excluding any explicitly unpickable components
         experiment = {
             "design_control": design_control,
             "fun_control": fun_control,
             "optimizer_control": optimizer_control,
-            "spot_tuner": spot_tuner,
+            "spot_tuner": self._get_pickle_safe_spot_tuner(),
             "surrogate_control": surrogate_control,
         }
 
         # Determine the filename based on PREFIX if not provided
-        PREFIX = fun_control.get("PREFIX")
-        if filename is None and PREFIX is not None:
-            filename = get_experiment_filename(PREFIX)
+        PREFIX = fun_control.get("PREFIX", "experiment")
+        if filename is None:
+            filename = self.get_experiment_filename(PREFIX)
 
         if path is not None:
             filename = os.path.join(path, filename)
@@ -1117,30 +1104,43 @@ class Spot:
                 try:
                     pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 except Exception as e:
-                    print(f"Error: {e}")
+                    print(f"Error during pickling: {e}")
                     raise e
             print(f"Experiment saved to {filename}")
 
-    def remove_logger_handlers(self) -> None:
+    def _remove_logger_handlers(self) -> None:
         """
         Remove handlers from the logger to avoid pickling issues.
         """
         logger = logging.getLogger(__name__)
-        for handler in logger.handlers[:]:  # Copy the list to avoid modification during iteration
+        for handler in list(logger.handlers):  # Copy the list to avoid modification during iteration
             logger.removeHandler(handler)
 
-    def reattach_logger_handlers(self) -> None:
+    def _close_and_del_spot_writer(self) -> None:
         """
-        Reattach handlers to the logger after unpickling.
+        Delete the spot_writer attribute from the object
+        if it exists and close the writer.
         """
-        logger = logging.getLogger(__name__)
-        # configure the handler and formatter as needed
-        py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
-        py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-        # add formatter to the handler
-        py_handler.setFormatter(py_formatter)
-        # add handler to the logger
-        logger.addHandler(py_handler)
+        if hasattr(self, "spot_writer") and self.spot_writer is not None:
+            self.spot_writer.flush()
+            self.spot_writer.close()
+            del self.spot_writer
+
+    def _get_pickle_safe_spot_tuner(self):
+        """
+        Create a copy of self excluding unpickleable components for safe pickling.
+        This ensures no unpicklable components are passed to pickle.dump().
+
+        Returns:
+            Spot: A copy of the Spot instance with unpickleable components removed.
+        """
+        # Make a deepcopy and manually remove unpickleable components
+        spot_tuner = copy.deepcopy(self)
+        unpickleable_attrs = ["spot_writer", "logger", "fun", "optimizer", "surrogate"]
+        for attr in unpickleable_attrs:
+            if hasattr(spot_tuner, attr):
+                delattr(spot_tuner, attr)
+        return spot_tuner
 
     def init_spot_writer(self) -> None:
         """
@@ -1153,150 +1153,6 @@ class Spot:
             self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
         else:
             self.spot_writer = None
-
-    def close_and_del_spot_writer(self) -> None:
-        """
-        Delete the spot_writer attribute from the object
-        if it exists and close the writer.
-        """
-        if hasattr(self, "spot_writer") and self.spot_writer is not None:
-            self.spot_writer.flush()
-            self.spot_writer.close()
-            del self.spot_writer
-
-    def de_serialize_dicts(self) -> tuple:
-        """
-        Deserialize the spot object and return the dictionaries.
-
-        Args:
-            self (object):
-                Spot object
-
-        Returns:
-            (tuple):
-                tuple containing dictionaries of spot object:
-                fun_control (dict): function control dictionary,
-                design_control (dict): design control dictionary,
-                optimizer_control (dict): optimizer control dictionary,
-                spot_tuner_control (dict): spot tuner control dictionary, and
-                surrogate_control (dict): surrogate control dictionary
-        """
-        spot_tuner = copy.deepcopy(self)
-        spot_tuner_control = vars(spot_tuner)
-
-        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
-        design_control = copy.deepcopy(spot_tuner_control["design_control"])
-        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
-        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
-
-        # remove keys from the dictionaries:
-        spot_tuner_control.pop("fun_control", None)
-        spot_tuner_control.pop("design_control", None)
-        spot_tuner_control.pop("optimizer_control", None)
-        spot_tuner_control.pop("surrogate_control", None)
-        spot_tuner_control.pop("spot_writer", None)
-        spot_tuner_control.pop("design", None)
-        spot_tuner_control.pop("fun", None)
-        spot_tuner_control.pop("optimizer", None)
-        spot_tuner_control.pop("rng", None)
-        spot_tuner_control.pop("surrogate", None)
-
-        fun_control.pop("core_model", None)
-        fun_control.pop("metric_river", None)
-        fun_control.pop("metric_sklearn", None)
-        fun_control.pop("metric_torch", None)
-        fun_control.pop("prep_model", None)
-        fun_control.pop("spot_writer", None)
-        fun_control.pop("test", None)
-        fun_control.pop("train", None)
-
-        surrogate_control.pop("model_optimizer", None)
-        surrogate_control.pop("surrogate", None)
-
-        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
-
-    def write_db_dict(self) -> None:
-        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
-
-        Args:
-            self (object): Spot object
-
-        Returns:
-            (NoneType): None
-
-        """
-        # get the time in seconds from 1.1.1970 and convert the time to a string
-        t_str = str(time.time())
-        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
-
-        (
-            fun_control,
-            design_control,
-            optimizer_control,
-            spot_tuner_control,
-            surrogate_control,
-        ) = self.de_serialize_dicts()
-        print("\n**")
-        print("The following dictionaries are written to the json file spotpython_db.json:")
-        print("fun_control:")
-        pprint.pprint(fun_control)
-
-        # Iterate over a list of the keys to avoid modifying the dictionary during iteration
-        for key in list(fun_control.keys()):
-            if not isinstance(fun_control[key], (int, float, str, list, dict)):
-                # remove the key from the dictionary
-                print(f"Removing non-serializable key: {key}")
-                fun_control.pop(key)
-
-        print("fun_control after removing non-serializabel keys:")
-        pprint.pprint(fun_control)
-        pprint.pprint(fun_control)
-        print("design_control:")
-        pprint.pprint(design_control)
-        print("optimizer_control:")
-        pprint.pprint(optimizer_control)
-        print("spot_tuner_control:")
-        pprint.pprint(spot_tuner_control)
-        print("surrogate_control:")
-        pprint.pprint(surrogate_control)
-        #
-        # Generate a description of the results:
-        # if spot_tuner_control['min_y'] exists:
-        try:
-            result = f"""
-                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
-                      at {spot_tuner_control['min_X']}."""
-            #
-            db_dict = {
-                "data": {
-                    "id": str(ident),
-                    "result": result,
-                    "fun_control": fun_control,
-                    "design_control": design_control,
-                    "surrogate_control": surrogate_control,
-                    "optimizer_control": optimizer_control,
-                    "spot_tuner_control": spot_tuner_control,
-                }
-            }
-            # Check if the directory "db_dicts" exists.
-            if not os.path.exists("db_dicts"):
-                try:
-                    os.makedirs("db_dicts")
-                except OSError as e:
-                    raise Exception(f"Error creating directory: {e}")
-
-            if os.path.exists("db_dicts"):
-                try:
-                    # Open the file in append mode to add each new dict as a new line
-                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
-                        # Using json.dumps to convert the dict to a JSON formatted string
-                        # We then write this string to the file followed by a newline character
-                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
-                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
-                except OSError as e:
-                    raise Exception(f"Error writing to file: {e}")
-        except KeyError:
-            print("No results to write.")
 
     def should_continue(self, timeout_start) -> bool:
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
@@ -2571,3 +2427,150 @@ class Spot:
         if show:
             fig.show()
         return fig
+
+    def _reattach_logger_handlers(self) -> None:
+        """
+        Reattach handlers to the logger after unpickling.
+        """
+        logger = logging.getLogger(__name__)
+        # configure the handler and formatter as needed
+        py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
+        py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+        # add formatter to the handler
+        py_handler.setFormatter(py_formatter)
+        # add handler to the logger
+        logger.addHandler(py_handler)
+
+    def _de_serialize_dicts(self) -> tuple:
+        """
+        Deserialize the spot object and return the dictionaries.
+
+        Args:
+            self (object):
+                Spot object
+
+        Returns:
+            (tuple):
+                tuple containing dictionaries of spot object:
+                fun_control (dict): function control dictionary,
+                design_control (dict): design control dictionary,
+                optimizer_control (dict): optimizer control dictionary,
+                spot_tuner_control (dict): spot tuner control dictionary, and
+                surrogate_control (dict): surrogate control dictionary
+        """
+        spot_tuner = copy.deepcopy(self)
+        spot_tuner_control = vars(spot_tuner)
+
+        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
+        design_control = copy.deepcopy(spot_tuner_control["design_control"])
+        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
+        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
+
+        # remove keys from the dictionaries:
+        spot_tuner_control.pop("fun_control", None)
+        spot_tuner_control.pop("design_control", None)
+        spot_tuner_control.pop("optimizer_control", None)
+        spot_tuner_control.pop("surrogate_control", None)
+        spot_tuner_control.pop("spot_writer", None)
+        spot_tuner_control.pop("design", None)
+        spot_tuner_control.pop("fun", None)
+        spot_tuner_control.pop("optimizer", None)
+        spot_tuner_control.pop("rng", None)
+        spot_tuner_control.pop("surrogate", None)
+
+        fun_control.pop("core_model", None)
+        fun_control.pop("metric_river", None)
+        fun_control.pop("metric_sklearn", None)
+        fun_control.pop("metric_torch", None)
+        fun_control.pop("prep_model", None)
+        fun_control.pop("spot_writer", None)
+        fun_control.pop("test", None)
+        fun_control.pop("train", None)
+
+        surrogate_control.pop("model_optimizer", None)
+        surrogate_control.pop("surrogate", None)
+
+        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
+
+    def _write_db_dict(self) -> None:
+        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        """
+        # get the time in seconds from 1.1.1970 and convert the time to a string
+        t_str = str(time.time())
+        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
+
+        (
+            fun_control,
+            design_control,
+            optimizer_control,
+            spot_tuner_control,
+            surrogate_control,
+        ) = self._de_serialize_dicts()
+        print("\n**")
+        print("The following dictionaries are written to the json file spotpython_db.json:")
+        print("fun_control:")
+        pprint.pprint(fun_control)
+
+        # Iterate over a list of the keys to avoid modifying the dictionary during iteration
+        for key in list(fun_control.keys()):
+            if not isinstance(fun_control[key], (int, float, str, list, dict)):
+                # remove the key from the dictionary
+                print(f"Removing non-serializable key: {key}")
+                fun_control.pop(key)
+
+        print("fun_control after removing non-serializabel keys:")
+        pprint.pprint(fun_control)
+        pprint.pprint(fun_control)
+        print("design_control:")
+        pprint.pprint(design_control)
+        print("optimizer_control:")
+        pprint.pprint(optimizer_control)
+        print("spot_tuner_control:")
+        pprint.pprint(spot_tuner_control)
+        print("surrogate_control:")
+        pprint.pprint(surrogate_control)
+        #
+        # Generate a description of the results:
+        # if spot_tuner_control['min_y'] exists:
+        try:
+            result = f"""
+                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
+                      at {spot_tuner_control['min_X']}."""
+            #
+            db_dict = {
+                "data": {
+                    "id": str(ident),
+                    "result": result,
+                    "fun_control": fun_control,
+                    "design_control": design_control,
+                    "surrogate_control": surrogate_control,
+                    "optimizer_control": optimizer_control,
+                    "spot_tuner_control": spot_tuner_control,
+                }
+            }
+            # Check if the directory "db_dicts" exists.
+            if not os.path.exists("db_dicts"):
+                try:
+                    os.makedirs("db_dicts")
+                except OSError as e:
+                    raise Exception(f"Error creating directory: {e}")
+
+            if os.path.exists("db_dicts"):
+                try:
+                    # Open the file in append mode to add each new dict as a new line
+                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
+                        # Using json.dumps to convert the dict to a JSON formatted string
+                        # We then write this string to the file followed by a newline character
+                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
+                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
+                except OSError as e:
+                    raise Exception(f"Error writing to file: {e}")
+        except KeyError:
+            print("No results to write.")
