@@ -13,8 +13,8 @@ from spotpython.light.trainmodel import train_model
 from spotpython.light.loadmodel import load_light_from_checkpoint
 from spotpython.utils.classes import get_removed_attributes_and_base_net
 import pandas as pd
-from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradients
-from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
+from captum.attr import LayerConductance
+from captum.attr import IntegratedGradients, DeepLift, GradientShap, FeatureAblation
 from matplotlib.ticker import MaxNLocator
 from spotpython.data.lightdatamodule import LightDataModule
 from spotpython.torch.dimensions import extract_linear_dims
@@ -1040,7 +1040,8 @@ def viz_net(
         show_attrs (bool, optional):
             whether to display non-tensor attributes of backward nodes (Requires PyTorch version >= 1.9)
         show_saved (bool, optional):
-            whether to display saved tensor nodes that are not by custom autograd functions. Saved tensor nodes for custom functions, if present, are always displayed. (Requires PyTorch version >= 1.9)
+            whether to display saved tensor nodes that are not by custom autograd functions. Saved tensor nodes for custom functions, if present, are always displayed.
+            (Requires PyTorch version >= 1.9)
         max_attr_chars (int, optional):
             if show_attrs is True, sets max number of characters to display for any given attribute. Defaults to 50.
         filename (str, optional):

@@ -387,7 +387,9 @@ class Analytical:
         the wing weight \( W \) using the following formula:
 
         \[
-        W = 0.036 \times S_W^{0.758} \times W_{fw}^{0.0035} \times \left( \frac{A}{\cos^2 \Lambda} \right)^{0.6} \times q^{0.006} \times \lambda^{0.04} \times \left( \frac{100 \times R_{tc}}{\cos \Lambda} \right)^{-0.3} \times (N_z \times W_{dg})^{0.49} + S_W \times W_p
+        W = 0.036 \times S_W^{0.758} \times W_{fw}^{0.0035} \times \left( \frac{A}{\cos^2 \Lambda} \right)^{0.6}
+        \times q^{0.006} \times \lambda^{0.04} \times \left( \frac{100 \times R_{tc}}{\cos \Lambda} \right)^{-0.3}
+        \times (N_z \times W_{dg})^{0.49} + S_W \times W_p
         \]
 
         where:

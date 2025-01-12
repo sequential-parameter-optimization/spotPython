@@ -818,11 +818,7 @@ class Spot:
         Therefore, the design size is `init_size` + `X_start.shape[0]`.
 
         Args:
-            self (object): Spot object
             X_start (numpy.ndarray, optional): initial design. Defaults to None.
-
-        Returns:
-            (NoneType): None
 
         Attributes:
             self.X (numpy.ndarray): initial design
@@ -836,13 +832,13 @@ class Spot:
                 from spotpython.fun.objectivefunctions import Analytical
                 from spotpython.spot import spot
                 from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                    fun_control_init,  design_control_init
                     )
                 # number of initial points:
                 ni = 7
                 # start point X_0
                 X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control = fun_control_init(
                     lower = np.array([-1, -1]),
                     upper = np.array([1, 1]))
@@ -852,7 +848,79 @@ class Spot:
                             design_control=design_control,)
                 S.initialize_design(X_start=X_start)
                 print(f"S.X: {S.X}")
+                    S.X: [[ 0.          0.        ]
+                        [ 0.          1.        ]
+                        [ 1.          0.        ]
+                        [ 1.          1.        ]
+                        [-0.90924339 -0.15823458]
+                        [-0.20581711 -0.48124909]
+                        [ 0.94974117 -0.94631272]
+                        [-0.12095571  0.06383589]
+                        [-0.66278702  0.17431637]
+                        [ 0.28200844  0.93001011]
+                        [ 0.47878812  0.65321058]]
                 print(f"S.y: {S.y}")
+                        S.y: [0.         1.         1.         2.         0.85176172 0.27396137
+                            1.79751605 0.01870531 0.46967283 0.94444757 0.65592212]
+        """
+        self.initialize_design_matrix(X_start)
+
+        self.evaluate_initial_design()
+
+        self.write_tensorboard_log()
+
+    def initialize_design_matrix(self, X_start=None) -> None:
+        """
+        Initialize the design matrix for the optimization process.
+        This method generates an initial design matrix, optionally
+        appending any provided starting points (`X_start`). The resulting
+        design matrix is sanitized for non-numeric values and stored in `self.X`.
+
+        Args:
+            X_start (numpy.ndarray, optional): User-provided starting points
+                for the design. Shape should be (n_samples, n_features).
+                Defaults to None.
+
+        Returns:
+            numpy.ndarray: The design matrix that combines the generated design
+                        with the provided starting points.
+
+        Raises:
+            Exception: If the resulting design matrix has zero rows.
+
+        Note:
+            * If `X_start` is not in the expected shape, it is ignored.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun import Analytical
+                from spotpython.spot import Spot
+                from spotpython.utils.init import fun_control_init
+                fun_control = fun_control_init(
+                    tensorboard_log=True,
+                    TENSORBOARD_CLEAN=True,
+                    lower = np.array([-1]),
+                    upper = np.array([1])
+                    )
+                fun = Analytical().fun_sphere
+                S = Spot(fun=fun,
+                            fun_control=fun_control,
+                            )
+                X_start = np.array([[0.5, 0.5], [0.4, 0.4]])
+                design_matrix = S.initialize_design_matrix(X_start)
+                print(f"Design matrix: {design_matrix}")
+                    Design matrix: [[ 0.1         0.2       ]
+                    [ 0.3         0.4       ]
+                    [ 0.86352963  0.7892358 ]
+                    [-0.24407197 -0.83687436]
+                    [ 0.36481882  0.8375811 ]
+                    [ 0.415331    0.54468512]
+                    [-0.56395091 -0.77797854]
+                    [-0.90259409 -0.04899292]
+                    [-0.16484832  0.35724741]
+                    [ 0.05170659  0.07401196]
+                    [-0.78548145 -0.44638164]
+                    [ 0.64017497 -0.30363301]]
         """
         if self.design_control["init_size"] > 0:
             X0 = self.generate_design(
@@ -861,32 +929,114 @@ class Spot:
                 lower=self.lower,
                 upper=self.upper,
             )
+
         if X_start is not None:
             if not isinstance(X_start, np.ndarray):
                 X_start = np.array(X_start)
             X_start = np.atleast_2d(X_start)
             try:
                 if self.design_control["init_size"] > 0:
-                    X0 = append(X_start, X0, axis=0)
+                    X0 = np.append(X_start, X0, axis=0)
                 else:
                     X0 = X_start
             except ValueError:
                 logger.warning("X_start has wrong shape. Ignoring it.")
+
         if X0.shape[0] == 0:
             raise Exception("X0 has zero rows. Check design_control['init_size'] or X_start.")
-        X0 = repair_non_numeric(X0, self.var_type)
-        self.X = X0
-        # (S-3): Eval initial design:
-        X_all = self.to_all_dim_if_needed(X0)
-        logger.debug("In Spot() initialize_design(), before calling self.fun: X_all: %s", X_all)
-        logger.debug("In Spot() initialize_design(), before calling self.fun: fun_control: %s", self.fun_control)
+
+        self.X = repair_non_numeric(X0, self.var_type)
+
+    def evaluate_initial_design(self) -> None:
+        """
+        Evaluate the initial design.
+
+        This method evaluates the initial design matrix `X0` by applying the objective function
+        and handling NaN values. The results are stored in `self.X` and `self.y`.
+
+        Raises:
+            ValueError: If the resulting design matrix has zero rows after removing NaN values.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import Spot
+                from spotpython.utils.init import fun_control_init
+                fun_control = fun_control_init(
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1])
+                )
+                fun = Analytical().fun_sphere
+                S = Spot(fun=fun, fun_control=fun_control)
+                X0 = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+                S.initialize_design_matrix(X_start=X0)
+                S.evaluate_initial_design()
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+                    S.X: [[ 0.          0.        ]
+                    [ 0.          1.        ]
+                    [ 1.          0.        ]
+                    [ 1.          1.        ]
+                    [ 0.86352963  0.7892358 ]
+                    [-0.24407197 -0.83687436]
+                    [ 0.36481882  0.8375811 ]
+                    [ 0.415331    0.54468512]
+                    [-0.56395091 -0.77797854]
+                    [-0.90259409 -0.04899292]
+                    [-0.16484832  0.35724741]
+                    [ 0.05170659  0.07401196]
+                    [-0.78548145 -0.44638164]
+                    [ 0.64017497 -0.30363301]]
+                    S.y: [0.         1.         1.         2.         1.36857656 0.75992983
+                    0.83463487 0.46918172 0.92329124 0.8170764  0.15480068 0.00815134
+                    0.81623768 0.502017  ]
+        """
+        # check that self.X has at leat one row and is not None
+        if self.X is None or self.X.shape[0] == 0:
+            raise ValueError("The design matrix has zero rows. Check design_control['init_size'] or X_start.")
+
+        X_all = self.to_all_dim_if_needed(self.X)
+        logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: X_all: %s", X_all)
+        logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: fun_control: %s", self.fun_control)
+
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
         self.y = apply_penalty_NA(self.y, self.fun_control["penalty_NA"])
-        logger.debug("In Spot() initialize_design(), after calling self.fun: self.y: %s", self.y)
+        logger.debug("In Spot() evaluate_initial_design(), after calling self.fun: self.y: %s", self.y)
+
         # TODO: Error if only nan values are returned
         logger.debug("New y value: %s", self.y)
-        #
+
         self.counter = self.y.size
+        self.X, self.y = remove_nan(self.X, self.y, stop_on_zero_return=True)
+
+        if self.X.shape[0] == 0:
+            raise ValueError("The resulting design matrix has zero rows after removing NaN values.")
+
+        logger.debug("In Spot() evaluate_initial_design(), final X val, after remove nan: self.X: %s", self.X)
+        logger.debug("In Spot() evaluate_initial_design(), final y val, after remove nan: self.y: %s", self.y)
+
+    def write_tensorboard_log(self) -> None:
+        """Writes initial design data using the spot_writer. The spot_writer
+        is a tensorboard writer that writes the data to a tensorboard file.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
+                fun = Analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1]),
+                    upper = np.array([1])
+                    )
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            )
+                S.initialize_design()
+                S.write_tensorboard_log()
+                    Moving TENSORBOARD_PATH: runs/ to TENSORBOARD_PATH_OLD: runs_OLD/runs_2025_01_12_09_24_15
+                    Created spot_tensorboard_path: runs/spot_logs/00_p040025_2025-01-12_09-24-15 for SummaryWriter()
+        """
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             # range goes to init_size -1 because the last value is added by update_stats(),
             # which always adds the last value.
@@ -901,10 +1051,252 @@ class Spot:
                 # self.spot_writer.add_hparams(config, {"spot_y": y_j}, run_name=self.spot_tensorboard_path)
                 self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
+
+    def save_experiment(self, filename=None, path=None, overwrite=True) -> None:
+        """
+        Save the experiment to a file.
+
+        Args:
+            filename (str):
+                The filename of the experiment file.
+            path (str):
+                The path to the experiment file.
+            overwrite (bool):
+                If `True`, the file will be overwritten if it already exists. Default is `True`.
+
+        Returns:
+            None
+        """
+        # Remove or close any unpickleable objects, e.g., the spot_writer
+        self.close_and_del_spot_writer()
+
+        # Remove the logger handler before pickling
+        self.remove_logger_handlers()
+
+        # Create deep copies of control dictionaries
+        fun_control = copy.deepcopy(self.fun_control)
+        optimizer_control = copy.deepcopy(self.optimizer_control)
+        surrogate_control = copy.deepcopy(self.surrogate_control)
+        design_control = copy.deepcopy(self.design_control)
+
+        # Deep copy the spot object itself (except unpickleable components)
+        try:
+            spot_tuner = copy.deepcopy(self)
+        except Exception as e:
+            print("Warning: Could not copy spot_tuner object!")
+            print(f"Error: {e}")
+            spot_tuner = self
+
+        # Prepare the experiment dictionary
+        experiment = {
+            "design_control": design_control,
+            "fun_control": fun_control,
+            "optimizer_control": optimizer_control,
+            "spot_tuner": spot_tuner,
+            "surrogate_control": surrogate_control,
+        }
+
+        # Determine the filename based on PREFIX if not provided
+        PREFIX = fun_control.get("PREFIX")
+        if filename is None and PREFIX is not None:
+            filename = get_experiment_filename(PREFIX)
+
+        if path is not None:
+            filename = os.path.join(path, filename)
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+        # Check if the file already exists
+        if filename is not None and os.path.exists(filename) and not overwrite:
+            print(f"Error: File {filename} already exists. Use overwrite=True to overwrite the file.")
+            return
+
+        # Serialize the experiment dictionary to the pickle file
+        if filename is not None:
+            with open(filename, "wb") as handle:
+                try:
+                    pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                except Exception as e:
+                    print(f"Error: {e}")
+                    raise e
+            print(f"Experiment saved to {filename}")
+
+    def remove_logger_handlers(self) -> None:
+        """
+        Remove handlers from the logger to avoid pickling issues.
+        """
+        logger = logging.getLogger(__name__)
+        for handler in logger.handlers[:]:  # Copy the list to avoid modification during iteration
+            logger.removeHandler(handler)
+
+    def reattach_logger_handlers(self) -> None:
+        """
+        Reattach handlers to the logger after unpickling.
+        """
+        logger = logging.getLogger(__name__)
+        # configure the handler and formatter as needed
+        py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
+        py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+        # add formatter to the handler
+        py_handler.setFormatter(py_formatter)
+        # add handler to the logger
+        logger.addHandler(py_handler)
+
+    def init_spot_writer(self) -> None:
+        """
+        Initialize the spot_writer for the current experiment if in fun_control
+        the tensorboard_log is set to True
+        and the spot_tensorboard_path is not None.
+        Otherwise, the spot_writer is set to None.
+        """
+        if self.fun_control["tensorboard_log"] and self.fun_control["spot_tensorboard_path"] is not None:
+            self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
+        else:
+            self.spot_writer = None
+
+    def close_and_del_spot_writer(self) -> None:
+        """
+        Delete the spot_writer attribute from the object
+        if it exists and close the writer.
+        """
+        if hasattr(self, "spot_writer") and self.spot_writer is not None:
+            self.spot_writer.flush()
+            self.spot_writer.close()
+            del self.spot_writer
+
+    def de_serialize_dicts(self) -> tuple:
+        """
+        Deserialize the spot object and return the dictionaries.
+
+        Args:
+            self (object):
+                Spot object
+
+        Returns:
+            (tuple):
+                tuple containing dictionaries of spot object:
+                fun_control (dict): function control dictionary,
+                design_control (dict): design control dictionary,
+                optimizer_control (dict): optimizer control dictionary,
+                spot_tuner_control (dict): spot tuner control dictionary, and
+                surrogate_control (dict): surrogate control dictionary
+        """
+        spot_tuner = copy.deepcopy(self)
+        spot_tuner_control = vars(spot_tuner)
+
+        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
+        design_control = copy.deepcopy(spot_tuner_control["design_control"])
+        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
+        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
+
+        # remove keys from the dictionaries:
+        spot_tuner_control.pop("fun_control", None)
+        spot_tuner_control.pop("design_control", None)
+        spot_tuner_control.pop("optimizer_control", None)
+        spot_tuner_control.pop("surrogate_control", None)
+        spot_tuner_control.pop("spot_writer", None)
+        spot_tuner_control.pop("design", None)
+        spot_tuner_control.pop("fun", None)
+        spot_tuner_control.pop("optimizer", None)
+        spot_tuner_control.pop("rng", None)
+        spot_tuner_control.pop("surrogate", None)
+
+        fun_control.pop("core_model", None)
+        fun_control.pop("metric_river", None)
+        fun_control.pop("metric_sklearn", None)
+        fun_control.pop("metric_torch", None)
+        fun_control.pop("prep_model", None)
+        fun_control.pop("spot_writer", None)
+        fun_control.pop("test", None)
+        fun_control.pop("train", None)
+
+        surrogate_control.pop("model_optimizer", None)
+        surrogate_control.pop("surrogate", None)
+
+        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
+
+    def write_db_dict(self) -> None:
+        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        """
+        # get the time in seconds from 1.1.1970 and convert the time to a string
+        t_str = str(time.time())
+        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
+
+        (
+            fun_control,
+            design_control,
+            optimizer_control,
+            spot_tuner_control,
+            surrogate_control,
+        ) = self.de_serialize_dicts()
+        print("\n**")
+        print("The following dictionaries are written to the json file spotpython_db.json:")
+        print("fun_control:")
+        pprint.pprint(fun_control)
+
+        # Iterate over a list of the keys to avoid modifying the dictionary during iteration
+        for key in list(fun_control.keys()):
+            if not isinstance(fun_control[key], (int, float, str, list, dict)):
+                # remove the key from the dictionary
+                print(f"Removing non-serializable key: {key}")
+                fun_control.pop(key)
+
+        print("fun_control after removing non-serializabel keys:")
+        pprint.pprint(fun_control)
+        pprint.pprint(fun_control)
+        print("design_control:")
+        pprint.pprint(design_control)
+        print("optimizer_control:")
+        pprint.pprint(optimizer_control)
+        print("spot_tuner_control:")
+        pprint.pprint(spot_tuner_control)
+        print("surrogate_control:")
+        pprint.pprint(surrogate_control)
         #
-        self.X, self.y = remove_nan(self.X, self.y, stop_on_zero_return=True)
-        logger.debug("In Spot() initialize_design(), final X val, after remove nan: self.X: %s", self.X)
-        logger.debug("In Spot() initialize_design(), final y val, after remove nan: self.y: %s", self.y)
+        # Generate a description of the results:
+        # if spot_tuner_control['min_y'] exists:
+        try:
+            result = f"""
+                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
+                      at {spot_tuner_control['min_X']}."""
+            #
+            db_dict = {
+                "data": {
+                    "id": str(ident),
+                    "result": result,
+                    "fun_control": fun_control,
+                    "design_control": design_control,
+                    "surrogate_control": surrogate_control,
+                    "optimizer_control": optimizer_control,
+                    "spot_tuner_control": spot_tuner_control,
+                }
+            }
+            # Check if the directory "db_dicts" exists.
+            if not os.path.exists("db_dicts"):
+                try:
+                    os.makedirs("db_dicts")
+                except OSError as e:
+                    raise Exception(f"Error creating directory: {e}")
+
+            if os.path.exists("db_dicts"):
+                try:
+                    # Open the file in append mode to add each new dict as a new line
+                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
+                        # Using json.dumps to convert the dict to a JSON formatted string
+                        # We then write this string to the file followed by a newline character
+                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
+                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
+                except OSError as e:
+                    raise Exception(f"Error writing to file: {e}")
+        except KeyError:
+            print("No results to write.")
 
     def should_continue(self, timeout_start) -> bool:
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
@@ -2179,249 +2571,3 @@ class Spot:
         if show:
             fig.show()
         return fig
-
-    def save_experiment(self, filename=None, path=None, overwrite=True) -> None:
-        """
-        Save the experiment to a file.
-
-        Args:
-            filename (str):
-                The filename of the experiment file.
-            path (str):
-                The path to the experiment file.
-            overwrite (bool):
-                If `True`, the file will be overwritten if it already exists. Default is `True`.
-
-        Returns:
-            None
-        """
-        # Remove or close any unpickleable objects, e.g., the spot_writer
-        self.close_and_del_spot_writer()
-
-        # Remove the logger handler before pickling
-        self.remove_logger_handlers()
-
-        # Create deep copies of control dictionaries
-        fun_control = copy.deepcopy(self.fun_control)
-        optimizer_control = copy.deepcopy(self.optimizer_control)
-        surrogate_control = copy.deepcopy(self.surrogate_control)
-        design_control = copy.deepcopy(self.design_control)
-
-        # Deep copy the spot object itself (except unpickleable components)
-        try:
-            spot_tuner = copy.deepcopy(self)
-        except Exception as e:
-            print("Warning: Could not copy spot_tuner object!")
-            print(f"Error: {e}")
-            spot_tuner = self
-
-        # Prepare the experiment dictionary
-        experiment = {
-            "design_control": design_control,
-            "fun_control": fun_control,
-            "optimizer_control": optimizer_control,
-            "spot_tuner": spot_tuner,
-            "surrogate_control": surrogate_control,
-        }
-
-        # Determine the filename based on PREFIX if not provided
-        PREFIX = fun_control.get("PREFIX")
-        if filename is None and PREFIX is not None:
-            filename = get_experiment_filename(PREFIX)
-
-        if path is not None:
-            filename = os.path.join(path, filename)
-            if not os.path.exists(path):
-                os.makedirs(path)
-
-        # Check if the file already exists
-        if filename is not None and os.path.exists(filename) and not overwrite:
-            print(f"Error: File {filename} already exists. Use overwrite=True to overwrite the file.")
-            return
-
-        # Serialize the experiment dictionary to the pickle file
-        if filename is not None:
-            with open(filename, "wb") as handle:
-                try:
-                    pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                except Exception as e:
-                    print(f"Error: {e}")
-                    raise e
-            print(f"Experiment saved to {filename}")
-
-    def remove_logger_handlers(self) -> None:
-        """
-        Remove handlers from the logger to avoid pickling issues.
-        """
-        logger = logging.getLogger(__name__)
-        for handler in logger.handlers[:]:  # Copy the list to avoid modification during iteration
-            logger.removeHandler(handler)
-
-    def reattach_logger_handlers(self) -> None:
-        """
-        Reattach handlers to the logger after unpickling.
-        """
-        logger = logging.getLogger(__name__)
-        # configure the handler and formatter as needed
-        py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
-        py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-        # add formatter to the handler
-        py_handler.setFormatter(py_formatter)
-        # add handler to the logger
-        logger.addHandler(py_handler)
-
-    def init_spot_writer(self) -> None:
-        """
-        Initialize the spot_writer for the current experiment if in fun_control
-        the tensorboard_log is set to True
-        and the spot_tensorboard_path is not None.
-        Otherwise, the spot_writer is set to None.
-        """
-        if self.fun_control["tensorboard_log"] and self.fun_control["spot_tensorboard_path"] is not None:
-            self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
-        else:
-            self.spot_writer = None
-
-    def close_and_del_spot_writer(self) -> None:
-        """
-        Delete the spot_writer attribute from the object
-        if it exists and close the writer.
-        """
-        if hasattr(self, "spot_writer") and self.spot_writer is not None:
-            self.spot_writer.flush()
-            self.spot_writer.close()
-            del self.spot_writer
-
-    def de_serialize_dicts(self) -> tuple:
-        """
-        Deserialize the spot object and return the dictionaries.
-
-        Args:
-            self (object):
-                Spot object
-
-        Returns:
-            (tuple):
-                tuple containing dictionaries of spot object:
-                fun_control (dict): function control dictionary,
-                design_control (dict): design control dictionary,
-                optimizer_control (dict): optimizer control dictionary,
-                spot_tuner_control (dict): spot tuner control dictionary, and
-                surrogate_control (dict): surrogate control dictionary
-        """
-        spot_tuner = copy.deepcopy(self)
-        spot_tuner_control = vars(spot_tuner)
-
-        fun_control = copy.deepcopy(spot_tuner_control["fun_control"])
-        design_control = copy.deepcopy(spot_tuner_control["design_control"])
-        optimizer_control = copy.deepcopy(spot_tuner_control["optimizer_control"])
-        surrogate_control = copy.deepcopy(spot_tuner_control["surrogate_control"])
-
-        # remove keys from the dictionaries:
-        spot_tuner_control.pop("fun_control", None)
-        spot_tuner_control.pop("design_control", None)
-        spot_tuner_control.pop("optimizer_control", None)
-        spot_tuner_control.pop("surrogate_control", None)
-        spot_tuner_control.pop("spot_writer", None)
-        spot_tuner_control.pop("design", None)
-        spot_tuner_control.pop("fun", None)
-        spot_tuner_control.pop("optimizer", None)
-        spot_tuner_control.pop("rng", None)
-        spot_tuner_control.pop("surrogate", None)
-
-        fun_control.pop("core_model", None)
-        fun_control.pop("metric_river", None)
-        fun_control.pop("metric_sklearn", None)
-        fun_control.pop("metric_torch", None)
-        fun_control.pop("prep_model", None)
-        fun_control.pop("spot_writer", None)
-        fun_control.pop("test", None)
-        fun_control.pop("train", None)
-
-        surrogate_control.pop("model_optimizer", None)
-        surrogate_control.pop("surrogate", None)
-
-        return (fun_control, design_control, optimizer_control, spot_tuner_control, surrogate_control)
-
-    def write_db_dict(self) -> None:
-        """Writes a dictionary with the experiment parameters to the json file spotpython_db.json.
-
-        Args:
-            self (object): Spot object
-
-        Returns:
-            (NoneType): None
-
-        """
-        # get the time in seconds from 1.1.1970 and convert the time to a string
-        t_str = str(time.time())
-        ident = str(self.fun_control["PREFIX"]) + "_" + t_str
-
-        (
-            fun_control,
-            design_control,
-            optimizer_control,
-            spot_tuner_control,
-            surrogate_control,
-        ) = self.de_serialize_dicts()
-        print("\n**")
-        print("The following dictionaries are written to the json file spotpython_db.json:")
-        print("fun_control:")
-        pprint.pprint(fun_control)
-
-        # Iterate over a list of the keys to avoid modifying the dictionary during iteration
-        for key in list(fun_control.keys()):
-            if not isinstance(fun_control[key], (int, float, str, list, dict)):
-                # remove the key from the dictionary
-                print(f"Removing non-serializable key: {key}")
-                fun_control.pop(key)
-
-        print("fun_control after removing non-serializabel keys:")
-        pprint.pprint(fun_control)
-        pprint.pprint(fun_control)
-        print("design_control:")
-        pprint.pprint(design_control)
-        print("optimizer_control:")
-        pprint.pprint(optimizer_control)
-        print("spot_tuner_control:")
-        pprint.pprint(spot_tuner_control)
-        print("surrogate_control:")
-        pprint.pprint(surrogate_control)
-        #
-        # Generate a description of the results:
-        # if spot_tuner_control['min_y'] exists:
-        try:
-            result = f"""
-                      Results for {ident}: Finally, the best value is {spot_tuner_control['min_y']}
-                      at {spot_tuner_control['min_X']}."""
-            #
-            db_dict = {
-                "data": {
-                    "id": str(ident),
-                    "result": result,
-                    "fun_control": fun_control,
-                    "design_control": design_control,
-                    "surrogate_control": surrogate_control,
-                    "optimizer_control": optimizer_control,
-                    "spot_tuner_control": spot_tuner_control,
-                }
-            }
-            # Check if the directory "db_dicts" exists.
-            if not os.path.exists("db_dicts"):
-                try:
-                    os.makedirs("db_dicts")
-                except OSError as e:
-                    raise Exception(f"Error creating directory: {e}")
-
-            if os.path.exists("db_dicts"):
-                try:
-                    # Open the file in append mode to add each new dict as a new line
-                    with open("db_dicts/" + self.fun_control["db_dict_name"], "a") as f:
-                        # Using json.dumps to convert the dict to a JSON formatted string
-                        # We then write this string to the file followed by a newline character
-                        # This ensures that each dict is on its own line, conforming to the JSON Lines format
-                        f.write(json.dumps(db_dict, cls=NumpyEncoder) + "\n")
-                except OSError as e:
-                    raise Exception(f"Error writing to file: {e}")
-        except KeyError:
-            print("No results to write.")
