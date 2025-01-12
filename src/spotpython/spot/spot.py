@@ -263,8 +263,8 @@ class Spot:
             matplotlib.use("TkAgg")
         self.verbosity = self.fun_control["verbosity"]
 
-        # Tensorboard:
-        self.init_spot_writer()
+        # # Tensorboard:
+        # self.init_spot_writer()
 
         # Bounds are internal, because they are functions of self.lower and self.upper
         # and used by the optimizer:
@@ -316,31 +316,31 @@ class Spot:
             if self.surrogate_control["n_theta"] > 1:
                 surrogate_control.update({"n_theta": self.k})
 
-        # If no surrogate model is specified, use the internal
-        # spotpython kriging surrogate:
-        if self.surrogate is None:
-            # Call kriging with surrogate_control parameters:
-            self.surrogate = Kriging(
-                name="kriging",
-                noise=self.surrogate_control["noise"],
-                model_optimizer=self.surrogate_control["model_optimizer"],
-                model_fun_evals=self.surrogate_control["model_fun_evals"],
-                seed=self.surrogate_control["seed"],
-                log_level=self.log_level,
-                min_theta=self.surrogate_control["min_theta"],
-                max_theta=self.surrogate_control["max_theta"],
-                metric_factorial=self.surrogate_control["metric_factorial"],
-                n_theta=self.surrogate_control["n_theta"],
-                theta_init_zero=self.surrogate_control["theta_init_zero"],
-                p_val=self.surrogate_control["p_val"],
-                n_p=self.surrogate_control["n_p"],
-                optim_p=self.surrogate_control["optim_p"],
-                min_Lambda=self.surrogate_control["min_Lambda"],
-                max_Lambda=self.surrogate_control["max_Lambda"],
-                var_type=self.surrogate_control["var_type"],
-                spot_writer=self.spot_writer,
-                counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
-            )
+        # # If no surrogate model is specified, use the internal
+        # # spotpython kriging surrogate:
+        # if self.surrogate is None:
+        #     # Call kriging with surrogate_control parameters:
+        #     self.surrogate = Kriging(
+        #         name="kriging",
+        #         noise=self.surrogate_control["noise"],
+        #         model_optimizer=self.surrogate_control["model_optimizer"],
+        #         model_fun_evals=self.surrogate_control["model_fun_evals"],
+        #         seed=self.surrogate_control["seed"],
+        #         log_level=self.log_level,
+        #         min_theta=self.surrogate_control["min_theta"],
+        #         max_theta=self.surrogate_control["max_theta"],
+        #         metric_factorial=self.surrogate_control["metric_factorial"],
+        #         n_theta=self.surrogate_control["n_theta"],
+        #         theta_init_zero=self.surrogate_control["theta_init_zero"],
+        #         p_val=self.surrogate_control["p_val"],
+        #         n_p=self.surrogate_control["n_p"],
+        #         optim_p=self.surrogate_control["optim_p"],
+        #         min_Lambda=self.surrogate_control["min_Lambda"],
+        #         max_Lambda=self.surrogate_control["max_Lambda"],
+        #         var_type=self.surrogate_control["var_type"],
+        #         spot_writer=self.spot_writer,
+        #         counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
+        #     )
 
         # Internal attributes:
         self.X = None
@@ -791,6 +791,35 @@ class Spot:
                 3.7179535332164810e-04])
 
         """
+        # Tensorboard:
+        self.init_spot_writer()
+
+        # If no surrogate model is specified, use the internal
+        # spotpython kriging surrogate:
+        if self.surrogate is None:
+            # Call kriging with surrogate_control parameters:
+            self.surrogate = Kriging(
+                name="kriging",
+                noise=self.surrogate_control["noise"],
+                model_optimizer=self.surrogate_control["model_optimizer"],
+                model_fun_evals=self.surrogate_control["model_fun_evals"],
+                seed=self.surrogate_control["seed"],
+                log_level=self.log_level,
+                min_theta=self.surrogate_control["min_theta"],
+                max_theta=self.surrogate_control["max_theta"],
+                metric_factorial=self.surrogate_control["metric_factorial"],
+                n_theta=self.surrogate_control["n_theta"],
+                theta_init_zero=self.surrogate_control["theta_init_zero"],
+                p_val=self.surrogate_control["p_val"],
+                n_p=self.surrogate_control["n_p"],
+                optim_p=self.surrogate_control["optim_p"],
+                min_Lambda=self.surrogate_control["min_Lambda"],
+                max_Lambda=self.surrogate_control["max_Lambda"],
+                var_type=self.surrogate_control["var_type"],
+                spot_writer=self.spot_writer,
+                counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
+            )
+
         self.initialize_design(X_start)
         self.update_stats()
         self.fit_surrogate()
@@ -801,6 +830,7 @@ class Spot:
             self.update_writer()
             self.fit_surrogate()
             self.show_progress_if_needed(timeout_start)
+
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
             self.spot_writer.flush()
             self.spot_writer.close()
@@ -1052,7 +1082,7 @@ class Spot:
                 self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
 
-    def save_experiment(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
+    def save_experiment(self, filename=None, path=None, overwrite=True, unpickleables="file_io", verbosity=0) -> None:
         """
         Save the experiment to a file.
 
@@ -1067,6 +1097,12 @@ class Spot:
             overwrite (bool):
                 If `True`, the file will be overwritten if it already exists.
                 Default is `True`.
+            unpickleables (str):
+                The type of unpickleable components to exclude. Default is "file_io", which
+                excludes file I/O components like the spot_writer and logger.
+                If set to any other value, the function will exclude the function, optimizer,
+                surrogate, data_set, scaler, rng, and design components.
+                Default is "file_io".
             verbosity (int):
                 The level of verbosity. Default is 0.
 
@@ -1088,7 +1124,7 @@ class Spot:
             "design_control": design_control,
             "fun_control": fun_control,
             "optimizer_control": optimizer_control,
-            "spot_tuner": self._get_pickle_safe_spot_tuner(verbosity=verbosity),
+            "spot_tuner": self._get_pickle_safe_spot_tuner(unpickleables=unpickleables, verbosity=verbosity),
             "surrogate_control": surrogate_control,
         }
 
@@ -1135,12 +1171,18 @@ class Spot:
             self.spot_writer.close()
             del self.spot_writer
 
-    def _get_pickle_safe_spot_tuner(self, verbosity=0) -> Spot:
+    def _get_pickle_safe_spot_tuner(self, unpickleables="file_io", verbosity=0) -> Spot:
         """
         Create a copy of self excluding unpickleable components for safe pickling.
         This ensures no unpicklable components are passed to pickle.dump().
 
         Args:
+            unpickleables (str):
+                The type of unpickleable components to exclude. Default is "file_io", which
+                excludes file I/O components like the spot_writer and logger.
+                If set to any other value, the function will exclude the function, optimizer,
+                surrogate, data_set, scaler, rng, and design components.
+                Default is "file_io".
             verbosity (int):
                 The level of verbosity. Default is 0.
 
@@ -1148,8 +1190,10 @@ class Spot:
             Spot: A copy of the Spot instance with unpickleable components removed.
         """
         # List of attributes that can't be pickled
-        unpickleable_attrs = ["spot_writer", "logger", "fun", "optimizer", "surrogate", "data_set", "scaler", "rng", "design"]
-
+        if unpickleables == "file_io":
+            unpickleable_attrs = ["spot_writer", "logger"]
+        else:
+            unpickleable_attrs = ["spot_writer", "logger", "fun", "optimizer", "surrogate", "data_set", "scaler", "rng", "design"]
         # Prepare a dictionary to store picklable state
         picklable_state = {}
 
@@ -1184,8 +1228,12 @@ class Spot:
         """
         if self.fun_control["tensorboard_log"] and self.fun_control["spot_tensorboard_path"] is not None:
             self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
+            if self.verbosity > 0:
+                print(f"Created spot_tensorboard_path: {self.fun_control['spot_tensorboard_path']} for SummaryWriter()")
         else:
             self.spot_writer = None
+            if self.verbosity > 0:
+                print("No tensorboard log created.")
 
     def should_continue(self, timeout_start) -> bool:
         return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)

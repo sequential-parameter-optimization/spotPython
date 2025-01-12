@@ -171,7 +171,7 @@ class LightDataModule(L.LightningDataModule):
             self.data_predict, _, _ = random_split(self.data_full, [test_size, train_size, val_size], generator=generator_predict)
             if self.verbosity > 0:
                 print(f"train_size: {train_size}, val_size: {val_size}, test_size (= predict_size): {test_size} for splitting predict data.")
-                print(f"predict samples: {len(self.data_predict)} generated for train & val data.")
+                print(f"predict samples: {len(self.data_predict)} generated for predict data.")
             if self.scaler is not None:
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)

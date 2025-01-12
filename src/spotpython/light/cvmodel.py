@@ -64,6 +64,7 @@ def cv_model(config: dict, fun_control: dict) -> float:
                 dataset=fun_control["data_set"],
                 data_full_train=fun_control["data_full_train"],
                 data_test=fun_control["data_test"],
+                data_val=fun_control["data_val"],
                 num_workers=fun_control["num_workers"],
                 batch_size=config["batch_size"],
                 data_dir=fun_control["DATASET_PATH"],
