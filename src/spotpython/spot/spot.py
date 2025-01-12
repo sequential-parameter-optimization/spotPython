@@ -1052,14 +1052,23 @@ class Spot:
                 self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
 
-    def save_experiment(self, filename=None, path=None, overwrite=True) -> None:
+    def save_experiment(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
         """
         Save the experiment to a file.
 
         Args:
-            filename (str): The filename of the experiment file.
-            path (str): The path to the experiment file.
-            overwrite (bool): If `True`, the file will be overwritten if it already exists. Default is `True`.
+            filename (str):
+                The filename of the experiment file. If not provided,
+                the filename is generated based on the PREFIX using the
+                `get_experiment_filename()` function. Default is `None`.
+            path (str):
+                The path to the experiment file. If not provided, the file
+                is saved in the current working directory. Default is `None`.
+            overwrite (bool):
+                If `True`, the file will be overwritten if it already exists.
+                Default is `True`.
+            verbosity (int):
+                The level of verbosity. Default is 0.
 
         Returns:
             None
@@ -1079,14 +1088,14 @@ class Spot:
             "design_control": design_control,
             "fun_control": fun_control,
             "optimizer_control": optimizer_control,
-            "spot_tuner": self._get_pickle_safe_spot_tuner(),
+            "spot_tuner": self._get_pickle_safe_spot_tuner(verbosity=verbosity),
             "surrogate_control": surrogate_control,
         }
 
         # Determine the filename based on PREFIX if not provided
         PREFIX = fun_control.get("PREFIX", "experiment")
         if filename is None:
-            filename = self.get_experiment_filename(PREFIX)
+            filename = get_experiment_filename(PREFIX)
 
         if path is not None:
             filename = os.path.join(path, filename)
@@ -1126,21 +1135,45 @@ class Spot:
             self.spot_writer.close()
             del self.spot_writer
 
-    def _get_pickle_safe_spot_tuner(self):
+    def _get_pickle_safe_spot_tuner(self, verbosity=0) -> Spot:
         """
         Create a copy of self excluding unpickleable components for safe pickling.
         This ensures no unpicklable components are passed to pickle.dump().
 
+        Args:
+            verbosity (int):
+                The level of verbosity. Default is 0.
+
         Returns:
             Spot: A copy of the Spot instance with unpickleable components removed.
         """
-        # Make a deepcopy and manually remove unpickleable components
-        spot_tuner = copy.deepcopy(self)
-        unpickleable_attrs = ["spot_writer", "logger", "fun", "optimizer", "surrogate"]
-        for attr in unpickleable_attrs:
-            if hasattr(spot_tuner, attr):
-                delattr(spot_tuner, attr)
-        return spot_tuner
+        # List of attributes that can't be pickled
+        unpickleable_attrs = ["spot_writer", "logger", "fun", "optimizer", "surrogate", "data_set", "scaler", "rng", "design"]
+
+        # Prepare a dictionary to store picklable state
+        picklable_state = {}
+
+        # Copy picklable attributes to the dictionary
+        for key, value in self.__dict__.items():
+            if key not in unpickleable_attrs:
+                try:
+                    # Test if the attribute can be pickled
+                    copy.deepcopy(value)
+                    picklable_state[key] = value
+                    if verbosity > 1:
+                        print(f"Attribute {key} is picklable and will be included in the experiment file.")
+                except Exception:
+                    if verbosity > 0:
+                        print(f"Attribute {key} is not picklable and will be excluded from the experiment file.")
+                    continue
+
+        # Use the dictionary to create a new instance
+        picklable_instance = self.__class__.__new__(self.__class__)
+        picklable_instance.__dict__.update(picklable_state)
+        if verbosity > 1:
+            print(f"Picklable instance created: {picklable_instance.__dict__}")
+
+        return picklable_instance
 
     def init_spot_writer(self) -> None:
         """

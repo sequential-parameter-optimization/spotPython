@@ -70,8 +70,10 @@ def load_pickle(filename: str):
     return obj
 
 
-def get_experiment_filename(PREFIX):
+def get_experiment_filename(PREFIX) -> str:
     """Returns the name of the experiment.
+    This is the PREFIX with the suffix ".pkl".
+    It is none, if PREFIX is None.
 
     Args:
         PREFIX (str): Prefix of the experiment.
@@ -89,7 +91,7 @@ def get_experiment_filename(PREFIX):
     if PREFIX is None:
         return None
     else:
-        filename = "spot_" + PREFIX + "_experiment.pickle"
+        filename = PREFIX + ".pkl"
     return filename
 
 
@@ -118,7 +120,7 @@ def load_experiment(PKL_NAME=None, PREFIX=None):
 
     Examples:
         >>> from spotpython.utils.file import load_experiment
-        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment("spot_0_experiment.pickle")
+        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment("RUN_0.pkl")
 
     """
     if PKL_NAME is None and PREFIX is not None:
