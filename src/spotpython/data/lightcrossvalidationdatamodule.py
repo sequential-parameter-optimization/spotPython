@@ -19,6 +19,8 @@ class LightCrossValidationDataModule(L.LightningDataModule):
             The full training dataset from which training and validation sets will be derived.
         data_test (torch.utils.data.Dataset, optional):
             The separate test dataset that will be used for testing.
+        data_val (torch.utils.data.Dataset, optional):
+            The separate validation dataset that will be used for validation.
         k (int): The fold number. Defaults to 1.
         split_seed (int): The random seed for splitting the data. Defaults to 42.
         num_splits (int): The number of splits for cross-validation. Defaults to 10.
@@ -49,6 +51,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         dataset: Optional[object] = None,
         data_full_train: Optional[object] = None,
         data_test: Optional[object] = None,
+        data_val: Optional[object] = None,
         k: int = 1,
         split_seed: int = 42,
         num_splits: int = 10,
@@ -63,6 +66,7 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         self.data_full = dataset
         self.data_full_train = data_full_train
         self.data_test = data_test
+        self.data_val = data_val
         self.data_dir = data_dir
         self.num_workers = num_workers
         self.k = k
