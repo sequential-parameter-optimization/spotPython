@@ -113,7 +113,8 @@ def load_result(PREFIX) -> None:
     if PREFIX is None:
         raise ValueError("No PREFIX provided.")
     PKL_NAME = PREFIX + "_res.pkl"
-    load_experiment(PKL_NAME)
+    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(PKL_NAME=PKL_NAME)
+    return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
 
 
 def load_experiment(PREFIX=None, PKL_NAME=None):
