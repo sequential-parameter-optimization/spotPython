@@ -70,7 +70,8 @@ def fun_control_init(
     prep_model=None,
     prep_model_name=None,
     progress_file=None,
-    save_experiment=False,
+    save_experiment=True,
+    save_result=True,
     scaler=None,
     scaler_name=None,
     scenario=None,
@@ -234,7 +235,9 @@ def fun_control_init(
         progress_file (str):
             The name of the progress file. Default is None.
         save_experiment (bool):
-            Whether to save the experiment or not. Default is False.
+            Whether to save the experiment before the run is started or not. Default is False.
+        save_result (bool):
+            Whether to save the result after the experiment is done or not. Default is False.
         scaler (object):
             The scaler object, e.g., the TorchStandard scaler from spot.utils.scaler.py.
             Default is None.
@@ -450,6 +453,7 @@ def fun_control_init(
         "prep_model_name": prep_model_name,
         "progress_file": progress_file,
         "save_experiment": save_experiment,
+        "save_result": save_result,
         "save_model": False,
         "scaler": scaler,
         "scaler_name": scaler_name,

@@ -110,7 +110,8 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
     trainer.fit(model=model, datamodule=dm)
 
     # Load the last checkpoint
-    test_result = trainer.test(datamodule=dm, ckpt_path="last")
+    # test_result = trainer.test(datamodule=dm, ckpt_path="last")
+    test_result = trainer.test(datamodule=dm, ckpt_path="best")
     test_result = test_result[0]
     print(f"test_model result: {test_result}")
     return test_result["val_loss"], test_result["hp_metric"]

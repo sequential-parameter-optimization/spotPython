@@ -316,32 +316,6 @@ class Spot:
             if self.surrogate_control["n_theta"] > 1:
                 surrogate_control.update({"n_theta": self.k})
 
-        # # If no surrogate model is specified, use the internal
-        # # spotpython kriging surrogate:
-        # if self.surrogate is None:
-        #     # Call kriging with surrogate_control parameters:
-        #     self.surrogate = Kriging(
-        #         name="kriging",
-        #         noise=self.surrogate_control["noise"],
-        #         model_optimizer=self.surrogate_control["model_optimizer"],
-        #         model_fun_evals=self.surrogate_control["model_fun_evals"],
-        #         seed=self.surrogate_control["seed"],
-        #         log_level=self.log_level,
-        #         min_theta=self.surrogate_control["min_theta"],
-        #         max_theta=self.surrogate_control["max_theta"],
-        #         metric_factorial=self.surrogate_control["metric_factorial"],
-        #         n_theta=self.surrogate_control["n_theta"],
-        #         theta_init_zero=self.surrogate_control["theta_init_zero"],
-        #         p_val=self.surrogate_control["p_val"],
-        #         n_p=self.surrogate_control["n_p"],
-        #         optim_p=self.surrogate_control["optim_p"],
-        #         min_Lambda=self.surrogate_control["min_Lambda"],
-        #         max_Lambda=self.surrogate_control["max_Lambda"],
-        #         var_type=self.surrogate_control["var_type"],
-        #         spot_writer=self.spot_writer,
-        #         counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
-        #     )
-
         # Internal attributes:
         self.X = None
         self.y = None
@@ -354,6 +328,40 @@ class Spot:
         self.mean_X = None
         self.mean_y = None
         self.var_y = None
+
+        # save experiment must be called before the spot_writer is initialized
+        if self.fun_control.get("save_experiment"):
+            filename = self.fun_control.get("PREFIX") + "_exp.pkl"
+            self.save_experiment(filename=filename, verbosity=self.verbosity)
+
+        # Tensorboard must be initialized before the surrogate model:
+        self.init_spot_writer()
+
+        # If no surrogate model is specified, use the internal
+        # spotpython kriging surrogate:
+        if self.surrogate is None:
+            # Call kriging with surrogate_control parameters:
+            self.surrogate = Kriging(
+                name="kriging",
+                noise=self.surrogate_control["noise"],
+                model_optimizer=self.surrogate_control["model_optimizer"],
+                model_fun_evals=self.surrogate_control["model_fun_evals"],
+                seed=self.surrogate_control["seed"],
+                log_level=self.log_level,
+                min_theta=self.surrogate_control["min_theta"],
+                max_theta=self.surrogate_control["max_theta"],
+                metric_factorial=self.surrogate_control["metric_factorial"],
+                n_theta=self.surrogate_control["n_theta"],
+                theta_init_zero=self.surrogate_control["theta_init_zero"],
+                p_val=self.surrogate_control["p_val"],
+                n_p=self.surrogate_control["n_p"],
+                optim_p=self.surrogate_control["optim_p"],
+                min_Lambda=self.surrogate_control["min_Lambda"],
+                max_Lambda=self.surrogate_control["max_Lambda"],
+                var_type=self.surrogate_control["var_type"],
+                spot_writer=self.spot_writer,
+                counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
+            )
 
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
@@ -791,35 +799,6 @@ class Spot:
                 3.7179535332164810e-04])
 
         """
-        # Tensorboard:
-        self.init_spot_writer()
-
-        # If no surrogate model is specified, use the internal
-        # spotpython kriging surrogate:
-        if self.surrogate is None:
-            # Call kriging with surrogate_control parameters:
-            self.surrogate = Kriging(
-                name="kriging",
-                noise=self.surrogate_control["noise"],
-                model_optimizer=self.surrogate_control["model_optimizer"],
-                model_fun_evals=self.surrogate_control["model_fun_evals"],
-                seed=self.surrogate_control["seed"],
-                log_level=self.log_level,
-                min_theta=self.surrogate_control["min_theta"],
-                max_theta=self.surrogate_control["max_theta"],
-                metric_factorial=self.surrogate_control["metric_factorial"],
-                n_theta=self.surrogate_control["n_theta"],
-                theta_init_zero=self.surrogate_control["theta_init_zero"],
-                p_val=self.surrogate_control["p_val"],
-                n_p=self.surrogate_control["n_p"],
-                optim_p=self.surrogate_control["optim_p"],
-                min_Lambda=self.surrogate_control["min_Lambda"],
-                max_Lambda=self.surrogate_control["max_Lambda"],
-                var_type=self.surrogate_control["var_type"],
-                spot_writer=self.spot_writer,
-                counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
-            )
-
         self.initialize_design(X_start)
         self.update_stats()
         self.fit_surrogate()
@@ -837,8 +816,9 @@ class Spot:
         if self.fun_control.get("db_dict_name") is not None:
             self._write_db_dict()
 
-        if self.fun_control.get("save_experiment"):
-            self.save_experiment()
+        if self.fun_control.get("save_result"):
+            filename = self.fun_control.get("PREFIX") + "_res.pkl"
+            self.save_experiment(filename=filename, verbosity=self.verbosity)
         return self
 
     def initialize_design(self, X_start=None) -> None:

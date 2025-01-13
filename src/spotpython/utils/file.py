@@ -95,7 +95,28 @@ def get_experiment_filename(PREFIX) -> str:
     return filename
 
 
-def load_experiment(PKL_NAME=None, PREFIX=None):
+def load_result(PREFIX) -> None:
+    """Loads the result from a pickle file with the name
+    PREFIX + "_res.pkl".
+    This is the standard filename for the result file,
+    when it is saved by the spot tuner using `save_result()`, i.e.,
+    when fun_control["save_result"] is set to True.
+
+    Args:
+        PREFIX (str): Prefix of the experiment.
+
+    Examples:
+        >>> from spotpython.utils.file import load_result
+        >>> load_result("branin")
+
+    """
+    if PREFIX is None:
+        raise ValueError("No PREFIX provided.")
+    PKL_NAME = PREFIX + "_res.pkl"
+    load_experiment(PKL_NAME)
+
+
+def load_experiment(PREFIX=None, PKL_NAME=None):
     """
     Loads the experiment from a pickle file.
     If PKL_NAME is None and PREFIX is not None, the experiment is loaded based on the PREFIX
@@ -105,8 +126,8 @@ def load_experiment(PKL_NAME=None, PREFIX=None):
     and `None` is assigned to the corresponding variables.
 
     Args:
-        PKL_NAME (str): Name of the pickle file. Defaults to None.
         PREFIX (str, optional): Prefix of the experiment. Defaults to None.
+        PKL_NAME (str): Name of the pickle file. Defaults to None.
 
     Returns:
         spot_tuner (object): The spot tuner object.
@@ -120,7 +141,7 @@ def load_experiment(PKL_NAME=None, PREFIX=None):
 
     Examples:
         >>> from spotpython.utils.file import load_experiment
-        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment("RUN_0.pkl")
+        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment(PKL_NAME="RUN_0.pkl")
 
     """
     if PKL_NAME is None and PREFIX is not None:

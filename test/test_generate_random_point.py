@@ -1,7 +1,8 @@
 import pytest
 import numpy as np
 from unittest.mock import Mock
-from spotpython.spot import spot
+from spotpython.spot import Spot
+from spotpython.fun import Analytical
 from spotpython.utils.init import fun_control_init
 
 
@@ -13,10 +14,13 @@ def setup_spot():
     )
     return fun_control
 
+def fun_nan(X, fun_control):
+    return np.array([np.nan])
+
 
 def test_generate_random_point(setup_spot):
-    fun = Mock(return_value=np.array([0]))  # Replace with valid function
-    S = spot.Spot(fun=fun, fun_control=setup_spot)
+    fun = Analytical().fun_sphere
+    S = Spot(fun=fun, fun_control=setup_spot)
     X0, y0 = S.generate_random_point()
 
     print(f"X0: {X0}")
@@ -30,8 +34,8 @@ def test_generate_random_point(setup_spot):
 
 
 def test_generate_random_point_with_nan(setup_spot):
-    fun = Mock(return_value=np.array([np.nan]))  # Function that returns NaN
-    S = spot.Spot(fun=fun, fun_control=setup_spot)
+    fun = fun_nan
+    S = Spot(fun=fun, fun_control=setup_spot)
     X0, y0 = S.generate_random_point()
 
     print(f"X0 with NaN: {X0}")

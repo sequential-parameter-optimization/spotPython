@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
-from spotpython.fun.objectivefunctions import Analytical
-from spotpython.spot.spot import Spot
+from spotpython.fun import Analytical
+from spotpython.spot import Spot
 from spotpython.utils.init import fun_control_init, design_control_init, optimizer_control_init, surrogate_control_init
 
 def test_to_all_dim():
@@ -14,7 +14,7 @@ def test_to_all_dim():
     surrogate_control = surrogate_control_init()
     
     spot_instance = Spot(
-        fun=lambda x: x,  # Dummy function
+        fun = Analytical().fun_sphere,  # Dummy function
         fun_control=fun_control,
         design_control=design_control,
         optimizer_control=optimizer_control,
