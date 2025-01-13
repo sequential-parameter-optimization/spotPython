@@ -95,7 +95,7 @@ def get_experiment_filename(PREFIX) -> str:
     return filename
 
 
-def load_result(PREFIX) -> None:
+def load_result(PREFIX) -> tuple:
     """Loads the result from a pickle file with the name
     PREFIX + "_res.pkl".
     This is the standard filename for the result file,
@@ -104,6 +104,9 @@ def load_result(PREFIX) -> None:
 
     Args:
         PREFIX (str): Prefix of the experiment.
+
+    Returns:
+        (spot_tuner, fun_control, design_control, surrogate_control, optimizer_control): Tuple of objects.
 
     Examples:
         >>> from spotpython.utils.file import load_result
