@@ -141,14 +141,14 @@ def load_result(PREFIX) -> tuple:
     if PREFIX is None:
         raise ValueError("No PREFIX provided.")
     filename = get_result_filename(PREFIX)
-    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(PKL_NAME=filename)
+    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(filename=filename)
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
 
 
-def load_experiment(PREFIX=None, PKL_NAME=None):
+def load_experiment(PREFIX=None, filename=None):
     """
     Loads the experiment from a pickle file.
-    If PKL_NAME is None and PREFIX is not None, the experiment is loaded based on the PREFIX
+    If filename is None and PREFIX is not None, the experiment is loaded based on the PREFIX
     using the get_experiment_filename function.
     If the spot tuner object and the fun control dictionary do not exist, an error is thrown.
     If the design control, surrogate control, and optimizer control dictionaries do not exist, a warning is issued
@@ -156,7 +156,7 @@ def load_experiment(PREFIX=None, PKL_NAME=None):
 
     Args:
         PREFIX (str, optional): Prefix of the experiment. Defaults to None.
-        PKL_NAME (str): Name of the pickle file. Defaults to None.
+        filename (str): Name of the pickle file. Defaults to None.
 
     Returns:
         spot_tuner (object): The spot tuner object.
@@ -170,14 +170,14 @@ def load_experiment(PREFIX=None, PKL_NAME=None):
 
     Examples:
         >>> from spotpython.utils.file import load_experiment
-        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment(PKL_NAME="RUN_0.pkl")
+        >>> spot_tuner, fun_control, design_control, _, _ = load_experiment(filename="RUN_0.pkl")
 
     """
-    if PKL_NAME is None and PREFIX is not None:
-        PKL_NAME = get_experiment_filename(PREFIX)
-    with open(PKL_NAME, "rb") as handle:
+    if filename is None and PREFIX is not None:
+        filename = get_experiment_filename(PREFIX)
+    with open(filename, "rb") as handle:
         experiment = pickle.load(handle)
-        print(f"Loaded experiment from {PKL_NAME}")
+        print(f"Loaded experiment from {filename}")
     # assign spot_tuner and fun_control only if they exist otherwise throw an error
     if "spot_tuner" not in experiment:
         raise ValueError("The spot tuner object does not exist in the pickle file.")
@@ -283,11 +283,11 @@ def get_experiment_from_PREFIX(PREFIX, return_dict=True) -> dict:
         return config, fun_control, design_control, surrogate_control, optimizer_control
 
 
-def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
+def load_and_run_spot_python_experiment(spot_filename) -> tuple:
     """Loads and runs a spot experiment.
 
     Args:
-        spot_pkl_name (str):
+        spot_filename (str):
             The name of the spot experiment file.
 
     Returns:
@@ -305,7 +305,7 @@ def load_and_run_spot_python_experiment(spot_pkl_name) -> tuple:
 
     """
     p_open = None
-    (spot_tuner, fun_control, design_control, surrogate_control, optimizer_control) = load_experiment(spot_pkl_name)
+    (spot_tuner, fun_control, design_control, surrogate_control, optimizer_control) = load_experiment(spot_filename)
     print("\nLoaded fun_control in spotRun():")
     # pprint.pprint(fun_control)
     print(gen_design_table(fun_control))

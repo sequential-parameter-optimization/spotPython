@@ -58,7 +58,7 @@ def test_save_and_load_experiment(tmp_path):
     assert os.path.exists(filepath), f"File {filepath} should exist."
 
     # Load the experiment
-    spot_tuner, loaded_fun_control, loaded_design_control, loaded_surrogate_control, loaded_optimizer_control = load_experiment(PKL_NAME=filepath)
+    spot_tuner, loaded_fun_control, loaded_design_control, loaded_surrogate_control, loaded_optimizer_control = load_experiment(filename=filepath)
 
     # Check if the loaded data matches the original data
     assert compare_dicts(loaded_fun_control, fun_control), "Loaded fun_control should match the original fun_control."
