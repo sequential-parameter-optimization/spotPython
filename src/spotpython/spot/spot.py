@@ -29,7 +29,7 @@ from spotpython.utils.init import fun_control_init, optimizer_control_init, surr
 from spotpython.utils.compare import selectNew
 from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points
 from spotpython.utils.repair import remove_nan
-from spotpython.utils.file import get_experiment_filename
+from spotpython.utils.file import get_experiment_filename, get_result_filename
 from spotpython.budget.ocba import get_ocba_X
 import logging
 import time
@@ -1062,9 +1062,43 @@ class Spot:
                 self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
 
+    def save_results(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
+        """
+        Save the results to a file.
+        If filename is not provided, the filename is generated based on the PREFIX using the
+        `get_result_filename()` function. The results file is saved in the current working directory
+        unless a path is provided. The file is saved in pickle format using the highest protocol.
+        If no arguments are provided, the file is saved with the default name PREFIX + "_res.pkl".
+
+        Args:
+            filename (str):
+                The filename of the results file. If not provided,
+                the filename is generated based on the PREFIX using the
+                `get_result_filename()` function. Default is `None`.
+            path (str):
+                The path to the results file. If not provided, the file
+                is saved in the current working directory. Default is `None`.
+            overwrite (bool):
+                If `True`, the file will be overwritten if it already exists.
+                Default is `True`.
+            verbosity (int):
+                The level of verbosity. Default is 0.
+
+        Returns:
+            None
+        """
+        PREFIX = self.fun_control.get("PREFIX", "result")
+        if filename is None:
+            filename = get_result_filename(PREFIX)
+        self.save_experiment(self, filename=filename, path=None, overwrite=True, unpickleables="file_io", verbosity=0)
+
     def save_experiment(self, filename=None, path=None, overwrite=True, unpickleables="file_io", verbosity=0) -> None:
         """
         Save the experiment to a file.
+        If no filename is provided, the filename is generated based on the PREFIX using the
+        `get_experiment_filename()` function. The experiment file is saved in the current working directory
+        unless a path is provided. The file is saved in pickle format using the highest protocol.
+        If no arguments are provided, the file is saved with the default name PREFIX + "_exp.pkl".
 
         Args:
             filename (str):
