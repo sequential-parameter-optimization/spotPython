@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 from spotpython.fun.objectivefunctions import Analytical
-from spotpython.spot import spot
+from spotpython.spot import Spot
 from spotpython.budget.ocba import get_ocba, get_ocba_X
 from spotpython.utils.aggregate import aggregate_mean_var
 from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
@@ -39,7 +39,7 @@ fun_control = fun_control_init(
     show_progress=True,
     sigma=0.001,
 )
-spot_1_noisy = spot.Spot(
+spot_1_noisy = Spot(
     fun=fun,
     surrogate_control=surrogate_control,
     design_control=design_control,

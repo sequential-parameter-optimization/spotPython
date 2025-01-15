@@ -131,7 +131,10 @@ def load_result(PREFIX) -> tuple:
         PREFIX (str): Prefix of the experiment.
 
     Returns:
-        (spot_tuner, fun_control, design_control, surrogate_control, optimizer_control): Tuple of objects.
+        spot_tuner (Spot): The spot tuner object.
+        
+    Notes:
+        The corresponding save_result function is part of the class spot.
 
     Examples:
         >>> from spotpython.utils.file import load_result
@@ -141,8 +144,8 @@ def load_result(PREFIX) -> tuple:
     if PREFIX is None:
         raise ValueError("No PREFIX provided.")
     filename = get_result_filename(PREFIX)
-    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(filename=filename)
-    return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
+    spot_tuner = load_experiment(filename=filename)
+    return spot_tuner
 
 
 def load_experiment(PREFIX=None, filename=None):
@@ -159,11 +162,7 @@ def load_experiment(PREFIX=None, filename=None):
         filename (str): Name of the pickle file. Defaults to None.
 
     Returns:
-        spot_tuner (object): The spot tuner object.
-        fun_control (dict): The function control dictionary.
-        design_control (dict): The design control dictionary.
-        surrogate_control (dict): The surrogate control dictionary.
-        optimizer_control (dict): The optimizer control dictionary.
+        spot_tuner (Spot): The spot tuner object.
 
     Notes:
         The corresponding save_experiment function is part of the class spot.
@@ -176,35 +175,10 @@ def load_experiment(PREFIX=None, filename=None):
     if filename is None and PREFIX is not None:
         filename = get_experiment_filename(PREFIX)
     with open(filename, "rb") as handle:
-        experiment = pickle.load(handle)
+        spot_tuner = pickle.load(handle)
         print(f"Loaded experiment from {filename}")
-    # assign spot_tuner and fun_control only if they exist otherwise throw an error
-    if "spot_tuner" not in experiment:
-        raise ValueError("The spot tuner object does not exist in the pickle file.")
-    if "fun_control" not in experiment:
-        raise ValueError("The fun control dictionary does not exist in the pickle file.")
-    spot_tuner = experiment["spot_tuner"]
-    fun_control = experiment["fun_control"]
-    # assign the rest of the dictionaries if they exist otherwise assign None
-    if "design_control" not in experiment:
-        design_control = None
-        # issue a warning
-        print("The design control dictionary does not exist in the pickle file. Returning None.")
-    else:
-        design_control = experiment["design_control"]
-    if "surrogate_control" not in experiment:
-        surrogate_control = None
-        # issue a warning
-        print("The surrogate control dictionary does not exist in the pickle file. Returning None.")
-    else:
-        surrogate_control = experiment["surrogate_control"]
-    if "optimizer_control" not in experiment:
-        # issue a warning
-        print("The optimizer control dictionary does not exist in the pickle file. Returning None.")
-        optimizer_control = None
-    else:
-        optimizer_control = experiment["optimizer_control"]
-    return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
+    return spot_tuner
+
 
 
 def load_dict_from_file(coremodel, dirname="userModel"):
@@ -269,7 +243,7 @@ def get_experiment_from_PREFIX(PREFIX, return_dict=True) -> dict:
 
     """
     experiment_name = get_experiment_filename(PREFIX)
-    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(experiment_name)
+    spot_tuner = load_experiment(experiment_name)
     config = get_tuned_architecture(spot_tuner, fun_control)
     if return_dict:
         return {

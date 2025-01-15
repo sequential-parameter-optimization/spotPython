@@ -2,51 +2,6 @@ import copy
 import numpy as np
 
 
-def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
-    """
-    Sample scaling from unit hypercube to different bounds. Converts a sample from `[0, 1)` to `[a, b)`.
-    The following transformation is used:
-    `(b - a) * X + a`
-
-    Note:
-        equal lower and upper bounds are feasible.
-
-    Args:
-        X (array):
-            Sample to scale.
-        lower (array):
-            lower bound of transformed data.
-        upper (array):
-            upper bounds of transformed data.
-
-    Returns:
-        (array):
-            Scaled sample.
-
-    Examples:
-        Transform three samples in the unit hypercube to (lower, upper) bounds:
-
-        >>> import numpy as np
-        >>> from scipy.stats import qmc
-        >>> from spotpython.utils.transform import scale
-        >>> lower = np.array([6, 0])
-        >>> upper = np.array([6, 5])
-        >>> sample = np.array([[0.5 , 0.75],
-        >>>             [0.5 , 0.5],
-        >>>             [0.75, 0.25]])
-        >>> scale(sample, lower, upper)
-
-    """
-    # Checking that X is within (0,1) interval
-    if (X.max() > 1.0) or (X.min() < 0.0):
-        raise ValueError("Sample is not in unit hypercube")
-    # Vectorized scaling operation
-    X = (upper - lower) * X + lower
-    # Handling case where lower == upper
-    X[:, lower == upper] = lower[lower == upper]
-    return X
-
-
 def transform_multby2_int(x: int) -> int:
     """Transformations for hyperparameters of type int.
 
@@ -99,7 +54,7 @@ def transform_power_10_int(x: int) -> int:
     return int(10**x)
 
 
-def transform_power_2(x):
+def transform_power_2(x) -> float:
     """Transformations for hyperparameters of type float.
 
     Args:
@@ -116,7 +71,7 @@ def transform_power_2(x):
     return 2**x
 
 
-def transform_power_10(x):
+def transform_power_10(x) -> float:
     """Transformations for hyperparameters of type float.
 
     Args:
@@ -133,9 +88,10 @@ def transform_power_10(x):
     return 10**x
 
 
-def transform_none_to_None(x):
+def transform_none_to_None(x) -> str:
     """
     Transformations for hyperparameters of type None.
+    If the input is "none", the output is None.
 
     Args:
         x (str): The string to transform.
@@ -209,31 +165,216 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
             A dictionary containing the values of the hyperparameters.
 
     Examples:
-        >>> import copy
-            from spotpython.utils.prepare import transform_hyper_parameter_values
-            fun_control = {
-            "core_model_hyper_dict": {
-                "leaf_prediction": {
-                    "levels": ["mean", "model", "adaptive"],
-                    "type": "factor",
-                    "default": "mean",
-                    "core_model_parameter_type": "str"},
-                "max_depth": {"type": "int",
-                              "default": 20
-                              "transform": "transform_power_2",
-                              "lower": 2,
-                              "upper": 20}}}
-            hyper_parameter_values = {'max_depth': 20,
-                                      'leaf_prediction': 'mean'}
-            transform_hyper_parameter_values(fun_control, hyper_parameter_values)
-            {'max_depth': 1048576,
-             'leaf_prediction': 'mean'}
+            >>> from spotpython.utils.transform import transform_hyper_parameter_values
+                fun_control = {
+                    "core_model_hyper_dict": {
+                        "leaf_prediction": {
+                                "type": "factor",
+                                "transform": "None",
+                                "default": "mean",
+                                "levels": ["mean", "model", "adaptive"],
+                                "core_model_parameter_type": "str"
+                                            },
+                        "max_depth": {
+                                "type": "int",
+                                "default": 20,
+                                "transform": "transform_power_2",
+                                "lower": 2,
+                                "upper": 20}
+                            }
+                    }
+                hyper_parameter_values = {
+                        'max_depth': 2,
+                        'leaf_prediction': 'mean'}
+                transform_hyper_parameter_values(fun_control, hyper_parameter_values)
+                    {'max_depth': 4, 'leaf_prediction': 'mean'}
+                fun_control = {
+                    "core_model_hyper_dict": {
+                        "l1": {
+                            "type": "int",
+                            "default": 3,
+                            "transform": "transform_power_2_int",
+                            "lower": 3,
+                            "upper": 8
+                        },
+                        "epochs": {
+                            "type": "int",
+                            "default": 4,
+                            "transform": "transform_power_2_int",
+                            "lower": 4,
+                            "upper": 9
+                        },
+                        "batch_size": {
+                            "type": "int",
+                            "default": 4,
+                            "transform": "transform_power_2_int",
+                            "lower": 1,
+                            "upper": 4
+                        },
+                        "act_fn": {
+                            "levels": [
+                                "Sigmoid",
+                                "Tanh",
+                                "ReLU",
+                                "LeakyReLU",
+                                "ELU",
+                                "Swish"
+                            ],
+                            "type": "factor",
+                            "default": "ReLU",
+                            "transform": "None",
+                            "class_name": "spotpython.torch.activation",
+                            "core_model_parameter_type": "instance()",
+                            "lower": 0,
+                            "upper": 5
+                        },
+                        "optimizer": {
+                            "levels": [
+                                "Adadelta",
+                                "Adagrad",
+                                "Adam",
+                                "AdamW",
+                                "SparseAdam",
+                                "Adamax",
+                                "ASGD",
+                                "NAdam",
+                                "RAdam",
+                                "RMSprop",
+                                "Rprop",
+                                "SGD"
+                            ],
+                            "type": "factor",
+                            "default": "SGD",
+                            "transform": "None",
+                            "class_name": "torch.optim",
+                            "core_model_parameter_type": "str",
+                            "lower": 0,
+                            "upper": 11
+                        },
+                        "dropout_prob": {
+                            "type": "float",
+                            "default": 0.01,
+                            "transform": "None",
+                            "lower": 0.0,
+                            "upper": 0.25
+                        },
+                        "lr_mult": {
+                            "type": "float",
+                            "default": 1.0,
+                            "transform": "None",
+                            "lower": 0.1,
+                            "upper": 10.0
+                        },
+                        "patience": {
+                            "type": "int",
+                            "default": 2,
+                            "transform": "transform_power_2_int",
+                            "lower": 2,
+                            "upper": 6
+                        },
+                        "batch_norm": {
+                            "levels": [
+                                0,
+                                1
+                            ],
+                            "type": "factor",
+                            "default": 0,
+                            "transform": "None",
+                            "core_model_parameter_type": "bool",
+                            "lower": 0,
+                            "upper": 1
+                        },
+                        "initialization": {
+                            "levels": [
+                                "Default",
+                                "kaiming_uniform",
+                                "kaiming_normal",
+                                "xavier_uniform",
+                                "xavier_normal"
+                            ],
+                            "type": "factor",
+                            "default": "Default",
+                            "transform": "None",
+                            "core_model_parameter_type": "str",
+                            "lower": 0,
+                            "upper": 4
+                        }
+                    }
+                }
+                hyper_parameter_values = {
+                        'l1': 2,
+                        'epochs': 3,
+                        'batch_size': 4,
+                        'act_fn': 'ReLU',
+                        'optimizer': 'SGD',
+                        'dropout_prob': 0.01,
+                        'lr_mult': 1.0,
+                        'patience': 3,
+                        'batch_norm': 0,
+                        'initialization': 'Default',        
+                    }
+                transform_hyper_parameter_values(fun_control, hyper_parameter_values)
+                    {'l1': 4,
+                    'epochs': 8,
+                    'batch_size': 16,
+                    'act_fn': 'ReLU',
+                    'optimizer': 'SGD',
+                    'dropout_prob': 0.01,
+                    'lr_mult': 1.0,
+                    'patience': 8,
+                    'batch_norm': 0,
+                    'initialization': 'Default'}                
     """
     hyper_parameter_values = copy.deepcopy(hyper_parameter_values)
     for key, value in hyper_parameter_values.items():
         if fun_control["core_model_hyper_dict"][key]["type"] in ["int", "float", "num", "factor"] and fun_control["core_model_hyper_dict"][key]["transform"] != "None":
             hyper_parameter_values[key] = eval(fun_control["core_model_hyper_dict"][key]["transform"])(value)
     return hyper_parameter_values
+
+
+def scale(X: np.ndarray, lower: np.ndarray, upper: np.ndarray) -> np.ndarray:
+    """
+    Sample scaling from unit hypercube to different bounds. Converts a sample from `[0, 1)` to `[a, b)`.
+    The following transformation is used:
+    `(b - a) * X + a`
+
+    Note:
+        equal lower and upper bounds are feasible.
+
+    Args:
+        X (array):
+            Sample to scale.
+        lower (array):
+            lower bound of transformed data.
+        upper (array):
+            upper bounds of transformed data.
+
+    Returns:
+        (array):
+            Scaled sample.
+
+    Examples:
+        Transform three samples in the unit hypercube to (lower, upper) bounds:
+
+        >>> import numpy as np
+        >>> from scipy.stats import qmc
+        >>> from spotpython.utils.transform import scale
+        >>> lower = np.array([6, 0])
+        >>> upper = np.array([6, 5])
+        >>> sample = np.array([[0.5 , 0.75],
+        >>>             [0.5 , 0.5],
+        >>>             [0.75, 0.25]])
+        >>> scale(sample, lower, upper)
+
+    """
+    # Checking that X is within (0,1) interval
+    if (X.max() > 1.0) or (X.min() < 0.0):
+        raise ValueError("Sample is not in unit hypercube")
+    # Vectorized scaling operation
+    X = (upper - lower) * X + lower
+    # Handling case where lower == upper
+    X[:, lower == upper] = lower[lower == upper]
+    return X
 
 
 def nat_to_cod_X(X, cod_type):

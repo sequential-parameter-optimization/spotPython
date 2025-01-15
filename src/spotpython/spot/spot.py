@@ -42,6 +42,7 @@ from spotpython.hyperparameters.values import (
 import plotly.graph_objects as go
 from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
+from spotpython.utils.file import load_result
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -331,8 +332,7 @@ class Spot:
 
         # save experiment must be called before the spot_writer is initialized
         if self.fun_control.get("save_experiment"):
-            filename = self.fun_control.get("PREFIX") + "_exp.pkl"
-            self.save_experiment(filename=filename, verbosity=self.verbosity)
+            self.save_experiment(verbosity=self.verbosity)
 
         # Tensorboard must be initialized before the surrogate model:
         self.init_spot_writer()
@@ -799,27 +799,35 @@ class Spot:
                 3.7179535332164810e-04])
 
         """
-        self.initialize_design(X_start)
-        self.update_stats()
-        self.fit_surrogate()
-        timeout_start = time.time()
-        while self.should_continue(timeout_start):
-            self.update_design()
+        #
+        PREFIX = self.fun_control["PREFIX"]
+        filename = get_result_filename(PREFIX)
+        if os.path.exists(filename):
+            # print a warning and load the result
+            print(f"Result file {filename} exists. Loading the result.")
+            spot_tuner = load_result(filename=filename)
+            return spot_tuner
+        else:
+            self.initialize_design(X_start)
             self.update_stats()
-            self.update_writer()
             self.fit_surrogate()
-            self.show_progress_if_needed(timeout_start)
+            timeout_start = time.time()
+            while self.should_continue(timeout_start):
+                self.update_design()
+                self.update_stats()
+                self.update_writer()
+                self.fit_surrogate()
+                self.show_progress_if_needed(timeout_start)
 
-        if hasattr(self, "spot_writer") and self.spot_writer is not None:
-            self.spot_writer.flush()
-            self.spot_writer.close()
-        if self.fun_control.get("db_dict_name") is not None:
-            self._write_db_dict()
+            if hasattr(self, "spot_writer") and self.spot_writer is not None:
+                self.spot_writer.flush()
+                self.spot_writer.close()
+            if self.fun_control.get("db_dict_name") is not None:
+                self._write_db_dict()
 
-        if self.fun_control.get("save_result"):
-            filename = self.fun_control.get("PREFIX") + "_res.pkl"
-            self.save_experiment(filename=filename, verbosity=self.verbosity)
-        return self
+            if self.fun_control.get("save_result"):
+                self.save_result(verbosity=self.verbosity)
+            return self
 
     def initialize_design(self, X_start=None) -> None:
         """
@@ -1062,7 +1070,7 @@ class Spot:
                 self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
 
-    def save_results(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
+    def save_result(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
         """
         Save the results to a file.
         If filename is not provided, the filename is generated based on the PREFIX using the
@@ -1090,7 +1098,7 @@ class Spot:
         PREFIX = self.fun_control.get("PREFIX", "result")
         if filename is None:
             filename = get_result_filename(PREFIX)
-        self.save_experiment(self, filename=filename, path=None, overwrite=True, unpickleables="file_io", verbosity=0)
+        self.save_experiment(filename=filename, path=None, overwrite=True, unpickleables="file_io", verbosity=0)
 
     def save_experiment(self, filename=None, path=None, overwrite=True, unpickleables="file_io", verbosity=0) -> None:
         """
