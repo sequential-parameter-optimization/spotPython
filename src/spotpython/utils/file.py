@@ -71,8 +71,8 @@ def load_pickle(filename: str):
 
 
 def get_experiment_filename(PREFIX) -> str:
-    """Returns the name of the experiment.
-    This is the PREFIX with the suffix ".pkl".
+    """Returns the name of the experiment file.
+    This is the PREFIX with the suffix "_exp.pkl".
     It is none, if PREFIX is None.
 
     Args:
@@ -91,7 +91,32 @@ def get_experiment_filename(PREFIX) -> str:
     if PREFIX is None:
         return None
     else:
-        filename = PREFIX + ".pkl"
+        filename = PREFIX + "_exp.pkl"
+    return filename
+
+
+def get_result_filename(PREFIX) -> str:
+    """Returns the name of the result file.
+    This is the PREFIX with the suffix "_res.pkl".
+    It is none, if PREFIX is None.
+
+    Args:
+        PREFIX (str): Prefix of the experiment.
+
+    Returns:
+        filename (str): Name of the experiment.
+
+    Examples:
+        >>> from spotpython.utils.file import get_experiment_name
+        >>> from spotpython.utils.init import fun_control_init
+        >>> fun_control = fun_control_init(PREFIX="branin")
+        >>> PREFIX = fun_control["PREFIX"]
+        >>> filename = get_experiment_filename(PREFIX)
+    """
+    if PREFIX is None:
+        return None
+    else:
+        filename = PREFIX + "_res.pkl"
     return filename
 
 
@@ -115,8 +140,8 @@ def load_result(PREFIX) -> tuple:
     """
     if PREFIX is None:
         raise ValueError("No PREFIX provided.")
-    PKL_NAME = PREFIX + "_res.pkl"
-    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(PKL_NAME=PKL_NAME)
+    filename = get_result_filename(PREFIX)
+    spot_tuner, fun_control, design_control, surrogate_control, optimizer_control = load_experiment(PKL_NAME=filename)
     return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control
 
 
