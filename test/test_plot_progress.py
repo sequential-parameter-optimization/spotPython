@@ -1,6 +1,6 @@
 import numpy as np
 from spotpython.fun.objectivefunctions import Analytical
-from spotpython.spot import spot
+from spotpython.spot import Spot
 from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
 
 
@@ -15,7 +15,7 @@ def test_plot_progress():
     )
     design_control = design_control_init(init_size=ni)
     surrogate_control = surrogate_control_init(n_theta=3)
-    S = spot.Spot(
+    S = Spot(
         fun=fun,
         fun_control=fun_control,
         design_control=design_control,
@@ -44,7 +44,7 @@ def test_plot_progress_n_init():
     )
     design_control = design_control_init(init_size=ni)
     surrogate_control = surrogate_control_init(n_theta=3)
-    S = spot.Spot(
+    S = Spot(
         fun=fun,
         fun_control=fun_control,
         design_control=design_control,

@@ -5,7 +5,6 @@ import os
 import json
 import sys
 import importlib
-from spotpython.hyperparameters.values import get_tuned_architecture
 from spotpython.utils.eda import gen_design_table
 from spotpython.utils.init import setup_paths
 
@@ -120,19 +119,29 @@ def get_result_filename(PREFIX) -> str:
     return filename
 
 
-def load_result(PREFIX) -> tuple:
+def _handle_filneame(filename, PREFIX):
+    if filename is None:
+        if PREFIX is None:
+            raise ValueError("No PREFIX provided.")
+        filename = get_result_filename(PREFIX)
+    return filename
+
+
+def load_result(PREFIX=None, filename=None) -> tuple:
     """Loads the result from a pickle file with the name
     PREFIX + "_res.pkl".
     This is the standard filename for the result file,
     when it is saved by the spot tuner using `save_result()`, i.e.,
     when fun_control["save_result"] is set to True.
+    If a filename is provided, the result is loaded from this file.
 
     Args:
-        PREFIX (str): Prefix of the experiment.
+        PREFIX (str): Prefix of the experiment. Defaults to None.
+        filename (str): Name of the pickle file. Defaults to None.
 
     Returns:
         spot_tuner (Spot): The spot tuner object.
-        
+
     Notes:
         The corresponding save_result function is part of the class spot.
 
@@ -141,9 +150,7 @@ def load_result(PREFIX) -> tuple:
         >>> load_result("branin")
 
     """
-    if PREFIX is None:
-        raise ValueError("No PREFIX provided.")
-    filename = get_result_filename(PREFIX)
+    filename = _handle_filneame(filename, PREFIX)
     spot_tuner = load_experiment(filename=filename)
     return spot_tuner
 
@@ -172,13 +179,11 @@ def load_experiment(PREFIX=None, filename=None):
         >>> spot_tuner, fun_control, design_control, _, _ = load_experiment(filename="RUN_0.pkl")
 
     """
-    if filename is None and PREFIX is not None:
-        filename = get_experiment_filename(PREFIX)
+    filename = _handle_filneame(filename, PREFIX)
     with open(filename, "rb") as handle:
         spot_tuner = pickle.load(handle)
         print(f"Loaded experiment from {filename}")
     return spot_tuner
-
 
 
 def load_dict_from_file(coremodel, dirname="userModel"):
@@ -218,43 +223,6 @@ def load_core_model_from_file(coremodel, dirname="userModel"):
     module = importlib.import_module(coremodel)
     core_model = getattr(module, coremodel)
     return core_model
-
-
-def get_experiment_from_PREFIX(PREFIX, return_dict=True) -> dict:
-    """
-    Setup the experiment based on the PREFIX provided and return the relevant configuration
-    and control objects.
-
-    Args:
-        PREFIX (str):
-            The prefix for the experiment filename.
-        return_dict (bool, optional):
-            Whether to return the configuration and control objects as a dictionary.
-            If False, a tuple is returned:
-            "(config, fun_control, design_control, surrogate_control, optimizer_control)."
-            Defaults to True.
-
-    Returns:
-        dict: Dictionary containing the configuration and control objects.
-
-    Example:
-        >>> from spotpython.utils.file import get_experiment_from_PREFIX
-        >>> config = get_experiment_from_PREFIX("100")["config"]
-
-    """
-    experiment_name = get_experiment_filename(PREFIX)
-    spot_tuner = load_experiment(experiment_name)
-    config = get_tuned_architecture(spot_tuner, fun_control)
-    if return_dict:
-        return {
-            "config": config,
-            "fun_control": fun_control,
-            "design_control": design_control,
-            "surrogate_control": surrogate_control,
-            "optimizer_control": optimizer_control,
-        }
-    else:
-        return config, fun_control, design_control, surrogate_control, optimizer_control
 
 
 def load_and_run_spot_python_experiment(spot_filename) -> tuple:

@@ -22,7 +22,7 @@ def fun_control_init(
     _L_out=None,
     _L_cond=None,
     _torchmetric=None,
-    PREFIX="00",
+    PREFIX=None,
     TENSORBOARD_CLEAN=False,
     accelerator="auto",
     converters=None,
@@ -381,6 +381,9 @@ def fun_control_init(
     # Setting the seed
     L.seed_everything(seed)
 
+    if PREFIX is None:
+        PREFIX = _init_PREFIX()
+
     CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH = setup_paths(TENSORBOARD_CLEAN)
     spot_tensorboard_path = create_spot_tensorboard_path(tensorboard_log, PREFIX)
 
@@ -516,6 +519,23 @@ def fun_control_init(
             filename=None,
         )
     return fun_control
+
+
+def _init_PREFIX() -> str:
+    """Initialize the PREFIX for the experiment name.
+
+    Returns:
+        PREFIX (str):
+            The PREFIX for the experiment name.
+
+    Examples:
+        >>> from spotpython.utils.init import _init_PREFIX
+        >>> _init_PREFIX()
+        '00'
+    """
+    # set the prefix to the actual date and time
+    PREFIX = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    return PREFIX
 
 
 def setup_paths(tensorboard_clean) -> tuple:

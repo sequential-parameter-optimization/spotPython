@@ -1135,23 +1135,10 @@ class Spot:
         self._close_and_del_spot_writer()
         self._remove_logger_handlers()
 
-        # Create deep copies of control dictionaries
-        fun_control = copy.deepcopy(self.fun_control)
-        optimizer_control = copy.deepcopy(self.optimizer_control)
-        surrogate_control = copy.deepcopy(self.surrogate_control)
-        design_control = copy.deepcopy(self.design_control)
-
-        # Prepare an experiment dictionary excluding any explicitly unpickable components
-        experiment = {
-            "design_control": design_control,
-            "fun_control": fun_control,
-            "optimizer_control": optimizer_control,
-            "spot_tuner": self._get_pickle_safe_spot_tuner(unpickleables=unpickleables, verbosity=verbosity),
-            "surrogate_control": surrogate_control,
-        }
+        S = self._get_pickle_safe_spot_tuner(unpickleables=unpickleables, verbosity=verbosity)
 
         # Determine the filename based on PREFIX if not provided
-        PREFIX = fun_control.get("PREFIX", "experiment")
+        PREFIX = self.fun_control.get("PREFIX", "experiment")
         if filename is None:
             filename = get_experiment_filename(PREFIX)
 
@@ -1169,7 +1156,7 @@ class Spot:
         if filename is not None:
             with open(filename, "wb") as handle:
                 try:
-                    pickle.dump(experiment, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    pickle.dump(S, handle, protocol=pickle.HIGHEST_PROTOCOL)
                 except Exception as e:
                     print(f"Error during pickling: {e}")
                     raise e

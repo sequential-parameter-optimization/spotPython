@@ -311,7 +311,7 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
                         'lr_mult': 1.0,
                         'patience': 3,
                         'batch_norm': 0,
-                        'initialization': 'Default',        
+                        'initialization': 'Default',
                     }
                 transform_hyper_parameter_values(fun_control, hyper_parameter_values)
                     {'l1': 4,
@@ -323,7 +323,7 @@ def transform_hyper_parameter_values(fun_control, hyper_parameter_values):
                     'lr_mult': 1.0,
                     'patience': 8,
                     'batch_norm': 0,
-                    'initialization': 'Default'}                
+                    'initialization': 'Default'}
     """
     hyper_parameter_values = copy.deepcopy(hyper_parameter_values)
     for key, value in hyper_parameter_values.items():

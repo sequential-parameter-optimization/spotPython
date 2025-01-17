@@ -31,6 +31,66 @@ from spotpython.light import regression
 # End Important
 
 
+def assign_values(X: np.array, var_list: list) -> dict:
+    """
+    This function takes an np.array X and a list of variable names as input arguments
+    and returns a dictionary where the keys are the variable names and the values are assigned from X.
+
+    Args:
+        X (np.array):
+            A 2D numpy array where each column represents a variable.
+        var_list (list):
+            A list of strings representing variable names.
+
+    Returns:
+        dict:
+            A dictionary where keys are variable names and values are assigned from X.
+
+    Raises:
+        ValueError: If the length of var_list does not match the number of columns in X.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.hyperparameters.values import assign_values
+        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> var_list = ['a', 'b']
+        >>> result = assign_values(X, var_list)
+        >>> print(result)
+        {'a': array([1, 3, 5]), 'b': array([2, 4, 6])}
+    """
+    if X.shape[1] != len(var_list):
+        raise ValueError("Length of var_list does not match the number of columns in X.")
+
+    result = {var_list[i]: X[:, i] for i in range(len(var_list))}
+    return result
+
+
+def get_tuned_architecture(spot_tuner, force_minX=False) -> dict:
+    """
+    Returns the tuned architecture. If the spot tuner has noise,
+    it returns the architecture with the lowest mean (.min_mean_X),
+    otherwise it returns the architecture with the lowest value (.min_X).
+
+    Args:
+        spot_tuner (object):
+            spot tuner object.
+        force_minX (bool):
+            If True, return the architecture with the lowest value (.min_X).
+
+    Returns:
+        (dict):
+            dictionary containing the tuned architecture.
+    """
+    if not spot_tuner.noise or force_minX:
+        X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1, -1))
+    else:
+        # noise or force_minX is False:
+        X = spot_tuner.to_all_dim(spot_tuner.min_mean_X.reshape(1, -1))
+        fun_control = copy(spot_tuner.fun_control)
+    config = get_one_config_from_X(X, fun_control)
+    return config
+
+
 def generate_one_config_from_var_dict(
     var_dict: Dict[str, np.ndarray],
     fun_control: Dict[str, Union[List[str], str]],
@@ -273,36 +333,6 @@ def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any
         else:
             new_dict[key] = v[key]
     return new_dict
-
-
-def assign_values(X: np.array, var_list: list) -> dict:
-    """
-    This function takes an np.array X and a list of variable names as input arguments
-    and returns a dictionary where the keys are the variable names and the values are assigned from X.
-
-    Args:
-        X (np.array):
-            A 2D numpy array where each column represents a variable.
-        var_list (list):
-            A list of strings representing variable names.
-
-    Returns:
-        dict:
-            A dictionary where keys are variable names and values are assigned from X.
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.hyperparameters.values import assign_values
-        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
-        >>> var_list = ['a', 'b']
-        >>> result = assign_values(X, var_list)
-        >>> print(result)
-        {'a': array([1, 3, 5]), 'b': array([2, 4, 6])}
-    """
-    result = {}
-    for i, var_name in enumerate(var_list):
-        result[var_name] = X[:, i]
-    return result
 
 
 def modify_boolean_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
@@ -981,68 +1011,6 @@ def get_default_hyperparameters_as_array(fun_control) -> np.array:
         X0 = np.array([X0])
         X0.shape[1]
         return X0
-
-
-# def get_default_hyperparameters_for_core_model(fun_control) -> dict:
-#     """Get the default hyper parameters for the core model.
-
-#     Args:
-#         fun_control (dict):
-#             The function control dictionary.
-
-#     Returns:
-#         (dict):
-#             The default hyper parameters for the core model.
-
-#     Examples:
-#         >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-#             from spotriver.data.river_hyper_dict import RiverHyperDict
-#             fun_control = {}
-#             add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-#                 fun_control=func_control,
-#                 hyper_dict=RiverHyperDict,
-#                 filename=None)
-#             get_default_hyperparameters_for_core_model(fun_control)
-#             {'leaf_prediction': 'mean',
-#             'leaf_model': 'NBAdaptive',
-#             'splitter': 'HoeffdingAdaptiveTreeSplitter',
-#             'binary_split': 'info_gain',
-#             'stop_mem_management': False}
-#     """
-#     values = get_default_values(fun_control)
-#     print(f"values: {values}")
-#     pprint.pprint(fun_control)
-#     values = get_dict_with_levels_and_types(fun_control=fun_control, v=values, default=True)
-#     values = convert_keys(values, fun_control["var_type"])
-#     values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
-#     return values
-
-
-def get_tuned_architecture(spot_tuner, fun_control, force_minX=False) -> dict:
-    """
-    Returns the tuned architecture. If the spot tuner has noise,
-    it returns the architecture with the lowest mean (.min_mean_X),
-    otherwise it returns the architecture with the lowest value (.min_X).
-
-    Args:
-        spot_tuner (object):
-            spot tuner object.
-        fun_control (dict):
-            dictionary containing control parameters for the hyperparameter tuning.
-        force_minX (bool):
-            If True, return the architecture with the lowest value (.min_X).
-
-    Returns:
-        (dict):
-            dictionary containing the tuned architecture.
-    """
-    if not spot_tuner.noise or force_minX:
-        X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1, -1))
-    else:
-        # noise or force_minX is False:
-        X = spot_tuner.to_all_dim(spot_tuner.min_mean_X.reshape(1, -1))
-    config = get_one_config_from_X(X, fun_control)
-    return config
 
 
 def create_model(config, fun_control, **kwargs) -> object:
