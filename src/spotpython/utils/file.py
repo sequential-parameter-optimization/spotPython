@@ -119,11 +119,19 @@ def get_result_filename(PREFIX) -> str:
     return filename
 
 
-def _handle_filneame(filename, PREFIX):
+def _handle_res_filneame(filename, PREFIX):
     if filename is None:
         if PREFIX is None:
             raise ValueError("No PREFIX provided.")
         filename = get_result_filename(PREFIX)
+    return filename
+
+
+def _handle_exp_filneame(filename, PREFIX):
+    if filename is None:
+        if PREFIX is None:
+            raise ValueError("No PREFIX provided.")
+        filename = get_experiment_filename(PREFIX)
     return filename
 
 
@@ -150,7 +158,7 @@ def load_result(PREFIX=None, filename=None) -> tuple:
         >>> load_result("branin")
 
     """
-    filename = _handle_filneame(filename, PREFIX)
+    filename = _handle_res_filneame(filename, PREFIX)
     spot_tuner = load_experiment(filename=filename)
     return spot_tuner
 
@@ -179,7 +187,7 @@ def load_experiment(PREFIX=None, filename=None):
         >>> spot_tuner, fun_control, design_control, _, _ = load_experiment(filename="RUN_0.pkl")
 
     """
-    filename = _handle_filneame(filename, PREFIX)
+    filename = _handle_exp_filneame(filename, PREFIX)
     with open(filename, "rb") as handle:
         spot_tuner = pickle.load(handle)
         print(f"Loaded experiment from {filename}")
