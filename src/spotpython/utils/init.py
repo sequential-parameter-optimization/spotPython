@@ -45,7 +45,7 @@ def fun_control_init(
     enable_progress_bar=False,
     EXPERIMENT_NAME=None,
     eval=None,
-    force_run=False,
+    force_run=True,
     fun_evals=15,
     fun_repeats=1,
     horizon=None,
