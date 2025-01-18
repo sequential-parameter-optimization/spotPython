@@ -14,7 +14,11 @@ def setup_spot():
     ne = 20  # number of evaluations
     X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     fun = Analytical().fun_sphere
-    fun_control = fun_control_init(lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=ne)
+    fun_control = fun_control_init(
+        PREFIX = "test_spot_run",
+        lower=np.array([-1, -1]),
+        upper=np.array([1, 1]),
+        fun_evals=ne)
     design_control = design_control_init(init_size=ni)
 
     S = spot.Spot(

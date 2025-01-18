@@ -4,7 +4,7 @@ def test_show_progress():
     """
     import numpy as np
     from spotpython.fun.objectivefunctions import Analytical
-    from spotpython.spot import spot
+    from spotpython.spot import Spot
     from math import inf
     from spotpython.utils.init import (
         fun_control_init,
@@ -20,9 +20,10 @@ def test_show_progress():
     lower = np.array([-1])
     upper = np.array([1])
 
-    spot_1 = spot.Spot(
+    spot_1 = Spot(
         fun=fun,
-        fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=n, show_progress=False),
+        fun_control=fun_control_init(PREFIX="test_show_progress_1",
+                                     lower=lower, upper=upper, fun_evals=n, show_progress=False),
         design_control=design_control_init(init_size=ni),
     )
     spot_1.run()
@@ -31,9 +32,13 @@ def test_show_progress():
     # number of points.
     assert spot_1.y.shape[0] == n
 
-    spot_2 = spot.Spot(
+    spot_2 = Spot(
         fun=fun,
-        fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=n, show_progress=False),
+        fun_control=fun_control_init(PREFIX="test_show_progress_2",
+                                     lower=lower,
+                                     upper=upper,
+                                     fun_evals=n,
+                                     show_progress=False),
         design_control=design_control_init(init_size=ni),
     )
     spot_2.run()
@@ -42,9 +47,13 @@ def test_show_progress():
     # number of points.
     assert spot_2.y.shape[0] == n
 
-    spot_3 = spot.Spot(
+    spot_3 = Spot(
         fun=fun,
-        fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=inf, max_time=0.1, show_progress=False),
+        fun_control=fun_control_init(PREFIX="test_show_progress_3",
+                                     lower=lower,
+                                     upper=upper,
+                                     fun_evals=inf,
+                                     max_time=0.1, show_progress=False),
         design_control=design_control_init(init_size=ni),
     )
     spot_3.run()
@@ -53,9 +62,10 @@ def test_show_progress():
     # because we do not know how many points can be evaluated.
     assert spot_3.y.shape[0] > 0
 
-    spot_4 = spot.Spot(
+    spot_4 = Spot(
         fun=fun,
-        fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=inf, max_time=0.1, show_progress=True),
+        fun_control=fun_control_init(PREFIX="test_show_progress_4",
+                                     lower=lower, upper=upper, fun_evals=inf, max_time=0.1, show_progress=True),
         design_control=design_control_init(init_size=ni),
     )
     spot_4.run()

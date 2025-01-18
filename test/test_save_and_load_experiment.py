@@ -48,7 +48,7 @@ def _compare_dicts(dict1, dict2, ignore_keys=None):
     return True
 
 def test_save_and_load_experiment():
-    PREFIX = "test_02"
+    PREFIX = "test_save_and_load_experiment_02"
     # Initialize function control
     fun_control = fun_control_init(
         PREFIX=PREFIX,

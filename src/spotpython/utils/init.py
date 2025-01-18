@@ -4,8 +4,10 @@ import lightning as L
 from scipy.optimize import differential_evolution
 import numpy as np
 import socket
+import copy
 import datetime
 from dateutil.tz import tzlocal
+from importlib.metadata import version, PackageNotFoundError
 from spotpython.hyperparameters.values import (
     add_core_model_to_fun_control,
     get_core_model_from_name,
@@ -43,6 +45,7 @@ def fun_control_init(
     enable_progress_bar=False,
     EXPERIMENT_NAME=None,
     eval=None,
+    force_run=False,
     fun_evals=15,
     fun_repeats=1,
     horizon=None,
@@ -162,6 +165,10 @@ def fun_control_init(
             The name of the experiment.
             Default is None. If None, the experiment name is generated based on the
             current date and time.
+        force_run (bool):
+            Whether to force the run or not. If a result file (PREFIX+"_run.pkl") exists, the run is mot
+            performed and the result is loaded from the file.
+            Default is False.
         fun_evals (int):
             The number of function evaluations.
         fun_repeats (int):
@@ -382,7 +389,7 @@ def fun_control_init(
     L.seed_everything(seed)
 
     if PREFIX is None:
-        PREFIX = _init_PREFIX()
+        PREFIX = _init_prefix()
 
     CHECKPOINT_PATH, DATASET_PATH, RESULTS_PATH, TENSORBOARD_PATH = setup_paths(TENSORBOARD_CLEAN)
     spot_tensorboard_path = create_spot_tensorboard_path(tensorboard_log, PREFIX)
@@ -420,6 +427,7 @@ def fun_control_init(
         "devices": devices,
         "enable_progress_bar": enable_progress_bar,
         "eval": eval,
+        "force_run": force_run,
         "fun_evals": fun_evals,
         "fun_repeats": fun_repeats,
         "horizon": horizon,
@@ -521,21 +529,26 @@ def fun_control_init(
     return fun_control
 
 
-def _init_PREFIX() -> str:
-    """Initialize the PREFIX for the experiment name.
+def _init_prefix() -> str:
+    """Initialize the prefix for the experiment name.
+    Attempts to derive the prefix from the package version. If unsuccessful,
+    defaults to '000'.
 
     Returns:
-        PREFIX (str):
-            The PREFIX for the experiment name.
+        str: The prefix for the experiment name.
 
     Examples:
-        >>> from spotpython.utils.init import _init_PREFIX
-        >>> _init_PREFIX()
+        >>> from spotpython.utils.init import _init_prefix
+        >>> _init_prefix()
         '00'
     """
-    # set the prefix to the actual date and time
-    PREFIX = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    return PREFIX
+    DEFAULT_PREFIX = "000"
+    try:
+        package_version = version("package_name")
+    except PackageNotFoundError:
+        package_version = DEFAULT_PREFIX
+
+    return package_version
 
 
 def setup_paths(tensorboard_clean) -> tuple:
@@ -584,8 +597,11 @@ def setup_paths(tensorboard_clean) -> tuple:
             now = datetime.datetime.now()
             os.makedirs("runs_OLD", exist_ok=True)
             # use [:-1] to remove "/" from the end of the path
-            TENSORBOARD_PATH_OLD = "runs_OLD/" + TENSORBOARD_PATH[:-1] + "_" + now.strftime("%Y_%m_%d_%H_%M_%S")
+            TENSORBOARD_PATH_OLD = "runs_OLD/" + TENSORBOARD_PATH[:-1] + "_" + now.strftime("%Y_%m_%d_%H_%M_%S") + "_" + "0"
             print(f"Moving TENSORBOARD_PATH: {TENSORBOARD_PATH} to TENSORBOARD_PATH_OLD: {TENSORBOARD_PATH_OLD}")
+            # if TENSORBOARD_PATH_OLD already exists, change the name increasing the number at the end
+            while os.path.exists(TENSORBOARD_PATH_OLD):
+                TENSORBOARD_PATH_OLD = copy.deepcopy(TENSORBOARD_PATH_OLD[:-1] + str(int(TENSORBOARD_PATH_OLD[-1]) + 1))
             os.rename(TENSORBOARD_PATH[:-1], TENSORBOARD_PATH_OLD)
 
     os.makedirs(TENSORBOARD_PATH, exist_ok=True)

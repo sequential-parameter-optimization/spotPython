@@ -1,6 +1,6 @@
 import numpy as np
 from spotpython.fun.objectivefunctions import Analytical
-from spotpython.spot import spot
+from spotpython.spot import Spot
 from spotpython.utils.init import fun_control_init, surrogate_control_init, design_control_init
 
 
@@ -19,9 +19,15 @@ def test_to_red():
     fun = Analytical().fun_sphere
     lower = np.array([-1, -1, -1])
     upper = np.array([-1, 1, 1])
-    spot_1 = spot.Spot(
+    PREFIX = "test_to_red"
+    spot_1 = Spot(
         fun=fun,
-        fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=fun_evals, show_progress=True, log_level=50),
+        fun_control=fun_control_init(PREFIX=PREFIX,
+                                     lower=lower,
+                                     upper=upper,
+                                     fun_evals=fun_evals,
+                                     show_progress=True,
+                                     log_level=50),
         design_control=design_control_init(init_size=ni),
         surrogate_control=surrogate_control_init(n_theta=2),
     )
@@ -41,10 +47,14 @@ def test_to_red_dim():
     var_type = ['float', 'int', 'float', 'int']
     var_name = ['x1', 'x2', 'x3', 'x4']
 
-    spot_instance = spot.Spot(
+    spot_instance = Spot(
         # Assuming Spot takes fun, fun_control, design_control as arguments
         fun = Analytical().fun_sphere,  # Replace with appropriate function
-        fun_control=fun_control_init(lower=lower, upper=upper, fun_evals=fun_evals, show_progress=True, log_level=50),        
+        fun_control=fun_control_init(PREFIX = "test_to_red_dim",
+                                     lower=lower,
+                                     upper=upper,
+                                     fun_evals=fun_evals
+                                     ),        
     )
     
     spot_instance.var_type = var_type

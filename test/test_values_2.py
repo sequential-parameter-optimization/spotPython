@@ -88,7 +88,7 @@ def test_get_th_hyperparameter_name_from_fun_control():
     fun_control = fun_control_init(
         _L_in=10,
         _L_out=1,
-        PREFIX="000",
+        PREFIX="test_values_2",
         TENSORBOARD_CLEAN=True,
         device=getDevice(),
         enable_progress_bar=False,

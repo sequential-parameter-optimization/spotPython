@@ -802,11 +802,12 @@ class Spot:
         #
         PREFIX = self.fun_control["PREFIX"]
         filename = get_result_filename(PREFIX)
-        if os.path.exists(filename):
+        if os.path.exists(filename) and not self.fun_control.get("force_run"):
             # print a warning and load the result
             print(f"Result file {filename} exists. Loading the result.")
-            spot_tuner = load_result(filename=filename)
-            return spot_tuner
+            S = load_result(filename=filename)
+            self._copy_from(S)
+            return self
         else:
             self.initialize_design(X_start)
             self.update_stats()
@@ -828,6 +829,10 @@ class Spot:
             if self.fun_control.get("save_result"):
                 self.save_result(verbosity=self.verbosity)
             return self
+
+    def _copy_from(self, other):
+        for attr in other.__dict__:
+            setattr(self, attr, getattr(other, attr))
 
     def initialize_design(self, X_start=None) -> None:
         """

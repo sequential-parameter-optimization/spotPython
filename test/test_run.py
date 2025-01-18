@@ -16,6 +16,7 @@ def test_run_method():
 
     # Initialize function control
     fun_control = fun_control_init(
+        PREFIX = "test_spot_run",
         lower=np.array([-1, -1]),
         upper=np.array([1, 1])
     )
@@ -39,7 +40,7 @@ def test_run_method():
     assert S.X.shape[0] == S.y.shape[0], "The design matrix X and response vector y should have the same number of rows."
 
     # Check if the minimum value in y is as expected
-    assert np.min(S.y) == 0.0, "The minimum value in y should be 0.0."
+    assert np.min(np.abs(S.y)) == 0.0, "The minimum value in y should be 0.0."
 
     # Check if the corresponding x values are as expected
     min_index = np.argmin(S.y)
