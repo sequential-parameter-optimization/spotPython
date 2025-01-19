@@ -106,3 +106,5 @@ def test_get_th_hyperparameter_name_from_fun_control():
     set_control_hyperparameter_value(fun_control, "l1", [3, 8])
     set_control_hyperparameter_value(fun_control, "optimizer", ["Adam", "AdamW", "Adamax", "NAdam"])
     assert get_ith_hyperparameter_name_from_fun_control(fun_control, key="optimizer", i=0) == "Adam"
+
+

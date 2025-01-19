@@ -65,6 +65,135 @@ def assign_values(X: np.array, var_list: list) -> dict:
     return result
 
 
+def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, Union[int, float]], None, None]:
+    """Iterate over the values of a dictionary of variables.
+    This function takes a dictionary of variables as input arguments and returns a generator that
+    yields dictionaries with the values from the arrays in the input dictionary.
+
+    Args:
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+
+    Returns:
+        Generator[dict]:
+            A generator that yields dictionaries with the values from the arrays in the input dictionary.
+
+    Raises:
+        ValueError: If the arrays in the dictionary do not have the same length.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.hyperparameters.values import iterate_dict_values
+        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
+        >>> print(var_dict)
+                {'a': array([1, 3, 5]), 'b': array([2, 4, 6])}
+        >>> list(iterate_dict_values(var_dict))
+                [{'a': np.int64(1), 'b': np.int64(2)},
+                {'a': np.int64(3), 'b': np.int64(4)},
+                {'a': np.int64(5), 'b': np.int64(6)}]
+    """
+    # Check if the dictionary is empty
+    if not var_dict:
+        return
+
+    # Get the length of the first array
+    first_length = None
+    for value in var_dict.values():
+        if first_length is None:
+            first_length = len(value)
+        elif len(value) != first_length:
+            raise ValueError("All arrays must have the same length.")
+
+    # Generate the output dictionaries
+    for i in range(first_length):
+        yield {key: value[i] for key, value in var_dict.items()}
+
+
+def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> Dict[str, Union[int, float]]:
+    """Convert values in a dictionary to integers or floats based on a list of variable types.
+    This function processes a dictionary 'd' based on the list of variable types 'var_type'.
+    It handles the conversion of strings or other compatible types to 'int' or 'float' as specified.
+    Specifically:
+        1. If `var_type[i]` is anything other than `"num"` or `"float"`, the value should be converted to `int()`.
+            If the conversion fails (i.e., if the value is not an integer value or representation), an error is raised.
+        2. If `var_type[i]` is `"float"`, the value should be converted to `float()`.
+        3. If `var_type[i]` is `"num"`, the function should decide whether to convert the value to `int()` or `float()`
+            based on whether it represents an integer or a float.
+
+    Args:
+        d (dict): The input dictionary with values to convert.
+        var_type (list): A list of variable types where:
+            - Not "num" or "float": the value is converted to int(). If conversion to int() fails, an error is raised.
+            - "float": convert the value to a float.
+            - "num": the value is converted to int() if it represents an integer, otherwise to float().
+
+    Returns:
+        dict: A modified dictionary with values converted based on 'var_type' settings.
+
+    Raises:
+        ValueError: If the conversion to an integer is not possible when required.
+
+    Examples:
+            >>> from spotpython.hyperparameters.values import convert_keys
+                d = {'a': 1, 'b': 2.1, 'c': 3}
+                var_type = ["int", "num", "int"]
+                convert_keys(d, var_type)
+                    {'a': 1, 'b': 2.1, 'c': 3}
+    """
+    keys = list(d.keys())
+
+    for i in range(len(keys)):
+        try:
+            if var_type[i] not in ["num", "float"]:
+                value = float(d[keys[i]])
+                if value.is_integer():
+                    d[keys[i]] = int(value)
+                else:
+                    raise ValueError(f"Invalid value for conversion at {keys[i]}: {d[keys[i]]} (not an integer)")
+            elif var_type[i] == "float":
+                d[keys[i]] = float(d[keys[i]])
+            elif var_type[i] == "num":
+                value = float(d[keys[i]])
+                d[keys[i]] = int(value) if value.is_integer() else value
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Invalid value for conversion at {keys[i]}: {d[keys[i]]}")
+
+    return d
+
+
+def get_one_config_from_X(X, fun_control=None):
+    """Get one config from X.
+
+    Args:
+        X (np.array):
+            The array with the hyper parameter values.
+        fun_control (dict):
+            The function control dictionary.
+
+    Returns:
+        (dict):
+            The config dictionary.
+
+    Examples:
+        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
+            from spotriver.data.river_hyper_dict import RiverHyperDict
+            fun_control = {}
+            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
+                fun_control=func_control,
+                hyper_dict=RiverHyperDict,
+                filename=None)
+            X = np.array([0, 0, 0, 0, 0])
+            get_one_config_from_X(X, fun_control)
+            {'leaf_prediction': 'mean',
+            'leaf_model': 'NBAdaptive',
+            'splitter': 'HoeffdingAdaptiveTreeSplitter',
+            'binary_split': 'info_gain',
+            'stop_mem_management': False}
+    """
+    var_dict = assign_values(X, fun_control["var_name"])
+    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    return config
+
+
 def get_tuned_architecture(spot_tuner, force_minX=False) -> dict:
     """
     Returns the tuned architecture. If the spot tuner has noise,
@@ -161,60 +290,6 @@ def return_conf_list_from_var_dict(
     for values in generate_one_config_from_var_dict(var_dict, fun_control, default=default):
         conf_list.append(values)
     return conf_list
-
-
-def iterate_dict_values(var_dict: Dict[str, np.ndarray]) -> Generator[Dict[str, Union[int, float]], None, None]:
-    """Iterate over the values of a dictionary of variables.
-    This function takes a dictionary of variables as input arguments and returns a generator that
-    yields dictionaries with the values from the arrays in the input dictionary.
-
-    Args:
-        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
-
-    Returns:
-        Generator[dict]:
-            A generator that yields dictionaries with the values from the arrays in the input dictionary.
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.hyperparameters.values import iterate_dict_values
-        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-        >>> list(iterate_dict_values(var_dict))
-        [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
-    """
-    n = len(next(iter(var_dict.values())))
-    for i in range(n):
-        yield {key: value[i] for key, value in var_dict.items()}
-
-
-def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> Dict[str, Union[int, float]]:
-    """Convert values in a dictionary to integers based on a list of variable types.
-    This function takes a dictionary `d` and a list of variable types `var_type` as arguments.
-    For each key in the dictionary,
-    if the corresponding entry in `var_type` is not equal to `"num"`,
-    the value associated with that key is converted to an integer.
-
-    Args:
-        d (dict): The input dictionary.
-        var_type (list):
-            A list of variable types. If the entry is not `"num"` the corresponding
-            value will be converted to the type `"int"`.
-
-    Returns:
-        dict: The modified dictionary with values converted to integers based on `var_type`.
-
-    Examples:
-        >>> from spotpython.hyperparameters.values import convert_keys
-        >>> d = {'a': '1.1', 'b': '2', 'c': '3.1'}
-        >>> var_type = ["int", "num", "int"]
-        >>> convert_keys(d, var_type)
-        {'a': 1, 'b': '2', 'c': 3}
-    """
-    keys = list(d.keys())
-    for i in range(len(keys)):
-        if var_type[i] not in ["num", "float"]:
-            d[keys[i]] = int(d[keys[i]])
-    return d
 
 
 def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any], default=False) -> Dict[str, Any]:
@@ -875,40 +950,6 @@ def get_one_core_model_from_X(
     config = return_conf_list_from_var_dict(var_dict, fun_control, default=default)[0]
     core_model = fun_control["core_model"](**config)
     return core_model
-
-
-def get_one_config_from_X(X, fun_control=None):
-    """Get one config from X.
-
-    Args:
-        X (np.array):
-            The array with the hyper parameter values.
-        fun_control (dict):
-            The function control dictionary.
-
-    Returns:
-        (dict):
-            The config dictionary.
-
-    Examples:
-        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotriver.data.river_hyper_dict import RiverHyperDict
-            fun_control = {}
-            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-                fun_control=func_control,
-                hyper_dict=RiverHyperDict,
-                filename=None)
-            X = np.array([0, 0, 0, 0, 0])
-            get_one_config_from_X(X, fun_control)
-            {'leaf_prediction': 'mean',
-            'leaf_model': 'NBAdaptive',
-            'splitter': 'HoeffdingAdaptiveTreeSplitter',
-            'binary_split': 'info_gain',
-            'stop_mem_management': False}
-    """
-    var_dict = assign_values(X, fun_control["var_name"])
-    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
-    return config
 
 
 def get_one_sklearn_model_from_X(X, fun_control=None):
