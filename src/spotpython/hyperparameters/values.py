@@ -160,64 +160,92 @@ def convert_keys(d: Dict[str, Union[int, float, str]], var_type: List[str]) -> D
     return d
 
 
-def get_one_config_from_X(X, fun_control=None):
-    """Get one config from X.
+def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any], default=False) -> Dict[str, Any]:
+    """Get dictionary with levels and types.
+    The function maps the numerical output of the hyperparameter optimization to the corresponding levels
+    of the hyperparameter needed by the core model, i.e., the tuned algorithm.
+    The function takes the dictionaries fun_control and v and returns a new dictionary with the same keys as v
+    but with the values of the levels of the keys from fun_control.
+    If the key value in the dictionary is 0, it takes the first value from the list,
+    if it is 1, it takes the second and so on.
+    If a key is not in fun_control, it takes the key from v.
+    If the core_model_parameter_type value is instance, it returns the class of the value from the module
+    via getattr("class", value).
 
     Args:
-        X (np.array):
-            The array with the hyper parameter values.
-        fun_control (dict):
-            The function control dictionary.
+        fun_control (Dict[str, Any]):
+            A dictionary containing information about the core model hyperparameters.
+        v (Dict[str, Any]):
+            A dictionary containing the numerical output of the hyperparameter optimization.
+        default (bool):
+            A boolean value indicating whether to use the default values from fun_control.
 
     Returns:
-        (dict):
-            The config dictionary.
+        Dict[str, Any]:
+            A new dictionary with the same keys as v but with the values of the levels of the keys from fun_control.
 
     Examples:
-        >>> from river.tree import HoeffdingAdaptiveTreeRegressor
-            from spotriver.data.river_hyper_dict import RiverHyperDict
-            fun_control = {}
-            add_core_model_to_fun_control(core_model=HoeffdingAdaptiveTreeRegressor,
-                fun_control=func_control,
-                hyper_dict=RiverHyperDict,
-                filename=None)
-            X = np.array([0, 0, 0, 0, 0])
-            get_one_config_from_X(X, fun_control)
-            {'leaf_prediction': 'mean',
-            'leaf_model': 'NBAdaptive',
-            'splitter': 'HoeffdingAdaptiveTreeSplitter',
-            'binary_split': 'info_gain',
-            'stop_mem_management': False}
+            >>> from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
+                from spotpython.hyperparameters.values import assign_values, get_var_name, iterate_dict_values, convert_keys, get_dict_with_levels_and_types, get_core_model_from_name, add_core_model_to_fun_control
+                import pprint
+                core_model_name="light.regression.NNLinearRegressor"
+                hyperdict=LightHyperDict
+                fun_control = {}
+                _ , core_model_instance = get_core_model_from_name(core_model_name)
+                add_core_model_to_fun_control(
+                    core_model=core_model_instance,
+                    fun_control=fun_control,
+                    hyper_dict=hyperdict,
+                    filename=None,
+                )
+                v = {'act_fn': 2,
+                            'batch_norm': 0,
+                            'batch_size': 4,
+                            'dropout_prob': 0.01,
+                            'epochs': 4,
+                            'initialization': 0,
+                            'l1': 3,
+                            'lr_mult': 1.0,
+                            'optimizer': 11,
+                            'patience': 2}
+                get_dict_with_levels_and_types(fun_control=fun_control, v=v)
+                    {'act_fn': ReLU(),
+                    'batch_norm': False,
+                    'batch_size': 4,
+                    'dropout_prob': 0.01,
+                    'epochs': 4,
+                    'initialization': 'Default',
+                    'l1': 3,
+                    'lr_mult': 1.0,
+                    'optimizer': 'SGD',
+                    'patience': 2}
     """
-    var_dict = assign_values(X, fun_control["var_name"])
-    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
-    return config
-
-
-def get_tuned_architecture(spot_tuner, force_minX=False) -> dict:
-    """
-    Returns the tuned architecture. If the spot tuner has noise,
-    it returns the architecture with the lowest mean (.min_mean_X),
-    otherwise it returns the architecture with the lowest value (.min_X).
-
-    Args:
-        spot_tuner (object):
-            spot tuner object.
-        force_minX (bool):
-            If True, return the architecture with the lowest value (.min_X).
-
-    Returns:
-        (dict):
-            dictionary containing the tuned architecture.
-    """
-    if not spot_tuner.noise or force_minX:
-        X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1, -1))
+    if default:
+        d = fun_control["core_model_hyper_dict_default"]
     else:
-        # noise or force_minX is False:
-        X = spot_tuner.to_all_dim(spot_tuner.min_mean_X.reshape(1, -1))
-        fun_control = copy(spot_tuner.fun_control)
-    config = get_one_config_from_X(X, fun_control)
-    return config
+        d = fun_control["core_model_hyper_dict"]
+    new_dict = {}
+    for key, value in v.items():
+        if key in d and d[key]["type"] == "factor":
+            if d[key]["core_model_parameter_type"] == "instance":
+                if "class_name" in d[key]:
+                    mdl = d[key]["class_name"]
+                c = d[key]["levels"][value]
+                new_dict[key] = class_for_name(mdl, c)
+            elif d[key]["core_model_parameter_type"] == "instance()":
+                mdl = d[key]["class_name"]
+                c = d[key]["levels"][value]
+                k = class_for_name(mdl, c)
+                new_dict[key] = k()
+            # bool() introduced to convert 0 and 1 to False and True in v0.14.54
+            elif d[key]["core_model_parameter_type"] == "bool":
+                new_dict[key] = bool(d[key]["levels"][value])
+            else:
+                new_dict[key] = d[key]["levels"][value]
+        else:
+            new_dict[key] = v[key]
+    return new_dict
 
 
 def generate_one_config_from_var_dict(
@@ -239,23 +267,245 @@ def generate_one_config_from_var_dict(
             value will be converted to the type "int".
         default (bool):
             A boolean value indicating whether to use the default values from fun_control.
+            Default is False.
 
     Returns:
         Generator[dict]: A generator that yields dictionaries with the values from the arrays in the input dictionary.
 
     Examples:
-        >>> import numpy as np
-        >>> from spotpython.hyperparameters.values import generate_one_config_from_var_dict
-        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-        >>> fun_control = {"var_type": ["int", "num"]}
-        >>> list(generate_one_config_from_var_dict(var_dict, fun_control))
-        [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
+            >>> from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.hyperparameters.values import (get_core_model_from_name,
+                    add_core_model_to_fun_control, generate_one_config_from_var_dict)
+                import pprint
+                core_model_name="light.regression.NNLinearRegressor"
+                hyperdict=LightHyperDict
+                fun_control = {}
+                _ , core_model_instance = get_core_model_from_name(core_model_name)
+                add_core_model_to_fun_control(
+                    core_model=core_model_instance,
+                    fun_control=fun_control,
+                    hyper_dict=hyperdict,
+                    filename=None,
+                )
+                var_dict = {'l1': np.array([3.]),
+                            'epochs': np.array([4.]),
+                            'batch_size': np.array([4.]),
+                            'act_fn': np.array([2.]),
+                            'optimizer': np.array([11.]),
+                            'dropout_prob': np.array([0.01]),
+                            'lr_mult': np.array([1.]),
+                            'patience': np.array([2.]),
+                            'batch_norm': np.array([0.]),
+                            'initialization': np.array([0.])}
+                g = generate_one_config_from_var_dict(var_dict=var_dict, fun_control=fun_control)
+                # Since g is an iterator, we need to call next to get the values
+                values = next(g)
+                pprint.pprint(values)
+                    {'act_fn': ReLU(),
+                    'batch_norm': False,
+                    'batch_size': 16,
+                    'dropout_prob': 0.01,
+                    'epochs': 16,
+                    'initialization': 'Default',
+                    'l1': 8,
+                    'lr_mult': 1.0,
+                    'optimizer': 'SGD',
+                    'patience': 4}
     """
     for values in iterate_dict_values(var_dict):
         values = convert_keys(values, fun_control["var_type"])
         values = get_dict_with_levels_and_types(fun_control=fun_control, v=values, default=default)
         values = transform_hyper_parameter_values(fun_control=fun_control, hyper_parameter_values=values)
         yield values
+
+
+def return_conf_list_from_var_dict(
+    var_dict: Dict[str, np.ndarray],
+    fun_control: Dict[str, Union[List[str], str]],
+    default: bool = False,
+) -> List[Dict[str, Union[int, float]]]:
+    """Return a list of configurations from a dictionary of variables.
+
+    This function takes a dictionary of variables and a dictionary of function control as input arguments.
+    It performs similar steps as generate_one_config_from_var_dict() but returns a list of dictionaries
+    of hyper parameter values.
+
+    Args:
+        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
+        fun_control (dict): A dictionary which (at least) has an entry with the following key:
+            "var_type" (list): A list of variable types. If the entry is not "num" or not "float" the corresponding
+            value will be converted to the type "int".
+
+    Returns:
+        list: A list of dictionaries of hyper parameter values. Transformations are applied to the values.
+
+    Examples:
+            >>> import numpy as np
+                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.hyperparameters.values import  get_core_model_from_name, add_core_model_to_fun_control, generate_one_config_from_var_dict
+                import pprint
+                core_model_name="light.regression.NNLinearRegressor"
+                hyperdict=LightHyperDict
+                fun_control = {}
+                _ , core_model_instance = get_core_model_from_name(core_model_name)
+                add_core_model_to_fun_control(
+                    core_model=core_model_instance,
+                    fun_control=fun_control,
+                    hyper_dict=hyperdict,
+                    filename=None,
+                )
+                var_dict = {'l1': np.array([3., 4.]),
+                            'epochs': np.array([4., 3.]),
+                            'batch_size': np.array([4., 4.]),
+                            'act_fn': np.array([2., 1.]),
+                            'optimizer': np.array([11., 10.]),
+                            'dropout_prob': np.array([0.01, 0.]),
+                            'lr_mult': np.array([1., 1.1]),
+                            'patience': np.array([2., 3.]),
+                            'batch_norm': np.array([0., 1.]),
+                            'initialization': np.array([0., 1.])}
+                g = generate_one_config_from_var_dict(var_dict=var_dict, fun_control=fun_control)
+                conf_list = []
+                for values in generate_one_config_from_var_dict(var_dict, fun_control):
+                    conf_list.append(values)
+                conf_list
+                    [{'l1': 8,
+                    'epochs': 16,
+                    'batch_size': 16,
+                    'act_fn': ReLU(),
+                    'optimizer': 'SGD',
+                    'dropout_prob': 0.01,
+                    'lr_mult': 1.0,
+                    'patience': 4,
+                    'batch_norm': False,
+                    'initialization': 'Default'},
+                    {'l1': 16,
+                    'epochs': 8,
+                    'batch_size': 16,
+                    'act_fn': Tanh(),
+                    'optimizer': 'Rprop',
+                    'dropout_prob': 0.0,
+                    'lr_mult': 1.1,
+                    'patience': 8,
+                    'batch_norm': True,
+                    'initialization': 'kaiming_uniform'}]
+    """
+    conf_list = []
+    for values in generate_one_config_from_var_dict(var_dict, fun_control, default=default):
+        conf_list.append(values)
+    return conf_list
+
+
+def get_one_config_from_X(X, fun_control=None) -> dict:
+    """Get one config from X.
+
+    Args:
+        X (np.array):
+            The array with the hyper parameter values.
+        fun_control (dict):
+            The fun_control dictionary.
+
+    Returns:
+        (dict):
+            The config dictionary.
+
+    Examples:
+        >>> from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
+            from spotpython.hyperparameters.values import get_core_model_from_name, add_core_model_to_fun_control, get_one_config_from_X
+            core_model_name="light.regression.NNLinearRegressor"
+            hyperdict=LightHyperDict
+            fun_control = {}
+            coremodel, core_model_instance = get_core_model_from_name(core_model_name)
+            add_core_model_to_fun_control(
+                core_model=core_model_instance,
+                fun_control=fun_control,
+                hyper_dict=hyperdict,
+                filename=None,
+            )
+            X = get_default_hyperparameters_as_array(fun_control)
+            get_one_config_from_X(X, fun_control)
+                {'l1': 8,
+                'epochs': 16,
+                'batch_size': 16,
+                'act_fn': ReLU(),
+                'optimizer': 'SGD',
+                'dropout_prob': 0.01,
+                'lr_mult': 1.0,
+                'patience': 4,
+                'batch_norm': False,
+                'initialization': 'Default'}
+    """
+    var_dict = assign_values(X, fun_control["var_name"])
+    config = return_conf_list_from_var_dict(var_dict, fun_control)[0]
+    return config
+
+
+def get_tuned_architecture(spot_tuner, force_minX=False) -> dict:
+    """
+    Returns the tuned architecture. If the spot tuner has noise,
+    it returns the architecture with the lowest mean (.min_mean_X),
+    otherwise it returns the architecture with the lowest value (.min_X).
+
+    Args:
+        spot_tuner (object):
+            spot tuner object.
+        force_minX (bool):
+            If True, return the architecture with the lowest value (.min_X).
+
+    Returns:
+        (dict):
+            dictionary containing the tuned architecture.
+
+    Examples:
+        >>> from spotpython.data.diabetes import Diabetes
+            from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+            from spotpython.fun.hyperlight import HyperLight
+            from spotpython.utils.init import fun_control_init, design_control_init
+            from spotpython.spot import Spot
+            import numpy as np
+            from spotpython.hyperparameters.values import set_hyperparameter, get_one_config_from_X
+            fun_control = fun_control_init(
+                force_run=False,
+                PREFIX="get_one_config_from_X",
+                save_experiment=True,
+                fun_evals=10,
+                max_time=1,
+                data_set = Diabetes(),
+                core_model_name="light.regression.NNLinearRegressor",
+                hyperdict=LightHyperDict,
+                _L_in=10,
+                _L_out=1)
+            # Uncomment the following lines to perform the hyperparameter optimization:
+            # set_hyperparameter(fun_control, "epochs", [2,3])
+            # set_hyperparameter(fun_control, "patience", [1,2])
+            # design_control = design_control_init(init_size=5)
+            # fun = HyperLight().fun
+            # S = Spot(fun=fun,fun_control=fun_control, design_control=design_control)
+            # S.run()
+            # X = S.to_all_dim(S.min_X.reshape(1, -1))
+            # Otherwise, only take the result:
+            X = np.array([[ 4., 2., 1., 3.,  11., 0.03480567, 7.98104224,  1., 1., 0.]])
+            get_one_config_from_X(X, fun_control)
+               {'l1': 16,
+                'epochs': 4,
+                'batch_size': 2,
+                'act_fn': LeakyReLU(),
+                'optimizer': 'SGD',
+                'dropout_prob': 0.03480567,
+                'lr_mult': 7.98104224,
+                'patience': 2,
+                'batch_norm': True,
+                'initialization': 'Default'}
+    """
+    if not spot_tuner.noise or force_minX:
+        X = spot_tuner.to_all_dim(spot_tuner.min_X.reshape(1, -1))
+    else:
+        # noise or force_minX is False:
+        X = spot_tuner.to_all_dim(spot_tuner.min_mean_X.reshape(1, -1))
+        fun_control = copy(spot_tuner.fun_control)
+    config = get_one_config_from_X(X, fun_control)
+    return config
 
 
 def return_conf_list_from_var_dict(
@@ -290,124 +540,6 @@ def return_conf_list_from_var_dict(
     for values in generate_one_config_from_var_dict(var_dict, fun_control, default=default):
         conf_list.append(values)
     return conf_list
-
-
-def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any], default=False) -> Dict[str, Any]:
-    """Get dictionary with levels and types.
-    The function maps the numerical output of the hyperparameter optimization to the corresponding levels
-    of the hyperparameter needed by the core model, i.e., the tuned algorithm.
-    The function takes the dictionaries fun_control and v and returns a new dictionary with the same keys as v
-    but with the values of the levels of the keys from fun_control.
-    If the key value in the dictionary is 0, it takes the first value from the list,
-    if it is 1, it takes the second and so on.
-    If a key is not in fun_control, it takes the key from v.
-    If the core_model_parameter_type value is instance, it returns the class of the value from the module
-    via getattr("class", value).
-
-    Args:
-        fun_control (Dict[str, Any]):
-            A dictionary containing information about the core model hyperparameters.
-        v (Dict[str, Any]):
-            A dictionary containing the numerical output of the hyperparameter optimization.
-        default (bool):
-            A boolean value indicating whether to use the default values from fun_control.
-
-    Returns:
-        Dict[str, Any]:
-            A new dictionary with the same keys as v but with the values of the levels of the keys from fun_control.
-
-    Examples:
-        >>> fun_control = {
-        ...     "core_model_hyper_dict": {
-        ...         "leaf_prediction": {
-        ...             "levels": ["mean", "model", "adaptive"],
-        ...             "type": "factor",
-        ...             "default": "mean",
-        ...             "core_model_parameter_type": "str"
-        ...         },
-        ...         "leaf_model": {
-        ...             "levels": [
-        ...                 "linear_model.LinearRegression",
-        ...                 "linear_model.PARegressor",
-        ...                 "linear_model.Perceptron"
-        ...             ],
-        ...             "type": "factor",
-        ...             "default": "LinearRegression",
-        ...             "core_model_parameter_type": "instance"
-        ...         },
-        ...         "splitter": {
-        ...             "levels": ["EBSTSplitter", "TEBSTSplitter", "QOSplitter"],
-        ...             "type": "factor",
-        ...             "default": "EBSTSplitter",
-        ...             "core_model_parameter_type": "instance()"
-        ...         },
-        ...         "binary_split": {
-        ...             "levels": [0, 1],
-        ...             "type": "factor",
-        ...             "default": 0,
-        ...             "core_model_parameter_type": "bool"
-        ...         },
-        ...         "stop_mem_management": {
-        ...             "levels": [0, 1],
-        ...             "type": "factor",
-        ...             "default": 0,
-        ...             "core_model_parameter_type": "bool"
-        ...         }
-        ...     }
-        ... }
-        >>> v = {
-        ...     'grace_period': 200,
-        ...     'max_depth': 10,
-        ...     'delta': 1e-07,
-        ...     'tau': 0.05,
-        ...     'leaf_prediction': 0,
-        ...     'leaf_model': 0,
-        ...     'model_selector_decay': 0.95,
-        ...     'splitter': 1,
-        ...     'min_samples_split': 9,
-        ...     'binary_split': 0,
-        ...     'max_size': 500.0
-        ... }
-        >>> get_dict_with_levels_and_types(fun_control, v)
-        {
-            'grace_period': 200,
-            'max_depth': 10,
-            'delta': 1e-07,
-            'tau': 0.05,
-            'leaf_prediction': 'mean',
-            'leaf_model': linear_model.LinearRegression,
-            'model_selector_decay': 0.95,
-            'splitter': TEBSTSplitter,
-            'min_samples_split': 9,
-            'binary_split': False,
-            'max_size': 500.0
-        }
-    """
-    if default:
-        d = fun_control["core_model_hyper_dict_default"]
-    else:
-        d = fun_control["core_model_hyper_dict"]
-    new_dict = {}
-    for key, value in v.items():
-        if key in d and d[key]["type"] == "factor":
-            if d[key]["core_model_parameter_type"] == "instance":
-                if "class_name" in d[key]:
-                    mdl = d[key]["class_name"]
-                c = d[key]["levels"][value]
-                new_dict[key] = class_for_name(mdl, c)
-            elif d[key]["core_model_parameter_type"] == "instance()":
-                mdl = d[key]["class_name"]
-                c = d[key]["levels"][value]
-                k = class_for_name(mdl, c)
-                new_dict[key] = k()
-            # bool() introduced to convert 0 and 1 to False and True in v0.14.54
-            elif d[key]["core_model_parameter_type"] == "bool":
-                new_dict[key] = bool(d[key]["levels"][value])
-            else:
-                new_dict[key] = d[key]["levels"][value]
-        else:
-            new_dict[key] = v[key]
-    return new_dict
 
 
 def modify_boolean_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:
