@@ -7,6 +7,7 @@ import sys
 import importlib
 from spotpython.utils.eda import gen_design_table
 from spotpython.utils.init import setup_paths
+import copy
 
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -233,40 +234,28 @@ def load_core_model_from_file(coremodel, dirname="userModel"):
     return core_model
 
 
-def load_and_run_spot_python_experiment(spot_filename) -> tuple:
+def load_and_run_spot_python_experiment(PREFIX=None, filename=None) -> object:
     """Loads and runs a spot experiment.
 
     Args:
-        spot_filename (str):
-            The name of the spot experiment file.
+        PREFIX (str, optional): Prefix of the experiment. Defaults to None.
+        filename (str): Name of the pickle file. Defaults to None
 
     Returns:
-        tuple: A tuple containing the spot tuner, fun control,
-               design control, surrogate control, optimizer control,
-               and the tensorboard process object (p_popen).
-
-    Notes:
-        p_open is deprecated and should be removed in future versions.
-        It returns None.
+        spot_tuner (Spot): The spot tuner object.
 
     Examples:
         >>> from spotpython.utils.file import load_and_run_spot_python_experiment
-        >>> spot_tuner = load_and_run_spot_python_experiment("spot_branin_experiment.pickle")
+        >>> spot_tuner = load_and_run_spot_python_experiment(filename="spot_branin_experiment.pickle")
+        >>> # Or use PREFIX
+        >>> spot_tuner = load_and_run_spot_python_experiment(PREFIX="spot_branin_experiment")
 
     """
-    p_open = None
-    (spot_tuner, fun_control, design_control, surrogate_control, optimizer_control) = load_experiment(spot_filename)
-    print("\nLoaded fun_control in spotRun():")
-    # pprint.pprint(fun_control)
+    spot_tuner = load_experiment(PREFIX=PREFIX, filename=filename)
+    fun_control = copy.copy(spot_tuner.fun_control)
     print(gen_design_table(fun_control))
     setup_paths(fun_control["TENSORBOARD_CLEAN"])
     spot_tuner.init_spot_writer()
-    # if fun_control["tensorboard_start"]:
-    #     p_open = start_tensorboard()
-    # else:
-    #     p_open = None
     spot_tuner.run()
-    # # tensorboard --logdir="runs/"
-    # stop_tensorboard(p_open)
     print(gen_design_table(fun_control=fun_control, spot=spot_tuner))
-    return spot_tuner, fun_control, design_control, surrogate_control, optimizer_control, p_open
+    return spot_tuner
