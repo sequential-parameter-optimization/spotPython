@@ -213,15 +213,9 @@ def load_and_run_spot_python_experiment(PREFIX=None, filename=None) -> object:
         >>> spot_tuner = load_and_run_spot_python_experiment(PREFIX="spot_branin_experiment")
 
     """
-    spot_tuner = load_experiment(PREFIX=PREFIX, filename=filename)
-    pprint.pprint(spot_tuner)
-    # fun_control = copy.copy(spot_tuner["fun_control"])
-    # print(gen_design_table(fun_control))
-    # setup_paths(fun_control["TENSORBOARD_CLEAN"])
-    # spot_tuner.init_spot_writer()
-    # spot_tuner.run()
-    # print(gen_design_table(fun_control=fun_control, spot=spot_tuner))
-    return spot_tuner
+    S = load_experiment(PREFIX=PREFIX, filename=filename)
+    S.run()    
+    return S
 
 
 
