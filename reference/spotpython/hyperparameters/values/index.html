@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.40">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.41">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.0253249f.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -8799,40 +8799,39 @@ otherwise it returns the architecture with the lowest value (.min_X).</p>
 <span class="go">    from spotpython.utils.init import fun_control_init, design_control_init</span>
 <span class="go">    from spotpython.spot import Spot</span>
 <span class="go">    import numpy as np</span>
-<span class="go">    from spotpython.hyperparameters.values import set_hyperparameter, get_one_config_from_X</span>
-<span class="go">    fun_control = fun_control_init(</span>
-<span class="go">        force_run=False,</span>
-<span class="go">        PREFIX=&quot;get_one_config_from_X&quot;,</span>
-<span class="go">        save_experiment=True,</span>
-<span class="go">        fun_evals=10,</span>
-<span class="go">        max_time=1,</span>
-<span class="go">        data_set = Diabetes(),</span>
-<span class="go">        core_model_name=&quot;light.regression.NNLinearRegressor&quot;,</span>
-<span class="go">        hyperdict=LightHyperDict,</span>
-<span class="go">        _L_in=10,</span>
-<span class="go">        _L_out=1)</span>
-<span class="go">    # Uncomment the following lines to perform the hyperparameter optimization:</span>
-<span class="go">    # set_hyperparameter(fun_control, &quot;epochs&quot;, [2,3])</span>
-<span class="go">    # set_hyperparameter(fun_control, &quot;patience&quot;, [1,2])</span>
-<span class="go">    # design_control = design_control_init(init_size=5)</span>
-<span class="go">    # fun = HyperLight().fun</span>
-<span class="go">    # S = Spot(fun=fun,fun_control=fun_control, design_control=design_control)</span>
-<span class="go">    # S.run()</span>
-<span class="go">    # X = S.to_all_dim(S.min_X.reshape(1, -1))</span>
-<span class="go">    # Otherwise, only take the result:</span>
-<span class="go">    X = np.array([[ 4., 2., 1., 3.,  11., 0.03480567, 7.98104224,  1., 1., 0.]])</span>
-<span class="go">    get_one_config_from_X(X, fun_control)</span>
-<span class="go">       {&#39;l1&#39;: 16,</span>
-<span class="go">        &#39;epochs&#39;: 4,</span>
-<span class="go">        &#39;batch_size&#39;: 2,</span>
-<span class="go">        &#39;act_fn&#39;: LeakyReLU(),</span>
-<span class="go">        &#39;optimizer&#39;: &#39;SGD&#39;,</span>
-<span class="go">        &#39;dropout_prob&#39;: 0.03480567,</span>
-<span class="go">        &#39;lr_mult&#39;: 7.98104224,</span>
-<span class="go">        &#39;patience&#39;: 2,</span>
-<span class="go">        &#39;batch_norm&#39;: True,</span>
-<span class="go">        &#39;initialization&#39;: &#39;Default&#39;}</span>
+<span class="go">    from spotpython.hyperparameters.values import set_hyperparameter, get_tuned_architecture</span>
 </code></pre></div>
+    <pre><code>fun_control = fun_control_init(
+    force_run=False,
+    PREFIX="get_one_config_from_X",
+    save_experiment=True,
+    fun_evals=10,
+    max_time=1,
+    data_set = Diabetes(),
+    core_model_name="light.regression.NNLinearRegressor",
+    hyperdict=LightHyperDict,
+    _L_in=10,
+    _L_out=1)
+
+set_hyperparameter(fun_control, "epochs", [2,3])
+set_hyperparameter(fun_control, "patience", [1,2])
+design_control = design_control_init(init_size=5)
+
+fun = HyperLight().fun
+S = Spot(fun=fun,fun_control=fun_control, design_control=design_control)
+S.run()
+get_tuned_architecture(S)
+    {'l1': 16,
+    'epochs': 4,
+    'batch_size': 2,
+    'act_fn': LeakyReLU(),
+    'optimizer': 'SGD',
+    'dropout_prob': 0.034805674424520705,
+    'lr_mult': 7.981042243396318,
+    'patience': 2,
+    'batch_norm': True,
+    'initialization': 'Default'}
+</code></pre>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/hyperparameters/values.py</code></summary>
@@ -8923,7 +8922,9 @@ otherwise it returns the architecture with the lowest value (.min_X).</p>
 <span class="sd">            from spotpython.utils.init import fun_control_init, design_control_init</span>
 <span class="sd">            from spotpython.spot import Spot</span>
 <span class="sd">            import numpy as np</span>
-<span class="sd">            from spotpython.hyperparameters.values import set_hyperparameter, get_one_config_from_X</span>
+<span class="sd">            from spotpython.hyperparameters.values import set_hyperparameter, get_tuned_architecture</span>
+
+
 <span class="sd">            fun_control = fun_control_init(</span>
 <span class="sd">                force_run=False,</span>
 <span class="sd">                PREFIX=&quot;get_one_config_from_X&quot;,</span>
@@ -8935,24 +8936,22 @@ otherwise it returns the architecture with the lowest value (.min_X).</p>
 <span class="sd">                hyperdict=LightHyperDict,</span>
 <span class="sd">                _L_in=10,</span>
 <span class="sd">                _L_out=1)</span>
-<span class="sd">            # Uncomment the following lines to perform the hyperparameter optimization:</span>
-<span class="sd">            # set_hyperparameter(fun_control, &quot;epochs&quot;, [2,3])</span>
-<span class="sd">            # set_hyperparameter(fun_control, &quot;patience&quot;, [1,2])</span>
-<span class="sd">            # design_control = design_control_init(init_size=5)</span>
-<span class="sd">            # fun = HyperLight().fun</span>
-<span class="sd">            # S = Spot(fun=fun,fun_control=fun_control, design_control=design_control)</span>
-<span class="sd">            # S.run()</span>
-<span class="sd">            # X = S.to_all_dim(S.min_X.reshape(1, -1))</span>
-<span class="sd">            # Otherwise, only take the result:</span>
-<span class="sd">            X = np.array([[ 4., 2., 1., 3.,  11., 0.03480567, 7.98104224,  1., 1., 0.]])</span>
-<span class="sd">            get_one_config_from_X(X, fun_control)</span>
-<span class="sd">               {&#39;l1&#39;: 16,</span>
+
+<span class="sd">            set_hyperparameter(fun_control, &quot;epochs&quot;, [2,3])</span>
+<span class="sd">            set_hyperparameter(fun_control, &quot;patience&quot;, [1,2])</span>
+<span class="sd">            design_control = design_control_init(init_size=5)</span>
+
+<span class="sd">            fun = HyperLight().fun</span>
+<span class="sd">            S = Spot(fun=fun,fun_control=fun_control, design_control=design_control)</span>
+<span class="sd">            S.run()</span>
+<span class="sd">            get_tuned_architecture(S)</span>
+<span class="sd">                {&#39;l1&#39;: 16,</span>
 <span class="sd">                &#39;epochs&#39;: 4,</span>
 <span class="sd">                &#39;batch_size&#39;: 2,</span>
 <span class="sd">                &#39;act_fn&#39;: LeakyReLU(),</span>
 <span class="sd">                &#39;optimizer&#39;: &#39;SGD&#39;,</span>
-<span class="sd">                &#39;dropout_prob&#39;: 0.03480567,</span>
-<span class="sd">                &#39;lr_mult&#39;: 7.98104224,</span>
+<span class="sd">                &#39;dropout_prob&#39;: 0.034805674424520705,</span>
+<span class="sd">                &#39;lr_mult&#39;: 7.981042243396318,</span>
 <span class="sd">                &#39;patience&#39;: 2,</span>
 <span class="sd">                &#39;batch_norm&#39;: True,</span>
 <span class="sd">                &#39;initialization&#39;: &#39;Default&#39;}</span>
@@ -12946,7 +12945,7 @@ are used to update the fun_control dictionary.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.tabs", "navigation.instant", "navigation.indexes"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
         <script src="../../../../javascripts/mathjax.js"></script>
       
