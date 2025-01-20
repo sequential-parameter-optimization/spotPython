@@ -8,6 +8,7 @@ import importlib
 from spotpython.utils.eda import gen_design_table
 from spotpython.utils.init import setup_paths
 import copy
+import pprint
 
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -120,7 +121,7 @@ def get_result_filename(PREFIX) -> str:
     return filename
 
 
-def _handle_res_filneame(filename, PREFIX):
+def _handle_res_filename(filename, PREFIX):
     if filename is None:
         if PREFIX is None:
             raise ValueError("No PREFIX provided.")
@@ -128,7 +129,7 @@ def _handle_res_filneame(filename, PREFIX):
     return filename
 
 
-def _handle_exp_filneame(filename, PREFIX):
+def _handle_exp_filename(filename, PREFIX):
     if filename is None:
         if PREFIX is None:
             raise ValueError("No PREFIX provided.")
@@ -159,7 +160,7 @@ def load_result(PREFIX=None, filename=None) -> tuple:
         >>> load_result("branin")
 
     """
-    filename = _handle_res_filneame(filename, PREFIX)
+    filename = _handle_res_filename(filename, PREFIX)
     spot_tuner = load_experiment(filename=filename)
     return spot_tuner
 
@@ -188,11 +189,40 @@ def load_experiment(PREFIX=None, filename=None):
         >>> spot_tuner, fun_control, design_control, _, _ = load_experiment(filename="RUN_0.pkl")
 
     """
-    filename = _handle_exp_filneame(filename, PREFIX)
+    filename = _handle_exp_filename(filename, PREFIX)
     with open(filename, "rb") as handle:
         spot_tuner = pickle.load(handle)
         print(f"Loaded experiment from {filename}")
     return spot_tuner
+
+
+def load_and_run_spot_python_experiment(PREFIX=None, filename=None) -> object:
+    """Loads and runs a spot experiment.
+
+    Args:
+        PREFIX (str, optional): Prefix of the experiment. Defaults to None.
+        filename (str): Name of the pickle file. Defaults to None
+
+    Returns:
+        spot_tuner (Spot): The spot tuner object.
+
+    Examples:
+        >>> from spotpython.utils.file import load_and_run_spot_python_experiment
+        >>> spot_tuner = load_and_run_spot_python_experiment(filename="spot_branin_experiment.pickle")
+        >>> # Or use PREFIX
+        >>> spot_tuner = load_and_run_spot_python_experiment(PREFIX="spot_branin_experiment")
+
+    """
+    spot_tuner = load_experiment(PREFIX=PREFIX, filename=filename)
+    pprint.pprint(spot_tuner)
+    # fun_control = copy.copy(spot_tuner["fun_control"])
+    # print(gen_design_table(fun_control))
+    # setup_paths(fun_control["TENSORBOARD_CLEAN"])
+    # spot_tuner.init_spot_writer()
+    # spot_tuner.run()
+    # print(gen_design_table(fun_control=fun_control, spot=spot_tuner))
+    return spot_tuner
+
 
 
 def load_dict_from_file(coremodel, dirname="userModel"):
@@ -232,30 +262,3 @@ def load_core_model_from_file(coremodel, dirname="userModel"):
     module = importlib.import_module(coremodel)
     core_model = getattr(module, coremodel)
     return core_model
-
-
-def load_and_run_spot_python_experiment(PREFIX=None, filename=None) -> object:
-    """Loads and runs a spot experiment.
-
-    Args:
-        PREFIX (str, optional): Prefix of the experiment. Defaults to None.
-        filename (str): Name of the pickle file. Defaults to None
-
-    Returns:
-        spot_tuner (Spot): The spot tuner object.
-
-    Examples:
-        >>> from spotpython.utils.file import load_and_run_spot_python_experiment
-        >>> spot_tuner = load_and_run_spot_python_experiment(filename="spot_branin_experiment.pickle")
-        >>> # Or use PREFIX
-        >>> spot_tuner = load_and_run_spot_python_experiment(PREFIX="spot_branin_experiment")
-
-    """
-    spot_tuner = load_experiment(PREFIX=PREFIX, filename=filename)
-    fun_control = copy.copy(spot_tuner.fun_control)
-    print(gen_design_table(fun_control))
-    setup_paths(fun_control["TENSORBOARD_CLEAN"])
-    spot_tuner.init_spot_writer()
-    spot_tuner.run()
-    print(gen_design_table(fun_control=fun_control, spot=spot_tuner))
-    return spot_tuner

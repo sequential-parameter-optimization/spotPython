@@ -1,9 +1,10 @@
 import pytest
+import numpy as np
 import pprint
 from spotpython.spot import Spot
 from spotpython.fun.objectivefunctions import Analytical
 from spotpython.utils.init import fun_control_init, design_control_init
-from spotpython.utils.file import load_experiment
+from spotpython.utils.file import load_result
 
 def _compare_dicts(dict1, dict2, ignore_keys=None):
     """
@@ -46,11 +47,10 @@ def _compare_dicts(dict1, dict2, ignore_keys=None):
 
     return True
 
-def test_save_and_load_experiment():
-    PREFIX = "test_save_and_load_experiment_03"
+def test_save_and_load_result():
+    PREFIX = "test_save_and_load_result_02"
     # Initialize function control
     fun_control = fun_control_init(
-        save_experiment=True,
         PREFIX=PREFIX,
         lower=np.array([-1, -1]),
         upper=np.array([1, 1]),
@@ -66,9 +66,12 @@ def test_save_and_load_experiment():
         fun_control=fun_control,
         design_control=design_control,
     )
+    
+    X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    S.run(X_start=X_start)
 
     # Load the experiment
-    S_loaded = load_experiment(PREFIX)
+    S_loaded = load_result(PREFIX)
     print(f"S: {S}")    
     print(f"S_loaded: {S_loaded}")
     pprint.pprint(S_loaded)
