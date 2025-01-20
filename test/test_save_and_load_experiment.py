@@ -4,6 +4,7 @@ from spotpython.spot import Spot
 from spotpython.fun.objectivefunctions import Analytical
 from spotpython.utils.init import fun_control_init, design_control_init
 from spotpython.utils.file import load_experiment
+import numpy as np
 
 def _compare_dicts(dict1, dict2, ignore_keys=None):
     """

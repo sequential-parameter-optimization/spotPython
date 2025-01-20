@@ -330,10 +330,6 @@ class Spot:
         self.mean_y = None
         self.var_y = None
 
-        # save experiment must be called before the spot_writer is initialized
-        if self.fun_control.get("save_experiment"):
-            self.save_experiment(verbosity=self.verbosity)
-
         # Tensorboard must be initialized before the surrogate model:
         self.init_spot_writer()
 
@@ -362,6 +358,10 @@ class Spot:
                 spot_writer=self.spot_writer,
                 counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
             )
+
+        # save experiment move here (spotpython >= v0.24.1)
+        if self.fun_control.get("save_experiment"):
+            self.save_experiment(verbosity=self.verbosity)        
 
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
@@ -1139,7 +1139,7 @@ class Spot:
         # Ensure we don't accidentally try to pickle unpicklable components
         self._close_and_del_spot_writer()
         self._remove_logger_handlers()
-
+        
         S = self._get_pickle_safe_spot_tuner(unpickleables=unpickleables, verbosity=verbosity)
 
         # Determine the filename based on PREFIX if not provided
