@@ -4244,13 +4244,7 @@ It is none, if PREFIX is None.</p>
 <span class="normal">215</span>
 <span class="normal">216</span>
 <span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span>
-<span class="normal">221</span>
-<span class="normal">222</span>
-<span class="normal">223</span>
-<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_and_run_spot_python_experiment</span><span class="p">(</span><span class="n">PREFIX</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="normal">218</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_and_run_spot_python_experiment</span><span class="p">(</span><span class="n">PREFIX</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads and runs a spot experiment.</span>
 
 <span class="sd">    Args:</span>
@@ -4267,15 +4261,9 @@ It is none, if PREFIX is None.</p>
 <span class="sd">        &gt;&gt;&gt; spot_tuner = load_and_run_spot_python_experiment(PREFIX=&quot;spot_branin_experiment&quot;)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">spot_tuner</span> <span class="o">=</span> <span class="n">load_experiment</span><span class="p">(</span><span class="n">PREFIX</span><span class="o">=</span><span class="n">PREFIX</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">spot_tuner</span><span class="p">)</span>
-    <span class="c1"># fun_control = copy.copy(spot_tuner[&quot;fun_control&quot;])</span>
-    <span class="c1"># print(gen_design_table(fun_control))</span>
-    <span class="c1"># setup_paths(fun_control[&quot;TENSORBOARD_CLEAN&quot;])</span>
-    <span class="c1"># spot_tuner.init_spot_writer()</span>
-    <span class="c1"># spot_tuner.run()</span>
-    <span class="c1"># print(gen_design_table(fun_control=fun_control, spot=spot_tuner))</span>
-    <span class="k">return</span> <span class="n">spot_tuner</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">load_experiment</span><span class="p">(</span><span class="n">PREFIX</span><span class="o">=</span><span class="n">PREFIX</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">S</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>    
+    <span class="k">return</span> <span class="n">S</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4477,7 +4465,13 @@ It is none, if PREFIX is None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/file.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
 <span class="normal">253</span>
@@ -4485,13 +4479,7 @@ It is none, if PREFIX is None.</p>
 <span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_core_model_from_file</span><span class="p">(</span><span class="n">coremodel</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;userModel&quot;</span><span class="p">):</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_core_model_from_file</span><span class="p">(</span><span class="n">coremodel</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;userModel&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads a core model from a python file.</span>
 
 <span class="sd">    Args:</span>
@@ -4593,7 +4581,13 @@ It is none, if PREFIX is None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/file.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">228</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
 <span class="normal">229</span>
 <span class="normal">230</span>
 <span class="normal">231</span>
@@ -4606,13 +4600,7 @@ It is none, if PREFIX is None.</p>
 <span class="normal">238</span>
 <span class="normal">239</span>
 <span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_dict_from_file</span><span class="p">(</span><span class="n">coremodel</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;userModel&quot;</span><span class="p">):</span>
+<span class="normal">241</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_dict_from_file</span><span class="p">(</span><span class="n">coremodel</span><span class="p">,</span> <span class="n">dirname</span><span class="o">=</span><span class="s2">&quot;userModel&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads a dictionary from a json file.</span>
 
 <span class="sd">    Args:</span>
