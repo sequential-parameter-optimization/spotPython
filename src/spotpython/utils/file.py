@@ -5,10 +5,6 @@ import os
 import json
 import sys
 import importlib
-from spotpython.utils.eda import gen_design_table
-from spotpython.utils.init import setup_paths
-import copy
-import pprint
 
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -214,9 +210,8 @@ def load_and_run_spot_python_experiment(PREFIX=None, filename=None) -> object:
 
     """
     S = load_experiment(PREFIX=PREFIX, filename=filename)
-    S.run()    
+    S.run()
     return S
-
 
 
 def load_dict_from_file(coremodel, dirname="userModel"):

@@ -187,7 +187,8 @@ def get_dict_with_levels_and_types(fun_control: Dict[str, Any], v: Dict[str, Any
     Examples:
             >>> from spotpython.hyperdict.light_hyper_dict import LightHyperDict
                 from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
-                from spotpython.hyperparameters.values import assign_values, get_var_name, iterate_dict_values, convert_keys, get_dict_with_levels_and_types, get_core_model_from_name, add_core_model_to_fun_control
+                from spotpython.hyperparameters.values import (assign_values, get_var_name, iterate_dict_values,
+                    convert_keys, get_dict_with_levels_and_types, get_core_model_from_name, add_core_model_to_fun_control)
                 import pprint
                 core_model_name="light.regression.NNLinearRegressor"
                 hyperdict=LightHyperDict
@@ -506,40 +507,6 @@ def get_tuned_architecture(spot_tuner, force_minX=False) -> dict:
     fun_control = copy.copy(spot_tuner.fun_control)
     config = get_one_config_from_X(X, fun_control)
     return config
-
-
-def return_conf_list_from_var_dict(
-    var_dict: Dict[str, np.ndarray],
-    fun_control: Dict[str, Union[List[str], str]],
-    default: bool = False,
-) -> List[Dict[str, Union[int, float]]]:
-    """Return a list of configurations from a dictionary of variables.
-
-    This function takes a dictionary of variables and a dictionary of function control as input arguments.
-    It performs similar steps as generate_one_config_from_var_dict() but returns a list of dictionaries
-    of hyper parameter values.
-
-    Args:
-        var_dict (dict): A dictionary where keys are variable names and values are numpy arrays.
-        fun_control (dict): A dictionary which (at least) has an entry with the following key:
-            "var_type" (list): A list of variable types. If the entry is not "num" the corresponding
-            value will be converted to the type "int".
-
-    Returns:
-        list: A list of dictionaries of hyper parameter values. Transformations are applied to the values.
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.hyperparameters.values import return_conf_list_from_var_dict
-        >>> var_dict = {'a': np.array([1, 3, 5]), 'b': np.array([2, 4, 6])}
-        >>> fun_control = {'var_type': ['int', 'int']}
-        >>> return_conf_list_from_var_dict(var_dict, fun_control)
-        [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}, {'a': 5, 'b': 6}]
-    """
-    conf_list = []
-    for values in generate_one_config_from_var_dict(var_dict, fun_control, default=default):
-        conf_list.append(values)
-    return conf_list
 
 
 def modify_boolean_hyper_parameter_levels(fun_control, hyperparameter, levels) -> None:

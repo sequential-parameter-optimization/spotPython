@@ -45,6 +45,75 @@ def get_stars(input_list) -> list:
     return output_list
 
 
+def show_exp_table(fun_control: dict, tablefmt="github") -> str:
+    """Generates a table with the design variables and their bounds.
+        Can be used for the experiment design, which was not run yet.
+    Args:
+        fun_control (dict):
+            A dictionary with function design variables.
+    Returns:
+        (str):
+            a table with the design variables, their default values, and their bounds.
+            Use the `print` function to display the table.
+    """
+    default_values = get_default_values(fun_control)
+    defaults = list(default_values.values())
+    tab = tabulate(
+        {
+            "name": get_var_name(fun_control),
+            "type": get_var_type(fun_control),
+            "default": defaults,
+            "lower": get_bound_values(fun_control, "lower", as_list=True),
+            "upper": get_bound_values(fun_control, "upper", as_list=True),
+            "transform": get_transform(fun_control),
+        },
+        headers="keys",
+        tablefmt=tablefmt,
+    )
+    return tab
+
+
+def show_res_table(spot: object = None, tablefmt="github") -> str:
+    """
+    Generates a table with the design variables and their bounds,
+    after the run was completed.
+
+    Args:
+        spot (object):
+            A spot object. Defaults to None.
+    Returns:
+        (str):
+            a table with the design variables, their default values, their bounds,
+            the value and the importance of each hyperparameter.
+            Use the `print` function to display the table.
+    """
+    fun_control = spot.fun_control
+    default_values = get_default_values(fun_control)
+    defaults = list(default_values.values())
+    res = spot.print_results(print_screen=False, dict=fun_control)
+    tuned = [item[1] for item in res]
+    importance = spot.get_importance()
+    stars = get_stars(importance)
+    tab = tabulate(
+        {
+            "name": get_var_name(fun_control),
+            "type": get_var_type(fun_control),
+            "default": defaults,
+            "lower": get_bound_values(fun_control, "lower", as_list=True),
+            "upper": get_bound_values(fun_control, "upper", as_list=True),
+            "tuned": tuned,
+            "transform": get_transform(fun_control),
+            "importance": importance,
+            "stars": stars,
+        },
+        headers="keys",
+        numalign="right",
+        floatfmt=("", "", "", "", "", "", "", ".2f"),
+        tablefmt=tablefmt,
+    )
+    return tab
+
+
 def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") -> str:
     """Generates a table with the design variables and their bounds.
     Args:

@@ -361,7 +361,7 @@ class Spot:
 
         # save experiment move here (spotpython >= v0.24.1)
         if self.fun_control.get("save_experiment"):
-            self.save_experiment(verbosity=self.verbosity)        
+            self.save_experiment(verbosity=self.verbosity)
 
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
@@ -1139,7 +1139,7 @@ class Spot:
         # Ensure we don't accidentally try to pickle unpicklable components
         self._close_and_del_spot_writer()
         self._remove_logger_handlers()
-        
+
         S = self._get_pickle_safe_spot_tuner(unpickleables=unpickleables, verbosity=verbosity)
 
         # Determine the filename based on PREFIX if not provided
