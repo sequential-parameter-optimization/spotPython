@@ -45,16 +45,53 @@ def get_stars(input_list) -> list:
     return output_list
 
 
-def show_exp_table(fun_control: dict, tablefmt="github") -> str:
+def print_exp_table(fun_control: dict, tablefmt="github", print_tab=True) -> str:
     """Generates a table with the design variables and their bounds.
         Can be used for the experiment design, which was not run yet.
     Args:
         fun_control (dict):
             A dictionary with function design variables.
+        tablefmt (str):
+            The format of the table. Defaults to "github".
+        print_tab (bool):
+            If True, the table is printed. Otherwise, the result code from tabulate
+            is returned. Defaults to True.
+
     Returns:
         (str):
             a table with the design variables, their default values, and their bounds.
             Use the `print` function to display the table.
+    
+    Examples:
+            >>> from spotpython.data.diabetes import Diabetes
+                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+                from spotpython.fun.hyperlight import HyperLight
+                from spotpython.utils.init import fun_control_init
+                from spotpython.spot import Spot
+                from spotpython.utils.eda import print_exp_table
+                fun_control = fun_control_init(
+                    PREFIX="print_exp_table",
+                    fun_evals=10,
+                    max_time=1,
+                    data_set = Diabetes(),
+                    core_model_name="light.regression.NNLinearRegressor",
+                    hyperdict=LightHyperDict,
+                    _L_in=10,
+                    _L_out=1)
+                fun = HyperLight().fun
+                print_exp_table(fun_control)
+                | name           | type   | default   |   lower |   upper | transform             |
+                |----------------|--------|-----------|---------|---------|-----------------------|
+                | l1             | int    | 3         |     3   |    8    | transform_power_2_int |
+                | epochs         | int    | 4         |     4   |    9    | transform_power_2_int |
+                | batch_size     | int    | 4         |     1   |    4    | transform_power_2_int |
+                | act_fn         | factor | ReLU      |     0   |    5    | None                  |
+                | optimizer      | factor | SGD       |     0   |   11    | None                  |
+                | dropout_prob   | float  | 0.01      |     0   |    0.25 | None                  |
+                | lr_mult        | float  | 1.0       |     0.1 |   10    | None                  |
+                | patience       | int    | 2         |     2   |    6    | transform_power_2_int |
+                | batch_norm     | factor | 0         |     0   |    1    | None                  |
+                | initialization | factor | Default   |     0   |    4    | None             |
     """
     default_values = get_default_values(fun_control)
     defaults = list(default_values.values())
@@ -70,10 +107,13 @@ def show_exp_table(fun_control: dict, tablefmt="github") -> str:
         headers="keys",
         tablefmt=tablefmt,
     )
-    return tab
+    if print_tab:
+        print(tab)
+    else:
+        return tab
 
 
-def show_res_table(spot: object = None, tablefmt="github") -> str:
+def print_res_table(spot: object = None, tablefmt="github", print_tab=True) -> str:
     """
     Generates a table with the design variables and their bounds,
     after the run was completed.
@@ -81,16 +121,68 @@ def show_res_table(spot: object = None, tablefmt="github") -> str:
     Args:
         spot (object):
             A spot object. Defaults to None.
+        tablefmt (str):
+            The format of the table. Defaults to "github".
+        print_tab (bool):
+            If True, the table is printed. Otherwise, the result code from tabulate
+            is returned. Defaults to True.
+
     Returns:
         (str):
             a table with the design variables, their default values, their bounds,
             the value and the importance of each hyperparameter.
             Use the `print` function to display the table.
+
+    Examples:
+    >>> from spotpython.data.diabetes import Diabetes
+        from spotpython.hyperdict.light_hyper_dict import LightHyperDict
+        from spotpython.fun.hyperlight import HyperLight
+        from spotpython.utils.init import fun_control_init, design_control_init
+        from spotpython.spot import Spot
+        from spotpython.utils.eda import print_res_table
+        from spotpython.hyperparameters.values import set_hyperparameter
+        fun_control = fun_control_init(
+            PREFIX="print_res_table",
+            fun_evals=5,
+            max_time=1,
+            data_set = Diabetes(),
+            core_model_name="light.regression.NNLinearRegressor",
+            hyperdict=LightHyperDict,
+            _L_in=10,
+            _L_out=1)
+        set_hyperparameter(fun_control, "optimizer", [ "Adadelta", "Adam", "Adamax"])
+        set_hyperparameter(fun_control, "l1", [1,2])
+        set_hyperparameter(fun_control, "epochs", [2,2])
+        set_hyperparameter(fun_control, "batch_size", [4,11])
+        set_hyperparameter(fun_control, "dropout_prob", [0.0, 0.025])
+        set_hyperparameter(fun_control, "patience", [1,2])
+        design_control = design_control_init(init_size=3)
+        fun = HyperLight().fun
+        S = Spot(fun=fun, fun_control=fun_control, design_control=design_control)
+        S.run()
+        print_res_table(S)            
+        | name           | type   | default   |   lower |   upper | tuned                | transform             |   importance | stars   |
+        |----------------|--------|-----------|---------|---------|----------------------|-----------------------|--------------|---------|
+        | l1             | int    | 3         |     1.0 |     2.0 | 2.0                  | transform_power_2_int |        29.49 | *       |
+        | epochs         | int    | 4         |     2.0 |     2.0 | 2.0                  | transform_power_2_int |         0.00 |         |
+        | batch_size     | int    | 4         |     4.0 |    11.0 | 5.0                  | transform_power_2_int |         1.18 | *       |
+        | act_fn         | factor | ReLU      |     0.0 |     5.0 | ELU                  | None                  |         0.32 | .       |
+        | optimizer      | factor | SGD       |     0.0 |     2.0 | Adam                 | None                  |         0.08 |         |
+        | dropout_prob   | float  | 0.01      |     0.0 |   0.025 | 0.010464684336704316 | None                  |         0.27 | .       |
+        | lr_mult        | float  | 1.0       |     0.1 |    10.0 | 8.82569482726512     | None                  |         9.55 | *       |
+        | patience       | int    | 2         |     1.0 |     2.0 | 2.0                  | transform_power_2_int |       100.00 | ***     |
+        | batch_norm     | factor | 0         |     0.0 |     1.0 | 0                    | None                  |         0.05 |         |
+        | initialization | factor | Default   |     0.0 |     4.0 | kaiming_normal       | None                  |         1.07 | *       |
     """
     fun_control = spot.fun_control
     default_values = get_default_values(fun_control)
     defaults = list(default_values.values())
-    res = spot.print_results(print_screen=False, dict=fun_control)
+    # try spot.print_results. If it fails, issue an error message that asked to run the spot object first
+    try:
+        res = spot.print_results(print_screen=False, dict=fun_control)
+    except:
+        print("Did you run the spot object?")
+        return
     tuned = [item[1] for item in res]
     importance = spot.get_importance()
     stars = get_stars(importance)
@@ -111,7 +203,10 @@ def show_res_table(spot: object = None, tablefmt="github") -> str:
         floatfmt=("", "", "", "", "", "", "", ".2f"),
         tablefmt=tablefmt,
     )
-    return tab
+    if print_tab:
+        print(tab)
+    else:
+        return tab
 
 
 def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") -> str:
