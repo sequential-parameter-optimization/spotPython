@@ -70,7 +70,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
             from spotpython.data.diabetes import Diabetes
             from spotpython.hyperdict.light_hyper_dict import LightHyperDict
             from spotpython.utils.init import fun_control_init
-            from spotpython.utils.eda import gen_design_table
+            from spotpython.utils.eda import print_exp_table
             from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
             from spotpython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
             from spotpython.light.trainmodel import train_model
@@ -90,7 +90,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
                 TENSORBOARD_CLEAN=True,
                 tensorboard_log=True,
                 seed=42,)
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             X = get_default_hyperparameters_as_array(fun_control)
             # set epochs to 2^8:
             # X[0, 1] = 8

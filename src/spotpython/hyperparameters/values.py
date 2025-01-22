@@ -1603,16 +1603,16 @@ def set_int_hyperparameter_values(fun_control, key, lower, upper) -> None:
         >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_int_hyperparameter_values
-            from spotpython.utils.eda import gen_design_table
+            from spotpython.utils.eda import print_exp_table
             fun_control = fun_control_init(
                 core_model_name="forest.AMFRegressor",
                 hyperdict=RiverHyperDict,
             )
             print("Before modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             set_int_hyperparameter_values(fun_control, "n_estimators", 2, 5)
             print("After modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             Seed set to 123
                 Before modification:
                 | name            | type   |   default |   lower |   upper | transform   |
@@ -1659,16 +1659,16 @@ def set_float_hyperparameter_values(fun_control, key, lower, upper) -> None:
         >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_float_hyperparameter_values
-            from spotpython.utils.eda import gen_design_table
+            from spotpython.utils.eda import print_exp_table
             fun_control = fun_control_init(
                 core_model_name="forest.AMFRegressor",
                 hyperdict=RiverHyperDict,
             )
             print("Before modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             set_float_hyperparameter_values(fun_control, "step", 0.2, 5)
             print("After modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             Seed set to 123
     """
     set_control_hyperparameter_value(
@@ -1699,16 +1699,16 @@ def set_boolean_hyperparameter_values(fun_control, key, lower, upper):
         >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_boolean_hyperparameter_values
-            from spotpython.utils.eda import gen_design_table
+            from spotpython.utils.eda import print_exp_table
             fun_control = fun_control_init(
                 core_model_name="forest.AMFRegressor",
                 hyperdict=RiverHyperDict,
             )
             print("Before modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             set_boolean_hyperparameter_values(fun_control, "use_aggregation", 0, 0)
             print("After modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control)
             Seed set to 123
             Before modification:
             | name            | type   |   default |   lower |   upper | transform   |
@@ -1753,17 +1753,17 @@ def set_factor_hyperparameter_values(fun_control, key, levels):
         >>> from spotriver.hyperdict.river_hyper_dict import RiverHyperDict
             from spotpython.utils.init import fun_control_init
             from spotpython.hyperparameters.values import set_factor_hyperparameter_values
-            from spotpython.utils.eda import gen_design_table
+            from spotpython.utils.eda import print_exp_table
             fun_control = fun_control_init(
                 core_model_name="tree.HoeffdingTreeRegressor",
                 hyperdict=RiverHyperDict,
             )
             print("Before modification:")
-            print(gen_design_table(fun_control))
+            print_exp_tablefun_control)
             set_factor_hyperparameter_values(fun_control, "leaf_model", ['LinearRegression',
                                                                 'Perceptron'])
             print("After modification:")
-            print(gen_design_table(fun_control))
+            print_exp_table(fun_control))
                 Seed set to 123
                 Before modification:
                 | name                   | type   | default          |   lower |    upper | transform              |

@@ -61,7 +61,7 @@ def print_exp_table(fun_control: dict, tablefmt="github", print_tab=True) -> str
         (str):
             a table with the design variables, their default values, and their bounds.
             Use the `print` function to display the table.
-    
+
     Examples:
             >>> from spotpython.data.diabetes import Diabetes
                 from spotpython.hyperdict.light_hyper_dict import LightHyperDict
@@ -160,7 +160,7 @@ def print_res_table(spot: object = None, tablefmt="github", print_tab=True) -> s
         fun = HyperLight().fun
         S = Spot(fun=fun, fun_control=fun_control, design_control=design_control)
         S.run()
-        print_res_table(S)            
+        print_res_table(S)
         | name           | type   | default   |   lower |   upper | tuned                | transform             |   importance | stars   |
         |----------------|--------|-----------|---------|---------|----------------------|-----------------------|--------------|---------|
         | l1             | int    | 3         |     1.0 |     2.0 | 2.0                  | transform_power_2_int |        29.49 | *       |
@@ -180,8 +180,11 @@ def print_res_table(spot: object = None, tablefmt="github", print_tab=True) -> s
     # try spot.print_results. If it fails, issue an error message that asked to run the spot object first
     try:
         res = spot.print_results(print_screen=False, dict=fun_control)
-    except:
-        print("Did you run the spot object?")
+    except AttributeError as e:
+        print(f"AttributeError: {e}. Did you run the spot object?")
+        return
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
         return
     tuned = [item[1] for item in res]
     importance = spot.get_importance()
@@ -223,21 +226,6 @@ def gen_design_table(fun_control: dict, spot: object = None, tablefmt="github") 
             the table will also include the value and the importance of each hyperparameter.
             Use the `print` function to display the table.
 
-    Examples:
-        >>> from spotpython.utils.eda import gen_design_table
-        >>> from spotpython.hyperparameters.values import get_default_values
-        >>> fun_control = {
-        ...     "x1": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x2": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x3": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x4": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x5": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x6": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x7": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x8": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x9": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ...     "x10": {"type": "int", "default": 1, "lower": 1, "upper": 10},
-        ... }
     """
     default_values = get_default_values(fun_control)
     defaults = list(default_values.values())

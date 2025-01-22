@@ -109,7 +109,7 @@ class HyperLight:
                 from spotpython.hyperdict.light_hyper_dict import LightHyperDict
                 from spotpython.fun.hyperlight import HyperLight
                 from spotpython.utils.init import fun_control_init
-                from spotpython.utils.eda import gen_design_table
+                from spotpython.utils.eda import print_exp_table
                 from spotpython.spot import spot
                 from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
                 PREFIX="000"
@@ -127,7 +127,7 @@ class HyperLight:
                     TENSORBOARD_CLEAN=True,
                     tensorboard_log=True,
                     seed=42,)
-                print(gen_design_table(fun_control))
+                print_exp_table(fun_control)
                 X = get_default_hyperparameters_as_array(fun_control)
                 # set epochs to 2^8:
                 X[0, 1] = 8
