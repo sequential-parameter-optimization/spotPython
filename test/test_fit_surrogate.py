@@ -3,7 +3,6 @@ from spotpython.fun.objectivefunctions import Analytical
 from spotpython.spot import spot
 from spotpython.utils.init import fun_control_init, design_control_init
 
-
 def test_fit_surrogate():
     # number of initial points:
     ni = 0
@@ -24,5 +23,17 @@ def test_fit_surrogate():
     S.initialize_design(X_start=X_start)
     S.update_stats()
     S.fit_surrogate()
-    # correlation matrix should be square and the same size as the number of points
+
+    # Correlation matrix should be square and the same size as the number of points
     assert S.surrogate.Psi.shape[0] == S.X.shape[0]
+
+    # Check the prediction for a known input
+    predicted_value = S.surrogate.predict(np.array([[0, 0]]))
+    expected_value = np.array([1.49011612e-08])
+
+    # Assert that the predicted value is approximately equal to the expected value
+    np.testing.assert_allclose(predicted_value, expected_value, atol=1e-7,
+                               err_msg="Prediction for input [[0, 0]] does not match the expected value.")
+
+if __name__ == '__main__':
+    test_fit_surrogate()

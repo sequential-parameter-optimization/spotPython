@@ -51,7 +51,7 @@ def aggregate_mean_var(X, y, sort=False, var_empirical=False) -> (np.ndarray, np
             [ 2. nan]
         >>> X = np.array([[1, 2], [3, 4], [1, 2], [3, 4], [1,2]])
             y = np.array([1, 2, 3, 4, 5])
-            X_agg, y_mean, y_var = aggregate_mean_var(X, y, theoretical_var=False)
+            X_agg, y_mean, y_var = aggregate_mean_var(X, y, var_empirical=True)
             print(X_agg)
             print(y_mean)
             print(y_var)
@@ -59,6 +59,26 @@ def aggregate_mean_var(X, y, sort=False, var_empirical=False) -> (np.ndarray, np
             [3 4]]
             [3. 3.]
             [4. 2.]
+        >>> X_1 = np.ones((2, 3))
+            y_1 = np.sum(X_1, axis=1)
+            y_2 = 2 * y_1
+            X_2 = np.append(X_1, 2 * X_1, axis=0)
+            X = np.append(X_2, X_1, axis=0)
+            y = np.append(y_1, y_2, axis=0)
+            y = np.append(y, y_2, axis=0)
+            print(X)
+            print(y)
+            Z = aggregate_mean_var(X, y, var_empirical=True)
+            print(Z)
+            [[1. 1. 1.]
+            [1. 1. 1.]
+            [2. 2. 2.]
+            [2. 2. 2.]
+            [1. 1. 1.]
+            [1. 1. 1.]]
+            [3. 3. 6. 6. 6. 6.]
+            (array([[1., 1., 1.],
+                [2., 2., 2.]]), array([4.5, 6. ]), array([3., 0.]))
     """
     if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray):
         raise TypeError("X and y must be numpy arrays.")
@@ -141,11 +161,11 @@ def select_distant_points(X, y, k):
             y = np.array([1, 2, 3, 4, 5])
             selected_points, selected_y = select_distant_points(X, y, 3)
             print(selected_points)
-            [[1 2]
-            [7 8]
-            [9 10]]
+            [[ 5  6]
+            [ 9 10]
+            [ 1  2]]
             print(selected_y)
-            [1 4 5]
+            [3 5 1]
 
     """
     # Perform k-means clustering to find k clusters

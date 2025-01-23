@@ -1,6 +1,6 @@
 import numpy as np
-from spotpython.fun.objectivefunctions import Analytical
-from spotpython.spot import spot
+from spotpython.fun import Analytical
+from spotpython.spot import Spot
 from spotpython.utils.init import fun_control_init, design_control_init
 
 
@@ -11,7 +11,7 @@ def test_update_design():
     fun = Analytical().fun_sphere
     lower = np.array([-1, -1])
     upper = np.array([1, 1])
-    S = spot.Spot(
+    S = Spot(
         fun=fun,
         fun_control=fun_control_init(noise=False, lower=lower, upper=upper, show_progress=True),
         design_control=design_control_init(init_size=ni),
@@ -43,7 +43,7 @@ def test_update_design_with_repeats_and_ocba():
         lower=np.array([-1, -1]),
         upper=np.array([1, 1]),
     )
-    S = spot.Spot(fun=fun, fun_control=fun_control, design_control=design_control_init(init_size=ni, repeats=2))
+    S = Spot(fun=fun, fun_control=fun_control, design_control=design_control_init(init_size=ni, repeats=2))
     S.initialize_design(X_start=X_start)
     X_shape_before = S.X.shape
     y_size_before = S.y.size
@@ -73,7 +73,7 @@ def test_update_design_with_repeats_and_ocba_no_var():
         ocba_delta=1,
         show_progress=True,
     )
-    S = spot.Spot(fun=fun, fun_control=fun_control, design_control=design_control_init(init_size=ni, repeats=2))
+    S = Spot(fun=fun, fun_control=fun_control, design_control=design_control_init(init_size=ni, repeats=2))
     S.initialize_design(X_start=X_start)
     X_shape_before = S.X.shape
     y_size_before = S.y.size

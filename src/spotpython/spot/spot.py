@@ -797,7 +797,7 @@ class Spot:
         Examples:
             >>> import numpy as np
                 from spotpython.fun.objectivefunctions import Analytical
-                from spotpython.spot import spot
+                from spotpython.spot import Spot
                 from spotpython.utils.init import (
                     fun_control_init, design_control_init
                     )
@@ -810,7 +810,7 @@ class Spot:
                     lower = np.array([-1, -1]),
                     upper = np.array([1, 1]))
                 design_control=design_control_init(init_size=ni)
-                S = spot.Spot(fun=fun,
+                S = Spot(fun=fun,
                             fun_control=fun_control,
                             design_control=design_control,)
                 S.run(X_start=X_start)
@@ -1137,9 +1137,11 @@ class Spot:
 
     def update_stats(self) -> None:
         """
-        Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`
-        If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`
-        2. `mean_y` 3. `min_mean_y` 4. `min_mean_X`.
+        Update the following stats:
+        1. `min_y`, 2. `min_X`, and 3. `counter`
+        If `noise` is `True`, additionally the following stats are computed:
+        1. `mean_X`,  2. `mean_y`,  3. `var_y`, 4. `min_mean_X`(X value of the best mean y value so far),
+        5. `min_mean_y` (best mean y value so far), and 6. `min_var_y` (ariance of the best mean y value so far).
 
         Args:
             self (object): Spot object
@@ -1170,10 +1172,255 @@ class Spot:
             self.var_y = Z[2]
             # X value of the best mean y value so far:
             self.min_mean_X = self.mean_X[argmin(self.mean_y)]
-            # variance of the best mean y value so far:
-            self.min_var_y = self.var_y[argmin(self.mean_y)]
             # best mean y value so far:
             self.min_mean_y = self.mean_y[argmin(self.mean_y)]
+            # variance of the best mean y value so far:
+            self.min_var_y = self.var_y[argmin(self.mean_y)]
+
+    def fit_surrogate(self) -> None:
+        """
+        Fit surrogate model. The surrogate model
+        is fitted to the data stored in `self.X` and `self.y`.
+        It uses the generic `fit()` method of the
+        surrogate model `surrogate`. The default surrogate model is
+        an instance from spotpython's `Kriging` class.
+        If `show_models` is `True`, the model is plotted.
+        If the number of points is greater than `max_surrogate_points`,
+        the surrogate model is fitted to a subset of the data points.
+        The subset is selected using the `select_distant_points()` function.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        Attributes:
+            self.surrogate (object):
+                surrogate model
+            self.X (numpy.ndarray):
+                design points
+            self.y (numpy.ndarray):
+                function values
+            self.max_surrogate_points (int):
+                maximum number of points to fit the surrogate model
+            self.show_models (bool):
+                if True, the model is plotted
+
+        Note:
+            * As shown in https://sequential-parameter-optimization.github.io/Hyperparameter-Tuning-Cookbook/
+            other surrogate models can be used as well.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
+                fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                )
+                # number of initial points:
+                ni = 0
+                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
+                fun = analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1])
+                    )
+                design_control=design_control_init(init_size=ni)
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control,)
+                S.initialize_design(X_start=X_start)
+                S.update_stats()
+                S.fit_surrogate()
+                S.surrogate.predict(np.array([[0, 0]]))
+                    array([1.49011612e-08])
+
+        """
+        logger.debug("In fit_surrogate(): self.X: %s", self.X)
+        logger.debug("In fit_surrogate(): self.y: %s", self.y)
+        logger.debug("In fit_surrogate(): self.X.shape: %s", self.X.shape)
+        logger.debug("In fit_surrogate(): self.y.shape: %s", self.y.shape)
+        X_points = self.X.shape[0]
+        y_points = self.y.shape[0]
+        if X_points == y_points:
+            if X_points > self.max_surrogate_points:
+                logger.info("Selecting distant points for surrogate fitting.")
+                X_S, y_S = select_distant_points(X=self.X, y=self.y, k=self.max_surrogate_points)
+            else:
+                X_S = self.X
+                y_S = self.y
+            self.surrogate.fit(X_S, y_S)
+        else:
+            logger.warning("X and y have different sizes. Surrogate not fitted.")
+        if self.show_models:
+            self.plot_model()
+
+    def update_design(self) -> None:
+        """
+        Update design. Generate and evaluate new design points.
+        It is basically a call to the method `get_new_X0()`.
+        If `noise` is `True`, additionally the following steps
+        (from `get_X_ocba()`) are performed:
+        1. Compute OCBA points.
+        2. Evaluate OCBA points.
+        3. Append OCBA points to the new design points.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        Attributes:
+            self.X (numpy.ndarray): updated design
+            self.y (numpy.ndarray): updated design values
+
+        Examples:
+            >>> # 1. Without OCBA points:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.utils.init import (
+                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                    )
+                from spotpython.spot import Spot
+                # number of initial points:
+                ni = 0
+                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
+                fun = Analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1])
+                    )
+                design_control=design_control_init(init_size=ni)
+                S = Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control,)
+                S.initialize_design(X_start=X_start)
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+                X_shape_before = S.X.shape
+                print(f"X_shape_before: {X_shape_before}")
+                print(f"y_size_before: {S.y.size}")
+                y_size_before = S.y.size
+                S.update_stats()
+                S.fit_surrogate()
+                S.update_design()
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+                print(f"S.n_points: {S.n_points}")
+                print(f"X_shape_after: {S.X.shape}")
+                print(f"y_size_after: {S.y.size}")
+            >>> #
+            >>> # 2. Using the OCBA points:
+                import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import Spot
+                from spotpython.utils.init import fun_control_init, design_control_init
+                # number of initial points:
+                ni = 3
+                X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
+                fun = Analytical().fun_sphere
+                fun_control = fun_control_init(
+                        sigma=0.02,
+                        lower = np.array([-1, -1]),
+                        upper = np.array([1, 1]),
+                        noise=True,
+                        ocba_delta=1,
+                    )
+                design_control=design_control_init(init_size=ni, repeats=2)
+                S = Spot(fun=fun,
+                            design_control=design_control,
+                            fun_control=fun_control
+                )
+                S.initialize_design(X_start=X_start)
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+                X_shape_before = S.X.shape
+                print(f"X_shape_before: {X_shape_before}")
+                print(f"y_size_before: {S.y.size}")
+                y_size_before = S.y.size
+                S.update_stats()
+                S.fit_surrogate()
+                S.update_design()
+                print(f"S.X: {S.X}")
+                print(f"S.y: {S.y}")
+                print(f"S.n_points: {S.n_points}")
+                print(f"S.ocba_delta: {S.ocba_delta}")
+                print(f"X_shape_after: {S.X.shape}")
+                print(f"y_size_after: {S.y.size}")
+                # compare the shapes of the X and y values before and after the update_design method
+                assert X_shape_before[0] + S.ocba_delta == S.X.shape[0]
+                assert X_shape_before[1] == S.X.shape[1]
+                assert y_size_before + S.ocba_delta == S.y.size
+                Experiment saved to 000_exp.pkl
+                    S.X: [[ 0.          1.        ]
+                    [ 1.          0.        ]
+                    [ 1.          1.        ]
+                    [ 1.          1.        ]
+                    [ 0.54509876 -0.36921401]
+                    [ 0.54509876 -0.36921401]
+                    [ 0.18642675  0.87708546]
+                    [ 0.18642675  0.87708546]
+                    [-0.45060393 -0.208063  ]
+                    [-0.45060393 -0.208063  ]]
+                    S.y: [0.98021757 0.99264427 2.02575851 2.00387949 0.45185626 0.44499372
+                    0.79130456 0.81487288 0.24000221 0.23988634]
+                    X_shape_before: (10, 2)
+                    y_size_before: 10
+                    S.X: [[ 0.          1.        ]
+                    [ 1.          0.        ]
+                    [ 1.          1.        ]
+                    [ 1.          1.        ]
+                    [ 0.54509876 -0.36921401]
+                    [ 0.54509876 -0.36921401]
+                    [ 0.18642675  0.87708546]
+                    [ 0.18642675  0.87708546]
+                    [-0.45060393 -0.208063  ]
+                    [-0.45060393 -0.208063  ]
+                    [-0.02292587  0.0145145 ]]
+                    S.y: [ 0.98021757  0.99264427  2.02575851  2.00387949  0.45185626  0.44499372
+                    0.79130456  0.81487288  0.24000221  0.23988634 -0.01904616]
+                    S.n_points: 1
+                    S.ocba_delta: 1
+                    X_shape_after: (11, 2)
+                    y_size_after: 11
+        """
+        # OCBA (only if noise). Determination of the OCBA points depends on the
+        # old X and y values.
+        if self.noise and self.ocba_delta > 0 and not np.all(self.var_y > 0) and (self.mean_X.shape[0] <= 2):
+            logger.warning("self.var_y <= 0. OCBA points are not generated:")
+            logger.warning("There are less than 3 points or points with no variance information.")
+            logger.debug("In update_design(): self.mean_X: %s", self.mean_X)
+            logger.debug("In update_design(): self.var_y: %s", self.var_y)
+        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0) and (self.mean_X.shape[0] > 2):
+            X_ocba = get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
+        else:
+            X_ocba = None
+        # Determine the new X0 values based on the old X and y values:
+        X0 = self.get_new_X0()
+        # Append OCBA points to the new design points:
+        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0):
+            X0 = append(X_ocba, X0, axis=0)
+        X_all = self.to_all_dim_if_needed(X0)
+        logger.debug(
+            "In update_design(): self.fun_control sigma and seed passed to fun(): %s %s",
+            self.fun_control["sigma"],
+            self.fun_control["seed"],
+        )
+        # (S-18): Evaluating New Solutions:
+        y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
+        X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
+        # Append New Solutions (only if they are not nan):
+        if y0.shape[0] > 0:
+            self.X = np.append(self.X, X0, axis=0)
+            self.y = np.append(self.y, y0)
+        else:
+            # otherwise, generate a random point and append it to the design
+            Xr, yr = self.generate_random_point()
+            self.X = np.append(self.X, Xr, axis=0)
+            self.y = np.append(self.y, yr)
 
     def save_result(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
         """
@@ -1399,204 +1646,6 @@ class Spot:
         y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         return X0, y0
-
-    def update_design(self) -> None:
-        """
-        Update design. Generate and evaluate new design points.
-        It is basically a call to the method `get_new_X0()`.
-        If `noise` is `True`, additionally the following steps
-        (from `get_X_ocba()`) are performed:
-        1. Compute OCBA points.
-        2. Evaluate OCBA points.
-        3. Append OCBA points to the new design points.
-
-        Args:
-            self (object): Spot object
-
-        Returns:
-            (NoneType): None
-
-        Attributes:
-            self.X (numpy.ndarray): updated design
-            self.y (numpy.ndarray): updated design values
-
-        Examples:
-            >>> # 1. Without OCBA points:
-            >>> import numpy as np
-                from spotpython.fun.objectivefunctions import Analytical
-                from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
-                    )
-                from spotpython.spot import spot
-                # number of initial points:
-                ni = 0
-                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
-                fun = analytical().fun_sphere
-                fun_control = fun_control_init(
-                    lower = np.array([-1, -1]),
-                    upper = np.array([1, 1])
-                    )
-                design_control=design_control_init(init_size=ni)
-                S = spot.Spot(fun=fun,
-                            fun_control=fun_control,
-                            design_control=design_control,)
-                S.initialize_design(X_start=X_start)
-                print(f"S.X: {S.X}")
-                print(f"S.y: {S.y}")
-                X_shape_before = S.X.shape
-                print(f"X_shape_before: {X_shape_before}")
-                print(f"y_size_before: {S.y.size}")
-                y_size_before = S.y.size
-                S.update_stats()
-                S.fit_surrogate()
-                S.update_design()
-                print(f"S.X: {S.X}")
-                print(f"S.y: {S.y}")
-                print(f"S.n_points: {S.n_points}")
-                print(f"X_shape_after: {S.X.shape}")
-                print(f"y_size_after: {S.y.size}")
-            >>> #
-            >>> # 2. Using the OCBA points:
-            >>> import numpy as np
-                from spotpython.fun.objectivefunctions import Analytical
-                from spotpython.spot import spot
-                from spotpython.utils.init import fun_control_init
-                # number of initial points:
-                ni = 3
-                X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
-                fun = analytical().fun_sphere
-                fun_control = fun_control_init(
-                        sigma=0.02,
-                        lower = np.array([-1, -1]),
-                        upper = np.array([1, 1]),
-                        noise=True,
-                        ocba_delta=1,
-                    )
-                design_control=design_control_init(init_size=ni, repeats=2)
-
-                S = spot.Spot(fun=fun,
-                            design_control=design_control,
-                            fun_control=fun_control
-                )
-                S.initialize_design(X_start=X_start)
-                print(f"S.X: {S.X}")
-                print(f"S.y: {S.y}")
-                X_shape_before = S.X.shape
-                print(f"X_shape_before: {X_shape_before}")
-                print(f"y_size_before: {S.y.size}")
-                y_size_before = S.y.size
-                S.update_stats()
-                S.fit_surrogate()
-                S.update_design()
-                print(f"S.X: {S.X}")
-                print(f"S.y: {S.y}")
-                print(f"S.n_points: {S.n_points}")
-                print(f"S.ocba_delta: {S.ocba_delta}")
-                print(f"X_shape_after: {S.X.shape}")
-                print(f"y_size_after: {S.y.size}")
-                # compare the shapes of the X and y values before and after the update_design method
-                assert X_shape_before[0] + S.n_points * S.fun_repeats + S.ocba_delta == S.X.shape[0]
-                assert X_shape_before[1] == S.X.shape[1]
-                assert y_size_before + S.n_points * S.fun_repeats + S.ocba_delta == S.y.size
-
-        """
-        # OCBA (only if noise). Determination of the OCBA points depends on the
-        # old X and y values.
-        if self.noise and self.ocba_delta > 0 and not np.all(self.var_y > 0) and (self.mean_X.shape[0] <= 2):
-            logger.warning("self.var_y <= 0. OCBA points are not generated:")
-            logger.warning("There are less than 3 points or points with no variance information.")
-            logger.debug("In update_design(): self.mean_X: %s", self.mean_X)
-            logger.debug("In update_design(): self.var_y: %s", self.var_y)
-        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0) and (self.mean_X.shape[0] > 2):
-            X_ocba = get_ocba_X(self.mean_X, self.mean_y, self.var_y, self.ocba_delta)
-        else:
-            X_ocba = None
-        # Determine the new X0 values based on the old X and y values:
-        X0 = self.get_new_X0()
-        # Append OCBA points to the new design points:
-        if self.noise and self.ocba_delta > 0 and np.all(self.var_y > 0):
-            X0 = append(X_ocba, X0, axis=0)
-        X_all = self.to_all_dim_if_needed(X0)
-        logger.debug(
-            "In update_design(): self.fun_control sigma and seed passed to fun(): %s %s",
-            self.fun_control["sigma"],
-            self.fun_control["seed"],
-        )
-        # (S-18): Evaluating New Solutions:
-        y0 = self.fun(X=X_all, fun_control=self.fun_control)
-        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
-        X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
-        # Append New Solutions (only if they are not nan):
-        if y0.shape[0] > 0:
-            self.X = np.append(self.X, X0, axis=0)
-            self.y = np.append(self.y, y0)
-        else:
-            # otherwise, generate a random point and append it to the design
-            Xr, yr = self.generate_random_point()
-            self.X = np.append(self.X, Xr, axis=0)
-            self.y = np.append(self.y, yr)
-
-    def fit_surrogate(self) -> None:
-        """
-        Fit surrogate model. The surrogate model
-        is fitted to the data stored in `self.X` and `self.y`.
-        It uses the generic `fit()` method of the
-        surrogate model `surrogate`. The default surrogate model is
-        an instance from spotpython's `Kriging` class.
-        Args:
-            self (object): Spot object
-
-        Returns:
-            (NoneType): None
-
-        Attributes:
-            self.surrogate (object): surrogate model
-
-        Note:
-            * As shown in https://sequential-parameter-optimization.github.io/Hyperparameter-Tuning-Cookbook/
-            other surrogate models can be used as well.
-
-        Examples:
-                >>> import numpy as np
-                    from spotpython.fun.objectivefunctions import Analytical
-                    from spotpython.spot import spot
-                    from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
-                    )
-                    # number of initial points:
-                    ni = 0
-                    X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
-                    fun = analytical().fun_sphere
-                    fun_control = fun_control_init(
-                        lower = np.array([-1, -1]),
-                        upper = np.array([1, 1])
-                        )
-                    design_control=design_control_init(init_size=ni)
-                    S = spot.Spot(fun=fun,
-                                fun_control=fun_control,
-                                design_control=design_control,)
-                    S.initialize_design(X_start=X_start)
-                    S.update_stats()
-                    S.fit_surrogate()
-
-        """
-        logger.debug("In fit_surrogate(): self.X: %s", self.X)
-        logger.debug("In fit_surrogate(): self.y: %s", self.y)
-        logger.debug("In fit_surrogate(): self.X.shape: %s", self.X.shape)
-        logger.debug("In fit_surrogate(): self.y.shape: %s", self.y.shape)
-        X_points = self.X.shape[0]
-        y_points = self.y.shape[0]
-        if X_points == y_points:
-            if X_points > self.max_surrogate_points:
-                X_S, y_S = select_distant_points(X=self.X, y=self.y, k=self.max_surrogate_points)
-            else:
-                X_S = self.X
-                y_S = self.y
-            self.surrogate.fit(X_S, y_S)
-        else:
-            logger.warning("X and y have different sizes. Surrogate not fitted.")
-        if self.show_models:
-            self.plot_model()
 
     def show_progress_if_needed(self, timeout_start) -> None:
         """Show progress bar if `show_progress` is `True`. If

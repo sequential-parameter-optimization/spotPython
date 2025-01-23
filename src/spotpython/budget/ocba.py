@@ -44,9 +44,10 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
     Examples:
         >>> import copy
             import numpy as np
-            from spotpython.fun.objectivefunctions import analytical
-            from spotpython.spot import spot
+            from spotpython.fun import Analytical
+            from spotpython.spot import Spot
             from spotpython.budget.ocba import get_ocba
+            from spotpython.utils.init import fun_control_init, design_control_init, surrogate_control_init
             # Example is based on the example from the book:
             # Chun-Hung Chen and Loo Hay Lee:
             #     Stochastic Simulation Optimization: An Optimal Computer Budget Allocation,
@@ -56,10 +57,8 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
             #     var_y = np.array([1,1,9,9,4])
             #     get_ocba(mean_y, var_y, 50)
             #     [11  9 19  9  2]
-            fun = analytical().fun_linear
-            fun_control = {"sigma": 0.001,
-                        "seed": 123}
-            spot_1_noisy = spot.Spot(fun=fun,
+            fun = Analytical().fun_linear
+            fun_control = fun_control_init(
                             lower = np.array([-1]),
                             upper = np.array([1]),
                             fun_evals = 20,
@@ -68,10 +67,14 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
                             ocba_delta=1,
                             seed=123,
                             show_models=False,
+                            sigma=0.001,
+                            )
+            design_control = design_control_init(init_size=3, repeats=2)
+            surrogate_control = surrogate_control_init(noise=True)
+            spot_1_noisy = Spot(fun=fun,
                             fun_control = fun_control,
-                            design_control={"init_size": 3,
-                                            "repeats": 2},
-                            surrogate_control={"noise": True})
+                            design_control=design_control,
+                            surrogate_control=surrogate_control)
             spot_1_noisy.run()
             spot_2 = copy.deepcopy(spot_1_noisy)
             spot_2.mean_y = np.array([1,2,3,4,5])
@@ -81,12 +84,12 @@ def get_ocba(means, vars, delta, verbose=False) -> array:
             assert sum(o) == 50
             assert (o == np.array([[11, 9, 19, 9, 2]])).all()
             o
-            spotpython tuning: -1.000367786651468 [####------] 45.00%
-            spotpython tuning: -1.000989121350348 [######----] 60.00%
-            spotpython tuning: -1.000989121350348 [########--] 75.00%
-            spotpython tuning: -1.000989121350348 [#########-] 90.00%
-            spotpython tuning: -1.000989121350348 [##########] 100.00% Done...
-            array([11,  9, 19,  9,  2])
+                spotpython tuning: -1.000367786651468 [####------] 45.00%
+                spotpython tuning: -1.000989121350348 [######----] 60.00%
+                spotpython tuning: -1.000989121350348 [########--] 75.00%
+                spotpython tuning: -1.000989121350348 [#########-] 90.00%
+                spotpython tuning: -1.000989121350348 [##########] 100.00% Done...
+                array([11,  9, 19,  9,  2])
     """
     if np.all(vars > 0) and (means.shape[0] > 2):
         n_designs = means.shape[0]
