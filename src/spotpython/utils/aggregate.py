@@ -3,14 +3,22 @@ import numpy as np
 from sklearn.cluster import KMeans
 
 
-def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray):
+def aggregate_mean_var(X, y, sort=False, var_empirical=False) -> (np.ndarray, np.ndarray, np.ndarray):
     """
-    Aggregate array to mean.
+    Aggregate array to mean and variance per group.
+    Note: The empirical variance might result in nan values.
+    Therefore, the theoretical variance is calculated by default.
 
     Args:
-        X (numpy.ndarray): X array, shape `(n, k)`.
-        y (numpy.ndarray): values, shape `(n,)`.
-        sort (bool): Whether to sort the resulting DataFrame by the group keys.
+        X (numpy.ndarray):
+            X array, shape `(n, k)`.
+        y (numpy.ndarray):
+            values, shape `(n,)`.
+        sort (bool):
+            Whether to sort the resulting DataFrame by the group keys.
+        var_empirical (bool):
+            Whether to calculate the empirical variance. Default is False, which
+            avoids nan values in the variance calculation.
 
     Returns:
         (numpy.ndarray):
@@ -22,16 +30,35 @@ def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray)
 
     Examples:
         >>> from spotpython.utils.aggregate import aggregate_mean_var
+            import numpy as np
             X = np.array([[1, 2], [3, 4], [1, 2]])
             y = np.array([1, 2, 3])
             X_agg, y_mean, y_var = aggregate_mean_var(X, y)
             print(X_agg)
-            [[1. 2.]
-            [3. 4.]]
+            [[1. 2.] [3. 4.]]
             print(y_mean)
             [2. 2.]
             print(y_var)
-            [1. 0.]
+            [1 0]
+        # Empirical variance might result in nan values, see the example below
+        >>> X_agg, y_mean, y_var = aggregate_mean_var(X, y, var_empirical=True)
+            print(X_agg)
+            print(y_mean)
+            print(y_var)
+            [[1 2]
+            [3 4]]
+            [2. 2.]
+            [ 2. nan]
+        >>> X = np.array([[1, 2], [3, 4], [1, 2], [3, 4], [1,2]])
+            y = np.array([1, 2, 3, 4, 5])
+            X_agg, y_mean, y_var = aggregate_mean_var(X, y, theoretical_var=False)
+            print(X_agg)
+            print(y_mean)
+            print(y_var)
+            [[1 2]
+            [3 4]]
+            [3. 3.]
+            [4. 2.]
     """
     if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray):
         raise TypeError("X and y must be numpy arrays.")
@@ -46,12 +73,24 @@ def aggregate_mean_var(X, y, sort=False) -> (np.ndarray, np.ndarray, np.ndarray)
     df = pd.DataFrame(X)
     df["y"] = y
 
-    # Group by all X columns, calculating the mean and variance of y for each group
-    grouped = df.groupby(list(df.columns[:-1]), as_index=False, sort=sort).agg({"y": ["mean", "var"]})
+    # Define a custom function to calculate the theoretical variance
+    def theoretical_var(group):
+        n = len(group)
+        if n == 0:
+            return np.nan
+        mean = group.mean()
+        return ((group - mean) ** 2).sum() / n
 
-    # Extract mean and variance results from the multi-index DataFrame columns
-    y_mean = grouped[("y", "mean")].to_numpy()
-    y_var = grouped[("y", "var")].to_numpy()
+    if var_empirical:
+        # Group by all X columns, calculating the mean and empirical variance of y for each group
+        grouped = df.groupby(list(df.columns[:-1]), as_index=False, sort=sort).agg(y_mean=pd.NamedAgg(column="y", aggfunc="mean"), y_var=pd.NamedAgg(column="y", aggfunc="var"))
+    else:
+        # Group by all X columns, calculating the mean and theoretical variance of y for each group
+        grouped = df.groupby(list(df.columns[:-1]), as_index=False, sort=sort).agg(y_mean=pd.NamedAgg(column="y", aggfunc="mean"), y_var=pd.NamedAgg(column="y", aggfunc=theoretical_var))
+
+    # Extract mean and variance results from the grouped DataFrame
+    y_mean = grouped["y_mean"].to_numpy()
+    y_var = grouped["y_var"].to_numpy()
 
     # Extract the unique X values
     X_agg = grouped.iloc[:, :-2].to_numpy()

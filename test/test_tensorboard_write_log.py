@@ -21,7 +21,7 @@ def mock_spot():
 
 def test_write_tensorboard_log(mock_spot):
     # Call the method
-    Spot.write_tensorboard_log(mock_spot)
+    Spot.write_initial_tensorboard_log(mock_spot)
 
     # Define expected calls
     expected_calls = [

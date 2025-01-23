@@ -235,7 +235,7 @@ class Spot:
         # because the writer is passed to the surrogate model:
         self.init_spot_writer()
 
-        self._surrogate_update(surrogate)
+        self._surrogate_setup(surrogate)
 
         if self.fun_control.get("save_experiment"):
             self.save_experiment(verbosity=self.verbosity)
@@ -392,7 +392,7 @@ class Spot:
             if self.surrogate_control["n_theta"] > 1:
                 self.surrogate_control.update({"n_theta": self.k})
 
-    def _surrogate_update(self, surrogate) -> None:
+    def _surrogate_setup(self, surrogate) -> None:
         # Surrogate related information:
         self.surrogate = surrogate
         # If no surrogate model is specified, use the internal
@@ -950,7 +950,7 @@ class Spot:
 
         self.evaluate_initial_design()
 
-        self.write_tensorboard_log()
+        self.write_initial_tensorboard_log()
 
     def initialize_design_matrix(self, X_start=None) -> None:
         """
@@ -1098,7 +1098,7 @@ class Spot:
         logger.debug("In Spot() evaluate_initial_design(), final X val, after remove nan: self.X: %s", self.X)
         logger.debug("In Spot() evaluate_initial_design(), final y val, after remove nan: self.y: %s", self.y)
 
-    def write_tensorboard_log(self) -> None:
+    def write_initial_tensorboard_log(self) -> None:
         """Writes initial design data using the spot_writer. The spot_writer
         is a tensorboard writer that writes the data to a tensorboard file.
 
@@ -1116,7 +1116,7 @@ class Spot:
                             fun_control=fun_control,
                             )
                 S.initialize_design()
-                S.write_tensorboard_log()
+                S.write_initial_tensorboard_log()
                     Moving TENSORBOARD_PATH: runs/ to TENSORBOARD_PATH_OLD: runs_OLD/runs_2025_01_12_09_24_15
                     Created spot_tensorboard_path: runs/spot_logs/00_p040025_2025-01-12_09-24-15 for SummaryWriter()
         """
@@ -1134,6 +1134,46 @@ class Spot:
                 # self.spot_writer.add_hparams(config, {"spot_y": y_j}, run_name=self.spot_tensorboard_path)
                 self.spot_writer.add_hparams(config, {"hp_metric": y_j})
                 self.spot_writer.flush()
+
+    def update_stats(self) -> None:
+        """
+        Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`
+        If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`
+        2. `mean_y` 3. `min_mean_y` 4. `min_mean_X`.
+
+        Args:
+            self (object): Spot object
+
+        Returns:
+            (NoneType): None
+
+        Attributes:
+            self.min_y (float): minimum y value
+            self.min_X (numpy.ndarray): X value of the minimum y value
+            self.counter (int): number of function evaluations
+            self.mean_X (numpy.ndarray): mean X values
+            self.mean_y (numpy.ndarray): mean y values
+            self.var_y (numpy.ndarray): variance of y values
+            self.min_mean_y (float): minimum mean y value
+            self.min_mean_X (numpy.ndarray): X value of the minimum mean y value
+
+        """
+        self.min_y = min(self.y)
+        self.min_X = self.X[argmin(self.y)]
+        self.counter = self.y.size
+        self.fun_control.update({"counter": self.counter})
+        # Update aggregated x and y values (if noise):
+        if self.noise:
+            Z = aggregate_mean_var(X=self.X, y=self.y)
+            self.mean_X = Z[0]
+            self.mean_y = Z[1]
+            self.var_y = Z[2]
+            # X value of the best mean y value so far:
+            self.min_mean_X = self.mean_X[argmin(self.mean_y)]
+            # variance of the best mean y value so far:
+            self.min_var_y = self.var_y[argmin(self.mean_y)]
+            # best mean y value so far:
+            self.min_mean_y = self.mean_y[argmin(self.mean_y)]
 
     def save_result(self, filename=None, path=None, overwrite=True, verbosity=0) -> None:
         """
@@ -1613,46 +1653,6 @@ class Spot:
                     [27.4698033 ,  0.3959685 ]])
         """
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)
-
-    def update_stats(self) -> None:
-        """
-        Update the following stats: 1. `min_y` 2. `min_X` 3. `counter`
-        If `noise` is `True`, additionally the following stats are computed: 1. `mean_X`
-        2. `mean_y` 3. `min_mean_y` 4. `min_mean_X`.
-
-        Args:
-            self (object): Spot object
-
-        Returns:
-            (NoneType): None
-
-        Attributes:
-            self.min_y (float): minimum y value
-            self.min_X (numpy.ndarray): X value of the minimum y value
-            self.counter (int): number of function evaluations
-            self.mean_X (numpy.ndarray): mean X values
-            self.mean_y (numpy.ndarray): mean y values
-            self.var_y (numpy.ndarray): variance of y values
-            self.min_mean_y (float): minimum mean y value
-            self.min_mean_X (numpy.ndarray): X value of the minimum mean y value
-
-        """
-        self.min_y = min(self.y)
-        self.min_X = self.X[argmin(self.y)]
-        self.counter = self.y.size
-        self.fun_control.update({"counter": self.counter})
-        # Update aggregated x and y values (if noise):
-        if self.noise:
-            Z = aggregate_mean_var(X=self.X, y=self.y)
-            self.mean_X = Z[0]
-            self.mean_y = Z[1]
-            self.var_y = Z[2]
-            # X value of the best mean y value so far:
-            self.min_mean_X = self.mean_X[argmin(self.mean_y)]
-            # variance of the best mean y value so far:
-            self.min_var_y = self.var_y[argmin(self.mean_y)]
-            # best mean y value so far:
-            self.min_mean_y = self.mean_y[argmin(self.mean_y)]
 
     def update_writer(self) -> None:
         if hasattr(self, "spot_writer") and self.spot_writer is not None:
