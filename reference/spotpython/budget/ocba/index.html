@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.41">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.40">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.0253249f.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.8c3ca2c6.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -3865,9 +3865,10 @@ https://github.com/TomMonks/sim-tools</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">copy</span>
 <span class="go">    import numpy as np</span>
-<span class="go">    from spotpython.fun.objectivefunctions import analytical</span>
-<span class="go">    from spotpython.spot import spot</span>
+<span class="go">    from spotpython.fun import Analytical</span>
+<span class="go">    from spotpython.spot import Spot</span>
 <span class="go">    from spotpython.budget.ocba import get_ocba</span>
+<span class="go">    from spotpython.utils.init import fun_control_init, design_control_init, surrogate_control_init</span>
 <span class="go">    # Example is based on the example from the book:</span>
 <span class="go">    # Chun-Hung Chen and Loo Hay Lee:</span>
 <span class="go">    #     Stochastic Simulation Optimization: An Optimal Computer Budget Allocation,</span>
@@ -3877,10 +3878,8 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="go">    #     var_y = np.array([1,1,9,9,4])</span>
 <span class="go">    #     get_ocba(mean_y, var_y, 50)</span>
 <span class="go">    #     [11  9 19  9  2]</span>
-<span class="go">    fun = analytical().fun_linear</span>
-<span class="go">    fun_control = {&quot;sigma&quot;: 0.001,</span>
-<span class="go">                &quot;seed&quot;: 123}</span>
-<span class="go">    spot_1_noisy = spot.Spot(fun=fun,</span>
+<span class="go">    fun = Analytical().fun_linear</span>
+<span class="go">    fun_control = fun_control_init(</span>
 <span class="go">                    lower = np.array([-1]),</span>
 <span class="go">                    upper = np.array([1]),</span>
 <span class="go">                    fun_evals = 20,</span>
@@ -3889,10 +3888,14 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="go">                    ocba_delta=1,</span>
 <span class="go">                    seed=123,</span>
 <span class="go">                    show_models=False,</span>
+<span class="go">                    sigma=0.001,</span>
+<span class="go">                    )</span>
+<span class="go">    design_control = design_control_init(init_size=3, repeats=2)</span>
+<span class="go">    surrogate_control = surrogate_control_init(noise=True)</span>
+<span class="go">    spot_1_noisy = Spot(fun=fun,</span>
 <span class="go">                    fun_control = fun_control,</span>
-<span class="go">                    design_control={&quot;init_size&quot;: 3,</span>
-<span class="go">                                    &quot;repeats&quot;: 2},</span>
-<span class="go">                    surrogate_control={&quot;noise&quot;: True})</span>
+<span class="go">                    design_control=design_control,</span>
+<span class="go">                    surrogate_control=surrogate_control)</span>
 <span class="go">    spot_1_noisy.run()</span>
 <span class="go">    spot_2 = copy.deepcopy(spot_1_noisy)</span>
 <span class="go">    spot_2.mean_y = np.array([1,2,3,4,5])</span>
@@ -3902,12 +3905,12 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="go">    assert sum(o) == 50</span>
 <span class="go">    assert (o == np.array([[11, 9, 19, 9, 2]])).all()</span>
 <span class="go">    o</span>
-<span class="go">    spotpython tuning: -1.000367786651468 [####------] 45.00%</span>
-<span class="go">    spotpython tuning: -1.000989121350348 [######----] 60.00%</span>
-<span class="go">    spotpython tuning: -1.000989121350348 [########--] 75.00%</span>
-<span class="go">    spotpython tuning: -1.000989121350348 [#########-] 90.00%</span>
-<span class="go">    spotpython tuning: -1.000989121350348 [##########] 100.00% Done...</span>
-<span class="go">    array([11,  9, 19,  9,  2])</span>
+<span class="go">        spotpython tuning: -1.000367786651468 [####------] 45.00%</span>
+<span class="go">        spotpython tuning: -1.000989121350348 [######----] 60.00%</span>
+<span class="go">        spotpython tuning: -1.000989121350348 [########--] 75.00%</span>
+<span class="go">        spotpython tuning: -1.000989121350348 [#########-] 90.00%</span>
+<span class="go">        spotpython tuning: -1.000989121350348 [##########] 100.00% Done...</span>
+<span class="go">        array([11,  9, 19,  9,  2])</span>
 </code></pre></div>
 
             <details class="quote">
@@ -4047,7 +4050,10 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array</span><span class="p">:</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimal Computer Budget Allocation (OCBA)</span>
 
@@ -4082,9 +4088,10 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import copy</span>
 <span class="sd">            import numpy as np</span>
-<span class="sd">            from spotpython.fun.objectivefunctions import analytical</span>
-<span class="sd">            from spotpython.spot import spot</span>
+<span class="sd">            from spotpython.fun import Analytical</span>
+<span class="sd">            from spotpython.spot import Spot</span>
 <span class="sd">            from spotpython.budget.ocba import get_ocba</span>
+<span class="sd">            from spotpython.utils.init import fun_control_init, design_control_init, surrogate_control_init</span>
 <span class="sd">            # Example is based on the example from the book:</span>
 <span class="sd">            # Chun-Hung Chen and Loo Hay Lee:</span>
 <span class="sd">            #     Stochastic Simulation Optimization: An Optimal Computer Budget Allocation,</span>
@@ -4094,10 +4101,8 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">            #     var_y = np.array([1,1,9,9,4])</span>
 <span class="sd">            #     get_ocba(mean_y, var_y, 50)</span>
 <span class="sd">            #     [11  9 19  9  2]</span>
-<span class="sd">            fun = analytical().fun_linear</span>
-<span class="sd">            fun_control = {&quot;sigma&quot;: 0.001,</span>
-<span class="sd">                        &quot;seed&quot;: 123}</span>
-<span class="sd">            spot_1_noisy = spot.Spot(fun=fun,</span>
+<span class="sd">            fun = Analytical().fun_linear</span>
+<span class="sd">            fun_control = fun_control_init(</span>
 <span class="sd">                            lower = np.array([-1]),</span>
 <span class="sd">                            upper = np.array([1]),</span>
 <span class="sd">                            fun_evals = 20,</span>
@@ -4106,10 +4111,14 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">                            ocba_delta=1,</span>
 <span class="sd">                            seed=123,</span>
 <span class="sd">                            show_models=False,</span>
+<span class="sd">                            sigma=0.001,</span>
+<span class="sd">                            )</span>
+<span class="sd">            design_control = design_control_init(init_size=3, repeats=2)</span>
+<span class="sd">            surrogate_control = surrogate_control_init(noise=True)</span>
+<span class="sd">            spot_1_noisy = Spot(fun=fun,</span>
 <span class="sd">                            fun_control = fun_control,</span>
-<span class="sd">                            design_control={&quot;init_size&quot;: 3,</span>
-<span class="sd">                                            &quot;repeats&quot;: 2},</span>
-<span class="sd">                            surrogate_control={&quot;noise&quot;: True})</span>
+<span class="sd">                            design_control=design_control,</span>
+<span class="sd">                            surrogate_control=surrogate_control)</span>
 <span class="sd">            spot_1_noisy.run()</span>
 <span class="sd">            spot_2 = copy.deepcopy(spot_1_noisy)</span>
 <span class="sd">            spot_2.mean_y = np.array([1,2,3,4,5])</span>
@@ -4119,12 +4128,12 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="sd">            assert sum(o) == 50</span>
 <span class="sd">            assert (o == np.array([[11, 9, 19, 9, 2]])).all()</span>
 <span class="sd">            o</span>
-<span class="sd">            spotpython tuning: -1.000367786651468 [####------] 45.00%</span>
-<span class="sd">            spotpython tuning: -1.000989121350348 [######----] 60.00%</span>
-<span class="sd">            spotpython tuning: -1.000989121350348 [########--] 75.00%</span>
-<span class="sd">            spotpython tuning: -1.000989121350348 [#########-] 90.00%</span>
-<span class="sd">            spotpython tuning: -1.000989121350348 [##########] 100.00% Done...</span>
-<span class="sd">            array([11,  9, 19,  9,  2])</span>
+<span class="sd">                spotpython tuning: -1.000367786651468 [####------] 45.00%</span>
+<span class="sd">                spotpython tuning: -1.000989121350348 [######----] 60.00%</span>
+<span class="sd">                spotpython tuning: -1.000989121350348 [########--] 75.00%</span>
+<span class="sd">                spotpython tuning: -1.000989121350348 [#########-] 90.00%</span>
+<span class="sd">                spotpython tuning: -1.000989121350348 [##########] 100.00% Done...</span>
+<span class="sd">                array([11,  9, 19,  9,  2])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="nb">vars</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">):</span>
         <span class="n">n_designs</span> <span class="o">=</span> <span class="n">means</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -4344,10 +4353,7 @@ https://github.com/TomMonks/sim-tools</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/budget/ocba.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
@@ -4393,7 +4399,10 @@ https://github.com/TomMonks/sim-tools</p>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
-<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_ocba_X</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">float64</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function calculates the OCBA allocation and repeats the input array X along the specified axis.</span>
 
@@ -4535,7 +4544,7 @@ https://github.com/TomMonks/sim-tools</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.tabs", "navigation.instant", "navigation.indexes"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.525ec568.min.js"></script>
       
         <script src="../../../../javascripts/mathjax.js"></script>
       
