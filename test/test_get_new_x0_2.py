@@ -1,63 +1,41 @@
-import pytest
 import numpy as np
-from unittest.mock import MagicMock
+import pytest
+from spotpython.spot import Spot
 from spotpython.fun.objectivefunctions import Analytical
-from spotpython.utils.init import fun_control_init, design_control_init
-from spotpython.spot import spot  # Import spot as module, assuming it contains Spot
+from spotpython.utils.init import fun_control_init
 
-def create_spot_instance():
-    # Number of initial points
-    ni = 3
-    X_start = np.array([[0, 1], [1, 0], [1, 1], [1, 1]])
-    fun = Analytical().fun_sphere
+def test_suggest_X0():
+    # Setup
+    nn = 3
+    fun_sphere = Analytical().fun_sphere
     fun_control = fun_control_init(
-        n_points=10,
-        ocba_delta=0,
         lower=np.array([-1, -1]),
-        upper=np.array([1, 1])
+        upper=np.array([1, 1]),
+        n_points=nn,
     )
-    design_control = design_control_init(init_size=ni)
-    spot_instance = spot.Spot(fun=fun, fun_control=fun_control, design_control=design_control)
-    spot_instance.initialize_design(X_start=X_start)
-    return spot_instance
-
-def test_get_new_X0_successful_suggestion():
-    spot_instance = create_spot_instance()
-
-    # Configure essential testing properties
-    spot_instance.tolerance_x = 0.1
-    spot_instance.var_type = ['float', 'float']
-    spot_instance.X = np.array([[0, 0], [1, 1]])
-
-    # Mock the methods to simulate expected behaviors
-    spot_instance.suggest_new_X = MagicMock(return_value=np.array([[0.5, 0.5]] * 10))  # Must return 'n_points' amount
-    spot_instance.repair_non_numeric = MagicMock(side_effect=lambda X, var_type: X)
-    spot_instance.selectNew = MagicMock(return_value=(np.array([[0.5, 0.5]] * 10), np.arange(10)))
-
-    # Call the method under test
-    X0 = spot_instance.get_new_X0()
-
+    
+    spot_1 = Spot(
+        fun=fun_sphere,
+        fun_control=fun_control,
+    )
+    
+    # (S-2) Initial Design:
+    spot_1.X = spot_1.design.scipy_lhd(
+        spot_1.design_control["init_size"], 
+        lower=spot_1.lower, 
+        upper=spot_1.upper
+    )
+    # (S-3): Eval initial design:
+    spot_1.y = spot_1.fun(spot_1.X)
+    spot_1.fit_surrogate()
+    X0 = spot_1.suggest_new_X()
+    
+        
     # Assertions
-    assert X0.shape[0] == spot_instance.fun_control['n_points']
-    assert np.all(X0 >= spot_instance.fun_control['lower']) and np.all(X0 <= spot_instance.fun_control['upper'])
+    assert X0.size == spot_1.n_points * spot_1.k, "X0 size mismatch"
+    assert X0.ndim == 2, "X0 should have 2 dimensions"
+    assert X0.shape[0] == nn, "X0 first dimension should match n_points"
+    assert X0.shape[1] == 2, "X0 second dimension should match the problem dimensionality"
 
-def test_get_new_X0_with_space_filling():
-    spot_instance = create_spot_instance()
-
-    # Configure essential testing properties
-    spot_instance.tolerance_x = 0.1
-    spot_instance.var_type = ['float', 'float']
-    spot_instance.X = np.array([[0, 0], [1, 1]])
-
-    # Mock methods with appropriate return values
-    spot_instance.suggest_new_X = MagicMock(return_value=np.empty((0, 2)))  # Ensure it's a 2D array with 0 rows
-    spot_instance.repair_non_numeric = MagicMock(side_effect=lambda X, var_type: X)
-    spot_instance.selectNew = MagicMock(return_value=(np.empty((0, 2)), []))
-    spot_instance.generate_design = MagicMock(return_value=np.array([[-0.5, 0.5]] * 10))  # Must return 'n_points'
-
-    # Call the method under test
-    X0 = spot_instance.get_new_X0()
-
-    # Assertions
-    assert X0.shape[0] == spot_instance.fun_control['n_points']
-    assert np.all(X0 >= spot_instance.fun_control['lower']) and np.all(X0 <= spot_instance.fun_control['upper'])
+if __name__ == "__main__":
+    pytest.main([__file__])

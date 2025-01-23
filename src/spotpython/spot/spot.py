@@ -9,7 +9,8 @@ import json
 from numpy.random import default_rng
 from spotpython.design.spacefilling import SpaceFilling
 from spotpython.build.kriging import Kriging
-from spotpython.utils.repair import repair_non_numeric, apply_penalty_NA
+from spotpython.utils.repair import apply_penalty_NA
+from spotpython.utils.seed import set_all_seeds
 import numpy as np
 import pandas as pd
 import pylab
@@ -28,7 +29,7 @@ from numpy import min, max
 from spotpython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotpython.utils.compare import selectNew
 from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points
-from spotpython.utils.repair import remove_nan
+from spotpython.utils.repair import remove_nan, repair_non_numeric
 from spotpython.utils.file import get_experiment_filename, get_result_filename
 from spotpython.budget.ocba import get_ocba_X
 import logging
@@ -198,33 +199,100 @@ class Spot:
         # small value:
         self.eps = sqrt(spacing(1))
 
+        self._set_fun(fun)
+
+        self._set_bounds_and_dim()
+
+        # Random number generator:
+        self.rng = default_rng(self.fun_control["seed"])
+        set_all_seeds(self.fun_control["seed"])
+
+        self._set_var_type()
+
+        self._set_var_name()
+
+        # Reduce dim based on lower == upper logic:
+        # modifies lower, upper, var_type, and var_name
+        self.to_red_dim()
+
+        # Additional self attributes updates:
+        self._set_additional_attributes()
+
+        # Bounds are internal, because they are functions of self.lower and self.upper
+        # and used by the optimizer:
+        de_bounds = []
+        for j in range(self.lower.size):
+            de_bounds.append([self.lower[j], self.upper[j]])
+        self.de_bounds = de_bounds
+
+        self._design_setup(design)
+
+        self._optimizer_setup(optimizer)
+
+        self._surrogate_control_setup()
+
+        # The writer (Tensorboard) must be initialized before the surrogate model,
+        # because the writer is passed to the surrogate model:
+        self.init_spot_writer()
+
+        self._surrogate_update(surrogate)
+
+        if self.fun_control.get("save_experiment"):
+            self.save_experiment(verbosity=self.verbosity)
+
+        logger.setLevel(self.log_level)
+        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
+        logger.debug("In Spot() init(): fun_control: %s", self.fun_control)
+        logger.debug("In Spot() init(): design_control: %s", self.design_control)
+        logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
+        logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
+        logger.debug("In Spot() init(): self.get_spot_attributes_as_df(): %s", self.get_spot_attributes_as_df())
+
+    def _set_fun(self, fun):
+        """Set the objective function.
+
+        Args:
+            fun (Callable): objective function
+
+        Returns:
+            (NoneType): None
+
+        Raises:
+            Exception: No objective function specified.
+            Exception: Objective function is not callable
+
+        """
         self.fun = fun
         if self.fun is None:
             raise Exception("No objective function specified.")
         if not callable(self.fun):
             raise Exception("Objective function is not callable.")
 
-        # 1. fun_control updates:
-        # -----------------------
-        # Random number generator:
-        self.rng = default_rng(self.fun_control["seed"])
+    def _set_bounds_and_dim(self) -> None:
+        """
+        Set the lower and upper bounds and the number of dimensions.
 
-        # 2. lower attribute updates:
-        # -----------------------
+        Returns:
+            (NoneType): None
+
+        """
+        # lower attribute updates:
         # if lower is in the fun_control dictionary, use the value of the key "lower" as the lower bound
         if get_control_key_value(control_dict=self.fun_control, key="lower") is not None:
             self.lower = get_control_key_value(control_dict=self.fun_control, key="lower")
         # Number of dimensions is based on lower
         self.k = self.lower.size
 
-        # 3. upper attribute updates:
-        # -----------------------
+        # upper attribute updates:
         # if upper is in fun_control dictionary, use the value of the key "upper" as the upper bound
         if get_control_key_value(control_dict=self.fun_control, key="upper") is not None:
             self.upper = get_control_key_value(control_dict=self.fun_control, key="upper")
 
-        # 4. var_type attribute updates:
-        # -----------------------
+    def _set_var_type(self) -> None:
+        """
+        Set the variable types. If the variable types are not specified,
+        all variable types are forced to 'num'.
+        """
         self.var_type = self.fun_control["var_type"]
         # Force numeric type as default in every dim:
         # assume all variable types are "num" if "num" is
@@ -233,19 +301,20 @@ class Spot:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
 
-        # 5. var_name attribute updates:
-        # -----------------------
+    def _set_var_name(self) -> None:
+        """
+        Set the variable names. If the variable names are not specified,
+        all variable names are set to x0, x1, x2, ...
+        """
         self.var_name = self.fun_control["var_name"]
         # use x0, x1, ... as default variable names:
         if self.var_name is None:
             self.var_name = ["x" + str(i) for i in range(len(self.lower))]
 
-        # Reduce dim based on lower == upper logic:
-        # modifies lower, upper, var_type, and var_name
-        self.to_red_dim()
-
-        # 6. Additional self attributes updates:
-        # -----------------------
+    def _set_additional_attributes(self) -> None:
+        """
+        Set additional attributes based on the fun_control dictionary
+        """
         self.fun_evals = self.fun_control["fun_evals"]
         self.fun_repeats = self.fun_control["fun_repeats"]
         self.max_time = self.fun_control["max_time"]
@@ -264,32 +333,38 @@ class Spot:
             matplotlib.use("TkAgg")
         self.verbosity = self.fun_control["verbosity"]
 
-        # # Tensorboard:
-        # self.init_spot_writer()
+        # Internal attributes:
+        self.X = None
+        self.y = None
 
-        # Bounds are internal, because they are functions of self.lower and self.upper
-        # and used by the optimizer:
-        de_bounds = []
-        for j in range(self.lower.size):
-            de_bounds.append([self.lower[j], self.upper[j]])
-        self.de_bounds = de_bounds
+        # Logging information:
+        self.counter = 0
+        self.min_y = None
+        self.min_X = None
+        self.min_mean_X = None
+        self.min_mean_y = None
+        self.mean_X = None
+        self.mean_y = None
+        self.var_y = None
 
-        # Design related information:
+    def _design_setup(self, design) -> None:
+        """
+        Design related information:
+        If no design is specified, use the internal spacefilling design.
+        """
         self.design = design
-        if design is None:
-            self.design = SpaceFilling(k=self.lower.size, seed=self.fun_control["seed"])
-        # self.design_control = {"init_size": 10, "repeats": 1}
-        # self.design_control.update(design_control)
+        if self.design is None:
+            self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"])
 
-        # Optimizer related information:
+    def _optimizer_setup(self, optimizer) -> None:
+        """
+        Optimizer setup. If no optimizer is specified, use Differential Evolution.
+        """
         self.optimizer = optimizer
-        # self.optimizer_control = {"max_iter": 1000, "seed": 125}
-        # self.optimizer_control.update(optimizer_control)
         if self.optimizer is None:
             self.optimizer = optimize.differential_evolution
 
-        # Surrogate related information:
-        self.surrogate = surrogate
+    def _surrogate_control_setup(self) -> None:
         self.surrogate_control.update({"var_type": self.var_type})
         # Surrogate control updates:
         # The default value for `noise` from the surrogate_control dictionary
@@ -303,36 +378,23 @@ class Spot:
         # self.optimizer is not None here. If 1) the key "model_optimizer"
         # is still None or 2) a user specified optimizer is provided, update the value of
         # the key "model_optimizer" to the value of self.optimizer.
-        if self.surrogate_control["model_optimizer"] is None or optimizer is not None:
+        if self.surrogate_control["model_optimizer"] is None or self.optimizer is not None:
             self.surrogate_control.update({"model_optimizer": self.optimizer})
 
         # if self.surrogate_control["n_theta"] is a string and == isotropic, use 1 theta value:
         if isinstance(self.surrogate_control["n_theta"], str):
             if self.surrogate_control["n_theta"] == "anisotropic":
-                surrogate_control.update({"n_theta": self.k})
+                self.surrogate_control.update({"n_theta": self.k})
             else:
                 # case "isotropic":
-                surrogate_control.update({"n_theta": 1})
+                self.surrogate_control.update({"n_theta": 1})
         if isinstance(self.surrogate_control["n_theta"], int):
             if self.surrogate_control["n_theta"] > 1:
-                surrogate_control.update({"n_theta": self.k})
+                self.surrogate_control.update({"n_theta": self.k})
 
-        # Internal attributes:
-        self.X = None
-        self.y = None
-        # Logging information:
-        self.counter = 0
-        self.min_y = None
-        self.min_X = None
-        self.min_mean_X = None
-        self.min_mean_y = None
-        self.mean_X = None
-        self.mean_y = None
-        self.var_y = None
-
-        # Tensorboard must be initialized before the surrogate model:
-        self.init_spot_writer()
-
+    def _surrogate_update(self, surrogate) -> None:
+        # Surrogate related information:
+        self.surrogate = surrogate
         # If no surrogate model is specified, use the internal
         # spotpython kriging surrogate:
         if self.surrogate is None:
@@ -358,18 +420,6 @@ class Spot:
                 spot_writer=self.spot_writer,
                 counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
             )
-
-        # save experiment move here (spotpython >= v0.24.1)
-        if self.fun_control.get("save_experiment"):
-            self.save_experiment(verbosity=self.verbosity)
-
-        logger.setLevel(self.log_level)
-        logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
-        logger.debug("In Spot() init(): fun_control: %s", self.fun_control)
-        logger.debug("In Spot() init(): design_control: %s", self.design_control)
-        logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
-        logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
-        logger.debug("In Spot() init(): self.get_spot_attributes_as_df(): %s", self.get_spot_attributes_as_df())
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
         """Get all attributes of the spot object as a pandas dataframe.
@@ -830,7 +880,17 @@ class Spot:
                 self.save_result(verbosity=self.verbosity)
             return self
 
-    def _copy_from(self, other):
+    def _copy_from(self, other) -> None:
+        """Copy attributes from another object.
+        This method copies all attributes from the `other` object to the current
+        object (`self`). It assumes that both objects are instances of a class
+        that share similar attributes.
+
+        Args:
+            other: An instance of a class from which attributes will be copied to
+            the current instance.
+
+        """
         for attr in other.__dict__:
             setattr(self, attr, getattr(other, attr))
 
@@ -1103,7 +1163,7 @@ class Spot:
         PREFIX = self.fun_control.get("PREFIX", "result")
         if filename is None:
             filename = get_result_filename(PREFIX)
-        self.save_experiment(filename=filename, path=None, overwrite=True, unpickleables="file_io", verbosity=0)
+        self.save_experiment(filename=filename, path=path, overwrite=overwrite, unpickleables="file_io", verbosity=verbosity)
 
     def save_experiment(self, filename=None, path=None, overwrite=True, unpickleables="file_io", verbosity=0) -> None:
         """
@@ -1291,7 +1351,7 @@ class Spot:
             lower=self.lower,
             upper=self.upper,
         )
-        X0 = repair_non_numeric(X0, self.var_type)
+        X0 = repair_non_numeric(X=X0, var_type=self.var_type)
         X_all = self.to_all_dim_if_needed(X0)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
