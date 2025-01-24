@@ -537,6 +537,394 @@ class Kriging(surrogates):
         self.de_bounds = de_bounds
         logger.debug("In _set_de_bounds(): self.de_bounds: %s", self.de_bounds)
 
+    def _optimize_model(self) -> Union[List[float], Tuple[float]]:
+        """
+        Optimize the model using the specified model_optimizer.
+
+        This method uses the specified model_optimizer to optimize the
+        likelihood function (`fun_likelihood`) with respect to the model parameters.
+        The optimization is performed within the bounds specified by the attribute
+        `de_bounds`.
+        The result of the optimization is returned as a list or tuple of optimized parameter values.
+
+        Args:
+            self (object): The Kriging object.
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n=2
+                p=2
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                print(new_theta_p_Lambda)
+                    [0.12167915 1.49467909 1.82808259 1.69648798 0.79564346]
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n_theta=2
+                n_p=2
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                assert  len(new_theta_p_Lambda) == n_theta + n_p + 1
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n_theta=2
+                n_p=2
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                assert len(new_theta_p_Lambda) == n_theta + n_p
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n_theta=2
+                n_p=1
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                assert  len(new_theta_p_Lambda) == n_theta + n_p
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4]])
+                nat_y = np.array([1, 2])
+                n_theta=1
+                n_p=1
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=False, noise=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                assert  len(new_theta_p_Lambda) == 1
+
+        Returns:
+            result["x"] (Union[List[float], Tuple[float]]):
+                A list or tuple of optimized parameter values.
+        """
+        logger.debug("Entering _optimize_model.")
+        if not callable(self.model_optimizer):
+            logger.error("model_optimizer is not callable.")
+            raise ValueError("model_optimizer must be a callable function or method.")
+
+        optimizer_strategies: Dict[str, Dict] = {
+            'dual_annealing': {'func': self.fun_likelihood, 'bounds': self.de_bounds},
+            'differential_evolution': {
+                'func': self.fun_likelihood,
+                'bounds': self.de_bounds,
+                'maxiter': self.model_fun_evals,
+                'seed': self.seed
+            },
+            'direct': {
+                'func': self.fun_likelihood,
+                'bounds': self.de_bounds,
+                'eps': 1e-2
+            },
+            'shgo': {'func': self.fun_likelihood, 'bounds': self.de_bounds},
+            'basinhopping': {'func': self.fun_likelihood, 'x0': np.mean(self.de_bounds, axis=1)}
+        }
+
+        optimizer_name = self.model_optimizer.__name__
+        logger.debug("Optimizer selected: %s", optimizer_name)
+
+        if optimizer_name not in optimizer_strategies:
+            logger.info("Using default options for optimizer: %s", optimizer_name)
+            optimizer_args = {'func': self.fun_likelihood, 'bounds': self.de_bounds}
+        else:
+            optimizer_args = optimizer_strategies[optimizer_name]
+
+        logger.debug("Parameters for optimization: %s", optimizer_args)
+
+        try:
+            result = self.model_optimizer(**optimizer_args)
+        except Exception as e:
+            logger.error("Optimization failed due to error: %s", str(e))
+            raise
+
+        if "x" not in result:
+            logger.error("Optimization result does not contain 'x'. Result: %s", result)
+            raise ValueError("The optimization result does not contain the expected 'x' key.")
+        logger.debug("Optimization result: %s", result)
+        optimized_parameters = list(result["x"])
+        logger.debug("Extracted optimized parameters: %s", optimized_parameters)
+        return optimized_parameters
+
+    def _extract_from_bounds(self, new_theta_p_Lambda: np.ndarray) -> None:
+        """
+        Extract `theta`, `p`, and `Lambda` from bounds. The kriging object stores
+        `theta` as an array,  `p` as an array, and `Lambda` as a float.
+
+        Args:
+            self (object): The Kriging object.
+            new_theta_p_Lambda (np.ndarray):
+                1d-array with theta, p, and Lambda values. Order is important.
+        Returns:
+            None
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.build import Kriging
+                num_theta = 2
+                num_p = 3
+                S = Kriging(
+                    seed=124,
+                    n_theta=num_theta,
+                    n_p=num_p,
+                    optim_p=True,
+                    noise=True
+                )
+                bounds_array = np.array([1, 2, 3, 4, 5, 6])
+                S._extract_from_bounds(new_theta_p_Lambda=bounds_array)
+                assert np.array_equal(S.theta,
+                    [1, 2]), f"Expected theta to be [1, 2] but got {S.theta}"
+                assert np.array_equal(S.p,
+                    [3, 4, 5]), f"Expected p to be [3, 4, 5] but got {S.p}"
+                assert S.Lambda == 6, f"Expected Lambda to be 6 but got {S.Lambda}"
+            >>> import numpy as np
+                from spotpython.build import Kriging
+                num_theta = 1
+                num_p = 1
+                S = Kriging(
+                    seed=124,
+                    n_theta=num_theta,
+                    n_p=num_p,
+                    optim_p=False,
+                    noise=False
+                )
+                bounds_array = np.array([1])
+                S._extract_from_bounds(new_theta_p_Lambda=bounds_array)
+                assert np.array_equal(S.theta,
+                    [1]), f"Expected theta to be [1] but got {S.theta}"
+            >>> import numpy as np
+                from spotpython.build import Kriging
+                num_theta = 1
+                num_p = 2
+                S = Kriging(
+                    seed=124,
+                    n_theta=num_theta,
+                    n_p=num_p,
+                    optim_p=True,
+                    noise=True
+                )
+                bounds_array = np.array([1, 2, 3, 4])
+                S._extract_from_bounds(new_theta_p_Lambda=bounds_array)
+                assert np.array_equal(S.theta,
+                    [1]), f"Expected theta to be [1, 2] but got {S.theta}"
+                assert np.array_equal(S.p,
+                    [2, 3]), f"Expected p to be [3, 4, 5] but got {S.p}"
+                assert S.Lambda == 4, f"Expected Lambda to be 6 but got {S.Lambda}"
+
+        """
+        logger.debug("Extracting parameters from: %s", new_theta_p_Lambda)
+
+        # Validate array length
+        expected_length = self.n_theta
+        if self.optim_p:
+            expected_length += self.n_p
+        if self.noise:
+            expected_length += 1
+
+        if len(new_theta_p_Lambda) < expected_length:
+            logger.error("Input array is too short. Expected at least %d elements, got %d.",
+                         expected_length, len(new_theta_p_Lambda))
+            raise ValueError(f"Input array must have at least {expected_length} elements.")
+
+        # Extract theta
+        self.theta = new_theta_p_Lambda[:self.n_theta]
+        logger.debug("Extracted theta: %s", self.theta)
+
+        if self.optim_p:
+            # Extract p if optim_p is True
+            self.p = new_theta_p_Lambda[self.n_theta:self.n_theta + self.n_p]
+            logger.debug("Extracted p: %s", self.p)
+
+        if self.noise:
+            # Extract Lambda
+            lambda_index = self.n_theta + (self.n_p if self.optim_p else 0)
+            self.Lambda = new_theta_p_Lambda[lambda_index]
+            logger.debug("Extracted Lambda: %s", self.Lambda)
+
+    def build_Psi(self) -> None:
+        """
+        Constructs a new (n x n) correlation matrix Psi to reflect new data
+        or a change in hyperparameters.
+        This method uses `theta`, `p`, and coded `X` values to construct the
+        correlation matrix as described in [Forr08a, p.57].
+
+        Attributes:
+            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
+            cnd_Psi (float): Condition number of Psi.
+            inf_Psi (bool): True if Psi is infinite, False otherwise.
+
+        Raises:
+            LinAlgError: If building Psi fails.
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                nat_X = np.array([[0], [1]])
+                nat_y = np.array([0, 1])
+                n=1
+                p=1
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                print(S.nat_X)
+                print(S.nat_y)
+                S._set_theta_values()
+                print(f"S.theta: {S.theta}")
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                S._extract_from_bounds(new_theta_p_Lambda)
+                print(f"S.theta: {S.theta}")
+                S.build_Psi()
+                print(f"S.Psi: {S.Psi}")
+                    [[0]
+                    [1]]
+                    [0 1]
+                    S.theta: [0.]
+                    S.theta: [1.60036366]
+                    S.Psi: [[1.00000001e+00 4.96525625e-18]
+                    [4.96525625e-18 1.00000001e+00]]
+        """
+        try:
+            n = self.n
+            k = self.k
+            theta10 = np.power(10.0, self.theta)
+
+            # Ensure theta has the correct length
+            if self.n_theta == 1:
+                theta10 = theta10 * np.ones(k)
+
+            # Initialize the Psi matrix
+            self.Psi = np.zeros((n, n), dtype=np.float64)
+
+            # Calculate the distance matrix using ordered variables
+            if self.ordered_mask.any():
+                X_ordered = self.nat_X[:, self.ordered_mask]
+                D_ordered = squareform(
+                    pdist(X_ordered, metric='sqeuclidean', w=theta10[self.ordered_mask])
+                )
+                self.Psi += D_ordered
+
+            # Add the contribution of factor variables to the distance matrix
+            if self.factor_mask.any():
+                X_factor = self.nat_X[:, self.factor_mask]
+                D_factor = squareform(
+                    pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask])
+                )
+                self.Psi += D_factor
+
+            # Calculate correlation from distance
+            self.Psi = np.exp(-self.Psi)
+
+            # Adjust diagonal elements for noise or minimum epsilon
+            diag_indices = np.diag_indices_from(self.Psi)
+            if self.noise:
+                self.Psi[diag_indices] += self.Lambda
+                logger.debug("Noise level Lambda applied to diagonal: %s", self.Lambda)
+            else:
+                self.Psi[diag_indices] += self.eps
+
+            # Check for infinite values
+            self.inf_Psi = np.isinf(self.Psi).any()
+
+            # Calculate condition number
+            self.cnd_Psi = cond(self.Psi)
+            logger.debug("Condition number of Psi: %f", self.cnd_Psi)
+
+        except LinAlgError as err:
+            logger.error("Building Psi failed. Error: %s, Type: %s", err, type(err))
+            raise
+
+    def build_U(self, scipy: bool = True) -> None:
+        """
+        Performs Cholesky factorization of Psi as U as described in [Forr08a, p.57].
+        This method uses either `scipy_cholesky` or numpy's `cholesky` to perform the Cholesky factorization of Psi.
+
+        Args:
+            self (object):
+                The Kriging object.
+            scipy (bool):
+                If True, use `scipy_cholesky`.
+                If False, use numpy's `cholesky`.
+                Defaults to True.
+
+        Returns:
+            None
+
+        Raises:
+            LinAlgError:
+                If Cholesky factorization fails for Psi.
+
+        Attributes:
+            U (np.matrix): Kriging U matrix, Cholesky decomposition. Shape (n,n).
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                nat_X = np.array([[0], [1]])
+                nat_y = np.array([0, 1])
+                n=1
+                p=1
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                print(S.nat_X)
+                print(S.nat_y)
+                S._set_theta_values()
+                print(f"S.theta: {S.theta}")
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                S._extract_from_bounds(new_theta_p_Lambda)
+                print(f"S.theta: {S.theta}")
+                S.build_Psi()
+                print(f"S.Psi: {S.Psi}")
+                S.build_U()
+                print(f"S.U:{S.U}")
+                    [[0]
+                    [1]]
+                    [0 1]
+                    S.theta: [0.]
+                    S.theta: [1.60036366]
+                    S.Psi: [[1.00000001e+00 4.96525625e-18]
+                    [4.96525625e-18 1.00000001e+00]]
+                    S.U:[[1.00000001e+00 4.96525622e-18]
+                    [0.00000000e+00 1.00000001e+00]]
+        """
+        try:
+            self.U = scipy_cholesky(self.Psi, lower=True) if scipy else cholesky(self.Psi)
+            self.U = self.U.T
+        except LinAlgError as err:
+            print(f"build_U() Cholesky failed for Psi:\n {self.Psi}. {err=}, {type(err)=}")
+
     def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
         """
         Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
@@ -587,8 +975,8 @@ class Kriging(surrogates):
         self._set_de_bounds()
         # Finally, set new theta and p values and update the surrogate again
         # for new_theta_p_Lambda in de_results["x"]:
-        new_theta_p_Lambda = self.optimize_model()
-        self.extract_from_bounds(new_theta_p_Lambda)
+        new_theta_p_Lambda = self._optimize_model()
+        self._extract_from_bounds(new_theta_p_Lambda)
         self.build_Psi()
         self.build_U()
         # TODO: check if the following line is necessary!
@@ -774,157 +1162,6 @@ class Kriging(surrogates):
 
         return EI
 
-    def extract_from_bounds(self, new_theta_p_Lambda: np.ndarray) -> None:
-        """
-        Extract `theta`, `p`, and `Lambda` from bounds. The kriging object stores
-        `theta` as an array,  `p` as an array, and `Lambda` as a float.
-
-        Args:
-            self (object): The Kriging object.
-            new_theta_p_Lambda (np.ndarray):
-                1d-array with theta, p, and Lambda values. Order is important.
-        Returns:
-            None
-
-        Examples:
-            >>> import numpy as np
-                from spotpython.build.kriging import Kriging
-                import logging
-                logging.basicConfig(level=logging.DEBUG)
-                # Define the number of theta and p parameters
-                num_theta = 2
-                num_p = 3
-                # Initialize the Kriging model
-                kriging_model = Kriging(
-                    name='kriging',
-                    seed=124,
-                    n_theta=num_theta,
-                    n_p=num_p,
-                    optim_p=True,
-                    noise=True
-                )
-                # Create bounds array
-                bounds_array = np.array([1, 2, 3, 4, 5, 6])
-                # Extract parameters from given bounds
-                kriging_model.extract_from_bounds(new_theta_p_Lambda=bounds_array)
-                # Assertions to check if parameters are correctly extracted
-                assert np.array_equal(kriging_model.theta,
-                    [1, 2]), f"Expected theta to be [1, 2] but got {kriging_model.theta}"
-                assert np.array_equal(kriging_model.p,
-                    [3, 4, 5]), f"Expected p to be [3, 4, 5] but got {kriging_model.p}"
-                assert kriging_model.Lambda == 6, f"Expected Lambda to be 6 but got {kriging_model.Lambda}"
-                print("All assertions passed!")
-        """
-        logger.debug("Extracting parameters from: %s", new_theta_p_Lambda)
-
-        # Validate array length
-        expected_length = self.n_theta
-        if self.optim_p:
-            expected_length += self.n_p
-        if self.noise:
-            expected_length += 1
-
-        if len(new_theta_p_Lambda) < expected_length:
-            logger.error("Input array is too short. Expected at least %d elements, got %d.",
-                         expected_length, len(new_theta_p_Lambda))
-            raise ValueError(f"Input array must have at least {expected_length} elements.")
-
-        # Extract theta
-        self.theta = new_theta_p_Lambda[:self.n_theta]
-        logger.debug("Extracted theta: %s", self.theta)
-
-        if self.optim_p:
-            # Extract p if optim_p is True
-            self.p = new_theta_p_Lambda[self.n_theta:self.n_theta + self.n_p]
-            logger.debug("Extracted p: %s", self.p)
-
-        if self.noise:
-            # Extract Lambda
-            lambda_index = self.n_theta + (self.n_p if self.optim_p else 0)
-            self.Lambda = new_theta_p_Lambda[lambda_index]
-            logger.debug("Extracted Lambda: %s", self.Lambda)
-
-    def optimize_model(self) -> Union[List[float], Tuple[float]]:
-        """
-        Optimize the model using the specified model_optimizer.
-
-        This method uses the specified model_optimizer to optimize the
-        likelihood function (`fun_likelihood`) with respect to the model parameters.
-        The optimization is performed within the bounds specified by the attribute
-        `de_bounds`.
-        The result of the optimization is returned as a list or tuple of optimized parameter values.
-
-        Args:
-            self (object): The Kriging object.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                nat_X = np.array([[1, 2], [3, 4]])
-                nat_y = np.array([1, 2])
-                n=2
-                p=2
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S._initialize_variables(nat_X, nat_y)
-                S._set_variable_types()
-                S._set_theta_values()
-                S._initialize_matrices()
-                S._set_de_bounds()
-                new_theta_p_Lambda = S.optimize_model()
-                print(new_theta_p_Lambda)
-                [0.12167915 1.49467909 1.82808259 1.69648798 0.79564346]
-
-        Returns:
-            result["x"] (Union[List[float], Tuple[float]]):
-                A list or tuple of optimized parameter values.
-        """
-        logger.debug("Entering optimize_model.")
-        if not callable(self.model_optimizer):
-            logger.error("model_optimizer is not callable.")
-            raise ValueError("model_optimizer must be a callable function or method.")
-
-        optimizer_strategies: Dict[str, Dict] = {
-            'dual_annealing': {'func': self.fun_likelihood, 'bounds': self.de_bounds},
-            'differential_evolution': {
-                'func': self.fun_likelihood,
-                'bounds': self.de_bounds,
-                'maxiter': self.model_fun_evals,
-                'seed': self.seed
-            },
-            'direct': {
-                'func': self.fun_likelihood,
-                'bounds': self.de_bounds,
-                'eps': 1e-2
-            },
-            'shgo': {'func': self.fun_likelihood, 'bounds': self.de_bounds},
-            'basinhopping': {'func': self.fun_likelihood, 'x0': np.mean(self.de_bounds, axis=1)}
-        }
-
-        optimizer_name = self.model_optimizer.__name__
-        logger.debug("Optimizer selected: %s", optimizer_name)
-
-        if optimizer_name not in optimizer_strategies:
-            logger.info("Using default options for optimizer: %s", optimizer_name)
-            optimizer_args = {'func': self.fun_likelihood, 'bounds': self.de_bounds}
-        else:
-            optimizer_args = optimizer_strategies[optimizer_name]
-
-        logger.debug("Parameters for optimization: %s", optimizer_args)
-
-        try:
-            result = self.model_optimizer(**optimizer_args)
-        except Exception as e:
-            logger.error("Optimization failed due to error: %s", str(e))
-            raise
-
-        if "x" not in result:
-            logger.error("Optimization result does not contain 'x'. Result: %s", result)
-            raise ValueError("The optimization result does not contain the expected 'x' key.")
-        logger.debug("Optimization result: %s", result)
-        optimized_parameters = list(result["x"])
-        logger.debug("Extracted optimized parameters: %s", optimized_parameters)
-        return optimized_parameters
-
     def update_log(self) -> None:
         """
         Update the log with the current values of negLnLike, theta, p, and Lambda.
@@ -956,7 +1193,7 @@ class Kriging(surrogates):
                 S._set_theta_values()
                 S._initialize_matrices()
                 S._set_de_bounds()
-                new_theta_p_Lambda = S.optimize_model()
+                new_theta_p_Lambda = S._optimize_model()
                 S.update_log()
                 print(S.log)
                 {'negLnLike': array([-1.38629436]),
@@ -1030,8 +1267,8 @@ class Kriging(surrogates):
                 print(f"S.theta: {S.theta}")
                 S._initialize_matrices()
                 S._set_de_bounds()
-                new_theta_p_Lambda = S.optimize_model()
-                S.extract_from_bounds(new_theta_p_Lambda)
+                new_theta_p_Lambda = S._optimize_model()
+                S._extract_from_bounds(new_theta_p_Lambda)
                 print(f"S.theta: {S.theta}")
                 S.build_Psi()
                 print(f"S.Psi: {S.Psi}")
@@ -1051,10 +1288,10 @@ class Kriging(surrogates):
                     -1.3862943611198906
         """
         # Extract hyperparameters
-        self.extract_from_bounds(new_theta_p_Lambda)
+        self._extract_from_bounds(new_theta_p_Lambda)
         # Check transformed theta values
-        theta_scaled = np.power(10.0, self.theta)
-        if self.__is_any__(theta_scaled, 0):
+        theta10 = np.power(10.0, self.theta)
+        if self.__is_any__(theta10, 0):
             logger.warning("Failure in fun_likelihood: 10^theta == 0. Setting negLnLike to %s", self.pen_val)
             return self.pen_val
         # Build Psi matrix and check its condition
@@ -1112,162 +1349,6 @@ class Kriging(surrogates):
         if not isinstance(x, np.ndarray):
             x = np.array([x])  # Wrap scalar x in an array
         return np.any(x == v)
-
-    def build_Psi(self) -> None:
-        """
-        Constructs a new (n x n) correlation matrix Psi to reflect new data
-        or a change in hyperparameters.
-        This method uses `theta`, `p`, and coded `X` values to construct the
-        correlation matrix as described in [Forr08a, p.57].
-
-        Attributes:
-            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
-            cnd_Psi (float): Condition number of Psi.
-            inf_Psi (bool): True if Psi is infinite, False otherwise.
-
-        Raises:
-            LinAlgError: If building Psi fails.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                nat_X = np.array([[0], [1]])
-                nat_y = np.array([0, 1])
-                n=1
-                p=1
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S._initialize_variables(nat_X, nat_y)
-                S._set_variable_types()
-                print(S.nat_X)
-                print(S.nat_y)
-                S._set_theta_values()
-                print(f"S.theta: {S.theta}")
-                S._initialize_matrices()
-                S._set_de_bounds()
-                new_theta_p_Lambda = S.optimize_model()
-                S.extract_from_bounds(new_theta_p_Lambda)
-                print(f"S.theta: {S.theta}")
-                S.build_Psi()
-                print(f"S.Psi: {S.Psi}")
-                    [[0]
-                    [1]]
-                    [0 1]
-                    S.theta: [0.]
-                    S.theta: [1.60036366]
-                    S.Psi: [[1.00000001e+00 4.96525625e-18]
-                    [4.96525625e-18 1.00000001e+00]]
-        """
-        try:
-            n = self.n
-            k = self.k
-            theta = np.power(10.0, self.theta)
-
-            # Ensure theta has the correct length
-            if self.n_theta == 1:
-                theta = theta * np.ones(k)
-
-            # Initialize the Psi matrix
-            self.Psi = np.zeros((n, n), dtype=np.float64)
-
-            # Calculate the distance matrix using ordered variables
-            if self.ordered_mask.any():
-                X_ordered = self.nat_X[:, self.ordered_mask]
-                D_ordered = squareform(
-                    pdist(X_ordered, metric='sqeuclidean', w=theta[self.ordered_mask])
-                )
-                self.Psi += D_ordered
-
-            # Add the contribution of factor variables to the distance matrix
-            if self.factor_mask.any():
-                X_factor = self.nat_X[:, self.factor_mask]
-                D_factor = squareform(
-                    pdist(X_factor, metric=self.metric_factorial, w=theta[self.factor_mask])
-                )
-                self.Psi += D_factor
-
-            # Calculate correlation from distance
-            self.Psi = np.exp(-self.Psi)
-
-            # Adjust diagonal elements for noise or minimum epsilon
-            diag_indices = np.diag_indices_from(self.Psi)
-            if self.noise:
-                self.Psi[diag_indices] += self.Lambda
-                logger.debug("Noise level Lambda applied to diagonal: %s", self.Lambda)
-            else:
-                self.Psi[diag_indices] += self.eps
-
-            # Check for infinite values
-            self.inf_Psi = np.isinf(self.Psi).any()
-
-            # Calculate condition number
-            self.cnd_Psi = cond(self.Psi)
-            logger.debug("Condition number of Psi: %f", self.cnd_Psi)
-
-        except LinAlgError as err:
-            logger.error("Building Psi failed. Error: %s, Type: %s", err, type(err))
-            raise
-
-    def build_U(self, scipy: bool = True) -> None:
-        """
-        Performs Cholesky factorization of Psi as U as described in [Forr08a, p.57].
-        This method uses either `scipy_cholesky` or numpy's `cholesky` to perform the Cholesky factorization of Psi.
-
-        Args:
-            self (object):
-                The Kriging object.
-            scipy (bool):
-                If True, use `scipy_cholesky`.
-                If False, use numpy's `cholesky`.
-                Defaults to True.
-
-        Returns:
-            None
-
-        Raises:
-            LinAlgError:
-                If Cholesky factorization fails for Psi.
-
-        Attributes:
-            U (np.matrix): Kriging U matrix, Cholesky decomposition. Shape (n,n).
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                nat_X = np.array([[0], [1]])
-                nat_y = np.array([0, 1])
-                n=1
-                p=1
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S._initialize_variables(nat_X, nat_y)
-                S._set_variable_types()
-                print(S.nat_X)
-                print(S.nat_y)
-                S._set_theta_values()
-                print(f"S.theta: {S.theta}")
-                S._initialize_matrices()
-                S._set_de_bounds()
-                new_theta_p_Lambda = S.optimize_model()
-                S.extract_from_bounds(new_theta_p_Lambda)
-                print(f"S.theta: {S.theta}")
-                S.build_Psi()
-                print(f"S.Psi: {S.Psi}")
-                S.build_U()
-                print(f"S.U:{S.U}")
-                    [[0]
-                    [1]]
-                    [0 1]
-                    S.theta: [0.]
-                    S.theta: [1.60036366]
-                    S.Psi: [[1.00000001e+00 4.96525625e-18]
-                    [4.96525625e-18 1.00000001e+00]]
-                    S.U:[[1.00000001e+00 4.96525622e-18]
-                    [0.00000000e+00 1.00000001e+00]]
-        """
-        try:
-            self.U = scipy_cholesky(self.Psi, lower=True) if scipy else cholesky(self.Psi)
-            self.U = self.U.T
-        except LinAlgError as err:
-            print(f"build_U() Cholesky failed for Psi:\n {self.Psi}. {err=}, {type(err)=}")
 
     def likelihood(self) -> None:
         """
@@ -1482,9 +1563,9 @@ class Kriging(surrogates):
         logger.debug("Building psi vector for point: %s", cod_x)
         try:
             self.psi = np.zeros((self.n, 1))
-            theta_scaled = np.power(10.0, self.theta)
+            theta10 = np.power(10.0, self.theta)
             if self.n_theta == 1:
-                theta_scaled = theta_scaled * np.ones(self.k)
+                theta10 = theta10 * np.ones(self.k)
 
             D = np.zeros(self.n)
 
@@ -1495,7 +1576,7 @@ class Kriging(surrogates):
                 D += cdist(x_ordered.reshape(1, -1),
                            X_ordered,
                            metric='sqeuclidean',
-                           w=theta_scaled[self.ordered_mask]).ravel()
+                           w=theta10[self.ordered_mask]).ravel()
             logger.debug("Distance D after ordered mask: %s", D)
             # Compute factor distance contributions
             if self.factor_mask.any():
@@ -1504,7 +1585,7 @@ class Kriging(surrogates):
                 D += cdist(x_factor.reshape(1, -1),
                            X_factor,
                            metric=self.metric_factorial,
-                           w=theta_scaled[self.factor_mask]).ravel()
+                           w=theta10[self.factor_mask]).ravel()
             logger.debug("Distance D after factor mask: %s", D)
 
             self.psi = np.exp(-D).reshape(-1, 1)

@@ -101,7 +101,7 @@ def test_build_Psi():
     # Finally, set new theta and p values and update the surrogate again
     # for new_theta_p_Lambda in de_results["x"]:
     new_theta_p_Lambda = result["x"]
-    S.extract_from_bounds(new_theta_p_Lambda)
+    S._extract_from_bounds(new_theta_p_Lambda)
     S.build_Psi()
     assert S.Psi.shape[0] == ni
     assert S.Psi.shape[1] == ni

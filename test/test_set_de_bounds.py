@@ -21,7 +21,7 @@ def test_set_de_bounds():
     # assume 1 theta, fixed p, no noise:
 
     new_theta_p_Lambda = np.array([-2.11625348])
-    S.extract_from_bounds(new_theta_p_Lambda)
+    S._extract_from_bounds(new_theta_p_Lambda)
 
     res_theta = np.array([-2.11625348])
     assert np.array_equal(S.theta, res_theta)
@@ -47,7 +47,7 @@ def test_set_de_bounds():
     # assume 1 theta, fixed p, noise:
 
     new_theta_p_Lambda = np.array([-2.11625348, 0.1234])
-    S.extract_from_bounds(new_theta_p_Lambda)
+    S._extract_from_bounds(new_theta_p_Lambda)
 
     res_theta = np.array([-2.11625348])
     assert np.array_equal(S.theta, res_theta)

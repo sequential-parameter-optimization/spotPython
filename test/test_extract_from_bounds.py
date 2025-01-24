@@ -1,6 +1,6 @@
 def test_extract_from_bounds():
     """
-    Test extract_from_bounds
+    Test _extract_from_bounds
     """
     from spotpython.build import Kriging
     import numpy as np
@@ -219,7 +219,7 @@ def test_extract_from_bounds():
     # Finally, set new theta and p values and update the surrogate again
     # for new_theta_p_Lambda in de_results["x"]:
     new_theta_p_Lambda = result["x"]
-    S.extract_from_bounds(new_theta_p_Lambda)
+    S._extract_from_bounds(new_theta_p_Lambda)
     assert S.theta.shape[0] == 2
     assert S.Lambda > 0
     assert S.p == np.array([2.0])

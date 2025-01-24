@@ -70,7 +70,7 @@ def test_extract_from_bounds():
     n = 2
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-    S.extract_from_bounds(np.array([1, 2, 3, 4]))
+    S._extract_from_bounds(np.array([1, 2, 3, 4]))
     assert len(S.theta) == n
 
 
@@ -85,7 +85,7 @@ def test_optimize_model():
     S._set_theta_values()
     S._initialize_matrices()
     S._set_de_bounds()
-    new_theta_p_Lambda = S.optimize_model()
+    new_theta_p_Lambda = S._optimize_model()
     assert len(new_theta_p_Lambda) == n + p + 1
     # no noise, so Lambda is not considered
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
@@ -94,7 +94,7 @@ def test_optimize_model():
     S._set_theta_values()
     S._initialize_matrices()
     S._set_de_bounds()
-    new_theta_p_Lambda = S.optimize_model()
+    new_theta_p_Lambda = S._optimize_model()
     assert len(new_theta_p_Lambda) == n + p
 
 
@@ -109,7 +109,7 @@ def test_update_log():
     S._set_theta_values()
     S._initialize_matrices()
     S._set_de_bounds()
-    _ = S.optimize_model()
+    _ = S._optimize_model()
     S.update_log()
     assert len(S.log["negLnLike"]) == 1
     assert len(S.log["theta"]) == n
@@ -237,8 +237,8 @@ def test_fun_likelihood():
     S._set_theta_values()
     S._initialize_matrices()
     S._set_de_bounds()
-    new_theta_p_Lambda = S.optimize_model()
-    S.extract_from_bounds(new_theta_p_Lambda)
+    new_theta_p_Lambda = S._optimize_model()
+    S._extract_from_bounds(new_theta_p_Lambda)
     S.build_Psi()
     S.build_U()
     assert S.negLnLike < 0
