@@ -400,15 +400,14 @@ class Spot:
         if self.surrogate is None:
             # Call kriging with surrogate_control parameters:
             self.surrogate = Kriging(
-                name="kriging",
                 noise=self.surrogate_control["noise"],
+                var_type=self.surrogate_control["var_type"],
+                name="kriging",
+                seed=self.surrogate_control["seed"],
                 model_optimizer=self.surrogate_control["model_optimizer"],
                 model_fun_evals=self.surrogate_control["model_fun_evals"],
-                seed=self.surrogate_control["seed"],
-                log_level=self.log_level,
                 min_theta=self.surrogate_control["min_theta"],
                 max_theta=self.surrogate_control["max_theta"],
-                metric_factorial=self.surrogate_control["metric_factorial"],
                 n_theta=self.surrogate_control["n_theta"],
                 theta_init_zero=self.surrogate_control["theta_init_zero"],
                 p_val=self.surrogate_control["p_val"],
@@ -416,9 +415,10 @@ class Spot:
                 optim_p=self.surrogate_control["optim_p"],
                 min_Lambda=self.surrogate_control["min_Lambda"],
                 max_Lambda=self.surrogate_control["max_Lambda"],
-                var_type=self.surrogate_control["var_type"],
+                log_level=self.log_level,
                 spot_writer=self.spot_writer,
                 counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
+                metric_factorial=self.surrogate_control["metric_factorial"],
             )
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
@@ -1762,34 +1762,30 @@ class Spot:
 
         Examples:
             >>> import numpy as np
-                from spotpython.spot import spot
-                from spotpython.fun.objectivefunctions import Analytical
-                from spotpython.utils.init import (
-                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
-                    )
+                from spotpython.spot import Spot
+                from spotpython.fun import Analytical
+                from spotpython.utils.init import fun_control_init
                 nn = 3
-                fun_sphere = analytical().fun_sphere
+                fun_sphere = Analytical().fun_sphere
                 fun_control = fun_control_init(
                         lower = np.array([-1, -1]),
                         upper = np.array([1, 1]),
                         n_points=nn,
                         )
-                spot_1 = spot.Spot(
+                S = Spot(
                     fun=fun_sphere,
                     fun_control=fun_control,
                     )
-                # (S-2) Initial Design:
-                spot_1.X = spot_1.design.scipy_lhd(
-                    spot_1.design_control["init_size"], lower=spot_1.lower, upper=spot_1.upper
+                S.X = S.design.scipy_lhd(
+                    S.design_control["init_size"], lower=S.lower, upper=S.upper
                 )
-                print(f"spot_1.X: {spot_1.X}")
-                # (S-3): Eval initial design:
-                spot_1.y = spot_1.fun(spot_1.X)
-                print(f"spot_1.y: {spot_1.y}")
-                spot_1.fit_surrogate()
-                X0 = spot_1.suggest_new_X()
+                print(f"S.X: {S.X}")
+                S.y = S.fun(S.X)
+                print(f"S.y: {S.y}")
+                S.fit_surrogate()
+                X0 = S.suggest_new_X()
                 print(f"X0: {X0}")
-                assert X0.size == spot_1.n_points * spot_1.k
+                assert X0.size == S.n_points * S.k
                 assert X0.ndim == 2
                 assert X0.shape[0] == nn
                 assert X0.shape[1] == 2

@@ -3,7 +3,7 @@ def test_set_de_bounds():
     Test set_de_bounds
     """
     import numpy as np
-    from spotpython.build.kriging import Kriging
+    from spotpython.build import Kriging
 
     X_train = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
     y_train = np.array([1.0, 2.0, 3.0])
@@ -59,7 +59,7 @@ def test_set_de_bounds():
     assert S.Lambda == res_Lambda
 
     # 2nd Test Series
-    from spotpython.build.kriging import Kriging
+    from spotpython.build import Kriging
     import numpy as np
     import copy
     from numpy import linspace
@@ -86,7 +86,7 @@ def test_set_de_bounds():
     S.num_mask = array(list(map(lambda x: x == "num", S.var_type)))
     S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
 
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.theta = zeros(S.n_theta)
     # TODO: Currently not used:
     S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)

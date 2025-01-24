@@ -110,7 +110,7 @@ class Kriging(surrogates):
                 "chebyshev", "canberra", "braycurtis", "mahalanobis", "matching".
 
         Examples:
-            >>> from spotpython.build.kriging import Kriging
+            >>> from spotpython.build import Kriging
                 import numpy as np
                 import matplotlib.pyplot as plt
                 from numpy import linspace, arange
@@ -145,6 +145,7 @@ class Kriging(surrogates):
 
         """
         super().__init__(name, seed, log_level)
+        self._set_internal_attributes()
 
         self.noise = noise
         self.var_type = var_type
@@ -154,13 +155,8 @@ class Kriging(surrogates):
         self.spot_writer = spot_writer
         self.counter = counter
         self.metric_factorial = metric_factorial
-
-        self.sigma = 0
-        self.eps = sqrt(spacing(1))
         self.min_theta = min_theta
         self.max_theta = max_theta
-        self.min_p = 1
-        self.max_p = 2
         self.min_Lambda = min_Lambda
         self.max_Lambda = max_Lambda
         self.n_theta = n_theta
@@ -168,10 +164,6 @@ class Kriging(surrogates):
         self.n_p = n_p
         self.optim_p = optim_p
         self.theta_init_zero = theta_init_zero
-        # Psi matrix condition:
-        self.cnd_Psi = 0
-        self.inf_Psi = False
-
         self.model_optimizer = model_optimizer
         if self.model_optimizer is None:
             self.model_optimizer = differential_evolution
@@ -194,6 +186,285 @@ class Kriging(surrogates):
         # Logger
         logger.setLevel(self.log_level)
         logger.info(f"Starting the logger at level {self.log_level} for module {__name__}:")
+
+    def _set_internal_attributes(self) -> None:
+        """ Set attributes that are not using external arguments that are passed
+            to the class constructor.
+        """
+        self.sigma = 0
+        self.eps = sqrt(spacing(1))
+        self.min_p = 1
+        self.max_p = 2
+        # Psi matrix condition:
+        self.cnd_Psi = 0
+        self.inf_Psi = False
+
+    def _initialize_variables(self, nat_X: np.ndarray, nat_y: np.ndarray) -> None:
+        """
+        Initialize variables for the class instance.
+        This method takes in the independent and dependent variable data as input
+        and initializes the class instance variables.
+        It creates deep copies of the input data and stores them in the
+        instance variables `nat_X` and `nat_y`.
+        It also calculates the number of observations `n` and
+        the number of independent variables `k` from the shape of `nat_X`.
+        Finally, it creates empty arrays with the same shape as `nat_X`
+        and `nat_y` and stores them in the instance variables `cod_X` and `cod_y`.
+
+        Args:
+            self (object): The Kriging object.
+            nat_X (np.ndarray): The independent variable data.
+            nat_y (np.ndarray): The dependent variable data.
+
+        Returns:
+            None
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4], [1,2]])
+                nat_y = np.array([1, 2, 11])
+                S = Kriging()
+                S._initialize_variables(nat_X, nat_y)
+                print(f"S.nat_X: {S.nat_X}")
+                print(f"S.nat_y: {S.nat_y}")
+                print(f"S.aggregated_mean_y: {S.aggregated_mean_y}")
+                print(f"S.min_X: {S.min_X}")
+                print(f"S.max_X: {S.max_X}")
+                print(f"S.n: {S.n}")
+                print(f"S.k: {S.k}")
+                   S.nat_X: [[1 2]
+                    [3 4]
+                    [1 2]]
+                    S.nat_y: [ 1  2 11]
+                    S.aggregated_mean_y: [6. 2.]
+                    S.min_X: [1 2]
+                    S.max_X: [3 4]
+                    S.n: 3
+                    S.k: 2
+        """
+        # Validate input dimensions
+        if nat_X.ndim != 2 or nat_y.ndim != 1:
+            raise ValueError("nat_X must be a 2D array and nat_y must be a 1D array.")
+        if nat_X.shape[0] != nat_y.shape[0]:
+            raise ValueError("The number of samples in nat_X and nat_y must be equal.")
+
+        # Initialize instance variables
+        self.nat_X = copy.deepcopy(nat_X)
+        self.nat_y = copy.deepcopy(nat_y)
+        self.n, self.k = self.nat_X.shape
+
+        # Calculate and store min and max of X
+        self.min_X = np.min(self.nat_X, axis=0)
+        self.max_X = np.max(self.nat_X, axis=0)
+
+        # Calculate the aggregated mean of y
+        _, aggregated_mean_y, _ = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
+        self.aggregated_mean_y = np.copy(aggregated_mean_y)
+
+        # Logging the initialized variables
+        logger.debug("In _initialize_variables(): self.nat_X: %s", self.nat_X)
+        logger.debug("In _initialize_variables(): self.nat_y: %s", self.nat_y)
+        logger.debug("In _initialize_variables(): self.aggregated_mean_y: %s", self.aggregated_mean_y)
+        logger.debug("In _initialize_variables(): self.min_X: %s", self.min_X)
+        logger.debug("In _initialize_variables(): self.max_X: %s", self.max_X)
+        logger.debug("In _initialize_variables(): self.n: %d", self.n)
+        logger.debug("In _initialize_variables(): self.k: %d", self.k)
+
+    def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
+        """
+        Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
+        The function computes the following internal values:
+        1. `theta`, `p`, and `Lambda` values via optimization of the function `fun_likelihood()`.
+        2. Correlation matrix `Psi` via `buildPsi()`.
+        3. U matrix via `buildU()`.
+
+        Args:
+            self (object): The Kriging object.
+            nat_X (np.ndarray): Sample points.
+            nat_y (np.ndarray): Function values.
+
+        Returns:
+            object: Fitted estimator.
+
+        Attributes:
+            theta (np.ndarray): Kriging theta values. Shape (k,).
+            p (np.ndarray): Kriging p values. Shape (k,).
+            LnDetPsi (np.float64): Determinant Psi matrix.
+            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
+            psi (np.ndarray): psi vector. Shape (n,).
+            one (np.ndarray): vector of ones. Shape (n,).
+            mu (np.float64): Kriging expected mean value mu.
+            U (np.matrix): Kriging U matrix, Cholesky decomposition. Shape (n,n).
+            SigmaSqr (np.float64): Sigma squared value.
+            Lambda (float): lambda noise value.
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 0], [1, 0]])
+                nat_y = np.array([1, 2])
+                S = Kriging()
+                S.fit(nat_X, nat_y)
+                print(S.Psi)
+                [[1.00000001 1.        ]
+                [1.         1.00000001]]
+
+        """
+        logger.debug("In fit(): nat_X: %s", nat_X)
+        logger.debug("In fit(): nat_y: %s", nat_y)
+        self._initialize_variables(nat_X, nat_y)
+        self.set_variable_types()
+        self.set_theta_values()
+        self.initialize_matrices()
+        # build_Psi() and build_U() are called in fun_likelihood
+        self.set_de_bounds()
+        # Finally, set new theta and p values and update the surrogate again
+        # for new_theta_p_Lambda in de_results["x"]:
+        new_theta_p_Lambda = self.optimize_model()
+        self.extract_from_bounds(new_theta_p_Lambda)
+        self.build_Psi()
+        self.build_U()
+        # TODO: check if the following line is necessary!
+        self.likelihood()
+        self.update_log()
+
+    def predict(self, nat_X: ndarray, return_val: str = "y") -> Union[float, Tuple[float, float]]:
+        """
+        This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.
+
+        Args:
+            self (object): The Kriging object.
+            nat_X (ndarray): Design variable to evaluate in natural units.
+            return_val (str): Specifies which prediction values to return. It can be "y", "s", "ei", or "all".
+
+        Returns:
+            Union[float, Tuple[float, float, float]]: Depending on `return_val`, returns the predicted value,
+            predicted error, expected improvement, or all.
+
+        Raises:
+            TypeError: If `nat_X` is not an ndarray or doesn't match expected dimensions.
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                from numpy import linspace, arange
+                rng = np.random.RandomState(1)
+                X = linspace(start=0, stop=10, num=1_0).reshape(-1, 1)
+                y = np.squeeze(X * np.sin(X))
+                training_indices = rng.choice(arange(y.size), size=6, replace=False)
+                X_train, y_train = X[training_indices], y[training_indices]
+                S = Kriging(name='kriging', seed=124)
+                S.fit(X_train, y_train)
+                mean_prediction, std_prediction, s_ei = S.predict(X, return_val="all")
+                print(f"mean_prediction: {mean_prediction}")
+                print(f"std_prediction: {std_prediction}")
+                print(f"s_ei: {s_ei}")
+        """
+        if not isinstance(nat_X, ndarray):
+            raise TypeError(f"Expected an ndarray, got {type(nat_X)} instead.")
+
+        try:
+            X = nat_X.reshape(-1, self.nat_X.shape[1])
+            X = repair_non_numeric(X, self.var_type)
+        except Exception as e:
+            raise TypeError("Input to predict was not convertible to the size of X") from e
+
+        y, s, ei = self.predict_coded_batch(X)
+
+        if return_val == "y":
+            return y
+        elif return_val == "s":
+            return s
+        elif return_val == "ei":
+            return -ei
+        elif return_val == "all":
+            return y, s, -ei
+        else:
+            raise ValueError(f"Invalid return_val: {return_val}. Supported values are 'y', 's', 'ei', 'all'.")
+
+    def predict_coded(self, cod_x: np.ndarray) -> Tuple[float, float, float]:
+        """
+        Kriging prediction of one point in coded units as described in (2.20) in [Forr08a].
+        The error is returned as well. The method is used in `predict`.
+
+        Args:
+            self (object): The Kriging object.
+            cod_x (np.ndarray): Point in coded units to make prediction at.
+
+        Returns:
+            Tuple[float, float, float]: Predicted value, predicted error, and expected improvement.
+
+        Note:
+            Uses attributes such as `self.mu` and `self.SigmaSqr` that are expected
+            to be calculated by `likelihood`.
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                from numpy import linspace, arange, empty
+                rng = np.random.RandomState(1)
+                X = linspace(start=0, stop=10, num=10).reshape(-1, 1)
+                y = np.squeeze(X * np.sin(X))
+                training_indices = rng.choice(arange(y.size), size=6, replace=False)
+                X_train, y_train = X[training_indices], y[training_indices]
+                S = Kriging(name='kriging', seed=124)
+                S.fit(X_train, y_train)
+                n = X.shape[0]
+                y = empty(n, dtype=float)
+                s = empty(n, dtype=float)
+                ei = empty(n, dtype=float)
+                for i in range(n):
+                    y_coded, s_coded, ei_coded = S.predict_coded(X[i, :])
+                    y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()
+                    s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()
+                    ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()
+                print(f"y: {y}")
+                print(f"s: {s}")
+                print(f"ei: {-1.0*ei}")
+        """
+        self.build_psi_vec(cod_x)
+        mu_adj = self.mu
+        psi = self.psi
+
+        # Calculate the prediction
+        U_T_inv = solve(self.U.T, self.nat_y - self.one.dot(mu_adj))
+        f = mu_adj + psi.T.dot(solve(self.U, U_T_inv))[0]
+
+        Lambda = self.Lambda if self.noise else 0.0
+
+        # Calculate the estimated error
+        SSqr = self.SigmaSqr * (1 + Lambda - psi.T.dot(solve(self.U, solve(self.U.T, psi))))
+        SSqr = power(abs(SSqr), 0.5)[0]
+
+        # Calculate expected improvement
+        EI = self.exp_imp(y0=f, s0=SSqr)
+
+        return f, SSqr, EI
+
+    def predict_coded_batch(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Vectorized prediction for batch input using coded units.
+
+        Args:
+            X (np.ndarray): Input array of coded points.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                Arrays of predicted values, predicted errors, and expected improvements.
+        """
+        n = X.shape[0]
+        y = np.empty(n, dtype=float)
+        s = np.empty(n, dtype=float)
+        ei = np.empty(n, dtype=float)
+
+        for i in range(n):
+            y_coded, s_coded, ei_coded = self.predict_coded(X[i, :])
+            y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()
+            s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()
+            ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()
+
+        return y, s, ei
 
     def exp_imp(self, y0: float, s0: float) -> float:
         """
@@ -372,7 +643,7 @@ class Kriging(surrogates):
                 n=2
                 p=2
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
                 S.initialize_matrices()
@@ -458,7 +729,7 @@ class Kriging(surrogates):
                 n=2
                 p=2
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
                 S.initialize_matrices()
@@ -497,126 +768,6 @@ class Kriging(surrogates):
                                              {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
             self.spot_writer.flush()
 
-    def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
-        """
-        Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
-        The function computes the following internal values:
-        1. `theta`, `p`, and `Lambda` values via optimization of the function `fun_likelihood()`.
-        2. Correlation matrix `Psi` via `buildPsi()`.
-        3. U matrix via `buildU()`.
-
-        Args:
-            self (object): The Kriging object.
-            nat_X (np.ndarray): Sample points.
-            nat_y (np.ndarray): Function values.
-
-        Returns:
-            object: Fitted estimator.
-
-        Attributes:
-            theta (np.ndarray): Kriging theta values. Shape (k,).
-            p (np.ndarray): Kriging p values. Shape (k,).
-            LnDetPsi (np.float64): Determinant Psi matrix.
-            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
-            psi (np.ndarray): psi vector. Shape (n,).
-            one (np.ndarray): vector of ones. Shape (n,).
-            mu (np.float64): Kriging expected mean value mu.
-            U (np.matrix): Kriging U matrix, Cholesky decomposition. Shape (n,n).
-            SigmaSqr (np.float64): Sigma squared value.
-            Lambda (float): lambda noise value.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                nat_X = np.array([[1, 0], [1, 0]])
-                nat_y = np.array([1, 2])
-                S = Kriging()
-                S.fit(nat_X, nat_y)
-                print(S.Psi)
-                [[1.00000001 1.        ]
-                [1.         1.00000001]]
-
-        """
-        logger.debug("In fit(): nat_X: %s", nat_X)
-        logger.debug("In fit(): nat_y: %s", nat_y)
-        self.initialize_variables(nat_X, nat_y)
-        self.set_variable_types()
-        self.set_theta_values()
-        self.initialize_matrices()
-        # build_Psi() and build_U() are called in fun_likelihood
-        self.set_de_bounds()
-        # Finally, set new theta and p values and update the surrogate again
-        # for new_theta_p_Lambda in de_results["x"]:
-        new_theta_p_Lambda = self.optimize_model()
-        self.extract_from_bounds(new_theta_p_Lambda)
-        self.build_Psi()
-        self.build_U()
-        # TODO: check if the following line is necessary!
-        self.likelihood()
-        self.update_log()
-
-    def initialize_variables(self, nat_X: np.ndarray, nat_y: np.ndarray) -> None:
-        """
-        Initialize variables for the class instance.
-        This method takes in the independent and dependent variable data as input
-        and initializes the class instance variables.
-        It creates deep copies of the input data and stores them in the
-        instance variables `nat_X` and `nat_y`.
-        It also calculates the number of observations `n` and
-        the number of independent variables `k` from the shape of `nat_X`.
-        Finally, it creates empty arrays with the same shape as `nat_X`
-        and `nat_y` and stores them in the instance variables `cod_X` and `cod_y`.
-
-        Args:
-            self (object): The Kriging object.
-            nat_X (np.ndarray): The independent variable data.
-            nat_y (np.ndarray): The dependent variable data.
-
-        Returns:
-            None
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                nat_X = np.array([[1, 2], [3, 4]])
-                nat_y = np.array([1, 2])
-                S = Kriging()
-                S.initialize_variables(nat_X, nat_y)
-                print(f"S.nat_X: {S.nat_X}")
-                print(f"S.nat_y: {S.nat_y}")
-                S.nat_X: [[1 2]
-                          [3 4]]
-                S.nat_y: [1 2]
-
-        """
-        # Validate input dimensions
-        if nat_X.ndim != 2 or nat_y.ndim != 1:
-            raise ValueError("nat_X must be a 2D array and nat_y must be a 1D array.")
-        if nat_X.shape[0] != nat_y.shape[0]:
-            raise ValueError("The number of samples in nat_X and nat_y must be equal.")
-
-        # Initialize instance variables
-        self.nat_X = copy.deepcopy(nat_X)
-        self.nat_y = copy.deepcopy(nat_y)
-        self.n, self.k = self.nat_X.shape
-
-        # Calculate and store min and max of X
-        self.min_X = np.min(self.nat_X, axis=0)
-        self.max_X = np.max(self.nat_X, axis=0)
-
-        # Calculate the aggregated mean of y
-        _, aggregated_mean_y, _ = aggregate_mean_var(X=self.nat_X, y=self.nat_y)
-        self.aggregated_mean_y = np.copy(aggregated_mean_y)
-
-        # Logging the initialized variables
-        logger.debug("In initialize_variables(): self.nat_X: %s", self.nat_X)
-        logger.debug("In initialize_variables(): self.nat_y: %s", self.nat_y)
-        logger.debug("In initialize_variables(): self.aggregated_mean_y: %s", self.aggregated_mean_y)
-        logger.debug("In initialize_variables(): self.min_X: %s", self.min_X)
-        logger.debug("In initialize_variables(): self.max_X: %s", self.max_X)
-        logger.debug("In initialize_variables(): self.n: %d", self.n)
-        logger.debug("In initialize_variables(): self.k: %d", self.k)
-
     def set_variable_types(self) -> None:
         """
         Set the variable types for the class instance.
@@ -637,7 +788,7 @@ class Kriging(surrogates):
                 n=2
                 p=2
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 assert S.var_type == ['num', 'num']
                 assert S.var_type == ['num', 'num']
@@ -694,7 +845,7 @@ class Kriging(surrogates):
                 n=2
                 p=2
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
                 assert S.theta.all() == array([0., 0.]).all()
@@ -743,7 +894,7 @@ class Kriging(surrogates):
                 n=3
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
                 S.initialize_matrices()
@@ -827,7 +978,7 @@ class Kriging(surrogates):
                 n=1
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 print(S.nat_X)
                 print(S.nat_y)
@@ -903,7 +1054,7 @@ class Kriging(surrogates):
                 n=1
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
                 print(f"S.theta: {S.theta}")
@@ -941,7 +1092,7 @@ class Kriging(surrogates):
                 n=1
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 print(S.nat_X)
                 print(S.nat_y)
@@ -1043,7 +1194,7 @@ class Kriging(surrogates):
                 n=1
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 print(S.nat_X)
                 print(S.nat_y)
@@ -1100,7 +1251,7 @@ class Kriging(surrogates):
                 n=2
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
-                S.initialize_variables(nat_X, nat_y)
+                S._initialize_variables(nat_X, nat_y)
                 S.set_variable_types()
                 S.set_theta_values()
                 S.initialize_matrices()
@@ -1244,143 +1395,6 @@ class Kriging(surrogates):
             ax.plot_surface(X, Y, Ze, rstride=3, cstride=3, alpha=0.9, cmap="jet")
             #
             pylab.show()
-
-    def predict(self, nat_X: ndarray, return_val: str = "y") -> Union[float, Tuple[float, float]]:
-        """
-        This function returns the prediction (in natural units) of the surrogate at the natural coordinates of X.
-
-        Args:
-            self (object): The Kriging object.
-            nat_X (ndarray): Design variable to evaluate in natural units.
-            return_val (str): Specifies which prediction values to return. It can be "y", "s", "ei", or "all".
-
-        Returns:
-            Union[float, Tuple[float, float, float]]: Depending on `return_val`, returns the predicted value,
-            predicted error, expected improvement, or all.
-
-        Raises:
-            TypeError: If `nat_X` is not an ndarray or doesn't match expected dimensions.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                from numpy import linspace, arange
-                rng = np.random.RandomState(1)
-                X = linspace(start=0, stop=10, num=1_0).reshape(-1, 1)
-                y = np.squeeze(X * np.sin(X))
-                training_indices = rng.choice(arange(y.size), size=6, replace=False)
-                X_train, y_train = X[training_indices], y[training_indices]
-                S = Kriging(name='kriging', seed=124)
-                S.fit(X_train, y_train)
-                mean_prediction, std_prediction, s_ei = S.predict(X, return_val="all")
-                print(f"mean_prediction: {mean_prediction}")
-                print(f"std_prediction: {std_prediction}")
-                print(f"s_ei: {s_ei}")
-        """
-        if not isinstance(nat_X, ndarray):
-            raise TypeError(f"Expected an ndarray, got {type(nat_X)} instead.")
-
-        try:
-            X = nat_X.reshape(-1, self.nat_X.shape[1])
-            X = repair_non_numeric(X, self.var_type)
-        except Exception as e:
-            raise TypeError("Input to predict was not convertible to the size of X") from e
-
-        y, s, ei = self.predict_coded_batch(X)
-
-        if return_val == "y":
-            return y
-        elif return_val == "s":
-            return s
-        elif return_val == "ei":
-            return -ei
-        elif return_val == "all":
-            return y, s, -ei
-        else:
-            raise ValueError(f"Invalid return_val: {return_val}. Supported values are 'y', 's', 'ei', 'all'.")
-
-    def predict_coded(self, cod_x: np.ndarray) -> Tuple[float, float, float]:
-        """
-        Kriging prediction of one point in coded units as described in (2.20) in [Forr08a].
-        The error is returned as well. The method is used in `predict`.
-
-        Args:
-            self (object): The Kriging object.
-            cod_x (np.ndarray): Point in coded units to make prediction at.
-
-        Returns:
-            Tuple[float, float, float]: Predicted value, predicted error, and expected improvement.
-
-        Note:
-            Uses attributes such as `self.mu` and `self.SigmaSqr` that are expected
-            to be calculated by `likelihood`.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                from numpy import linspace, arange, empty
-                rng = np.random.RandomState(1)
-                X = linspace(start=0, stop=10, num=10).reshape(-1, 1)
-                y = np.squeeze(X * np.sin(X))
-                training_indices = rng.choice(arange(y.size), size=6, replace=False)
-                X_train, y_train = X[training_indices], y[training_indices]
-                S = Kriging(name='kriging', seed=124)
-                S.fit(X_train, y_train)
-                n = X.shape[0]
-                y = empty(n, dtype=float)
-                s = empty(n, dtype=float)
-                ei = empty(n, dtype=float)
-                for i in range(n):
-                    y_coded, s_coded, ei_coded = S.predict_coded(X[i, :])
-                    y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()
-                    s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()
-                    ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()
-                print(f"y: {y}")
-                print(f"s: {s}")
-                print(f"ei: {-1.0*ei}")
-        """
-        self.build_psi_vec(cod_x)
-        mu_adj = self.mu
-        psi = self.psi
-
-        # Calculate the prediction
-        U_T_inv = solve(self.U.T, self.nat_y - self.one.dot(mu_adj))
-        f = mu_adj + psi.T.dot(solve(self.U, U_T_inv))[0]
-
-        Lambda = self.Lambda if self.noise else 0.0
-
-        # Calculate the estimated error
-        SSqr = self.SigmaSqr * (1 + Lambda - psi.T.dot(solve(self.U, solve(self.U.T, psi))))
-        SSqr = power(abs(SSqr), 0.5)[0]
-
-        # Calculate expected improvement
-        EI = self.exp_imp(y0=f, s0=SSqr)
-
-        return f, SSqr, EI
-
-    def predict_coded_batch(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """
-        Vectorized prediction for batch input using coded units.
-
-        Args:
-            X (np.ndarray): Input array of coded points.
-
-        Returns:
-            Tuple[np.ndarray, np.ndarray, np.ndarray]:
-                Arrays of predicted values, predicted errors, and expected improvements.
-        """
-        n = X.shape[0]
-        y = np.empty(n, dtype=float)
-        s = np.empty(n, dtype=float)
-        ei = np.empty(n, dtype=float)
-
-        for i in range(n):
-            y_coded, s_coded, ei_coded = self.predict_coded(X[i, :])
-            y[i] = y_coded if np.isscalar(y_coded) else y_coded.item()
-            s[i] = s_coded if np.isscalar(s_coded) else s_coded.item()
-            ei[i] = ei_coded if np.isscalar(ei_coded) else ei_coded.item()
-
-        return y, s, ei
 
     def build_psi_vec(self, cod_x: np.ndarray) -> None:
         """

@@ -1,4 +1,4 @@
-from spotpython.build.kriging import Kriging
+from spotpython.build import Kriging
 import numpy as np
 from math import erf
 from numpy import log, var
@@ -80,7 +80,7 @@ def test_optimize_model():
     n = 2
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -89,7 +89,7 @@ def test_optimize_model():
     assert len(new_theta_p_Lambda) == n + p + 1
     # no noise, so Lambda is not considered
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -104,7 +104,7 @@ def test_update_log():
     n = 2
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -132,11 +132,11 @@ def test_fit():
     assert len(S.log["negLnLike"]) == 1
 
 
-def test_initialize_variables():
+def test__initialize_variables():
     nat_X = np.array([[1, 2], [3, 4]])
     nat_y = np.array([1, 2])
     S = Kriging()
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     assert S.nat_X.all() == nat_X.all()
     assert S.nat_y.all() == nat_y.all()
     assert S.nat_X.shape == (2, 2)
@@ -149,7 +149,7 @@ def test_set_variable_types():
     n = 2
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     assert S.var_type == ["num", "num"]
     assert S.var_type == ["num", "num"]
@@ -162,7 +162,7 @@ def test_set_variable_types():
     n = 3
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.var_type
     assert S.var_type == ["num", "num", "num"]
@@ -174,7 +174,7 @@ def set_theta_values():
     n = 2
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     assert S.theta.all() == np.array([0.0, 0.0]).all()
@@ -184,7 +184,7 @@ def set_theta_values():
     n = 3
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     snt = S.n_theta
     S.set_theta_values()
@@ -199,7 +199,7 @@ def test_initialize_matrices():
     n = 3
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -213,7 +213,7 @@ def test_initialize_matrices():
     n = 3
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -232,7 +232,7 @@ def test_fun_likelihood():
     n = 1
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -250,7 +250,7 @@ def test_likelihood():
     n = 2
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.set_variable_types()
     S.set_theta_values()
     S.initialize_matrices()
@@ -263,3 +263,5 @@ def test_likelihood():
     sigma2 = E / (E**2 - 1) * (25 / 4 + 25 / 4 * E)
     # asssert S.SigmaSqr is close to sigma2 with a tolerance of 1e-6
     assert np.allclose(S.SigmaSqr, sigma2, atol=1e-6)
+
+

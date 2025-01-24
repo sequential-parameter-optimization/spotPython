@@ -34,7 +34,7 @@ def test_extract_from_bounds():
     S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
     S.int_mask = array(list(map(lambda x: x == "int", S.var_type)))
     S.ordered_mask = array(list(map(lambda x: x == "num" or x == "int" or x == "float", S.var_type)))
-    S.initialize_variables(nat_X, nat_y)
+    S._initialize_variables(nat_X, nat_y)
     S.theta = zeros(S.n_theta)
     # TODO: Currently not used:
     S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)
@@ -122,7 +122,7 @@ def test_extract_from_bounds():
     S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
     S.int_mask = array(list(map(lambda x: x == "int", S.var_type)))
     S.ordered_mask = array(list(map(lambda x: x == "num" or x == "int" or x == "float", S.var_type)))
-    S.initialize_variables(S.nat_X, S.nat_y)
+    S._initialize_variables(S.nat_X, S.nat_y)
     S.theta = zeros(S.n_theta)
     # TODO: Currently not used:
     S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)
@@ -180,7 +180,7 @@ def test_extract_from_bounds():
     S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
     S.int_mask = array(list(map(lambda x: x == "int", S.var_type)))
     S.ordered_mask = array(list(map(lambda x: x == "num" or x == "int" or x == "float", S.var_type)))
-    S.initialize_variables(S.nat_X, S.nat_y)
+    S._initialize_variables(S.nat_X, S.nat_y)
     S.theta = zeros(S.n_theta)
     # TODO: Currently not used:
     S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)
