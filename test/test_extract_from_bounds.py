@@ -2,7 +2,7 @@ def test_extract_from_bounds():
     """
     Test extract_from_bounds
     """
-    from spotpython.build.kriging import Kriging
+    from spotpython.build import Kriging
     import numpy as np
     import copy
     from numpy import linspace, argmin
@@ -52,7 +52,7 @@ def test_extract_from_bounds():
     S.SigmaSqr = None
     S.Lambda = None
     # build_Psi() and build_U() are called in fun_likelihood
-    S.set_de_bounds()
+    S._set_de_bounds()
     if S.model_optimizer.__name__ == "dual_annealing":
         result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
     elif S.model_optimizer.__name__ == "differential_evolution":
@@ -140,7 +140,7 @@ def test_extract_from_bounds():
     S.SigmaSqr = None
     S.Lambda = None
     # build_Psi() and build_U() are called in fun_likelihood
-    S.set_de_bounds()
+    S._set_de_bounds()
     if S.model_optimizer.__name__ == "dual_annealing":
         result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
     elif S.model_optimizer.__name__ == "differential_evolution":
@@ -198,7 +198,7 @@ def test_extract_from_bounds():
     S.SigmaSqr = None
     S.Lambda = None
     # build_Psi() and build_U() are called in fun_likelihood
-    S.set_de_bounds()
+    S._set_de_bounds()
     if S.model_optimizer.__name__ == "dual_annealing":
         result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
     elif S.model_optimizer.__name__ == "differential_evolution":

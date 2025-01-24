@@ -707,7 +707,7 @@ def surrogate_control_init(
     min_Lambda=1e-9,
     max_Lambda=1,
     seed=124,
-    theta_init_zero=True,
+    theta_init_zero=False,
     var_type=None,
     metric_factorial="canberra",
 ) -> dict:
@@ -745,7 +745,8 @@ def surrogate_control_init(
         seed (int):
             The seed to use for the random number generator.
         theta_init_zero (bool):
-            Whether to initialize theta with zero or not. Default is True.
+            Whether to initialize theta with zero or not. If False, theta is
+            set to n/(100 * k). Default is False.
         var_type (list):
             A list containing the type of the variables. Default is None.
             Note: Will be set in the Spot class.

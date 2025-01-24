@@ -1,6 +1,6 @@
 def test_set_de_bounds():
     """
-    Test set_de_bounds
+    Test _set_de_bounds
     """
     import numpy as np
     from spotpython.build import Kriging
@@ -13,7 +13,7 @@ def test_set_de_bounds():
     S = Kriging(name="kriging", seed=123, log_level=50, n_theta=1, noise=False, cod_type="norm")
     S.fit(X_train, y_train)
     res = [[S.min_theta, S.max_theta]]
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert np.array_equal(S.de_bounds, res)
 
     # Return:
@@ -38,7 +38,7 @@ def test_set_de_bounds():
 
     res = [[S.min_theta, S.max_theta], [S.min_Lambda, S.max_Lambda]]
 
-    S.set_de_bounds()
+    S._set_de_bounds()
 
     assert np.array_equal(S.de_bounds, res)
 
@@ -107,14 +107,14 @@ def test_set_de_bounds():
     S.SigmaSqr = None
     S.Lambda = None
     # build_Psi() and build_U() are called in fun_likelihood
-    S.set_de_bounds()
+    S._set_de_bounds()
     # 1. check default (only theta):
     assert S.de_bounds[0][0] == S.min_theta
     assert S.de_bounds[0][1] == S.max_theta
     # 2. Check theta and p:
     S = Kriging(name="kriging", min_theta=-4, max_theta=5, optim_p=True, seed=124)
 
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert S.de_bounds[0][0] == S.min_theta
     assert S.de_bounds[0][1] == S.max_theta
     assert S.de_bounds[1][0] == S.min_p
@@ -123,7 +123,7 @@ def test_set_de_bounds():
     # 3. Check theta, p, and Lambda:
     S = Kriging(name="kriging", min_theta=-4, max_theta=5, optim_p=True, noise=True, seed=124)
 
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert S.de_bounds[0][0] == S.min_theta
     assert S.de_bounds[0][1] == S.max_theta
     assert S.de_bounds[1][0] == S.min_p
@@ -134,7 +134,7 @@ def test_set_de_bounds():
     # 3. Check theta and Lambda:
     S = Kriging(name="kriging", min_theta=-4, max_theta=5, optim_p=False, noise=True, seed=124)
 
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert S.de_bounds[0][0] == S.min_theta
     assert S.de_bounds[0][1] == S.max_theta
     assert S.de_bounds[1][0] == S.min_Lambda

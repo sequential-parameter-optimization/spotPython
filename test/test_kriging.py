@@ -50,19 +50,19 @@ def test_de_bounds():
     Test if the bounds for the DE algorithm are set correctly.
     """
     S = Kriging(name="kriging", seed=124)
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert S.de_bounds == [[-3, 2]]
     n = 10
     S = Kriging(name="kriging", seed=124, n_theta=n)
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert len(S.de_bounds) == n
     n = 2
     p = 4
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True)
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert len(S.de_bounds) == n + p
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=False)
-    S.set_de_bounds()
+    S._set_de_bounds()
     assert len(S.de_bounds) == n
 
 
@@ -81,19 +81,19 @@ def test_optimize_model():
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
-    S.set_de_bounds()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
+    S._set_de_bounds()
     new_theta_p_Lambda = S.optimize_model()
     assert len(new_theta_p_Lambda) == n + p + 1
     # no noise, so Lambda is not considered
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
-    S.set_de_bounds()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
+    S._set_de_bounds()
     new_theta_p_Lambda = S.optimize_model()
     assert len(new_theta_p_Lambda) == n + p
 
@@ -105,10 +105,10 @@ def test_update_log():
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
-    S.set_de_bounds()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
+    S._set_de_bounds()
     _ = S.optimize_model()
     S.update_log()
     assert len(S.log["negLnLike"]) == 1
@@ -150,7 +150,7 @@ def test_set_variable_types():
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
+    S._set_variable_types()
     assert S.var_type == ["num", "num"]
     assert S.var_type == ["num", "num"]
     assert S.num_mask.all()
@@ -163,7 +163,7 @@ def test_set_variable_types():
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
+    S._set_variable_types()
     S.var_type
     assert S.var_type == ["num", "num", "num"]
 
@@ -175,8 +175,8 @@ def set_theta_values():
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
+    S._set_variable_types()
+    S._set_theta_values()
     assert S.theta.all() == np.array([0.0, 0.0]).all()
     nat_X = np.array([[1, 2], [3, 4]])
     nat_y = np.array([1, 2])
@@ -185,9 +185,9 @@ def set_theta_values():
     p = 2
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
+    S._set_variable_types()
     snt = S.n_theta
-    S.set_theta_values()
+    S._set_theta_values()
     # since snt == 3, it is not equal to S.n_theta, which is 2 because
     # of the correction in the set_theta_values method
     assert S.n_theta != snt
@@ -200,9 +200,9 @@ def test_initialize_matrices():
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
     # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
     # else self.pen_val = self.n * var(self.nat_y) + 1e4
     assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4
@@ -214,9 +214,9 @@ def test_initialize_matrices():
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
     # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
     # else self.pen_val = self.n * var(self.nat_y) + 1e4
     assert S.pen_val == nat_X.shape[0] * (var(S.nat_y)) + 1e4
@@ -233,10 +233,10 @@ def test_fun_likelihood():
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
-    S.set_de_bounds()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
+    S._set_de_bounds()
     new_theta_p_Lambda = S.optimize_model()
     S.extract_from_bounds(new_theta_p_Lambda)
     S.build_Psi()
@@ -251,9 +251,9 @@ def test_likelihood():
     p = 1
     S = Kriging(name="kriging", seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
     S._initialize_variables(nat_X, nat_y)
-    S.set_variable_types()
-    S.set_theta_values()
-    S.initialize_matrices()
+    S._set_variable_types()
+    S._set_theta_values()
+    S._initialize_matrices()
     S.build_Psi()
     S.build_U()
     S.likelihood()

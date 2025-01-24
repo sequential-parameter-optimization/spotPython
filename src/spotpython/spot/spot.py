@@ -157,7 +157,7 @@ class Spot:
                         min_theta=-3,
                         max_theta=3,
                         n_theta=2,
-                        theta_init_zero=True,
+                        theta_init_zero=False,
                         n_p=1,
                         optim_p=False,
                         var_type=["num", "num"],

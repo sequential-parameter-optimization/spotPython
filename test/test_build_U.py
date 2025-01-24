@@ -74,7 +74,7 @@ def test_build_U():
     S.SigmaSqr = None
     S.Lambda = None
     # build_Psi() and build_U() are called in fun_likelihood
-    S.set_de_bounds()
+    S._set_de_bounds()
     if S.model_optimizer.__name__ == "dual_annealing":
         result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
     elif S.model_optimizer.__name__ == "differential_evolution":

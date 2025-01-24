@@ -15,7 +15,6 @@ from numpy.linalg import cholesky, solve, LinAlgError, cond
 from scipy.optimize import differential_evolution
 from scipy.linalg import cholesky as scipy_cholesky
 import pylab
-from spotpython.design.spacefilling import SpaceFilling
 from spotpython.build.surrogates import surrogates
 from scipy.spatial.distance import squareform
 from scipy.spatial.distance import pdist
@@ -51,7 +50,7 @@ class Kriging(surrogates):
             min_theta: float = -3.0,
             max_theta: float = 2.0,
             n_theta: int = 1,
-            theta_init_zero: bool = True,
+            theta_init_zero: bool = False,
             p_val: float = 2.0,
             n_p: int = 1,
             optim_p: bool = False,
@@ -271,6 +270,273 @@ class Kriging(surrogates):
         logger.debug("In _initialize_variables(): self.n: %d", self.n)
         logger.debug("In _initialize_variables(): self.k: %d", self.k)
 
+    def _set_variable_types(self) -> None:
+        """
+        Set the variable types for the class instance.
+        This method sets the variable types for the class instance based
+        on the `var_type` attribute. If the length of `var_type` is less
+        than `k`, all variable types are forced to 'num' and a warning is logged.
+        The method then creates Boolean masks for each variable
+        type ('num', 'factor', 'int', 'ordered') using numpy arrays, e.g.,
+        `num_mask = array([ True,  True])` if two numerical variables are present.
+
+        Args:
+            self (object): The Kriging object.
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+                nat_y = np.array([1, 2, 3])
+                var_type = ["num", "int", "float"]
+                n_theta=2
+                n_p=2
+                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                assert S.var_type == ["num", "int", "float"]
+                assert S.num_mask.all() == False
+                assert S.factor_mask.all() == False
+                assert S.int_mask.all() == False
+                assert S.ordered_mask.all() == True
+                assert np.all(S.num_mask == np.array([True, False, False]))
+                assert np.all(S.int_mask == np.array([False, True, False]))
+                assert np.all(S.ordered_mask == np.array([True, True, True]))
+
+        Returns:
+            None
+        """
+        logger.debug("In _set_variable_types(): self.k: %s", self.k)
+        logger.debug("In _set_variable_types(): self.var_type: %s", self.var_type)
+
+        # Ensure var_type has appropriate length by defaulting to 'num'
+        if len(self.var_type) < self.k:
+            self.var_type = ['num'] * self.k  # Corrected to fill with 'num' instead of duplicating
+            logger.warning("In _set_variable_types(): All variable types forced to 'num'.")
+            logger.debug("In _set_variable_types(): self.var_type: %s", self.var_type)
+        # Create masks for each type using numpy vectorized operations
+        var_type_array = np.array(self.var_type)
+        self.num_mask = (var_type_array == "num")
+        self.factor_mask = (var_type_array == "factor")
+        self.int_mask = (var_type_array == "int")
+        self.ordered_mask = np.isin(var_type_array, ["int", "num", "float"])
+        logger.debug("In _set_variable_types(): self.num_mask: %s", self.num_mask)
+        logger.debug("In _set_variable_types(): self.factor_mask: %s", self.factor_mask)
+        logger.debug("In _set_variable_types(): self.int_mask: %s", self.int_mask)
+        logger.debug("In _set_variable_types(): self.ordered_mask: %s", self.ordered_mask)
+
+    def _set_theta_values(self) -> None:
+        """
+        Set the theta values for the class instance.
+        This method sets the theta values for the class instance based
+        on the `n_theta` and `k` attributes. If `n_theta` is greater than
+        `k`, `n_theta` is set to `k` and a warning is logged.
+        The method then initializes the `theta` attribute as a list
+        of zeros with length `n_theta`.
+        The `x0_theta` attribute is also initialized as a list of ones
+        with length `n_theta`, multiplied by `n / (100 * k)`.
+
+        Args:
+            self (object): The Kriging object.
+        Returns:
+            None
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                from numpy import array
+                nat_X = np.array([[1, 2], [3, 4]])
+                n = nat_X.shape[0]
+                k = nat_X.shape[1]
+                nat_y = np.array([1, 2])
+                n_theta=2
+                n_p=2
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True, theta_init_zero=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                assert S.theta.all() == array([0., 0.]).all()
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True, theta_init_zero=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                t = np.ones(n_theta, dtype=float) * n / (100 * k)
+                assert S.theta.all() == t.all()
+                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+                n = nat_X.shape[0]
+                k = nat_X.shape[1]
+                nat_y = np.array([1, 2, 3])
+                n_theta=2
+                n_p=2
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True, theta_init_zero=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                assert S.theta.all() == array([0., 0.]).all()
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True, theta_init_zero=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                t = np.ones(n_theta, dtype=float) * n / (100 * k)
+                assert S.theta.all() == t.all()
+        """
+        logger.debug("In set_theta_values(): self.k: %s", self.k)
+        logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
+
+        # Adjust `n_theta` if it exceeds `k`
+        if self.n_theta > self.k:
+            self.n_theta = self.k
+            logger.warning("Too few theta values or more theta values than dimensions. `n_theta` set to `k`.")
+            logger.debug("In set_theta_values(): self.n_theta reset to: %s", self.n_theta)
+
+        # Initialize theta values
+        if hasattr(self, "theta_init_zero") and self.theta_init_zero:
+            self.theta = np.zeros(self.n_theta, dtype=float)
+            logger.debug("Theta initialized to zeros: %s", self.theta)
+        else:
+            logger.debug("In set_theta_values(): self.n: %s", self.n)
+            self.theta = np.ones(self.n_theta, dtype=float) * self.n / (100 * self.k)
+            logger.debug("Theta initialized based on n and k: %s", self.theta)
+
+    def _initialize_matrices(self) -> None:
+        """
+        Initialize the matrices for the class instance.
+        This method initializes several matrices and attributes for the class instance.
+        The `p` attribute is initialized as a list of ones with length `n_p`, multiplied by 2.0.
+        The `pen_val` attribute is initialized as the natural logarithm of the
+        variance of `nat_y`, multiplied by `n`, plus 1e4.
+        The `negLnLike`, `LnDetPsi`, `mu`, `U`, `SigmaSqr`, and `Lambda` attributes are all set to None.
+        The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.
+        The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.
+        The `one` attribute is initialized as a list of ones with length `n`.
+
+        Args:
+            self (object): The Kriging object.
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                from numpy import log, var
+                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+                nat_y = np.array([1, 2, 3])
+                n = nat_X.shape[0]
+                k = nat_X.shape[1]
+                n_theta=2
+                n_p=2
+                S=Kriging(seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                assert np.all(S.p == 2.0 * np.ones(n_p))
+                # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
+                # else self.pen_val = self.n * var(self.nat_y) + 1e4
+                assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4
+                assert S.Psi.shape == (n, n)
+                assert S.psi.shape == (n, 1)
+                assert S.one.shape == (n,)
+
+        Returns:
+            None
+        """
+        logger.debug("In _initialize_matrices(): self.n_p: %s", self.n_p)
+
+        # Adjust `n_p` if it exceeds `k`
+        if self.n_p > self.k:
+            self.n_p = self.k
+            logger.warning("More p values than dimensions. `n_p` set to `k`.")
+            logger.debug("In _initialize_matrices(): self.n_p reset to: %s", self.n_p)
+
+        # Initialize p
+        self.p = np.ones(self.n_p) * self.p_val
+        logger.debug("In _initialize_matrices(): self.p: %s", self.p)
+
+        # Calculate variance of nat_y
+        y_variance = var(self.nat_y)
+        logger.debug("In _initialize_matrices(): var(self.nat_y): %s", y_variance)
+
+        # Set penalty value based on variance
+        if y_variance > 0:
+            self.pen_val = self.n * log(y_variance) + 1e4
+        else:
+            self.pen_val = self.n * y_variance + 1e4
+        logger.debug("In _initialize_matrices(): self.pen_val: %s", self.pen_val)
+
+        # Initialize other attributes
+        self.negLnLike = None
+        self.LnDetPsi = None
+        self.mu = None
+        self.U = None
+        self.SigmaSqr = None
+        self.Lambda = None
+
+        # Initialize matrix Psi and vector psi
+        self.Psi = np.zeros((self.n, self.n), dtype=np.float64)
+        logger.debug("In _initialize_matrices(): self.Psi shape: %s", self.Psi.shape)
+
+        self.psi = np.zeros((self.n, 1), dtype=np.float64)
+        logger.debug("In _initialize_matrices(): self.psi shape: %s", self.psi.shape)
+
+        # Initialize one
+        self.one = np.ones(self.n, dtype=np.float64)
+        logger.debug("In _initialize_matrices(): self.one: %s", self.one)
+
+    def _set_de_bounds(self) -> None:
+        """
+        Determine search bounds for model_optimizer, e.g., differential evolution.
+        This method sets the attribute `de_bounds` of the object to a list of lists,
+        where each inner list represents the lower and upper bounds for a parameter
+        being optimized. The number of inner lists is determined by the number of
+        parameters being optimized (`n_theta` and `n_p`), as well as whether noise is
+        being considered (`noise`).
+
+        Args:
+            self (object): The Kriging object.
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                S = Kriging()
+                S._set_de_bounds()
+                print(S.de_bounds)
+                    [[-3.0, 2.0]]
+                S = Kriging(n_theta=2, n_p=2, optim_p=True)
+                S._set_de_bounds()
+                print(S.de_bounds)
+                    [[-3.0, 2.0], [-3.0, 2.0], [1, 2], [1, 2]]
+                S = Kriging(n_theta=2, n_p=2, optim_p=True, noise=True)
+                S._set_de_bounds()
+                print(S.de_bounds)
+                    [[-3.0, 2.0], [-3.0, 2.0], [1, 2], [1, 2], [1e-09, 1.0]]
+                S = Kriging(n_theta=2, n_p=2, noise=True)
+                S._set_de_bounds()
+                print(S.de_bounds)
+                    [[-3.0, 2.0], [-3.0, 2.0], [1e-09, 1.0]]
+
+        Returns:
+            None
+        """
+        logger.debug("In _set_de_bounds(): self.min_theta: %s", self.min_theta)
+        logger.debug("In _set_de_bounds(): self.max_theta: %s", self.max_theta)
+        logger.debug("In _set_de_bounds(): self.n_theta: %s", self.n_theta)
+        logger.debug("In _set_de_bounds(): self.optim_p: %s", self.optim_p)
+        logger.debug("In _set_de_bounds(): self.min_p: %s", self.min_p)
+        logger.debug("In _set_de_bounds(): self.max_p: %s", self.max_p)
+        logger.debug("In _set_de_bounds(): self.n_p: %s", self.n_p)
+        logger.debug("In _set_de_bounds(): self.noise: %s", self.noise)
+        logger.debug("In _set_de_bounds(): self.min_Lambda: %s", self.min_Lambda)
+        logger.debug("In _set_de_bounds(): self.max_Lambda: %s", self.max_Lambda)
+
+        de_bounds = [[self.min_theta, self.max_theta] for _ in range(self.n_theta)]
+        if self.optim_p:
+            de_bounds += [[self.min_p, self.max_p] for _ in range(self.n_p)]
+            if self.noise:
+                de_bounds.append([self.min_Lambda, self.max_Lambda])
+        else:
+            if self.noise:
+                de_bounds.append([self.min_Lambda, self.max_Lambda])
+        self.de_bounds = de_bounds
+        logger.debug("In _set_de_bounds(): self.de_bounds: %s", self.de_bounds)
+
     def fit(self, nat_X: np.ndarray, nat_y: np.ndarray) -> object:
         """
         Fits the hyperparameters (`theta`, `p`, `Lambda`) of the Kriging model.
@@ -314,11 +580,11 @@ class Kriging(surrogates):
         logger.debug("In fit(): nat_X: %s", nat_X)
         logger.debug("In fit(): nat_y: %s", nat_y)
         self._initialize_variables(nat_X, nat_y)
-        self.set_variable_types()
-        self.set_theta_values()
-        self.initialize_matrices()
+        self._set_variable_types()
+        self._set_theta_values()
+        self._initialize_matrices()
         # build_Psi() and build_U() are called in fun_likelihood
-        self.set_de_bounds()
+        self._set_de_bounds()
         # Finally, set new theta and p values and update the surrogate again
         # for new_theta_p_Lambda in de_results["x"]:
         new_theta_p_Lambda = self.optimize_model()
@@ -508,50 +774,6 @@ class Kriging(surrogates):
 
         return EI
 
-    def set_de_bounds(self) -> None:
-        """
-        Determine search bounds for model_optimizer, e.g., differential evolution.
-        This method sets the attribute `de_bounds` of the object to a list of lists,
-        where each inner list represents the lower and upper bounds for a parameter
-        being optimized. The number of inner lists is determined by the number of
-        parameters being optimized (`n_theta` and `n_p`), as well as whether noise is
-        being considered (`noise`).
-
-        Args:
-            self (object): The Kriging object.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                S = Kriging(name='kriging', seed=124)
-                S.set_de_bounds()
-                print(S.de_bounds)
-                [[-3.0, 2.0]]
-
-        Returns:
-            None
-        """
-        logger.debug("In set_de_bounds(): self.min_theta: %s", self.min_theta)
-        logger.debug("In set_de_bounds(): self.max_theta: %s", self.max_theta)
-        logger.debug("In set_de_bounds(): self.n_theta: %s", self.n_theta)
-        logger.debug("In set_de_bounds(): self.optim_p: %s", self.optim_p)
-        logger.debug("In set_de_bounds(): self.min_p: %s", self.min_p)
-        logger.debug("In set_de_bounds(): self.max_p: %s", self.max_p)
-        logger.debug("In set_de_bounds(): self.n_p: %s", self.n_p)
-        logger.debug("In set_de_bounds(): self.noise: %s", self.noise)
-        logger.debug("In set_de_bounds(): self.min_Lambda: %s", self.min_Lambda)
-        logger.debug("In set_de_bounds(): self.max_Lambda: %s", self.max_Lambda)
-
-        de_bounds = [[self.min_theta, self.max_theta] for _ in range(self.n_theta)]
-        if self.optim_p:
-            de_bounds += [[self.min_p, self.max_p] for _ in range(self.n_p)]
-            if self.noise:
-                de_bounds.append([self.min_Lambda, self.max_Lambda])
-        else:
-            if self.noise:
-                de_bounds.append([self.min_Lambda, self.max_Lambda])
-        self.de_bounds = de_bounds
-        logger.debug("In set_de_bounds(): self.de_bounds: %s", self.de_bounds)
-
     def extract_from_bounds(self, new_theta_p_Lambda: np.ndarray) -> None:
         """
         Extract `theta`, `p`, and `Lambda` from bounds. The kriging object stores
@@ -644,10 +866,10 @@ class Kriging(surrogates):
                 p=2
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                S.set_theta_values()
-                S.initialize_matrices()
-                S.set_de_bounds()
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
                 new_theta_p_Lambda = S.optimize_model()
                 print(new_theta_p_Lambda)
                 [0.12167915 1.49467909 1.82808259 1.69648798 0.79564346]
@@ -730,10 +952,10 @@ class Kriging(surrogates):
                 p=2
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                S.set_theta_values()
-                S.initialize_matrices()
-                S.set_de_bounds()
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
+                S._set_de_bounds()
                 new_theta_p_Lambda = S.optimize_model()
                 S.update_log()
                 print(S.log)
@@ -768,184 +990,6 @@ class Kriging(surrogates):
                                              {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter+self.log_length)
             self.spot_writer.flush()
 
-    def set_variable_types(self) -> None:
-        """
-        Set the variable types for the class instance.
-        This method sets the variable types for the class instance based
-        on the `var_type` attribute. If the length of `var_type` is less
-        than `k`, all variable types are forced to 'num' and a warning is logged.
-        The method then creates Boolean masks for each variable
-        type ('num', 'factor', 'int', 'ordered') using numpy arrays, e.g.,
-        `num_mask = array([ True,  True])` if two numerical variables are present.
-
-        Args:
-            self (object): The Kriging object.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                nat_X = np.array([[1, 2], [3, 4]])
-                nat_y = np.array([1, 2])
-                n=2
-                p=2
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                assert S.var_type == ['num', 'num']
-                assert S.var_type == ['num', 'num']
-                assert S.num_mask.all() == True
-                assert S.factor_mask.all() == False
-                assert S.int_mask.all() == False
-                assert S.ordered_mask.all() == True
-
-        Returns:
-            None
-        """
-        logger.debug("In set_variable_types(): self.k: %s", self.k)
-        logger.debug("In set_variable_types(): self.var_type: %s", self.var_type)
-
-        # Ensure var_type has appropriate length by defaulting to 'num'
-        if len(self.var_type) < self.k:
-            self.var_type = ['num'] * self.k  # Corrected to fill with 'num' instead of duplicating
-            logger.warning("In set_variable_types(): All variable types forced to 'num'.")
-            logger.debug("In set_variable_types(): self.var_type: %s", self.var_type)
-        # Create masks for each type using numpy vectorized operations
-        var_type_array = np.array(self.var_type)
-        self.num_mask = (var_type_array == "num")
-        self.factor_mask = (var_type_array == "factor")
-        self.int_mask = (var_type_array == "int")
-        self.ordered_mask = np.isin(var_type_array, ["int", "num", "float"])
-        logger.debug("In set_variable_types(): self.num_mask: %s", self.num_mask)
-        logger.debug("In set_variable_types(): self.factor_mask: %s", self.factor_mask)
-        logger.debug("In set_variable_types(): self.int_mask: %s", self.int_mask)
-        logger.debug("In set_variable_types(): self.ordered_mask: %s", self.ordered_mask)
-
-    def set_theta_values(self) -> None:
-        """
-        Set the theta values for the class instance.
-
-        This method sets the theta values for the class instance based
-        on the `n_theta` and `k` attributes. If `n_theta` is greater than
-        `k`, `n_theta` is set to `k` and a warning is logged.
-        The method then initializes the `theta` attribute as a list
-        of zeros with length `n_theta`.
-        The `x0_theta` attribute is also initialized as a list of ones
-        with length `n_theta`, multiplied by `n / (100 * k)`.
-
-        Args:
-            self (object): The Kriging object.
-        Returns:
-            None
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                from numpy import array
-                nat_X = np.array([[1, 2], [3, 4]])
-                nat_y = np.array([1, 2])
-                n=2
-                p=2
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                S.set_theta_values()
-                assert S.theta.all() == array([0., 0.]).all()
-        """
-        logger.debug("In set_theta_values(): self.k: %s", self.k)
-        logger.debug("In set_theta_values(): self.n_theta: %s", self.n_theta)
-
-        # Adjust `n_theta` if it exceeds `k`
-        if self.n_theta > self.k:
-            self.n_theta = self.k
-            logger.warning("Too few theta values or more theta values than dimensions. `n_theta` set to `k`.")
-            logger.debug("In set_theta_values(): self.n_theta reset to: %s", self.n_theta)
-
-        # Initialize theta values
-        if hasattr(self, "theta_init_zero") and self.theta_init_zero:
-            self.theta = np.zeros(self.n_theta, dtype=float)
-            logger.debug("Theta initialized to zeros: %s", self.theta)
-        else:
-            logger.debug("In set_theta_values(): self.n: %s", self.n)
-            self.theta = np.ones(self.n_theta, dtype=float) * self.n / (100 * self.k)
-            logger.debug("Theta initialized based on n and k: %s", self.theta)
-
-    def initialize_matrices(self) -> None:
-        """
-        Initialize the matrices for the class instance.
-
-        This method initializes several matrices and attributes for the class instance.
-        The `p` attribute is initialized as a list of ones with length `n_p`, multiplied by 2.0.
-        The `pen_val` attribute is initialized as the natural logarithm of the
-        variance of `nat_y`, multiplied by `n`, plus 1e4.
-        The `negLnLike`, `LnDetPsi`, `mu`, `U`, `SigmaSqr`, and `Lambda` attributes are all set to None.
-        The `gen` attribute is initialized using the `SpaceFilling` function with arguments `k` and `seed`.
-        The `Psi` attribute is initialized as a zero matrix with shape `(n, n)` and dtype `float64`.
-        The `psi` attribute is initialized as a zero matrix with shape `(n, 1)`.
-        The `one` attribute is initialized as a list of ones with length `n`.
-
-        Args:
-            self (object): The Kriging object.
-
-        Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                from numpy import log, var
-                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
-                nat_y = np.array([1, 2, 3])
-                n=3
-                p=1
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=True)
-                S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                S.set_theta_values()
-                S.initialize_matrices()
-                # if var(self.nat_y) is > 0, then self.pen_val = self.n * log(var(self.nat_y)) + 1e4
-                # else self.pen_val = self.n * var(self.nat_y) + 1e4
-                assert S.pen_val == nat_X.shape[0] * log(var(S.nat_y)) + 1e4
-                assert S.Psi.shape == (n, n)
-
-        Returns:
-            None
-        """
-        logger.debug("In initialize_matrices(): self.n_p: %s", self.n_p)
-
-        # Initialize p
-        self.p = np.ones(self.n_p) * self.p_val
-        logger.debug("In initialize_matrices(): self.p: %s", self.p)
-
-        # Calculate variance of nat_y
-        y_variance = var(self.nat_y)
-        logger.debug("In initialize_matrices(): var(self.nat_y): %s", y_variance)
-
-        # Set penalty value based on variance
-        if y_variance > 0:
-            self.pen_val = self.n * log(y_variance) + 1e4
-        else:
-            self.pen_val = self.n * y_variance + 1e4
-        logger.debug("In initialize_matrices(): self.pen_val: %s", self.pen_val)
-
-        # Initialize other attributes
-        self.negLnLike = None
-        self.LnDetPsi = None
-        self.mu = None
-        self.U = None
-        self.SigmaSqr = None
-        self.Lambda = None
-
-        # Initialize generator
-        self.gen = SpaceFilling(k=self.k, seed=self.seed)
-        logger.debug("In initialize_matrices(): self.gen: %s", self.gen)
-
-        # Initialize matrix Psi and vector psi
-        self.Psi = np.zeros((self.n, self.n), dtype=np.float64)
-        logger.debug("In initialize_matrices(): self.Psi shape: %s", self.Psi.shape)
-
-        self.psi = np.zeros((self.n, 1), dtype=np.float64)
-        logger.debug("In initialize_matrices(): self.psi shape: %s", self.psi.shape)
-
-        # Initialize one
-        self.one = np.ones(self.n, dtype=np.float64)
-        logger.debug("In initialize_matrices(): self.one: %s", self.one)
-
     def fun_likelihood(self, new_theta_p_Lambda: np.ndarray) -> float:
         """
         Compute log likelihood for a set of hyperparameters (theta, p, Lambda).
@@ -979,13 +1023,13 @@ class Kriging(surrogates):
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
+                S._set_variable_types()
                 print(S.nat_X)
                 print(S.nat_y)
-                S.set_theta_values()
+                S._set_theta_values()
                 print(f"S.theta: {S.theta}")
-                S.initialize_matrices()
-                S.set_de_bounds()
+                S._initialize_matrices()
+                S._set_de_bounds()
                 new_theta_p_Lambda = S.optimize_model()
                 S.extract_from_bounds(new_theta_p_Lambda)
                 print(f"S.theta: {S.theta}")
@@ -1055,8 +1099,8 @@ class Kriging(surrogates):
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                S.set_theta_values()
+                S._set_variable_types()
+                S._set_theta_values()
                 print(f"S.theta: {S.theta}")
                 print(S.__is_any__(power(10.0, S.theta), 0))
                 print(S.__is_any__(S.theta, 0))
@@ -1093,13 +1137,13 @@ class Kriging(surrogates):
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
+                S._set_variable_types()
                 print(S.nat_X)
                 print(S.nat_y)
-                S.set_theta_values()
+                S._set_theta_values()
                 print(f"S.theta: {S.theta}")
-                S.initialize_matrices()
-                S.set_de_bounds()
+                S._initialize_matrices()
+                S._set_de_bounds()
                 new_theta_p_Lambda = S.optimize_model()
                 S.extract_from_bounds(new_theta_p_Lambda)
                 print(f"S.theta: {S.theta}")
@@ -1195,13 +1239,13 @@ class Kriging(surrogates):
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
+                S._set_variable_types()
                 print(S.nat_X)
                 print(S.nat_y)
-                S.set_theta_values()
+                S._set_theta_values()
                 print(f"S.theta: {S.theta}")
-                S.initialize_matrices()
-                S.set_de_bounds()
+                S._initialize_matrices()
+                S._set_de_bounds()
                 new_theta_p_Lambda = S.optimize_model()
                 S.extract_from_bounds(new_theta_p_Lambda)
                 print(f"S.theta: {S.theta}")
@@ -1252,9 +1296,9 @@ class Kriging(surrogates):
                 p=1
                 S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
                 S._initialize_variables(nat_X, nat_y)
-                S.set_variable_types()
-                S.set_theta_values()
-                S.initialize_matrices()
+                S._set_variable_types()
+                S._set_theta_values()
+                S._initialize_matrices()
                 S.build_Psi()
                 S.build_U()
                 S.likelihood()
