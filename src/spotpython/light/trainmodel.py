@@ -116,6 +116,10 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
             test_size=fun_control["test_size"],
             test_seed=fun_control["test_seed"],
             scaler=fun_control["scaler"],
+            collate_fn_name=fun_control["collate_fn_name"],
+            shuffle_train=fun_control["shuffle_train"],
+            shuffle_val=fun_control["shuffle_val"],
+            shuffle_test=fun_control["shuffle_test"],
             verbosity=fun_control["verbosity"],
         )
     else:
@@ -173,6 +177,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   This allows accessing the latest checkpoint in a deterministic manner.
     #   Default: None.
     config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
+    print(f"config_id: {config_id}")
     callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False
@@ -263,7 +268,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         gradient_clip_val=None,
         gradient_clip_algorithm="norm",
     )
-
+    print(f"train_model(): Trainer: {trainer}")
     # Fit the model
     # Args:
     # - model: Model to fit
@@ -272,10 +277,11 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     # - ckpt_path: Path/URL of the checkpoint from which training is resumed.
     #   Could also be one of two special keywords "last" and "hpc".
     #   If there is no checkpoint file at the path, an exception is raised.
-    trainer.fit(model=model, datamodule=dm, ckpt_path=None)
-
+    try:
+        trainer.fit(model=model, datamodule=dm, ckpt_path=None)
+    except Exception as e:
+        print(f"train_model(): trainer.fit failed with exception: {e}")
     # Test best model on validation and test set
-
     verbose = fun_control["verbosity"] > 0
 
     # Validate the model
@@ -294,6 +300,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   e.g., in model- or callback hooks like validation_step() etc.
     #   The length of the list corresponds to the number of validation dataloaders used.
     result = trainer.validate(model=model, datamodule=dm, ckpt_path=None, verbose=verbose)
+    print(f"result: {result}")
 
     # unlist the result (from a list of one dict)
     result = result[0]

@@ -69,6 +69,10 @@ def cv_model(config: dict, fun_control: dict) -> float:
                 batch_size=config["batch_size"],
                 data_dir=fun_control["DATASET_PATH"],
                 scaler=fun_control["scaler"],
+                collate_fn_name=fun_control["collate_fn_name"],
+                shuffle_train=fun_control["shuffle_train"],
+                shuffle_val=fun_control["shuffle_val"],
+                shuffle_test=fun_control["shuffle_test"],
                 verbosity=fun_control["verbosity"],
             )
         else:

@@ -158,7 +158,8 @@ class HyperLight:
             except Exception as err:
                 if fun_control["verbosity"] > 0:
                     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                    pprint.pprint(fun_control)
+                    if fun_control["verbosity"] > 1:
+                        pprint.pprint(fun_control)
                     print(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                     print("Setting df_eval to np.nan\n")
                 logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")

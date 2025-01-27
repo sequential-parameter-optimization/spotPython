@@ -3,6 +3,34 @@ import torch
 from torch.utils.data import DataLoader, random_split, TensorDataset
 from typing import Optional
 from math import floor
+from torch.nn.utils.rnn import pad_sequence
+
+
+class PadSequenceManyToMany:
+    """
+    A callable class for padding sequences in a many-to-many RNN model.
+    """
+
+    def __call__(self, batch):
+        batch_x, batch_y = zip(*batch)
+        padded_batch_x = pad_sequence(batch_x, batch_first=True)
+        padded_batch_y = pad_sequence(batch_y, batch_first=True)
+        lengths = torch.tensor([len(x) for x in batch_x])
+
+        return padded_batch_x, lengths, padded_batch_y
+
+
+class PadSequenceManyToOne:
+    """
+    A callable class for padding sequences in a many-to-one RNN model.
+    """
+
+    def __call__(self, batch):
+        batch_x, batch_y = zip(*batch)
+        padded_batch_x = pad_sequence(batch_x, batch_first=True)
+        lengths = torch.tensor([len(x) for x in batch_x])
+
+        return padded_batch_x, lengths, torch.tensor(batch_y)
 
 
 class LightDataModule(L.LightningDataModule):
@@ -66,6 +94,10 @@ class LightDataModule(L.LightningDataModule):
         data_val: Optional[object] = None,
         test_size: Optional[float] = None,
         test_seed: int = 42,
+        collate_fn_name: Optional[str] = None,
+        shuffle_train: bool = True,
+        shuffle_val: bool = False,
+        shuffle_test: bool = False,
         num_workers: int = 0,
         scaler: Optional[object] = None,
         verbosity: int = 0,
@@ -78,6 +110,10 @@ class LightDataModule(L.LightningDataModule):
         self.data_val = data_val
         self.test_size = test_size
         self.test_seed = test_seed
+        self.collate_fn_name = collate_fn_name
+        self.shuffle_train = shuffle_train
+        self.shuffle_val = shuffle_val
+        self.shuffle_test = shuffle_test
         self.num_workers = num_workers
         self.scaler = scaler
         self.verbosity = verbosity
@@ -255,6 +291,18 @@ class LightDataModule(L.LightningDataModule):
                 # Transform the predict data
                 self.data_predict = self.transform_dataset(self.data_predict)
 
+    def _get_collate_fn(self, collate_fn_name: str = None) -> object:
+        """
+        Returns the collate function based on the collate_fn_name.
+        """
+        if collate_fn_name == "PadSequenceManyToMany":
+            collate_fn = PadSequenceManyToMany()
+        elif collate_fn_name == "PadSequenceManyToOne":
+            collate_fn = PadSequenceManyToOne()
+        else:
+            collate_fn = None
+        return collate_fn
+
     def setup(self, stage: Optional[str] = None) -> None:
         """
         Splits the data for use in training, validation, and testing.
@@ -309,7 +357,7 @@ class LightDataModule(L.LightningDataModule):
             print(f"LightDataModule.train_dataloader(). data_train size: {len(self.data_train)}")
         # print(f"LightDataModule: train_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: train_dataloader(). num_workers: {self.num_workers}")
-        return DataLoader(self.data_train, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_train, batch_size=self.batch_size, shuffle=self.shuffle_train, collate_fn=self._get_collate_fn(collate_fn_name=self.collate_fn_name), num_workers=self.num_workers)
 
     def val_dataloader(self) -> DataLoader:
         """
@@ -333,7 +381,7 @@ class LightDataModule(L.LightningDataModule):
             print(f"LightDataModule.val_dataloader(). Val. set size: {len(self.data_val)}")
         # print(f"LightDataModule: val_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: val_dataloader(). num_workers: {self.num_workers}")
-        return DataLoader(self.data_val, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_val, batch_size=self.batch_size, shuffle=self.shuffle_val, collate_fn=self._get_collate_fn(collate_fn_name=self.collate_fn_name), num_workers=self.num_workers)
 
     def test_dataloader(self) -> DataLoader:
         """
@@ -358,7 +406,7 @@ class LightDataModule(L.LightningDataModule):
             print(f"LightDataModule.test_dataloader(). Test set size: {len(self.data_test)}")
         # print(f"LightDataModule: test_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: test_dataloader(). num_workers: {self.num_workers}")
-        return DataLoader(self.data_test, batch_size=self.batch_size, num_workers=self.num_workers)
+        return DataLoader(self.data_test, batch_size=self.batch_size, shuffle=self.shuffle_test, collate_fn=self._get_collate_fn(collate_fn_name=self.collate_fn_name), num_workers=self.num_workers)
 
     def predict_dataloader(self) -> DataLoader:
         """
@@ -383,4 +431,4 @@ class LightDataModule(L.LightningDataModule):
             print(f"LightDataModule.predict_dataloader(). Predict set size: {len(self.data_predict)}")
         # print(f"LightDataModule: predict_dataloader(). batch_size: {self.batch_size}")
         # print(f"LightDataModule: predict_dataloader(). num_workers: {self.num_workers}")
-        return DataLoader(self.data_predict, batch_size=len(self.data_predict), num_workers=self.num_workers)
+        return DataLoader(self.data_predict, batch_size=len(self.data_predict), shuffle=False, collate_fn=self._get_collate_fn(collate_fn_name=self.collate_fn_name), num_workers=self.num_workers)

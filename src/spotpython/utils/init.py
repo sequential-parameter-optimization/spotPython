@@ -27,6 +27,7 @@ def fun_control_init(
     PREFIX=None,
     TENSORBOARD_CLEAN=False,
     accelerator="auto",
+    collate_fn_name=None,
     converters=None,
     core_model=None,
     core_model_name=None,
@@ -83,6 +84,9 @@ def fun_control_init(
     show_models=False,
     show_progress=True,
     shuffle=None,
+    shuffle_train=True,
+    shuffle_val=False,
+    shuffle_test=False,
     sigma=0.0,
     strategy="auto",
     surrogate=None,
@@ -123,6 +127,8 @@ def fun_control_init(
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
             Default is "auto".
+        collate_fn_name (str):
+            The name of the collate function. Default is None.
         converters (dict):
             A dictionary containing the converters. Default is None.
         core_model (object):
@@ -265,6 +271,12 @@ def fun_control_init(
             Whether to show the configuration or not. Default is `False`.
         shuffle (bool):
             Whether the data were shuffled or not. Default is None.
+        shuffle_train (bool):
+            Whether the training data were shuffled or not. Default is True.
+        shuffle_val (bool):
+            Whether the validation data were shuffled or not. Default is False.
+        shuffle_test (bool):
+            Whether the test data were shuffled or not. Default is False.
         surrogate (object):
             The surrogate model object. Default is None.
         strategy (str):
@@ -409,6 +421,7 @@ def fun_control_init(
         "_L_cond": _L_cond,
         "_torchmetric": _torchmetric,
         "accelerator": accelerator,
+        "collate_fn_name": collate_fn_name,
         "converters": converters,
         "core_model": core_model,
         "core_model_name": core_model_name,
@@ -475,6 +488,9 @@ def fun_control_init(
         "show_models": show_models,
         "show_progress": show_progress,
         "shuffle": shuffle,
+        "shuffle_train": shuffle_train,
+        "shuffle_val": shuffle_val,
+        "shuffle_test": shuffle_test,
         "sigma": sigma,
         "spot_tensorboard_path": spot_tensorboard_path,
         "strategy": strategy,

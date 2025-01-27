@@ -76,6 +76,10 @@ def test_model(config: dict, fun_control: dict) -> Tuple[float, float]:
             test_size=fun_control["test_size"],
             test_seed=fun_control["test_seed"],
             scaler=fun_control["scaler"],
+            collate_fn_name=fun_control["collate_fn_name"],
+            shuffle_train=fun_control["shuffle_train"],
+            shuffle_val=fun_control["shuffle_val"],
+            shuffle_test=fun_control["shuffle_test"],
             verbosity=fun_control["verbosity"],
         )
     else:
