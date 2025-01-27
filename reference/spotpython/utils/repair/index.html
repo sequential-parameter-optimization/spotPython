@@ -1904,6 +1904,8 @@
       
         
       
+        
+      
     
     
       
@@ -1989,6 +1991,27 @@
   
   <span class="md-ellipsis">
     nn_linear_regressor
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../light/regression/nn_many_to_many_rnn_regressor/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_many_to_many_rnn_regressor
   </span>
   
 
@@ -3756,7 +3779,7 @@
 
 
 <h2 id="spotpython.utils.repair.apply_penalty_NA" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">apply_penalty_NA</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">penalty_NA</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">apply_penalty_NA</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">penalty_NA</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
 
 <a href="#spotpython.utils.repair.apply_penalty_NA" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -3831,6 +3854,20 @@
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verbosity</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>verbosity level. Default is 0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
             </td>
           </tr>
       </tbody>
@@ -3921,7 +3958,9 @@
 <span class="normal">128</span>
 <span class="normal">129</span>
 <span class="normal">130</span>
-<span class="normal">131</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">apply_penalty_NA</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">penalty_NA</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">apply_penalty_NA</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">penalty_NA</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Replaces NaN values in y with a penalty value of penalty_NA and issues a warning if necessary.</span>
 
@@ -3930,6 +3969,7 @@
 <span class="sd">        penalty_NA (float): penalty value to replace NaN values in y</span>
 <span class="sd">        sd (float): standard deviation for the random noise added to penalty_NA. Default is 0.1.</span>
 <span class="sd">        stop_on_zero_return (bool): whether to stop if the returned dimension is less than 1. Default is False.</span>
+<span class="sd">        verbosity (int): verbosity level. Default is 0.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        numpy.ndarray: y array with NaN values replaced by penalty value</span>
@@ -3967,10 +4007,11 @@
     <span class="k">if</span> <span class="n">nan_dim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! The dimension of the returned y array is </span><span class="si">{</span><span class="n">y_cleaned</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="sa">f</span><span class="s2">&quot;which is smaller than the original dimension </span><span class="si">{</span><span class="n">original_dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! Check whether continuing with the reduced dimension is useful.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;y before penalty: </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">. y after penalty: </span><span class="si">{</span><span class="n">y_cleaned</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">original_dim</span> <span class="o">-</span> <span class="n">nan_dim</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">stop_on_zero_return</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;!!!! The dimension of the returned y array is less than 1. Check the input data.&quot;</span><span class="p">)</span>
-
     <span class="k">return</span> <span class="n">y_cleaned</span>
 </code></pre></div></td></tr></table></div>
             </details>
