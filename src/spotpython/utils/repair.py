@@ -78,7 +78,7 @@ def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) 
     return X_cleaned, y_cleaned
 
 
-def apply_penalty_NA(y: np.ndarray, penalty_NA: float, sd=0.1, stop_on_zero_return: bool = False) -> np.ndarray:
+def apply_penalty_NA(y: np.ndarray, penalty_NA: float, sd=0.1, stop_on_zero_return: bool = False, verbosity=0) -> np.ndarray:
     """
     Replaces NaN values in y with a penalty value of penalty_NA and issues a warning if necessary.
 
@@ -87,6 +87,7 @@ def apply_penalty_NA(y: np.ndarray, penalty_NA: float, sd=0.1, stop_on_zero_retu
         penalty_NA (float): penalty value to replace NaN values in y
         sd (float): standard deviation for the random noise added to penalty_NA. Default is 0.1.
         stop_on_zero_return (bool): whether to stop if the returned dimension is less than 1. Default is False.
+        verbosity (int): verbosity level. Default is 0.
 
     Returns:
         numpy.ndarray: y array with NaN values replaced by penalty value
@@ -124,8 +125,9 @@ def apply_penalty_NA(y: np.ndarray, penalty_NA: float, sd=0.1, stop_on_zero_retu
     if nan_dim > 1:
         warnings.warn(f"\n!!! The dimension of the returned y array is {y_cleaned.shape[0]}, " f"which is smaller than the original dimension {original_dim}.")
         warnings.warn("\n!!! Check whether continuing with the reduced dimension is useful.")
+        if verbosity > 0:
+            print(f"y before penalty: {y}. y after penalty: {y_cleaned}")
 
     if (original_dim - nan_dim) < 1 and stop_on_zero_return:
         raise ValueError("!!!! The dimension of the returned y array is less than 1. Check the input data.")
-
     return y_cleaned

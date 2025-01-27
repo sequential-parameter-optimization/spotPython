@@ -74,7 +74,7 @@ def fun_control_init(
     prep_model=None,
     prep_model_name=None,
     progress_file=None,
-    save_experiment=True,
+    save_experiment=False,
     save_result=True,
     scaler=None,
     scaler_name=None,

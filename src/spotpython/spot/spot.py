@@ -233,7 +233,7 @@ class Spot:
 
         # The writer (Tensorboard) must be initialized before the surrogate model,
         # because the writer is passed to the surrogate model:
-        self.init_spot_writer()
+        self._init_spot_writer()
 
         self._surrogate_setup(surrogate)
 
@@ -862,6 +862,8 @@ class Spot:
             self.initialize_design(X_start)
             self.update_stats()
             self.fit_surrogate()
+            if self.verbosity > 0:
+                print("\n------ Starting optimization on the Surrogate for the given Budget ------\n")
             timeout_start = time.time()
             while self.should_continue(timeout_start):
                 self.update_design()
@@ -1083,7 +1085,7 @@ class Spot:
         logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: fun_control: %s", self.fun_control)
 
         self.y = self.fun(X=X_all, fun_control=self.fun_control)
-        self.y = apply_penalty_NA(self.y, self.fun_control["penalty_NA"])
+        self.y = apply_penalty_NA(self.y, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         logger.debug("In Spot() evaluate_initial_design(), after calling self.fun: self.y: %s", self.y)
 
         # TODO: Error if only nan values are returned
@@ -1410,7 +1412,7 @@ class Spot:
         )
         # (S-18): Evaluating New Solutions:
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
-        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
+        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         # Append New Solutions (only if they are not nan):
         if y0.shape[0] > 0:
@@ -1580,7 +1582,7 @@ class Spot:
 
         return picklable_instance
 
-    def init_spot_writer(self) -> None:
+    def _init_spot_writer(self) -> None:
         """
         Initialize the spot_writer for the current experiment if in fun_control
         the tensorboard_log is set to True
@@ -1590,7 +1592,7 @@ class Spot:
         if self.fun_control["tensorboard_log"] and self.fun_control["spot_tensorboard_path"] is not None:
             self.spot_writer = SummaryWriter(log_dir=self.fun_control["spot_tensorboard_path"])
             if self.verbosity > 0:
-                print(f"Created spot_tensorboard_path: {self.fun_control['spot_tensorboard_path']} for SummaryWriter()")
+                print(f"_init_spot_writer(): Created spot_tensorboard_path: {self.fun_control['spot_tensorboard_path']} for SummaryWriter()")
         else:
             self.spot_writer = None
             if self.verbosity > 0:
@@ -1643,7 +1645,7 @@ class Spot:
         logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
         y0 = self.fun(X=X_all, fun_control=self.fun_control)
-        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"])
+        y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         return X0, y0
 
@@ -1978,7 +1980,7 @@ class Spot:
         if self.k == 1:
             X_test = np.linspace(self.lower[0], self.upper[0], 100)
             y_test = self.fun(X=X_test.reshape(-1, 1), fun_control=self.fun_control)
-            y_test = apply_penalty_NA(y_test, self.fun_control["penalty_NA"])
+            y_test = apply_penalty_NA(y_test, self.fun_control["penalty_NA"], verbosity=self.verbosity)
             if isinstance(self.surrogate, Kriging):
                 y_hat = self.surrogate.predict(X_test[:, np.newaxis], return_val="y")
             else:
