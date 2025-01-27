@@ -36,8 +36,6 @@ class ManyToManyRNN(nn.Module):
         x = self.fc(x)
         x = self.activation_fct(x)
         x = self.output_layer(x)
-        # print(f"forward pass output X shape: {x.shape}")
-        # print(f"X: {x}")
         return x
 
 
@@ -50,7 +48,7 @@ class ManyToManyRNNRegressor(L.LightningModule):
         rnn_units: int = 256,
         fc_units: int = 256,
         act_fn: nn.Module = nn.ReLU(),
-        dropout: float = 0.0,
+        dropout_prob: float = 0.0,
         bidirectional: bool = True,
         optimizer: str = "Adam",
         lr_mult: float = 1.0,
@@ -75,11 +73,11 @@ class ManyToManyRNNRegressor(L.LightningModule):
         self.layers = ManyToManyRNN(
             input_size=_L_in,
             output_size=_L_out,
-            rnn_units=rnn_units,
-            fc_units=fc_units,
-            activation_fct=act_fn,
-            dropout=dropout,
-            bidirectional=bidirectional,
+            rnn_units=self.hparams.rnn_units,
+            fc_units=self.hparams.fc_units,
+            activation_fct=self.hparams.act_fn,
+            dropout=self.hparams.dropout_prob,
+            bidirectional=self.hparams.bidirectional,
         )
 
     def forward(self, x, lengths) -> torch.Tensor:
@@ -93,11 +91,11 @@ class ManyToManyRNNRegressor(L.LightningModule):
         loss = self.metric(y_hat, y)
         return loss
 
-    def training_step(self, batch: tuple) -> torch.Tensor:
+    def training_step(self, batch: tuple, batch_idx) -> torch.Tensor:
         val_loss = self._calculate_loss(batch)
         return val_loss
 
-    def validation_step(self, batch, batch_idx, prog_bar: bool = False) -> torch.Tensor:
+    def validation_step(self, batch: tuple, batch_idx, prog_bar: bool = False) -> torch.Tensor:
         val_loss = self._calculate_loss(batch)
         self.log("val_loss", val_loss, prog_bar=True)
         self.log("hp_metric", val_loss, prog_bar=True)

@@ -177,7 +177,6 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   This allows accessing the latest checkpoint in a deterministic manner.
     #   Default: None.
     config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
-    print(f"config_id: {config_id}")
     callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False
@@ -268,7 +267,6 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         gradient_clip_val=None,
         gradient_clip_algorithm="norm",
     )
-    print(f"train_model(): Trainer: {trainer}")
     # Fit the model
     # Args:
     # - model: Model to fit
@@ -300,7 +298,6 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   e.g., in model- or callback hooks like validation_step() etc.
     #   The length of the list corresponds to the number of validation dataloaders used.
     result = trainer.validate(model=model, datamodule=dm, ckpt_path=None, verbose=verbose)
-    print(f"result: {result}")
 
     # unlist the result (from a list of one dict)
     result = result[0]

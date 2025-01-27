@@ -43,8 +43,7 @@ def test_ManyToManyRNNRegressor_forward(example_batch):
 
 def test_ManyToManyRNNRegressor_training_step(example_batch):
     model = ManyToManyRNNRegressor(_L_in=10, _L_out=1, batch_size=4)
-    x, lengths, y = example_batch
-    loss = model.training_step((x, lengths, y), 0)
+    loss = model.training_step(example_batch,0 )
     assert loss is not None
 
 def test_ManyToManyRNNRegressor_validation_step(example_batch):
