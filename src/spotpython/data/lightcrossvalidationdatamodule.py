@@ -59,6 +59,10 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         num_workers: int = 0,
         pin_memory: bool = False,
         scaler: Optional[object] = None,
+        collate_fn_name: Optional[str] = None,
+        shuffle_train: bool = True,
+        shuffle_val: bool = False,
+        shuffle_test: bool = False,
         verbosity: int = 0,
     ):
         super().__init__()
@@ -76,6 +80,10 @@ class LightCrossValidationDataModule(L.LightningDataModule):
         self.scaler = scaler
         self.save_hyperparameters(logger=False)
         assert 0 <= self.k < self.num_splits, "incorrect fold number"
+        self.collate_fn_name = collate_fn_name
+        self.shuffle_train = shuffle_train
+        self.shuffle_val = shuffle_val
+        self.shuffle_test = shuffle_test
         self.verbosity = verbosity
 
         # no data transformations
