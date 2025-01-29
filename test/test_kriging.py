@@ -1,4 +1,4 @@
-from spotpython.build import Kriging
+from spotpython.build.kriging import Kriging
 import numpy as np
 from math import erf
 from numpy import log, var

@@ -33,6 +33,7 @@ def fun_control_init(
     core_model_name=None,
     data=None,
     data_full_train=None,
+    hacky=False,  # !TODO: Documentation
     data_val=None,
     data_dir="./data",
     data_module=None,
@@ -429,6 +430,7 @@ def fun_control_init(
         "data": data,
         "data_dir": data_dir,
         "data_full_train": data_full_train,
+        "hacky": hacky,
         "data_module": data_module,
         "data_set": data_set,
         "data_set_name": data_set_name,

@@ -1,10 +1,14 @@
 import lightning as L
-from spotpython.data.lightdatamodule import LightDataModule
+from spotpython.data.lightdatamodule import LightDataModule, PadSequenceManyToMany
 from spotpython.utils.eda import generate_config_id
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.callbacks import ModelCheckpoint
+from torch.utils.data import DataLoader
+import torch
 import os
+
+import numpy as np
 
 
 def generate_config_id_with_timestamp(config: dict, timestamp: bool) -> str:
@@ -124,6 +128,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         )
     else:
         dm = fun_control["data_module"]
+
     model = build_model_instance(config, fun_control)
     # TODO: Check if this is necessary or if this is handled by the trainer
     # dm.setup()
@@ -182,6 +187,63 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         # add ModelCheckpoint only if timestamp is False
         dirpath = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
         callbacks.append(ModelCheckpoint(dirpath=dirpath, monitor=None, verbose=False, save_last=True))  # Save the last checkpoint
+
+    if fun_control["hacky"]:
+        verbose = fun_control["verbosity"] > 0
+        ds = fun_control["data_full_train"]
+        indices = list(range(len(ds)))
+        indice_results_val_loss = []
+        indice_results_hp_metric = []
+        for i in indices:
+            print(f"train_model(): Hacky Implementation with Index {i}")
+            test_indices = [indices[i]]
+            train_indices = [index for index in indices if index != test_indices[0]]
+
+            train_dataset = torch.utils.data.Subset(ds, train_indices)
+            test_dataset = torch.utils.data.Subset(ds, test_indices)
+
+            train_dl = DataLoader(train_dataset, batch_size=config["batch_size"], shuffle=False, collate_fn=PadSequenceManyToMany())
+            test_dl = DataLoader(test_dataset, batch_size=config["batch_size"], shuffle=False, collate_fn=PadSequenceManyToMany())
+
+            model = build_model_instance(config, fun_control)
+
+            enable_progress_bar = fun_control["enable_progress_bar"] or False
+            trainer = L.Trainer(
+                # Where to save models
+                default_root_dir=os.path.join(fun_control["CHECKPOINT_PATH"], config_id),
+                max_epochs=model.hparams.epochs,
+                accelerator=fun_control["accelerator"],
+                devices=fun_control["devices"],
+                strategy=fun_control["strategy"],
+                num_nodes=fun_control["num_nodes"],
+                precision=fun_control["precision"],
+                logger=TensorBoardLogger(save_dir=fun_control["TENSORBOARD_PATH"], version=config_id, default_hp_metric=True, log_graph=fun_control["log_graph"], name=""),
+                callbacks=callbacks,
+                enable_progress_bar=enable_progress_bar,
+                num_sanity_val_steps=fun_control["num_sanity_val_steps"],
+                log_every_n_steps=fun_control["log_every_n_steps"],
+                gradient_clip_val=None,
+                gradient_clip_algorithm="norm",
+            )
+
+            trainer.fit(model=model, train_dataloaders=train_dl, ckpt_path=None)
+            result = trainer.validate(model=model, dataloaders=test_dl, ckpt_path=None, verbose=verbose)
+            result = result[0]
+
+            print(f"results_dict: {result}")
+
+            indice_results_val_loss.append(result["val_loss"])
+            indice_results_hp_metric.append(result["hp_metric"])
+
+        mean_val_loss = np.mean(indice_results_val_loss)
+        mean_hp_metric = np.mean(indice_results_hp_metric)
+
+        print(f"train_model(): Mean Validation Loss: {mean_val_loss}")
+        print(f"train_model(): Mean Hyperparameter Metric: {mean_hp_metric}")
+
+        results_dict = {"val_loss": mean_val_loss, "hp_metric": mean_hp_metric}
+
+        return results_dict["val_loss"]
 
     # Tensorboard logger. The tensorboard is passed to the trainer.
     # See: https://lightning.ai/docs/pytorch/stable/extensions/generated/lightning.pytorch.loggers.TensorBoardLogger.html
