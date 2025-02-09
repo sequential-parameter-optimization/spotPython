@@ -141,3 +141,60 @@ def pairwise_partial_correlation(x, y, z, method="pearson") -> dict:
         "gp": pcor_result["gp"],
         "method": method,
     }
+
+
+def semi_partial_correlation(x, method="pearson"):
+    if isinstance(x, pd.DataFrame):
+        x = x.to_numpy()
+    if not isinstance(x, np.ndarray):
+        raise ValueError("Supply a matrix-like 'x'")
+    if not np.issubdtype(x.dtype, np.number):
+        raise ValueError("'x' must be numeric")
+
+    n = x.shape[0]
+    gp = x.shape[1] - 2
+    cvx = np.cov(x, rowvar=False, bias=True)
+
+    try:
+        if np.linalg.det(cvx) < np.finfo(float).eps:
+            icvx = pinv(cvx)
+        else:
+            icvx = inv(cvx)
+    except LinAlgError:
+        icvx = pinv(cvx)
+
+    sp_cor = -cov_to_cor(icvx) / np.sqrt(np.diag(cvx)) / np.sqrt(np.abs(np.diag(icvx) - np.square(icvx.T) / np.diag(icvx)))
+    np.fill_diagonal(sp_cor, 1)
+
+    if method == "kendall":
+        denominator = np.sqrt(2 * (2 * (n - gp) + 5) / (9 * (n - gp) * (n - 1 - gp)))
+        statistic = sp_cor / denominator
+        p_value = 2 * norm.cdf(-np.abs(statistic))
+    else:
+        factor = np.sqrt((n - 2 - gp) / (1 - sp_cor**2))
+        statistic = sp_cor * factor
+        p_value = 2 * t.cdf(-np.abs(statistic), df=n - 2 - gp)
+
+    np.fill_diagonal(statistic, 0)
+    np.fill_diagonal(p_value, 0)
+
+    return {"estimate": sp_cor, "p_value": p_value, "statistic": statistic, "n": n, "gp": gp, "method": method}
+
+
+def pairwise_semi_partial_correlation(x, y, z, method="pearson"):
+    x = np.asarray(x)
+    y = np.asarray(y)
+    z = pd.DataFrame(z)
+
+    xyz = pd.concat([pd.Series(x), pd.Series(y), z], axis=1)
+
+    spcor_result = semi_partial_correlation(xyz, method=method)
+
+    return {
+        "estimate": spcor_result["estimate"][0, 1],
+        "p_value": spcor_result["p_value"][0, 1],
+        "statistic": spcor_result["statistic"][0, 1],
+        "n": spcor_result["n"],
+        "gp": spcor_result["gp"],
+        "method": method,
+    }
