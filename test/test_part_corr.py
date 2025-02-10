@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import pandas as pd
-from spotpython.utils.stats import cov_to_cor, partial_correlation, pairwise_partial_correlation
+from spotpython.utils.stats import cov_to_cor, partial_correlation, partial_correlation_test
 
 def test_cov_to_cor():
     covariance = np.array([[1, 0.8], [0.8, 1]])
@@ -24,11 +24,11 @@ def test_partial_correlation():
     assert result['gp'] == 1, "The number of given parameters should be 1"
 
 
-def test_pairwise_partial_correlation():
+def test_partial_correlation_test():
     x = [1, 2, 3, 4]
     y = [2, 3, 4, 5]
     z = pd.DataFrame({'C': [4, 5, 6, 7]})
-    result = pairwise_partial_correlation(x, y, z, method='pearson')
+    result = partial_correlation_test(x, y, z, method='pearson')
 
     print(result)  # Debug: Output the result for inspection
 
@@ -51,13 +51,13 @@ def test_partial_correlation_input_validation():
     with pytest.raises(ValueError):
         partial_correlation(pd.DataFrame({'A': ['a', 'b', 'c']}))
 
-def test_pairwise_partial_correlation_input_validation():
+def test_partial_correlation_test_input_validation():
     x = [1, 2, 3, 4]
     y = [2, 3, 4, 5]
     z_invalid = "not a dataframe"
     
     with pytest.raises(ValueError):
-        pairwise_partial_correlation(x, y, z_invalid)
+        partial_correlation_test(x, y, z_invalid)
 
 if __name__ == "__main__":
     pytest.main()

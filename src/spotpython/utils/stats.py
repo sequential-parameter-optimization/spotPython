@@ -44,7 +44,7 @@ def partial_correlation(x, method="pearson") -> dict:
         Commun Stat Appl Methods 22, 6 (Nov 2015), 665–674.
 
     Examples:
-        >>> from spotpython.utils.stats import cov_to_cor
+        >>> from spotpython.utils.stats import partial_correlation
         >>> import numpy as np
         >>> import pandas as pd
         >>> data = pd.DataFrame({
@@ -61,6 +61,7 @@ def partial_correlation(x, method="pearson") -> dict:
                           [0. , 0. , 0. ]]), ...
         }
     """
+    eps = 1e-6
     if isinstance(x, pd.DataFrame):
         x = x.to_numpy()
     if not isinstance(x, np.ndarray):
@@ -83,13 +84,12 @@ def partial_correlation(x, method="pearson") -> dict:
     p_cor = -cov_to_cor(icvx)
     np.fill_diagonal(p_cor, 1)
 
-    epsilon = 1e-10  # small value to prevent division by zero
     if method == "kendall":
         denominator = np.sqrt(2 * (2 * (n - gp) + 5) / (9 * (n - gp) * (n - 1 - gp)))
         statistic = p_cor / denominator
         p_value = 2 * norm.cdf(-np.abs(statistic))
     else:
-        factor = np.sqrt((n - 2 - gp) / (1 - p_cor**2 + epsilon))
+        factor = np.sqrt((n - 2 - gp) / (1 + eps - p_cor**2))
         statistic = p_cor * factor
         p_value = 2 * t.cdf(-np.abs(statistic), df=n - 2 - gp)
 
@@ -99,8 +99,9 @@ def partial_correlation(x, method="pearson") -> dict:
     return {"estimate": p_cor, "p_value": p_value, "statistic": statistic, "n": n, "gp": gp, "method": method}
 
 
-def pairwise_partial_correlation(x, y, z, method="pearson") -> dict:
-    """Calculate the pairwise partial correlation between two variables given others.
+def partial_correlation_test(x, y, z, method="pearson") -> dict:
+    """The partial correlation coefficient between x and y given z.
+        x and y should be arrays (vectors) of the same length, and z should be a data frame (matrix).
 
     Args:
         x (array-like): The first variable as a 1-dimensional array or list.
