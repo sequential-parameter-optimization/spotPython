@@ -59,7 +59,7 @@ def find_equal_in_lists(a: List[int], b: List[int]) -> List[int]:
     return equal
 
 
-def check_identical_columns_and_rows(df, name, remove=False, verbosity=1) -> pd.DataFrame:
+def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> pd.DataFrame:
     """
     Checks for exact identical columns and rows in the DataFrame.
 
@@ -69,7 +69,6 @@ def check_identical_columns_and_rows(df, name, remove=False, verbosity=1) -> pd.
 
     Args:
         df (pd.DataFrame): The DataFrame to check.
-        name (str): Name of the DataFrame for reporting.
         remove (bool): Whether to remove duplicate columns/rows.
         verbosity (int): Level of verbosity; 0 for no output, 1 for standard messages.
 
@@ -85,7 +84,6 @@ def check_identical_columns_and_rows(df, name, remove=False, verbosity=1) -> pd.
     # Check for exact identical columns
     col_mask = df.T.duplicated(keep="first")
     if col_mask.any() and verbosity > 0:
-        print(f"\nExact identical columns in {name}:")
         print(list(df.columns[col_mask]))
 
     if remove:
@@ -94,7 +92,6 @@ def check_identical_columns_and_rows(df, name, remove=False, verbosity=1) -> pd.
     # Check for exact identical rows
     row_mask = df.duplicated(keep="first")
     if row_mask.any() and verbosity > 0:
-        print(f"\nExact identical rows in {name}:")
         print(list(df.index[row_mask]))
 
     if remove:
@@ -103,13 +100,12 @@ def check_identical_columns_and_rows(df, name, remove=False, verbosity=1) -> pd.
     return df
 
 
-def check_identical_columns_and_rows_with_tol(df, name, tolerance, remove=False, verbosity=1) -> pd.DataFrame:
+def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbosity=1) -> pd.DataFrame:
     """
     Checks for identical columns and rows within a given tolerance.
 
     Args:
         df (pd.DataFrame): The DataFrame to check.
-        name (str): Name of the DataFrame for reporting.
         tolerance (float): The tolerance for checking equivalence.
         remove (bool): Whether to remove duplicates found within the tolerance.
         verbosity (int): Level of verbosity; 0 for no output, 1 for standard messages.
@@ -136,7 +132,6 @@ def check_identical_columns_and_rows_with_tol(df, name, tolerance, remove=False,
                 identical_columns.append((df.columns[i], df.columns[j]))
 
     if identical_columns and verbosity > 0:
-        print(f"\nIdentical columns within tolerance in {name}:")
         for col_pair in identical_columns:
             print(col_pair)
 
@@ -151,7 +146,6 @@ def check_identical_columns_and_rows_with_tol(df, name, tolerance, remove=False,
                 identical_rows.append((df.index[i], df.index[j]))
 
     if identical_rows and verbosity > 0:
-        print(f"\nIdentical rows within tolerance in {name}:")
         for row_pair in identical_rows:
             print(row_pair)
 

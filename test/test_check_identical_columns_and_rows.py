@@ -16,11 +16,11 @@ def test_check_exact_identical_columns_and_rows():
     })
 
     # Exact duplicates - should identify and remove B
-    result_df = check_identical_columns_and_rows(df1, "Test DataFrame 1", remove=True)
+    result_df = check_identical_columns_and_rows(df1, remove=True)
     assert list(result_df.columns) == ["A", "C"], "Failed to remove duplicate columns accurately"
 
     # No duplicates - should not remove any columns
-    result_df = check_identical_columns_and_rows(df2, "Test DataFrame 2", remove=True)
+    result_df = check_identical_columns_and_rows(df2, remove=True)
     assert list(result_df.columns) == ["X", "Y"], "Incorrectly removed columns when there were none to remove"
 
 def test_check_identical_columns_and_rows_with_tol():
@@ -32,11 +32,11 @@ def test_check_identical_columns_and_rows_with_tol():
     })
 
     # Within-tolerance duplicates - should identify and remove B
-    result_df = check_identical_columns_and_rows_with_tol(df1, "Test DataFrame 1", tolerance=0.05, remove=True)
+    result_df = check_identical_columns_and_rows_with_tol(df1, tolerance=0.05, remove=True)
     assert list(result_df.columns) == ["A", "C"], "Failed to remove near-duplicate columns accurately"
 
     # No near duplicates within a small tolerance
-    result_df = check_identical_columns_and_rows_with_tol(df1, "Test DataFrame 1", tolerance=0.001, remove=True)
+    result_df = check_identical_columns_and_rows_with_tol(df1, tolerance=0.001, remove=True)
     assert list(result_df.columns) == ["A", "B", "C"], "Incorrectly removed columns when they are not near duplicates"
 
 def test_check_exact_identical_columns_and_rows_remove_true():
@@ -46,7 +46,7 @@ def test_check_exact_identical_columns_and_rows_remove_true():
         "C": [4, 5, 6]
     })
     
-    result_df = check_identical_columns_and_rows(df1, "Test DataFrame 1", remove=True)
+    result_df = check_identical_columns_and_rows(df1, remove=True)
     assert list(result_df.columns) == ["A", "C"], "Failed to remove duplicate columns accurately"
 
 def test_check_exact_identical_columns_and_rows_remove_false():
@@ -57,7 +57,7 @@ def test_check_exact_identical_columns_and_rows_remove_false():
     })
     
     # Check without removing duplicates
-    result_df = check_identical_columns_and_rows(df1, "Test DataFrame 1", remove=False)
+    result_df = check_identical_columns_and_rows(df1, remove=False)
     assert list(result_df.columns) == ["A", "B", "C"], "Incorrectly identified or removed columns when remove=False"
 
 def test_check_identical_columns_and_rows_with_tol_remove_true():
@@ -67,7 +67,7 @@ def test_check_identical_columns_and_rows_with_tol_remove_true():
         "C": [4.00, 5.00, 6.00]
     })
 
-    result_df = check_identical_columns_and_rows_with_tol(df1, "Test DataFrame 1", tolerance=0.05, remove=True)
+    result_df = check_identical_columns_and_rows_with_tol(df1, tolerance=0.05, remove=True)
     assert list(result_df.columns) == ["A", "C"], "Failed to remove near-duplicate columns accurately with tolerance"
 
 def test_check_identical_columns_and_rows_with_tol_remove_false():
@@ -78,7 +78,7 @@ def test_check_identical_columns_and_rows_with_tol_remove_false():
     })
 
     # Check without removing duplicates
-    result_df = check_identical_columns_and_rows_with_tol(df1, "Test DataFrame 1", tolerance=0.05, remove=False)
+    result_df = check_identical_columns_and_rows_with_tol(df1, tolerance=0.05, remove=False)
     assert list(result_df.columns) == ["A", "B", "C"], "Incorrectly identified or removed columns when remove=False"
 
 def test_with_no_duplicates():
@@ -87,10 +87,10 @@ def test_with_no_duplicates():
         "Y": [4, 5, 6],
         "Z": [7, 8, 9]
     })
-    result_df = check_identical_columns_and_rows(df, "Test DataFrame with No Duplicates", remove=True)
+    result_df = check_identical_columns_and_rows(df, remove=True)
     assert list(result_df.columns) == ["X", "Y", "Z"], "Incorrectly removed columns in a no-duplicates scenario"
 
-    result_df_with_tol = check_identical_columns_and_rows_with_tol(df, "Test DataFrame with No Duplicates", tolerance=0.1, remove=True)
+    result_df_with_tol = check_identical_columns_and_rows_with_tol(df, tolerance=0.1, remove=True)
     assert list(result_df_with_tol.columns) == ["X", "Y", "Z"], "Incorrectly removed columns in a no-duplicates scenario with tolerance"
 
 
