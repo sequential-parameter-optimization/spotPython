@@ -86,7 +86,7 @@ def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> tuple:
     identical_columns = []
     for i in range(len(df.columns)):
         for j in range(i + 1, len(df.columns)):
-            if df.iloc[:, i].equals(df.iloc[:, j]):
+            if df.iloc[:, i].equals(df.iloc[:, j]):  # Ensure entire columns are compared
                 identical_columns.append((df.columns[i], df.columns[j]))
 
     if identical_columns and verbosity > 0:
@@ -101,7 +101,7 @@ def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> tuple:
     identical_rows = []
     for i in range(len(df.index)):
         for j in range(i + 1, len(df.index)):
-            if df.iloc[i, :].equals(df.iloc[j, :]):
+            if df.iloc[i, :].equals(df.iloc[j, :]):  # Ensure entire rows are compared
                 identical_rows.append((df.index[i], df.index[j]))
 
     if identical_rows and verbosity > 0:

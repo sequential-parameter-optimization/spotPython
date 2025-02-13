@@ -3,6 +3,7 @@ import pytest
 from spotpython.utils.compare import check_identical_columns_and_rows, check_identical_columns_and_rows_with_tol
 
 def test_check_exact_identical_columns_and_rows_remove_true():
+    # Test DataFrame with exact duplicate columns
     df1 = pd.DataFrame({
         "A": [1, 2, 3],
         "B": [1, 2, 3],
@@ -15,6 +16,7 @@ def test_check_exact_identical_columns_and_rows_remove_true():
     assert identical_rows == [], "Incorrectly identified duplicate rows where none exist"
 
 def test_check_exact_identical_columns_and_rows_remove_false():
+    # Test DataFrame checks presence of duplicates without removing
     df1 = pd.DataFrame({
         "A": [1, 2, 3],
         "B": [1, 2, 3],
@@ -27,6 +29,7 @@ def test_check_exact_identical_columns_and_rows_remove_false():
     assert identical_rows == [], "Incorrectly found duplicate rows"
 
 def test_check_identical_columns_and_rows_with_tol_remove_true():
+    # Test DataFrame with near-duplicate tolerance checks for columns
     df1 = pd.DataFrame({
         "A": [1.00, 2.01, 3.00],
         "B": [1.01, 2.00, 3.01],
@@ -39,6 +42,7 @@ def test_check_identical_columns_and_rows_with_tol_remove_true():
     assert identical_rows == [], "Incorrectly found duplicate rows"
 
 def test_check_identical_columns_and_rows_with_tol_remove_false():
+    # Test DataFrame with tolerance execution, no removal
     df1 = pd.DataFrame({
         "A": [1.00, 2.01, 3.00],
         "B": [1.01, 2.00, 3.01],
@@ -51,6 +55,7 @@ def test_check_identical_columns_and_rows_with_tol_remove_false():
     assert identical_rows == [], "Incorrectly found duplicate rows"
 
 def test_with_no_duplicates():
+    # Tests scenarios where there are no duplicate columns or rows present
     df = pd.DataFrame({
         "X": [1, 2, 3],
         "Y": [4, 5, 6],
