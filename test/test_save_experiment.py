@@ -12,6 +12,7 @@ def test_save_experiment(tmp_path, capsys):
     
     # Initialize function control
     fun_control = fun_control_init(
+        save_experiment=True,
         PREFIX=PREFIX,
         lower=np.array([-1, -1]),
         upper=np.array([1, 1])
