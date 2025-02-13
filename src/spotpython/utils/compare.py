@@ -2,7 +2,6 @@ from typing import Tuple
 from typing import List
 
 import numpy as np
-import pandas as pd
 
 
 def selectNew(A: np.ndarray, X: np.ndarray, tolerance: float = 0) -> Tuple[np.ndarray, np.ndarray]:
@@ -59,7 +58,7 @@ def find_equal_in_lists(a: List[int], b: List[int]) -> List[int]:
     return equal
 
 
-def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> pd.DataFrame:
+def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> tuple:
     """
     Checks for exact identical columns and rows in the DataFrame.
 
@@ -73,34 +72,50 @@ def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> pd.DataFr
         verbosity (int): Level of verbosity; 0 for no output, 1 for standard messages.
 
     Returns:
-        pd.DataFrame: The DataFrame with duplicates removed if specified.
+        tuple: A tuple containing the DataFrame with duplicates removed if specified,
+               a list of tuples indicating which columns are duplicates,
+               and a list of tuples indicating which rows are duplicates.
 
     Example:
         >>> df = pd.DataFrame({"A": [1, 2, 3], "B": [1, 2, 3], "C": [4, 5, 6]})
-        >>> check_identical_columns_and_rows(df, "Example DataFrame", remove=False, verbosity=1)
-        Identical columns in Example DataFrame:
-        ['A', 'B']
+        >>> check_identical_columns_and_rows(df, remove=False, verbosity=1)
+        Identical columns in DataFrame:
+        [('A', 'B')]
     """
     # Check for exact identical columns
-    col_mask = df.T.duplicated(keep="first")
-    if col_mask.any() and verbosity > 0:
-        print(list(df.columns[col_mask]))
+    identical_columns = []
+    for i in range(len(df.columns)):
+        for j in range(i + 1, len(df.columns)):
+            if df.iloc[:, i].equals(df.iloc[:, j]):
+                identical_columns.append((df.columns[i], df.columns[j]))
 
-    if remove:
-        df = df.loc[:, ~col_mask]
+    if identical_columns and verbosity > 0:
+        print("Identical columns in DataFrame:")
+        for col_pair in identical_columns:
+            print(col_pair)
+
+    if remove and identical_columns:
+        df = df.drop(columns=[col_pair[1] for col_pair in identical_columns])
 
     # Check for exact identical rows
-    row_mask = df.duplicated(keep="first")
-    if row_mask.any() and verbosity > 0:
-        print(list(df.index[row_mask]))
+    identical_rows = []
+    for i in range(len(df.index)):
+        for j in range(i + 1, len(df.index)):
+            if df.iloc[i, :].equals(df.iloc[j, :]):
+                identical_rows.append((df.index[i], df.index[j]))
 
-    if remove:
-        df = df.loc[~row_mask]
+    if identical_rows and verbosity > 0:
+        print("Identical rows in DataFrame:")
+        for row_pair in identical_rows:
+            print(row_pair)
 
-    return df
+    if remove and identical_rows:
+        df = df.drop(index=[row_pair[1] for row_pair in identical_rows])
+
+    return df, identical_columns, identical_rows
 
 
-def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbosity=1) -> pd.DataFrame:
+def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbosity=1) -> tuple:
     """
     Checks for identical columns and rows within a given tolerance.
 
@@ -111,13 +126,15 @@ def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbo
         verbosity (int): Level of verbosity; 0 for no output, 1 for standard messages.
 
     Returns:
-        pd.DataFrame: The DataFrame with duplicates removed if specified.
+        tuple: A tuple containing the DataFrame with duplicates removed if specified,
+               a list of tuples indicating which columns are duplicates within the tolerance,
+               and a list of tuples indicating which rows are duplicates within the tolerance.
 
     Example:
         >>> df = pd.DataFrame({"A": [1, 1, 3], "B": [1, 1.01, 3], "C": [4, 5, 6]})
-        >>> check_identical_columns_and_rows_with_tol(df, "Example DataFrame", tolerance=0.05, remove=False, verbosity=1)
-        Identical columns within tolerance in Example DataFrame:
-        ('A', 'B')
+        >>> check_identical_columns_and_rows_with_tol(df, tolerance=0.05, remove=False, verbosity=1)
+        Identical columns within tolerance in DataFrame:
+        [('A', 'B')]
     """
 
     # Function to compare rows/columns with tolerance
@@ -132,10 +149,11 @@ def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbo
                 identical_columns.append((df.columns[i], df.columns[j]))
 
     if identical_columns and verbosity > 0:
+        print("Identical columns within tolerance in DataFrame:")
         for col_pair in identical_columns:
             print(col_pair)
 
-    if remove:
+    if remove and identical_columns:
         df = df.drop(columns=[col_pair[1] for col_pair in identical_columns])
 
     # Check for identical rows within tolerance
@@ -146,10 +164,11 @@ def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbo
                 identical_rows.append((df.index[i], df.index[j]))
 
     if identical_rows and verbosity > 0:
+        print("Identical rows within tolerance in DataFrame:")
         for row_pair in identical_rows:
             print(row_pair)
 
-    if remove:
+    if remove and identical_rows:
         df = df.drop(index=[row_pair[1] for row_pair in identical_rows])
 
-    return df
+    return df, identical_columns, identical_rows
