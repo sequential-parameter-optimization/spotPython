@@ -76,11 +76,13 @@ def check_identical_columns_and_rows(df, remove=False, verbosity=1) -> tuple:
                a list of tuples indicating which columns are duplicates,
                and a list of tuples indicating which rows are duplicates.
 
-    Example:
+    Examples:
+        >>> import pandas as pd
+        >>> from spotpython.utils.compare import check_identical_columns_and_rows
         >>> df = pd.DataFrame({"A": [1, 2, 3], "B": [1, 2, 3], "C": [4, 5, 6]})
         >>> check_identical_columns_and_rows(df, remove=False, verbosity=1)
-        Identical columns in DataFrame:
-        [('A', 'B')]
+                Identical columns in DataFrame:
+                [('A', 'B')]
     """
     # Check for exact identical columns
     identical_columns = []
@@ -130,11 +132,13 @@ def check_identical_columns_and_rows_with_tol(df, tolerance, remove=False, verbo
                a list of tuples indicating which columns are duplicates within the tolerance,
                and a list of tuples indicating which rows are duplicates within the tolerance.
 
-    Example:
+    Examples:
+        >>> import pandas as pd
+        >>> from spotpython.utils.compare import check_identical_columns_and_rows_with_tol
         >>> df = pd.DataFrame({"A": [1, 1, 3], "B": [1, 1.01, 3], "C": [4, 5, 6]})
         >>> check_identical_columns_and_rows_with_tol(df, tolerance=0.05, remove=False, verbosity=1)
-        Identical columns within tolerance in DataFrame:
-        [('A', 'B')]
+            Identical columns within tolerance in DataFrame:
+            [('A', 'B')]
     """
 
     # Function to compare rows/columns with tolerance
