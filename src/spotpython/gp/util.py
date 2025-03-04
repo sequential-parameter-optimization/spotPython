@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def log_determinant_chol(M):
+def log_determinant_chol(M) -> float:
     """
     Returns the log determinant of the n x n Cholesky decomposition of a matrix M.
 

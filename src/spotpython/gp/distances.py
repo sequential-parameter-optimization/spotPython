@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def new_matrix_bones(data, rows, cols):
+def new_matrix_bones(data, rows, cols) -> np.ndarray:
     """
     Create a matrix view of the given data.
 
@@ -16,7 +16,7 @@ def new_matrix_bones(data, rows, cols):
     return np.reshape(data, (rows, cols))
 
 
-def covar_anisotropic(X1=None, X2=None, d=None, g=None):
+def covar_anisotropic(X1=None, X2=None, d=None, g=None) -> np.ndarray:
     """
     Calculate the separable covariance matrix between the rows of X1 and X2 with lengthscale d and nugget g.
 
@@ -78,7 +78,7 @@ def covar_anisotropic(X1=None, X2=None, d=None, g=None):
         return K
 
 
-def covar_sep_R(col_in, X1_in, n1_in, X2_in, n2_in, d_in, g_in):
+def covar_sep_R(col_in, X1_in, n1_in, X2_in, n2_in, d_in, g_in) -> np.ndarray:
     """
     Calculate a covariance matrix (K) using a separable power exponential covariance function with range d[col] and nugget g.
 
@@ -124,7 +124,7 @@ def covar_sep_R(col_in, X1_in, n1_in, X2_in, n2_in, d_in, g_in):
     return K
 
 
-def covar_sep(col, X1, n1, X2, n2, d, g):
+def covar_sep(col, X1, n1, X2, n2, d, g) -> np.ndarray:
     """
     Calculate the correlation (K) between X1 and X2 with a separable power exponential correlation function
     with range d and nugget g.
@@ -171,7 +171,7 @@ def covar_sep(col, X1, n1, X2, n2, d, g):
     return K
 
 
-def covar_sep_symm_R(col_in, X_in, n_in, d_in, g_in):
+def covar_sep_symm_R(col_in, X_in, n_in, d_in, g_in) -> np.ndarray:
     """
     Calculate a symmetric covariance matrix (K) using a separable power exponential covariance function with range d[col] and nugget g.
 
@@ -211,7 +211,7 @@ def covar_sep_symm_R(col_in, X_in, n_in, d_in, g_in):
     return K
 
 
-def covar_sep_symm(col, X, n, d, g):
+def covar_sep_symm(col, X, n, d, g) -> np.ndarray:
     """
     Calculate the correlation (K) between X1 and X2 with a separable power exponential correlation function
     with range d and nugget g.
@@ -240,7 +240,7 @@ def covar_sep_symm(col, X, n, d, g):
     return K
 
 
-def dist(X1, X2=None):
+def dist(X1, X2=None) -> np.ndarray:
     """
     Calculate the distance matrix between the rows of X1 and X2, or between X1 and itself when X2 is None.
 
@@ -287,7 +287,7 @@ def dist(X1, X2=None):
         return D
 
 
-def distance_R(X1_in, n1_in, X2_in, n2_in, m_in):
+def distance_R(X1_in, n1_in, X2_in, n2_in, m_in) -> np.ndarray:
     """
     Calculate the distance matrix between the rows of X1 and X2.
 
@@ -321,7 +321,7 @@ def distance_R(X1_in, n1_in, X2_in, n2_in, m_in):
     return D
 
 
-def distance(X1, n1, X2, n2, m):
+def distance(X1, n1, X2, n2, m) -> np.ndarray:
     """
     Calculate the distance matrix (D) between X1 and X2.
 
@@ -346,7 +346,7 @@ def distance(X1, n1, X2, n2, m):
     return D
 
 
-def distance_symm_R(X_in, n_in, m_in):
+def distance_symm_R(X_in, n_in, m_in) -> np.ndarray:
     """
     Calculate the distance matrix between the rows of X and itself, with output in the symmetric D_out matrix.
 

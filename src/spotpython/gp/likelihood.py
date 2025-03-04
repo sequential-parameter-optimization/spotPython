@@ -3,7 +3,7 @@ from numpy.linalg import inv, det
 from spotpython.gp.distances import covar_anisotropic, dist
 
 
-def nlsep(par, X, Y):
+def nlsep(par, X, Y) -> float:
     """
     Calculate the negative log-likelihood for a separable power exponential correlation function.
 
@@ -36,7 +36,7 @@ def nlsep(par, X, Y):
     return -ll
 
 
-def nl(par, D, Y):
+def nl(par, D, Y) -> float:
     """
     Calculate the negative log-likelihood for an exponential correlation function.
 
@@ -69,7 +69,7 @@ def nl(par, D, Y):
     return -ll
 
 
-def gradnl(par, D, Y):
+def gradnl(par, D, Y) -> np.ndarray:
     """
     Calculate the gradient of the negative log-likelihood for an exponential correlation function.
 
@@ -113,7 +113,7 @@ def gradnl(par, D, Y):
     return -np.array([dlltheta, dllg])
 
 
-def gradnlsep(par, X, Y):
+def gradnlsep(par, X, Y) -> np.ndarray:
     """
     Calculate the gradient of the negative log-likelihood for a separable power exponential correlation function.
 

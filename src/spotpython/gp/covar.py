@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def covar_sep_symm(col, X, n, d, g, K=None):
+def covar_sep_symm(col, X, n, d, g, K=None) -> np.ndarray:
     """
     Calculate the correlation (K) between X1 and X2 with a separable power exponential correlation function with range d and nugget g.
 
@@ -42,7 +42,7 @@ def covar_sep_symm(col, X, n, d, g, K=None):
     return K
 
 
-def covar_sep(col, X1, n1, X2, n2, d, g):
+def covar_sep(col, X1, n1, X2, n2, d, g) -> np.ndarray:
     """
     Calculate the correlation (K) between X1 and X2 with
     a separable power exponential correlation function
@@ -86,7 +86,7 @@ def covar_sep(col, X1, n1, X2, n2, d, g):
     return K
 
 
-def diff_covar_sep(col, X1, n1, X2, n2, d, K):
+def diff_covar_sep(col, X1, n1, X2, n2, d, K) -> np.ndarray:
     """
     Calculate the first and second derivative (wrt d) of the correlation (K)
     between X1 and X2 with a separable power exponential correlation function
@@ -132,7 +132,7 @@ def diff_covar_sep(col, X1, n1, X2, n2, d, K):
     return dK
 
 
-def diff_covar_sep_symm(col, X, n, d, K):
+def diff_covar_sep_symm(col, X, n, d, K) -> np.ndarray:
     """
     Calculate the first and second derivative (wrt d) of the correlation (K)
     between X1 and X2 with a separable power exponential correlation function

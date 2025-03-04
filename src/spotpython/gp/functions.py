@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.stats import qmc
 
 
-def fried(n=50, m=6):
+def fried(n=50, m=6) -> pd.DataFrame:
     """
     Generate a dataset using the Friedman function.
 
@@ -46,7 +46,7 @@ def fried(n=50, m=6):
     return data
 
 
-def f2d(x, y=None):
+def f2d(x, y=None) -> np.ndarray:
     """
     Simple 2-d test function used in Gramacy & Apley (2015).
 

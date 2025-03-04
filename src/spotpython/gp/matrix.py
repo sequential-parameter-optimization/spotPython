@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def new_dup_vector(vold, n):
+def new_dup_vector(vold, n) -> np.ndarray:
     """
     Allocates a new numpy array of size n and fills it with the contents of vold.
 
@@ -20,11 +20,11 @@ def new_dup_vector(vold, n):
         [1. 2. 3.]
     """
     v = np.empty(n)
-    dupv(v, vold, n)
+    v = dupv(v, vold, n)
     return v
 
 
-def dupv(v, vold, n):
+def dupv(v, vold, n) -> np.ndarray:
     """
     Copies vold to v (assumes v has already been allocated).
 
@@ -32,6 +32,9 @@ def dupv(v, vold, n):
         v (ndarray): The array to copy to.
         vold (ndarray): The original array to copy from.
         n (int): The size of the arrays.
+
+    Returns:
+        ndarray: The updated array v.
 
     Examples:
         >>> v = np.empty(3)
@@ -43,9 +46,10 @@ def dupv(v, vold, n):
     """
     for i in range(n):
         v[i] = vold[i]
+    return v
 
 
-def new_vector(n):
+def new_vector(n) -> np.ndarray:
     """
     Allocates a new numpy array of size n.
 
@@ -67,7 +71,7 @@ def new_vector(n):
     return v
 
 
-def new_matrix_bones(v, n1, n2):
+def new_matrix_bones(v, n1, n2) -> np.ndarray:
     """
     Create a 2D numpy array (matrix) from a 1D numpy array (vector).
     The resulting matrix shares the same memory as the input vector.
@@ -96,7 +100,7 @@ def new_matrix_bones(v, n1, n2):
     return M
 
 
-def new_matrix(n1, n2):
+def new_matrix(n1, n2) -> np.ndarray:
     """
     Create a new n1 x n2 matrix which is allocated like an n1*n2 array,
     but can be referenced as a 2-d array.
@@ -124,7 +128,7 @@ def new_matrix(n1, n2):
     return m
 
 
-def sub_p_matrix(V, p, v, nrows, lenp, col_offset):
+def sub_p_matrix(V, p, v, nrows, lenp, col_offset) -> np.ndarray:
     """
     Copy the columns `v[1:n1][p[n2]]` to V.
     Must have nrow(v) == nrow(V) and ncol(V) >= lenp and ncol(v) >= max(p).
@@ -137,6 +141,9 @@ def sub_p_matrix(V, p, v, nrows, lenp, col_offset):
         lenp (int): The length of the array p.
         col_offset (int): The column offset in the destination matrix.
 
+    Returns:
+        ndarray: The updated destination matrix V.
+
     Examples:
         >>> V = np.zeros((3, 5))
         >>> p = np.array([0, 2])
@@ -144,7 +151,7 @@ def sub_p_matrix(V, p, v, nrows, lenp, col_offset):
         >>> nrows = 3
         >>> lenp = 2
         >>> col_offset = 1
-        >>> sub_p_matrix(V, p, v, nrows, lenp, col_offset)
+        >>> V = sub_p_matrix(V, p, v, nrows, lenp, col_offset)
         >>> print(V)
         [[0. 1. 3. 0. 0.]
          [0. 4. 6. 0. 0.]
@@ -156,9 +163,10 @@ def sub_p_matrix(V, p, v, nrows, lenp, col_offset):
     for i in range(nrows):
         for j in range(lenp):
             V[i, j + col_offset] = v[i, p[j]]
+    return V
 
 
-def sub_p_matrix_rows(V, p, v, ncols, lenp, row_offset):
+def sub_p_matrix_rows(V, p, v, ncols, lenp, row_offset) -> np.ndarray:
     """
     Copy the rows `v[1:n1][p[n2]]` to V.
     Must have ncol(v) == ncol(V) and nrow(V) >= lenp and nrow(v) >= max(p).
@@ -170,6 +178,9 @@ def sub_p_matrix_rows(V, p, v, ncols, lenp, row_offset):
         ncols (int): The number of columns in the matrices.
         lenp (int): The length of the array p.
         row_offset (int): The row offset in the destination matrix.
+
+    Returns:
+        ndarray: The updated destination matrix V.
 
     Examples:
         >>> V = np.zeros((5, 3))
@@ -191,9 +202,10 @@ def sub_p_matrix_rows(V, p, v, ncols, lenp, row_offset):
 
     for i in range(lenp):
         V[i + row_offset, :ncols] = v[p[i], :ncols]
+    return V
 
 
-def new_p_submatrix_rows(p, v, nrows, ncols, row_offset):
+def new_p_submatrix_rows(p, v, nrows, ncols, row_offset) -> np.ndarray:
     """
     Create a new matrix from the rows of v, specified by p.
     Must have ncol(v) == ncol(V) and nrow(V) >= nrows and nrow(v) >= max(p).
@@ -227,11 +239,11 @@ def new_p_submatrix_rows(p, v, nrows, ncols, row_offset):
 
     V = np.zeros((nrows + row_offset, ncols))
     if nrows > 0:
-        sub_p_matrix_rows(V, p, v, ncols, nrows, row_offset)
+        V = sub_p_matrix_rows(V, p, v, ncols, nrows, row_offset)
     return V
 
 
-def dup_matrix(m, M, n1, n2):
+def dup_matrix(m, M, n1, n2) -> np.ndarray:
     """
     Copy the contents of matrix M to matrix m.
 
@@ -240,6 +252,9 @@ def dup_matrix(m, M, n1, n2):
         M (ndarray): The source matrix.
         n1 (int): The number of rows in the matrices.
         n2 (int): The number of columns in the matrices.
+
+    Returns:
+        ndarray: The updated destination matrix m.
 
     Examples:
         >>> M = np.array([[1, 2], [3, 4], [5, 6]])
@@ -253,9 +268,10 @@ def dup_matrix(m, M, n1, n2):
     for i in range(n1):
         for j in range(n2):
             m[i, j] = M[i, j]
+    return m
 
 
-def new_dup_matrix(M, n1, n2):
+def new_dup_matrix(M, n1, n2) -> np.ndarray:
     """
     Create a new n1 x n2 matrix which is allocated like an n1*n2 array,
     and copy the contents of n1 x n2 matrix M into it.
@@ -286,7 +302,7 @@ def new_dup_matrix(M, n1, n2):
     return m
 
 
-def new_id_matrix(n):
+def new_id_matrix(n) -> np.ndarray:
     """
     Create a new n x n identity matrix.
 

@@ -10,7 +10,7 @@ class GPRegressor:
         self.eps = np.sqrt(np.finfo(float).eps)
         self.fitted = False
 
-    def fit(self, X, y):
+    def fit(self, X, y) -> "GPRegressor":
         """
         Fit the Gaussian Process model.
 
@@ -46,7 +46,7 @@ class GPRegressor:
 
         return self
 
-    def predict(self, XX):
+    def predict(self, XX) -> tuple:
         """
         Predict using the Gaussian Process model.
 

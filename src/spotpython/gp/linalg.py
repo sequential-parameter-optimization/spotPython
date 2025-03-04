@@ -2,7 +2,7 @@ import numpy as np
 from scipy.linalg import cho_factor, cho_solve
 
 
-def linalg_dsymv(n, alpha, A, lda, x, incx, beta, y, incy):
+def linalg_dsymv(n, alpha, A, lda, x, incx, beta, y, incy) -> np.ndarray:
     """
     Perform the symmetric matrix-vector operation y := alpha*A*x + beta*y.
 
@@ -55,7 +55,7 @@ def linalg_dsymv(n, alpha, A, lda, x, incx, beta, y, incy):
     return y
 
 
-def linalg_ddot(n, x, incx, y, incy):
+def linalg_ddot(n, x, incx, y, incy) -> float:
     """
     Perform the dot product of two vectors x and y.
 
@@ -84,7 +84,7 @@ def linalg_ddot(n, x, incx, y, incy):
     return np.dot(x, y)
 
 
-def linalg_dposv(n, Mutil, Mi):
+def linalg_dposv(n, Mutil, Mi) -> tuple:
     """
     Solve the linear equations A * x = B for x, where A is a symmetric positive definite matrix.
 
