@@ -989,7 +989,7 @@ def pred_generic(n, phidf, Z, Ki, nn, k, mean, Sigma):
     ktKik = np.dot(ktKi, k)
 
     # mean <- ktKi %*% Z
-    mean[:] = np.dot(ktKi, Z)
+    mean[:] = np.dot(ktKi, Z).reshape(-1)
 
     # Sigma <- phi*(Sigma - ktKik)/df
     Sigma[:] = phidf * (Sigma - ktKik)
@@ -1136,7 +1136,7 @@ def predGPsep_lite(gpsep, nn, XX, nonug, mean, sigma2, df, llik):
 
     # mean <- ktKi %*% Z
     if mean is not None:
-        mean[:] = np.dot(ktKi, gpsep.Z)
+        mean[:] = np.dot(ktKi, gpsep.Z).reshape(-1)
 
     # Sigma <- phi*(Sigma - ktKik)/df
     # *df = n - m - 1.0;  # only if estimating beta
@@ -1151,10 +1151,7 @@ def predGPsep_lite(gpsep, nn, XX, nonug, mean, sigma2, df, llik):
         llik[0] = -0.5 * (gpsep.n * np.log(0.5 * gpsep.phi) + gpsep.ldetK)
         # Continuing: - ((double) n)*M_LN_SQRT_2PI;
 
-    # Clean up
-    del k
-    del ktKi
-    del ktKik
+
 
 
 def new_predutil_generic_lite(n, Ki, nn, k):
