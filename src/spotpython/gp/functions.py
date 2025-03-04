@@ -44,3 +44,27 @@ def fried(n=50, m=6):
     data["Ytrue"] = Ytrue
 
     return data
+
+
+def f2d(x, y=None):
+    """
+    Simple 2-d test function used in Gramacy & Apley (2015).
+
+    Args:
+        x (ndarray): The x-coordinates.
+        y (ndarray, optional): The y-coordinates. If None, x is assumed to be a 2D array.
+
+    Returns:
+        ndarray: The calculated z-values.
+    """
+    if y is None:
+        if not isinstance(x, np.ndarray) or x.ndim != 2:
+            x = np.array(x).reshape(-1, 2)
+        y = x[:, 1]
+        x = x[:, 0]
+
+    def g(z):
+        return np.exp(-((z - 1) ** 2)) + np.exp(-0.8 * (z + 1) ** 2) - 0.05 * np.sin(8 * (z + 0.1))
+
+    z = -g(x) * g(y)
+    return z
