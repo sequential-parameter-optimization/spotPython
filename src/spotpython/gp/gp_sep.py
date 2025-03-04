@@ -116,7 +116,7 @@ class GPsep:
 
         Returns:
             dict: A dictionary containing the mean, Sigma (or s2), df, and llik.
-            
+
         Examples:
             >>> import numpy as np
             >>> from spotpython.gp.gp_sep import GPsep, newGPsep
