@@ -1,6 +1,7 @@
 import numpy as np
 from numpy.linalg import inv, det
 from spotpython.gp.distances import covar_anisotropic, dist
+from scipy import linalg
 
 
 def nlsep(par, X, Y) -> float:
@@ -33,6 +34,65 @@ def nlsep(par, X, Y) -> float:
     Ki = inv(K)
     ldetK = np.log(det(K))
     ll = -(n / 2) * np.log(Y.T @ Ki @ Y) - (1 / 2) * ldetK
+    return -ll
+
+
+def nlsep_0(par, X, Y) -> float:
+    """
+    Calculate the negative log-likelihood for a separable power exponential correlation function.
+
+    Args:
+        par (np.ndarray): Array of parameters, where the first ncol(X) elements are the range parameters
+                          and the last element is the nugget parameter.
+        X (np.ndarray): Input matrix of shape (n, col).
+        Y (np.ndarray): Response vector of shape (n,).
+
+    Returns:
+        float: Negative log-likelihood.
+    """
+    theta = par[: X.shape[1]]
+    g = par[X.shape[1]]
+    print(f"theta: {theta}")
+    print(f"g: {g}")
+    
+    n = len(Y)
+
+    # Ensure g is at least a small positive value for numerical stability
+    g = max(g, np.finfo(float).eps)
+
+    # Calculate covariance matrix
+    K = covar_anisotropic(X, d=theta, g=g)
+
+    try:
+        # Use Cholesky decomposition for numerical stability when calculating log-determinant
+        L = linalg.cholesky(K, lower=True)
+        ldetK = 2.0 * np.sum(np.log(np.diag(L)))
+
+        # Use the Cholesky factor for solving systems instead of explicit inverse
+        # which is more stable and efficient
+        alpha = linalg.solve_triangular(L, Y, lower=True)
+        quadform = np.sum(alpha**2)
+
+        ll = -(n / 2.0) * np.log(quadform) - 0.5 * ldetK
+    except linalg.LinAlgError:
+        # If Cholesky fails, fall back to a regularized approach
+        # Add a small jitter to the diagonal to ensure positive definiteness
+        jitter = 1e-8 * np.trace(K) / len(K)
+        K_reg = K + np.eye(n) * jitter
+
+        # Try again with the regularized matrix
+        try:
+            L = linalg.cholesky(K_reg, lower=True)
+            ldetK = 2.0 * np.sum(np.log(np.diag(L)))
+            alpha = linalg.solve_triangular(L, Y, lower=True)
+            quadform = np.sum(alpha**2)
+            ll = -(n / 2.0) * np.log(quadform) - 0.5 * ldetK
+        except linalg.LinAlgError:
+            # If that still fails, use a more direct but less numerically stable approach
+            Ki = inv(K_reg)
+            ldetK = np.log(max(det(K_reg), np.finfo(float).tiny))
+            ll = -(n / 2.0) * np.log(Y.T @ Ki @ Y) - 0.5 * ldetK
+
     return -ll
 
 

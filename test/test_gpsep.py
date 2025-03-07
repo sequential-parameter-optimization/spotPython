@@ -13,7 +13,8 @@ def test_predict_vals():
     Z = np.array([0.0, 1.0, 0.5])
     
     # Instantiate a new GPsep model
-    gpsep = newGPsep(X, Z, d=2.0, g=1e-6)
+    g_val = 1e-5
+    gpsep = newGPsep(X, Z, d=2.0, g=g_val)
     
     # New points to predict
     XX = np.array([[0.5], [1.5]])
@@ -59,7 +60,8 @@ def test_get_d():
     
     # Instantiate a new GPsep model with a known length-scale
     d_val = 2.0
-    gpsep = newGPsep(X, Z, d=d_val, g=1e-6)
+    g_val = 1e-6
+    gpsep = newGPsep(X, Z, d=d_val, g=g_val, optimize=False)
     
     # get_d should return a copy of the length-scale array
     returned_d = gpsep.get_d()

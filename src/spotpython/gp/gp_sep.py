@@ -9,6 +9,7 @@ from scipy.optimize import minimize
 from spotpython.gp.likelihood import nlsep, gradnlsep
 import warnings
 from typing import Optional, List, Dict, Any, Union
+
 # from scipy.spatial.distance import pdist, squareform
 from spotpython.gp.distances import dist
 
@@ -270,8 +271,9 @@ class GPsep:
 
         return g
 
-    def fit(self, X: np.ndarray, Z: np.ndarray, d: np.ndarray, g: float, dK: bool = False) -> "GPsep":
+    def fit_0(self, X: np.ndarray, Z: np.ndarray, d: np.ndarray, g: float, dK: bool = True) -> "GPsep":
         """
+        Replaced by the fit() method!
         Fits the GP model with training data.
 
         Args:
@@ -279,7 +281,7 @@ class GPsep:
             Z (np.ndarray): The output data vector of length n.
             d (Union[np.ndarray, float]): The length-scale parameters.
             g (float): The nugget parameter.
-            dK (bool): Flag to indicate whether to calculate derivatives.
+            dK (bool): Flag to indicate whether to calculate derivatives. Default is True.
 
         Returns:
             GPsep: The fitted GPsep object.
@@ -300,6 +302,82 @@ class GPsep:
         self.g = g
 
         self.build(dK)
+        return self
+
+    def fit(self, X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, auto_optimize: bool = False, verbosity=0) -> "GPsep":
+        """
+        Fits the GP model with training data and optionally auto-optimizes hyperparameters.
+
+        Args:
+            X (np.ndarray): The input data matrix of shape (n, m).
+            Z (np.ndarray): The output data vector of length n.
+            d (Union[np.ndarray, float, None]): The length-scale parameters. If None, will be determined automatically.
+            g (Union[float, None]): The nugget parameter. If None, will be determined automatically.
+            dK (bool): Flag to indicate whether to calculate derivatives. Default is True.
+            auto_optimize (bool): Whether to automatically optimize hyperparameters using MLE.
+            verbosity (int): Verbosity level for optimization output.
+
+        Returns:
+            GPsep: The fitted GPsep object.
+        """
+        n, m = X.shape
+        if n == 0:
+            raise ValueError("X must be a matrix with rows.")
+        if len(Z) != n:
+            raise ValueError(f"X has {n} rows but Z length is {len(Z)}")
+
+        self.m = m
+        self.n = n
+        self.X = X
+        self.Z = Z
+
+        # Determine good hyperparameters if not explicitly provided
+        if d is None or g is None or auto_optimize:
+            # Process length-scale arguments
+            d_args = self.darg(d, X)
+
+            # Process nugget arguments
+            g_dict = {"mle": True} if g is None else g
+            g_args = self.garg(g_dict, Z)
+
+            # Use the determined parameters if not provided
+            d_val = d_args["start"] if d is None else d
+            g_val = g_args["start"] if g is None else g
+
+            # Set the parameters
+            self.d = np.full(m, d_val) if isinstance(d_val, (int, float)) else d_val
+            if len(self.d) != m:
+                raise ValueError(f"Length of d ({len(self.d)}) does not match ncol(X) ({m})")
+            self.g = g_val
+
+            # Build the model with current hyperparameters
+            self.build(dK)
+
+            # Optimize hyperparameters if requested
+            if auto_optimize:
+                result = self.mleGPsep_main(
+                    tmin=[d_args["min"], g_args["min"]],  # Min bounds for d and g
+                    tmax=[d_args["max"], g_args["max"]],  # Max bounds for d and g
+                    ab=d_args["ab"] + g_args["ab"],  # Prior parameters (concatenated)
+                    maxit=100,
+                    verb=verbosity,  # Set to higher value for verbose output
+                )
+                # Note: mleGPsep_main already updates self.d and self.g internally
+                if verbosity > 0:
+                    # Print optimization results
+                    print("Optimization complete:")
+                    print(f"Optimized lengthscale (d): {self.get_d()}")
+                    print(f"Optimized nugget (g): {self.get_g()}")
+                    print(f"Message: {result['msg']}")
+                    print(f"Iterations: {result['its']}")
+        else:
+            # Original behavior for explicitly provided parameters
+            self.d = np.full(m, d) if isinstance(d, (int, float)) else d
+            if len(self.d) != m:
+                raise ValueError(f"Length of d ({len(self.d)}) does not match ncol(X) ({m})")
+            self.g = g
+            self.build(dK)
+
         return self
 
     def newdK(self) -> None:
@@ -595,10 +673,10 @@ class GPsep:
 
         if tmin[self.m] <= 0:
             tmin[self.m] = np.finfo(float).eps
-        if self.g >= tmax[self.m]:
-            raise ValueError(f"g={self.g} >= tmax={tmax[self.m]}")
-        elif self.g <= tmin[self.m]:
-            raise ValueError(f"g={self.g} <= tmin={tmin[self.m]}")
+        if self.g > tmax[self.m]:
+            raise ValueError(f"g={self.g} > tmax={tmax[self.m]}")
+        elif self.g < tmin[self.m]:
+            raise ValueError(f"g={self.g} < tmin={tmin[self.m]}")
 
         # Check for negative entries in ab array
         if np.any(ab < 0):
@@ -651,7 +729,7 @@ class GPsep:
 
         # Possibly reset parameters
         theta = np.concatenate((self.get_d(), [self.get_g()]))
-        if np.any(theta <= tmin):
+        if np.any(theta < tmin):
             print("resetting due to init on lower boundary")
             print(f"theta: {theta}")
             print(f"tmin: {tmin}")
@@ -683,19 +761,20 @@ class GPsep:
         }
 
 
-def newGPsep(X: np.ndarray, Z: np.ndarray, d: float, g: float, dK: bool = False) -> GPsep:
+def newGPsep(X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, optimize: bool = True) -> GPsep:
     """
-    Instantiate a new GPsep model.
+    Instantiate a new GPsep model with automatic hyperparameter optimization.
 
     Args:
         X (np.ndarray): The input data matrix of shape (n, m).
         Z (np.ndarray): The output data vector of length n.
-        d (float): The length-scale parameter.
-        g (float): The nugget parameter.
+        d (optional): The length-scale parameters. If None, will be determined automatically.
+        g (optional): The nugget parameter. If None, will be determined automatically.
         dK (bool): Flag to indicate whether to calculate derivatives.
+        optimize (bool): Whether to optimize hyperparameters after initialization.
 
     Returns:
-        GPsep: The newly created GPsep object.
+        GPsep: The newly created and optimized GPsep object.
     """
     gpsep = GPsep()
-    return gpsep.fit(X, Z, d, g, dK)
+    return gpsep.fit(X, Z, d=d, g=g, dK=dK, auto_optimize=optimize)
