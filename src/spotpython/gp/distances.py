@@ -334,6 +334,19 @@ def distance(X1, n1, X2, n2, m) -> np.ndarray:
 
     Returns:
         np.ndarray: Distance matrix D of shape (n1, n2).
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.gp.distances import distance
+        >>> X1 = np.array([[1.0, 2.0], [3.0, 4.0]])
+        >>> n1 = 2
+        >>> X2 = np.array([[5.0, 6.0], [7.0, 8.0]])
+        >>> n2 = 2
+        >>> m = 2
+        >>> D_out = distance(X1, n1, X2, n2, m)
+        >>> print(D_out)
+        [[32.  8.]
+         [18.  2.]]
     """
     D = np.zeros((n1, n2))
 

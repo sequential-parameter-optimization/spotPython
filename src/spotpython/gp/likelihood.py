@@ -136,8 +136,16 @@ def gradnlsep(par, X, Y) -> np.ndarray:
         >>> print(grad)
         [-0.000 -0.000 -0.000]
     """
-    theta = par[: X.shape[1]]
-    g = par[X.shape[1]]
+    n_col = X.shape[1]
+    # par is an array of parameters, where the first ncol(X) elements are the range parameters theta
+    # and the last element is the nugget parameter g. par has shape (ncol(X) + 1,)
+    if len(par) != n_col + 1:
+        raise ValueError("The number of elements in par should be equal to the number of columns in X + 1")
+    # Extract the range parameters theta from par
+    theta = par[:n_col]
+    # Extract the nugget parameter g from par
+    g = par[n_col]
+    # Calculate the covariance matrix K using the anisotropic covariance function
     n = len(Y)
     K = covar_anisotropic(X, d=theta, g=g)
     Ki = inv(K)
@@ -147,9 +155,14 @@ def gradnlsep(par, X, Y) -> np.ndarray:
     dlltheta = np.empty(len(theta))
     for k in range(len(dlltheta)):
         dotK = K * dist(X[:, [k]]) / (theta[k] ** 2)
-        dlltheta[k] = (n / 2) * (KiY.T @ dotK @ KiY) / (Y.T @ KiY) - (1 / 2) * np.sum(np.diag(Ki @ dotK))
+        # Use .item() to convert the (1,1) result into a scalar
+        numerator = (KiY.T @ dotK @ KiY).item()
+        denominator = (Y.T @ KiY).item()
+        dlltheta[k] = (n / 2) * (numerator / denominator) - (1 / 2) * np.sum(np.diag(Ki @ dotK))
 
-    # For g
-    dllg = (n / 2) * (KiY.T @ KiY) / (Y.T @ KiY) - (1 / 2) * np.sum(np.diag(Ki))
+    # For g, also ensure the result is a scalar
+    numerator_g = (KiY.T @ KiY).item()
+    denominator_g = (Y.T @ KiY).item()
+    dllg = (n / 2) * (numerator_g / denominator_g) - (1 / 2) * np.sum(np.diag(Ki))
 
     return -np.concatenate([dlltheta, [dllg]])
