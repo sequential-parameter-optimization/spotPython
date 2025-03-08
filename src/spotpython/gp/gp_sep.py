@@ -17,7 +17,7 @@ from spotpython.gp.distances import dist
 class GPsep:
     """A class to represent a Gaussian Process with separable covariance."""
 
-    def __init__(self, m: int = None, n: int = None, X: np.ndarray = None, Z: np.ndarray = None, d: np.ndarray = None, g: float = None) -> None:
+    def __init__(self, m: int = None, n: int = None, X: np.ndarray = None, Z: np.ndarray = None, d: np.ndarray = None, g: float = None, nlsep_method="inv", gradnlsep_method="inv") -> None:
         """
         Initialize the GP model with data and hyperparameters.
 
@@ -28,6 +28,9 @@ class GPsep:
             Z (np.ndarray): Output data vector of length n.
             d (np.ndarray): Length-scale parameters.
             g (float): Nugget parameter.
+            nl_method (str): Method to use for likelihood optimization. Possible values are "inv" and "chol". Default is "inv".
+            gradnl_method (str): Method to use for likelihood gradient optimization. Possible values are "inv", "chol", and "direct". Default is "inv".
+
         """
         self.m = m
         self.n = n
@@ -42,6 +45,8 @@ class GPsep:
         self.dK = None
         self.ldetK = None
         self.gpsepi = 0  # Placeholder if needed for R-interface
+        self.nlsep_method = nlsep_method
+        self.gradnlsep_method = gradnlsep_method
 
     def getDs(self, p: float = 0.1, samp_size: int = 1000) -> dict:
         """
@@ -191,7 +196,7 @@ class GPsep:
         and priors for the nugget parameter.
 
         Args:
-            g: Could be a dictionary, numeric, or None. If numeric, turn it into {"start": g}.
+            g (float): Could be a dictionary, numeric, or None. If numeric, turn it into {"start": g}.
             y (np.ndarray): The response vector. If None, use self.Z.
 
         Returns:
@@ -630,10 +635,10 @@ class GPsep:
         print(f"bounds: {bounds}")
 
         def objective(par):
-            return nlsep(par, self.X, self.Z)
+            return nlsep(par, self.X, self.Z, self.nlsep_method)
 
         def gradient(par):
-            return gradnlsep(par, self.X, self.Z)
+            return gradnlsep(par, self.X, self.Z, self.gradnlsep_method)
 
         result = minimize(fun=objective, x0=p, method="L-BFGS-B", jac=gradient, bounds=bounds, options={"maxiter": maxit, "disp": verb > 0})
         print(f"result: {result}")
