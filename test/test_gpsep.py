@@ -20,7 +20,7 @@ def test_predict_vals():
     XX = np.array([[0.5], [1.5]])
     
     # Evaluate prediction
-    result = gpsep.predict(XX, lite=False, nonug=False)
+    result = gpsep.predict(XX, lite=False, nonug=False, return_full=True)
     
     # Check for required keys
     assert "mean" in result

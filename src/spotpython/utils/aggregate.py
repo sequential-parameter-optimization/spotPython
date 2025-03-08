@@ -81,7 +81,9 @@ def aggregate_mean_var(X, y, sort=False, var_empirical=False) -> (np.ndarray, np
                 [2., 2., 2.]]), array([4.5, 6. ]), array([3., 0.]))
     """
     if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray):
-        raise TypeError("X and y must be numpy arrays.")
+        # convert X and y to numpy arrays
+        X = np.array(X)
+        y = np.array(y)
 
     if X.ndim != 2 or y.ndim != 1:
         raise ValueError("X must be a 2D array and y must be a 1D array.")

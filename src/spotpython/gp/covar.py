@@ -1,45 +1,12 @@
 import numpy as np
+import pandas as pd
 
 
-def covar_sep_symm(col, X, n, d, g, K=None) -> np.ndarray:
-    """
-    Calculate the correlation (K) between X1 and X2 with a separable power exponential correlation function with range d and nugget g.
-
-    Args:
-        col (int): Number of columns in the input matrix X.
-        X (ndarray): Input matrix of shape (n, col).
-        n (int): Number of rows in the input matrix X.
-        d (ndarray): Array of length col representing the range parameters.
-        g (float): Nugget parameter.
-        K (ndarray): The covariance matrix of shape (n, n).
-
-    Returns:
-        ndarray: The calculated covariance matrix K of shape (n, n).
-
-    Examples:
-        >>> col = 2
-        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
-        >>> n = 3
-        >>> d = np.array([1.0, 1.0])
-        >>> g = 0.1
-        >>> K = covar_sep_symm(col, X, n, d, g)
-        >>> print(K)
-        [[1.1        0.01831564 0.00012341]
-         [0.01831564 1.1        0.01831564]
-         [0.00012341 0.01831564 1.1       ]]
-    """
-    K = np.zeros((n, n))
-
-    for i in range(n):
-        K[i, i] = 1.0 + g
-        for j in range(i + 1, n):
-            K[i, j] = 0.0
-            for k in range(col):
-                K[i, j] += (X[i, k] - X[j, k]) ** 2 / d[k]
-            K[i, j] = np.exp(-K[i, j])
-            K[j, i] = K[i, j]
-
-    return K
+def prepare_X(X: np.ndarray) -> np.ndarray:
+    # check if X is a dataframe and convert to numpy array
+    if isinstance(X, pd.DataFrame):
+        X = X.to_numpy()
+    return X
 
 
 def covar_sep(col, X1, n1, X2, n2, d, g) -> np.ndarray:
@@ -61,6 +28,8 @@ def covar_sep(col, X1, n1, X2, n2, d, g) -> np.ndarray:
         ndarray: The calculated covariance matrix K of shape (n1, n2).
 
     Examples:
+        >>> import numpy as np
+        >>> from spotpython.gp.covar import covar_sep
         >>> col = 2
         >>> X1 = np.array([[1, 2], [3, 4], [5, 6]])
         >>> n1 = 3
@@ -75,13 +44,62 @@ def covar_sep(col, X1, n1, X2, n2, d, g) -> np.ndarray:
          [1.38389653e-87 5.14820022e-131]]
     """
     K = np.zeros((n1, n2))
+    X1 = prepare_X(X1)
+    X2 = prepare_X(X2)
 
     for i in range(n1):
         for j in range(n2):
             K[i, j] = 0.0
             for k in range(col):
                 K[i, j] += (X1[i, k] - X2[j, k]) ** 2 / d[k]
+            if i == j and K[i, j] == 0.0:
+                K[i, j] = 1.0 + g
+            else:
+                K[i, j] = np.exp(0.0 - K[i, j])
+
+    return K
+
+
+def covar_sep_symm(col, X, n, d, g) -> np.ndarray:
+    """
+    Calculate the correlation (K) between X1 and X2 with a separable power exponential correlation function with range d and nugget g.
+
+    Args:
+        col (int): Number of columns in the input matrix X (features).
+        X (ndarray): Input matrix of shape (n, col).
+        n (int): Number of rows in the input matrix X.
+        d (ndarray): Array of length col representing the range parameters, shape (col,).
+        g (float): Nugget parameter.
+
+    Returns:
+        ndarray: The calculated covariance matrix K of shape (n, n).
+
+    Examples:
+        >>> from spotpython.gp.covar import covar_sep_symm
+        >>> import numpy as np
+        >>> col = 2
+        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> n = 3
+        >>> d = np.array([1.0, 1.0])
+        >>> g = 0.1
+        >>> K = covar_sep_symm(col, X, n, d, g)
+        >>> print(K)
+        [[1.1        0.01831564 0.00012341]
+         [0.01831564 1.1        0.01831564]
+         [0.00012341 0.01831564 1.1       ]]
+    """
+    K = np.zeros((n, n))
+    X = prepare_X(X)
+
+    # calculate the covariance matrix K
+    for i in range(n):
+        K[i, i] = 1.0 + g
+        for j in range(i + 1, n):
+            K[i, j] = 0.0
+            for k in range(col):
+                K[i, j] += (X[i, k] - X[j, k]) ** 2 / d[k]
             K[i, j] = np.exp(-K[i, j])
+            K[j, i] = K[i, j]
 
     return K
 
@@ -121,6 +139,8 @@ def diff_covar_sep(col, X1, n1, X2, n2, d, K) -> np.ndarray:
           [3.72007598e-44 1.38389653e-87]
           [1.38389653e-87 5.14820022e-131]]]
     """
+    X1 = prepare_X(X1)
+    X2 = prepare_X(X2)
     dK = np.zeros((col, n1, n2))
 
     for k in range(col):
@@ -163,6 +183,7 @@ def diff_covar_sep_symm(col, X, n, d, K) -> np.ndarray:
           [0.36787944 0.         0.36787944]
           [0.01831564 0.36787944 0.        ]]]
     """
+    X = prepare_X(X)
     dK = np.zeros((col, n, n))
 
     for k in range(col):

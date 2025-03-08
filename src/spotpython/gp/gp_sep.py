@@ -5,31 +5,43 @@ from spotpython.gp.covar import covar_sep_symm, covar_sep, diff_covar_sep_symm
 from spotpython.gp.util import log_determinant_chol
 from spotpython.gp.matrix import new_vector, new_id_matrix, new_dup_matrix
 from spotpython.gp.lite import predGPsep_lite
-from scipy.optimize import minimize
 from spotpython.gp.likelihood import nlsep, gradnlsep
 import warnings
 from typing import Optional, List, Dict, Any, Union
 
 # from scipy.spatial.distance import pdist, squareform
 from spotpython.gp.distances import dist
+from spotpython.utils.optimize import run_minimize_with_restarts
 
 
 class GPsep:
     """A class to represent a Gaussian Process with separable covariance."""
 
-    def __init__(self, m: int = None, n: int = None, X: np.ndarray = None, Z: np.ndarray = None, d: np.ndarray = None, g: float = None, nlsep_method="inv", gradnlsep_method="inv") -> None:
+    def __init__(
+        self, m: int = None, n: int = None, X: np.ndarray = None, Z: np.ndarray = None, d: np.ndarray = None, g: float = None, nlsep_method="inv", gradnlsep_method="inv", n_restarts_optimizer=9
+    ) -> None:
         """
         Initialize the GP model with data and hyperparameters.
 
         Args:
-            m (int): Number of input dimensions.
-            n (int): Number of observations.
-            X (np.ndarray): Input data matrix of shape (n, m).
-            Z (np.ndarray): Output data vector of length n.
-            d (np.ndarray): Length-scale parameters.
-            g (float): Nugget parameter.
-            nl_method (str): Method to use for likelihood optimization. Possible values are "inv" and "chol". Default is "inv".
-            gradnl_method (str): Method to use for likelihood gradient optimization. Possible values are "inv", "chol", and "direct". Default is "inv".
+            m (int):
+                Number of input dimensions.
+            n (int):
+                Number of observations.
+            X (np.ndarray):
+                Input data matrix of shape (n, m).
+            Z (np.ndarray):
+                Output data vector of length n.
+            d (np.ndarray):
+                Length-scale parameters.
+            g (float):
+                Nugget parameter.
+            nlsep_method (str):
+                Method to use for likelihood optimization. Possible values are "inv" and "chol". Default is "inv".
+            gradnlsep_method (str):
+                Method to use for likelihood gradient optimization. Possible values are "inv", "chol", and "direct". Default is "inv".
+            n_restarts_optimizer (int):
+                Number of restarts for the optimizer. Default is 9.
 
         """
         self.m = m
@@ -44,9 +56,9 @@ class GPsep:
         self.phi = None
         self.dK = None
         self.ldetK = None
-        self.gpsepi = 0  # Placeholder if needed for R-interface
         self.nlsep_method = nlsep_method
         self.gradnlsep_method = gradnlsep_method
+        self.n_restarts_optimizer = n_restarts_optimizer
 
     def getDs(self, p: float = 0.1, samp_size: int = 1000) -> dict:
         """
@@ -206,6 +218,8 @@ class GPsep:
         if y is None:
             y = self.Z
 
+        # print(f"Response vector: {y}")
+
         if y is None or len(y) == 0:
             raise ValueError("No response data found (y is empty).")
 
@@ -263,7 +277,8 @@ class GPsep:
         # Clamp 'start' to valid range if needed
         start_array = np.atleast_1d(g["start"])
         if np.any(start_array < g["min"]) or np.any(start_array > g["max"]):
-            warnings.warn(f"Some 'start' values are out of [{g['min']}, {g['max']}]; " "clamping them to the valid range.", UserWarning)
+            print(f"start_array: {start_array}")
+            warnings.warn(f"Some 'start' values are out of [{g['min']}, {g['max']}];" "clamping them to the valid range.", UserWarning)
             start_array = np.clip(start_array, g["min"], g["max"])
 
         # If start_array is length 1, store it back as a scalar
@@ -356,6 +371,7 @@ class GPsep:
             self.g = g_val
 
             # Build the model with current hyperparameters
+            # TODO: check if this is necessary
             self.build(dK)
 
             # Optimize hyperparameters if requested
@@ -389,8 +405,9 @@ class GPsep:
         """
         Allocate space for derivative calculations and compute them.
         """
-        if self.dK is not None:
-            raise RuntimeError("dK calculations have already been initialized.")
+        # TODO: Check if this is necessary
+        # if self.dK is not None:
+        #     raise RuntimeError("dK calculations have already been initialized.")
 
         self.dK = diff_covar_sep_symm(self.m, self.X, self.n, self.d, self.K)
 
@@ -401,7 +418,13 @@ class GPsep:
         if self.KiZ is None:
             self.KiZ = new_vector(self.n)
 
-        Z = self.Z.reshape(-1, 1)
+        # Convert Z to numpy array if it's a pandas Series
+        if hasattr(self.Z, "to_numpy"):
+            Z_array = self.Z.to_numpy()
+        else:
+            Z_array = np.asarray(self.Z)
+
+        Z = Z_array.reshape(-1, 1)
         KiZ = np.dot(self.Ki, Z)
         phi = np.dot(Z.T, KiZ)
         self.phi = phi[0, 0]
@@ -414,8 +437,9 @@ class GPsep:
         Args:
             dK (bool): Flag to indicate whether to calculate derivatives.
         """
-        if self.K is not None:
-            raise RuntimeError("Covariance matrix has already been built.")
+        # TODO: check if the following line is necessary
+        # if self.K is not None:
+        #     raise RuntimeError("Covariance matrix has already been built.")
 
         self.K = covar_sep_symm(self.m, self.X, self.n, self.d, self.g)
         self.Ki = new_id_matrix(self.n)
@@ -429,17 +453,28 @@ class GPsep:
         if dK:
             self.newdK()
 
-    def predict(self, XX: np.ndarray, lite: bool = False, nonug: bool = False) -> dict:
+    def predict(self, XX: np.ndarray, lite: bool = False, nonug: bool = False, return_full=False, return_std=False) -> float:
         """
         Predict the Gaussian Process output at new input points.
 
         Args:
-            XX (np.ndarray): The predictive locations.
-            lite (bool): Flag to indicate whether to compute only the diagonal of Sigma.
-            nonug (bool): Flag to indicate whether to use nugget.
+            XX (np.ndarray):
+                The predictive locations.
+            lite (bool):
+                Flag to indicate whether to compute only the diagonal of Sigma.
+            nonug (bool):
+                Flag to indicate whether to use nugget.
+            return_full (bool): Flag to indicate whether to return the full dictionry, which
+                includes the mean, Sigma, df, and llik. Default is False.
+            return_std (bool):
+                Flag to indicate whether to return the standard deviation. Only applicable when
+                return_full is False. Default is False.
 
         Returns:
-            dict: A dictionary containing the mean, Sigma (or s2), df, and llik.
+            float:
+                The predicted output at the new input points.
+                If return_full is True, returns a containing the mean, Sigma (or s2), df, and llik.
+                If return_std is True, returns a tuple containing the mean and standard deviation.
 
         Examples:
                 import numpy as np
@@ -472,9 +507,21 @@ class GPsep:
                 plt.show()
         """
         if lite:
-            return self._predict_lite(XX, nonug)
+            res = self._predict_lite(XX, nonug)
+            if return_full:
+                return res
+            elif return_std:
+                return (res["mean"], res["s2"])
+            else:
+                return res["mean"]
         else:
-            return self._predict_full(XX, nonug)
+            res = self._predict_full(XX, nonug)
+            if return_full:
+                return res
+            elif return_std:
+                return (res["mean"], res["Sigma"])
+            else:
+                return res["mean"]
 
     def _predict_lite(self, XX: np.ndarray, nonug: bool) -> dict:
         """
@@ -594,13 +641,14 @@ class GPsep:
             raise ValueError("Input dimension m is not allocated.")
         return self.m
 
-    def new_params(self, d: np.ndarray, g: float) -> None:
+    def set_new_params(self, d: np.ndarray, g: float, dK=True) -> None:
         """
         Change the parameterization of the GP without destroying and reallocating memory.
 
         Args:
             d (np.ndarray): The new length-scale parameters.
             g (float): The new nugget parameter.
+            dK (bool): Flag to indicate whether to calculate derivatives. Default is True.
         """
         if self.d is None or self.g is None:
             raise ValueError("GP parameters are not allocated.")
@@ -612,7 +660,7 @@ class GPsep:
         self.d = np.where(d <= 0, self.d, d)
         self.g = g if g >= 0 else self.g
 
-        self.build(dK=True)
+        self.build(dK=dK)
 
     def mleGPsep_both(self, tmin: np.ndarray, tmax: np.ndarray, ab: np.ndarray, maxit: int, verb: int) -> dict:
         """
@@ -631,6 +679,7 @@ class GPsep:
         print(f"Starting MLE with d={self.d}, g={self.g}")
         # generate starting point p
         p = np.concatenate([self.d, [self.g]])
+        print(f"Starting point: {p}")
         bounds = [(tmin[i], tmax[i]) for i in range(len(p))]
         print(f"bounds: {bounds}")
 
@@ -640,14 +689,17 @@ class GPsep:
         def gradient(par):
             return gradnlsep(par, self.X, self.Z, self.gradnlsep_method)
 
-        result = minimize(fun=objective, x0=p, method="L-BFGS-B", jac=gradient, bounds=bounds, options={"maxiter": maxit, "disp": verb > 0})
+        # result = minimize(fun=objective, x0=p, method="L-BFGS-B", jac=gradient, bounds=bounds, options={"maxiter": maxit, "disp": verb > 0})
+        result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=maxit, verb=verb)
+
         print(f"result: {result}")
 
-        self.d = result.x[:-1]
-        self.g = result.x[-1]
-        # self.build(dK=False)
+        d = result.x[:-1]
+        g = result.x[-1]
+        print(f"Optimized d: {d}, g: {g}")
+        # set new parameters and build
+        self.set_new_params(d, g)
         print(f"Updated d: {self.d}, g: {self.g}")
-
         return {"parameters": result.x, "iterations": result.nit, "convergence": result.status, "message": result.message}
 
     def mleGPsep_both_R(self, maxit: int, verb: int, tmin: np.ndarray, tmax: np.ndarray, ab: Union[List[float], np.ndarray]) -> dict:
@@ -742,7 +794,7 @@ class GPsep:
                 if tmax[i] < 0:
                     tmax[i] = np.sqrt(m)
             theta_new = 0.9 * np.maximum(tmin, 0) + 0.1 * np.array(tmax)
-            self.new_params(theta_new[:m], theta_new[m])
+            self.set_new_params(theta_new[:m], theta_new[m])
             return {
                 "theta": theta_new,
                 "its": 0,
@@ -751,6 +803,7 @@ class GPsep:
             }
 
         # Call your underlying C/Python L-BFGS-B optimization here; placeholder below:
+        print(f"Calling mleGPsep_both_R with:\nmaxit={maxit},\ntmin={tmin},\ntmax={tmax}")
         out = self.mleGPsep_both_R(maxit=maxit, verb=verb, tmin=tmin, tmax=tmax, ab=ab)
 
         # After returning, sanity check
