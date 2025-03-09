@@ -241,7 +241,31 @@ def garg(g, y: np.ndarray = None) -> dict:
 
 
 class GPsep:
-    """A class to represent a Gaussian Process with separable covariance."""
+    """A class to represent a Gaussian Process with separable covariance.
+
+    Attributes:
+        m: Number of input dimensions.
+        n: Number of observations.
+        X: Input data matrix.
+        Z: Output data vector.
+        d: Length-scale parameters.
+        g: Nugget parameter.
+        K: Covariance matrix.
+        Ki: Inverse of covariance matrix.
+        KiZ: Product of Ki and Z.
+        phi: Scalar value from Z^T Ki Z calculation.
+        dK: Boolean flag for calculating derivatives.
+        DK: Matrix of derivatives.
+        ldetK: Log determinant of K.
+        nlsep_method: Method for likelihood computation.
+        gradnlsep_method: Method for gradient computation.
+        n_restarts_optimizer: Number of restarts for optimization.
+        samp_size: Sample size for distance calculations.
+        maxit: Maximum number of optimization iterations.
+        verbosity: Verbosity level.
+        auto_optimize: Whether to automatically optimize hyperparameters.
+        max_points: Maximum number of points for model building.
+    """
 
     def __init__(
         self,
@@ -321,22 +345,91 @@ class GPsep:
         self.auto_optimize = auto_optimize
         self.max_points = max_points
 
-    def fit(self, X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, auto_optimize: bool = None, verbosity=0) -> "GPsep":
-        """
-        Fits the GP model with training data and optionally auto-optimizes hyperparameters.
+        # need to store the initial parameters for the fit method (sklearn compatibility)
+        self.init_params = {
+            "X": X,
+            "Z": Z,
+            "d": d,
+            "g": g,
+            "nlsep_method": nlsep_method,
+            "gradnlsep_method": gradnlsep_method,
+            "n_restarts_optimizer": n_restarts_optimizer,
+            "samp_size": samp_size,
+            "maxit": maxit,
+            "verbosity": verbosity,
+            "auto_optimize": auto_optimize,
+            "max_points": max_points,
+        }
+
+    # Add these two methods required by scikit-learn
+    def get_params(self, deep=True):
+        """Get parameters for this estimator.
+
+        This method is required for scikit-learn compatibility.
 
         Args:
-            X (np.ndarray): The input data matrix of shape (n, m).
-            Z (np.ndarray): The output data vector of length n.
-            d (Union[np.ndarray, float, None]): The length-scale parameters. If None, will be determined automatically.
-            g (Union[float, None]): The nugget parameter. If None, will be determined automatically.
-            dK (bool): Flag to indicate whether to calculate derivatives. Default is True.
-            auto_optimize (bool): Whether to automatically optimize hyperparameters using MLE.
-            verbosity (int): Verbosity level for optimization output.
-            auto_optimize (bool): Whether to automatically optimize hyperparameters using MLE. If None, uses the default value from the object, which is True.
+            deep: If True, will return the parameters for this estimator and
+                contained subobjects that are estimators. Defaults to True.
+
+        Returns:
+            dict: Parameter names mapped to their values.
+        """
+        return {
+            "X": self.X,
+            "Z": self.Z,
+            "d": self.d,
+            "g": self.g,
+            "nlsep_method": self.nlsep_method,
+            "gradnlsep_method": self.gradnlsep_method,
+            "n_restarts_optimizer": self.n_restarts_optimizer,
+            "samp_size": self.samp_size,
+            "maxit": self.maxit,
+            "verbosity": self.verbosity,
+            "auto_optimize": self.auto_optimize,
+            "max_points": self.max_points,
+        }
+
+    def set_params(self, **parameters):
+        """Set the parameters of this estimator.
+
+        This method is required for scikit-learn compatibility.
+
+        Args:
+            **parameters: Estimator parameters as keyword arguments.
+
+        Returns:
+            self: Estimator instance.
+        """
+        for parameter, value in parameters.items():
+            setattr(self, parameter, value)
+
+        # Update the stored parameters for potential re-initialization
+        self.init_params.update(parameters)
+
+        return self
+
+    def fit(self, X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, auto_optimize: bool = None, verbosity=0) -> "GPsep":
+        """Fit the GP model with training data and optionally auto-optimize hyperparameters.
+
+        Args:
+            X: The input data matrix of shape (n, m).
+            Z: The output data vector of length n.
+            d: The length-scale parameters. If None, will be determined
+                automatically. Defaults to None.
+            g: The nugget parameter. If None, will be determined automatically.
+                Defaults to None.
+            dK: Flag to indicate whether to calculate derivatives.
+                Defaults to True.
+            auto_optimize: Whether to automatically optimize hyperparameters
+                using MLE. If None, uses the default value from the object.
+                Defaults to None.
+            verbosity: Verbosity level for optimization output. Defaults to 0.
 
         Returns:
             GPsep: The fitted GPsep object.
+
+        Raises:
+            ValueError: If X has no rows or if X and Z dimensions mismatch.
         """
         # if X or Z are pandas dataframes or series, convert them to numpy arrays
         if hasattr(X, "to_numpy"):
@@ -484,7 +577,6 @@ class GPsep:
                 d = result.x[:-1]
                 g = result.x[-1]
 
-
                 # set new parameters and build
                 self.set_new_params(d, g)
                 if self.verbosity > 0:
@@ -547,34 +639,32 @@ class GPsep:
         self.Ki = matrix_inversion_dispatcher(self.K, method=self.nlsep_method)
         self.ldetK = np.log(det(self.K))
         self.calc_ZtKiZ()
-        if self.dK:
-            # TODO: Check if this is necessary
-            # if self.dK is not None:
-            #     raise RuntimeError("dK calculations have already been initialized.")
-            self.DK = diff_covar_sep_symm(self.m, self.X, self.n, self.d, self.K)
+        # TODO: Check if this is necessary
+        # if self.dK:
+        #     # TODO: Check if this is necessary
+        #     # if self.dK is not None:
+        #     #     raise RuntimeError("dK calculations have already been initialized.")
+        #     self.DK = diff_covar_sep_symm(self.m, self.X, self.n, self.d, self.K)
 
     def predict(self, XX: np.ndarray, lite: bool = False, nonug: bool = False, return_full=False, return_std=False) -> float:
-        """
-        Predict the Gaussian Process output at new input points.
+        """Predict the Gaussian Process output at new input points.
 
         Args:
-            XX (np.ndarray):
-                The predictive locations.
-            lite (bool):
-                Flag to indicate whether to compute only the diagonal of Sigma.
-            nonug (bool):
-                Flag to indicate whether to use nugget.
-            return_full (bool): Flag to indicate whether to return the full dictionry, which
-                includes the mean, Sigma, df, and llik. Default is False.
-            return_std (bool):
-                Flag to indicate whether to return the standard deviation. Only applicable when
-                return_full is False. Default is False.
+            XX: The predictive locations.
+            lite: Flag to indicate whether to compute only the diagonal
+                of Sigma. Defaults to False.
+            nonug: Flag to indicate whether to exclude nugget.
+                Defaults to False.
+            return_full: Flag to indicate whether to return the full dictionary,
+                which includes the mean, Sigma, df, and llik. Defaults to False.
+            return_std: Flag to indicate whether to return the standard deviation.
+                Only applicable when return_full is False. Defaults to False.
 
         Returns:
-            float:
-                The predicted output at the new input points.
-                If return_full is True, returns a containing the mean, Sigma (or s2), df, and llik.
-                If return_std is True, returns a tuple containing the mean and standard deviation.
+            Various formats based on arguments:
+            - If return_full=True: Dictionary with 'mean', 'Sigma'/'s2', 'df', 'llik'
+            - If return_std=True: Tuple (mean, std_deviation)
+            - Otherwise: Mean predictions
 
         Examples:
                 import numpy as np
