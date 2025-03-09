@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from spotpython.gp.gp_sep import newGPsep, GPsep
+from spotpython.gp.gp_sep import newGPsep, GPsep, getDs, garg, darg
 
 def test_predict_vals():
     """
@@ -93,10 +93,10 @@ def test_getDs_basic():
     Z = np.sin(X).ravel()
 
     # Instantiate GPsep with minimal parameters
-    gp = GPsep(m=1, n=len(X), X=X, Z=Z, d=None, g=0.0)
+    gp = GPsep(X=X, Z=Z, d=None, g=0.0, samp_size=5)
 
     # Call getDs
-    results = gp.getDs(p=0.1, samp_size=5)
+    results = getDs(X=X, p=0.1)
 
     # Check the result structure
     assert isinstance(results, dict), "getDs should return a dictionary"
@@ -118,10 +118,10 @@ def test_darg_none():
     Z = np.sin(X).ravel()
 
     # Instantiate GPsep
-    gp = GPsep(m=1, n=len(X), X=X, Z=Z)
+    gp = GPsep(X=X, Z=Z, samp_size=5)
 
     # Call darg with d=None
-    result = gp.darg(d=None, X=X, samp_size=5)
+    result = darg(d=None, X=X)
 
     # Check basic fields
     assert isinstance(result, dict), "Expected darg to return a dict"
@@ -151,12 +151,12 @@ def test_darg_numeric():
     Z = np.cos(X).ravel()
 
     # Instantiate GPsep
-    gp = GPsep(m=1, n=len(X), X=X, Z=Z)
+    gp = GPsep(X=X, Z=Z, samp_size=10)
     
     # Pass a numeric value for d
     numeric_d = 2.5
     # Set samp_size >= len(X) to avoid sub-sampling 
-    result = gp.darg(d=numeric_d, X=X, samp_size=10)
+    result = darg(d=numeric_d, X=X)
 
     assert isinstance(result, dict), "Expected a dict result"
     assert "start" in result, "Expected 'start' in the result"
@@ -174,10 +174,10 @@ def test_garg_None():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(m=1, n=len(y), Z=y)
+    gp = GPsep(Z=y)
     
     # Call garg with g=None
-    result = gp.garg(g=None, y=y)
+    result = garg(g=None, y=y)
     
     # Check basic fields
     assert isinstance(result, dict), "Expected garg to return a dict"
@@ -206,11 +206,11 @@ def test_garg_numeric():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(m=1, n=len(y), Z=y)
+    gp = GPsep(Z=y)
     
     # Pass a numeric value for g
     numeric_g = 0.01
-    result = gp.garg(g=numeric_g, y=y)
+    result = garg(g=numeric_g, y=y)
     
     # Check the returned dictionary
     assert isinstance(result, dict), "Expected a dict result"
@@ -228,11 +228,11 @@ def test_garg_with_mle():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(m=1, n=len(y), Z=y)
+    gp = GPsep(Z=y)
     
     # Create a dictionary with mle=True
     g_dict = {"mle": True}
-    result = gp.garg(g=g_dict, y=y)
+    result = garg(g=g_dict, y=y)
     
     # Check basic fields
     assert isinstance(result, dict), "Expected garg to return a dict"
@@ -256,12 +256,12 @@ def test_garg_errors():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(m=1, n=len(y), Z=y)
+    gp = GPsep(Z=y)
     
     # Test with invalid g type
     with pytest.raises(ValueError):
-        gp.garg(g="not_a_dict_or_number", y=y)
+        garg(g="not_a_dict_or_number", y=y)
     
     # Test with empty y
     with pytest.raises(ValueError):
-        gp.garg(g=None, y=np.array([]))
+        garg(g=None, y=np.array([]))

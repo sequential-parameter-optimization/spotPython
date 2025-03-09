@@ -46,6 +46,10 @@ def covar_anisotropic(X1=None, X2=None, d=None, g=None) -> np.ndarray:
         [[0.00012341 0.00033546]
          [0.00033546 0.000911
     """
+    # Convert pandas dataframes to numpy arrays
+    X1 = np.asarray(X1)
+    if X2 is not None:
+        X2 = np.asarray(X2)
     if X1 is None:
         raise ValueError("X1 cannot be None")
 
