@@ -461,15 +461,15 @@ class GPsep:
                 #     raise ValueError("derivative info not in GPsep; use newGPsep with dK=True")
 
                 # New: mleGPsep_optimize starts here:
-                print(f"Starting MLE with d={self.d}, g={self.g}")
+
                 # generate starting point p
                 p = np.concatenate([self.d, [self.g]])
-                print(f"Starting point: {p}")
                 bounds = [(tmin[i], tmax[i]) for i in range(len(p))]
-                print(f"bounds: {bounds}")
-                print(f"p: {p}")
-                # print(f"self.X: {self.X}")
-                # print(f"self.Z: {self.Z}")
+                if self.verbosity > 0:
+                    print(f"Starting MLE with d={self.d}, g={self.g}")
+                    print(f"Starting point: {p}")
+                    print(f"bounds: {bounds}")
+                    print(f"p: {p}")
                 X = copy.deepcopy(self.X)
                 Z = copy.deepcopy(self.Z)
 
@@ -480,14 +480,17 @@ class GPsep:
                     return gradnlsep(par, X, Z, self.gradnlsep_method)
 
                 result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity)
-                print(f"result: {result}")
 
                 d = result.x[:-1]
                 g = result.x[-1]
-                print(f"Optimized d: {d}, g: {g}")
+
+
                 # set new parameters and build
                 self.set_new_params(d, g)
-                print(f"Updated d: {self.d}, g: {self.g}")
+                if self.verbosity > 0:
+                    print(f"result: {result}")
+                    print(f"Optimized d: {d}, g: {g}")
+                    print(f"Updated d: {self.d}, g: {self.g}")
                 self.build()
                 new_theta = np.concatenate((self.get_d(), [self.get_g()]))
                 if np.sqrt(np.mean((result.x - new_theta) ** 2)) > np.sqrt(np.finfo(float).eps):
@@ -531,7 +534,6 @@ class GPsep:
         KiZ = np.dot(self.Ki, Z)
         phi = np.dot(Z.T, KiZ)
         self.phi = phi[0, 0]
-        print(f"phi: {self.phi}")
         self.KiZ = KiZ
 
     def build(self) -> None:
