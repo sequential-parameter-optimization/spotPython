@@ -597,7 +597,9 @@ class GPsep(BaseEstimator, RegressorMixin):
                 def gradient(par):
                     return gradnlsep(par, X, y, self.gradnlsep_method)
 
-                result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity, random_state=self.seed)
+                result = run_minimize_with_restarts(
+                    objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity, random_state=self.seed
+                )
 
                 d = result.x[:-1]
                 g = result.x[-1]
