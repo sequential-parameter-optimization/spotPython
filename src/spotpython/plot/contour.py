@@ -264,6 +264,7 @@ def plotModel(
         on_mask = np.isclose(z_actual, z_pred_for_point, atol=atol)
         below_mask = z_actual - atol / 2.0 < z_pred_for_point
         above_mask = z_actual + atol / 2.0 > z_pred_for_point
+        num_correct = np.count_nonzero(on_mask)
 
         # 2D contour scatter
         ax_contour.scatter(
@@ -332,7 +333,9 @@ def plotModel(
 
     # --- Title, save, and show ---
     if title:
-        fig.suptitle(title, fontsize=legend_fontsize + 2)
+        updated_title = f"{title}  Correct Points: {num_correct}"
+        fig.suptitle(updated_title, fontsize=legend_fontsize + 2)
+
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     if filename:
