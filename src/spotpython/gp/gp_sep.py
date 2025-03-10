@@ -14,6 +14,7 @@ from spotpython.gp.distances import covar_anisotropic
 from spotpython.utils.linalg import matrix_inversion_dispatcher
 from numpy.linalg import det
 from spotpython.utils.aggregate import select_distant_points
+from sklearn.base import BaseEstimator, RegressorMixin
 
 
 def crude_reset(theta, tmin, tmax, m):
@@ -114,12 +115,11 @@ def darg(d, X: np.ndarray = None, samp_size: int = 1000) -> dict:
         dict: Updated 'd' with fields 'start', 'min', 'max', 'mle', 'ab', etc.
 
     Examples:
-        >>> from spotpython.gp.gp_sep import GPsep
+        >>> from spotpython.gp.gp_sep import darg
         >>> import numpy as np
         >>> X = np.array([[1, 2], [3, 4], [5, 6]])
-        >>> gp = GPsep(m=2, n=3, X=X)
         >>> d = 2.5
-        >>> result = gp.darg(d=d, X=X, samp_size=10)
+        >>> result = darg(d=d, X=X, samp_size=10)
         >>> print(result)
     """
     if X is None:
@@ -278,7 +278,7 @@ def garg(g, y: np.ndarray = None) -> dict:
     return g
 
 
-class GPsep:
+class GPsep(BaseEstimator, RegressorMixin):
     """A class to represent a Gaussian Process with separable covariance.
 
     Attributes:
@@ -303,22 +303,22 @@ class GPsep:
         verbosity: Verbosity level.
         auto_optimize: Whether to automatically optimize hyperparameters.
         max_points: Maximum number of points for model building.
+        seed: Random seed for reproducibility.
     """
 
     def __init__(
         self,
-        X: np.ndarray = None,
-        y: np.ndarray = None,
-        d: np.ndarray = None,
-        g: float = None,
+        d=None,
+        g=None,
         nlsep_method="inv",
         gradnlsep_method="inv",
         n_restarts_optimizer=9,
-        samp_size: int = 1000,
+        samp_size=1000,
         maxit=100,
         verbosity=0,
         auto_optimize=True,
         max_points=None,
+        seed=123,
     ) -> None:
         """
         Initialize the GP model with data and hyperparameters.
@@ -349,31 +349,9 @@ class GPsep:
             max_points (int):
                 Maximum number of points to use for the model building. Default is None, which means all points are used.
         """
-        if X is not None:
-            # convert pandas dataframes or series to numpy arrays
-            if hasattr(X, "to_numpy"):
-                X = X.to_numpy()
-        if y is not None:
-            if hasattr(y, "to_numpy"):
-                y = y.to_numpy()
-            y = y.reshape(-1, 1)
-        if X is not None and y is not None:
-            if max_points is not None:
-                X, y = select_distant_points(X, y, max_points)
-                print(f"Selected {max_points} points for the model.")
-        self.m = None  # (int) number of input dimensions
-        self.n = None  # (int) number of observations
-        self.X = X
-        self.y = y
+        # Hyperparameters (do not store training data)
         self.d = d
         self.g = g
-        self.K = None
-        self.Ki = None
-        self.Kiy = None
-        self.phi = None
-        self.dK = None  # boolean
-        self.DK = None  # matrix
-        self.ldetK = None
         self.nlsep_method = nlsep_method
         self.gradnlsep_method = gradnlsep_method
         self.n_restarts_optimizer = n_restarts_optimizer
@@ -382,11 +360,27 @@ class GPsep:
         self.verbosity = verbosity
         self.auto_optimize = auto_optimize
         self.max_points = max_points
+        self.seed = seed
+
+        # Attributes set during fit
+        self.m = None
+        self.n = None
+        self.X_ = None
+        self.y_ = None
+        self.dk = None  # derivative flag
+        self.K = None
+        self.Ki = None
+        self.Kiy = None
+        self.phi = None
+        self.dK = None
+        self.DK = None
+        self.ldetK = None
+
+        # Internal flag to check if fitted
+        self._is_fitted = False
 
         # need to store the initial parameters for the fit method (sklearn compatibility)
         self.init_params = {
-            "X": X,
-            "y": y,
             "d": d,
             "g": g,
             "nlsep_method": nlsep_method,
@@ -397,6 +391,7 @@ class GPsep:
             "verbosity": verbosity,
             "auto_optimize": auto_optimize,
             "max_points": max_points,
+            "seed": seed,
         }
 
     # Add these two methods required by scikit-learn
@@ -413,8 +408,6 @@ class GPsep:
             dict: Parameter names mapped to their values.
         """
         return {
-            "X": self.X,
-            "y": self.y,
             "d": self.d,
             "g": self.g,
             "nlsep_method": self.nlsep_method,
@@ -425,6 +418,7 @@ class GPsep:
             "verbosity": self.verbosity,
             "auto_optimize": self.auto_optimize,
             "max_points": self.max_points,
+            "seed": self.seed,
         }
 
     def set_params(self, **parameters):
@@ -450,8 +444,8 @@ class GPsep:
         """Fit the GP model with training data and optionally auto-optimize hyperparameters.
 
         Args:
-            X: The input data matrix of shape (n, m).
-            y: The output data vector of length n.
+            X: array-like of shape (n_samples, n_features)
+            y: array-like of shape (n_samples,)
             d: The length-scale parameters. If None, will be determined
                 automatically. Defaults to None.
             g: The nugget parameter. If None, will be determined automatically.
@@ -475,10 +469,12 @@ class GPsep:
         if hasattr(y, "to_numpy"):
             y = y.to_numpy()
         y = y.reshape(-1, 1)
-        print(f"X shape: {X.shape}, y shape: {y.shape}")
+        if verbosity > 0:
+            print(f"X shape: {X.shape}, y shape: {y.shape}")
         if self.max_points is not None:
             X, y = select_distant_points(X, y, self.max_points)
-            print(f"Selected {self.max_points} points for the model.")
+            if verbosity > 0:
+                print(f"Selected {self.max_points} points for the model.")
         if auto_optimize is None:
             auto_optimize = self.auto_optimize
         n, m = X.shape
@@ -600,7 +596,9 @@ class GPsep:
                 def gradient(par):
                     return gradnlsep(par, X, y, self.gradnlsep_method)
 
-                result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity)
+                result = run_minimize_with_restarts(
+                    objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity, random_state=self.seed
+                )
 
                 d = result.x[:-1]
                 g = result.x[-1]
@@ -611,7 +609,7 @@ class GPsep:
                     print(f"result: {result}")
                     print(f"Optimized d: {d}, g: {g}")
                     print(f"Updated d: {self.d}, g: {self.g}")
-                self.build()
+                self._build()
                 new_theta = np.concatenate((self.get_d(), [self.get_g()]))
                 if np.sqrt(np.mean((result.x - new_theta) ** 2)) > np.sqrt(np.finfo(float).eps):
                     warnings.warn("stored theta not the same as theta-hat", RuntimeWarning)
@@ -622,10 +620,12 @@ class GPsep:
                     print(f"Optimized nugget (g): {self.get_g()}")
                     print(f"Message: {result['msg']}")
                     print(f"Iterations: {result['its']}")
+                self._is_fitted = True
                 return self
             else:
                 # No optimization, just build the model with roughly estimated parameters using darg and garg
-                self.build()
+                self._build()
+                self._is_fitted = True
                 return self
         else:
             # Original behavior for explicitly provided parameters
@@ -634,7 +634,8 @@ class GPsep:
             if len(self.d) != m:
                 raise ValueError(f"Length of d ({len(self.d)}) does not match ncol(X) ({m})")
             self.g = g
-            self.build()
+            self._build()
+            self._is_fitted = True
             return self
 
     def calc_ytKiy(self) -> None:
@@ -656,7 +657,7 @@ class GPsep:
         self.phi = phi[0, 0]
         self.Kiy = Kiy
 
-    def build(self) -> None:
+    def _build(self) -> None:
         """
         Completes all correlation calculations after data is defined.
         """
@@ -674,11 +675,15 @@ class GPsep:
         #     #     raise RuntimeError("dK calculations have already been initialized.")
         #     self.DK = diff_covar_sep_symm(self.m, self.X, self.n, self.d, self.K)
 
-    def predict(self, XX: np.ndarray, lite: bool = False, nonug: bool = False, return_full=False, return_std=False) -> float:
+    def _check_is_fitted(self):
+        if not self._is_fitted:
+            raise ValueError("This GPsep instance is not fitted yet. Call 'fit' with " "appropriate arguments before using 'predict'.")
+
+    def predict(self, X: np.ndarray, lite: bool = False, nonug: bool = False, return_full=False, return_std=False) -> float:
         """Predict the Gaussian Process output at new input points.
 
         Args:
-            XX: The predictive locations.
+            X: The predictive locations.
             lite: Flag to indicate whether to compute only the diagonal
                 of Sigma. Defaults to False.
             nonug: Flag to indicate whether to exclude nugget.
@@ -724,11 +729,12 @@ class GPsep:
                 plt.title("Predictive Distribution")
                 plt.show()
         """
-        # if XX is a pandas dataframe, convert it to a numpy array
-        if hasattr(XX, "to_numpy"):
-            XX = XX.to_numpy()
+        self._check_is_fitted()
+        # if X is a pandas dataframe, convert it to a numpy array
+        if hasattr(X, "to_numpy"):
+            X = X.to_numpy()
         if lite:
-            res = self._predict_lite(XX, nonug)
+            res = self._predict_lite(X, nonug)
             if return_full:
                 return res
             elif return_std:
@@ -736,7 +742,7 @@ class GPsep:
             else:
                 return res["mean"]
         else:
-            res = self._predict_full(XX, nonug)
+            res = self._predict_full(X, nonug)
             if return_full:
                 return res
             elif return_std:
@@ -744,34 +750,34 @@ class GPsep:
             else:
                 return res["mean"]
 
-    def _predict_lite(self, XX: np.ndarray, nonug: bool) -> dict:
+    def _predict_lite(self, X: np.ndarray, nonug: bool) -> dict:
         """
         Predict only the diagonal of Sigma—optimized for speed.
 
         Args:
-            XX (np.ndarray): The predictive locations.
+            X (np.ndarray): The predictive locations.
             nonug (bool): Flag to indicate whether to use nugget.
 
         Returns:
             dict: A dictionary containing the mean, s2, df, and llik.
         """
-        nn = XX.shape[0]
-        m = XX.shape[1]
-        mean_out, s2_out, df_out, llik_out = predGPsep_lite(self, m, nn, XX, lite_in=True, nonug_in=nonug)
+        nn = X.shape[0]
+        m = X.shape[1]
+        mean_out, s2_out, df_out, llik_out = predGPsep_lite(self, m, nn, X, lite_in=True, nonug_in=nonug)
         return {"mean": mean_out, "s2": s2_out, "df": df_out, "llik": llik_out}
 
-    def _predict_full(self, XX: np.ndarray, nonug: bool) -> dict:
+    def _predict_full(self, X: np.ndarray, nonug: bool) -> dict:
         """
         Compute full predictive covariance matrix.
 
         Args:
-            XX (np.ndarray): The predictive locations.
+            X (np.ndarray): The predictive locations.
             nonug (bool): Flag to indicate whether to use nugget.
 
         Returns:
             dict: A dictionary containing the mean, Sigma, df, and llik.
         """
-        nn, m = XX.shape
+        nn, m = X.shape
         if m != self.m:
             raise ValueError(f"ncol(X)={m} does not match GPsep model ({self.m})")
 
@@ -785,8 +791,8 @@ class GPsep:
         df[0] = float(n)
         phidf = self.phi / df[0]
         llik[0] = -0.5 * (df[0] * np.log(0.5 * self.phi) + self.ldetK)
-        k = covar_sep(self.m, self.X, n, XX, nn, self.d, 0.0)
-        Sigma[...] = covar_sep_symm(self.m, XX, nn, self.d, g)
+        k = covar_sep(self.m, self.X, n, X, nn, self.d, 0.0)
+        Sigma[...] = covar_sep_symm(self.m, X, nn, self.d, g)
         ktKi = np.dot(k.T, self.Ki)
         mean[:] = np.dot(ktKi, self.y).reshape(-1)
         Sigma[...] = phidf * (Sigma - np.dot(ktKi, k))
@@ -880,7 +886,7 @@ class GPsep:
         # set new parameters and build
         self.set_new_params(d, g)
         print(f"Updated d: {self.d}, g: {self.g}")
-        self.build()
+        self._build()
         return {"parameters": result.x, "iterations": result.nit, "convergence": result.status, "message": result.message}
 
 
