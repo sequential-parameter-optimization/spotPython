@@ -472,9 +472,10 @@ class GPsep(BaseEstimator, RegressorMixin):
         if verbosity > 0:
             print(f"X shape: {X.shape}, y shape: {y.shape}")
         if self.max_points is not None:
-            X, y = select_distant_points(X, y, self.max_points)
-            if verbosity > 0:
-                print(f"Selected {self.max_points} points for the model.")
+            if X.shape[0] > self.max_points:
+                X, y = select_distant_points(X, y, self.max_points)
+                if verbosity > 0:
+                    print(f"Selected {self.max_points} points for the model.")
         if auto_optimize is None:
             auto_optimize = self.auto_optimize
         n, m = X.shape
@@ -596,9 +597,7 @@ class GPsep(BaseEstimator, RegressorMixin):
                 def gradient(par):
                     return gradnlsep(par, X, y, self.gradnlsep_method)
 
-                result = run_minimize_with_restarts(
-                    objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity, random_state=self.seed
-                )
+                result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity, random_state=self.seed)
 
                 d = result.x[:-1]
                 g = result.x[-1]
