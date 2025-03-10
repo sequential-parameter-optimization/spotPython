@@ -16,6 +16,44 @@ from numpy.linalg import det
 from spotpython.utils.aggregate import select_distant_points
 
 
+def crude_reset(theta, tmin, tmax, m):
+    """
+    Check whether any elements of the parameter vector ``theta`` lie below the
+    corresponding elements of the lower bound ``tmin``. If so, reset ``theta``
+    to a new vector based on the weighted average of ``tmin`` and ``tmax``,
+    leaving bounds unmodified except for cases where ``tmax`` is negative.
+
+    Args:
+        theta (np.ndarray): The current parameter values.
+        tmin (np.ndarray): The lower bounds for the parameters.
+        tmax (np.ndarray): The upper bounds for the parameters (may be adjusted if negative).
+        m (int): The dimensionality or number of parameters (used to adjust negative ``tmax`` entries).
+
+    Returns:
+        dict or None: A dictionary containing:
+            - "theta" (np.ndarray): The reset parameter values.
+            - "its" (int): Number of iterations (0, indicating immediate reset).
+            - "msg" (str): Reason for the reset.
+            - "conv" (int): Reset code (102).
+        Returns None if no reset is needed.
+    """
+    if np.any(theta < tmin):
+        print("resetting due to init on lower boundary")
+        print(f"theta: {theta}")
+        print(f"tmin: {tmin}")
+        for i in range(len(tmax)):
+            if tmax[i] < 0:
+                tmax[i] = np.sqrt(m)
+        theta_new = 0.9 * np.maximum(tmin, 0) + 0.1 * np.array(tmax)
+        return {
+            "theta": theta_new,
+            "its": 0,
+            "msg": "reset due to init on lower boundary",
+            "conv": 102,
+        }
+    return None
+
+
 def getDs(X: np.ndarray, p: float = 0.1, samp_size: int = 1000) -> dict:
     """
     Calculate a rough starting, minimum, and maximum length-scale from the data X.
@@ -505,23 +543,13 @@ class GPsep:
                 # Possibly reset parameters
                 theta = np.concatenate((self.get_d(), [self.get_g()]))
                 # Check if theta is on the boundary. If not on the boundary,
-                # build the model and return the current parameters.
-                if np.any(theta < tmin):
-                    print("resetting due to init on lower boundary")
-                    print(f"theta: {theta}")
-                    print(f"tmin: {tmin}")
-                    for i in range(len(tmax)):
-                        if tmax[i] < 0:
-                            tmax[i] = np.sqrt(m)
-                    theta_new = 0.9 * np.maximum(tmin, 0) + 0.1 * np.array(tmax)
-                    self.set_new_params(theta_new[:m], theta_new[m])
-                    self.build()
-                    return {
-                        "theta": theta_new,
-                        "its": 0,
-                        "msg": "reset due to init on lower boundary",
-                        "conv": 102,
-                    }
+                # reset the  current parameters.
+                theta_new = crude_reset(theta, tmin, tmax, m)
+                if theta_new is not None:
+                    theta = theta_new["theta"]
+                    # isuue a warning if the parameters are reset
+                    warnings.warn(f"resetting due to init on lower boundary: {theta_new['msg']}", RuntimeWarning)
+
                 # Convert ab to numpy array if it is a list
                 if not isinstance(ab, np.ndarray):
                     ab = np.array(ab, dtype=float)
