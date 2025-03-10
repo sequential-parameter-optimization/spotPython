@@ -1,60 +1,68 @@
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
-from sklearn.cluster import KMeans
-from sklearn.neighbors import NearestNeighbors
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.preprocessing import StandardScaler
 from spotpython.gp.gp_sep import GPsep
 import copy
+import matplotlib.pyplot as plt
+from sklearn.neighbors import KernelDensity
 
 
 class TreeGP(BaseEstimator, RegressorMixin):
     """A tree-based Gaussian Process model that partitions the input space
-    and fits local GP models on each partition.
+    using regression trees and fits local GP models on each partition.
 
-    This model divides the input space using clustering, trains a separate
-    GPsep model on each cluster, and combines their predictions to cover
-    the whole input space.
+    This model uses a decision tree to create regions based on both X and y values,
+    then trains separate GPsep models on each region. Model predictions are blended
+    along boundaries for smoothness.
 
     Attributes:
-        n_clusters: Number of clusters to partition the input space.
-        min_points: Minimum number of points required in each cluster.
-        weighting: Method for combining predictions ('hard' or 'distance').
-        distance_power: Power parameter for distance-based weighting.
+        max_depth: Maximum depth of the regression tree for partitioning.
+        min_samples_leaf: Minimum samples required in each leaf node.
+        smooth_transitions: Whether to use soft transitions between regions.
+        smooth_factor: Controls the smoothness of transitions (higher = smoother).
         gp_params: Parameters passed to each local GPsep model.
-        cluster_model: The clustering algorithm used for partitioning.
-        local_models: List of GPsep models for each partition.
-        cluster_centers: Centers of each cluster.
-        X_bounds: The bounds of the input space from training data.
-        y_bounds: The bounds of the output space from training data.
+        tree_model: The regression tree used for partitioning.
+        local_models: Dictionary mapping leaf indices to GPsep models.
+        leaf_stats: Statistics for each leaf node.
+        scaler_X: Feature scaler for input normalization.
+        scaler_y: Response scaler for output normalization.
     """
 
-    def __init__(self, n_clusters=3, min_points=10, weighting="distance", distance_power=2, gp_params=None):
-        """Initialize the TreeGP model with partitioning and GP parameters.
+    def __init__(self, max_depth=3, min_samples_leaf=10, smooth_transitions=True, smooth_factor=2.0, gp_params=None, auto_scale=True, plot_partitions=False):
+        """Initialize the TreeGP model with regression tree partitioning.
 
         Args:
-            n_clusters: Number of clusters to create. Defaults to 3.
-            min_points: Minimum points required per cluster. If a cluster has
-                fewer points, it will be merged with nearest cluster.
-                Defaults to 10.
-            weighting: Method for combining predictions ('hard' or 'distance').
-                Defaults to 'distance'.
-            distance_power: Power parameter for distance-based weighting.
-                Higher values make the weighting more local. Defaults to 2.
+            max_depth: Maximum depth of the tree for partitioning. Defaults to 3.
+            min_samples_leaf: Minimum samples required in each leaf node. Defaults to 10.
+            smooth_transitions: Whether to use soft transitions between regions.
+                Defaults to True.
+            smooth_factor: Controls smoothness of transitions (higher = smoother).
+                Defaults to 2.0.
             gp_params: Dictionary of parameters to pass to each GPsep model.
                 Defaults to None.
+            auto_scale: Whether to automatically scale inputs and outputs.
+                Defaults to True.
+            plot_partitions: Whether to plot the partitions after fitting.
+                Defaults to False.
         """
-        self.n_clusters = n_clusters
-        self.min_points = min_points
-        self.weighting = weighting
-        self.distance_power = distance_power
+        self.max_depth = max_depth
+        self.min_samples_leaf = min_samples_leaf
+        self.smooth_transitions = smooth_transitions
+        self.smooth_factor = smooth_factor
         self.gp_params = gp_params or {}
+        self.auto_scale = auto_scale
+        self.plot_partitions = plot_partitions
 
         # These will be set during fitting
-        self.cluster_model = None
-        self.local_models = []
-        self.cluster_centers = None
-        self.X_bounds = None
-        self.y_bounds = None
-        self.cluster_indices = None
+        self.tree_model = None
+        self.local_models = {}
+        self.leaf_stats = {}
+        self.scaler_X = None
+        self.scaler_y = None
+        self.leaves = None
+        self.X_train = None
+        self.y_train = None
 
     def get_params(self, deep=True):
         """Get parameters for this estimator.
@@ -67,11 +75,13 @@ class TreeGP(BaseEstimator, RegressorMixin):
             dict: Parameter names mapped to their values.
         """
         params = {
-            "n_clusters": self.n_clusters,
-            "min_points": self.min_points,
-            "weighting": self.weighting,
-            "distance_power": self.distance_power,
+            "max_depth": self.max_depth,
+            "min_samples_leaf": self.min_samples_leaf,
+            "smooth_transitions": self.smooth_transitions,
+            "smooth_factor": self.smooth_factor,
             "gp_params": self.gp_params,
+            "auto_scale": self.auto_scale,
+            "plot_partitions": self.plot_partitions,
         }
 
         if deep and self.gp_params:
@@ -96,9 +106,39 @@ class TreeGP(BaseEstimator, RegressorMixin):
                 setattr(self, parameter, value)
         return self
 
+    def _find_leaves_and_samples(self, tree, n_samples):
+        """Extract leaf node indices and corresponding sample indices from the fitted tree.
+
+        Args:
+            tree: The fitted decision tree.
+            n_samples: Number of samples in training data.
+
+        Returns:
+            dict: Mapping from leaf index to array of sample indices.
+        """
+        # Get the decision path for all samples
+        node_indicator = tree.decision_path(self.X_train)
+
+        # Get the leaf node for each sample
+        leaf_ids = tree.apply(self.X_train)
+
+        # Create a dictionary mapping each leaf node to its samples
+        leaves = {}
+        for sample_id in range(n_samples):
+            leaf_id = leaf_ids[sample_id]
+            if leaf_id not in leaves:
+                leaves[leaf_id] = []
+            leaves[leaf_id].append(sample_id)
+
+        # Convert lists to numpy arrays
+        for leaf_id in leaves:
+            leaves[leaf_id] = np.array(leaves[leaf_id])
+
+        return leaves
+
     def fit(self, X, y):
-        """Fit the TreeGP model by partitioning the input space and
-        fitting local GP models to each partition.
+        """Fit the TreeGP model by partitioning the input space with a regression tree
+        and fitting local GP models to each partition.
 
         Args:
             X: Training input samples of shape (n_samples, n_features).
@@ -106,9 +146,6 @@ class TreeGP(BaseEstimator, RegressorMixin):
 
         Returns:
             self: Returns self.
-
-        Raises:
-            ValueError: If the number of samples is less than n_clusters or min_points.
         """
         # Convert pandas objects to numpy arrays if necessary
         if hasattr(X, "to_numpy"):
@@ -117,74 +154,139 @@ class TreeGP(BaseEstimator, RegressorMixin):
             y = y.to_numpy()
 
         y = y.reshape(-1)
-        n_samples = X.shape[0]
+        n_samples, n_features = X.shape
 
-        if n_samples < max(self.n_clusters, self.min_points):
-            raise ValueError(f"Number of samples ({n_samples}) must be at least " f"max(n_clusters, min_points) = {max(self.n_clusters, self.min_points)}")
+        # Store original data for later use
+        self.X_train = X
+        self.y_train = y
 
-        # Store data bounds for later normalization
-        self.X_bounds = (np.min(X, axis=0), np.max(X, axis=0))
-        self.y_bounds = (np.min(y), np.max(y))
+        # Scale data if requested
+        if self.auto_scale:
+            self.scaler_X = StandardScaler()
+            X_scaled = self.scaler_X.fit_transform(X)
 
-        # Partition the input space using KMeans clustering
-        self.cluster_model = KMeans(n_clusters=self.n_clusters, random_state=42, n_init="auto")
+            self.scaler_y = StandardScaler()
+            y_scaled = self.scaler_y.fit_transform(y.reshape(-1, 1)).ravel()
+        else:
+            X_scaled = X
+            y_scaled = y
 
-        cluster_labels = self.cluster_model.fit_predict(X)
-        self.cluster_centers = self.cluster_model.cluster_centers_
+        # Fit a regression tree to partition the input space
+        self.tree_model = DecisionTreeRegressor(max_depth=self.max_depth, min_samples_leaf=self.min_samples_leaf, random_state=42)
+        self.tree_model.fit(X_scaled, y_scaled)
 
-        # Handle clusters with too few points by merging them
-        valid_clusters = []
-        clusters_to_merge = []
+        # Find leaf nodes and their corresponding samples
+        self.leaves = self._find_leaves_and_samples(self.tree_model, n_samples)
 
-        for i in range(self.n_clusters):
-            cluster_size = np.sum(cluster_labels == i)
-            if cluster_size >= self.min_points:
-                valid_clusters.append(i)
-            else:
-                clusters_to_merge.append(i)
+        # Fit a GP model for each leaf node
+        self.local_models = {}
+        self.leaf_stats = {}
 
-        # If there are clusters to merge, reassign their points to nearest valid cluster
-        if clusters_to_merge:
-            if not valid_clusters:
-                # If no valid clusters, just use a single GPsep model
-                print("No valid clusters with enough points. Falling back to single model.")
-                self.n_clusters = 1
-                self.cluster_centers = np.mean(X, axis=0, keepdims=True)
-                cluster_labels = np.zeros(n_samples, dtype=int)
-            else:
-                # Reassign points from small clusters to nearest valid cluster
-                nn = NearestNeighbors(n_neighbors=1).fit(self.cluster_centers[valid_clusters])
+        for leaf_id, sample_indices in self.leaves.items():
+            # Skip leaves with too few points (shouldn't happen with min_samples_leaf, but just in case)
+            if len(sample_indices) < 3:  # Need at least 3 points for a reasonable GP
+                continue
 
-                for i in clusters_to_merge:
-                    # Find points in this cluster
-                    mask = cluster_labels == i
-                    if np.any(mask):
-                        # Find nearest valid cluster for each point
-                        _, indices = nn.kneighbors(X[mask])
-                        # Reassign to nearest valid cluster
-                        cluster_labels[mask] = [valid_clusters[idx[0]] for idx in indices]
+            # Get data for this leaf
+            X_leaf = X[sample_indices]
+            y_leaf = y[sample_indices]
 
-        # Save cluster assignments
-        self.cluster_indices = [np.where(cluster_labels == i)[0] for i in range(self.n_clusters)]
+            # Store statistics for this leaf
+            self.leaf_stats[leaf_id] = {"mean": np.mean(y_leaf), "std": np.std(y_leaf), "center": np.mean(X_leaf, axis=0), "n_samples": len(sample_indices)}
 
-        # Fit local GPsep models for each cluster
-        self.local_models = []
+            # Create and fit a GPsep model for this leaf
+            gp = GPsep(**self.gp_params)
+            gp.fit(X_leaf, y_leaf)
+            self.local_models[leaf_id] = gp
 
-        for i in range(self.n_clusters):
-            idx = self.cluster_indices[i]
-            if len(idx) > 0:  # Make sure we have points in this cluster
-                # Create and fit a GPsep model for this cluster
-                gp = GPsep(**self.gp_params)
-                gp.fit(X[idx], y[idx])
-                self.local_models.append(gp)
-            else:
-                # This shouldn't happen after our merging step, but just in case
-                self.local_models.append(None)
+        # Optionally visualize the partitions
+        if self.plot_partitions and n_features <= 2:
+            self.plot_tree_partitions()
 
         return self
 
+    def _get_leaf_probabilities(self, X):
+        """Calculate probabilities for each leaf node for test points.
+
+        For each test point, find the leaf it belongs to and assign a probability
+        of 1.0 to that leaf. If smooth_transitions is True, also assign non-zero
+        probabilities to nearby leaves based on proximity.
+
+        Args:
+            X: Test points of shape (n_samples, n_features).
+
+        Returns:
+            array: Probabilities of shape (n_samples, n_leaves).
+        """
+        n_samples = X.shape[0]
+        leaf_ids = list(self.local_models.keys())
+        n_leaves = len(leaf_ids)
+
+        # Scale input if needed
+        if self.auto_scale:
+            X_scaled = self.scaler_X.transform(X)
+        else:
+            X_scaled = X
+
+        # Get leaf node assignments from the tree
+        leaf_assignments = self.tree_model.apply(X_scaled)
+
+        # Initialize probabilities matrix
+        probabilities = np.zeros((n_samples, n_leaves))
+
+        # Simple case: hard assignments
+        if not self.smooth_transitions:
+            for i, leaf_id in enumerate(leaf_assignments):
+                try:
+                    leaf_idx = leaf_ids.index(leaf_id)
+                    probabilities[i, leaf_idx] = 1.0
+                except ValueError:
+                    # If leaf_id is not in local_models (rare edge case), use nearest leaf
+                    dists = []
+                    for lid in leaf_ids:
+                        leaf_center = self.leaf_stats[lid]["center"]
+                        dist = np.sum((X[i] - leaf_center) ** 2)
+                        dists.append(dist)
+                    nearest_leaf_idx = np.argmin(dists)
+                    probabilities[i, nearest_leaf_idx] = 1.0
+
+            return probabilities
+
+        # More complex case: smooth transitions
+        # We need to calculate distances to all leaf centers
+        for i in range(n_samples):
+            x = X[i]
+            # Vector of distances to each leaf center
+            distances = np.zeros(n_leaves)
+
+            for j, leaf_id in enumerate(leaf_ids):
+                leaf_center = self.leaf_stats[leaf_id]["center"]
+                distances[j] = np.sqrt(np.sum((x - leaf_center) ** 2))
+
+            # Convert distances to weights using a kernel function
+            # Higher smooth_factor makes transitions smoother but may blur important boundaries
+            bandwidth = np.mean(distances) / self.smooth_factor
+            weights = np.exp(-0.5 * (distances / bandwidth) ** 2)
+
+            # If the point is directly in a leaf, boost that leaf's weight
+            try:
+                leaf_idx = leaf_ids.index(leaf_assignments[i])
+                weights[leaf_idx] *= 3.0  # Boost the weight of the assigned leaf
+            except ValueError:
+                pass  # Leaf not in our models, just use distances
+
+            # Normalize weights to sum to 1
+            if np.sum(weights) > 0:
+                probabilities[i] = weights / np.sum(weights)
+            else:
+                # Fallback to nearest leaf
+                nearest_leaf_idx = np.argmin(distances)
+                probabilities[i, nearest_leaf_idx] = 1.0
+
+        return probabilities
+
     def predict(self, X, return_std=False, **kwargs):
-        """Predict using the TreeGP model.
+        """Predict using the TreeGP model, combining predictions from multiple local models.
 
         Args:
             X: Query points of shape (n_samples, n_features).
@@ -199,118 +301,197 @@ class TreeGP(BaseEstimator, RegressorMixin):
             X = X.to_numpy()
 
         n_samples = X.shape[0]
-        y_pred = np.zeros(n_samples)
+        leaf_ids = list(self.local_models.keys())
+        n_leaves = len(leaf_ids)
+
+        # Get probability weights for each leaf
+        leaf_probs = self._get_leaf_probabilities(X)
+
+        # Get predictions from each local model
+        all_preds = np.zeros((n_samples, n_leaves))
+        all_vars = np.zeros((n_samples, n_leaves))
+
+        for i, leaf_id in enumerate(leaf_ids):
+            model = self.local_models[leaf_id]
+
+            # Only predict for samples with non-zero weight for this leaf
+            # (saves computation for distant points)
+            mask = leaf_probs[:, i] > 1e-6
+            if np.any(mask):
+                # Get predictions
+                preds = model.predict(X[mask], return_full=True)
+                all_preds[mask, i] = preds["mean"]
+
+                # Extract variances from the covariance matrix
+                if "Sigma" in preds:
+                    # If full covariance matrix is returned, extract diagonal
+                    if len(preds["Sigma"].shape) == 2:
+                        all_vars[mask, i] = np.diag(preds["Sigma"])
+                    else:
+                        # If already diagonal elements, use directly
+                        all_vars[mask, i] = preds["Sigma"]
+                elif "s2" in preds:
+                    all_vars[mask, i] = preds["s2"]
+
+        # Weight predictions by leaf probabilities
+        y_pred = np.sum(all_preds * leaf_probs, axis=1)
 
         if return_std:
-            y_std = np.zeros(n_samples)
+            # Weighted variance calculation (accounting for model uncertainty + transition uncertainty)
 
-        # Get distances to cluster centers for weighting
-        distances = np.zeros((n_samples, self.n_clusters))
+            # Base uncertainty: weighted average of variances
+            weighted_vars = np.sum(all_vars * leaf_probs, axis=1)
 
-        for i in range(self.n_clusters):
-            # Calculate Euclidean distance to each cluster center
-            diff = X - self.cluster_centers[i]
-            distances[:, i] = np.sqrt(np.sum(diff**2, axis=1))
+            # Plus additional uncertainty from model disagreement
+            means_diff = all_preds - y_pred.reshape(-1, 1)
+            model_variance = np.sum(leaf_probs * (means_diff**2), axis=1)
 
-        if self.weighting == "hard":
-            # Hard assignment: use closest cluster's model for prediction
-            cluster_assignments = np.argmin(distances, axis=1)
+            # Combine both sources of uncertainty
+            total_var = weighted_vars + model_variance
+            y_std = np.sqrt(total_var)
 
-            for i in range(self.n_clusters):
-                mask = cluster_assignments == i
-                if np.any(mask) and self.local_models[i] is not None:
-                    if return_std:
-                        # Use return_full=True to get the full prediction dictionary
-                        preds = self.local_models[i].predict(X[mask], return_full=True)
-                        y_pred[mask] = preds["mean"]
-
-                        # Extract standard deviations from the covariance matrix
-                        if "Sigma" in preds:
-                            # If full covariance matrix is returned, extract diagonal
-                            if len(preds["Sigma"].shape) == 2:
-                                y_std[mask] = np.sqrt(np.diag(preds["Sigma"]))
-                            else:
-                                # If already diagonal elements, just use directly
-                                y_std[mask] = np.sqrt(preds["Sigma"])
-                        elif "s2" in preds:
-                            # Some implementations return variances as "s2"
-                            y_std[mask] = np.sqrt(preds["s2"])
-                    else:
-                        y_pred[mask] = self.local_models[i].predict(X[mask], return_full=False)
-
-        else:  # distance weighting
-            # Compute weights from distances (closer = higher weight)
-            weights = 1.0 / np.maximum(distances**self.distance_power, 1e-10)
-            # Normalize weights
-            weights_sum = np.sum(weights, axis=1, keepdims=True)
-            weights = weights / np.maximum(weights_sum, 1e-10)
-
-            # Get predictions from each model and combine with weights
-            all_preds = np.zeros((n_samples, self.n_clusters))
-            all_var = np.zeros((n_samples, self.n_clusters))  # Store variances instead of std devs
-
-            for i in range(self.n_clusters):
-                if self.local_models[i] is not None:
-                    if return_std:
-                        # Use return_full=True to get the full prediction dictionary
-                        preds = self.local_models[i].predict(X, return_full=True)
-                        all_preds[:, i] = preds["mean"]
-
-                        # Extract variances from the covariance matrix
-                        if "Sigma" in preds:
-                            # If full covariance matrix is returned, extract diagonal
-                            if len(preds["Sigma"].shape) == 2:
-                                all_var[:, i] = np.diag(preds["Sigma"])
-                            else:
-                                # If already diagonal elements, use directly
-                                all_var[:, i] = preds["Sigma"]
-                        elif "s2" in preds:
-                            all_var[:, i] = preds["s2"]
-                    else:
-                        all_preds[:, i] = self.local_models[i].predict(X)
-
-            # Combine predictions using weights
-            y_pred = np.sum(all_preds * weights, axis=1)
-
-            if return_std:
-                # Combine variances (with appropriate weighting)
-                y_var = np.sum(all_var * (weights**2), axis=1)
-                y_std = np.sqrt(y_var)
-
-        if return_std:
             return y_pred, y_std
         else:
             return y_pred
 
-    def score(self, X, y, **kwargs):
-        """Calculate the coefficient of determination R^2 of the prediction.
+    def plot_tree_partitions(self, figsize=(12, 10), cmap="viridis"):
+        """Visualize the tree partitions and local models.
+
+        Works for 1D and 2D input spaces.
 
         Args:
-            X: Test input samples.
-            y: True values for X.
-            **kwargs: Additional arguments passed to predict().
-
-        Returns:
-            float: R^2 score.
+            figsize: Figure size as (width, height). Defaults to (12, 10).
+            cmap: Colormap to use. Defaults to 'viridis'.
         """
-        from sklearn.metrics import r2_score
+        X = self.X_train
+        y = self.y_train
+        n_features = X.shape[1]
 
-        return r2_score(y, self.predict(X, **kwargs))
+        if n_features > 2:
+            raise ValueError("Visualization only works for 1D or 2D inputs")
+
+        leaf_ids = list(self.local_models.keys())
+        n_leaves = len(leaf_ids)
+        colors = plt.cm.tab10(np.linspace(0, 1, n_leaves))
+
+        plt.figure(figsize=figsize)
+
+        # 1D case
+        if n_features == 1:
+            # Plot original data points
+            for i, leaf_id in enumerate(leaf_ids):
+                indices = self.leaves[leaf_id]
+                plt.scatter(X[indices], y[indices], color=colors[i], label=f"Leaf {i}", alpha=0.7, edgecolor="k")
+
+            # Generate a grid for smooth predictions
+            x_min, x_max = X.min(), X.max()
+            margin = 0.1 * (x_max - x_min)
+            X_grid = np.linspace(x_min - margin, x_max + margin, 1000).reshape(-1, 1)
+
+            # Get predictions for the grid
+            y_pred, y_std = self.predict(X_grid, return_std=True)
+
+            # Plot predictions
+            plt.plot(X_grid, y_pred, "r-", lw=2, label="TreeGP prediction")
+            plt.fill_between(X_grid.ravel(), y_pred - 1.96 * y_std, y_pred + 1.96 * y_std, color="red", alpha=0.2, label="95% confidence")
+
+            # Plot local model predictions
+            if self.smooth_transitions:
+                leaf_probs = self._get_leaf_probabilities(X_grid)
+                for i, leaf_id in enumerate(leaf_ids):
+                    # Only show local model within its high-probability region
+                    mask = leaf_probs[:, i] > 0.2
+                    if np.any(mask):
+                        model = self.local_models[leaf_id]
+                        local_pred = model.predict(X_grid[mask])
+                        plt.plot(X_grid[mask], local_pred, "--", color=colors[i], alpha=0.5, label=f"Local model {i}")
+
+            plt.xlabel("x")
+            plt.ylabel("y")
+            plt.legend()
+            plt.title("TreeGP: Regression Tree Partitions with Local GP Models")
+
+        # 2D case
+        else:
+            # Create a subplot grid: 3 rows, 2 columns
+            fig, axes = plt.subplots(2, 2, figsize=figsize)
+
+            # Plot 1: Original data points colored by leaf assignment
+            ax = axes[0, 0]
+            for i, leaf_id in enumerate(leaf_ids):
+                indices = self.leaves[leaf_id]
+                ax.scatter(X[indices, 0], X[indices, 1], color=colors[i], label=f"Leaf {i}", alpha=0.7)
+            ax.set_title("Training Data Partitions")
+            ax.set_xlabel("x1")
+            ax.set_ylabel("x2")
+            ax.legend()
+
+            # Plot 2: Create a mesh grid for visualization
+            ax = axes[0, 1]
+            x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
+            y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
+            xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
+            grid = np.c_[xx.ravel(), yy.ravel()]
+
+            # Get leaf assignments for the grid
+            if self.auto_scale:
+                grid_scaled = self.scaler_X.transform(grid)
+                leaf_assignments = self.tree_model.apply(grid_scaled)
+            else:
+                leaf_assignments = self.tree_model.apply(grid)
+
+            # Create a color map for visualization
+            Z = np.zeros(leaf_assignments.shape)
+            for i, leaf_id in enumerate(leaf_ids):
+                Z[leaf_assignments == leaf_id] = i
+
+            Z = Z.reshape(xx.shape)
+            ax.contourf(xx, yy, Z, alpha=0.4, cmap=cmap)
+            ax.scatter(X[:, 0], X[:, 1], c="black", edgecolor="k", s=20)
+            ax.set_xlim(xx.min(), xx.max())
+            ax.set_ylim(yy.min(), yy.max())
+            ax.set_title("Decision Tree Regions")
+            ax.set_xlabel("x1")
+            ax.set_ylabel("x2")
+
+            # Plot 3: Prediction heatmap
+            ax = axes[1, 0]
+            grid_pred = self.predict(grid).reshape(xx.shape)
+
+            # Plot the heatmap
+            c = ax.contourf(xx, yy, grid_pred, 50, cmap="viridis")
+            plt.colorbar(c, ax=ax)
+            ax.set_title("TreeGP Predictions")
+            ax.set_xlabel("x1")
+            ax.set_ylabel("x2")
+
+            # Plot 4: Uncertainty heatmap
+            ax = axes[1, 1]
+            _, grid_std = self.predict(grid, return_std=True)
+            grid_std = grid_std.reshape(xx.shape)
+
+            c = ax.contourf(xx, yy, grid_std, 50, cmap="plasma")
+            plt.colorbar(c, ax=ax)
+            ax.set_title("Prediction Uncertainty (Std)")
+            ax.set_xlabel("x1")
+            ax.set_ylabel("x2")
+
+            plt.tight_layout()
+
+        plt.show()
 
 
-# Helper function to create and fit a TreeGP model in a single call
-def newTreeGP(X, y, n_clusters=3, **kwargs):
+def newTreeGP(X, y, **kwargs):
     """
     Create and fit a TreeGP model in a single function call.
 
     Args:
         X: Training input samples.
         y: Target values.
-        n_clusters: Number of clusters to partition the data. Defaults to 3.
         **kwargs: Additional parameters passed to TreeGP constructor.
 
     Returns:
         TreeGP: The fitted TreeGP model.
     """
-    model = TreeGP(n_clusters=n_clusters, **kwargs)
+    model = TreeGP(**kwargs)
     return model.fit(X, y)
