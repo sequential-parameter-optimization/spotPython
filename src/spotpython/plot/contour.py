@@ -1,452 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib
-import pylab
 import os
-
-
-def plotCombinations(
-    model,
-    X=None,
-    lower=None,
-    upper=None,
-    x_vars=None,
-    y_vars=None,
-    min_z=None,
-    max_z=None,
-    var_type=None,
-    var_name=None,
-    show=True,
-    save_dir=None,
-    n_grid=50,
-    contour_levels=10,
-    dpi=200,
-    title_prefix="",
-    figsize=(12, 6),
-    use_min=False,
-    use_max=True,
-    margin=0.1,
-    aspect_equal=False,
-    legend_fontsize=12,
-):
-    """Plot model surfaces for multiple combinations of input variables.
-
-    This function generates contour and 3D surface plots for all specified combinations
-    of input variables, avoiding redundant and meaningless combinations.
-
-    Args:
-        model: A fitted model object with a predict method.
-        X: Array of input points used for training. If provided, variable count and
-            bounds will be derived from this matrix when not explicitly specified.
-        lower: Array-like with lower bounds for all dimensions. If None, derived
-            from X. Defaults to None.
-        upper: Array-like with upper bounds for all dimensions. If None, derived
-            from X. Defaults to None.
-        x_vars: List of indices for x-axis variables. If None or empty, all variables
-            are used. Defaults to None.
-        y_vars: List of indices for y-axis variables. If None or empty, all variables
-            are used. Defaults to None.
-        min_z: Minimum value for the colorbar. If None, determined from the data.
-        max_z: Maximum value for the colorbar. If None, determined from the data.
-        var_type: List of variable types ("float", "int", etc.). If None, all types are
-            assumed to be numeric.
-        var_name: List of variable names. If None, generic names x0, x1, ... are used.
-        show: Whether to display the plots. Defaults to True.
-        save_dir: Directory to save plots. If provided, plots are saved as PNG files.
-            Defaults to None.
-        n_grid: Number of grid points in each dimension. Defaults to 50.
-        contour_levels: Number of contour levels. Defaults to 10.
-        dpi: DPI for saving figures. Defaults to 200.
-        title_prefix: Prefix for plot titles. Defaults to "".
-        figsize: Figure size as (width, height) tuple. Defaults to (12, 6).
-        use_min: Whether to use minimum values for non-plotted dimensions. Defaults to False.
-        use_max: Whether to use maximum values for non-plotted dimensions. Defaults to True.
-        margin: Fraction of range to add as margin when determining bounds from X.
-            Defaults to 0.1 (10%).
-        aspect_equal: Whether to set the aspect ratio to 1:1. Defaults to False.
-        legend_fontsize: Font size for the legend and plot labels. Defaults to 12.
-
-    Returns:
-        None. Displays and/or saves the visualizations.
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.gp.gp_sep import GPsep
-        >>> from spotpython.utils.plot_utils import plotCombinations
-        >>>
-        >>> # Create and fit a model
-        >>> X = np.random.rand(30, 5)
-        >>> y = np.sum(X**2, axis=1)
-        >>> model = GPsep().fit(X, y)
-        >>>
-        >>> # Plot with automatic bound detection
-        >>> plotCombinations(
-        >>>     model=model,
-        >>>     X=X,
-        >>>     x_vars=[0, 2],
-        >>>     y_vars=[1, 3, 4]
-        >>> )
-        >>>
-        >>> # Plot with explicit bounds
-        >>> plotCombinations(
-        >>>     model=model,
-        >>>     lower=np.zeros(5),
-        >>>     upper=np.ones(5)
-        >>> )
-    """
-    # If X is provided, extract number of variables and bounds if needed
-    if X is not None:
-        if hasattr(X, "to_numpy"):  # Handle pandas DataFrame
-            X = X.to_numpy()
-
-        # Get number of features
-        n_vars_X = X.shape[1]
-
-        # Calculate bounds if not provided
-        if lower is None:
-            min_vals = np.min(X, axis=0)
-            # Add some margin to ensure data points aren't on the boundary
-            range_vals = np.ptp(X, axis=0)  # peak-to-peak range
-            lower = min_vals - margin * range_vals
-
-        if upper is None:
-            max_vals = np.max(X, axis=0)
-            # Add some margin to ensure data points aren't on the boundary
-            range_vals = np.ptp(X, axis=0)  # peak-to-peak range
-            upper = max_vals + margin * range_vals
-
-    # Determine number of variables from lower/upper bounds
-    if lower is not None:
-        n_vars = len(lower)
-    elif upper is not None:
-        n_vars = len(upper)
-    elif X is not None:
-        n_vars = n_vars_X
-    else:
-        raise ValueError("Either X, lower, or upper must be provided to determine the number of variables")
-
-    # If x_vars or y_vars is None or empty, use all variable indices
-    if x_vars is None or len(x_vars) == 0:
-        x_vars = list(range(n_vars))
-    if y_vars is None or len(y_vars) == 0:
-        y_vars = list(range(n_vars))
-
-    # Create a list to track which combinations have been plotted
-    plotted_pairs = set()
-
-    # Iterate through all combinations
-    for i in x_vars:
-        for j in y_vars:
-            # Skip if i == j (meaningless comparison)
-            if i == j:
-                continue
-
-            # Create a canonical representation of the pair to avoid redundancies
-            pair = tuple(sorted([i, j]))
-
-            # Skip if this pair has already been plotted
-            if pair in plotted_pairs:
-                continue
-
-            # Add the pair to the set of plotted pairs
-            plotted_pairs.add(pair)
-
-            # Create a descriptive title
-            variable_i = var_name[i] if var_name is not None else f"x{i}"
-            variable_j = var_name[j] if var_name is not None else f"x{j}"
-            plot_title = f"{title_prefix}{variable_i} vs {variable_j}"
-
-            # Determine filename if saving is requested
-            filename = None
-            if save_dir is not None:
-                os.makedirs(save_dir, exist_ok=True)
-                filename = os.path.join(save_dir, f"plot_{variable_i}_vs_{variable_j}.png")
-
-            # Call plotModel for this combination
-            plotModel(
-                model=model,
-                lower=lower,
-                upper=upper,
-                i=i,
-                j=j,
-                min_z=min_z,
-                max_z=max_z,
-                var_type=var_type,
-                var_name=var_name,
-                show=show,
-                filename=filename,
-                n_grid=n_grid,
-                contour_levels=contour_levels,
-                dpi=dpi,
-                title=plot_title,
-                figsize=figsize,
-                use_min=use_min,
-                use_max=use_max,
-                aspect_equal=aspect_equal,
-                legend_fontsize=legend_fontsize,
-            )
-
-    return None
-
-
-def plotModel(
-    model,
-    lower,
-    upper,
-    i=0,
-    j=1,
-    min_z=None,
-    max_z=None,
-    var_type=None,
-    var_name=None,
-    show=True,
-    filename=None,
-    n_grid=50,
-    contour_levels=10,
-    dpi=200,
-    title="",
-    figsize=(12, 6),
-    use_min=False,
-    use_max=True,
-    tkagg=False,
-    aspect_equal=True,
-    legend_fontsize=12,
-):
-    """Plot 2D contour and 3D surface for any model with a predict method.
-
-    This function creates visualizations of a model's predictions over a 2D slice of the input
-    space, showing both a contour plot and a 3D surface. It works with any model that
-    implements a predict method (such as GPsep or scikit-learn models).
-
-    Args:
-        model: A fitted model object with a predict method.
-        lower: Array-like with lower bounds for all dimensions.
-        upper: Array-like with upper bounds for all dimensions.
-        i: Index of first dimension to plot (x-axis). Defaults to 0.
-        j: Index of second dimension to plot (y-axis). Defaults to 1.
-        min_z: Minimum value for the colorbar. If None, determined from the data.
-        max_z: Maximum value for the colorbar. If None, determined from the data.
-        var_type: List of variable types ("float", "int", etc.). If None, all types are
-            assumed to be numeric.
-        var_name: List of variable names. If None, generic names x0, x1, ... are used.
-        show: Whether to display the plot. Defaults to True.
-        filename: If provided, the plot is saved to this file. Defaults to None.
-        n_grid: Number of grid points in each dimension. Defaults to 50.
-        contour_levels: Number of contour levels. Defaults to 10.
-        dpi: DPI for saving the figure. Defaults to 200.
-        title: Title for the plot. Defaults to "".
-        figsize: Figure size as (width, height) tuple. Defaults to (12, 6).
-        use_min: Whether to use minimum values for non-plotted dimensions. Defaults to False.
-        use_max: Whether to use maximum values for non-plotted dimensions. Defaults to True.
-        tkagg: Whether to use TkAgg backend for matplotlib. Defaults to False.
-        aspect_equal: Whether to set aspect ratio to be equal. Defaults to True.
-        legend_fontsize: Font size for the legend. Defaults to 12.
-
-    Returns:
-        None. Displays and/or saves the visualization.
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.gp.gp_sep import GPsep
-        >>> from spotpython.plot.contour import plotModel
-        >>>
-        >>> # Create and fit a GPsep model
-        >>> X = np.random.rand(20, 3)
-        >>> y = np.sum(X**2, axis=1)
-        >>> model = GPsep().fit(X, y)
-        >>>
-        >>> # Plot the first two dimensions
-        >>> plotModel(
-        >>>     model=model,
-        >>>     lower=np.zeros(3),
-        >>>     upper=np.ones(3),
-        >>>     i=0,
-        >>>     j=1,
-        >>>     var_name=["x", "y", "z"],
-        >>>     title="Response Surface"
-        >>> )
-    """
-
-    # Helper functions for the visualization
-    def generate_mesh_grid(lower, upper, grid_points):
-        """Generate a mesh grid for the given range."""
-        x = np.linspace(lower[i], upper[i], num=grid_points)
-        y = np.linspace(lower[j], upper[j], num=grid_points)
-        return np.meshgrid(x, y), x, y
-
-    def process_var_values(z00, var_type, use_min=True):
-        """Process each entry according to variable type."""
-        result = []
-        for k in range(len(var_type)) if var_type is not None else range(len(z00[0])):
-            if var_type is not None and var_type[k] == "float":
-                mean_value = np.mean(z00[:, k])
-                result.append(mean_value)
-            else:  # For int, factor, or when var_type is None
-                if use_min:
-                    min_value = min(z00[:, k])
-                    result.append(min_value)
-                else:
-                    max_value = max(z00[:, k])
-                    result.append(max_value)
-        return result
-
-    def change_values(x, y, z0, idx_i, idx_j):
-        """Change the values at indices i and j in z0 to x and y."""
-        z0_copy = z0.copy()
-        z0_copy[idx_i] = x
-        z0_copy[idx_j] = y
-        return z0_copy
-
-    def plot_contour_subplots(X, Y, Z, ax, min_z, max_z, contour_levels):
-        """Plot the contour and colorbar on the given axes."""
-        contour = ax.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
-        cbar = pylab.colorbar(contour, ax=ax)
-        cbar.ax.tick_params(labelsize=legend_fontsize - 2)  # Adjust colorbar tick size
-
-    # Set the matplotlib backend if needed
-    if tkagg:
-        matplotlib.use("TkAgg")
-
-    # Create the figure
-    fig = plt.figure(figsize=figsize)
-
-    # Generate the mesh grid
-    (X, Y), x, y = generate_mesh_grid(lower, upper, n_grid)
-
-    # Initialize lists to store predictions
-    Z_list, X_list, Y_list = [], [], []
-
-    # Create initial parameter vectors from bounds
-    z00 = np.array([lower, upper])
-
-    # If var_type is not provided, assume all numeric
-    if var_type is None:
-        var_type = ["float"] * len(lower)
-
-    # Process values for hidden dimensions based on flags
-    if use_min:
-        z0_min = process_var_values(z00, var_type, use_min=True)
-        # Get predictions on grid with min values for hidden dimensions
-        Z_min = np.zeros_like(X)
-        for idx_x in range(X.shape[0]):
-            for idx_y in range(X.shape[1]):
-                point = change_values(X[idx_x, idx_y], Y[idx_x, idx_y], z0_min, i, j)
-                # Handle different model.predict() return formats
-                prediction = model.predict(np.array([point]))
-                if isinstance(prediction, dict):
-                    # For models that return dictionaries (like GPsep)
-                    Z_min[idx_x, idx_y] = prediction["mean"] if "mean" in prediction else prediction.get("y", 0)
-                elif isinstance(prediction, tuple):
-                    # For models that return (mean, std_dev) tuples
-                    Z_min[idx_x, idx_y] = prediction[0]
-                else:
-                    # For models that return direct predictions
-                    Z_min[idx_x, idx_y] = prediction
-
-        Z_list.append(Z_min)
-        X_list.append(X)
-        Y_list.append(Y)
-
-    if use_max:
-        z0_max = process_var_values(z00, var_type, use_min=False)
-        # Get predictions on grid with max values for hidden dimensions
-        Z_max = np.zeros_like(X)
-        for idx_x in range(X.shape[0]):
-            for idx_y in range(X.shape[1]):
-                point = change_values(X[idx_x, idx_y], Y[idx_x, idx_y], z0_max, i, j)
-                # Handle different model.predict() return formats
-                prediction = model.predict(np.array([point]))
-                if isinstance(prediction, dict):
-                    # For models that return dictionaries (like GPsep)
-                    Z_max[idx_x, idx_y] = prediction["mean"] if "mean" in prediction else prediction.get("y", 0)
-                elif isinstance(prediction, tuple):
-                    # For models that return (mean, std_dev) tuples
-                    Z_max[idx_x, idx_y] = prediction[0]
-                else:
-                    # For models that return direct predictions
-                    Z_max[idx_x, idx_y] = prediction
-
-        Z_list.append(Z_max)
-        X_list.append(X)
-        Y_list.append(Y)
-
-    # Combine predictions for visualization
-    if Z_list:  # Ensure that there is at least one Z to stack
-        Z_combined = np.vstack(Z_list)
-        X_combined = np.vstack(X_list)
-        Y_combined = np.vstack(Y_list)
-
-        # Set min/max values for colorbar if not provided
-        if min_z is None:
-            min_z = np.min(Z_combined)
-        if max_z is None:
-            max_z = np.max(Z_combined)
-
-        # Create contour plot
-        ax_contour = fig.add_subplot(121)
-        plot_contour_subplots(X_combined, Y_combined, Z_combined, ax_contour, min_z, max_z, contour_levels)
-
-        # Set equal aspect ratio if requested
-        if aspect_equal:
-            ax_contour.set_aspect("equal")
-
-        # Add axis labels
-        if var_name is None:
-            ax_contour.set_xlabel(f"x{i}", fontsize=legend_fontsize)
-            ax_contour.set_ylabel(f"x{j}", fontsize=legend_fontsize)
-        else:
-            ax_contour.set_xlabel(f"x{i}: {var_name[i]}", fontsize=legend_fontsize)
-            ax_contour.set_ylabel(f"x{j}: {var_name[j]}", fontsize=legend_fontsize)
-
-        # Adjust tick label size
-        ax_contour.tick_params(axis="both", which="major", labelsize=legend_fontsize - 2)
-
-        # Create 3D surface plot
-        ax_3d = fig.add_subplot(122, projection="3d")
-        surf = ax_3d.plot_surface(X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
-
-        # Add a colorbar for the 3D plot that's properly sized
-        cbar = fig.colorbar(surf, ax=ax_3d, shrink=0.7, pad=0.1)
-        cbar.ax.tick_params(labelsize=legend_fontsize - 2)
-
-        # Set equal aspect ratio for 3D plot if requested
-        if aspect_equal:
-            # Calculate the ranges for scaling
-            x_range = upper[i] - lower[i]
-            y_range = upper[j] - lower[j]
-            z_range = max_z - min_z
-
-            # Set box aspect with scaling to make x:y ratio = 1:1
-            # For z-axis, scale based on the ranges to get a reasonable height
-            scale_z = (x_range + y_range) / (2 * z_range) if z_range > 0 else 1
-            ax_3d.set_box_aspect([1, y_range / x_range if x_range > 0 else 1, scale_z])
-
-        # Add axis labels to 3D plot with adjusted font size
-        if var_name is None:
-            ax_3d.set_xlabel(f"x{i}", fontsize=legend_fontsize)
-            ax_3d.set_ylabel(f"x{j}", fontsize=legend_fontsize)
-            ax_3d.set_zlabel("f(x)", fontsize=legend_fontsize)
-        else:
-            ax_3d.set_xlabel(f"x{i}: {var_name[i]}", fontsize=legend_fontsize)
-            ax_3d.set_ylabel(f"x{j}: {var_name[j]}", fontsize=legend_fontsize)
-            ax_3d.set_zlabel("f(x)", fontsize=legend_fontsize)
-
-        # Adjust tick label size for 3D plot
-        ax_3d.tick_params(axis="both", which="major", labelsize=legend_fontsize - 2)
-
-        # Add title with proper font size
-        plt.suptitle(title, fontsize=legend_fontsize + 2)
-
-        # Adjust layout to make room for labels
-        plt.tight_layout(rect=[0, 0, 1, 0.95])
-
-        # Save figure if filename is provided
-        if filename:
-            pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0)
-
-        # Show figure if requested
-        if show:
-            pylab.show()
 
 
 def simple_contour(
@@ -500,3 +54,374 @@ def simple_contour(
         vmax=max_z,
     )
     plt.colorbar()
+
+
+def plotModel(
+    model,
+    lower,
+    upper,
+    i=0,
+    j=1,
+    min_z=None,
+    max_z=None,
+    var_type=None,
+    var_name=None,
+    show=True,
+    filename=None,
+    n_grid=50,
+    contour_levels=10,
+    dpi=200,
+    title="",
+    figsize=(12, 6),
+    use_min=False,
+    use_max=False,
+    aspect_equal=True,
+    legend_fontsize=12,
+    cmap="viridis",
+    X_points=None,
+    plot_points=True,
+    points_color="white",
+    points_size=30,
+):
+    """Generate 2D contour and 3D surface plots for a model's predictions.
+
+    This function creates contour and 3D surface plots of a model's predictions
+    over two selected dimensions (i, j). Remaining dimensions (if any) are assigned
+    fixed values based on user settings (min, max, or averages).
+
+    Args:
+        model (object): A model with a predict method.
+        lower (array_like): Lower bounds for each dimension.
+        upper (array_like): Upper bounds for each dimension.
+        i (int): Index of the dimension for the x-axis. Defaults to 0.
+        j (int): Index of the dimension for the y-axis. Defaults to 1.
+        min_z (float, optional): Minimum value for the color scale. Defaults to None.
+        max_z (float, optional): Maximum value for the color scale. Defaults to None.
+        var_type (list, optional): Variable types for each dimension. Defaults to None.
+        var_name (list, optional): Variable names for labeling axes. Defaults to None.
+        show (bool): Whether to display the plot. Defaults to True.
+        filename (str, optional): File path to save the figure. Defaults to None.
+        n_grid (int): Resolution for each dimension. Defaults to 50.
+        contour_levels (int): Number of contour levels. Defaults to 10.
+        dpi (int): DPI for saving the figure. Defaults to 200.
+        title (str): Plot title. Defaults to "".
+        figsize (tuple): Size of the figure (width, height). Defaults to (12, 6).
+        use_min (bool):
+            If True, hidden dimensions are set to their lower bounds.
+            If both use_min and use_max are False, the mean value is used. Defaults to False.
+        use_max (bool):
+            If True, hidden dimensions are set to their upper bounds. Defaults to False.
+            If both use_min and use_max are False, the mean value is used. Defaults to False.
+        aspect_equal (bool): Whether axes have equal scaling. Defaults to True.
+        legend_fontsize (int): Font size for labels and legends. Defaults to 12.
+        cmap (str): Colormap for the plots. Defaults to "viridis".
+        X_points: Original data points to plot.
+        plot_points: Whether to plot X_points.
+        points_color: Color for data points.
+        points_size: Marker size for data points.
+
+    Returns:
+        tuple: (fig, axes) containing the created figure and axes objects.
+
+    Raises:
+        ValueError: If i or j are out of bounds or if lower/upper shapes mismatch.
+    """
+    # Validate dimensions
+    lower = np.asarray(lower)
+    upper = np.asarray(upper)
+    n_dims = len(lower)
+    if len(upper) != n_dims:
+        raise ValueError("Mismatch in dimension count between lower and upper.")
+    if i >= n_dims or j >= n_dims or i < 0 or j < 0:
+        raise ValueError(f"Invalid dimension indices i={i}, j={j} for {n_dims}-dimensional data.")
+    if i == j:
+        raise ValueError("Dimensions i and j must be different.")
+
+    # Assign variable names if not specified
+    if var_name is None:
+        var_name = [f"x{k}" for k in range(n_dims)]
+    elif len(var_name) != n_dims:
+        raise ValueError("var_name length must match the number of dimensions.")
+
+    # Generate x-y grid
+    x_vals = np.linspace(lower[i], upper[i], n_grid)
+    y_vals = np.linspace(lower[j], upper[j], n_grid)
+    X, Y = np.meshgrid(x_vals, y_vals)
+
+    # Prepare hidden dimension strategies
+    # min -> lower, max -> upper, otherwise average
+    def hidden_value(dim):
+        if use_min:
+            return lower[dim]
+        if use_max:
+            return upper[dim]
+        return 0.5 * (lower[dim] + upper[dim])  # average if neither min nor max
+
+    # Construct full input points for prediction
+    all_points = []
+    for row in range(n_grid):
+        for col in range(n_grid):
+            point = np.zeros(n_dims)
+            point[i] = X[row, col]
+            point[j] = Y[row, col]
+            for dim in range(n_dims):
+                if dim != i and dim != j:
+                    point[dim] = hidden_value(dim)
+            all_points.append(point)
+    all_points = np.array(all_points)
+
+    # Predict
+    Z_pred = model.predict(all_points)
+    # Handle if the model returns dicts or tuples
+    if isinstance(Z_pred, dict):
+        Z_pred = Z_pred.get("mean", list(Z_pred.values())[0])
+    elif isinstance(Z_pred, tuple):
+        Z_pred = Z_pred[0]
+    Z_pred = np.array(Z_pred).reshape(n_grid, n_grid)
+
+    # Determine min/max Z if not given
+    if min_z is None:
+        min_z = np.min(Z_pred)
+    if max_z is None:
+        max_z = np.max(Z_pred)
+
+    # Create figure
+    fig = plt.figure(figsize=figsize)
+    ax1 = fig.add_subplot(1, 2, 1)
+    ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+
+    # 2D contour plot
+    contour = ax1.contourf(X, Y, Z_pred, levels=contour_levels, cmap=cmap, vmin=min_z, vmax=max_z)
+    cbar1 = plt.colorbar(contour, ax=ax1)
+    cbar1.ax.tick_params(labelsize=legend_fontsize - 2)
+    ax1.set_xlabel(var_name[i], fontsize=legend_fontsize)
+    ax1.set_ylabel(var_name[j], fontsize=legend_fontsize)
+    ax1.tick_params(axis="both", labelsize=legend_fontsize - 2)
+    if aspect_equal:
+        ax1.set_aspect("equal")
+
+    # Optionally plot original points on the 2D contour
+    if plot_points and X_points is not None:
+        ax1.scatter(
+            X_points[:, i],
+            X_points[:, j],
+            c=points_color,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+            zorder=5,
+        )
+
+    # 3D surface plot
+    surf = ax2.plot_surface(
+        X,
+        Y,
+        Z_pred,
+        cmap=cmap,
+        vmin=min_z,
+        vmax=max_z,
+        linewidth=0,
+        antialiased=True,
+        alpha=0.8,
+    )
+    cbar2 = fig.colorbar(surf, ax=ax2, shrink=0.7, pad=0.1)
+    cbar2.ax.tick_params(labelsize=legend_fontsize - 2)
+    ax2.set_xlabel(var_name[i], fontsize=legend_fontsize)
+    ax2.set_ylabel(var_name[j], fontsize=legend_fontsize)
+    ax2.set_zlabel("f(x)", fontsize=legend_fontsize)
+    ax2.tick_params(axis="both", labelsize=legend_fontsize - 2)
+
+    # Optionally plot original points in 3D
+    if plot_points and X_points is not None:
+        # Attempt model prediction for Z-values; fallback if it fails
+        try:
+            z_pred = model.predict(X_points)
+            if isinstance(z_pred, dict):
+                z_pred = z_pred.get("mean", list(z_pred.values())[0])
+            elif isinstance(z_pred, tuple):
+                z_pred = z_pred[0]
+        except Exception:
+            z_pred = np.full(X_points.shape[0], min_z)
+
+        ax2.scatter(
+            X_points[:, i],
+            X_points[:, j],
+            z_pred,
+            c=points_color,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+        )
+
+    # Optionally set equal aspect ratio in 3D
+    if aspect_equal:
+        x_range = upper[i] - lower[i]
+        y_range = upper[j] - lower[j]
+        z_range = max_z - min_z if max_z > min_z else 1
+        scale_z = (x_range + y_range) / (2 * z_range) if z_range else 1
+        ax2.set_box_aspect([1, (y_range / x_range) if x_range else 1, scale_z])
+
+    # Add title
+    if title:
+        fig.suptitle(title, fontsize=legend_fontsize + 2)
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+
+    # Save if requested
+    if filename:
+        plt.savefig(filename, bbox_inches="tight", dpi=dpi)
+
+    # Show the figure
+    if show:
+        plt.show()
+
+    return fig, (ax1, ax2)
+
+
+def plotCombinations(
+    model,
+    X=None,
+    lower=None,
+    upper=None,
+    x_vars=None,
+    y_vars=None,
+    min_z=None,
+    max_z=None,
+    var_type=None,
+    var_name=None,
+    show=True,
+    save_dir=None,
+    n_grid=50,
+    contour_levels=10,
+    dpi=200,
+    title_prefix="",
+    figsize=(12, 6),
+    use_min=False,
+    use_max=False,
+    margin=0.1,
+    aspect_equal=False,
+    legend_fontsize=12,
+    cmap="viridis",
+    X_points=None,
+    plot_points=True,
+    points_color="white",
+    points_size=30,
+):
+    """Plot model surfaces for multiple combinations of input variables.
+
+    This function generates contour and 3D surface plots for all specified
+    combinations of input variables, avoiding redundancies and meaningless combinations.
+
+    Args:
+        model: A fitted model with a predict method.
+        X: Array of training points (optional). If provided, used to derive bounds and dimension count.
+        lower: Array-like lower bounds for each dimension. If None, derived from X.
+        upper: Array-like upper bounds for each dimension. If None, derived from X.
+        x_vars: List of indices for x-axis variables. Defaults to all if None or empty.
+        y_vars: List of indices for y-axis variables. Defaults to all if None or empty.
+        min_z: Min value for color scale. If None, auto-calculated.
+        max_z: Max value for color scale. If None, auto-calculated.
+        var_type: List of variable types. If None, assumed numeric.
+        var_name: List of variable names. If None, named x0, x1, ...
+        show: Whether to display the plots. Defaults to True.
+        save_dir: Directory for saving plots. If None, not saved.
+        n_grid: Number of grid points along each axis. Defaults to 50.
+        contour_levels: Number of contour levels. Defaults to 10.
+        dpi: DPI for saving figures. Defaults to 200.
+        title_prefix: Prefix string for plot titles.
+        figsize: Figure size (width, height). Defaults to (12, 6).
+        use_min: Use lower bounds for non-plotted dimensions. Defaults to False.
+        use_max: Use upper bounds for non-plotted dimensions. Defaults to False.
+        margin: Fraction of range added as margin to bounds when derived from X. Defaults to 0.1.
+        aspect_equal: Whether to set equal aspect ratio. Defaults to False.
+        legend_fontsize: Font size for labels and legends. Defaults to 12.
+        cmap (str): Colormap for the plots. Defaults to "viridis".
+        X_points: Original data points to plot.
+        plot_points (bool): Whether to plot X_points.
+        points_color (str): Color for data points. Defaults to "white".
+        points_size (int): Marker size for data points. Defaults to 30.
+
+    Returns:
+        None
+    """
+    # Derive bounds from X if needed
+    if X is not None:
+        if hasattr(X, "to_numpy"):
+            X = X.to_numpy()
+        n_vars_X = X.shape[1]
+        if lower is None:
+            min_vals = np.min(X, axis=0)
+            range_vals = np.ptp(X, axis=0)
+            lower = min_vals - margin * range_vals
+        if upper is None:
+            max_vals = np.max(X, axis=0)
+            range_vals = np.ptp(X, axis=0)
+            upper = max_vals + margin * range_vals
+
+    # Determine the number of variables
+    if lower is not None:
+        n_vars = len(lower)
+    elif upper is not None:
+        n_vars = len(upper)
+    elif X is not None:
+        n_vars = n_vars_X
+    else:
+        raise ValueError("Cannot determine the number of variables without X, lower, or upper.")
+
+    # Default to all variables if x_vars or y_vars are missing
+    if not x_vars:
+        x_vars = list(range(n_vars))
+    if not y_vars:
+        y_vars = list(range(n_vars))
+
+    # Keep track of plotted pairs
+    plotted_pairs = set()
+
+    # Generate combinations
+    for i in x_vars:
+        for j in y_vars:
+            if i == j:
+                continue
+            pair = tuple(sorted([i, j]))
+            if pair in plotted_pairs:
+                continue
+            plotted_pairs.add(pair)
+
+            var_i_name = var_name[i] if var_name and i < len(var_name) else f"x{i}"
+            var_j_name = var_name[j] if var_name and j < len(var_name) else f"x{j}"
+            plot_title = f"{title_prefix}{var_i_name} vs {var_j_name}"
+
+            filename = None
+            if save_dir is not None:
+                os.makedirs(save_dir, exist_ok=True)
+                filename = os.path.join(save_dir, f"plot_{var_i_name}_vs_{var_j_name}.png")
+
+            # Call plotModel with the new arguments
+            plotModel(
+                model=model,
+                lower=lower,
+                upper=upper,
+                i=i,
+                j=j,
+                min_z=min_z,
+                max_z=max_z,
+                var_type=var_type,
+                var_name=var_name,
+                show=show,
+                filename=filename,
+                n_grid=n_grid,
+                contour_levels=contour_levels,
+                dpi=dpi,
+                title=plot_title,
+                figsize=figsize,
+                use_min=use_min,
+                use_max=use_max,
+                aspect_equal=aspect_equal,
+                legend_fontsize=legend_fontsize,
+                cmap=cmap,  # Pass colormap
+                X_points=X_points,  # Pass original data points
+                plot_points=plot_points,
+                points_color=points_color,
+                points_size=points_size,
+            )
+
+    return None
