@@ -10,11 +10,11 @@ def test_predict_vals():
     """
     # Create some small toy data
     X = np.array([[0.0], [1.0], [2.0]])
-    Z = np.array([0.0, 1.0, 0.5])
+    y = np.array([0.0, 1.0, 0.5])
     
     # Instantiate a new GPsep model
     g_val = 1e-5
-    gpsep = newGPsep(X, Z, d=2.0, g=g_val)
+    gpsep = newGPsep(X, y, d=2.0, g=g_val)
     
     # New points to predict
     XX = np.array([[0.5], [1.5]])
@@ -56,12 +56,12 @@ def test_get_d():
     """
     # Create some small toy data
     X = np.array([[0.0], [1.0], [2.0]])
-    Z = np.array([0.0, 1.0, 0.5])
+    y = np.array([0.0, 1.0, 0.5])
     
     # Instantiate a new GPsep model with a known length-scale
     d_val = 2.0
     g_val = 1e-6
-    gpsep = newGPsep(X, Z, d=d_val, g=g_val, optimize=False)
+    gpsep = newGPsep(X, y, d=d_val, g=g_val, optimize=False)
     
     # get_d should return a copy of the length-scale array
     returned_d = gpsep.get_d()
@@ -90,10 +90,10 @@ def test_getDs_basic():
     """Test the getDs method on a simple 1D dataset."""
     # Create small data
     X = np.linspace(0, 10, 11).reshape(-1, 1)
-    Z = np.sin(X).ravel()
+    y = np.sin(X).ravel()
 
     # Instantiate GPsep with minimal parameters
-    gp = GPsep(X=X, Z=Z, d=None, g=0.0, samp_size=5)
+    gp = GPsep(X=X, y=y, d=None, g=0.0, samp_size=5)
 
     # Call getDs
     results = getDs(X=X, p=0.1)
@@ -113,12 +113,12 @@ def test_darg_none():
     Test the darg method when d=None (should default to a dict
     with 'mle' set to True, and fill in values with getDs).
     """
-    # Create a small X and Z
+    # Create a small X and y
     X = np.linspace(0, 10, 11).reshape(-1, 1)
-    Z = np.sin(X).ravel()
+    y = np.sin(X).ravel()
 
     # Instantiate GPsep
-    gp = GPsep(X=X, Z=Z, samp_size=5)
+    gp = GPsep(X=X, y=y, samp_size=5)
 
     # Call darg with d=None
     result = darg(d=None, X=X)
@@ -146,12 +146,12 @@ def test_darg_numeric():
     Should convert to {"start": d, "mle": True, ...} and 
     fill in any missing fields.
     """
-    # Create a small X and Z
+    # Create a small X and y
     X = np.linspace(0, 5, 6).reshape(-1, 1)
-    Z = np.cos(X).ravel()
+    y = np.cos(X).ravel()
 
     # Instantiate GPsep
-    gp = GPsep(X=X, Z=Z, samp_size=10)
+    gp = GPsep(X=X, y=y, samp_size=10)
     
     # Pass a numeric value for d
     numeric_d = 2.5
@@ -174,7 +174,7 @@ def test_garg_None():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(Z=y)
+    gp = GPsep(y=y)
     
     # Call garg with g=None
     result = garg(g=None, y=y)
@@ -206,7 +206,7 @@ def test_garg_numeric():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(Z=y)
+    gp = GPsep(y=y)
     
     # Pass a numeric value for g
     numeric_g = 0.01
@@ -228,7 +228,7 @@ def test_garg_with_mle():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(Z=y)
+    gp = GPsep(y=y)
     
     # Create a dictionary with mle=True
     g_dict = {"mle": True}
@@ -256,7 +256,7 @@ def test_garg_errors():
     y = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
     
     # Instantiate GPsep
-    gp = GPsep(Z=y)
+    gp = GPsep(y=y)
     
     # Test with invalid g type
     with pytest.raises(ValueError):

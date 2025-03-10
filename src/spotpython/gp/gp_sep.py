@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from spotpython.gp.covar import covar_sep_symm, covar_sep, diff_covar_sep_symm
+from spotpython.gp.covar import covar_sep_symm, covar_sep
 from spotpython.gp.matrix import new_vector
 from spotpython.gp.lite import predGPsep_lite
 from spotpython.gp.likelihood import nlsep, gradnlsep
@@ -247,13 +247,13 @@ class GPsep:
         m: Number of input dimensions.
         n: Number of observations.
         X: Input data matrix.
-        Z: Output data vector.
+        y: Output data vector.
         d: Length-scale parameters.
         g: Nugget parameter.
         K: Covariance matrix.
         Ki: Inverse of covariance matrix.
-        KiZ: Product of Ki and Z.
-        phi: Scalar value from Z^T Ki Z calculation.
+        Kiy: Product of Ki and y.
+        phi: Scalar value from y^T Ki y calculation.
         dK: Boolean flag for calculating derivatives.
         DK: Matrix of derivatives.
         ldetK: Log determinant of K.
@@ -270,7 +270,7 @@ class GPsep:
     def __init__(
         self,
         X: np.ndarray = None,
-        Z: np.ndarray = None,
+        y: np.ndarray = None,
         d: np.ndarray = None,
         g: float = None,
         nlsep_method="inv",
@@ -288,7 +288,7 @@ class GPsep:
         Args:
             X (np.ndarray):
                 Input data matrix of shape (n, m). If pandas DataFrame, will be converted to numpy array.
-            Z (np.ndarray):
+            y (np.ndarray):
                 Output data vector of length n. If pandas Series, will be converted to numpy array.
             d (np.ndarray):
                 Length-scale parameters.
@@ -315,23 +315,23 @@ class GPsep:
             # convert pandas dataframes or series to numpy arrays
             if hasattr(X, "to_numpy"):
                 X = X.to_numpy()
-        if Z is not None:
-            if hasattr(Z, "to_numpy"):
-                Z = Z.to_numpy()
-            Z = Z.reshape(-1, 1)
-        if X is not None and Z is not None:
+        if y is not None:
+            if hasattr(y, "to_numpy"):
+                y = y.to_numpy()
+            y = y.reshape(-1, 1)
+        if X is not None and y is not None:
             if max_points is not None:
-                X, Z = select_distant_points(X, Z, max_points)
+                X, y = select_distant_points(X, y, max_points)
                 print(f"Selected {max_points} points for the model.")
         self.m = None  # (int) number of input dimensions
         self.n = None  # (int) number of observations
         self.X = X
-        self.Z = Z
+        self.y = y
         self.d = d
         self.g = g
         self.K = None
         self.Ki = None
-        self.KiZ = None
+        self.Kiy = None
         self.phi = None
         self.dK = None  # boolean
         self.DK = None  # matrix
@@ -348,7 +348,7 @@ class GPsep:
         # need to store the initial parameters for the fit method (sklearn compatibility)
         self.init_params = {
             "X": X,
-            "Z": Z,
+            "y": y,
             "d": d,
             "g": g,
             "nlsep_method": nlsep_method,
@@ -376,7 +376,7 @@ class GPsep:
         """
         return {
             "X": self.X,
-            "Z": self.Z,
+            "y": self.y,
             "d": self.d,
             "g": self.g,
             "nlsep_method": self.nlsep_method,
@@ -408,12 +408,12 @@ class GPsep:
 
         return self
 
-    def fit(self, X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, auto_optimize: bool = None, verbosity=0) -> "GPsep":
+    def fit(self, X: np.ndarray, y: np.ndarray, d=None, g=None, dK: bool = True, auto_optimize: bool = None, verbosity=0) -> "GPsep":
         """Fit the GP model with training data and optionally auto-optimize hyperparameters.
 
         Args:
             X: The input data matrix of shape (n, m).
-            Z: The output data vector of length n.
+            y: The output data vector of length n.
             d: The length-scale parameters. If None, will be determined
                 automatically. Defaults to None.
             g: The nugget parameter. If None, will be determined automatically.
@@ -429,30 +429,30 @@ class GPsep:
             GPsep: The fitted GPsep object.
 
         Raises:
-            ValueError: If X has no rows or if X and Z dimensions mismatch.
+            ValueError: If X has no rows or if X and y dimensions mismatch.
         """
-        # if X or Z are pandas dataframes or series, convert them to numpy arrays
+        # if X or y are pandas dataframes or series, convert them to numpy arrays
         if hasattr(X, "to_numpy"):
             X = X.to_numpy()
-        if hasattr(Z, "to_numpy"):
-            Z = Z.to_numpy()
-        Z = Z.reshape(-1, 1)
-        print(f"X shape: {X.shape}, Z shape: {Z.shape}")
+        if hasattr(y, "to_numpy"):
+            y = y.to_numpy()
+        y = y.reshape(-1, 1)
+        print(f"X shape: {X.shape}, y shape: {y.shape}")
         if self.max_points is not None:
-            X, Z = select_distant_points(X, Z, self.max_points)
+            X, y = select_distant_points(X, y, self.max_points)
             print(f"Selected {self.max_points} points for the model.")
         if auto_optimize is None:
             auto_optimize = self.auto_optimize
         n, m = X.shape
         if n == 0:
             raise ValueError("X must be a matrix with rows.")
-        if len(Z) != n:
-            raise ValueError(f"X has {n} rows but Z length is {len(Z)}")
+        if len(y) != n:
+            raise ValueError(f"X has {n} rows but y length is {len(y)}")
 
         self.m = m
         self.n = n
         self.X = X
-        self.Z = Z
+        self.y = y
         self.dk = dK
 
         # Determine good hyperparameters if not explicitly provided
@@ -463,7 +463,7 @@ class GPsep:
             # Process nugget arguments
             # TODO: Check if mle is True is correct
             g_dict = {"mle": True} if g is None else g
-            g_args = garg(g_dict, Z)
+            g_args = garg(g_dict, y)
 
             # Use the determined parameters if not provided
             d_val = d_args["start"] if d is None else d
@@ -564,13 +564,13 @@ class GPsep:
                     print(f"bounds: {bounds}")
                     print(f"p: {p}")
                 X = copy.deepcopy(self.X)
-                Z = copy.deepcopy(self.Z)
+                y = copy.deepcopy(self.y)
 
                 def objective(par):
-                    return nlsep(par, X, Z, self.nlsep_method)
+                    return nlsep(par, X, y, self.nlsep_method)
 
                 def gradient(par):
-                    return gradnlsep(par, X, Z, self.gradnlsep_method)
+                    return gradnlsep(par, X, y, self.gradnlsep_method)
 
                 result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=self.maxit, verb=self.verbosity)
 
@@ -609,24 +609,24 @@ class GPsep:
             self.build()
             return self
 
-    def calc_ZtKiZ(self) -> None:
+    def calc_ytKiy(self) -> None:
         """
-        Recalculate phi and related components from Ki and Z.
+        Recalculate phi and related components from Ki and y.
         """
-        if self.KiZ is None:
-            self.KiZ = new_vector(self.n)
+        if self.Kiy is None:
+            self.Kiy = new_vector(self.n)
 
-        # Convert Z to numpy array if it's a pandas Series
-        if hasattr(self.Z, "to_numpy"):
-            Z_array = self.Z.to_numpy()
+        # Convert y to numpy array if it's a pandas Series
+        if hasattr(self.y, "to_numpy"):
+            y_array = self.y.to_numpy()
         else:
-            Z_array = np.asarray(self.Z)
+            y_array = np.asarray(self.y)
 
-        Z = Z_array.reshape(-1, 1)
-        KiZ = np.dot(self.Ki, Z)
-        phi = np.dot(Z.T, KiZ)
+        y = y_array.reshape(-1, 1)
+        Kiy = np.dot(self.Ki, y)
+        phi = np.dot(y.T, Kiy)
         self.phi = phi[0, 0]
-        self.KiZ = KiZ
+        self.Kiy = Kiy
 
     def build(self) -> None:
         """
@@ -638,7 +638,7 @@ class GPsep:
         self.K = covar_anisotropic(self.X, d=self.d, g=self.g)
         self.Ki = matrix_inversion_dispatcher(self.K, method=self.nlsep_method)
         self.ldetK = np.log(det(self.K))
-        self.calc_ZtKiZ()
+        self.calc_ytKiy()
         # TODO: Check if this is necessary
         # if self.dK:
         #     # TODO: Check if this is necessary
@@ -672,9 +672,9 @@ class GPsep:
                 import matplotlib.pyplot as plt
                 # Simple sine data
                 X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)
-                Z = np.sin(X)
+                y = np.sin(X)
                 # New GP fit
-                gpsep = newGPsep(X, Z, d=2, g=0.000001)
+                gpsep = newGPsep(X, y, d=2, g=0.000001)
                 # Make predictions
                 XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)
                 p = gpsep.predict(XX, lite=False)
@@ -684,13 +684,13 @@ class GPsep:
                 Sigma = p["Sigma"]
                 df = p["df"]
                 # Generate samples from the multivariate t-distribution
-                ZZ = np.random.multivariate_normal(mean, Sigma, N)
-                ZZ = ZZ.T
+                yy = np.random.multivariate_normal(mean, Sigma, N)
+                yy = yy.T
                 # Plot the results
                 plt.figure(figsize=(10, 6))
                 for i in range(N):
-                    plt.plot(XX, ZZ[:, i], color="gray", linewidth=0.5)
-                plt.scatter(X, Z, color="black", s=50, zorder=5)
+                    plt.plot(XX, yy[:, i], color="gray", linewidth=0.5)
+                plt.scatter(X, y, color="black", s=50, zorder=5)
                 plt.xlabel("x")
                 plt.ylabel("f-hat(x)")
                 plt.title("Predictive Distribution")
@@ -760,7 +760,7 @@ class GPsep:
         k = covar_sep(self.m, self.X, n, XX, nn, self.d, 0.0)
         Sigma[...] = covar_sep_symm(self.m, XX, nn, self.d, g)
         ktKi = np.dot(k.T, self.Ki)
-        mean[:] = np.dot(ktKi, self.Z).reshape(-1)
+        mean[:] = np.dot(ktKi, self.y).reshape(-1)
         Sigma[...] = phidf * (Sigma - np.dot(ktKi, k))
         return {"mean": mean, "Sigma": Sigma, "df": df, "llik": llik}
 
@@ -837,10 +837,10 @@ class GPsep:
         print(f"bounds: {bounds}")
 
         def objective(par):
-            return nlsep(par, self.X, self.Z, self.nlsep_method)
+            return nlsep(par, self.X, self.y, self.nlsep_method)
 
         def gradient(par):
-            return gradnlsep(par, self.X, self.Z, self.gradnlsep_method)
+            return gradnlsep(par, self.X, self.y, self.gradnlsep_method)
 
         result = run_minimize_with_restarts(objective=objective, gradient=gradient, x0=p, bounds=bounds, n_restarts_optimizer=self.n_restarts_optimizer, maxit=maxit, verb=verb)
 
@@ -856,13 +856,13 @@ class GPsep:
         return {"parameters": result.x, "iterations": result.nit, "convergence": result.status, "message": result.message}
 
 
-def newGPsep(X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, optimize: bool = True) -> GPsep:
+def newGPsep(X: np.ndarray, y: np.ndarray, d=None, g=None, dK: bool = True, optimize: bool = True) -> GPsep:
     """
     Instantiate a new GPsep model with automatic hyperparameter optimization.
 
     Args:
         X (np.ndarray): The input data matrix of shape (n, m).
-        Z (np.ndarray): The output data vector of length n.
+        y (np.ndarray): The output data vector of length n.
         d (optional): The length-scale parameters. If None, will be determined automatically.
         g (optional): The nugget parameter. If None, will be determined automatically.
         dK (bool): Flag to indicate whether to calculate derivatives.
@@ -872,4 +872,4 @@ def newGPsep(X: np.ndarray, Z: np.ndarray, d=None, g=None, dK: bool = True, opti
         GPsep: The newly created and optimized GPsep object.
     """
     gpsep = GPsep()
-    return gpsep.fit(X, Z, d=d, g=g, dK=dK, auto_optimize=optimize)
+    return gpsep.fit(X, y, d=d, g=g, dK=dK, auto_optimize=optimize)
