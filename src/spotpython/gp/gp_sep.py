@@ -667,7 +667,10 @@ class GPsep(BaseEstimator, RegressorMixin):
         #     raise RuntimeError("Covariance matrix has already been built.")
         self.K = covar_anisotropic(self.X, d=self.d, g=self.g)
         self.Ki = matrix_inversion_dispatcher(self.K, method=self.nlsep_method)
-        self.ldetK = np.log(det(self.K))
+        detK = det(self.K)
+        if detK <= 1e-14:
+            detK = 1e-14  # TODO: Check if this can be improved
+        self.ldetK = np.log(detK)
         self.calc_ytKiy()
         # TODO: Check if this is necessary
         # if self.dK:

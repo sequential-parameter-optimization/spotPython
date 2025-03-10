@@ -79,143 +79,147 @@ def plotModel(
     legend_fontsize=12,
     cmap="viridis",
     X_points=None,
+    y_points=None,
     plot_points=True,
     points_color="white",
     points_size=30,
+    point_color_below="blue",
+    point_color_above="red",
+    atol=1e-6,
 ):
-    """Generate 2D contour and 3D surface plots for a model's predictions.
+    """
+    Generate 2D contour and 3D surface plots for a model's predictions.
 
-    This function creates contour and 3D surface plots of a model's predictions
-    over two selected dimensions (i, j). Remaining dimensions (if any) are assigned
-    fixed values based on user settings (min, max, or averages).
+    Even if the data is not strictly 3D, each point in X_points will have its
+    "predicted surface z-value" computed by:
+      1) Taking the i-th and j-th coordinates directly from that point.
+      2) Setting all other dimensions (leftover dims) based on use_min, use_max,
+         or their mean (if both are False).
+    Then, we compare the newly-computed "actual z" for that point with its
+    model-predicted z-value. If 'actual z' < 'predicted z', the point is colored
+    with point_color_below; otherwise, it is colored with point_color_above.
 
     Args:
         model (object): A model with a predict method.
         lower (array_like): Lower bounds for each dimension.
         upper (array_like): Upper bounds for each dimension.
-        i (int): Index of the dimension for the x-axis. Defaults to 0.
-        j (int): Index of the dimension for the y-axis. Defaults to 1.
-        min_z (float, optional): Minimum value for the color scale. Defaults to None.
-        max_z (float, optional): Maximum value for the color scale. Defaults to None.
+        i (int): Index for the x-axis dimension.
+        j (int): Index for the y-axis dimension.
+        min_z (float, optional): Min value for color scaling. Defaults to None.
+        max_z (float, optional): Max value for color scaling. Defaults to None.
         var_type (list, optional): Variable types for each dimension. Defaults to None.
         var_name (list, optional): Variable names for labeling axes. Defaults to None.
         show (bool): Whether to display the plot. Defaults to True.
         filename (str, optional): File path to save the figure. Defaults to None.
-        n_grid (int): Resolution for each dimension. Defaults to 50.
+        n_grid (int): Resolution for each axis. Defaults to 50.
         contour_levels (int): Number of contour levels. Defaults to 10.
-        dpi (int): DPI for saving the figure. Defaults to 200.
-        title (str): Plot title. Defaults to "".
-        figsize (tuple): Size of the figure (width, height). Defaults to (12, 6).
-        use_min (bool):
-            If True, hidden dimensions are set to their lower bounds.
-            If both use_min and use_max are False, the mean value is used. Defaults to False.
-        use_max (bool):
-            If True, hidden dimensions are set to their upper bounds. Defaults to False.
-            If both use_min and use_max are False, the mean value is used. Defaults to False.
+        dpi (int): DPI for saving. Defaults to 200.
+        title (str): Title for the figure. Defaults to "".
+        figsize (tuple): Figure size. Defaults to (12, 6).
+        use_min (bool): If True, leftover dims are set to lower bounds.
+        use_max (bool): If True, leftover dims are set to upper bounds.
         aspect_equal (bool): Whether axes have equal scaling. Defaults to True.
         legend_fontsize (int): Font size for labels and legends. Defaults to 12.
-        cmap (str): Colormap for the plots. Defaults to "viridis".
-        X_points: Original data points to plot.
-        plot_points: Whether to plot X_points.
-        points_color: Color for data points.
-        points_size: Marker size for data points.
+        cmap (str): Colormap. Defaults to "viridis".
+        X_points (ndarray): Original data points. Shape: (N, D).
+        y_points (ndarray): Original target values. Shape: (N,).
+        plot_points (bool): Whether to plot X_points. Defaults to True.
+        points_color (str): Fallback color for data points. Defaults to "white".
+        points_size (int): Marker size for data points. Defaults to 30.
+        point_color_below (str): Color if actual z < predicted z. Defaults to "lightgrey".
+        point_color_above (str): Color if actual z >= predicted z. Defaults to "white".
+        atol (float): Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.
 
     Returns:
-        tuple: (fig, axes) containing the created figure and axes objects.
+        (fig, (ax_contour, ax_surface)): Figure and axes for the contour and surface plots.
 
     Raises:
-        ValueError: If i or j are out of bounds or if lower/upper shapes mismatch.
+        ValueError: For mismatched dimensions or invalid i/j indices.
     """
-    # Validate dimensions
+    # --- Validate inputs ---
     lower = np.asarray(lower)
     upper = np.asarray(upper)
     n_dims = len(lower)
     if len(upper) != n_dims:
         raise ValueError("Mismatch in dimension count between lower and upper.")
-    if i >= n_dims or j >= n_dims or i < 0 or j < 0:
-        raise ValueError(f"Invalid dimension indices i={i}, j={j} for {n_dims}-dimensional data.")
+    if i < 0 or j < 0 or i >= n_dims or j >= n_dims:
+        raise ValueError(f"Invalid dimension indices i={i} or j={j} for {n_dims}-dimensional data.")
     if i == j:
         raise ValueError("Dimensions i and j must be different.")
 
-    # Assign variable names if not specified
     if var_name is None:
         var_name = [f"x{k}" for k in range(n_dims)]
     elif len(var_name) != n_dims:
         raise ValueError("var_name length must match the number of dimensions.")
 
-    # Generate x-y grid
+    # --- 2D grid for contour/surface ---
     x_vals = np.linspace(lower[i], upper[i], n_grid)
     y_vals = np.linspace(lower[j], upper[j], n_grid)
-    X, Y = np.meshgrid(x_vals, y_vals)
+    X_grid, Y_grid = np.meshgrid(x_vals, y_vals)
 
-    # Prepare hidden dimension strategies
-    # min -> lower, max -> upper, otherwise average
-    def hidden_value(dim):
+    # Helper for leftover dims
+    def hidden_value(dim_index):
         if use_min:
-            return lower[dim]
+            return lower[dim_index]
         if use_max:
-            return upper[dim]
-        return 0.5 * (lower[dim] + upper[dim])  # average if neither min nor max
+            return upper[dim_index]
+        return 0.5 * (lower[dim_index] + upper[dim_index])
 
-    # Construct full input points for prediction
-    all_points = []
+    # Build all grid points
+    grid_points = []
     for row in range(n_grid):
         for col in range(n_grid):
-            point = np.zeros(n_dims)
-            point[i] = X[row, col]
-            point[j] = Y[row, col]
+            p = np.zeros(n_dims)
+            p[i] = X_grid[row, col]
+            p[j] = Y_grid[row, col]
             for dim in range(n_dims):
-                if dim != i and dim != j:
-                    point[dim] = hidden_value(dim)
-            all_points.append(point)
-    all_points = np.array(all_points)
+                if dim not in (i, j):
+                    p[dim] = hidden_value(dim)
+            grid_points.append(p)
+    grid_points = np.array(grid_points)
 
-    # Predict
-    Z_pred = model.predict(all_points)
-    # Handle if the model returns dicts or tuples
+    # Predict for the grid
+    Z_pred = model.predict(grid_points)
     if isinstance(Z_pred, dict):
         Z_pred = Z_pred.get("mean", list(Z_pred.values())[0])
     elif isinstance(Z_pred, tuple):
         Z_pred = Z_pred[0]
-    Z_pred = np.array(Z_pred).reshape(n_grid, n_grid)
+    Z_pred = Z_pred.reshape(n_grid, n_grid)
 
-    # Determine min/max Z if not given
+    # Determine min/max color scale
     if min_z is None:
         min_z = np.min(Z_pred)
     if max_z is None:
         max_z = np.max(Z_pred)
 
-    # Create figure
+    # --- Set up figure ---
     fig = plt.figure(figsize=figsize)
-    ax1 = fig.add_subplot(1, 2, 1)
-    ax2 = fig.add_subplot(1, 2, 2, projection="3d")
+    ax_contour = fig.add_subplot(1, 2, 1)
+    ax_surface = fig.add_subplot(1, 2, 2, projection="3d")
 
-    # 2D contour plot
-    contour = ax1.contourf(X, Y, Z_pred, levels=contour_levels, cmap=cmap, vmin=min_z, vmax=max_z)
-    cbar1 = plt.colorbar(contour, ax=ax1)
-    cbar1.ax.tick_params(labelsize=legend_fontsize - 2)
-    ax1.set_xlabel(var_name[i], fontsize=legend_fontsize)
-    ax1.set_ylabel(var_name[j], fontsize=legend_fontsize)
-    ax1.tick_params(axis="both", labelsize=legend_fontsize - 2)
+    # --- 2D contour ---
+    cont = ax_contour.contourf(
+        X_grid,
+        Y_grid,
+        Z_pred,
+        levels=contour_levels,
+        cmap=cmap,
+        vmin=min_z,
+        vmax=max_z,
+    )
+    cb1 = plt.colorbar(cont, ax=ax_contour)
+    cb1.ax.tick_params(labelsize=legend_fontsize - 2)
+
+    ax_contour.set_xlabel(var_name[i], fontsize=legend_fontsize)
+    ax_contour.set_ylabel(var_name[j], fontsize=legend_fontsize)
+    ax_contour.tick_params(labelsize=legend_fontsize - 2)
     if aspect_equal:
-        ax1.set_aspect("equal")
+        ax_contour.set_aspect("equal")
 
-    # Optionally plot original points on the 2D contour
-    if plot_points and X_points is not None:
-        ax1.scatter(
-            X_points[:, i],
-            X_points[:, j],
-            c=points_color,
-            edgecolor="black",
-            s=points_size,
-            alpha=0.9,
-            zorder=5,
-        )
-
-    # 3D surface plot
-    surf = ax2.plot_surface(
-        X,
-        Y,
+    # --- 3D surface ---
+    surf = ax_surface.plot_surface(
+        X_grid,
+        Y_grid,
         Z_pred,
         cmap=cmap,
         vmin=min_z,
@@ -224,57 +228,120 @@ def plotModel(
         antialiased=True,
         alpha=0.8,
     )
-    cbar2 = fig.colorbar(surf, ax=ax2, shrink=0.7, pad=0.1)
-    cbar2.ax.tick_params(labelsize=legend_fontsize - 2)
-    ax2.set_xlabel(var_name[i], fontsize=legend_fontsize)
-    ax2.set_ylabel(var_name[j], fontsize=legend_fontsize)
-    ax2.set_zlabel("f(x)", fontsize=legend_fontsize)
-    ax2.tick_params(axis="both", labelsize=legend_fontsize - 2)
+    cb2 = fig.colorbar(surf, ax=ax_surface, shrink=0.7, pad=0.1)
+    cb2.ax.tick_params(labelsize=legend_fontsize - 2)
 
-    # Optionally plot original points in 3D
+    ax_surface.set_xlabel(var_name[i], fontsize=legend_fontsize)
+    ax_surface.set_ylabel(var_name[j], fontsize=legend_fontsize)
+    ax_surface.set_zlabel("f(x)", fontsize=legend_fontsize)
+    ax_surface.tick_params(labelsize=legend_fontsize - 2)
+
+    # --- Optionally plot points ---
     if plot_points and X_points is not None:
-        # Attempt model prediction for Z-values; fallback if it fails
-        try:
-            z_pred = model.predict(X_points)
-            if isinstance(z_pred, dict):
-                z_pred = z_pred.get("mean", list(z_pred.values())[0])
-            elif isinstance(z_pred, tuple):
-                z_pred = z_pred[0]
-        except Exception:
-            z_pred = np.full(X_points.shape[0], min_z)
+        # Build + predict each point individually, using the same i/j from the row
+        # and the use_min/use_max logic for leftover dims. Store these predicted values
+        # as "z_pred_for_point".
+        z_pred_for_point = []
+        for row_idx in range(X_points.shape[0]):
+            single_p = np.zeros(n_dims)
+            single_p[i] = X_points[row_idx, i]
+            single_p[j] = X_points[row_idx, j]
+            for dim_idx in range(n_dims):
+                if dim_idx not in (i, j):
+                    single_p[dim_idx] = hidden_value(dim_idx)
+            val = model.predict(single_p.reshape(1, -1))
+            val = np.atleast_1d(val)  # ensure at least 1D
+            if isinstance(val, dict):
+                val = val.get("mean", list(val.values())[0])
+            elif isinstance(val, tuple):
+                val = val[0]
+            z_pred_for_point.append(val[0] if hasattr(val, "__len__") else val)
+        z_pred_for_point = np.array(z_pred_for_point)
 
-        ax2.scatter(
-            X_points[:, i],
-            X_points[:, j],
-            z_pred,
+        # Use the ground-truth y_points directly:
+        z_actual = np.array(y_points).flatten()  # ensures a 1D shape
+
+        on_mask = np.isclose(z_actual, z_pred_for_point, atol=atol)
+        below_mask = z_actual - atol / 2.0 < z_pred_for_point
+        above_mask = z_actual + atol / 2.0 > z_pred_for_point
+
+        # 2D contour scatter
+        ax_contour.scatter(
+            X_points[below_mask, i],
+            X_points[below_mask, j],
+            c=point_color_below,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+            zorder=5,
+        )
+        ax_contour.scatter(
+            X_points[above_mask, i],
+            X_points[above_mask, j],
+            c=point_color_above,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+            zorder=5,
+        )
+        ax_contour.scatter(
+            X_points[on_mask, i],
+            X_points[on_mask, j],
+            c=points_color,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+            zorder=5,
+        )
+        # 3D plot scatter
+        ax_surface.scatter(
+            X_points[below_mask, i],
+            X_points[below_mask, j],
+            z_actual[below_mask],
+            c=point_color_below,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+        )
+        ax_surface.scatter(
+            X_points[above_mask, i],
+            X_points[above_mask, j],
+            z_actual[above_mask],
+            c=point_color_above,
+            edgecolor="black",
+            s=points_size,
+            alpha=0.9,
+        )
+        ax_surface.scatter(
+            X_points[on_mask, i],
+            X_points[on_mask, j],
+            z_actual[on_mask],
             c=points_color,
             edgecolor="black",
             s=points_size,
             alpha=0.9,
         )
 
-    # Optionally set equal aspect ratio in 3D
+    # --- Optionally set aspect in 3D ---
     if aspect_equal:
         x_range = upper[i] - lower[i]
         y_range = upper[j] - lower[j]
         z_range = max_z - min_z if max_z > min_z else 1
-        scale_z = (x_range + y_range) / (2 * z_range) if z_range else 1
-        ax2.set_box_aspect([1, (y_range / x_range) if x_range else 1, scale_z])
+        scale_z = (x_range + y_range) / (2.0 * z_range) if z_range else 1
+        ax_surface.set_box_aspect([1, (y_range / x_range) if x_range else 1, scale_z])
 
-    # Add title
+    # --- Title, save, and show ---
     if title:
         fig.suptitle(title, fontsize=legend_fontsize + 2)
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
-    # Save if requested
     if filename:
         plt.savefig(filename, bbox_inches="tight", dpi=dpi)
 
-    # Show the figure
     if show:
         plt.show()
 
-    return fig, (ax1, ax2)
+    return fig, (ax_contour, ax_surface)
 
 
 def plotCombinations(
@@ -302,9 +369,13 @@ def plotCombinations(
     legend_fontsize=12,
     cmap="viridis",
     X_points=None,
+    y_points=None,
     plot_points=True,
     points_color="white",
     points_size=30,
+    point_color_below="blue",
+    point_color_above="red",
+    atol=1e-6,
 ):
     """Plot model surfaces for multiple combinations of input variables.
 
@@ -336,9 +407,13 @@ def plotCombinations(
         legend_fontsize: Font size for labels and legends. Defaults to 12.
         cmap (str): Colormap for the plots. Defaults to "viridis".
         X_points: Original data points to plot.
+        y_points: Original target values to plot.
         plot_points (bool): Whether to plot X_points.
         points_color (str): Color for data points. Defaults to "white".
         points_size (int): Marker size for data points. Defaults to 30.
+        point_color_below (str): Color if actual z < predicted z. Defaults to "lightgrey".
+        point_color_above (str): Color if actual z >= predicted z. Defaults to "white".
+        atol (float): Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.
 
     Returns:
         None
@@ -419,9 +494,13 @@ def plotCombinations(
                 legend_fontsize=legend_fontsize,
                 cmap=cmap,  # Pass colormap
                 X_points=X_points,  # Pass original data points
+                y_points=y_points,  # Pass original target values
                 plot_points=plot_points,
                 points_color=points_color,
                 points_size=points_size,
+                point_color_below=point_color_below,
+                point_color_above=point_color_above,
+                atol=atol,
             )
 
     return None

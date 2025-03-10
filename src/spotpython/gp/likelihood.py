@@ -9,10 +9,12 @@ def nlsep(par, X, Y, nlsep_method="inv") -> float:
     Calculate the negative log-likelihood for a separable power exponential correlation function.
 
     Args:
-        par (np.ndarray): Array of parameters, where the first ncol(X) elements are the range parameters
-                          and the last element is the nugget parameter.
-        X (np.ndarray): Input matrix of shape (n, col).
-        Y (np.ndarray): Response vector of shape (n,).
+        par (np.ndarray):
+            Array of parameters, where the first ncol(X) elements are the range parameters and the last element is the nugget parameter.
+        X (np.ndarray):
+            Input matrix of shape (n, col).
+        Y (np.ndarray):
+            Response vector of shape (n,).
 
     Returns:
         float: Negative log-likelihood.
@@ -32,7 +34,10 @@ def nlsep(par, X, Y, nlsep_method="inv") -> float:
     n = len(Y)
     K = covar_anisotropic(X, d=theta, g=g)
     Ki = matrix_inversion_dispatcher(K, method=nlsep_method)
-    ldetK = np.log(det(K))
+    detK = det(K)
+    if detK <= 1e-14:
+        detK = 1e-14  # TODO: Check if this can be improved
+    ldetK = np.log(detK)
     ll = -(n / 2) * np.log(Y.T @ Ki @ Y) - (1 / 2) * ldetK
     return -ll
 
