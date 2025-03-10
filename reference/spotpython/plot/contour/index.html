@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.41">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.40">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.0253249f.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.8c3ca2c6.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -2852,6 +2852,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#spotpython.plot.contour.plotCombinations" class="md-nav__link">
+    <span class="md-ellipsis">
+      plotCombinations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotpython.plot.contour.plotModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      plotModel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#spotpython.plot.contour.simple_contour" class="md-nav__link">
     <span class="md-ellipsis">
       simple_contour
@@ -4087,6 +4105,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#spotpython.plot.contour.plotCombinations" class="md-nav__link">
+    <span class="md-ellipsis">
+      plotCombinations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotpython.plot.contour.plotModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      plotModel
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#spotpython.plot.contour.simple_contour" class="md-nav__link">
     <span class="md-ellipsis">
       simple_contour
@@ -4133,6 +4169,1862 @@
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="spotpython.plot.contour.plotCombinations" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plotCombinations</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">title_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_max</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">margin</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">aspect_equal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legend_fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">X_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">points_color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">points_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">point_color_below</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">point_color_above</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-06</span><span class="p">)</span></code>
+
+<a href="#spotpython.plot.contour.plotCombinations" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Plot model surfaces for multiple combinations of input variables.</p>
+<p>This function generates contour and 3D surface plots for all specified
+combinations of input variables, avoiding redundancies and meaningless combinations.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>model</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A fitted model with a predict method.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>X</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Array of training points (optional). If provided, used to derive bounds and dimension count.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>lower</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Array-like lower bounds for each dimension. If None, derived from X.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>upper</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Array-like upper bounds for each dimension. If None, derived from X.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>x_vars</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of indices for x-axis variables. Defaults to all if None or empty.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>y_vars</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of indices for y-axis variables. Defaults to all if None or empty.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>min_z</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Min value for color scale. If None, auto-calculated.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_z</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Max value for color scale. If None, auto-calculated.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>var_type</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of variable types. If None, assumed numeric.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>var_name</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of variable names. If None, named x0, x1, &hellip;</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>show</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to display the plots. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>save_dir</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Directory for saving plots. If None, not saved.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>n_grid</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of grid points along each axis. Defaults to 50.</p>
+              </div>
+            </td>
+            <td>
+                  <code>50</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>contour_levels</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of contour levels. Defaults to 10.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dpi</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DPI for saving figures. Defaults to 200.</p>
+              </div>
+            </td>
+            <td>
+                  <code>200</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>title_prefix</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Prefix string for plot titles.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>figsize</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Figure size (width, height). Defaults to (12, 6).</p>
+              </div>
+            </td>
+            <td>
+                  <code>(12, 6)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_min</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Use lower bounds for non-plotted dimensions. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_max</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Use upper bounds for non-plotted dimensions. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>margin</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Fraction of range added as margin to bounds when derived from X. Defaults to 0.1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>aspect_equal</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to set equal aspect ratio. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>legend_fontsize</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Font size for labels and legends. Defaults to 12.</p>
+              </div>
+            </td>
+            <td>
+                  <code>12</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cmap</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Colormap for the plots. Defaults to &ldquo;viridis&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;viridis&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>X_points</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Original data points to plot.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>y_points</code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Original target values to plot.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plot_points</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to plot X_points.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>points_color</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Color for data points. Defaults to &ldquo;white&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;white&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>points_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Marker size for data points. Defaults to 30.</p>
+              </div>
+            </td>
+            <td>
+                  <code>30</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>point_color_below</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Color if actual z &lt; predicted z. Defaults to &ldquo;lightgrey&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;blue&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>point_color_above</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Color if actual z &gt;= predicted z. Defaults to &ldquo;white&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;red&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>atol</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-06</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>None</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>spotpython/plot/contour.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plotCombinations</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">upper</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">var_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">save_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">title_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_max</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">margin</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">aspect_equal</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">legend_fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">X_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">points_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">points_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">point_color_below</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+    <span class="n">point_color_above</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+    <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot model surfaces for multiple combinations of input variables.</span>
+
+<span class="sd">    This function generates contour and 3D surface plots for all specified</span>
+<span class="sd">    combinations of input variables, avoiding redundancies and meaningless combinations.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model: A fitted model with a predict method.</span>
+<span class="sd">        X: Array of training points (optional). If provided, used to derive bounds and dimension count.</span>
+<span class="sd">        lower: Array-like lower bounds for each dimension. If None, derived from X.</span>
+<span class="sd">        upper: Array-like upper bounds for each dimension. If None, derived from X.</span>
+<span class="sd">        x_vars: List of indices for x-axis variables. Defaults to all if None or empty.</span>
+<span class="sd">        y_vars: List of indices for y-axis variables. Defaults to all if None or empty.</span>
+<span class="sd">        min_z: Min value for color scale. If None, auto-calculated.</span>
+<span class="sd">        max_z: Max value for color scale. If None, auto-calculated.</span>
+<span class="sd">        var_type: List of variable types. If None, assumed numeric.</span>
+<span class="sd">        var_name: List of variable names. If None, named x0, x1, ...</span>
+<span class="sd">        show: Whether to display the plots. Defaults to True.</span>
+<span class="sd">        save_dir: Directory for saving plots. If None, not saved.</span>
+<span class="sd">        n_grid: Number of grid points along each axis. Defaults to 50.</span>
+<span class="sd">        contour_levels: Number of contour levels. Defaults to 10.</span>
+<span class="sd">        dpi: DPI for saving figures. Defaults to 200.</span>
+<span class="sd">        title_prefix: Prefix string for plot titles.</span>
+<span class="sd">        figsize: Figure size (width, height). Defaults to (12, 6).</span>
+<span class="sd">        use_min: Use lower bounds for non-plotted dimensions. Defaults to False.</span>
+<span class="sd">        use_max: Use upper bounds for non-plotted dimensions. Defaults to False.</span>
+<span class="sd">        margin: Fraction of range added as margin to bounds when derived from X. Defaults to 0.1.</span>
+<span class="sd">        aspect_equal: Whether to set equal aspect ratio. Defaults to False.</span>
+<span class="sd">        legend_fontsize: Font size for labels and legends. Defaults to 12.</span>
+<span class="sd">        cmap (str): Colormap for the plots. Defaults to &quot;viridis&quot;.</span>
+<span class="sd">        X_points: Original data points to plot.</span>
+<span class="sd">        y_points: Original target values to plot.</span>
+<span class="sd">        plot_points (bool): Whether to plot X_points.</span>
+<span class="sd">        points_color (str): Color for data points. Defaults to &quot;white&quot;.</span>
+<span class="sd">        points_size (int): Marker size for data points. Defaults to 30.</span>
+<span class="sd">        point_color_below (str): Color if actual z &lt; predicted z. Defaults to &quot;lightgrey&quot;.</span>
+<span class="sd">        point_color_above (str): Color if actual z &gt;= predicted z. Defaults to &quot;white&quot;.</span>
+<span class="sd">        atol (float): Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Derive bounds from X if needed</span>
+    <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;to_numpy&quot;</span><span class="p">):</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">n_vars_X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">range_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">lower</span> <span class="o">=</span> <span class="n">min_vals</span> <span class="o">-</span> <span class="n">margin</span> <span class="o">*</span> <span class="n">range_vals</span>
+        <span class="k">if</span> <span class="n">upper</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">max_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">range_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">max_vals</span> <span class="o">+</span> <span class="n">margin</span> <span class="o">*</span> <span class="n">range_vals</span>
+
+    <span class="c1"># Determine the number of variables</span>
+    <span class="k">if</span> <span class="n">lower</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">upper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_vars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_vars</span> <span class="o">=</span> <span class="n">n_vars_X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot determine the number of variables without X, lower, or upper.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Default to all variables if x_vars or y_vars are missing</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">x_vars</span><span class="p">:</span>
+        <span class="n">x_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_vars</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">y_vars</span><span class="p">:</span>
+        <span class="n">y_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_vars</span><span class="p">))</span>
+
+    <span class="c1"># Keep track of plotted pairs</span>
+    <span class="n">plotted_pairs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Generate combinations</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">x_vars</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">y_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">pair</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">plotted_pairs</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">plotted_pairs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span>
+
+            <span class="n">var_i_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">var_name</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">var_j_name</span> <span class="o">=</span> <span class="n">var_name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">if</span> <span class="n">var_name</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">plot_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title_prefix</span><span class="si">}{</span><span class="n">var_i_name</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">var_j_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="n">filename</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">save_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;plot_</span><span class="si">{</span><span class="n">var_i_name</span><span class="si">}</span><span class="s2">_vs_</span><span class="si">{</span><span class="n">var_j_name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Call plotModel with the new arguments</span>
+            <span class="n">plotModel</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span>
+                <span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">,</span>
+                <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
+                <span class="n">min_z</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span>
+                <span class="n">max_z</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span>
+                <span class="n">var_type</span><span class="o">=</span><span class="n">var_type</span><span class="p">,</span>
+                <span class="n">var_name</span><span class="o">=</span><span class="n">var_name</span><span class="p">,</span>
+                <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+                <span class="n">n_grid</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span>
+                <span class="n">contour_levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
+                <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">plot_title</span><span class="p">,</span>
+                <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
+                <span class="n">use_min</span><span class="o">=</span><span class="n">use_min</span><span class="p">,</span>
+                <span class="n">use_max</span><span class="o">=</span><span class="n">use_max</span><span class="p">,</span>
+                <span class="n">aspect_equal</span><span class="o">=</span><span class="n">aspect_equal</span><span class="p">,</span>
+                <span class="n">legend_fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span><span class="p">,</span>
+                <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>  <span class="c1"># Pass colormap</span>
+                <span class="n">X_points</span><span class="o">=</span><span class="n">X_points</span><span class="p">,</span>  <span class="c1"># Pass original data points</span>
+                <span class="n">y_points</span><span class="o">=</span><span class="n">y_points</span><span class="p">,</span>  <span class="c1"># Pass original target values</span>
+                <span class="n">plot_points</span><span class="o">=</span><span class="n">plot_points</span><span class="p">,</span>
+                <span class="n">points_color</span><span class="o">=</span><span class="n">points_color</span><span class="p">,</span>
+                <span class="n">points_size</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+                <span class="n">point_color_below</span><span class="o">=</span><span class="n">point_color_below</span><span class="p">,</span>
+                <span class="n">point_color_above</span><span class="o">=</span><span class="n">point_color_above</span><span class="p">,</span>
+                <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="spotpython.plot.contour.plotModel" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plotModel</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_max</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aspect_equal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend_fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">X_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plot_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">points_color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">points_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">point_color_below</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">point_color_above</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-06</span><span class="p">)</span></code>
+
+<a href="#spotpython.plot.contour.plotModel" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Generate 2D contour and 3D surface plots for a model&rsquo;s predictions.</p>
+<p>Even if the data is not strictly 3D, each point in X_points will have its
+&ldquo;predicted surface z-value&rdquo; computed by:
+  1) Taking the i-th and j-th coordinates directly from that point.
+  2) Setting all other dimensions (leftover dims) based on use_min, use_max,
+     or their mean (if both are False).
+Then, we compare the newly-computed &ldquo;actual z&rdquo; for that point with its
+model-predicted z-value. If &lsquo;actual z&rsquo; &lt; &lsquo;predicted z&rsquo;, the point is colored
+with point_color_below; otherwise, it is colored with point_color_above.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>model</code></td>
+            <td>
+                  <code>object</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A model with a predict method.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>lower</code></td>
+            <td>
+                  <code>array_like</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Lower bounds for each dimension.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>upper</code></td>
+            <td>
+                  <code>array_like</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Upper bounds for each dimension.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>i</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index for the x-axis dimension.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>j</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index for the y-axis dimension.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>min_z</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Min value for color scaling. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_z</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Max value for color scaling. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>var_type</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Variable types for each dimension. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>var_name</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Variable names for labeling axes. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>show</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to display the plot. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filename</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File path to save the figure. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>n_grid</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Resolution for each axis. Defaults to 50.</p>
+              </div>
+            </td>
+            <td>
+                  <code>50</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>contour_levels</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of contour levels. Defaults to 10.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dpi</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>DPI for saving. Defaults to 200.</p>
+              </div>
+            </td>
+            <td>
+                  <code>200</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>title</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Title for the figure. Defaults to &ldquo;&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>figsize</code></td>
+            <td>
+                  <code>tuple</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Figure size. Defaults to (12, 6).</p>
+              </div>
+            </td>
+            <td>
+                  <code>(12, 6)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_min</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, leftover dims are set to lower bounds.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>use_max</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, leftover dims are set to upper bounds.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>aspect_equal</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether axes have equal scaling. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>legend_fontsize</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Font size for labels and legends. Defaults to 12.</p>
+              </div>
+            </td>
+            <td>
+                  <code>12</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>cmap</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Colormap. Defaults to &ldquo;viridis&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;viridis&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>X_points</code></td>
+            <td>
+                  <code>ndarray</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Original data points. Shape: (N, D).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>y_points</code></td>
+            <td>
+                  <code>ndarray</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Original target values. Shape: (N,).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plot_points</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to plot X_points. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>points_color</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Fallback color for data points. Defaults to &ldquo;white&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;white&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>points_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Marker size for data points. Defaults to 30.</p>
+              </div>
+            </td>
+            <td>
+                  <code>30</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>point_color_below</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Color if actual z &lt; predicted z. Defaults to &ldquo;lightgrey&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;blue&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>point_color_above</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Color if actual z &gt;= predicted z. Defaults to &ldquo;white&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;red&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>atol</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-06</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>(fig, (ax_contour, ax_surface))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Figure and axes for the contour and surface plots.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>ValueError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>For mismatched dimensions or invalid i/j indices.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>spotpython/plot/contour.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plotModel</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span>
+    <span class="n">lower</span><span class="p">,</span>
+    <span class="n">upper</span><span class="p">,</span>
+    <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">var_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">var_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">use_max</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">aspect_equal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">legend_fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">X_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">plot_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">points_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">points_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+    <span class="n">point_color_below</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+    <span class="n">point_color_above</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+    <span class="n">atol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate 2D contour and 3D surface plots for a model&#39;s predictions.</span>
+
+<span class="sd">    Even if the data is not strictly 3D, each point in X_points will have its</span>
+<span class="sd">    &quot;predicted surface z-value&quot; computed by:</span>
+<span class="sd">      1) Taking the i-th and j-th coordinates directly from that point.</span>
+<span class="sd">      2) Setting all other dimensions (leftover dims) based on use_min, use_max,</span>
+<span class="sd">         or their mean (if both are False).</span>
+<span class="sd">    Then, we compare the newly-computed &quot;actual z&quot; for that point with its</span>
+<span class="sd">    model-predicted z-value. If &#39;actual z&#39; &lt; &#39;predicted z&#39;, the point is colored</span>
+<span class="sd">    with point_color_below; otherwise, it is colored with point_color_above.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model (object): A model with a predict method.</span>
+<span class="sd">        lower (array_like): Lower bounds for each dimension.</span>
+<span class="sd">        upper (array_like): Upper bounds for each dimension.</span>
+<span class="sd">        i (int): Index for the x-axis dimension.</span>
+<span class="sd">        j (int): Index for the y-axis dimension.</span>
+<span class="sd">        min_z (float, optional): Min value for color scaling. Defaults to None.</span>
+<span class="sd">        max_z (float, optional): Max value for color scaling. Defaults to None.</span>
+<span class="sd">        var_type (list, optional): Variable types for each dimension. Defaults to None.</span>
+<span class="sd">        var_name (list, optional): Variable names for labeling axes. Defaults to None.</span>
+<span class="sd">        show (bool): Whether to display the plot. Defaults to True.</span>
+<span class="sd">        filename (str, optional): File path to save the figure. Defaults to None.</span>
+<span class="sd">        n_grid (int): Resolution for each axis. Defaults to 50.</span>
+<span class="sd">        contour_levels (int): Number of contour levels. Defaults to 10.</span>
+<span class="sd">        dpi (int): DPI for saving. Defaults to 200.</span>
+<span class="sd">        title (str): Title for the figure. Defaults to &quot;&quot;.</span>
+<span class="sd">        figsize (tuple): Figure size. Defaults to (12, 6).</span>
+<span class="sd">        use_min (bool): If True, leftover dims are set to lower bounds.</span>
+<span class="sd">        use_max (bool): If True, leftover dims are set to upper bounds.</span>
+<span class="sd">        aspect_equal (bool): Whether axes have equal scaling. Defaults to True.</span>
+<span class="sd">        legend_fontsize (int): Font size for labels and legends. Defaults to 12.</span>
+<span class="sd">        cmap (str): Colormap. Defaults to &quot;viridis&quot;.</span>
+<span class="sd">        X_points (ndarray): Original data points. Shape: (N, D).</span>
+<span class="sd">        y_points (ndarray): Original target values. Shape: (N,).</span>
+<span class="sd">        plot_points (bool): Whether to plot X_points. Defaults to True.</span>
+<span class="sd">        points_color (str): Fallback color for data points. Defaults to &quot;white&quot;.</span>
+<span class="sd">        points_size (int): Marker size for data points. Defaults to 30.</span>
+<span class="sd">        point_color_below (str): Color if actual z &lt; predicted z. Defaults to &quot;lightgrey&quot;.</span>
+<span class="sd">        point_color_above (str): Color if actual z &gt;= predicted z. Defaults to &quot;white&quot;.</span>
+<span class="sd">        atol (float): Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (fig, (ax_contour, ax_surface)): Figure and axes for the contour and surface plots.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: For mismatched dimensions or invalid i/j indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># --- Validate inputs ---</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
+    <span class="n">n_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lower</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mismatch in dimension count between lower and upper.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">n_dims</span> <span class="ow">or</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="n">n_dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid dimension indices i=</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> or j=</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">n_dims</span><span class="si">}</span><span class="s2">-dimensional data.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dimensions i and j must be different.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">var_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">var_name</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;x</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dims</span><span class="p">)]</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_dims</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;var_name length must match the number of dimensions.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- 2D grid for contour/surface ---</span>
+    <span class="n">x_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lower</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">upper</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">n_grid</span><span class="p">)</span>
+    <span class="n">y_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lower</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">upper</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">n_grid</span><span class="p">)</span>
+    <span class="n">X_grid</span><span class="p">,</span> <span class="n">Y_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span>
+
+    <span class="c1"># Helper for leftover dims</span>
+    <span class="k">def</span> <span class="nf">hidden_value</span><span class="p">(</span><span class="n">dim_index</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">use_min</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">lower</span><span class="p">[</span><span class="n">dim_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">use_max</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">upper</span><span class="p">[</span><span class="n">dim_index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">lower</span><span class="p">[</span><span class="n">dim_index</span><span class="p">]</span> <span class="o">+</span> <span class="n">upper</span><span class="p">[</span><span class="n">dim_index</span><span class="p">])</span>
+
+    <span class="c1"># Build all grid points</span>
+    <span class="n">grid_points</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_grid</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_grid</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_dims</span><span class="p">)</span>
+            <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_grid</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+            <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">Y_grid</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dims</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">dim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+                    <span class="n">p</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="n">hidden_value</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+            <span class="n">grid_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="n">grid_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grid_points</span><span class="p">)</span>
+
+    <span class="c1"># Predict for the grid</span>
+    <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Z_pred</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">Z_pred</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">Z_pred</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Z_pred</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">Z_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Z_pred</span> <span class="o">=</span> <span class="n">Z_pred</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_grid</span><span class="p">,</span> <span class="n">n_grid</span><span class="p">)</span>
+
+    <span class="c1"># Determine min/max color scale</span>
+    <span class="k">if</span> <span class="n">min_z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">min_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">Z_pred</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">max_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Z_pred</span><span class="p">)</span>
+
+    <span class="c1"># --- Set up figure ---</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">ax_contour</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax_surface</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- 2D contour ---</span>
+    <span class="n">cont</span> <span class="o">=</span> <span class="n">ax_contour</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+        <span class="n">X_grid</span><span class="p">,</span>
+        <span class="n">Y_grid</span><span class="p">,</span>
+        <span class="n">Z_pred</span><span class="p">,</span>
+        <span class="n">levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cb1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_contour</span><span class="p">)</span>
+    <span class="n">cb1</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">ax_contour</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span><span class="p">)</span>
+    <span class="n">ax_contour</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">var_name</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span><span class="p">)</span>
+    <span class="n">ax_contour</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">aspect_equal</span><span class="p">:</span>
+        <span class="n">ax_contour</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- 3D surface ---</span>
+    <span class="n">surf</span> <span class="o">=</span> <span class="n">ax_surface</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span>
+        <span class="n">X_grid</span><span class="p">,</span>
+        <span class="n">Y_grid</span><span class="p">,</span>
+        <span class="n">Z_pred</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">antialiased</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">cb2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">surf</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax_surface</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">cb2</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">ax_surface</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span><span class="p">)</span>
+    <span class="n">ax_surface</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">var_name</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span><span class="p">)</span>
+    <span class="n">ax_surface</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;f(x)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span><span class="p">)</span>
+    <span class="n">ax_surface</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># --- Optionally plot points ---</span>
+    <span class="k">if</span> <span class="n">plot_points</span> <span class="ow">and</span> <span class="n">X_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Build + predict each point individually, using the same i/j from the row</span>
+        <span class="c1"># and the use_min/use_max logic for leftover dims. Store these predicted values</span>
+        <span class="c1"># as &quot;z_pred_for_point&quot;.</span>
+        <span class="n">z_pred_for_point</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">single_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_dims</span><span class="p">)</span>
+            <span class="n">single_p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_points</span><span class="p">[</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span>
+            <span class="n">single_p</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_points</span><span class="p">[</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">dim_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dims</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">dim_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+                    <span class="n">single_p</span><span class="p">[</span><span class="n">dim_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">hidden_value</span><span class="p">(</span><span class="n">dim_idx</span><span class="p">)</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">single_p</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># ensure at least 1D</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">val</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">z_pred_for_point</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">z_pred_for_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z_pred_for_point</span><span class="p">)</span>
+
+        <span class="c1"># Use the ground-truth y_points directly:</span>
+        <span class="n">z_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_points</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># ensures a 1D shape</span>
+
+        <span class="n">on_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">z_actual</span><span class="p">,</span> <span class="n">z_pred_for_point</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">)</span>
+        <span class="n">below_mask</span> <span class="o">=</span> <span class="n">z_actual</span> <span class="o">-</span> <span class="n">atol</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">&lt;</span> <span class="n">z_pred_for_point</span>
+        <span class="n">above_mask</span> <span class="o">=</span> <span class="n">z_actual</span> <span class="o">+</span> <span class="n">atol</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">&gt;</span> <span class="n">z_pred_for_point</span>
+
+        <span class="c1"># 2D contour scatter</span>
+        <span class="n">ax_contour</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">below_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">below_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">point_color_below</span><span class="p">,</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax_contour</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">above_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">above_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">point_color_above</span><span class="p">,</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax_contour</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">on_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">on_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">points_color</span><span class="p">,</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># 3D plot scatter</span>
+        <span class="n">ax_surface</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">below_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">below_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+            <span class="n">z_actual</span><span class="p">[</span><span class="n">below_mask</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">point_color_below</span><span class="p">,</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax_surface</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">above_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">above_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+            <span class="n">z_actual</span><span class="p">[</span><span class="n">above_mask</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">point_color_above</span><span class="p">,</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ax_surface</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">on_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+            <span class="n">X_points</span><span class="p">[</span><span class="n">on_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span>
+            <span class="n">z_actual</span><span class="p">[</span><span class="n">on_mask</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">points_color</span><span class="p">,</span>
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">points_size</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># --- Optionally set aspect in 3D ---</span>
+    <span class="k">if</span> <span class="n">aspect_equal</span><span class="p">:</span>
+        <span class="n">x_range</span> <span class="o">=</span> <span class="n">upper</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">lower</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">y_range</span> <span class="o">=</span> <span class="n">upper</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">lower</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">z_range</span> <span class="o">=</span> <span class="n">max_z</span> <span class="o">-</span> <span class="n">min_z</span> <span class="k">if</span> <span class="n">max_z</span> <span class="o">&gt;</span> <span class="n">min_z</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">scale_z</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_range</span> <span class="o">+</span> <span class="n">y_range</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">z_range</span><span class="p">)</span> <span class="k">if</span> <span class="n">z_range</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">ax_surface</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">y_range</span> <span class="o">/</span> <span class="n">x_range</span><span class="p">)</span> <span class="k">if</span> <span class="n">x_range</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span> <span class="n">scale_z</span><span class="p">])</span>
+
+    <span class="c1"># --- Title, save, and show ---</span>
+    <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax_contour</span><span class="p">,</span> <span class="n">ax_surface</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -4299,8 +6191,7 @@
 
             <details class="quote">
               <summary>Source code in <code>spotpython/plot/contour.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 5</span>
-<span class="normal"> 6</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 6</span>
 <span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
@@ -4349,7 +6240,8 @@
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">simple_contour</span><span class="p">(</span>
+<span class="normal">55</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">simple_contour</span><span class="p">(</span>
     <span class="n">fun</span><span class="p">,</span>
     <span class="n">min_x</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">max_x</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -4492,7 +6384,7 @@
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.tabs", "navigation.instant", "navigation.indexes"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.525ec568.min.js"></script>
       
         <script src="../../../../javascripts/mathjax.js"></script>
       
