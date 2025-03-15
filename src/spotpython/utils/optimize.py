@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 
-def run_minimize_with_restarts(objective, gradient, x0, bounds, n_restarts_optimizer=5, method="L-BFGS-B", maxit=100, verb=0, random_state=None):
+def run_minimize_with_restarts(objective, gradient, x0, bounds, n_restarts_optimizer=5, method="L-BFGS-B", maxit=100, verb=0, random_state=None) -> "minimize":
     """
     Runs multiple restarts of the minimize() function and returns the best found result.
 
@@ -18,7 +18,10 @@ def run_minimize_with_restarts(objective, gradient, x0, bounds, n_restarts_optim
         random_state (int, optional): Seed for the random-number generator to ensure reproducibility.
 
     Returns:
-        OptimizeResult: The best optimization result among all restarts.
+        OptimizeResult (object): The best optimization result among all restarts,
+        represented as a ``OptimizeResult`` object. Important attributes are:
+        ``x`` the solution array, ``success`` a Boolean flag indicating if the optimizer
+        exited successfully and ``message`` which describes the cause of the termination.
     """
     if random_state is not None:
         np.random.seed(random_state)

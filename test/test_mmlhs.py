@@ -25,8 +25,8 @@ def test_mmlhs():
     X_start = np.array([[0]])
     population = 3
     iterations = 5
-    X_opt = mmlhs(X_start, population=population, iterations=iterations, q=2.0)
-    np.testing.assert_array_equal(X_opt, X_start, "Single point should remain unchanged")
+    with pytest.raises(ValueError):
+        X_opt = mmlhs(X_start, population=population, iterations=iterations, q=2.0)
 
     # Test case 3: Single dimension (k=1)
     X_start = np.array([
@@ -37,10 +37,9 @@ def test_mmlhs():
     ])
     population = 4
     iterations = 15
-    X_opt = mmlhs(X_start, population=population, iterations=iterations, q=2.0)
-    assert X_opt.shape == X_start.shape, "Optimized plan should have the same shape as the initial plan"
-    assert set(X_opt[:, 0]) == set(X_start[:, 0]), "Single column should remain a permutation"
-
+    # check if a ValueError is raised:
+    with pytest.raises(ValueError):
+        X_opt = mmlhs(X_start, population=population, iterations=iterations, q=2.0)
     # Test case 4: Higher dimensions
     X_start = np.array([
         [0, 0, 0],
@@ -59,9 +58,9 @@ def test_mmlhs():
     X_start = np.empty((0, 2))
     population = 5
     iterations = 10
-    X_opt = mmlhs(X_start, population=population, iterations=iterations, q=2.0)
-    np.testing.assert_array_equal(X_opt, X_start, "Empty array should remain unchanged")
-
+    with pytest.raises(ValueError):
+        X_opt = mmlhs(X_start, population=population, iterations=iterations, q=2.0)
+    
     # Test case 6: Check with different q values
     X_start = np.array([
         [0, 0],

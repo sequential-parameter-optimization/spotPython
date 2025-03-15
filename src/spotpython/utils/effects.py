@@ -59,7 +59,7 @@ def screening(X, fun, xi, p, labels, range=None, print=False) -> pd.DataFrame:
     Args:
         X (np.ndarray): The screening plan matrix, typically structured
             within a [0,1]^k box.
-        fun: The objective function to evaluate at each
+        fun (object): The objective function to evaluate at each
             design point in the screening plan.
         xi (float): The elementary effect step length factor.
         p (int): Number of discrete levels along each dimension.

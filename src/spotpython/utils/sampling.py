@@ -19,10 +19,40 @@ def fullfactorial(q, Edges=1) -> np.ndarray:
     Raises:
         ValueError: If any dimension in `q` is less than 2.
 
-    Example:
-        >>> q = [3, 4]
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
+        >>> from spotpython.utils.sampling import fullfactorial
+        >>> q = [3, 2]
+        >>> X = fullfactorial(q, Edges=0)
+        >>> print(X)
+                [[0.         0.        ]
+                [0.         0.75      ]
+                [0.41666667 0.        ]
+                [0.41666667 0.75      ]
+                [0.83333333 0.        ]
+                [0.83333333 0.75      ]]
         >>> X = fullfactorial(q, Edges=1)
         >>> print(X)
+                [[0.  0. ]
+                [0.  1. ]
+                [0.5 0. ]
+                [0.5 1. ]
+                [1.  0. ]
+                [1.  1. ]]
+
     """
     q = np.array(q)
     if np.min(q) < 2:
@@ -73,8 +103,23 @@ def rlh(n: int, k: int, edges: int = 0) -> np.ndarray:
         np.ndarray: A Latin hypercube sampling plan of n points in k dimensions,
                     with each coordinate in the range [0,1].
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
+        >>> from spotpython.utils.sampling import rlh
         >>> # Generate a 2D Latin hypercube with 5 points and edges=0
         >>> X = rlh(n=5, k=2, edges=0)
         >>> print(X)
@@ -126,9 +171,23 @@ def jd(X: np.ndarray, p: float = 1.0) -> Tuple[np.ndarray, np.ndarray]:
             - J is a 1D integer array that provides the multiplicity (occurrence count)
               of each distance in distinct_d.
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
-        >>> from your_module import jd
+        >>> from spotpython.utils.sampling import jd
         >>> # A small 3-point set in 2D
         >>> X = np.array([[0.0, 0.0],
         ...               [1.0, 1.0],
@@ -140,6 +199,8 @@ def jd(X: np.ndarray, p: float = 1.0) -> Tuple[np.ndarray, np.ndarray]:
         # Distinct distances: [1.41421356 2.82842712]
         # Occurrences: [1 1]
         # Explanation: Distances are sqrt(2) between consecutive points and 2*sqrt(2) for the farthest pair.
+            Distinct distances: [1.41421356 2.82842712]
+            Occurrences: [2 1]
     """
     n = X.shape[0]
 
@@ -182,9 +243,23 @@ def mm(X1: np.ndarray, X2: np.ndarray, p: Optional[float] = 1.0) -> int:
             - 1 if X1 is more space-filling
             - 2 if X2 is more space-filling
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
-        >>> from your_module import mm
+        >>> from spotpython.utils.sampling import mm
         >>> # Create two 3-point sampling plans in 2D
         >>> X1 = np.array([[0.0, 0.0],
         ...                [0.5, 0.5],
@@ -255,9 +330,23 @@ def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> 
             The space-fillingness metric Phiq. Larger values typically indicate a more
             space-filling plan according to the Morris-Mitchell criterion.
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
-        >>> from your_module import mmphi
+        >>> from spotpython.utils.sampling import mmphi
         >>> # Simple 3-point sampling plan in 2D
         >>> X = np.array([
         ...     [0.0, 0.0],
@@ -297,9 +386,23 @@ def mmsort(X3D: np.ndarray, p: Optional[float] = 1.0) -> np.ndarray:
             ascending order of space-filling quality. The first index in the
             returned array corresponds to the most space-filling plan.
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
-        >>> from your_module import mmsort
+        >>> from spotpython.utils.sampling import mmsort
         >>> # Suppose we have two 3-point sampling plans in 2D, stored in X3D:
         >>> X1 = np.array([[0.0, 0.0],
         ...                [0.5, 0.5],
@@ -353,9 +456,23 @@ def perturb(X: np.ndarray, PertNum: Optional[int] = 1) -> np.ndarray:
             The perturbed sampling plan, identical in shape to the input, with
             one or more random column swaps executed.
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
-        >>> from your_module import perturb
+        >>> from spotpython.utils.sampling import perturb
         >>> # Create a simple 4x2 sampling plan
         >>> X_original = np.array([
         ...     [1, 3],
@@ -367,9 +484,15 @@ def perturb(X: np.ndarray, PertNum: Optional[int] = 1) -> np.ndarray:
         >>> X_perturbed = perturb(X_original, PertNum=1)
         >>> print(X_perturbed)
         # The output may differ due to random swaps, but each column is still a permutation of [1,2,3,4].
+            [[1 3]
+            [2 2]
+            [3 1]
+            [4 4]]
     """
     # Get dimensions of the plan
     n, k = X.shape
+    if n < 2 or k < 2:
+        raise ValueError("Latin hypercubes require at least 2 points and 2 dimensions")
 
     for _ in range(PertNum):
         # Pick a random column
@@ -419,7 +542,21 @@ def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[flo
             A 2D array representing the most space-filling Latin hypercube found
             after all iterations, of the same shape as X_start.
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
         >>> from your_module import mmlhs
         >>> # Suppose we have an initial 4x2 plan
@@ -435,6 +572,11 @@ def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[flo
         >>> print(X_opt)
     """
     n = X_start.shape[0]
+    if n < 2:
+        raise ValueError("Latin hypercubes require at least 2 points")
+    k = X_start.shape[1]
+    if k < 2:
+        raise ValueError("Latin hypercubes are not defined for dim k < 2")
 
     # Initialize best plan and its metric
     X_best = X_start.copy()
@@ -471,6 +613,7 @@ def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[flo
         if plot and (X_best.shape[1] >= 2):
             plt.clf()
             plt.scatter(X_best[:, 0], X_best[:, 1], marker="o")
+            plt.grid(True)
             plt.title(f"Iteration {it} - Current Best Plan")
             plt.pause(0.01)
 
@@ -502,15 +645,29 @@ def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False) ->
         np.ndarray:
             A 2D array of shape (n, k) representing an optimized Latin hypercube.
 
-    Example:
-        >>> from your_module import bestlh
-        >>> # Generate a 5-point plan in 2D
-        >>> X_opt = bestlh(n=5, k=2, population=5, iterations=10)
-        >>> print(X_opt)
-        # Prints the optimized Latin hypercube after the search.
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
+        >>> import numpy as np
+            from spotpython.utils.sampling import bestlh
+            bestlh(n=5, k=2, population=5, iterations=10)
     """
+    if n < 2:
+        raise ValueError("Latin hypercubes require at least 2 points")
     if k < 2:
-        raise ValueError("Latin hypercubes are not defined for k < 2")
+        raise ValueError("Latin hypercubes are not defined for dim k < 2")
 
     # A list of exponents (q) to optimize
     q_list = [1, 2, 5, 10, 20, 50, 100]
@@ -568,12 +725,33 @@ def phisort(X3D: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0)
             order of mmphi. The first index in the returned array corresponds
             to the numerically lowest mmphi value.
 
-    Example:
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
         >>> import numpy as np
-        >>> from your_module import phisort
-        >>> # Suppose X3D has two sampling plans in X3D[:, :, 0] and X3D[:, :, 1]
-        >>> ranking = phisort(X3D, q=2, p=1)
-        >>> print("Sorted plan indices:", ranking)
+            from spotpython.utils.sampling import phisort
+            X1 = bestlh(n=5, k=2, population=5, iterations=10)
+            X2 = bestlh(n=5, k=2, population=15, iterations=20)
+            X3 = bestlh(n=5, k=2, population=25, iterations=30)
+            # Map X1 and X2 so that X3D has the two sampling plans in X3D[:, :, 0] and X3D[:, :, 1]
+            X3D = np.array([X1, X2])
+            print(phisort(X3D))
+            X3D = np.array([X3, X2])
+            print(phisort(X3D))
+                [2 1]
+                [1 2]
     """
     # Number of 2D sampling plans
     m = X3D.shape[2]
@@ -616,22 +794,31 @@ def subset(X: np.ndarray, ns: int) -> Tuple[np.ndarray, np.ndarray]:
             - Xs is the chosen subset of size ns, with space-filling properties.
             - Xr is the remainder (X \\ Xs).
 
-    Example:
-        >>> import numpy as np
-        >>> from your_module import subset
-        >>> # An example 5-point plan in 2D
-        >>> X = np.array([
-        ...     [0.0, 0.0],
-        ...     [0.0, 1.0],
-        ...     [1.0, 0.0],
-        ...     [1.0, 1.0],
-        ...     [0.5, 0.5]
-        ... ])
-        >>> # Extract a subset of size 3
-        >>> Xs, Xr = subset(X, ns=3)
-        >>> print("Subset:\n", Xs)
-        >>> print("Remainder:\n", Xr)
-        # The subset is chosen to optimize Morris-Mitchell space-filling (p=1, q=5).
+    Notes:
+        Many thanks to the original author of this code, A Sobester, for providing the original Matlab code under the GNU Licence. Original Matlab Code: Copyright 2007 A Sobester:
+        "This program is free software: you can redistribute it and/or modify  it
+        under the terms of the GNU Lesser General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or any
+        later version.
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+        General Public License for more details.
+        You should have received a copy of the GNU General Public License and GNU
+        Lesser General Public License along with this program. If not, see
+        <http://www.gnu.org/licenses/>."
+
+    Examples:
+        >>> from spotpython.utils.sampling import subset, bestlh
+            X = bestlh(n=5, k=3, population=5, iterations=10)
+            Xs, Xr = subset(X, ns=2)
+            print(Xs)
+            print(Xr)
+                [[0.25 0.   0.5 ]
+                [0.5  0.75 0.  ]]
+                [[1.   0.25 0.25]
+                [0.   1.   0.75]
+                [0.75 0.5  1.  ]]
     """
     # Number of total points
     n = X.shape[0]

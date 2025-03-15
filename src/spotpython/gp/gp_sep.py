@@ -17,7 +17,7 @@ from spotpython.utils.aggregate import select_distant_points
 from sklearn.base import BaseEstimator, RegressorMixin
 
 
-def crude_reset(theta, tmin, tmax, m):
+def crude_reset(theta, tmin, tmax, m) -> dict:
     """
     Check whether any elements of the parameter vector ``theta`` lie below the
     corresponding elements of the lower bound ``tmin``. If so, reset ``theta``
@@ -31,12 +31,12 @@ def crude_reset(theta, tmin, tmax, m):
         m (int): The dimensionality or number of parameters (used to adjust negative ``tmax`` entries).
 
     Returns:
-        dict or None: A dictionary containing:
+        (dict) or None: A dictionary containing:
             - "theta" (np.ndarray): The reset parameter values.
             - "its" (int): Number of iterations (0, indicating immediate reset).
             - "msg" (str): Reason for the reset.
             - "conv" (int): Reset code (102).
-        Returns None if no reset is needed.
+            Returns None if no reset is needed.
     """
     if np.any(theta < tmin):
         print("resetting due to init on lower boundary")
@@ -201,7 +201,7 @@ def garg(g, y: np.ndarray = None) -> dict:
     and priors for the nugget parameter.
 
     Args:
-        g: Could be a dictionary, numeric, or None. If numeric, turn it into {"start": g}.
+        g (dict}: Could be a dictionary, numeric, or None. If numeric, turn it into {"start": g}.
         y (np.ndarray): The response vector.
 
     Returns:
@@ -393,13 +393,13 @@ class GPsep(BaseEstimator, RegressorMixin):
         }
 
     # Add these two methods required by scikit-learn
-    def get_params(self, deep=True):
+    def get_params(self, deep=True) -> dict:
         """Get parameters for this estimator.
 
         This method is required for scikit-learn compatibility.
 
         Args:
-            deep: If True, will return the parameters for this estimator and
+            deep (bool): If True, will return the parameters for this estimator and
                 contained subobjects that are estimators. Defaults to True.
 
         Returns:
@@ -419,16 +419,16 @@ class GPsep(BaseEstimator, RegressorMixin):
             "seed": self.seed,
         }
 
-    def set_params(self, **parameters):
+    def set_params(self, **parameters: dict) -> "GPsep":
         """Set the parameters of this estimator.
 
         This method is required for scikit-learn compatibility.
 
         Args:
-            **parameters: Estimator parameters as keyword arguments.
+            **parameters (dict): Estimator parameters as keyword arguments.
 
         Returns:
-            self: Estimator instance.
+            self (GPsep): Estimator instance.
         """
         for parameter, value in parameters.items():
             setattr(self, parameter, value)
@@ -442,18 +442,24 @@ class GPsep(BaseEstimator, RegressorMixin):
         """Fit the GP model with training data and optionally auto-optimize hyperparameters.
 
         Args:
-            X: array-like of shape (n_samples, n_features)
-            y: array-like of shape (n_samples,)
-            d: The length-scale parameters. If None, will be determined
+            X (np.ndarray):
+                Array-like of shape (n_samples, n_features).
+            y (np.ndarray):
+                Array-like of shape (n_samples,).
+            d (Optional[Union[np.ndarray, float]]):
+                The length-scale parameters. If None, will be determined
                 automatically. Defaults to None.
-            g: The nugget parameter. If None, will be determined automatically.
-                Defaults to None.
-            dK: Flag to indicate whether to calculate derivatives.
+            g (Optional[float]):
+                The nugget parameter. If None, will be determined automatically. Defaults to None.
+            dK (bool):
+                Flag to indicate whether to calculate derivatives.
                 Defaults to True.
-            auto_optimize: Whether to automatically optimize hyperparameters
+            auto_optimize (Optional[bool]):
+                Whether to automatically optimize hyperparameters
                 using MLE. If None, uses the default value from the object.
                 Defaults to None.
-            verbosity: Verbosity level for optimization output. Defaults to 0.
+            verbosity (int):
+                Verbosity level for optimization output. Defaults to 0.
 
         Returns:
             GPsep: The fitted GPsep object.
@@ -685,7 +691,10 @@ class GPsep(BaseEstimator, RegressorMixin):
         #     #     raise RuntimeError("dK calculations have already been initialized.")
         #     self.DK = diff_covar_sep_symm(self.m, self.X, self.n, self.d, self.K)
 
-    def _check_is_fitted(self):
+    def _check_is_fitted(self) -> None:
+        """
+        Check if the GPsep instance is fitted.
+        """
         if not self._is_fitted:
             raise ValueError("This GPsep instance is not fitted yet. Call 'fit' with " "appropriate arguments before using 'predict'.")
 
@@ -693,14 +702,19 @@ class GPsep(BaseEstimator, RegressorMixin):
         """Predict the Gaussian Process output at new input points.
 
         Args:
-            X: The predictive locations.
-            lite: Flag to indicate whether to compute only the diagonal
+            X (np.ndarray):
+                The predictive locations.
+            lite (bool):
+                Flag to indicate whether to compute only the diagonal
                 of Sigma. Defaults to False.
-            nonug: Flag to indicate whether to exclude nugget.
+            nonug (bool):
+                Flag to indicate whether to exclude nugget.
                 Defaults to False.
-            return_full: Flag to indicate whether to return the full dictionary,
+            return_full (bool):
+                Flag to indicate whether to return the full dictionary,
                 which includes the mean, Sigma, df, and llik. Defaults to False.
-            return_std: Flag to indicate whether to return the standard deviation.
+            return_std (bool):
+                Flag to indicate whether to return the standard deviation.
                 Only applicable when return_full is False. Defaults to False.
 
         Returns:
@@ -710,34 +724,34 @@ class GPsep(BaseEstimator, RegressorMixin):
             - Otherwise: Mean predictions
 
         Examples:
-                import numpy as np
-                from spotpython.gp.gp_sep import newGPsep
-                import matplotlib.pyplot as plt
-                # Simple sine data
-                X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)
-                y = np.sin(X)
-                # New GP fit
-                gpsep = newGPsep(X, y, d=2, g=0.000001)
-                # Make predictions
-                XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)
-                p = gpsep.predict(XX, lite=False)
-                # Sample from the predictive distribution
-                N = 100
-                mean = p["mean"]
-                Sigma = p["Sigma"]
-                df = p["df"]
-                # Generate samples from the multivariate t-distribution
-                yy = np.random.multivariate_normal(mean, Sigma, N)
-                yy = yy.T
-                # Plot the results
-                plt.figure(figsize=(10, 6))
-                for i in range(N):
-                    plt.plot(XX, yy[:, i], color="gray", linewidth=0.5)
-                plt.scatter(X, y, color="black", s=50, zorder=5)
-                plt.xlabel("x")
-                plt.ylabel("f-hat(x)")
-                plt.title("Predictive Distribution")
-                plt.show()
+            import numpy as np
+            from spotpython.gp.gp_sep import newGPsep
+            import matplotlib.pyplot as plt
+            # Simple sine data
+            X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)
+            y = np.sin(X)
+            # New GP fit
+            gpsep = newGPsep(X, y, d=2, g=0.000001)
+            # Make predictions
+            XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)
+            p = gpsep.predict(XX, lite=False)
+            # Sample from the predictive distribution
+            N = 100
+            mean = p["mean"]
+            Sigma = p["Sigma"]
+            df = p["df"]
+            # Generate samples from the multivariate t-distribution
+            yy = np.random.multivariate_normal(mean, Sigma, N)
+            yy = yy.T
+            # Plot the results
+            plt.figure(figsize=(10, 6))
+            for i in range(N):
+                plt.plot(XX, yy[:, i], color="gray", linewidth=0.5)
+            plt.scatter(X, y, color="black", s=50, zorder=5)
+            plt.xlabel("x")
+            plt.ylabel("f-hat(x)")
+            plt.title("Predictive Distribution")
+            plt.show()
         """
         self._check_is_fitted()
         # if X is a pandas dataframe, convert it to a numpy array

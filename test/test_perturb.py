@@ -45,16 +45,17 @@ def test_perturb():
         [3],
         [4]
     ])
-    X_perturbed = perturb(X_original.copy(), PertNum=2)
-    assert X_perturbed.shape == X_original.shape, "Shape of perturbed array should match the original"
-    assert set(X_perturbed[:, 0]) == set(X_original[:, 0]), "Single column should remain a permutation"
+    # check if a ValueError is raised:
+    with pytest.raises(ValueError):
+        X_perturbed = perturb(X_original.copy(), PertNum=2)
 
     # Test case 5: Single row (n=1)
     X_original = np.array([[1, 2, 3]])
-    X_perturbed = perturb(X_original.copy(), PertNum=3)
-    np.testing.assert_array_equal(X_perturbed, X_original, "Single row should remain unchanged")
+    with pytest.raises(ValueError):
+        X_perturbed = perturb(X_original.copy(), PertNum=3)    
 
     # Test case 6: Edge case with empty array
     X_original = np.empty((0, 2))
-    X_perturbed = perturb(X_original.copy(), PertNum=1)
-    np.testing.assert_array_equal(X_perturbed, X_original, "Empty array should remain unchanged")
+    with pytest.raises(ValueError):
+        X_perturbed = perturb(X_original.copy(), PertNum=1)
+    

@@ -13,7 +13,7 @@ def simple_contour(
     max_z=None,
     n_samples=100,
     n_levels=30,
-):
+) -> None:
     """
     Simple contour plot
 
@@ -27,6 +27,9 @@ def simple_contour(
         max_z (int, optional): _description_. Defaults to 1.
         n_samples (int, optional): _description_. Defaults to 100.
         n_levels (int, optional): _description_. Defaults to 5.
+
+    Returns:
+        None
 
     Examples:
         >>> import matplotlib.pyplot as plt
@@ -86,7 +89,7 @@ def plotModel(
     point_color_below="blue",
     point_color_above="red",
     atol=1e-6,
-):
+) -> None:
     """
     Generate 2D contour and 3D surface plots for a model's predictions.
 
@@ -379,39 +382,39 @@ def plotCombinations(
     point_color_below="blue",
     point_color_above="red",
     atol=1e-6,
-):
+) -> None:
     """Plot model surfaces for multiple combinations of input variables.
 
     This function generates contour and 3D surface plots for all specified
     combinations of input variables, avoiding redundancies and meaningless combinations.
 
     Args:
-        model: A fitted model with a predict method.
-        X: Array of training points (optional). If provided, used to derive bounds and dimension count.
-        lower: Array-like lower bounds for each dimension. If None, derived from X.
-        upper: Array-like upper bounds for each dimension. If None, derived from X.
-        x_vars: List of indices for x-axis variables. Defaults to all if None or empty.
-        y_vars: List of indices for y-axis variables. Defaults to all if None or empty.
-        min_z: Min value for color scale. If None, auto-calculated.
-        max_z: Max value for color scale. If None, auto-calculated.
-        var_type: List of variable types. If None, assumed numeric.
-        var_name: List of variable names. If None, named x0, x1, ...
-        show: Whether to display the plots. Defaults to True.
-        save_dir: Directory for saving plots. If None, not saved.
-        n_grid: Number of grid points along each axis. Defaults to 50.
-        contour_levels: Number of contour levels. Defaults to 10.
-        dpi: DPI for saving figures. Defaults to 200.
-        title_prefix: Prefix string for plot titles.
-        figsize: Figure size (width, height). Defaults to (12, 6).
-        use_min: Use lower bounds for non-plotted dimensions. Defaults to False.
-        use_max: Use upper bounds for non-plotted dimensions. Defaults to False.
-        margin: Fraction of range added as margin to bounds when derived from X. Defaults to 0.1.
-        aspect_equal: Whether to set equal aspect ratio. Defaults to False.
-        legend_fontsize: Font size for labels and legends. Defaults to 12.
+        model (object): A fitted model with a predict method.
+        X (Optional[np.ndarray]): Array of training points. If provided, used to derive bounds and dimension count.
+        lower (Optional[Union[np.ndarray, List[float]]]): Array-like lower bounds for each dimension. If None, derived from X.
+        upper (Optional[Union[np.ndarray, List[float]]]): Array-like upper bounds for each dimension. If None, derived from X.
+        x_vars (Optional[List[int]]): List of indices for x-axis variables. Defaults to all if None or empty.
+        y_vars (Optional[List[int]]): List of indices for y-axis variables. Defaults to all if None or empty.
+        min_z (Optional[float]): Min value for color scale. If None, auto-calculated.
+        max_z (Optional[float]): Max value for color scale. If None, auto-calculated.
+        var_type (Optional[List[str]]): List of variable types. If None, assumed numeric.
+        var_name (Optional[List[str]]): List of variable names. If None, named x0, x1, ...
+        show (bool): Whether to display the plots. Defaults to True.
+        save_dir (Optional[str]): Directory for saving plots. If None, not saved.
+        n_grid (int): Number of grid points along each axis. Defaults to 50.
+        contour_levels (int): Number of contour levels. Defaults to 10.
+        dpi (int): DPI for saving figures. Defaults to 200.
+        title_prefix (str): Prefix string for plot titles.
+        figsize (Tuple[float, float]): Figure size (width, height). Defaults to (12, 6).
+        use_min (bool): Use lower bounds for non-plotted dimensions. Defaults to False.
+        use_max (bool): Use upper bounds for non-plotted dimensions. Defaults to False.
+        margin (float): Fraction of range added as margin to bounds when derived from X. Defaults to 0.1.
+        aspect_equal (bool): Whether to set equal aspect ratio. Defaults to False.
+        legend_fontsize (int): Font size for labels and legends. Defaults to 12.
         cmap (str): Colormap for the plots. Defaults to "viridis".
-        X_points: Original data points to plot.
-        y_points: Original target values to plot.
-        plot_points (bool): Whether to plot X_points.
+        X_points (Optional[np.ndarray]): Original data points to plot.
+        y_points (Optional[np.ndarray]): Original target values to plot.
+        plot_points (bool): Whether to plot X_points. Defaults to True.
         points_color (str): Color for data points. Defaults to "white".
         points_size (int): Marker size for data points. Defaults to 30.
         point_color_below (str): Color if actual z < predicted z. Defaults to "lightgrey".
