@@ -3428,6 +3428,8 @@
       
         
       
+        
+      
     
     
       
@@ -3840,6 +3842,27 @@
   
   <span class="md-ellipsis">
     repair
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    sampling
   </span>
   
 
@@ -4346,10 +4369,41 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>OptimizeResult</code></td>            <td>
+                  <code>object</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The best optimization result among all restarts.</p>
+                <p>The best optimization result among all restarts,</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="scipy.optimize.minimize">minimize</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>represented as a <code>OptimizeResult</code> object. Important attributes are:</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="scipy.optimize.minimize">minimize</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>x</code> the solution array, <code>success</code> a Boolean flag indicating if the optimizer</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+<td></td>            <td>
+                  <code><span title="scipy.optimize.minimize">minimize</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>exited successfully and <code>message</code> which describes the cause of the termination.</p>
               </div>
             </td>
           </tr>
@@ -4405,7 +4459,10 @@
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
-<span class="normal">52</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">run_minimize_with_restarts</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">n_restarts_optimizer</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> <span class="n">maxit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">run_minimize_with_restarts</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">n_restarts_optimizer</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> <span class="n">maxit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">verb</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;minimize&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Runs multiple restarts of the minimize() function and returns the best found result.</span>
 
@@ -4421,7 +4478,10 @@
 <span class="sd">        random_state (int, optional): Seed for the random-number generator to ensure reproducibility.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        OptimizeResult: The best optimization result among all restarts.</span>
+<span class="sd">        OptimizeResult (object): The best optimization result among all restarts,</span>
+<span class="sd">        represented as a ``OptimizeResult`` object. Important attributes are:</span>
+<span class="sd">        ``x`` the solution array, ``success`` a Boolean flag indicating if the optimizer</span>
+<span class="sd">        exited successfully and ``message`` which describes the cause of the termination.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>

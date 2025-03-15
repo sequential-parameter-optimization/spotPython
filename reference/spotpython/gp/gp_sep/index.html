@@ -3692,6 +3692,8 @@
       
         
       
+        
+      
     
     
       
@@ -4050,6 +4052,27 @@
   
   <span class="md-ellipsis">
     repair
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/sampling/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    sampling
   </span>
   
 
@@ -5466,7 +5489,27 @@
 <span class="normal">891</span>
 <span class="normal">892</span>
 <span class="normal">893</span>
-<span class="normal">894</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GPsep</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span>
+<span class="normal">905</span>
+<span class="normal">906</span>
+<span class="normal">907</span>
+<span class="normal">908</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GPsep</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to represent a Gaussian Process with separable covariance.</span>
 
 <span class="sd">    Attributes:</span>
@@ -5512,10 +5555,6 @@
 <span class="sd">        Initialize the GP model with data and hyperparameters.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            X (np.ndarray):</span>
-<span class="sd">                Input data matrix of shape (n, m). If pandas DataFrame, will be converted to numpy array.</span>
-<span class="sd">            y (np.ndarray):</span>
-<span class="sd">                Output data vector of length n. If pandas Series, will be converted to numpy array.</span>
 <span class="sd">            d (np.ndarray):</span>
 <span class="sd">                Length-scale parameters.</span>
 <span class="sd">            g (float):</span>
@@ -5536,6 +5575,8 @@
 <span class="sd">                Whether to automatically optimize hyperparameters using MLE. Default is True.</span>
 <span class="sd">            max_points (int):</span>
 <span class="sd">                Maximum number of points to use for the model building. Default is None, which means all points are used.</span>
+<span class="sd">            seed (int):</span>
+<span class="sd">                Random seed for reproducibility. Default is 123.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Hyperparameters (do not store training data)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
@@ -5583,13 +5624,13 @@
         <span class="p">}</span>
 
     <span class="c1"># Add these two methods required by scikit-learn</span>
-    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get parameters for this estimator.</span>
 
 <span class="sd">        This method is required for scikit-learn compatibility.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            deep: If True, will return the parameters for this estimator and</span>
+<span class="sd">            deep (bool): If True, will return the parameters for this estimator and</span>
 <span class="sd">                contained subobjects that are estimators. Defaults to True.</span>
 
 <span class="sd">        Returns:</span>
@@ -5609,16 +5650,16 @@
             <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
         <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GPsep&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the parameters of this estimator.</span>
 
 <span class="sd">        This method is required for scikit-learn compatibility.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            **parameters: Estimator parameters as keyword arguments.</span>
+<span class="sd">            **parameters (dict): Estimator parameters as keyword arguments.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            self: Estimator instance.</span>
+<span class="sd">            self (GPsep): Estimator instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -5632,24 +5673,38 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fit the GP model with training data and optionally auto-optimize hyperparameters.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            X: array-like of shape (n_samples, n_features)</span>
-<span class="sd">            y: array-like of shape (n_samples,)</span>
-<span class="sd">            d: The length-scale parameters. If None, will be determined</span>
+<span class="sd">            X (np.ndarray):</span>
+<span class="sd">                Array-like of shape (n_samples, n_features).</span>
+<span class="sd">            y (np.ndarray):</span>
+<span class="sd">                Array-like of shape (n_samples,).</span>
+<span class="sd">            d (Optional[Union[np.ndarray, float]]):</span>
+<span class="sd">                The length-scale parameters. If None, will be determined</span>
 <span class="sd">                automatically. Defaults to None.</span>
-<span class="sd">            g: The nugget parameter. If None, will be determined automatically.</span>
-<span class="sd">                Defaults to None.</span>
-<span class="sd">            dK: Flag to indicate whether to calculate derivatives.</span>
+<span class="sd">            g (Optional[float]):</span>
+<span class="sd">                The nugget parameter. If None, will be determined automatically. Defaults to None.</span>
+<span class="sd">            dK (bool):</span>
+<span class="sd">                Flag to indicate whether to calculate derivatives.</span>
 <span class="sd">                Defaults to True.</span>
-<span class="sd">            auto_optimize: Whether to automatically optimize hyperparameters</span>
+<span class="sd">            auto_optimize (Optional[bool]):</span>
+<span class="sd">                Whether to automatically optimize hyperparameters</span>
 <span class="sd">                using MLE. If None, uses the default value from the object.</span>
 <span class="sd">                Defaults to None.</span>
-<span class="sd">            verbosity: Verbosity level for optimization output. Defaults to 0.</span>
+<span class="sd">            verbosity (int):</span>
+<span class="sd">                Verbosity level for optimization output. Defaults to 0.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            GPsep: The fitted GPsep object.</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If X has no rows or if X and y dimensions mismatch.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from spotpython.gp.gp_sep import GPsep</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            &gt;&gt;&gt; X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="sd">            &gt;&gt;&gt; y = np.array([1, 2, 3])</span>
+<span class="sd">            &gt;&gt;&gt; model = GPsep()</span>
+<span class="sd">            &gt;&gt;&gt; model.fit(X, y)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># if X or y are pandas dataframes or series, convert them to numpy arrays</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;to_numpy&quot;</span><span class="p">):</span>
@@ -5867,7 +5922,10 @@
         <span class="c1">#     #     raise RuntimeError(&quot;dK calculations have already been initialized.&quot;)</span>
         <span class="c1">#     self.DK = diff_covar_sep_symm(self.m, self.X, self.n, self.d, self.K)</span>
 
-    <span class="k">def</span> <span class="nf">_check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if the GPsep instance is fitted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_fitted</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This GPsep instance is not fitted yet. Call &#39;fit&#39; with &quot;</span> <span class="s2">&quot;appropriate arguments before using &#39;predict&#39;.&quot;</span><span class="p">)</span>
 
@@ -5875,14 +5933,19 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict the Gaussian Process output at new input points.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            X: The predictive locations.</span>
-<span class="sd">            lite: Flag to indicate whether to compute only the diagonal</span>
+<span class="sd">            X (np.ndarray):</span>
+<span class="sd">                The predictive locations.</span>
+<span class="sd">            lite (bool):</span>
+<span class="sd">                Flag to indicate whether to compute only the diagonal</span>
 <span class="sd">                of Sigma. Defaults to False.</span>
-<span class="sd">            nonug: Flag to indicate whether to exclude nugget.</span>
+<span class="sd">            nonug (bool):</span>
+<span class="sd">                Flag to indicate whether to exclude nugget.</span>
 <span class="sd">                Defaults to False.</span>
-<span class="sd">            return_full: Flag to indicate whether to return the full dictionary,</span>
+<span class="sd">            return_full (bool):</span>
+<span class="sd">                Flag to indicate whether to return the full dictionary,</span>
 <span class="sd">                which includes the mean, Sigma, df, and llik. Defaults to False.</span>
-<span class="sd">            return_std: Flag to indicate whether to return the standard deviation.</span>
+<span class="sd">            return_std (bool):</span>
+<span class="sd">                Flag to indicate whether to return the standard deviation.</span>
 <span class="sd">                Only applicable when return_full is False. Defaults to False.</span>
 
 <span class="sd">        Returns:</span>
@@ -5892,34 +5955,34 @@
 <span class="sd">            - Otherwise: Mean predictions</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">                import numpy as np</span>
-<span class="sd">                from spotpython.gp.gp_sep import newGPsep</span>
-<span class="sd">                import matplotlib.pyplot as plt</span>
-<span class="sd">                # Simple sine data</span>
-<span class="sd">                X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)</span>
-<span class="sd">                y = np.sin(X)</span>
-<span class="sd">                # New GP fit</span>
-<span class="sd">                gpsep = newGPsep(X, y, d=2, g=0.000001)</span>
-<span class="sd">                # Make predictions</span>
-<span class="sd">                XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)</span>
-<span class="sd">                p = gpsep.predict(XX, lite=False)</span>
-<span class="sd">                # Sample from the predictive distribution</span>
-<span class="sd">                N = 100</span>
-<span class="sd">                mean = p[&quot;mean&quot;]</span>
-<span class="sd">                Sigma = p[&quot;Sigma&quot;]</span>
-<span class="sd">                df = p[&quot;df&quot;]</span>
-<span class="sd">                # Generate samples from the multivariate t-distribution</span>
-<span class="sd">                yy = np.random.multivariate_normal(mean, Sigma, N)</span>
-<span class="sd">                yy = yy.T</span>
-<span class="sd">                # Plot the results</span>
-<span class="sd">                plt.figure(figsize=(10, 6))</span>
-<span class="sd">                for i in range(N):</span>
-<span class="sd">                    plt.plot(XX, yy[:, i], color=&quot;gray&quot;, linewidth=0.5)</span>
-<span class="sd">                plt.scatter(X, y, color=&quot;black&quot;, s=50, zorder=5)</span>
-<span class="sd">                plt.xlabel(&quot;x&quot;)</span>
-<span class="sd">                plt.ylabel(&quot;f-hat(x)&quot;)</span>
-<span class="sd">                plt.title(&quot;Predictive Distribution&quot;)</span>
-<span class="sd">                plt.show()</span>
+<span class="sd">            import numpy as np</span>
+<span class="sd">            from spotpython.gp.gp_sep import newGPsep</span>
+<span class="sd">            import matplotlib.pyplot as plt</span>
+<span class="sd">            # Simple sine data</span>
+<span class="sd">            X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)</span>
+<span class="sd">            y = np.sin(X)</span>
+<span class="sd">            # New GP fit</span>
+<span class="sd">            gpsep = newGPsep(X, y, d=2, g=0.000001)</span>
+<span class="sd">            # Make predictions</span>
+<span class="sd">            XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)</span>
+<span class="sd">            p = gpsep.predict(XX, lite=False)</span>
+<span class="sd">            # Sample from the predictive distribution</span>
+<span class="sd">            N = 100</span>
+<span class="sd">            mean = p[&quot;mean&quot;]</span>
+<span class="sd">            Sigma = p[&quot;Sigma&quot;]</span>
+<span class="sd">            df = p[&quot;df&quot;]</span>
+<span class="sd">            # Generate samples from the multivariate t-distribution</span>
+<span class="sd">            yy = np.random.multivariate_normal(mean, Sigma, N)</span>
+<span class="sd">            yy = yy.T</span>
+<span class="sd">            # Plot the results</span>
+<span class="sd">            plt.figure(figsize=(10, 6))</span>
+<span class="sd">            for i in range(N):</span>
+<span class="sd">                plt.plot(XX, yy[:, i], color=&quot;gray&quot;, linewidth=0.5)</span>
+<span class="sd">            plt.scatter(X, y, color=&quot;black&quot;, s=50, zorder=5)</span>
+<span class="sd">            plt.xlabel(&quot;x&quot;)</span>
+<span class="sd">            plt.ylabel(&quot;f-hat(x)&quot;)</span>
+<span class="sd">            plt.title(&quot;Predictive Distribution&quot;)</span>
+<span class="sd">            plt.show()</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_is_fitted</span><span class="p">()</span>
         <span class="c1"># if X is a pandas dataframe, convert it to a numpy array</span>
@@ -6121,34 +6184,6 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>X</code></td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Input data matrix of shape (n, m). If pandas DataFrame, will be converted to numpy array.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>y</code></td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Output data vector of length n. If pandas Series, will be converted to numpy array.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code>d</code></td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span></code>
@@ -6288,6 +6323,20 @@
                   <code>None</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>seed</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Random seed for reproducibility. Default is 123.</p>
+              </div>
+            </td>
+            <td>
+                  <code>123</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -6377,9 +6426,7 @@
 <span class="normal">390</span>
 <span class="normal">391</span>
 <span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">393</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -6397,10 +6444,6 @@
 <span class="sd">    Initialize the GP model with data and hyperparameters.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        X (np.ndarray):</span>
-<span class="sd">            Input data matrix of shape (n, m). If pandas DataFrame, will be converted to numpy array.</span>
-<span class="sd">        y (np.ndarray):</span>
-<span class="sd">            Output data vector of length n. If pandas Series, will be converted to numpy array.</span>
 <span class="sd">        d (np.ndarray):</span>
 <span class="sd">            Length-scale parameters.</span>
 <span class="sd">        g (float):</span>
@@ -6421,6 +6464,8 @@
 <span class="sd">            Whether to automatically optimize hyperparameters using MLE. Default is True.</span>
 <span class="sd">        max_points (int):</span>
 <span class="sd">            Maximum number of points to use for the model building. Default is None, which means all points are used.</span>
+<span class="sd">        seed (int):</span>
+<span class="sd">            Random seed for reproducibility. Default is 123.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Hyperparameters (do not store training data)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span class="n">d</span>
@@ -6487,24 +6532,24 @@
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">642</span>
-<span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
-<span class="normal">646</span>
-<span class="normal">647</span>
-<span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span>
-<span class="normal">654</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">654</span>
 <span class="normal">655</span>
 <span class="normal">656</span>
 <span class="normal">657</span>
 <span class="normal">658</span>
-<span class="normal">659</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calc_ytKiy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calc_ytKiy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Recalculate phi and related components from Ki and y.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -6560,7 +6605,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>array-like of shape (n_samples, n_features)</p>
+                <p>Array-like of shape (n_samples, n_features).</p>
               </div>
             </td>
             <td>
@@ -6574,7 +6619,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>array-like of shape (n_samples,)</p>
+                <p>Array-like of shape (n_samples,).</p>
               </div>
             </td>
             <td>
@@ -6584,6 +6629,7 @@
           <tr class="doc-section-item">
             <td><code>d</code></td>
             <td>
+                  <code>Optional[Union[<span title="numpy.ndarray">ndarray</span>, float]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6598,11 +6644,11 @@ automatically. Defaults to None.</p>
           <tr class="doc-section-item">
             <td><code>g</code></td>
             <td>
+                  <code>Optional[float]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The nugget parameter. If None, will be determined automatically.
-Defaults to None.</p>
+                <p>The nugget parameter. If None, will be determined automatically. Defaults to None.</p>
               </div>
             </td>
             <td>
@@ -6627,7 +6673,7 @@ Defaults to True.</p>
           <tr class="doc-section-item">
             <td><code>auto_optimize</code></td>
             <td>
-                  <code>bool</code>
+                  <code>Optional[bool]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6643,6 +6689,7 @@ Defaults to None.</p>
           <tr class="doc-section-item">
             <td><code>verbosity</code></td>
             <td>
+                  <code>int</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -6702,9 +6749,21 @@ Defaults to None.</p>
       </tbody>
     </table>
 
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpython.gp.gp_sep</span> <span class="kn">import</span> <span class="n">GPsep</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">GPsep</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</code></pre></div>
+
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">443</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
 <span class="normal">444</span>
 <span class="normal">445</span>
 <span class="normal">446</span>
@@ -6901,28 +6960,54 @@ Defaults to None.</p>
 <span class="normal">637</span>
 <span class="normal">638</span>
 <span class="normal">639</span>
-<span class="normal">640</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dK</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">auto_optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GPsep&quot;</span><span class="p">:</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dK</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">auto_optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GPsep&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fit the GP model with training data and optionally auto-optimize hyperparameters.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        X: array-like of shape (n_samples, n_features)</span>
-<span class="sd">        y: array-like of shape (n_samples,)</span>
-<span class="sd">        d: The length-scale parameters. If None, will be determined</span>
+<span class="sd">        X (np.ndarray):</span>
+<span class="sd">            Array-like of shape (n_samples, n_features).</span>
+<span class="sd">        y (np.ndarray):</span>
+<span class="sd">            Array-like of shape (n_samples,).</span>
+<span class="sd">        d (Optional[Union[np.ndarray, float]]):</span>
+<span class="sd">            The length-scale parameters. If None, will be determined</span>
 <span class="sd">            automatically. Defaults to None.</span>
-<span class="sd">        g: The nugget parameter. If None, will be determined automatically.</span>
-<span class="sd">            Defaults to None.</span>
-<span class="sd">        dK: Flag to indicate whether to calculate derivatives.</span>
+<span class="sd">        g (Optional[float]):</span>
+<span class="sd">            The nugget parameter. If None, will be determined automatically. Defaults to None.</span>
+<span class="sd">        dK (bool):</span>
+<span class="sd">            Flag to indicate whether to calculate derivatives.</span>
 <span class="sd">            Defaults to True.</span>
-<span class="sd">        auto_optimize: Whether to automatically optimize hyperparameters</span>
+<span class="sd">        auto_optimize (Optional[bool]):</span>
+<span class="sd">            Whether to automatically optimize hyperparameters</span>
 <span class="sd">            using MLE. If None, uses the default value from the object.</span>
 <span class="sd">            Defaults to None.</span>
-<span class="sd">        verbosity: Verbosity level for optimization output. Defaults to 0.</span>
+<span class="sd">        verbosity (int):</span>
+<span class="sd">            Verbosity level for optimization output. Defaults to 0.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        GPsep: The fitted GPsep object.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If X has no rows or if X and y dimensions mismatch.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from spotpython.gp.gp_sep import GPsep</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="sd">        &gt;&gt;&gt; y = np.array([1, 2, 3])</span>
+<span class="sd">        &gt;&gt;&gt; model = GPsep()</span>
+<span class="sd">        &gt;&gt;&gt; model.fit(X, y)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># if X or y are pandas dataframes or series, convert them to numpy arrays</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s2">&quot;to_numpy&quot;</span><span class="p">):</span>
@@ -7143,16 +7228,16 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">805</span>
-<span class="normal">806</span>
-<span class="normal">807</span>
-<span class="normal">808</span>
-<span class="normal">809</span>
-<span class="normal">810</span>
-<span class="normal">811</span>
-<span class="normal">812</span>
-<span class="normal">813</span>
-<span class="normal">814</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_d</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_d</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Access the separable lengthscale parameter of the GP.</span>
 
@@ -7206,16 +7291,16 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">816</span>
-<span class="normal">817</span>
-<span class="normal">818</span>
-<span class="normal">819</span>
-<span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span>
-<span class="normal">823</span>
-<span class="normal">824</span>
-<span class="normal">825</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_g</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_g</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Access the nugget parameter of the GP.</span>
 
@@ -7269,16 +7354,16 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">827</span>
-<span class="normal">828</span>
-<span class="normal">829</span>
-<span class="normal">830</span>
-<span class="normal">831</span>
-<span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_m</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_m</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Access the input dimension m of the GP.</span>
 
@@ -7323,6 +7408,7 @@ Defaults to None.</p>
           <tr class="doc-section-item">
             <td><code>deep</code></td>
             <td>
+                  <code>bool</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7349,6 +7435,7 @@ contained subobjects that are estimators. Defaults to True.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>dict</code></td>            <td>
+                  <code>dict</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7361,7 +7448,9 @@ contained subobjects that are estimators. Defaults to True.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">398</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
 <span class="normal">399</span>
 <span class="normal">400</span>
 <span class="normal">401</span>
@@ -7383,15 +7472,13 @@ contained subobjects that are estimators. Defaults to True.</p>
 <span class="normal">417</span>
 <span class="normal">418</span>
 <span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="normal">420</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get parameters for this estimator.</span>
 
 <span class="sd">    This method is required for scikit-learn compatibility.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        deep: If True, will return the parameters for this estimator and</span>
+<span class="sd">        deep (bool): If True, will return the parameters for this estimator and</span>
 <span class="sd">            contained subobjects that are estimators. Defaults to True.</span>
 
 <span class="sd">    Returns:</span>
@@ -7539,27 +7626,7 @@ contained subobjects that are estimators. Defaults to True.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">856</span>
-<span class="normal">857</span>
-<span class="normal">858</span>
-<span class="normal">859</span>
-<span class="normal">860</span>
-<span class="normal">861</span>
-<span class="normal">862</span>
-<span class="normal">863</span>
-<span class="normal">864</span>
-<span class="normal">865</span>
-<span class="normal">866</span>
-<span class="normal">867</span>
-<span class="normal">868</span>
-<span class="normal">869</span>
-<span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
-<span class="normal">875</span>
-<span class="normal">876</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">876</span>
 <span class="normal">877</span>
 <span class="normal">878</span>
 <span class="normal">879</span>
@@ -7577,7 +7644,27 @@ contained subobjects that are estimators. Defaults to True.</p>
 <span class="normal">891</span>
 <span class="normal">892</span>
 <span class="normal">893</span>
-<span class="normal">894</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">mleGPsep_optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tmax</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ab</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">maxit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verb</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span>
+<span class="normal">903</span>
+<span class="normal">904</span>
+<span class="normal">905</span>
+<span class="normal">906</span>
+<span class="normal">907</span>
+<span class="normal">908</span>
+<span class="normal">909</span>
+<span class="normal">910</span>
+<span class="normal">911</span>
+<span class="normal">912</span>
+<span class="normal">913</span>
+<span class="normal">914</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">mleGPsep_optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tmax</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ab</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">maxit</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">verb</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Optimize the separable GP to use its MLE separable lengthscale and multiple nugget parameterization using the current data.</span>
 
@@ -7694,6 +7781,7 @@ Defaults to False.</p>
           <tr class="doc-section-item">
             <td><code>return_full</code></td>
             <td>
+                  <code>bool</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7708,6 +7796,7 @@ which includes the mean, Sigma, df, and llik. Defaults to False.</p>
           <tr class="doc-section-item">
             <td><code>return_std</code></td>
             <td>
+                  <code>bool</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -7814,22 +7903,7 @@ plt.show()</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">686</span>
-<span class="normal">687</span>
-<span class="normal">688</span>
-<span class="normal">689</span>
-<span class="normal">690</span>
-<span class="normal">691</span>
-<span class="normal">692</span>
-<span class="normal">693</span>
-<span class="normal">694</span>
-<span class="normal">695</span>
-<span class="normal">696</span>
-<span class="normal">697</span>
-<span class="normal">698</span>
-<span class="normal">699</span>
-<span class="normal">700</span>
-<span class="normal">701</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">701</span>
 <span class="normal">702</span>
 <span class="normal">703</span>
 <span class="normal">704</span>
@@ -7883,18 +7957,43 @@ plt.show()</p>
 <span class="normal">752</span>
 <span class="normal">753</span>
 <span class="normal">754</span>
-<span class="normal">755</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">lite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nonug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">return_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">lite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">nonug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">return_full</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Predict the Gaussian Process output at new input points.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        X: The predictive locations.</span>
-<span class="sd">        lite: Flag to indicate whether to compute only the diagonal</span>
+<span class="sd">        X (np.ndarray):</span>
+<span class="sd">            The predictive locations.</span>
+<span class="sd">        lite (bool):</span>
+<span class="sd">            Flag to indicate whether to compute only the diagonal</span>
 <span class="sd">            of Sigma. Defaults to False.</span>
-<span class="sd">        nonug: Flag to indicate whether to exclude nugget.</span>
+<span class="sd">        nonug (bool):</span>
+<span class="sd">            Flag to indicate whether to exclude nugget.</span>
 <span class="sd">            Defaults to False.</span>
-<span class="sd">        return_full: Flag to indicate whether to return the full dictionary,</span>
+<span class="sd">        return_full (bool):</span>
+<span class="sd">            Flag to indicate whether to return the full dictionary,</span>
 <span class="sd">            which includes the mean, Sigma, df, and llik. Defaults to False.</span>
-<span class="sd">        return_std: Flag to indicate whether to return the standard deviation.</span>
+<span class="sd">        return_std (bool):</span>
+<span class="sd">            Flag to indicate whether to return the standard deviation.</span>
 <span class="sd">            Only applicable when return_full is False. Defaults to False.</span>
 
 <span class="sd">    Returns:</span>
@@ -7904,34 +8003,34 @@ plt.show()</p>
 <span class="sd">        - Otherwise: Mean predictions</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">            import numpy as np</span>
-<span class="sd">            from spotpython.gp.gp_sep import newGPsep</span>
-<span class="sd">            import matplotlib.pyplot as plt</span>
-<span class="sd">            # Simple sine data</span>
-<span class="sd">            X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)</span>
-<span class="sd">            y = np.sin(X)</span>
-<span class="sd">            # New GP fit</span>
-<span class="sd">            gpsep = newGPsep(X, y, d=2, g=0.000001)</span>
-<span class="sd">            # Make predictions</span>
-<span class="sd">            XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)</span>
-<span class="sd">            p = gpsep.predict(XX, lite=False)</span>
-<span class="sd">            # Sample from the predictive distribution</span>
-<span class="sd">            N = 100</span>
-<span class="sd">            mean = p[&quot;mean&quot;]</span>
-<span class="sd">            Sigma = p[&quot;Sigma&quot;]</span>
-<span class="sd">            df = p[&quot;df&quot;]</span>
-<span class="sd">            # Generate samples from the multivariate t-distribution</span>
-<span class="sd">            yy = np.random.multivariate_normal(mean, Sigma, N)</span>
-<span class="sd">            yy = yy.T</span>
-<span class="sd">            # Plot the results</span>
-<span class="sd">            plt.figure(figsize=(10, 6))</span>
-<span class="sd">            for i in range(N):</span>
-<span class="sd">                plt.plot(XX, yy[:, i], color=&quot;gray&quot;, linewidth=0.5)</span>
-<span class="sd">            plt.scatter(X, y, color=&quot;black&quot;, s=50, zorder=5)</span>
-<span class="sd">            plt.xlabel(&quot;x&quot;)</span>
-<span class="sd">            plt.ylabel(&quot;f-hat(x)&quot;)</span>
-<span class="sd">            plt.title(&quot;Predictive Distribution&quot;)</span>
-<span class="sd">            plt.show()</span>
+<span class="sd">        import numpy as np</span>
+<span class="sd">        from spotpython.gp.gp_sep import newGPsep</span>
+<span class="sd">        import matplotlib.pyplot as plt</span>
+<span class="sd">        # Simple sine data</span>
+<span class="sd">        X = np.linspace(0, 2 * np.pi, 7).reshape(-1, 1)</span>
+<span class="sd">        y = np.sin(X)</span>
+<span class="sd">        # New GP fit</span>
+<span class="sd">        gpsep = newGPsep(X, y, d=2, g=0.000001)</span>
+<span class="sd">        # Make predictions</span>
+<span class="sd">        XX = np.linspace(-1, 2 * np.pi + 1, 499).reshape(-1, 1)</span>
+<span class="sd">        p = gpsep.predict(XX, lite=False)</span>
+<span class="sd">        # Sample from the predictive distribution</span>
+<span class="sd">        N = 100</span>
+<span class="sd">        mean = p[&quot;mean&quot;]</span>
+<span class="sd">        Sigma = p[&quot;Sigma&quot;]</span>
+<span class="sd">        df = p[&quot;df&quot;]</span>
+<span class="sd">        # Generate samples from the multivariate t-distribution</span>
+<span class="sd">        yy = np.random.multivariate_normal(mean, Sigma, N)</span>
+<span class="sd">        yy = yy.T</span>
+<span class="sd">        # Plot the results</span>
+<span class="sd">        plt.figure(figsize=(10, 6))</span>
+<span class="sd">        for i in range(N):</span>
+<span class="sd">            plt.plot(XX, yy[:, i], color=&quot;gray&quot;, linewidth=0.5)</span>
+<span class="sd">        plt.scatter(X, y, color=&quot;black&quot;, s=50, zorder=5)</span>
+<span class="sd">        plt.xlabel(&quot;x&quot;)</span>
+<span class="sd">        plt.ylabel(&quot;f-hat(x)&quot;)</span>
+<span class="sd">        plt.title(&quot;Predictive Distribution&quot;)</span>
+<span class="sd">        plt.show()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_check_is_fitted</span><span class="p">()</span>
     <span class="c1"># if X is a pandas dataframe, convert it to a numpy array</span>
@@ -8017,23 +8116,23 @@ plt.show()</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">838</span>
-<span class="normal">839</span>
-<span class="normal">840</span>
-<span class="normal">841</span>
-<span class="normal">842</span>
-<span class="normal">843</span>
-<span class="normal">844</span>
-<span class="normal">845</span>
-<span class="normal">846</span>
-<span class="normal">847</span>
-<span class="normal">848</span>
-<span class="normal">849</span>
-<span class="normal">850</span>
-<span class="normal">851</span>
-<span class="normal">852</span>
-<span class="normal">853</span>
-<span class="normal">854</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_new_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_new_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the parameterization of the GP without destroying and reallocating memory.</span>
 
@@ -8085,6 +8184,7 @@ plt.show()</p>
           <tr class="doc-section-item">
             <td><code>**parameters</code></td>
             <td>
+                  <code>dict</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8110,6 +8210,7 @@ plt.show()</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>self</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="spotpython.gp.gp_sep.GPsep" href="#spotpython.gp.gp_sep.GPsep">GPsep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8122,7 +8223,9 @@ plt.show()</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">424</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
 <span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
@@ -8137,18 +8240,16 @@ plt.show()</p>
 <span class="normal">436</span>
 <span class="normal">437</span>
 <span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<span class="normal">439</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;GPsep&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the parameters of this estimator.</span>
 
 <span class="sd">    This method is required for scikit-learn compatibility.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        **parameters: Estimator parameters as keyword arguments.</span>
+<span class="sd">        **parameters (dict): Estimator parameters as keyword arguments.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        self: Estimator instance.</span>
+<span class="sd">        self (GPsep): Estimator instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -8271,23 +8372,16 @@ leaving bounds unmodified except for cases where <code>tmax</code> is negative.<
       <tbody>
           <tr class="doc-section-item">
             <td>
+                  <code>dict</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>dict or None: A dictionary containing:
+                <p>(dict) or None: A dictionary containing:
 - &ldquo;theta&rdquo; (np.ndarray): The reset parameter values.
 - &ldquo;its&rdquo; (int): Number of iterations (0, indicating immediate reset).
 - &ldquo;msg&rdquo; (str): Reason for the reset.
-- &ldquo;conv&rdquo; (int): Reset code (102).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Returns None if no reset is needed.</p>
+- &ldquo;conv&rdquo; (int): Reset code (102).
+Returns None if no reset is needed.</p>
               </div>
             </td>
           </tr>
@@ -8331,7 +8425,7 @@ leaving bounds unmodified except for cases where <code>tmax</code> is negative.<
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">crude_reset</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">crude_reset</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check whether any elements of the parameter vector ``theta`` lie below the</span>
 <span class="sd">    corresponding elements of the lower bound ``tmin``. If so, reset ``theta``</span>
@@ -8345,12 +8439,12 @@ leaving bounds unmodified except for cases where <code>tmax</code> is negative.<
 <span class="sd">        m (int): The dimensionality or number of parameters (used to adjust negative ``tmax`` entries).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict or None: A dictionary containing:</span>
+<span class="sd">        (dict) or None: A dictionary containing:</span>
 <span class="sd">            - &quot;theta&quot; (np.ndarray): The reset parameter values.</span>
 <span class="sd">            - &quot;its&quot; (int): Number of iterations (0, indicating immediate reset).</span>
 <span class="sd">            - &quot;msg&quot; (str): Reason for the reset.</span>
 <span class="sd">            - &quot;conv&quot; (int): Reset code (102).</span>
-<span class="sd">        Returns None if no reset is needed.</span>
+<span class="sd">            Returns None if no reset is needed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">theta</span> <span class="o">&lt;</span> <span class="n">tmin</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;resetting due to init on lower boundary&quot;</span><span class="p">)</span>
@@ -8697,6 +8791,7 @@ and priors for the nugget parameter.</p>
           <tr class="doc-section-item">
             <td><code>g</code></td>
             <td>
+                  <code>dict}</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -8835,7 +8930,7 @@ and priors for the nugget parameter.</p>
 <span class="sd">    and priors for the nugget parameter.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        g: Could be a dictionary, numeric, or None. If numeric, turn it into {&quot;start&quot;: g}.</span>
+<span class="sd">        g (dict}: Could be a dictionary, numeric, or None. If numeric, turn it into {&quot;start&quot;: g}.</span>
 <span class="sd">        y (np.ndarray): The response vector.</span>
 
 <span class="sd">    Returns:</span>
@@ -9252,23 +9347,23 @@ and priors for the nugget parameter.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/gp/gp_sep.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">897</span>
-<span class="normal">898</span>
-<span class="normal">899</span>
-<span class="normal">900</span>
-<span class="normal">901</span>
-<span class="normal">902</span>
-<span class="normal">903</span>
-<span class="normal">904</span>
-<span class="normal">905</span>
-<span class="normal">906</span>
-<span class="normal">907</span>
-<span class="normal">908</span>
-<span class="normal">909</span>
-<span class="normal">910</span>
-<span class="normal">911</span>
-<span class="normal">912</span>
-<span class="normal">913</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">newGPsep</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dK</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GPsep</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">917</span>
+<span class="normal">918</span>
+<span class="normal">919</span>
+<span class="normal">920</span>
+<span class="normal">921</span>
+<span class="normal">922</span>
+<span class="normal">923</span>
+<span class="normal">924</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span>
+<span class="normal">929</span>
+<span class="normal">930</span>
+<span class="normal">931</span>
+<span class="normal">932</span>
+<span class="normal">933</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">newGPsep</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dK</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GPsep</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Instantiate a new GPsep model with automatic hyperparameter optimization.</span>
 
