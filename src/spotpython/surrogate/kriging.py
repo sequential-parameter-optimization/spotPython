@@ -13,13 +13,13 @@ class Kriging(BaseEstimator, RegressorMixin):
     Attributes:
         eps (float): A small regularization term to reduce ill-conditioning.
         penalty (float): The penalty value used if the correlation matrix is ill-conditioned.
-        logtheta_ (np.ndarray): Best-fit log(theta) parameters from fit().
+        logtheta_lambda_ (np.ndarray): Best-fit log(theta) parameters from fit().
         U_ (np.ndarray): The Cholesky factor of the correlation matrix after fit().
         X_ (np.ndarray): The training input data (n x d).
         y_ (np.ndarray): The training target values (n,).
     """
 
-    def __init__(self, eps: float = np.finfo(float).eps, penalty: float = 1e4):
+    def __init__(self, eps: float = np.finfo(float).eps, penalty: float = 1e4, noise=True):
         """
         Initializes the Kriging model.
 
@@ -33,10 +33,11 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         self.eps = eps
         self.penalty = penalty
-        self.logtheta_ = None
+        self.logtheta_lambda_ = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
+        self.noise = noise
 
     def get_params(self, deep: bool = True) -> Dict[str, float]:
         """
@@ -96,7 +97,7 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Initialize and fit the Kriging model
             >>> model = Kriging()
             >>> model.fit(X_train, y_train)
-            >>> print("Fitted log(theta):", model.logtheta_)
+            >>> print("Fitted log(theta):", model.logtheta_lambda_)
         """
         X = np.asarray(X)
         y = np.asarray(y).flatten()
@@ -105,18 +106,21 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         k = X.shape[1]
         if bounds is None:
-            bounds = [(-3.0, 2.0)] * k
+            if self.noise:
+                bounds = [(-3.0, 2.0)] * k + [(-6.0, 0.0)]
+            else:
+                bounds = [(-3.0, 2.0)] * k
 
         ModelInfo = {"X": self.X_, "y": self.y_}
-        self.logtheta_, _ = self.max_likelihood(bounds, ModelInfo)
+        self.logtheta_lambda_, _ = self.max_likelihood(bounds, ModelInfo)
 
-        # Once logtheta is found, compute the final correlation matrix
-        NegLnLike, Psi, U = self.likelihood(self.logtheta_, ModelInfo)
+        # Once logtheta_lambda is found, compute the final correlation matrix
+        NegLnLike, Psi, U = self.likelihood(self.logtheta_lambda_, ModelInfo)
         self.U_ = U
 
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray, return_std=False) -> np.ndarray:
         """
         Predicts the Kriging response at a set of points X. This method is compatible
         with scikit-learn and returns predictions for the input points.
@@ -125,10 +129,16 @@ class Kriging(BaseEstimator, RegressorMixin):
             X (np.ndarray):
                 Array of shape (n_samples, n_features) containing the points at which
                 to predict the Kriging response.
+            return_std (bool, optional):
+                If True, returns the standard deviation of the predictions as well.
+                Defaults to False.
 
         Returns:
             np.ndarray:
                 Predicted values of shape (n_samples,).
+            np.ndarray:
+                If self.return_std is True, returns the standard deviations of the predictions
+                of shape (n_samples,).
 
         Examples:
             >>> import numpy as np
@@ -141,15 +151,20 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Test data
             >>> X_test = np.array([[0.25, 0.25], [0.75, 0.75]])
             >>> # Predict responses
-            >>> y_pred = model.predict(X_test)
+            >>> y_pred, sd = model.predict(X_test)
             >>> print("Predictions:", y_pred)
+            >>> print("Standard deviations:", sd)
         """
-        # Create a ModelInfo dict with the final logtheta_ and U_:
-        ModelInfo = {"X": self.X_, "y": self.y_, "Theta": self.logtheta_, "U": self.U_}
+        # Create a ModelInfo dict with the final logtheta_lambda_ and U_:
+        ModelInfo = {"X": self.X_, "y": self.y_, "Theta_Lambda": self.logtheta_lambda_, "U": self.U_}
 
         X = np.atleast_2d(X)
-        predictions = [self._pred(x_i, ModelInfo) for x_i in X]
-        return np.array(predictions)
+        if return_std:
+            predictions, std_devs = zip(*[self._pred(x_i, ModelInfo) for x_i in X])
+            return np.array(predictions), np.array(std_devs)
+        else:
+            predictions = [self._pred(x_i, ModelInfo)[0] for x_i in X]
+            return np.array(predictions)
 
     def likelihood(self, x: np.ndarray, ModelInfo: Dict[str, np.ndarray]) -> Tuple[float, np.ndarray, np.ndarray]:
         """
@@ -158,8 +173,11 @@ class Kriging(BaseEstimator, RegressorMixin):
         negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.
 
         Args:
-            x (np.ndarray): 1D array of log(theta) parameters of length k.
-            ModelInfo (Dict[str, np.ndarray]): Contains "X" (design points) and "y" (targets).
+            x (np.ndarray):
+                1D array of log(theta) parameters of length k. If self.noise is True,
+                length is k+1 and the last element of x is the log(noise) parameter.
+            ModelInfo (Dict[str, np.ndarray]):
+                Contains "X" (design points) and "y" (targets).
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -172,7 +190,15 @@ class Kriging(BaseEstimator, RegressorMixin):
         X = ModelInfo["X"]
         y = ModelInfo["y"].flatten()
 
-        theta = 10.0**x
+        if self.noise:
+            theta = x[:-1]
+            lambda_ = x[-1]
+        else:
+            theta = x
+            lambda_ = self.eps
+
+        theta = 10.0**theta
+        lambda_ = 10.0**lambda_
         p = 1.99
         n = X.shape[0]
         one = np.ones(n)
@@ -184,7 +210,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 dist_vec = np.abs(X[i, :] - X[j, :]) ** p
                 Psi[i, j] = np.exp(-np.sum(theta * dist_vec))
 
-        Psi = Psi + Psi.T + np.eye(n) + np.eye(n) * self.eps
+        Psi = Psi + Psi.T + np.eye(n) + np.eye(n) * lambda_
 
         try:
             U = np.linalg.cholesky(Psi)
@@ -214,14 +240,25 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Args:
             x (np.ndarray): 1D array of length k for the point at which to predict.
-            ModelInfo (Dict[str, np.ndarray]): Must contain "X", "y", "Theta", and "U".
+            ModelInfo (Dict[str, np.ndarray]): Must contain "X", "y", "Theta_Lambda", and "U".
 
         Returns:
             float: The Kriging prediction at x.
+            float: The standard deviation of the prediction.
         """
         X = ModelInfo["X"]
         y = ModelInfo["y"].flatten()
-        theta = 10.0 ** ModelInfo["Theta"]
+
+        if self.noise:
+            theta = ModelInfo["Theta_Lambda"][:-1]
+            lambda_ = ModelInfo["Theta_Lambda"][-1]
+        else:
+            theta = ModelInfo["Theta_Lambda"]
+            lambda_ = self.eps
+
+        theta = 10.0**theta
+        lambda_ = 10.0**lambda_
+
         U = ModelInfo["U"]
 
         p = 1.99
@@ -235,19 +272,33 @@ class Kriging(BaseEstimator, RegressorMixin):
         one_tilde = np.linalg.solve(U.T, one_tilde)
         mu = (one @ y_tilde) / (one @ one_tilde)
 
+        resid = y - one * mu
+        resid_tilde = np.linalg.solve(U, resid)
+        resid_tilde = np.linalg.solve(U.T, resid_tilde)
+
         # Build psi
         psi = np.ones(n)
         for i in range(n):
             dist_vec = np.abs(X[i, :] - x) ** p
             psi[i] = np.exp(-np.sum(theta * dist_vec))
 
+        # Compute SigmaSqr
+        SigmaSqr = (resid @ resid_tilde) / n
+        # Compute SSqr
+        psi_tilde = np.linalg.solve(U, psi)
+        psi_tilde = np.linalg.solve(U.T, psi_tilde)
+        SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
+        # Compute s
+        s = np.abs(SSqr) ** 0.5
+
         # Final prediction
-        resid = y - one * mu
-        resid_tilde = np.linalg.solve(U, resid)
-        resid_tilde = np.linalg.solve(U.T, resid_tilde)
+        # TODO: check igf the following is can be omitted:
+        # resid = y - one * mu
+        # resid_tilde = np.linalg.solve(U, resid)
+        # resid_tilde = np.linalg.solve(U.T, resid_tilde)
         f = mu + psi @ resid_tilde
 
-        return float(f)
+        return float(f), float(s)
 
     def max_likelihood(self, bounds: List[Tuple[float, float]], ModelInfo: Dict[str, np.ndarray]) -> Tuple[np.ndarray, float]:
         """
@@ -263,8 +314,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             optimal log(theta) array and best_fun is the minimized negative log-likelihood.
         """
 
-        def objective(logtheta):
-            neg_ln_like, _, _ = self.likelihood(logtheta, ModelInfo)
+        def objective(logtheta_lambda):
+            neg_ln_like, _, _ = self.likelihood(logtheta_lambda, ModelInfo)
             return neg_ln_like
 
         result = differential_evolution(objective, bounds)
