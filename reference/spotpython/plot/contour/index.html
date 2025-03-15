@@ -1169,6 +1169,8 @@
       
         
       
+        
+      
     
     
       
@@ -1275,6 +1277,27 @@
   
   <span class="md-ellipsis">
     objectivefunctions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fun/xai_hyperlight/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    xai_hyperlight
   </span>
   
 
@@ -3475,6 +3498,8 @@
       
         
       
+        
+      
     
     
       
@@ -3623,6 +3648,27 @@
   
   <span class="md-ellipsis">
     eda
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../utils/effects/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    effects
   </span>
   
 
@@ -4634,10 +4680,7 @@ combinations of input variables, avoiding redundancies and meaningless combinati
 
             <details class="quote">
               <summary>Source code in <code>spotpython/plot/contour.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span>
-<span class="normal">350</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">350</span>
 <span class="normal">351</span>
 <span class="normal">352</span>
 <span class="normal">353</span>
@@ -4793,7 +4836,10 @@ combinations of input variables, avoiding redundancies and meaningless combinati
 <span class="normal">503</span>
 <span class="normal">504</span>
 <span class="normal">505</span>
-<span class="normal">506</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plotCombinations</span><span class="p">(</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plotCombinations</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">lower</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -5734,7 +5780,10 @@ with point_color_below; otherwise, it is colored with point_color_above.</p>
 <span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span>
-<span class="normal">344</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plotModel</span><span class="p">(</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plotModel</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">lower</span><span class="p">,</span>
     <span class="n">upper</span><span class="p">,</span>
@@ -5942,6 +5991,7 @@ with point_color_below; otherwise, it is colored with point_color_above.</p>
         <span class="n">on_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">z_actual</span><span class="p">,</span> <span class="n">z_pred_for_point</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="n">atol</span><span class="p">)</span>
         <span class="n">below_mask</span> <span class="o">=</span> <span class="n">z_actual</span> <span class="o">-</span> <span class="n">atol</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">&lt;</span> <span class="n">z_pred_for_point</span>
         <span class="n">above_mask</span> <span class="o">=</span> <span class="n">z_actual</span> <span class="o">+</span> <span class="n">atol</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">&gt;</span> <span class="n">z_pred_for_point</span>
+        <span class="n">num_correct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">on_mask</span><span class="p">)</span>
 
         <span class="c1"># 2D contour scatter</span>
         <span class="n">ax_contour</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
@@ -6010,7 +6060,9 @@ with point_color_below; otherwise, it is colored with point_color_above.</p>
 
     <span class="c1"># --- Title, save, and show ---</span>
     <span class="k">if</span> <span class="n">title</span><span class="p">:</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">updated_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">  Correct Points: </span><span class="si">{</span><span class="n">num_correct</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">updated_title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">legend_fontsize</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
