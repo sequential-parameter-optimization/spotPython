@@ -12,6 +12,8 @@ class Analytical:
             Offset value. Defaults to 0.0.
         seed (int):
             Seed value for random number generation. Defaults to 126.
+        fun_control (dict):
+            Dictionary containing control parameters for the function. Defaults to None.
 
     Notes:
         See [Numpy Random Sampling](https://numpy.org/doc/stable/reference/random/index.html#random-quick-start)
@@ -29,12 +31,22 @@ class Analytical:
             Dictionary containing control parameters for the function.
     """
 
-    def __init__(self, offset: float = 0.0, sigma=0.0, seed: int = 126) -> None:
+    def __init__(self, offset: float = 0.0, sigma=0.0, seed: int = 126, fun_control=None) -> None:
         self.offset = offset
         self.sigma = sigma
         self.seed = seed
         self.rng = default_rng(seed=self.seed)
-        self.fun_control = {"sigma": sigma, "seed": None, "sel_var": None}
+        self.fun_control = {"offset": offset, "sigma": self.sigma, "seed": self.seed}
+        # overwrite fun_control with user input if provided
+        if fun_control is not None:
+            self.fun_control = fun_control
+        # check if fun_control contains offset, sigma and seed, if not, add them
+        if "offset" not in self.fun_control:
+            self.fun_control["offset"] = self.offset
+        if "sigma" not in self.fun_control:
+            self.fun_control["sigma"] = self.sigma
+        if "seed" not in self.fun_control:
+            self.fun_control["seed"] = self.seed
 
     def __repr__(self) -> str:
         return f"analytical(offset={self.offset}, sigma={self.sigma}, seed={self.seed})"
@@ -142,19 +154,67 @@ class Analytical:
                 dict with entries `sigma` (noise level) and `seed` (random seed).
 
         Returns:
-            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
+            np.ndarray: A 1D numpy array with shape (n,) containing the calculated values, which were obtained by
+            summing the weighted input values after subtracting the offset. Noise can be added to the output. An intercept
+            can be provided by setting the `alpha` key in the `fun_control` dictionary. If the `beta` key is provided, the
+            weighted sum is computed. If `beta` is not provided, the sum of the input values is computed.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
-            >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
-            >>> fun.fun_linear(X)
-            array([ 6., 15.])
+            >>> # Without offset and without noise
+            >>> user_fun = UserAnalytical()
+            >>> X = np.array([[0, 0, 0], [1, 1, 1]])
+            >>> results = user_fun.fun_user_function(X)
+            >>> print(results)
+            >>>
+            >>> # With offset and without noise
+            >>> user_fun = UserAnalytical(offset=1.0)
+            >>> X = np.array([[0, 0, 0], [1, 1, 1]])
+            >>> results = user_fun.fun_user_function(X)
+            >>> print(results)
+            >>>
+            >>> # With offset and noise
+            >>> user_fun = UserAnalytical(offset=1.0, sigma=0.1, seed=1)
+            >>> X = np.array([[0, 0, 0], [1, 1, 1]])
+            >>> results = user_fun.fun_user_function(X)
+            >>> print(results)
+            >>>
+            >>> # Provide alpha (intercept), no beta
+            >>> fun_control = {"alpha": 10.0}
+            >>> fun.fun_linear(X, fun_control=fun_control)
+            >>> array([16., 25.])
+            >>>
+            >>> # Provide alpha and beta (weighted sum with intercept)
+            >>> fun_control = {"alpha": 2.0, "beta": [1.0, 2.0, 3.0]}
+            >>> fun.fun_linear(X, fun_control=fun_control)
+            array([14., 32.])
+                [0. 3.]
+                [3. 0.]
+                [3.03455842 0.08216181]
 
         """
         X = self._prepare_input_data(X, fun_control)
-        y = np.sum(X, axis=1)
+        offset = np.ones(X.shape[1]) * self.offset
+
+        alpha = self.fun_control.get("alpha", 0.0)
+        beta = self.fun_control.get("beta", None)
+        if beta is not None:
+            # check if beta is a numpy array
+            if not isinstance(beta, np.ndarray):
+                # convert beta to numpy array of shape (n,), where n is the number of columns in X
+                beta = np.array(beta)
+            if beta.shape[0] != X.shape[1]:
+                raise Exception("beta must have the same number of elements as the number of columns in X")
+
+        # Compute the linear response
+        if beta is not None:
+            # Weighted sum with intercept
+            y = alpha + np.dot(X - offset, beta)
+        else:
+            # Original behavior: just sum the rows
+            y = alpha + np.sum(X - offset, axis=1)
+
         return self._add_noise(y)
 
     def fun_sphere(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:

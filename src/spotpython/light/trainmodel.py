@@ -6,7 +6,6 @@ from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.callbacks import ModelCheckpoint
 from torch.utils.data import DataLoader
 from captum.attr import IntegratedGradients, DeepLift, KernelShap
-import pandas as pd
 import torch
 import os
 
