@@ -324,10 +324,6 @@ class GPsep(BaseEstimator, RegressorMixin):
         Initialize the GP model with data and hyperparameters.
 
         Args:
-            X (np.ndarray):
-                Input data matrix of shape (n, m). If pandas DataFrame, will be converted to numpy array.
-            y (np.ndarray):
-                Output data vector of length n. If pandas Series, will be converted to numpy array.
             d (np.ndarray):
                 Length-scale parameters.
             g (float):
@@ -348,6 +344,8 @@ class GPsep(BaseEstimator, RegressorMixin):
                 Whether to automatically optimize hyperparameters using MLE. Default is True.
             max_points (int):
                 Maximum number of points to use for the model building. Default is None, which means all points are used.
+            seed (int):
+                Random seed for reproducibility. Default is 123.
         """
         # Hyperparameters (do not store training data)
         self.d = d
@@ -462,6 +460,14 @@ class GPsep(BaseEstimator, RegressorMixin):
 
         Raises:
             ValueError: If X has no rows or if X and y dimensions mismatch.
+
+        Examples:
+            >>> from spotpython.gp.gp_sep import GPsep
+            >>> import numpy as np
+            >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+            >>> y = np.array([1, 2, 3])
+            >>> model = GPsep()
+            >>> model.fit(X, y)
         """
         # if X or y are pandas dataframes or series, convert them to numpy arrays
         if hasattr(X, "to_numpy"):
