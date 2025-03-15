@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Tuple, Optional
+import matplotlib.pyplot as plt
 
 
 def fullfactorial(q, Edges=1) -> np.ndarray:
@@ -275,3 +276,399 @@ def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> 
     # This follows the Morris-Mitchell definition.
     Phiq = np.sum(J * (d ** (-q))) ** (1.0 / q)
     return Phiq
+
+
+def mmsort(X3D: np.ndarray, p: Optional[float] = 1.0) -> np.ndarray:
+    """
+    Ranks multiple sampling plans stored in a 3D array according to the
+    Morris-Mitchell criterion, using a simple bubble sort.
+
+    Args:
+        X3D (np.ndarray):
+            A 3D NumPy array of shape (n, d, m), where m is the number of
+            sampling plans, and each plan is an (n, d) matrix of points.
+        p (float, optional):
+            The distance metric to use. p=1 for Manhattan (L1), p=2 for
+            Euclidean (L2). Defaults to 1.0.
+
+    Returns:
+        np.ndarray:
+            A 1D integer array of length m that holds the plan indices in
+            ascending order of space-filling quality. The first index in the
+            returned array corresponds to the most space-filling plan.
+
+    Example:
+        >>> import numpy as np
+        >>> from your_module import mmsort
+        >>> # Suppose we have two 3-point sampling plans in 2D, stored in X3D:
+        >>> X1 = np.array([[0.0, 0.0],
+        ...                [0.5, 0.5],
+        ...                [1.0, 1.0]])
+        >>> X2 = np.array([[0.2, 0.2],
+        ...                [0.6, 0.4],
+        ...                [0.9, 0.9]])
+        >>> # Stack them along the third dimension: shape will be (3, 2, 2)
+        >>> X3D = np.stack([X1, X2], axis=2)
+        >>> # Sort them using the Morris-Mitchell criterion with p=2
+        >>> ranking = mmsort(X3D, p=2.0)
+        >>> print(ranking)
+        # It might print [2 1] or [1 2], depending on which plan is more space-filling.
+    """
+    # Number of plans (m)
+    m = X3D.shape[2]
+
+    # Create index array (1-based to match original MATLAB convention)
+    Index = np.arange(1, m + 1)
+
+    swap_flag = True
+    while swap_flag:
+        swap_flag = False
+        i = 0
+        while i < m - 1:
+            # Compare plan at Index[i] vs. Index[i+1] using mm()
+            # Note: subtract 1 from each index to convert to 0-based array indexing
+            if mm(X3D[:, :, Index[i] - 1], X3D[:, :, Index[i + 1] - 1], p) == 2:
+                # Swap indices if the second plan is more space-filling
+                Index[i], Index[i + 1] = Index[i + 1], Index[i]
+                swap_flag = True
+            i += 1
+
+    return Index
+
+
+def perturb(X: np.ndarray, PertNum: Optional[int] = 1) -> np.ndarray:
+    """
+    Performs a specified number of random element swaps on a sampling plan.
+    If the plan is a Latin hypercube, the result remains a valid Latin hypercube.
+
+    Args:
+        X (np.ndarray):
+            A 2D array (sampling plan) of shape (n, k), where each row is a point
+            and each column is a dimension.
+        PertNum (int, optional):
+            The number of element swaps (perturbations) to perform. Defaults to 1.
+
+    Returns:
+        np.ndarray:
+            The perturbed sampling plan, identical in shape to the input, with
+            one or more random column swaps executed.
+
+    Example:
+        >>> import numpy as np
+        >>> from your_module import perturb
+        >>> # Create a simple 4x2 sampling plan
+        >>> X_original = np.array([
+        ...     [1, 3],
+        ...     [2, 4],
+        ...     [3, 1],
+        ...     [4, 2]
+        ... ])
+        >>> # Perturb it once
+        >>> X_perturbed = perturb(X_original, PertNum=1)
+        >>> print(X_perturbed)
+        # The output may differ due to random swaps, but each column is still a permutation of [1,2,3,4].
+    """
+    # Get dimensions of the plan
+    n, k = X.shape
+
+    for _ in range(PertNum):
+        # Pick a random column
+        col = int(np.floor(np.random.rand() * k))
+
+        # Pick two distinct row indices
+        el1, el2 = 0, 0
+        while el1 == el2:
+            el1 = int(np.floor(np.random.rand() * n))
+            el2 = int(np.floor(np.random.rand() * n))
+
+        # Swap the two selected elements in the chosen column
+        X[el1, col], X[el2, col] = X[el2, col], X[el1, col]
+
+    return X
+
+
+def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[float] = 2.0, plot=False) -> np.ndarray:
+    """
+    Performs an evolutionary search (using perturbations) to find a Morris-Mitchell
+    optimal Latin hypercube, starting from an initial plan X_start.
+
+    This function does the following:
+      1. Initializes a "best" Latin hypercube (X_best) from the provided X_start.
+      2. Iteratively perturbs X_best to create offspring.
+      3. Evaluates the space-fillingness of each offspring via the Morris-Mitchell
+         metric (using mmphi).
+      4. Updates the best plan whenever a better offspring is found.
+
+    Args:
+        X_start (np.ndarray):
+            A 2D array of shape (n, k) providing the initial Latin hypercube
+            (n points in k dimensions).
+        population (int):
+            Number of offspring to create in each generation.
+        iterations (int):
+            Total number of generations to run the evolutionary search.
+        q (float, optional):
+            The exponent used by the Morris-Mitchell space-filling criterion.
+            Defaults to 2.0.
+        plot (bool, optional):
+            If True, a simple scatter plot of the first two dimensions will be
+            displayed at each iteration. Only if k >= 2. Defaults to False.
+
+    Returns:
+        np.ndarray:
+            A 2D array representing the most space-filling Latin hypercube found
+            after all iterations, of the same shape as X_start.
+
+    Example:
+        >>> import numpy as np
+        >>> from your_module import mmlhs
+        >>> # Suppose we have an initial 4x2 plan
+        >>> X_start = np.array([
+        ...     [0, 0],
+        ...     [1, 3],
+        ...     [2, 1],
+        ...     [3, 2]
+        ... ])
+        >>> # Search for a more space-filling plan
+        >>> X_opt = mmlhs(X_start, population=5, iterations=10, q=2)
+        >>> print("Optimized plan:")
+        >>> print(X_opt)
+    """
+    n = X_start.shape[0]
+
+    # Initialize best plan and its metric
+    X_best = X_start.copy()
+    Phi_best = mmphi(X_best, q=q)
+
+    # After 85% of iterations, reduce the mutation rate to 1
+    leveloff = int(np.floor(0.85 * iterations))
+
+    for it in range(1, iterations + 1):
+        # Decrease number of mutations over time
+        if it < leveloff:
+            mutations = int(round(1 + (0.5 * n - 1) * (leveloff - it) / (leveloff - 1)))
+        else:
+            mutations = 1
+
+        X_improved = X_best.copy()
+        Phi_improved = Phi_best
+
+        # Create offspring, evaluate, and keep the best
+        for _ in range(population):
+            X_try = perturb(X_best.copy(), mutations)
+            Phi_try = mmphi(X_try, q=q)
+
+            if Phi_try < Phi_improved:
+                X_improved = X_try
+                Phi_improved = Phi_try
+
+        # Update the global best if we found a better plan
+        if Phi_improved < Phi_best:
+            X_best = X_improved
+            Phi_best = Phi_improved
+
+        # Simple visualization of the first two dimensions
+        if plot and (X_best.shape[1] >= 2):
+            plt.clf()
+            plt.scatter(X_best[:, 0], X_best[:, 1], marker="o")
+            plt.title(f"Iteration {it} - Current Best Plan")
+            plt.pause(0.01)
+
+    return X_best
+
+
+def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False) -> np.ndarray:
+    """
+    Generates an optimized Latin hypercube by evolving the Morris-Mitchell
+    criterion across multiple exponents (q values) and selecting the best plan.
+
+    Args:
+        n (int):
+            Number of points required in the Latin hypercube.
+        k (int):
+            Number of design variables (dimensions).
+        population (int):
+            Number of offspring in each generation of the evolutionary search.
+        iterations (int):
+            Number of generations for the evolutionary search.
+        p (int, optional):
+            The distance norm to use. p=1 for Manhattan (L1), p=2 for Euclidean (L2).
+            Defaults to 1 (faster than 2).
+        plot (bool, optional):
+            If True, a scatter plot of the optimized plan in the first two dimensions
+            will be displayed. Only if k>=2.  Defaults to False.
+
+    Returns:
+        np.ndarray:
+            A 2D array of shape (n, k) representing an optimized Latin hypercube.
+
+    Example:
+        >>> from your_module import bestlh
+        >>> # Generate a 5-point plan in 2D
+        >>> X_opt = bestlh(n=5, k=2, population=5, iterations=10)
+        >>> print(X_opt)
+        # Prints the optimized Latin hypercube after the search.
+    """
+    if k < 2:
+        raise ValueError("Latin hypercubes are not defined for k < 2")
+
+    # A list of exponents (q) to optimize
+    q_list = [1, 2, 5, 10, 20, 50, 100]
+
+    # Start with a random Latin hypercube
+    X_start = rlh(n, k, edges=1)
+
+    # Allocate a 3D array to store the results for each q
+    # (shape: (n, k, number_of_q_values))
+    X3D = np.zeros((n, k, len(q_list)))
+
+    # Evolve the plan for each q in q_list
+    for i, q_val in enumerate(q_list):
+        print(f"Now optimizing for q={q_val}...")
+        X3D[:, :, i] = mmlhs(X_start, population, iterations, q_val)
+
+    # Sort the set of evolved plans according to the Morris-Mitchell criterion
+    index_order = mmsort(X3D, p=p)
+
+    # index_order is a 1-based array of plan indices; the first element is the best
+    best_idx = index_order[0] - 1
+    print(f"Best lh found using q={q_list[best_idx]}...")
+
+    # The best plan in 3D array order
+    X = X3D[:, :, best_idx]
+
+    # Plot the first two dimensions
+    if plot and (k >= 2):
+        plt.scatter(X[:, 0], X[:, 1], c="r", marker="o")
+        plt.title(f"Morris-Mitchell optimum plan found using q={q_list[best_idx]}")
+        plt.xlabel("x_1")
+        plt.ylabel("x_2")
+        plt.show()
+
+    return X
+
+
+def phisort(X3D: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> np.ndarray:
+    """
+    Ranks multiple sampling plans stored in a 3D array by the Morris-Mitchell
+    numerical quality metric (mmphi). Uses a simple bubble-sort:
+    sampling plans with smaller mmphi values are placed first in the index array.
+
+    Args:
+        X3D (np.ndarray):
+            A 3D array of shape (n, d, m), where m is the number of sampling plans.
+        q (float, optional):
+            Exponent for the mmphi metric. Defaults to 2.0.
+        p (float, optional):
+            Distance norm for mmphi. p=1 is Manhattan; p=2 is Euclidean. Defaults to 1.0.
+
+    Returns:
+        np.ndarray:
+            A 1D integer array of length m, giving the plan indices in ascending
+            order of mmphi. The first index in the returned array corresponds
+            to the numerically lowest mmphi value.
+
+    Example:
+        >>> import numpy as np
+        >>> from your_module import phisort
+        >>> # Suppose X3D has two sampling plans in X3D[:, :, 0] and X3D[:, :, 1]
+        >>> ranking = phisort(X3D, q=2, p=1)
+        >>> print("Sorted plan indices:", ranking)
+    """
+    # Number of 2D sampling plans
+    m = X3D.shape[2]
+
+    # Create a 1-based index array
+    Index = np.arange(1, m + 1)
+
+    # Bubble-sort: plan with lower mmphi() climbs toward the front
+    swap_flag = True
+    while swap_flag:
+        swap_flag = False
+        for i in range(m - 1):
+            # Retrieve mmphi values for consecutive plans
+            val_i = mmphi(X3D[:, :, Index[i] - 1], q=q, p=p)
+            val_j = mmphi(X3D[:, :, Index[i + 1] - 1], q=q, p=p)
+
+            # Swap if the left plan's mmphi is larger (i.e. 'worse')
+            if val_i > val_j:
+                Index[i], Index[i + 1] = Index[i + 1], Index[i]
+                swap_flag = True
+
+    return Index
+
+
+def subset(X: np.ndarray, ns: int) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Returns a space-filling subset of a given size from a sampling plan, along with
+    the remainder. It repeatedly attempts to substitute each point in the subset
+    with a point from the remainder if doing so improves the Morris-Mitchell metric.
+
+    Args:
+        X (np.ndarray):
+            A 2D array representing the original sampling plan, of shape (n, d).
+        ns (int):
+            The size of the desired subset.
+
+    Returns:
+        (np.ndarray, np.ndarray):
+            A tuple (Xs, Xr) where:
+            - Xs is the chosen subset of size ns, with space-filling properties.
+            - Xr is the remainder (X \\ Xs).
+
+    Example:
+        >>> import numpy as np
+        >>> from your_module import subset
+        >>> # An example 5-point plan in 2D
+        >>> X = np.array([
+        ...     [0.0, 0.0],
+        ...     [0.0, 1.0],
+        ...     [1.0, 0.0],
+        ...     [1.0, 1.0],
+        ...     [0.5, 0.5]
+        ... ])
+        >>> # Extract a subset of size 3
+        >>> Xs, Xr = subset(X, ns=3)
+        >>> print("Subset:\n", Xs)
+        >>> print("Remainder:\n", Xr)
+        # The subset is chosen to optimize Morris-Mitchell space-filling (p=1, q=5).
+    """
+    # Number of total points
+    n = X.shape[0]
+
+    # Morris-Mitchell parameters
+    p = 1
+    q = 5
+
+    # Create a random permutation of row indices
+    r = np.random.permutation(n)
+
+    # Initial subset and remainder
+    Xs = X[r[:ns], :].copy()
+    Xr = X[r[ns:], :].copy()
+
+    # Attempt to improve space-filling by swapping points
+    for j in range(ns):
+        orig_crit = mmphi(Xs, q=q, p=p)
+        orig_point = Xs[j, :].copy()
+
+        # Track best substitution index and metric
+        bestsub = 0
+        bestsubcrit = np.inf
+
+        # Try replacing Xs[j] with each candidate in Xr
+        for i in range(n - ns):
+            Xs[j, :] = Xr[i, :]
+            crit = mmphi(Xs, q=q, p=p)
+            if crit < bestsubcrit:
+                bestsubcrit = crit
+                bestsub = i
+
+        # If a better subset is found, swap permanently
+        if bestsubcrit < orig_crit:
+            Xs[j, :] = Xr[bestsub, :].copy()
+            Xr[bestsub, :] = orig_point
+        else:
+            Xs[j, :] = orig_point
+
+    return Xs, Xr
