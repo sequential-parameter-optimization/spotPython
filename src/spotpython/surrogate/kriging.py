@@ -20,7 +20,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         y_ (np.ndarray): The training target values (n,).
     """
 
-    def __init__(self, eps: float = None, penalty: float = 1e4, noise=True):
+    def __init__(self, eps: float = None, penalty: float = 1e4, method="regression"):
         """
         Initializes the Kriging model.
 
@@ -28,13 +28,13 @@ class Kriging(BaseEstimator, RegressorMixin):
             eps (float, optional):
                 Small number added to the diagonal of the correlation matrix to reduce
                 ill-conditioning. Defaults to the square root of machine epsilon.
-                Only used if noise is False. If noise is True, eps is replaced by the
+                Only used if method is "interpolation". Otherwise, if method is "regression" or "reinterpolation", eps is replaced by the
                 lambda_ parameter. Defaults to None.
             penalty (float, optional):
                 Large negative log-likelihood assigned if the correlation matrix is
                 not positive-definite. Defaults to 1e4.
-            noise (bool, optional):
-                If True, includes a noise parameter in the optimization. Defaults to True.
+            method (str, optional):
+                The type how the model uis fitted. Can be "interpolation", "regression", or "reinterpolation". Defaults to "regression".
         """
         if eps is None:
             self.eps = self._get_eps()
@@ -44,13 +44,15 @@ class Kriging(BaseEstimator, RegressorMixin):
                 raise ValueError("eps must be positive")
             self.eps = eps
         self.penalty = penalty
-        self.noise = noise
         self.logtheta_lambda_ = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
         self.NegLnLike_ = None
         self.Psi_ = None
+        if method not in ["interpolation", "regression", "reinterpolation"]:
+            raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation']")
+        self.method = method
 
     def _get_eps(self) -> float:
         """
@@ -106,10 +108,11 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         k = X.shape[1]
         if bounds is None:
-            if self.noise:
-                bounds = [(-3.0, 2.0)] * k + [(-6.0, 0.0)]
-            else:
+            if self.method == "interpolation":
                 bounds = [(-3.0, 2.0)] * k
+            else:
+                # regression and reinterpolation use lambda_ as well
+                bounds = [(-3.0, 2.0)] * k + [(-6.0, 0.0)]
 
         self.logtheta_lambda_, _ = self.max_likelihood(bounds)
 
@@ -182,8 +185,8 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Args:
             x (np.ndarray):
-                1D array of log(theta) parameters of length k. If self.noise is True,
-                length is k+1 and the last element of x is the log(noise) parameter.
+                1D array of log(theta) parameters of length k. If self.method is "regression" or
+                "reinterpolation", length is k+1 and the last element of x is the log(noise) parameter.
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -196,18 +199,20 @@ class Kriging(BaseEstimator, RegressorMixin):
         X = self.X_
         y = self.y_.flatten()
 
-        if self.noise:
+        if (self.method == "regression") or (self.method == "reinterpolation"):
             theta = x[:-1]
             # theta is in log scale, so transform it back:
             theta = 10.0**theta
             lambda_ = x[-1]
             # lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
-        else:
+        elif self.method == "interpolation":
             theta = x
             theta = 10.0**theta
             # use the original, untransformed eps:
             lambda_ = self.eps
+        else:
+            raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
         p = 1.99
         n = X.shape[0]
@@ -254,20 +259,21 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             float: The Kriging prediction at x.
             float: The standard deviation of the prediction.
+            float: The NEGATIVE expected improvement at x.
         """
         X = self.X_
         y = self.y_.flatten()
 
-        if self.noise:
-            theta = self.logtheta_lambda_[:-1]
-            theta = 10.0**theta
-            lambda_ = self.logtheta_lambda_[-1]
-            lambda_ = 10.0**lambda_
-        else:
+        if self.method == "interpolation":
             theta = self.logtheta_lambda_
             theta = 10.0**theta
             # lambda is not transformed back:
             lambda_ = self.eps
+        else:
+            theta = self.logtheta_lambda_[:-1]
+            theta = 10.0**theta
+            lambda_ = self.logtheta_lambda_[-1]
+            lambda_ = 10.0**lambda_
 
         U = self.U_
 
@@ -292,21 +298,30 @@ class Kriging(BaseEstimator, RegressorMixin):
             dist_vec = np.abs(X[i, :] - x) ** p
             psi[i] = np.exp(-np.sum(theta * dist_vec))
 
-        # Compute SigmaSqr
-        SigmaSqr = (resid @ resid_tilde) / n
-        # Compute SSqr
-        psi_tilde = np.linalg.solve(U, psi)
-        psi_tilde = np.linalg.solve(U.T, psi_tilde)
-        # Eq. (3.1) in [forr08a] without lambda:
-        SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
+        # Compute SigmaSqr and SSqr
+        if (self.method == "interpolation") or (self.method == "regression"):
+            SigmaSqr = (resid @ resid_tilde) / n
+            # Compute SSqr
+            psi_tilde = np.linalg.solve(U, psi)
+            psi_tilde = np.linalg.solve(U.T, psi_tilde)
+            # Eq. (3.1) in [forr08a] without lambda:
+            SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
+        else:
+            # method is "reinterpolation"
+            Psi_adjusted = self.Psi_ - np.eye(n) * lambda_ + np.eye(n) * self.eps
+            SigmaSqr = (resid @ np.linalg.solve(U.T, np.linalg.solve(U, Psi_adjusted @ resid_tilde))) / n
+            # Compute Uint (Cholesky factor of the adjusted Psi matrix)
+            Uint = np.linalg.cholesky(Psi_adjusted)
+
+            # Compute SSqr
+            psi_tilde = np.linalg.solve(Uint, psi)
+            psi_tilde = np.linalg.solve(Uint.T, psi_tilde)
+            SSqr = SigmaSqr * (1 - psi @ psi_tilde)
+
         # Compute s
         s = np.abs(SSqr) ** 0.5
 
         # Final prediction
-        # TODO: check igf the following is can be omitted:
-        # resid = y - one * mu
-        # resid_tilde = np.linalg.solve(U, resid)
-        # resid_tilde = np.linalg.solve(U.T, resid_tilde)
         f = mu + psi @ resid_tilde
 
         # Compute ExpImp
