@@ -111,11 +111,10 @@ class Kriging(BaseEstimator, RegressorMixin):
             else:
                 bounds = [(-3.0, 2.0)] * k
 
-        ModelInfo = {"X": self.X_, "y": self.y_}
-        self.logtheta_lambda_, _ = self.max_likelihood(bounds, ModelInfo)
+        self.logtheta_lambda_, _ = self.max_likelihood(bounds)
 
         # Once logtheta_lambda is found, compute the final correlation matrix
-        self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_, ModelInfo)
+        self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
         return self
 
     def predict(self, X: np.ndarray, return_std=False, return_ei=False) -> np.ndarray:
@@ -157,28 +156,25 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> print("Standard deviations:", sd)
             >>> print("Expected improvement:", ei)
         """
-        # Create a ModelInfo dict with the final logtheta_lambda_ and U_:
-        ModelInfo = {"X": self.X_, "y": self.y_, "Theta_Lambda": self.logtheta_lambda_, "U": self.U_}
-
         X = np.atleast_2d(X)
         if return_std and return_ei:
             # Return predictions, standard deviations, and expected improvements
-            predictions, std_devs, eis = zip(*[self._pred(x_i, ModelInfo) for x_i in X])
+            predictions, std_devs, eis = zip(*[self._pred(x_i) for x_i in X])
             return np.array(predictions), np.array(std_devs), np.array(eis)
         elif return_std:
             # Return predictions and standard deviations
-            predictions, std_devs = zip(*[self._pred(x_i, ModelInfo)[:2] for x_i in X])
+            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
             return np.array(predictions), np.array(std_devs)
         elif return_ei:
             # Return predictions and expected improvements
-            predictions, eis = zip(*[(self._pred(x_i, ModelInfo)[0], self._pred(x_i, ModelInfo)[2]) for x_i in X])
+            predictions, eis = zip(*[(self._pred(x_i)[0], self._pred(x_i)[2]) for x_i in X])
             return np.array(predictions), np.array(eis)
         else:
             # Return only predictions
-            predictions = [self._pred(x_i, ModelInfo)[0] for x_i in X]
+            predictions = [self._pred(x_i)[0] for x_i in X]
             return np.array(predictions)
 
-    def likelihood(self, x: np.ndarray, ModelInfo: Dict[str, np.ndarray]) -> Tuple[float, np.ndarray, np.ndarray]:
+    def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
         of log(theta) parameters using a power exponent p=1.99. Returns the
@@ -188,8 +184,6 @@ class Kriging(BaseEstimator, RegressorMixin):
             x (np.ndarray):
                 1D array of log(theta) parameters of length k. If self.noise is True,
                 length is k+1 and the last element of x is the log(noise) parameter.
-            ModelInfo (Dict[str, np.ndarray]):
-                Contains "X" (design points) and "y" (targets).
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -199,8 +193,8 @@ class Kriging(BaseEstimator, RegressorMixin):
                 - U (np.ndarray): The Cholesky factor (or None if ill-conditioned).
         """
         # Extract data
-        X = ModelInfo["X"]
-        y = ModelInfo["y"].flatten()
+        X = self.X_
+        y = self.y_.flatten()
 
         if self.noise:
             theta = x[:-1]
@@ -249,34 +243,33 @@ class Kriging(BaseEstimator, RegressorMixin):
         NegLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
         return NegLnLike, Psi, U
 
-    def _pred(self, x: np.ndarray, ModelInfo: Dict[str, np.ndarray]) -> float:
+    def _pred(self, x: np.ndarray) -> float:
         """
         Computes a single-point Kriging prediction using the correlation matrix
-        information in ModelInfo. Internal helper method.
+        information. Internal helper method.
 
         Args:
             x (np.ndarray): 1D array of length k for the point at which to predict.
-            ModelInfo (Dict[str, np.ndarray]): Must contain "X", "y", "Theta_Lambda", and "U".
 
         Returns:
             float: The Kriging prediction at x.
             float: The standard deviation of the prediction.
         """
-        X = ModelInfo["X"]
-        y = ModelInfo["y"].flatten()
+        X = self.X_
+        y = self.y_.flatten()
 
         if self.noise:
-            theta = ModelInfo["Theta_Lambda"][:-1]
+            theta = self.logtheta_lambda_[:-1]
             theta = 10.0**theta
-            lambda_ = ModelInfo["Theta_Lambda"][-1]
+            lambda_ = self.logtheta_lambda_[-1]
             lambda_ = 10.0**lambda_
         else:
-            theta = ModelInfo["Theta_Lambda"]
+            theta = self.logtheta_lambda_
             theta = 10.0**theta
             # lambda is not transformed back:
             lambda_ = self.eps
 
-        U = ModelInfo["U"]
+        U = self.U_
 
         p = 1.99
         n = X.shape[0]
@@ -322,16 +315,15 @@ class Kriging(BaseEstimator, RegressorMixin):
         EITermTwo = s * (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((yBest - f) ** 2 / SSqr))
         ExpImp = np.log10(EITermOne + EITermTwo + self.eps)
 
-        return float(f), float(s), float(ExpImp)
+        return float(f), float(s), float(-ExpImp)
 
-    def max_likelihood(self, bounds: List[Tuple[float, float]], ModelInfo: Dict[str, np.ndarray]) -> Tuple[np.ndarray, float]:
+    def max_likelihood(self, bounds: List[Tuple[float, float]]) -> Tuple[np.ndarray, float]:
         """
         Maximizes the Kriging likelihood function using differential evolution
         over the range of log(theta) specified by bounds.
 
         Args:
             bounds (List[Tuple[float, float]]): Sequence of (low, high) bounds for log(theta).
-            ModelInfo (Dict[str, np.ndarray]): The model data with "X" and "y".
 
         Returns:
             (np.ndarray, float): (best_x, best_fun) where best_x is the
@@ -339,7 +331,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
 
         def objective(logtheta_lambda):
-            neg_ln_like, _, _ = self.likelihood(logtheta_lambda, ModelInfo)
+            neg_ln_like, _, _ = self.likelihood(logtheta_lambda)
             return neg_ln_like
 
         result = differential_evolution(objective, bounds)
