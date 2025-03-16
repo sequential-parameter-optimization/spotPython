@@ -4533,7 +4533,7 @@
 
 
 <h2 id="spotpython.utils.sampling.bestlh" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">bestlh</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">bestlh</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></code>
 
 <a href="#spotpython.utils.sampling.bestlh" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -4639,6 +4639,20 @@ will be displayed. Only if k&gt;=2.  Defaults to False.</p>
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>verbosity</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Verbosity level. 0 is silent, 1 prints the best q value found. Defaults to 0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
             </td>
           </tr>
       </tbody>
@@ -4775,7 +4789,11 @@ Lesser General Public License along with this program. If not, see
 <span class="normal">702</span>
 <span class="normal">703</span>
 <span class="normal">704</span>
-<span class="normal">705</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bestlh</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">population</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bestlh</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">population</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates an optimized Latin hypercube by evolving the Morris-Mitchell</span>
 <span class="sd">    criterion across multiple exponents (q values) and selecting the best plan.</span>
@@ -4795,6 +4813,8 @@ Lesser General Public License along with this program. If not, see
 <span class="sd">        plot (bool, optional):</span>
 <span class="sd">            If True, a scatter plot of the optimized plan in the first two dimensions</span>
 <span class="sd">            will be displayed. Only if k&gt;=2.  Defaults to False.</span>
+<span class="sd">        verbosity (int, optional):</span>
+<span class="sd">            Verbosity level. 0 is silent, 1 prints the best q value found. Defaults to 0.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray:</span>
@@ -4836,7 +4856,8 @@ Lesser General Public License along with this program. If not, see
 
     <span class="c1"># Evolve the plan for each q in q_list</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">q_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">q_list</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Now optimizing for q=</span><span class="si">{</span><span class="n">q_val</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Now optimizing for q=</span><span class="si">{</span><span class="n">q_val</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
         <span class="n">X3D</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmlhs</span><span class="p">(</span><span class="n">X_start</span><span class="p">,</span> <span class="n">population</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">q_val</span><span class="p">)</span>
 
     <span class="c1"># Sort the set of evolved plans according to the Morris-Mitchell criterion</span>
@@ -4844,7 +4865,8 @@ Lesser General Public License along with this program. If not, see
 
     <span class="c1"># index_order is a 1-based array of plan indices; the first element is the best</span>
     <span class="n">best_idx</span> <span class="o">=</span> <span class="n">index_order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best lh found using q=</span><span class="si">{</span><span class="n">q_list</span><span class="p">[</span><span class="n">best_idx</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best lh found using q=</span><span class="si">{</span><span class="n">q_list</span><span class="p">[</span><span class="n">best_idx</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
 
     <span class="c1"># The best plan in 3D array order</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">X3D</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">best_idx</span><span class="p">]</span>
@@ -7058,11 +7080,7 @@ Lesser General Public License along with this program. If not, see
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/sampling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">708</span>
-<span class="normal">709</span>
-<span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">712</span>
 <span class="normal">713</span>
 <span class="normal">714</span>
 <span class="normal">715</span>
@@ -7126,7 +7144,11 @@ Lesser General Public License along with this program. If not, see
 <span class="normal">773</span>
 <span class="normal">774</span>
 <span class="normal">775</span>
-<span class="normal">776</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">phisort</span><span class="p">(</span><span class="n">X3D</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">phisort</span><span class="p">(</span><span class="n">X3D</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Ranks multiple sampling plans stored in a 3D array by the Morris-Mitchell</span>
 <span class="sd">    numerical quality metric (mmphi). Uses a simple bubble-sort:</span>
@@ -7572,11 +7594,7 @@ Lesser General Public License along with this program. If not, see
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/sampling.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">779</span>
-<span class="normal">780</span>
-<span class="normal">781</span>
-<span class="normal">782</span>
-<span class="normal">783</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">783</span>
 <span class="normal">784</span>
 <span class="normal">785</span>
 <span class="normal">786</span>
@@ -7654,7 +7672,11 @@ Lesser General Public License along with this program. If not, see
 <span class="normal">858</span>
 <span class="normal">859</span>
 <span class="normal">860</span>
-<span class="normal">861</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ns</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ns</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a space-filling subset of a given size from a sampling plan, along with</span>
 <span class="sd">    the remainder. It repeatedly attempts to substitute each point in the subset</span>
