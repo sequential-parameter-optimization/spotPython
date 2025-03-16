@@ -19,56 +19,55 @@ class Kriging(BaseEstimator, RegressorMixin):
         y_ (np.ndarray): The training target values (n,).
     """
 
-    def __init__(self, eps: float = np.finfo(float).eps, penalty: float = 1e4, noise=True):
+    def __init__(self, eps: float = None, penalty: float = 1e4, noise=True):
         """
         Initializes the Kriging model.
 
         Args:
             eps (float, optional):
                 Small number added to the diagonal of the correlation matrix to reduce
-                ill-conditioning. Defaults to machine epsilon.
+                ill-conditioning. Defaults to the square root of machine epsilon.
+                Only used if noise is False. If noise is True, eps is replaced by the
+                lambda_ parameter. Defaults to None.
             penalty (float, optional):
                 Large negative log-likelihood assigned if the correlation matrix is
                 not positive-definite. Defaults to 1e4.
+            noise (bool, optional):
+                If True, includes a noise parameter in the optimization. Defaults to True.
         """
-        self.eps = eps
+        if eps is None:
+            self.eps = self._get_eps()
+        else:
+            # check if eps is positive
+            if eps <= 0:
+                raise ValueError("eps must be positive")
+            self.eps = eps
         self.penalty = penalty
+        self.noise = noise
         self.logtheta_lambda_ = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
-        self.noise = noise
+        self.NegLnLike_ = None
+        self.Psi_ = None
 
-    def get_params(self, deep: bool = True) -> Dict[str, float]:
+    def _get_eps(self) -> float:
         """
-        Get parameters for this estimator.
+        Returns the square root of the machine epsilon.
+        """
+        eps = np.finfo(float).eps
+        return np.sqrt(eps)
 
-        This method is required for scikit-learn compatibility.
+    def get_model_params(self) -> Dict[str, float]:
+        """
+        Get the model parameters (in addition to sklearn's get_params method).
 
-        Args:
-            deep (bool): If True, will return the parameters for this estimator and
-                contained subobjects that are estimators. Defaults to True.
+        This method is NOT required for scikit-learn compatibility.
 
         Returns:
-            dict: Parameter names mapped to their values.
+            dict: Parameter names not included in get_params() mapped to their values.
         """
-        return {"eps": self.eps, "penalty": self.penalty}
-
-    def set_params(self, **params: Dict[str, float]) -> "Kriging":
-        """
-        Set the parameters of this estimator.
-
-        This method is required for scikit-learn compatibility.
-
-        Args:
-            **params (dict): Estimator parameters as keyword arguments.
-
-        Returns:
-            self (Kriging): Estimator instance.
-        """
-        for key, value in params.items():
-            setattr(self, key, value)
-        return self
+        return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "NegLnLike": self.NegLnLike_}
 
     def fit(self, X: np.ndarray, y: np.ndarray, bounds: Optional[List[Tuple[float, float]]] = None) -> "Kriging":
         """
@@ -115,9 +114,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.logtheta_lambda_, _ = self.max_likelihood(bounds, ModelInfo)
 
         # Once logtheta_lambda is found, compute the final correlation matrix
-        NegLnLike, Psi, U = self.likelihood(self.logtheta_lambda_, ModelInfo)
-        self.U_ = U
-
+        self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_, ModelInfo)
         return self
 
     def predict(self, X: np.ndarray, return_std=False) -> np.ndarray:
@@ -192,13 +189,17 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         if self.noise:
             theta = x[:-1]
+            # theta is in log scale, so transform it back:
+            theta = 10.0**theta
             lambda_ = x[-1]
+            # lambda is in log scale, so transform it back:
+            lambda_ = 10.0**lambda_
         else:
             theta = x
+            theta = 10.0**theta
+            # use the original, untransformed eps:
             lambda_ = self.eps
 
-        theta = 10.0**theta
-        lambda_ = 10.0**lambda_
         p = 1.99
         n = X.shape[0]
         one = np.ones(n)
@@ -251,13 +252,14 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         if self.noise:
             theta = ModelInfo["Theta_Lambda"][:-1]
+            theta = 10.0**theta
             lambda_ = ModelInfo["Theta_Lambda"][-1]
+            lambda_ = 10.0**lambda_
         else:
             theta = ModelInfo["Theta_Lambda"]
+            theta = 10.0**theta
+            # lambda is not transformed back:
             lambda_ = self.eps
-
-        theta = 10.0**theta
-        lambda_ = 10.0**lambda_
 
         U = ModelInfo["U"]
 
