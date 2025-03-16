@@ -117,7 +117,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_, ModelInfo)
         return self
 
-    def predict(self, X: np.ndarray, return_std=False) -> np.ndarray:
+    def predict(self, X: np.ndarray, return_std=False, return_ei=False) -> np.ndarray:
         """
         Predicts the Kriging response at a set of points X. This method is compatible
         with scikit-learn and returns predictions for the input points.
@@ -128,6 +128,9 @@ class Kriging(BaseEstimator, RegressorMixin):
                 to predict the Kriging response.
             return_std (bool, optional):
                 If True, returns the standard deviation of the predictions as well.
+                Defaults to False.
+            return_ei (bool, optional):
+                If True, returns the expected improvement at each point.
                 Defaults to False.
 
         Returns:
@@ -148,18 +151,30 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Test data
             >>> X_test = np.array([[0.25, 0.25], [0.75, 0.75]])
             >>> # Predict responses
-            >>> y_pred, sd = model.predict(X_test)
+            >>> y_pred, sd, ei = model.predict(X_test)
             >>> print("Predictions:", y_pred)
             >>> print("Standard deviations:", sd)
+            >>> print("Expected improvement:", ei)
         """
         # Create a ModelInfo dict with the final logtheta_lambda_ and U_:
         ModelInfo = {"X": self.X_, "y": self.y_, "Theta_Lambda": self.logtheta_lambda_, "U": self.U_}
 
         X = np.atleast_2d(X)
-        if return_std:
-            predictions, std_devs = zip(*[self._pred(x_i, ModelInfo) for x_i in X])
+
+        if return_std and return_ei:
+            # Return predictions, standard deviations, and expected improvements
+            predictions, std_devs, eis = zip(*[self._pred(x_i, ModelInfo) for x_i in X])
+            return np.array(predictions), np.array(std_devs), np.array(eis)
+        elif return_std:
+            # Return predictions and standard deviations
+            predictions, std_devs = zip(*[self._pred(x_i, ModelInfo)[:2] for x_i in X])
             return np.array(predictions), np.array(std_devs)
+        elif return_ei:
+            # Return predictions and expected improvements
+            predictions, eis = zip(*[(self._pred(x_i, ModelInfo)[0], self._pred(x_i, ModelInfo)[2]) for x_i in X])
+            return np.array(predictions), np.array(eis)
         else:
+            # Return only predictions
             predictions = [self._pred(x_i, ModelInfo)[0] for x_i in X]
             return np.array(predictions)
 
@@ -289,6 +304,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         # Compute SSqr
         psi_tilde = np.linalg.solve(U, psi)
         psi_tilde = np.linalg.solve(U.T, psi_tilde)
+        # Eq. (3.1) in [forr08a] without lambda:
         SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
         # Compute s
         s = np.abs(SSqr) ** 0.5
@@ -300,7 +316,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         # resid_tilde = np.linalg.solve(U.T, resid_tilde)
         f = mu + psi @ resid_tilde
 
-        return float(f), float(s)
+        # Compute ExpImp
+        yBest = np.min(y)
+        EITermOne = (yBest - f) * (0.5 + 0.5 * np.erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
+        EITermTwo = s * (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((yBest - f) ** 2 / SSqr))
+        ExpImp = np.log10(EITermOne + EITermTwo + self.eps)
+
+        return float(f), float(s), float(ExpImp)
 
     def max_likelihood(self, bounds: List[Tuple[float, float]], ModelInfo: Dict[str, np.ndarray]) -> Tuple[np.ndarray, float]:
         """
