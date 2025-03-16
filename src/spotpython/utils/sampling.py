@@ -620,7 +620,7 @@ def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[flo
     return X_best
 
 
-def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False) -> np.ndarray:
+def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False, verbosity=0) -> np.ndarray:
     """
     Generates an optimized Latin hypercube by evolving the Morris-Mitchell
     criterion across multiple exponents (q values) and selecting the best plan.
@@ -640,6 +640,8 @@ def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False) ->
         plot (bool, optional):
             If True, a scatter plot of the optimized plan in the first two dimensions
             will be displayed. Only if k>=2.  Defaults to False.
+        verbosity (int, optional):
+            Verbosity level. 0 is silent, 1 prints the best q value found. Defaults to 0.
 
     Returns:
         np.ndarray:
@@ -681,7 +683,8 @@ def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False) ->
 
     # Evolve the plan for each q in q_list
     for i, q_val in enumerate(q_list):
-        print(f"Now optimizing for q={q_val}...")
+        if verbosity > 0:
+            print(f"Now optimizing for q={q_val}...")
         X3D[:, :, i] = mmlhs(X_start, population, iterations, q_val)
 
     # Sort the set of evolved plans according to the Morris-Mitchell criterion
@@ -689,7 +692,8 @@ def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False) ->
 
     # index_order is a 1-based array of plan indices; the first element is the best
     best_idx = index_order[0] - 1
-    print(f"Best lh found using q={q_list[best_idx]}...")
+    if verbosity > 0:
+        print(f"Best lh found using q={q_list[best_idx]}...")
 
     # The best plan in 3D array order
     X = X3D[:, :, best_idx]

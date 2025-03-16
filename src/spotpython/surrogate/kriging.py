@@ -4,6 +4,8 @@ from typing import Dict, Tuple, List, Optional
 from scipy.optimize import differential_evolution
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.special import erf
+import matplotlib.pyplot as plt
+from numpy import linspace, meshgrid, array
 
 
 class Kriging(BaseEstimator, RegressorMixin):
@@ -53,6 +55,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         if method not in ["interpolation", "regression", "reinterpolation"]:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation']")
         self.method = method
+        self.return_ei = False
+        self.return_std = False
 
     def _get_eps(self) -> float:
         """
@@ -159,6 +163,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> print("Standard deviations:", sd)
             >>> print("Expected improvement:", ei)
         """
+        self.return_std = return_std
+        self.return_ei = return_ei
         X = np.atleast_2d(X)
         if return_std and return_ei:
             # Return predictions, standard deviations, and expected improvements
@@ -325,12 +331,14 @@ class Kriging(BaseEstimator, RegressorMixin):
         f = mu + psi @ resid_tilde
 
         # Compute ExpImp
-        yBest = np.min(y)
-        EITermOne = (yBest - f) * (0.5 + 0.5 * erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
-        EITermTwo = s * (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((yBest - f) ** 2 / SSqr))
-        ExpImp = np.log10(EITermOne + EITermTwo + self.eps)
-
-        return float(f), float(s), float(-ExpImp)
+        if self.return_ei:
+            yBest = np.min(y)
+            EITermOne = (yBest - f) * (0.5 + 0.5 * erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
+            EITermTwo = s * (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((yBest - f) ** 2 / SSqr))
+            ExpImp = np.log10(EITermOne + EITermTwo + self.eps)
+            return float(f), float(s), float(-ExpImp)
+        else:
+            return float(f), float(s)
 
     def max_likelihood(self, bounds: List[Tuple[float, float]]) -> Tuple[np.ndarray, float]:
         """
@@ -351,3 +359,103 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         result = differential_evolution(objective, bounds)
         return result.x, result.fun
+
+    def plot(self, show: Optional[bool] = True, alpha=0.8) -> None:
+        """
+        This function plots 1D and 2D surrogates.
+
+        Args:
+            show (bool):
+                If `True`, the plots are displayed.
+                If `False`, `plt.show()` should be called outside this function.
+
+        Returns:
+            None
+
+        Examples:
+            >>> model = Kriging()
+            >>> model.fit(X_train, y_train)
+            >>> model.plot()
+        """
+        if self.X_ is None or self.y_ is None:
+            raise ValueError("The model must be fitted before calling the plot method.")
+
+        k = self.X_.shape[1]  # Number of dimensions
+
+        if k == 1:
+            # 1D Plot
+            fig = plt.figure(figsize=(9, 6))
+            n_grid = 100
+            x = linspace(self.X_[:, 0].min(), self.X_[:, 0].max(), num=n_grid).reshape(-1, 1)
+            y_pred, y_std = self.predict(x, return_std=True)
+
+            plt.plot(x, y_pred, "k", label="Prediction")
+            plt.fill_between(
+                x.ravel(),
+                y_pred - 1.96 * y_std,
+                y_pred + 1.96 * y_std,
+                alpha=0.2,
+                label="95% Confidence Interval",
+            )
+            plt.scatter(self.X_, self.y_, color="red", label="Training Data")
+            plt.xlabel("X")
+            plt.ylabel("Prediction")
+            plt.title("1D Kriging Surrogate")
+            plt.legend()
+            if show:
+                plt.show()
+
+        elif k == 2:
+            # 2D Plot
+            fig = plt.figure(figsize=(12, 10))
+            n_grid = 100
+            x1 = linspace(self.X_[:, 0].min(), self.X_[:, 0].max(), num=n_grid)
+            x2 = linspace(self.X_[:, 1].min(), self.X_[:, 1].max(), num=n_grid)
+            X1, X2 = meshgrid(x1, x2)
+            grid_points = array([X1.ravel(), X2.ravel()]).T
+
+            y_pred, y_std = self.predict(grid_points, return_std=True)
+            Z_pred = y_pred.reshape(X1.shape)
+            Z_std = y_std.reshape(X1.shape)
+
+            # Plot predicted values
+            ax1 = fig.add_subplot(221, projection="3d")
+            ax1.plot_surface(X1, X2, Z_pred, cmap="viridis", alpha=alpha)
+            ax1.set_title("Prediction Surface")
+            ax1.set_xlabel("X1")
+            ax1.set_ylabel("X2")
+            ax1.set_zlabel("Prediction")
+
+            # Plot prediction error
+            ax2 = fig.add_subplot(222, projection="3d")
+            ax2.plot_surface(X1, X2, Z_std, cmap="viridis", alpha=alpha)
+            ax2.set_title("Prediction Error Surface")
+            ax2.set_xlabel("X1")
+            ax2.set_ylabel("X2")
+            ax2.set_zlabel("Error")
+
+            # Contour plot of predicted values
+            ax3 = fig.add_subplot(223)
+            contour = ax3.contourf(X1, X2, Z_pred, cmap="viridis", levels=30)
+            plt.colorbar(contour, ax=ax3)
+            ax3.scatter(self.X_[:, 0], self.X_[:, 1], color="red", label="Training Data")
+            ax3.set_title("Prediction Contour")
+            ax3.set_xlabel("X1")
+            ax3.set_ylabel("X2")
+            ax3.legend()
+
+            # Contour plot of prediction error
+            ax4 = fig.add_subplot(224)
+            contour = ax4.contourf(X1, X2, Z_std, cmap="viridis", levels=30)
+            plt.colorbar(contour, ax=ax4)
+            ax4.scatter(self.X_[:, 0], self.X_[:, 1], color="red", label="Training Data")
+            ax4.set_title("Error Contour")
+            ax4.set_xlabel("X1")
+            ax4.set_ylabel("X2")
+            ax4.legend()
+
+            if show:
+                plt.show()
+
+        else:
+            raise ValueError("Plotting is only supported for 1D or 2D input data.")

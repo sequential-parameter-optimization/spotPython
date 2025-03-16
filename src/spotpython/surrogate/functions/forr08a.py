@@ -66,7 +66,7 @@ def branin(x: np.ndarray) -> np.ndarray:
 
     Examples:
         >>> import numpy as np
-        >>> from spotpython.surrogate.functions.branin import branin
+        >>> from spotpython.surrogate.functions.forr08a import branin
         >>> # Single input
         >>> print(branin(np.array([[0.5, 0.5]])))
         [26.63]
