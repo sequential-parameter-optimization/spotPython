@@ -36,7 +36,13 @@ class Kriging(BaseEstimator, RegressorMixin):
             noise (bool, optional):
                 If True, includes a noise parameter in the optimization. Defaults to True.
         """
-        self.eps = eps if eps is not None else np.sqrt(np.finfo(float).eps)
+        if eps is None:
+            self.eps = self._get_eps()
+        else:
+            # check if eps is positive
+            if eps <= 0:
+                raise ValueError("eps must be positive")
+            self.eps = eps
         self.penalty = penalty
         self.noise = noise
         self.logtheta_lambda_ = None
@@ -93,17 +99,23 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> model.fit(X_train, y_train)
             >>> print("Fitted log(theta):", model.logtheta_lambda_)
         """
-        self.X_ = np.asarray(X)
-        self.y_ = np.asarray(y).flatten()
+        X = np.asarray(X)
+        y = np.asarray(y).flatten()
+        self.X_ = X
+        self.y_ = y
 
-        k = self.X_.shape[1]
+        k = X.shape[1]
         if bounds is None:
-            bounds = [(-3.0, 2.0)] * k + ([(-6.0, 0.0)] if self.noise else [])
+            if self.noise:
+                bounds = [(-3.0, 2.0)] * k + [(-6.0, 0.0)]
+            else:
+                bounds = [(-3.0, 2.0)] * k
 
-        self.logtheta_lambda_, _ = self.max_likelihood(bounds)
+        ModelInfo = {"X": self.X_, "y": self.y_}
+        self.logtheta_lambda_, _ = self.max_likelihood(bounds, ModelInfo)
 
         # Once logtheta_lambda is found, compute the final correlation matrix
-        self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
+        self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_, ModelInfo)
         return self
 
     def predict(self, X: np.ndarray, return_std=False, return_ei=False) -> np.ndarray:
@@ -145,22 +157,28 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> print("Standard deviations:", sd)
             >>> print("Expected improvement:", ei)
         """
-        X = np.atleast_2d(X)
+        # Create a ModelInfo dict with the final logtheta_lambda_ and U_:
+        ModelInfo = {"X": self.X_, "y": self.y_, "Theta_Lambda": self.logtheta_lambda_, "U": self.U_}
 
+        X = np.atleast_2d(X)
         if return_std and return_ei:
-            predictions, std_devs, eis = zip(*[self._pred(x_i) for x_i in X])
+            # Return predictions, standard deviations, and expected improvements
+            predictions, std_devs, eis = zip(*[self._pred(x_i, ModelInfo) for x_i in X])
             return np.array(predictions), np.array(std_devs), np.array(eis)
         elif return_std:
-            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
+            # Return predictions and standard deviations
+            predictions, std_devs = zip(*[self._pred(x_i, ModelInfo)[:2] for x_i in X])
             return np.array(predictions), np.array(std_devs)
         elif return_ei:
-            predictions, eis = zip(*[(self._pred(x_i)[0], self._pred(x_i)[2]) for x_i in X])
+            # Return predictions and expected improvements
+            predictions, eis = zip(*[(self._pred(x_i, ModelInfo)[0], self._pred(x_i, ModelInfo)[2]) for x_i in X])
             return np.array(predictions), np.array(eis)
         else:
-            predictions = [self._pred(x_i)[0] for x_i in X]
+            # Return only predictions
+            predictions = [self._pred(x_i, ModelInfo)[0] for x_i in X]
             return np.array(predictions)
 
-    def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
+    def likelihood(self, x: np.ndarray, ModelInfo: Dict[str, np.ndarray]) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
         of log(theta) parameters using a power exponent p=1.99. Returns the
@@ -170,6 +188,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             x (np.ndarray):
                 1D array of log(theta) parameters of length k. If self.noise is True,
                 length is k+1 and the last element of x is the log(noise) parameter.
+            ModelInfo (Dict[str, np.ndarray]):
+                Contains "X" (design points) and "y" (targets).
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -178,21 +198,35 @@ class Kriging(BaseEstimator, RegressorMixin):
                 - Psi (np.ndarray): The correlation matrix.
                 - U (np.ndarray): The Cholesky factor (or None if ill-conditioned).
         """
-        theta = 10.0 ** x[:-1] if self.noise else 10.0**x
-        lambda_ = 10.0 ** x[-1] if self.noise else self.eps
+        # Extract data
+        X = ModelInfo["X"]
+        y = ModelInfo["y"].flatten()
+
+        if self.noise:
+            theta = x[:-1]
+            # theta is in log scale, so transform it back:
+            theta = 10.0**theta
+            lambda_ = x[-1]
+            # lambda is in log scale, so transform it back:
+            lambda_ = 10.0**lambda_
+        else:
+            theta = x
+            theta = 10.0**theta
+            # use the original, untransformed eps:
+            lambda_ = self.eps
 
         p = 1.99
-        n = self.X_.shape[0]
+        n = X.shape[0]
         one = np.ones(n)
 
         # Build correlation matrix
         Psi = np.zeros((n, n), dtype=float)
         for i in range(n):
             for j in range(i + 1, n):
-                dist_vec = np.abs(self.X_[i, :] - self.X_[j, :]) ** p
+                dist_vec = np.abs(X[i, :] - X[j, :]) ** p
                 Psi[i, j] = np.exp(-np.sum(theta * dist_vec))
 
-        Psi = Psi + Psi.T + np.eye(n) * (1 + lambda_)
+        Psi = Psi + Psi.T + np.eye(n) + np.eye(n) * lambda_
 
         try:
             U = np.linalg.cholesky(Psi)
@@ -201,13 +235,13 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         LnDetPsi = 2.0 * np.sum(np.log(np.abs(np.diag(U))))
 
-        temp_y = np.linalg.solve(U, self.y_)
+        temp_y = np.linalg.solve(U, y)
         temp_one = np.linalg.solve(U, one)
         vy = np.linalg.solve(U.T, temp_y)
         vone = np.linalg.solve(U.T, temp_one)
 
         mu = (one @ vy) / (one @ vone)
-        resid = self.y_ - one * mu
+        resid = y - one * mu
         tresid = np.linalg.solve(U, resid)
         tresid = np.linalg.solve(U.T, tresid)
         SigmaSqr = (resid @ tresid) / n
@@ -215,74 +249,97 @@ class Kriging(BaseEstimator, RegressorMixin):
         NegLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
         return NegLnLike, Psi, U
 
-    def _pred(self, x: np.ndarray) -> Tuple[float, float, float]:
+    def _pred(self, x: np.ndarray, ModelInfo: Dict[str, np.ndarray]) -> float:
         """
-        Computes a single-point Kriging prediction using the correlation matrix.
+        Computes a single-point Kriging prediction using the correlation matrix
+        information in ModelInfo. Internal helper method.
 
         Args:
             x (np.ndarray): 1D array of length k for the point at which to predict.
+            ModelInfo (Dict[str, np.ndarray]): Must contain "X", "y", "Theta_Lambda", and "U".
 
         Returns:
-            Tuple[float, float, float]:
-                - Prediction (f).
-                - Standard deviation (s).
-                - Expected improvement (ExpImp).
+            float: The Kriging prediction at x.
+            float: The standard deviation of the prediction.
         """
-        theta = 10.0 ** self.logtheta_lambda_[:-1] if self.noise else 10.0**self.logtheta_lambda_
-        lambda_ = 10.0 ** self.logtheta_lambda_[-1] if self.noise else self.eps
+        X = ModelInfo["X"]
+        y = ModelInfo["y"].flatten()
+
+        if self.noise:
+            theta = ModelInfo["Theta_Lambda"][:-1]
+            theta = 10.0**theta
+            lambda_ = ModelInfo["Theta_Lambda"][-1]
+            lambda_ = 10.0**lambda_
+        else:
+            theta = ModelInfo["Theta_Lambda"]
+            theta = 10.0**theta
+            # lambda is not transformed back:
+            lambda_ = self.eps
+
+        U = ModelInfo["U"]
 
         p = 1.99
-        n = self.X_.shape[0]
+        n = X.shape[0]
         one = np.ones(n)
 
         # Compute mu
-        y_tilde = np.linalg.solve(self.U_, self.y_)
-        y_tilde = np.linalg.solve(self.U_.T, y_tilde)
-        one_tilde = np.linalg.solve(self.U_, one)
-        one_tilde = np.linalg.solve(self.U_.T, one_tilde)
+        y_tilde = np.linalg.solve(U, y)
+        y_tilde = np.linalg.solve(U.T, y_tilde)
+        one_tilde = np.linalg.solve(U, one)
+        one_tilde = np.linalg.solve(U.T, one_tilde)
         mu = (one @ y_tilde) / (one @ one_tilde)
 
-        resid = self.y_ - one * mu
-        resid_tilde = np.linalg.solve(self.U_, resid)
-        resid_tilde = np.linalg.solve(self.U_.T, resid)
+        resid = y - one * mu
+        resid_tilde = np.linalg.solve(U, resid)
+        resid_tilde = np.linalg.solve(U.T, resid_tilde)
 
         # Build psi
-        psi = np.array([np.exp(-np.sum(theta * np.abs(self.X_[i, :] - x) ** p)) for i in range(n)])
+        psi = np.ones(n)
+        for i in range(n):
+            dist_vec = np.abs(X[i, :] - x) ** p
+            psi[i] = np.exp(-np.sum(theta * dist_vec))
 
         # Compute SigmaSqr
         SigmaSqr = (resid @ resid_tilde) / n
-        psi_tilde = np.linalg.solve(self.U_, psi)
-        psi_tilde = np.linalg.solve(self.U_.T, psi)
+        # Compute SSqr
+        psi_tilde = np.linalg.solve(U, psi)
+        psi_tilde = np.linalg.solve(U.T, psi_tilde)
+        # Eq. (3.1) in [forr08a] without lambda:
         SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
+        # Compute s
         s = np.abs(SSqr) ** 0.5
 
         # Final prediction
+        # TODO: check igf the following is can be omitted:
+        # resid = y - one * mu
+        # resid_tilde = np.linalg.solve(U, resid)
+        # resid_tilde = np.linalg.solve(U.T, resid_tilde)
         f = mu + psi @ resid_tilde
 
         # Compute ExpImp
-        yBest = np.min(self.y_)
+        yBest = np.min(y)
         EITermOne = (yBest - f) * (0.5 + 0.5 * erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
         EITermTwo = s * (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((yBest - f) ** 2 / SSqr))
         ExpImp = np.log10(EITermOne + EITermTwo + self.eps)
 
         return float(f), float(s), float(ExpImp)
 
-    def max_likelihood(self, bounds: List[Tuple[float, float]]) -> Tuple[np.ndarray, float]:
+    def max_likelihood(self, bounds: List[Tuple[float, float]], ModelInfo: Dict[str, np.ndarray]) -> Tuple[np.ndarray, float]:
         """
         Maximizes the Kriging likelihood function using differential evolution
         over the range of log(theta) specified by bounds.
 
         Args:
             bounds (List[Tuple[float, float]]): Sequence of (low, high) bounds for log(theta).
+            ModelInfo (Dict[str, np.ndarray]): The model data with "X" and "y".
 
         Returns:
-            Tuple[np.ndarray, float]:
-                - Optimal log(theta) array.
-                - Minimized negative log-likelihood.
+            (np.ndarray, float): (best_x, best_fun) where best_x is the
+            optimal log(theta) array and best_fun is the minimized negative log-likelihood.
         """
 
         def objective(logtheta_lambda):
-            neg_ln_like, _, _ = self.likelihood(logtheta_lambda)
+            neg_ln_like, _, _ = self.likelihood(logtheta_lambda, ModelInfo)
             return neg_ln_like
 
         result = differential_evolution(objective, bounds)
