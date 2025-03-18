@@ -1820,7 +1820,7 @@ class Spot:
             ),
             "direct": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds, eps=1e-2),
             "shgo": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds),
-            "basinhopping": lambda: self.optimizer(func=self.infill, x0=self.min_X),
+            "basinhopping": lambda: self.optimizer(func=self.infill, x0=self.min_X, minimizer_kwargs={"method": "Nelder-Mead"}),
             "default": lambda: self.optimizer(func=self.infill, bounds=self.de_bounds),
         }
         for i in range(self.n_points):

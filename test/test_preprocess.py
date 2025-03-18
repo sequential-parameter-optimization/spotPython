@@ -178,4 +178,4 @@ def test_generic_preprocess_df_with_empty_dataframe():
     try:
         generic_preprocess_df(df, target="target")
     except ValueError as e:
-        assert str(e) == "Target column 'target' not found in the DataFrame."
+        assert str(e) == "The input DataFrame is empty."
