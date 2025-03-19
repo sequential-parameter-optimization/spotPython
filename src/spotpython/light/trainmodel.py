@@ -8,6 +8,8 @@ from torch.utils.data import DataLoader
 from captum.attr import IntegratedGradients, DeepLift, KernelShap
 import torch
 import os
+from scipy.stats import spearmanr
+
 
 import numpy as np
 
@@ -693,11 +695,37 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
     attributions = np.stack(attributions_list, axis=1)
 
-    # Compute the max difference of the attribution methods for each feature
-    max_diffs = np.max(attributions, axis=1) - np.min(attributions, axis=1)
+    if fun_control["xai_metric"] == "max_diff":
+        # Compute the max difference of the attribution methods for each feature
+        result_xai = np.max(attributions, axis=1) - np.min(attributions, axis=1)
+        print("Maximum differences of feature attribution methods:", result_xai)
+        result_xai = result_xai.sum()
 
-    print("MAX DIFFS:", max_diffs)
+    if fun_control["xai_metric"] == "variance":
+        result_xai = np.var(attributions, axis=1)
+        print("Variance of feature attribution methods:", result_xai)
+        result_xai = result_xai.sum()
+
+    if fun_control["xai_metric"] == "spearman":
+        num_methods = attributions.shape[1]
+        spearman_matrix = np.zeros((num_methods, num_methods))  # Store correlation values
+
+        for i in range(num_methods):
+            for j in range(i + 1, num_methods):  # Only compute upper triangle
+                corr, _ = spearmanr(attributions[:, i], attributions[:, j])  # Compute Spearman correlation
+                spearman_matrix[i, j] = corr
+                spearman_matrix[j, i] = corr  # Mirror value in symmetric matrix
+
+        # Extract upper triangular values (excluding diagonal)
+        upper_triangle_values = spearman_matrix[np.triu_indices(num_methods, k=1)]
+
+        # Compute mean correlation as the consistency score
+        # Negative sign to use the result as loss of the objective function for minimization
+        result_xai = -np.mean(upper_triangle_values)
+
+        print("Spearman rank correlation matrix:\n", spearman_matrix)
+        print("Consistency Score (Mean Spearman Correlation):", -result_xai)
 
     # -------------------------------------------------------------------------------------------------------------------
 
-    return result["val_loss"], max_diffs.sum()
+    return result["val_loss"], result_xai
