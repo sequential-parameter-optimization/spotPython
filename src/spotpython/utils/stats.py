@@ -7,6 +7,8 @@ import itertools
 import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.formula.api import ols
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import statsmodels.api as sm
 
 
 def cov_to_cor(covariance_matrix) -> np.ndarray:
@@ -486,3 +488,253 @@ def plot_coeff_vs_pvals_by_included(data, xlabels=None, xlim=(0, 1), xlab="P val
         g.figure.suptitle(title)
     if show:
         plt.show()
+
+
+def vif(X, sorted=True) -> pd.DataFrame:
+    """
+    Calculates the Variance Inflation Factor (VIF) for each feature in a DataFrame.
+
+    VIF measures the multicollinearity among independent variables within a regression model.
+    High VIF values indicate high multicollinearity, which can cause issues with model
+    interpretation and stability.
+
+    Args:
+        X (pandas.DataFrame): A DataFrame containing the independent variables.
+        sorted (bool): Whether to sort the output DataFrame by VIF values.
+
+    Returns:
+        pandas.DataFrame: A DataFrame with two columns:
+            - "feature": The name of the feature.
+            - "VIF": The Variance Inflation Factor for the feature.
+
+    Examples:
+        >>> from spotpython.utils.stats import vif
+        >>> import pandas as pd
+        >>> data = pd.DataFrame({
+        ...     'x1': [1, 2, 3, 4, 5],
+        ...     'x2': [2, 4, 6, 8, 10],
+        ...     'x3': [1, 3, 5, 7, 9]
+        ... })
+        >>> vif(data)
+           feature          VIF
+        0      x1  1260.000000
+        1      x2         0.000000
+        2      x3   630.000000
+    """
+    vif_data = pd.DataFrame()
+    vif_data["feature"] = X.columns
+    vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+    if sorted:
+        vif_data = vif_data.sort_values(by="VIF", ascending=False).reset_index(drop=True)
+    return vif_data
+
+
+def condition_index(df) -> pd.DataFrame:
+    """
+    Calculates the Condition Index for each feature in a DataFrame to assess multicollinearity.
+
+    The Condition Index is computed based on the eigenvalues of the covariance matrix
+    of the standardized data. High condition indices suggest potential multicollinearity issues.
+
+    Args:
+        df (pandas.DataFrame): A DataFrame containing the independent variables.
+
+    Returns:
+        pandas.DataFrame: A DataFrame with the following columns:
+            - 'Feature': The name of the feature.
+            - 'Eigenvalue': The eigenvalue of the covariance matrix.
+            - 'Condition Index': The Condition Index for the feature.
+
+    Examples:
+        >>> from spotpython.utils.stats import condition_index
+        >>> import pandas as pd
+        >>> data = pd.DataFrame({
+        ...     'x1': [1, 2, 3, 4, 5],
+        ...     'x2': [2, 4, 6, 8, 10],
+        ...     'x3': [1, 3, 5, 7, 9]
+        ... })
+        >>> condition_index(data)
+           Feature  Eigenvalue  Condition Index
+        0      x1    1.140000         1.000000
+        1      x2    0.000000              inf
+        2      x3    0.002857        20.000000
+    """
+    # Standardisieren der Daten
+    X = df.values
+    X_centered = X - np.mean(X, axis=0)
+
+    # Berechnung der Kovarianzmatrix
+    covariance_matrix = np.cov(X_centered, rowvar=False)
+
+    # Berechnung der Eigenwerte der Kovarianzmatrix
+    eigenvalues, _ = np.linalg.eigh(covariance_matrix)
+
+    # Berechnung des Condition Index
+    # Condition Index ist die Wurzel des Verhältnisses des größten Eigenwertes zum jeweiligen Eigenwert
+    max_eigenvalue = max(eigenvalues)
+    condition_indices = np.sqrt(max_eigenvalue / eigenvalues)
+
+    # Erstellen eines DataFrames zur Anzeige der Ergebnisse
+    condition_index_df = pd.DataFrame({"Feature": df.columns, "Eigenvalue": eigenvalues, "Condition Index": condition_indices})
+
+    return condition_index_df
+
+
+def compute_standardized_betas(model, X_encoded, y) -> pd.DataFrame:
+    """
+    Computes standardized (beta) coefficients for a fitted statsmodels OLS model.
+
+    Args:
+        model (statsmodels.regression.linear_model.RegressionResultsWrapper): The fitted OLS model.
+        X_encoded (pandas.DataFrame): The design matrix of independent variables.
+        y (pandas.Series): The dependent variable.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the standardized beta coefficients.
+
+    Examples:
+        >>> from spotpython.utils.stats import compute_standardized_betas
+        >>> import pandas as pd
+        >>> import statsmodels.api as sm
+        >>> data = pd.DataFrame({
+        ...     'x1': [1, 2, 3, 4, 5],
+        ...     'x2': [2, 4, 6, 8, 10],
+        ...     'x3': [1, 3, 5, 7, 9]
+        ... })
+        >>> y = pd.Series([1, 2, 3, 4, 5])
+        >>> X = sm.add_constant(data)
+        >>> model = sm.OLS(y, X).fit()
+        >>> compute_standardized_betas(model, data, y)
+           Variable  Standardized Beta
+        0     const           0.000000
+        1       x1           0.000000
+        2       x2           0.000000
+        3       x3           0.000000
+
+    """
+    coeffs_unstd = model.params
+    std_X = X_encoded.drop(columns=["const"], errors="ignore").std()
+    std_y = y.std()
+    beta_std = coeffs_unstd.drop("const", errors="ignore") * (std_X / std_y)
+    beta_std_df = pd.DataFrame({"Variable": beta_std.index, "Standardized Beta": beta_std.values})
+    return beta_std_df
+
+
+def compute_coefficients_table(model, X_encoded, y, vif_table=None) -> pd.DataFrame:
+    """
+    Compute a coefficients table containing:
+      1. Variable name
+      2. Zero-order correlation
+      3. Partial correlation
+      4. Semipartial (part) correlation
+      5. Tolerance (1 / VIF)
+      6. VIF
+
+    Args:
+        model (statsmodels.regression.linear_model.RegressionResultsWrapper):
+            A fitted OLS model from statsmodels.
+        X_encoded (pd.DataFrame):
+            The DataFrame used to fit the model, including 'const'.
+        y (pd.Series):
+            Dependent variable used in fitting the model.
+        vif_table (pd.DataFrame):
+            A DataFrame with columns ["feature", "VIF"] for each column in X_encoded
+            (typ. from statsmodels.stats.outliers_influence.variance_inflation_factor).
+            Default is None.
+
+    Returns:
+        pd.DataFrame with columns:
+            - "Variable"
+            - "Zero-Order r"
+            - "Partial r"
+            - "Semipartial r"
+            - "Tolerance"
+            - "VIF"
+
+    Examples:
+        >>> from spotpython.utils.stats import compute_coefficients_table
+        >>> import pandas as pd
+        >>> import statsmodels.api as sm
+        >>> data = pd.DataFrame({
+        ...     'x1': [1, 2, 3, 4, 5],
+        ...     'x2': [2, 4, 6, 8, 10],
+        ...     'x3': [1, 3, 5, 7, 9]
+        ... })
+        >>> y = pd.Series([1, 2, 3, 4, 5])
+        >>> X = sm.add_constant(data)
+        >>> model = sm.OLS(y, X).fit()
+        >>> vif_table = pd.DataFrame({
+        ...     'feature': ['x1', 'x2', 'x3'],
+        ...     'VIF': [1, 2, 3]
+        ... })
+        >>> compute_coefficients_table(model, data, y, vif_table)
+           Variable  Zero-Order r  Partial r  Semipartial r  Tolerance  VIF
+        0       x1           0.0        0.0            0.0        1.0  1.0
+        1       x2           0.0        0.0            0.0        0.5  2.0
+        2       x3           0.0        0.0            0.0        0.333333  3.0
+
+    """
+
+    # Full-model R^2 and residual df
+    r2_full = model.rsquared
+
+    # We want to iterate over each predictor except the intercept
+    predictors = [col for col in X_encoded.columns if col != "const"]
+
+    results = []
+
+    for var in predictors:
+        # -------------------------------------------------------------------
+        # 1) Zero-order correlation: Pearson correlation of var with y
+        # -------------------------------------------------------------------
+        zero_order_r = X_encoded[var].corr(y)
+
+        # -------------------------------------------------------------------
+        # 2) Partial Correlation & 3) Semipartial Correlation
+        #    We compare a 'full' model vs. a 'reduced' model (without var)
+        # -------------------------------------------------------------------
+        X_reduced = X_encoded.drop(columns=[var])
+        reduced_model = sm.OLS(y, X_reduced).fit()
+        r2_reduced = reduced_model.rsquared
+
+        # The difference in R^2 contributed by this predictor
+        delta_r2 = r2_full - r2_reduced
+
+        # Determine sign from the unstandardized coefficient in the full model
+        coeff_sign = np.sign(model.params.get(var, 0.0))
+
+        # If numeric issues occur (e.g., delta_r2 < 0), set correlations to NaN
+        if delta_r2 <= 0.0 or (1 - r2_reduced) <= 0.0:
+            partial_r = np.nan
+            semipartial_r = np.nan
+        else:
+            # partial correlation
+            # partial_r² = (R²_full - R²_reduced) / (1 - R²_reduced)
+            partial_r = coeff_sign * np.sqrt(delta_r2 / (1 - r2_reduced))
+
+            # semipartial correlation (also called part correlation)
+            # semipartial_r² = (R²_full - R²_reduced)
+            # By definition, semipartial_r = sqrt( delta_r2 ), but we treat R² as a fraction
+            # Because the base R² is SSR / TSS, so:
+            semipartial_r = coeff_sign * np.sqrt(delta_r2)
+
+        # -------------------------------------------------------------------
+        # 4) Tolerance & 5) VIF
+        # -------------------------------------------------------------------
+        if vif_table is None:
+            results.append({"Variable": var, "Zero-Order r": zero_order_r, "Partial r": partial_r, "Semipartial r": semipartial_r})
+        else:
+            # Get the VIF for this predictor
+            vif_row = vif_table.loc[vif_table["feature"] == var, "VIF"]
+            if len(vif_row) == 0:
+                var_vif = np.nan
+            else:
+                var_vif = vif_row.iloc[0]
+            if var_vif <= 0 or np.isnan(var_vif):
+                tolerance = np.nan
+            else:
+                tolerance = 1.0 / var_vif
+            # Collect results
+            results.append({"Variable": var, "Zero-Order r": zero_order_r, "Partial r": partial_r, "Semipartial r": semipartial_r, "Tolerance": tolerance, "VIF": var_vif})
+
+    return pd.DataFrame(results)
