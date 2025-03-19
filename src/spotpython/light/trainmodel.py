@@ -695,6 +695,10 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
     attributions = np.stack(attributions_list, axis=1)
 
+    if fun_control["xai_metric"] not in {"max_diff", "variance", "spearman"}:
+        print("Invalid or missing xai_metric. Setting it to 'max_diff'.")
+        fun_control["xai_metric"] = "max_diff"
+
     if fun_control["xai_metric"] == "max_diff":
         # Compute the max difference of the attribution methods for each feature
         result_xai = np.max(attributions, axis=1) - np.min(attributions, axis=1)
