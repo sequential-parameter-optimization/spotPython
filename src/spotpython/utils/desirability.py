@@ -2,7 +2,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class DMax:
+class DesirabilityBase:
+    """
+    Base class for all desirability functions. Provides a method to print class attributes.
+    """
+
+    def print_class_attributes(self, indent=0):
+        """
+        Prints the attributes of the class object in a generic and recursive manner.
+
+        Args:
+            indent (int): The indentation level for nested objects.
+        """
+        # Print the class name of the current object
+        print("\n" + " " * indent + f"Class: {type(self).__name__}")
+
+        # Get the attributes of the object as a dictionary
+        attributes = vars(self)
+        for attr, value in attributes.items():
+            if isinstance(value, DesirabilityBase):  # Check if the attribute is another desirability object
+                print(" " * indent + f"{attr}:")
+                value.print_class_attributes(indent=indent + 2)  # Recursive call with increased indentation
+            elif isinstance(value, (list, tuple)) and all(isinstance(v, DesirabilityBase) for v in value):
+                print(" " * indent + f"{attr}: [")
+                for v in value:
+                    v.print_class_attributes(indent=indent + 2)  # Recursive call for each object in the list/tuple
+                print(" " * indent + "]")
+            else:
+                print(" " * indent + f"{attr}: {value}")
+
+
+class DMax(DesirabilityBase):
     def __init__(self, low, high, scale=1, tol=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
@@ -23,6 +53,8 @@ class DMax:
     def predict(self, newdata=None, missing=None):
         if newdata is None:
             newdata = np.array([])
+        elif isinstance(newdata, (int, float)):  # Handle single float or int input
+            newdata = np.array([newdata])
         if missing is None:
             missing = self.missing
 
@@ -37,7 +69,7 @@ class DMax:
         return out
 
 
-class DMin:
+class DMin(DesirabilityBase):
     def __init__(self, low, high, scale=1, tol=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
@@ -58,6 +90,8 @@ class DMin:
     def predict(self, newdata=None, missing=None):
         if newdata is None:
             newdata = np.array([])
+        elif isinstance(newdata, (int, float)):  # Handle single float or int input
+            newdata = np.array([newdata])
         if missing is None:
             missing = self.missing
 
@@ -72,7 +106,7 @@ class DMin:
         return out
 
 
-class DTarget:
+class DTarget(DesirabilityBase):
     def __init__(self, low, target, high, low_scale=1, high_scale=1, tol=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
@@ -99,6 +133,8 @@ class DTarget:
     def predict(self, newdata=None, missing=None):
         if newdata is None:
             newdata = np.array([])
+        elif isinstance(newdata, (int, float)):  # Handle single float or int input
+            newdata = np.array([newdata])
         if missing is None:
             missing = self.missing
 
@@ -114,7 +150,7 @@ class DTarget:
         return out
 
 
-class DArb:
+class DArb(DesirabilityBase):
     def __init__(self, x, d, tol=None):
         if any(d > 1) or any(d < 0):
             raise ValueError("The desirability values must be 0 <= d <= 1.")
@@ -136,6 +172,8 @@ class DArb:
     def predict(self, newdata=None, missing=None):
         if newdata is None:
             newdata = np.array([])
+        elif isinstance(newdata, (int, float)):  # Handle single float or int input
+            newdata = np.array([newdata])
         if missing is None:
             missing = self.missing
 
@@ -153,7 +191,7 @@ class DArb:
         return out
 
 
-class DBox:
+class DBox(DesirabilityBase):
     def __init__(self, low, high, tol=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
@@ -171,6 +209,8 @@ class DBox:
     def predict(self, newdata=None, missing=None):
         if newdata is None:
             newdata = np.array([])
+        elif isinstance(newdata, (int, float)):  # Handle single float or int input
+            newdata = np.array([newdata])
         if missing is None:
             missing = self.missing
 
@@ -183,7 +223,7 @@ class DBox:
         return out
 
 
-class DCategorical:
+class DCategorical(DesirabilityBase):
     def __init__(self, values, tol=None):
         if len(values) < 2:
             raise ValueError("'values' should have at least two values.")
@@ -201,6 +241,8 @@ class DCategorical:
     def predict(self, newdata=None, missing=None):
         if newdata is None:
             newdata = np.array([])
+        elif isinstance(newdata, (int, float)):  # Handle single float or int input
+            newdata = np.array([newdata])
         if missing is None:
             missing = self.missing
 
@@ -217,34 +259,60 @@ class DCategorical:
         return out
 
 
-class DOverall:
+class DOverall(DesirabilityBase):
     def __init__(self, *d_objs):
+        """
+        Combines multiple desirability objects into an overall desirability function.
+
+        Args:
+            *d_objs: Instances of desirability classes (e.g., DMax, DTarget, etc.).
+        """
         valid_classes = (DMax, DMin, DTarget, DArb, DBox, DCategorical)
-        if not all(isinstance(self, valid_classes) for obj in d_objs):
+        if not all(isinstance(obj, valid_classes) for obj in d_objs):
             raise ValueError("All objects must be instances of valid desirability classes.")
 
-        self.d_objs = d_objs
+        self.d_objs = d_objs  # Store the desirability objects
 
-    def predict(self, newdata=None, all=False):
-        if newdata is None:
-            newdata = np.full((1, len(self.d)), np.nan)
+    def predict(self, newdata, all=False):
+        """
+        Predicts the overall desirability based on the individual desirability objects.
 
-        if isinstance(newdata, np.ndarray) and newdata.ndim == 1:
-            newdata = newdata.reshape(1, -1)
+        Args:
+            newdata (list or numpy array): A list or array of predicted outcomes, one for each desirability object.
+            all (bool): Whether to return individual desirabilities along with the overall desirability.
 
-        if len(self.d) != newdata.shape[1]:
-            raise ValueError("The number of columns in newdata must match the number of desirability functions.")
+        Returns:
+            float or tuple: The overall desirability score, or a tuple of individual and overall desirabilities if `all=True`.
+        """
+        # if isinstance(newdata, (list, np.ndarray)) and len(newdata) != len(self.d_objs):
+        if isinstance(newdata, list) and len(newdata) != len(self.d_objs):
+            print(f"newdata: {newdata}")
+            print(f"self.d_objs: {self.d_objs}")
+            print(f"len(newdata): {len(newdata)}")
+            print(f"len(self.d_objs): {len(self.d_objs)}")
+            raise ValueError("The number of values must match the number of desirability objects.")
+        if isinstance(newdata, np.ndarray) and newdata.shape[1] != len(self.d_objs):
+            print(f"newdata: {newdata}")
+            print(f"self.d_objs: {self.d_objs}")
+            print(f"newdata.shape: {newdata.shape}")
+            print(f"len(self.d_objs): {len(self.d_objs)}")
+            raise ValueError("The number of values must match the number of desirability objects.")
 
-        out = np.full((newdata.shape[0], newdata.shape[1] + int(all)), np.nan)
-        for i, d_obj in enumerate(self.d):
-            out[:, i] = self.predict(newdata[:, i])
+        # # Compute individual desirabilities
+        # individual_desirabilities = [obj.predict(np.array([value]))[0] for obj, value in zip(self.d_objs, newdata)]
+        # Updated: Compute individual desirabilities
+        # Ensure newdata is a NumPy array
+        newdata = np.array(newdata)
+        individual_desirabilities = [obj.predict(value) for obj, value in zip(self.d_objs, newdata.T)]
+
+        # Compute the geometric mean of the individual desirabilities
+        # overall_desirability = np.prod(individual_desirabilities) ** (1 / len(individual_desirabilities))
+        # overall_desirability = individual_desirabilities ** (1 / len(individual_desirabilities))
+        overall_desirability = np.prod(individual_desirabilities, axis=0) ** (1 / len(individual_desirabilities))
 
         if all:
-            out[:, -1] = np.prod(out[:, :-1], axis=1) ** (1 / len(self.d))
-        else:
-            out = np.prod(out, axis=1) ** (1 / len(self.d))
-
-        return out
+            return individual_desirabilities, overall_desirability
+        return overall_desirability
 
 
 class DesirabilityPrinter:
