@@ -9,6 +9,7 @@ import seaborn as sns
 from statsmodels.formula.api import ols
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.api as sm
+from sklearn.preprocessing import OneHotEncoder
 
 
 def cov_to_cor(covariance_matrix) -> np.ndarray:
@@ -722,19 +723,64 @@ def compute_coefficients_table(model, X_encoded, y, vif_table=None) -> pd.DataFr
         # 4) Tolerance & 5) VIF
         # -------------------------------------------------------------------
         if vif_table is None:
-            results.append({"Variable": var, "Zero-Order r": zero_order_r, "Partial r": partial_r, "Semipartial r": semipartial_r})
+            vif_table = vif(X_encoded)
+            # results.append({"Variable": var, "Zero-Order r": zero_order_r, "Partial r": partial_r, "Semipartial r": semipartial_r})
+        # Get the VIF for this predictor
+        vif_row = vif_table.loc[vif_table["feature"] == var, "VIF"]
+        if len(vif_row) == 0:
+            var_vif = np.nan
         else:
-            # Get the VIF for this predictor
-            vif_row = vif_table.loc[vif_table["feature"] == var, "VIF"]
-            if len(vif_row) == 0:
-                var_vif = np.nan
-            else:
-                var_vif = vif_row.iloc[0]
-            if var_vif <= 0 or np.isnan(var_vif):
-                tolerance = np.nan
-            else:
-                tolerance = 1.0 / var_vif
-            # Collect results
-            results.append({"Variable": var, "Zero-Order r": zero_order_r, "Partial r": partial_r, "Semipartial r": semipartial_r, "Tolerance": tolerance, "VIF": var_vif})
+            var_vif = vif_row.iloc[0]
+        if var_vif <= 0 or np.isnan(var_vif):
+            tolerance = np.nan
+        else:
+            tolerance = 1.0 / var_vif
+        # Collect results
+        results.append({"Variable": var, "Zero-Order r": zero_order_r, "Partial r": partial_r, "Semipartial r": semipartial_r, "Tolerance": tolerance, "VIF": var_vif})
 
     return pd.DataFrame(results)
+
+
+def preprocess_df_for_ols(df, independent_var_columns, target_col) -> tuple:
+    """
+    Preprocesses a df for fiitting an OLS regression model using the specified target column and predictors.
+
+    Args:
+        df (pd.DataFrame): Input DataFrame containing the data.
+        independent_var_columns (list of str): List of names for predictor columns.
+        target_col (str): Name of the target/dependent variable column.
+
+    Returns:
+        X_encoded (pd.DataFrame): Encoded predictors with a constant term.
+        y (pd.Series): Target variable.
+
+    """
+    # Ensure the target column is numeric and 1D
+    y = pd.to_numeric(df[target_col], errors="coerce").fillna(0).squeeze()
+    if y.ndim != 1:
+        raise ValueError(f"Target column '{target_col}' must be 1-dimensional.")
+
+    # Ensure predictors are numeric
+    X = df[independent_var_columns].apply(pd.to_numeric, errors="coerce")
+    # Impute missing values
+    X = X.fillna(X.median())
+
+    # Identify categorical columns (replace with your actual categorical list if needed)
+    categorical_cols = ["type"]
+    encoder = OneHotEncoder(drop="first", sparse_output=False)
+    X_categorical_encoded = encoder.fit_transform(df[categorical_cols])
+
+    # Convert encoded data into a DataFrame
+    X_categorical_encoded_df = pd.DataFrame(X_categorical_encoded, columns=encoder.get_feature_names_out(categorical_cols), index=df.index)  # Ensure alignment with the original DataFrame
+
+    # Combine numeric and categorical (encoded) parts
+    X_encoded = pd.concat([X, X_categorical_encoded_df], axis=1)
+
+    # Add a constant term
+    X_encoded = sm.add_constant(X_encoded)
+
+    # Ensure alignment between X_encoded and y
+    if X_encoded.shape[0] != y.shape[0]:
+        raise ValueError(f"Mismatch in rows: predictors (X_encoded) have {X_encoded.shape[0]} rows, " f"but target (y) has {y.shape[0]} rows.")
+
+    return X_encoded, y
