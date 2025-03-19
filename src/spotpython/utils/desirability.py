@@ -412,3 +412,29 @@ def plot_dMax(obj, add=False, non_inform=True, **kwargs):
     if non_inform:
         plt.axhline(y=obj.missing, linestyle="--", **kwargs)
     plt.show()
+
+
+def conversion_pred(x):
+    """
+    Predicts the percent conversion based on the input vector x.
+
+    Args:
+        x (list or numpy array): A vector of three input values [x1, x2, x3].
+
+    Returns:
+        float: The predicted percent conversion.
+    """
+    return 81.09 + 1.0284 * x[0] + 4.043 * x[1] + 6.2037 * x[2] - 1.8366 * x[0] ** 2 + 2.9382 * x[1] ** 2 - 5.1915 * x[2] ** 2 + 2.2150 * x[0] * x[1] + 11.375 * x[0] * x[2] - 3.875 * x[1] * x[2]
+
+
+def activity_pred(x):
+    """
+    Predicts the thermal activity based on the input vector x.
+
+    Args:
+        x (list or numpy array): A vector of three input values [x1, x2, x3].
+
+    Returns:
+        float: The predicted thermal activity.
+    """
+    return 59.85 + 3.583 * x[0] + 0.2546 * x[1] + 2.2298 * x[2] + 0.83479 * x[0] ** 2 + 0.07484 * x[1] ** 2 + 0.05716 * x[2] ** 2 - 0.3875 * x[0] * x[1] - 0.375 * x[0] * x[2] + 0.3125 * x[1] * x[2]
