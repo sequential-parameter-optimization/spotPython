@@ -49,6 +49,7 @@ def fun_control_init(
     eval=None,
     force_run=True,
     fun_evals=15,
+    fun_mo2so=None,
     fun_repeats=1,
     horizon=None,
     hyperdict=None,
@@ -178,6 +179,9 @@ def fun_control_init(
             Default is False.
         fun_evals (int):
             The number of function evaluations.
+        fun_mo2so (object):
+            The multi-objective to single-objective transformation object. Default is None.
+            If None, the first objective value is used in case of multi-objective optimization.
         fun_repeats (int):
             The number of function repeats during the optimization. this value does not affect
             the number of the repeats in the initial design (this value can be set in the
@@ -444,6 +448,7 @@ def fun_control_init(
         "eval": eval,
         "force_run": force_run,
         "fun_evals": fun_evals,
+        "fun_mo2so": fun_mo2so,
         "fun_repeats": fun_repeats,
         "horizon": horizon,
         "hyperdict": hyperdict,

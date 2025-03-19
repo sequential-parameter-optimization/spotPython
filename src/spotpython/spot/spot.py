@@ -26,6 +26,7 @@ from numpy import sqrt
 from numpy import spacing
 from numpy import append
 from numpy import min, max
+from spotpython.utils.convert import get_shape, set_shape
 from spotpython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotpython.utils.compare import selectNew
 from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points
@@ -1032,6 +1033,44 @@ class Spot:
 
         self.X = repair_non_numeric(X0, self.var_type)
 
+    def _mo2so(self, y_mo) -> None:
+        """
+        Converts multi-objective values to a single-objective value by applying a user-defined
+        function from ``fun_control['fun_mo2so']``. If no user-defined function is given, the
+        values in the first objective row are used.
+
+        This method is called after the objective function evaluation (i.e., after ``self.fun()``).
+        It typically returns a 1D array with the single-objective values.
+
+        Args:
+            y_mo (numpy.ndarray):
+                A 2D array of shape (m, n), where ``m`` is
+                the number of objectives  and ``n`` is the number of data points.
+
+        Returns:
+            numpy.ndarray:
+                A 1D array of shape (n,) with single-objective values if ``m > 1``. If only one
+                objective is present (``m == 1``), no transformation is performed.
+
+        """
+        n, k = get_shape(y_mo)
+        # Ensure that y_mo is a (n, k) numpy array
+        y_mo = np.atleast_2d(y_mo)
+        m = y_mo.shape[0]  # Number of objectives
+        if m > 1:
+            if self.fun_control["fun_mo2so"] is not None:
+                y0 = self.fun_control["fun_mo2so"](y_mo)
+            else:
+                # Select the first row of an (m, k) array
+                y0 = y_mo[0, :]
+        else:
+            if k is None:
+                y0 = y_mo.flatten()
+            else:
+                y0 = y_mo  # Keep as 2D array for single-objective case
+
+        return y0
+
     def evaluate_initial_design(self) -> None:
         """
         Evaluate the initial design.
@@ -1084,7 +1123,10 @@ class Spot:
         logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: fun_control: %s", self.fun_control)
 
-        self.y = self.fun(X=X_all, fun_control=self.fun_control)
+        y_mo = self.fun(X=X_all, fun_control=self.fun_control)
+        #  Convert multi-objective values to single-objective values
+        # TODO: Store y_mo in self.y_mo (append new values)
+        self.y = self._mo2so(y_mo)
         self.y = apply_penalty_NA(self.y, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         logger.debug("In Spot() evaluate_initial_design(), after calling self.fun: self.y: %s", self.y)
 
@@ -1411,7 +1453,11 @@ class Spot:
             self.fun_control["seed"],
         )
         # (S-18): Evaluating New Solutions:
-        y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        y_mo = self.fun(X=X_all, fun_control=self.fun_control)
+        # Convert multi-objective values to single-objective values:
+        # TODO: Store y_mo in self.y_mo (append new values)
+        y0 = self._mo2so(y_mo)
+
         y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         # Append New Solutions (only if they are not nan):
@@ -1644,7 +1690,10 @@ class Spot:
         X_all = self.to_all_dim_if_needed(X0)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
-        y0 = self.fun(X=X_all, fun_control=self.fun_control)
+        # Convert multi-objective values to single-objective values
+        # TODO: Store y_mo in self.y_mo (append new values)
+        y_mo = self.fun(X=X_all, fun_control=self.fun_control)
+        y0 = self._mo2so(y_mo)
         y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         return X0, y0
@@ -1979,7 +2028,10 @@ class Spot:
         """
         if self.k == 1:
             X_test = np.linspace(self.lower[0], self.upper[0], 100)
-            y_test = self.fun(X=X_test.reshape(-1, 1), fun_control=self.fun_control)
+            y_mo = self.fun(X=X_test.reshape(-1, 1), fun_control=self.fun_control)
+            # convert multi-objective values to single-objective values
+            # TODO: Store y_mo in self.y_mo (append new values)
+            y_test = self._mo2so(y_mo)
             y_test = apply_penalty_NA(y_test, self.fun_control["penalty_NA"], verbosity=self.verbosity)
             if isinstance(self.surrogate, Kriging):
                 y_hat = self.surrogate.predict(X_test[:, np.newaxis], return_val="y")

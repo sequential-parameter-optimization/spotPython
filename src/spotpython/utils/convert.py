@@ -247,3 +247,85 @@ def set_dataset_target_type(dataset, target="y") -> pd.DataFrame:
         # convert the target column to 0 and 1
         dataset[target] = dataset[target].astype(int)
     return dataset
+
+
+def get_shape(x: np.ndarray) -> tuple:
+    """
+    Get the shape of a numpy array `x`.
+
+    This function returns the number of rows and columns of the input array `x`.
+    If `x` is a 1D array (shape `(n,)`), it returns `(n, None)`.
+    If `x` is a 2D array (shape `(n, k)`), it returns `(n, k)`.
+
+    Args:
+        x (numpy.ndarray): The input numpy array.
+
+    Returns:
+        tuple: A tuple `(n, k)` where:
+            - `n` is the number of rows in the array.
+            - `k` is the number of columns in the array, or `None` if `x` is 1D.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.utils.convert import get_shape
+        >>> x1 = np.array([1, 2, 3])
+        >>> get_shape(x1)
+        (3, None)
+
+        >>> x2 = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> get_shape(x2)
+        (3, 2)
+    """
+    if x.ndim == 1:
+        return x.shape[0], None
+    elif x.ndim == 2:
+        return x.shape[0], x.shape[1]
+    else:
+        raise ValueError("Input array must be 1D or 2D.")
+
+
+def set_shape(x: np.ndarray, target_shape: tuple) -> np.ndarray:
+    """
+    Adjust the shape of a numpy array `x` to match the target shape `(n, k)`.
+
+    If the target shape is `(n, None)`, the array is reshaped to 1D with `n` elements.
+    If the target shape is `(n, k)`, the array is reshaped to 2D with `n` rows and `k` columns.
+
+    Args:
+        x (numpy.ndarray): The input numpy array.
+        target_shape (tuple): The target shape `(n, k)` where:
+            - `n` is the number of rows.
+            - `k` is the number of columns, or `None` for a 1D array.
+
+    Returns:
+        numpy.ndarray: The reshaped numpy array.
+
+    Raises:
+        ValueError: If the target shape is incompatible with the size of the array.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.utils.convert import set_shape
+        >>> x = np.array([1, 2, 3, 4])
+        >>> set_shape(x, (4, None))
+            array([1, 2, 3, 4])
+        >>> x = np.array([1, 2, 3, 4])
+        >>> set_shape(x, (2, 2))
+        array([[1, 2],
+            [3, 4]])
+        >>> x = np.array([[1, 2], [3, 4]])
+        >>> set_shape(x, (4, None))
+        array([1, 2, 3, 4])
+    """
+    n, k = target_shape
+
+    if k is None:
+        # Reshape to 1D array with `n` elements
+        if x.size != n:
+            raise ValueError(f"Cannot reshape array of size {x.size} to shape ({n},)")
+        return x.reshape(n)
+    else:
+        # Reshape to 2D array with `n` rows and `k` columns
+        if x.size != n * k:
+            raise ValueError(f"Cannot reshape array of size {x.size} to shape ({n}, {k})")
+        return x.reshape(n, k)
