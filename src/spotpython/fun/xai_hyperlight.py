@@ -169,7 +169,6 @@ class XAI_HyperLight:
             # Multiply results by the weights. Positive weights mean that the result is to be minimized.
             # Negative weights mean that the result is to be maximized, e.g., accuracy.
             z_val = fun_control["weights"] * df_eval
-            print("Attribution : ", xai_attr)
             xai_incons = fun_control["xai_weight"] * xai_attr
 
             # Append, since several configurations can be evaluated at once.
