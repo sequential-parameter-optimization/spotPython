@@ -33,7 +33,7 @@ class DesirabilityBase:
 
 
 class DMax(DesirabilityBase):
-    def __init__(self, low, high, scale=1, tol=None):
+    def __init__(self, low, high, scale=1, tol=None, missing=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
         if scale <= 0:
@@ -43,8 +43,9 @@ class DMax(DesirabilityBase):
         self.high = high
         self.scale = scale
         self.tol = tol
-        self.missing = None
-        self.missing = self._calculate_non_informative_value()
+        self.missing = missing
+        if self.missing is None:
+            self.missing = self._calculate_non_informative_value()
 
     def _calculate_non_informative_value(self):
         test_seq = np.linspace(self.low, self.high, 100)
@@ -68,9 +69,26 @@ class DMax(DesirabilityBase):
             out[out == 0] = self.tol
         return out
 
+    def plot(self, add=False, non_inform=True, **kwargs):
+        x_range = extend_range([self.low, self.high])
+        if not add:
+            plt.plot([], [])  # Create an empty plot
+            plt.xlim(x_range)
+            plt.ylim(0, 1)
+            plt.xlabel("Input")
+            plt.ylabel("Desirability")
+        plt.hlines(0, x_range[0], self.low, **kwargs)
+        plt.hlines(1, self.high, x_range[1], **kwargs)
+        input_values = np.linspace(self.low, self.high, 100)
+        output_values = self.predict(input_values)
+        plt.plot(input_values, output_values, **kwargs)
+        if non_inform:
+            plt.axhline(y=self.missing, linestyle="--", **kwargs)
+        plt.show()
+
 
 class DMin(DesirabilityBase):
-    def __init__(self, low, high, scale=1, tol=None):
+    def __init__(self, low, high, scale=1, tol=None, missing=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
         if scale <= 0:
@@ -80,8 +98,9 @@ class DMin(DesirabilityBase):
         self.high = high
         self.scale = scale
         self.tol = tol
-        self.missing = None
-        self.missing = self._calculate_non_informative_value()
+        self.missing = missing
+        if self.missing is None:
+            self.missing = self._calculate_non_informative_value()
 
     def _calculate_non_informative_value(self):
         test_seq = np.linspace(self.low, self.high, 100)
@@ -105,9 +124,26 @@ class DMin(DesirabilityBase):
             out[out == 0] = self.tol
         return out
 
+    def plot(self, add=False, non_inform=True, **kwargs):
+        x_range = extend_range([self.low, self.high])
+        if not add:
+            plt.plot([], [])  # Create an empty plot
+            plt.xlim(x_range)
+            plt.ylim(0, 1)
+            plt.xlabel("Input")
+            plt.ylabel("Desirability")
+        plt.hlines(1, x_range[0], self.low, **kwargs)
+        plt.hlines(0, self.high, x_range[1], **kwargs)
+        input_values = np.linspace(self.low, self.high, 100)
+        output_values = self.predict(input_values)
+        plt.plot(input_values, output_values, **kwargs)
+        if non_inform:
+            plt.axhline(y=self.missing, linestyle="--", **kwargs)
+        plt.show()
+
 
 class DTarget(DesirabilityBase):
-    def __init__(self, low, target, high, low_scale=1, high_scale=1, tol=None):
+    def __init__(self, low, target, high, low_scale=1, high_scale=1, tol=None, missing=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
         if low >= target:
@@ -123,8 +159,9 @@ class DTarget(DesirabilityBase):
         self.low_scale = low_scale
         self.high_scale = high_scale
         self.tol = tol
-        self.missing = None
-        self.missing = self._calculate_non_informative_value()
+        self.missing = missing
+        if self.missing is None:
+            self.missing = self._calculate_non_informative_value()
 
     def _calculate_non_informative_value(self):
         test_seq = np.linspace(self.low, self.high, 100)
@@ -149,9 +186,26 @@ class DTarget(DesirabilityBase):
             out[out == 0] = self.tol
         return out
 
+    def plot(self, add=False, non_inform=True, **kwargs):
+        x_range = extend_range([self.low, self.high])
+        if not add:
+            plt.plot([], [])  # Create an empty plot
+            plt.xlim(x_range)
+            plt.ylim(0, 1)
+            plt.xlabel("Input")
+            plt.ylabel("Desirability")
+        plt.hlines(0, x_range[0], self.low, **kwargs)
+        plt.hlines(0, self.high, x_range[1], **kwargs)
+        input_values = np.linspace(self.low, self.high, 100)
+        output_values = self.predict(input_values)
+        plt.plot(input_values, output_values, **kwargs)
+        if non_inform:
+            plt.axhline(y=self.missing, linestyle="--", **kwargs)
+        plt.show()
+
 
 class DArb(DesirabilityBase):
-    def __init__(self, x, d, tol=None):
+    def __init__(self, x, d, tol=None, missing=None):
         if any(d > 1) or any(d < 0):
             raise ValueError("The desirability values must be 0 <= d <= 1.")
         if len(x) != len(d):
@@ -162,8 +216,9 @@ class DArb(DesirabilityBase):
         self.x = np.array(x)
         self.d = np.array(d)
         self.tol = tol
-        self.missing = None
-        self.missing = self._calculate_non_informative_value()
+        self.missing = missing
+        if self.missing is None:
+            self.missing = self._calculate_non_informative_value()
 
     def _calculate_non_informative_value(self):
         test_seq = np.linspace(min(self.x), max(self.x), 100)
@@ -190,17 +245,33 @@ class DArb(DesirabilityBase):
             out[out == 0] = self.tol
         return out
 
+    def plot(self, add=False, non_inform=True, **kwargs):
+        x_range = extend_range(self.x)
+        if not add:
+            plt.plot([], [])  # Create an empty plot
+            plt.xlim(x_range)
+            plt.ylim(0, 1)
+            plt.xlabel("Input")
+            plt.ylabel("Desirability")
+        input_values = np.linspace(x_range[0], x_range[1], 100)
+        output_values = self.predict(input_values)
+        plt.plot(input_values, output_values, **kwargs)
+        if non_inform:
+            plt.axhline(y=self.missing, linestyle="--", **kwargs)
+        plt.show()
+
 
 class DBox(DesirabilityBase):
-    def __init__(self, low, high, tol=None):
+    def __init__(self, low, high, tol=None, missing=None):
         if low >= high:
             raise ValueError("The low value must be less than the high value.")
 
         self.low = low
         self.high = high
         self.tol = tol
-        self.missing = None
-        self.missing = self._calculate_non_informative_value()
+        self.missing = missing
+        if self.missing is None:
+            self.missing = self._calculate_non_informative_value()
 
     def _calculate_non_informative_value(self):
         test_seq = np.linspace(self.low, self.high, 100)
@@ -222,9 +293,26 @@ class DBox(DesirabilityBase):
             out[out == 0] = self.tol
         return out
 
+    def plot(self, add=False, non_inform=True, **kwargs):
+        x_range = extend_range([self.low, self.high])
+        if not add:
+            plt.plot([], [])  # Create an empty plot
+            plt.xlim(x_range)
+            plt.ylim(0, 1)
+            plt.xlabel("Input")
+            plt.ylabel("Desirability")
+        plt.hlines(0, x_range[0], self.low, **kwargs)
+        plt.hlines(0, self.high, x_range[1], **kwargs)
+        plt.vlines(self.low, 0, 1, **kwargs)
+        plt.vlines(self.high, 0, 1, **kwargs)
+        plt.hlines(1, self.low, self.high, **kwargs)
+        if non_inform:
+            plt.axhline(y=self.missing, linestyle="--", **kwargs)
+        plt.show()
+
 
 class DCategorical(DesirabilityBase):
-    def __init__(self, values, tol=None):
+    def __init__(self, values, tol=None, missing=None):
         if len(values) < 2:
             raise ValueError("'values' should have at least two values.")
         if not all(isinstance(k, str) for k in values.keys()):
@@ -232,8 +320,9 @@ class DCategorical(DesirabilityBase):
 
         self.values = values
         self.tol = tol
-        self.missing = None
-        self.missing = self._calculate_non_informative_value()
+        self.missing = missing
+        if self.missing is None:
+            self.missing = self._calculate_non_informative_value()
 
     def _calculate_non_informative_value(self):
         return np.mean(list(self.values.values()))
@@ -258,6 +347,13 @@ class DCategorical(DesirabilityBase):
             out[out == 0] = self.tol
         return out
 
+    def plot(self, non_inform=True, **kwargs):
+        plt.bar(range(len(self.values)), list(self.values.values()), tick_label=list(self.values.keys()), **kwargs)
+        plt.ylabel("Desirability")
+        if non_inform:
+            plt.axhline(y=self.missing, linestyle="--", **kwargs)
+        plt.show()
+
 
 class DOverall(DesirabilityBase):
     def __init__(self, *d_objs):
@@ -268,6 +364,12 @@ class DOverall(DesirabilityBase):
             *d_objs: Instances of desirability classes (e.g., DMax, DTarget, etc.).
         """
         valid_classes = (DMax, DMin, DTarget, DArb, DBox, DCategorical)
+        # print the instanaces of desirability classes
+        print(f"d_objs: {d_objs}")
+        for obj in d_objs:
+            print(f"obj: {obj}")
+            print(f"isinstance(obj, valid_classes): {isinstance(obj, valid_classes)}")
+
         if not all(isinstance(obj, valid_classes) for obj in d_objs):
             raise ValueError("All objects must be instances of valid desirability classes.")
 
@@ -286,39 +388,26 @@ class DOverall(DesirabilityBase):
         """
 
         # # Compute individual desirabilities
-        # individual_desirabilities = [obj.predict(np.array([value]))[0] for obj, value in zip(self.d_objs, newdata)]
+        # individual_desirabilities = [self.predict(np.array([value]))[0] for obj, value in zip(self.d_objs, newdata)]
         # Updated: Compute individual desirabilities
         # Ensure newdata is a NumPy array
         newdata = np.array(newdata)
 
         # BEGIN Modified in 0.27.2: Allow 1D array as input
-        # Reshape 1D array to 2D array with one row
-        if newdata.ndim == 1:
-            newdata = newdata.reshape(1, -1)
         # Validate the shape of newdata
+        if newdata.ndim == 1:
+            newdata = newdata.reshape(1, -1)  # Reshape 1D array to 2D array with one row
+
         if newdata.shape[1] != len(self.d_objs):
+            print(f"newdata.shape: {newdata.shape}")
+            print(f"len(self.d_objs): {len(self.d_objs)}")
             raise ValueError("The number of columns in newdata must match the number of desirability objects.")
         # END Modify
 
-        # if isinstance(newdata, (list, np.ndarray)) and len(newdata) != len(self.d_objs):
-        if isinstance(newdata, list) and len(newdata) != len(self.d_objs):
-            print(f"newdata: {newdata}")
-            print(f"self.d_objs: {self.d_objs}")
-            print(f"len(newdata): {len(newdata)}")
-            print(f"len(self.d_objs): {len(self.d_objs)}")
-            raise ValueError("The number of values must match the number of desirability objects.")
-        if isinstance(newdata, np.ndarray) and newdata.shape[1] != len(self.d_objs):
-            print(f"newdata: {newdata}")
-            print(f"self.d_objs: {self.d_objs}")
-            print(f"newdata.shape: {newdata.shape}")
-            print(f"len(self.d_objs): {len(self.d_objs)}")
-            raise ValueError("The number of values must match the number of desirability objects.")
-
-        individual_desirabilities = [obj.predict(value) for obj, value in zip(self.d_objs, newdata.T)]
+        # Compute individual desirabilities
+        individual_desirabilities = [obj.predict(newdata[:, i]) for i, obj in enumerate(self.d_objs)]
 
         # Compute the geometric mean of the individual desirabilities
-        # overall_desirability = np.prod(individual_desirabilities) ** (1 / len(individual_desirabilities))
-        # overall_desirability = individual_desirabilities ** (1 / len(individual_desirabilities))
         overall_desirability = np.prod(individual_desirabilities, axis=0) ** (1 / len(individual_desirabilities))
 
         if all:
@@ -328,65 +417,65 @@ class DOverall(DesirabilityBase):
 
 class DesirabilityPrinter:
     @staticmethod
-    def print_dBox(obj, digits=3, print_call=True):
+    def print_dBox(self, digits=3, print_call=True):
         print("Box-like desirability function")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        print(f"Non-informative value: {round(obj.missing, digits)}")
-        if hasattr(obj, "tol") and obj.tol is not None:
-            print(f"Tolerance: {round(obj.tol, digits)}")
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        print(f"Non-informative value: {round(self.missing, digits)}")
+        if hasattr(self, "tol") and self.tol is not None:
+            print(f"Tolerance: {round(self.tol, digits)}")
 
     @staticmethod
-    def print_dMax(obj, digits=3, print_call=True):
+    def print_dMax(self, digits=3, print_call=True):
         print("Larger-is-better desirability function")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        print(f"Non-informative value: {round(obj.missing, digits)}")
-        if hasattr(obj, "tol") and obj.tol is not None:
-            print(f"Tolerance: {round(obj.tol, digits)}")
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        print(f"Non-informative value: {round(self.missing, digits)}")
+        if hasattr(self, "tol") and self.tol is not None:
+            print(f"Tolerance: {round(self.tol, digits)}")
 
     @staticmethod
-    def print_dMin(obj, digits=3, print_call=True):
+    def print_dMin(self, digits=3, print_call=True):
         print("Smaller-is-better desirability function")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        print(f"Non-informative value: {round(obj.missing, digits)}")
-        if hasattr(obj, "tol") and obj.tol is not None:
-            print(f"Tolerance: {round(obj.tol, digits)}")
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        print(f"Non-informative value: {round(self.missing, digits)}")
+        if hasattr(self, "tol") and self.tol is not None:
+            print(f"Tolerance: {round(self.tol, digits)}")
 
     @staticmethod
-    def print_dTarget(obj, digits=3, print_call=True):
+    def print_dTarget(self, digits=3, print_call=True):
         print("Target-is-best desirability function")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        print(f"Non-informative value: {round(obj.missing, digits)}")
-        if hasattr(obj, "tol") and obj.tol is not None:
-            print(f"Tolerance: {round(obj.tol, digits)}")
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        print(f"Non-informative value: {round(self.missing, digits)}")
+        if hasattr(self, "tol") and self.tol is not None:
+            print(f"Tolerance: {round(self.tol, digits)}")
 
     @staticmethod
-    def print_dArb(obj, digits=3, print_call=True):
+    def print_dArb(self, digits=3, print_call=True):
         print("Arbitrary desirability function")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        print(f"Non-informative value: {round(obj.missing, digits)}")
-        if hasattr(obj, "tol") and obj.tol is not None:
-            print(f"Tolerance: {round(obj.tol, digits)}")
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        print(f"Non-informative value: {round(self.missing, digits)}")
+        if hasattr(self, "tol") and self.tol is not None:
+            print(f"Tolerance: {round(self.tol, digits)}")
 
     @staticmethod
-    def print_dCategorical(obj, digits=3, print_call=True):
+    def print_dCategorical(self, digits=3, print_call=True):
         print("Desirability function for categorical data")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        print(f"Non-informative value: {round(obj.missing, digits)}")
-        if hasattr(obj, "tol") and obj.tol is not None:
-            print(f"Tolerance: {round(obj.tol, digits)}")
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        print(f"Non-informative value: {round(self.missing, digits)}")
+        if hasattr(self, "tol") and self.tol is not None:
+            print(f"Tolerance: {round(self.tol, digits)}")
 
     @staticmethod
-    def print_dOverall(obj, digits=3, print_call=True):
+    def print_dOverall(self, digits=3, print_call=True):
         print("Combined desirability function")
-        if print_call and hasattr(obj, "call"):
-            print(f"\nCall: {obj.call}\n")
-        for i, d_obj in enumerate(obj.d, start=1):
+        if print_call and hasattr(self, "call"):
+            print(f"\nCall: {self.call}\n")
+        for i, d_obj in enumerate(self.d, start=1):
             print("----")
             DesirabilityPrinter.print_dBox(d_obj, digits=digits, print_call=False)
 
@@ -395,102 +484,6 @@ def extend_range(values, factor=0.05):
     """Extend the range of values by a given factor."""
     range_span = max(values) - min(values)
     return [min(values) - factor * range_span, max(values) + factor * range_span]
-
-
-def plot_dBox(obj, add=False, non_inform=True, **kwargs):
-    x_range = extend_range([obj.low, obj.high])
-    if not add:
-        plt.plot([], [])  # Create an empty plot
-        plt.xlim(x_range)
-        plt.ylim(0, 1)
-        plt.xlabel("Input")
-        plt.ylabel("Desirability")
-    plt.hlines(0, x_range[0], obj.low, **kwargs)
-    plt.hlines(0, obj.high, x_range[1], **kwargs)
-    plt.vlines(obj.low, 0, 1, **kwargs)
-    plt.vlines(obj.high, 0, 1, **kwargs)
-    plt.hlines(1, obj.low, obj.high, **kwargs)
-    if non_inform:
-        plt.axhline(y=obj.missing, linestyle="--", **kwargs)
-    plt.show()
-
-
-def plot_dMin(obj, add=False, non_inform=True, **kwargs):
-    x_range = extend_range([obj.low, obj.high])
-    if not add:
-        plt.plot([], [])  # Create an empty plot
-        plt.xlim(x_range)
-        plt.ylim(0, 1)
-        plt.xlabel("Input")
-        plt.ylabel("Desirability")
-    plt.hlines(1, x_range[0], obj.low, **kwargs)
-    plt.hlines(0, obj.high, x_range[1], **kwargs)
-    input_values = np.linspace(obj.low, obj.high, 100)
-    output_values = obj.predict(input_values)
-    plt.plot(input_values, output_values, **kwargs)
-    if non_inform:
-        plt.axhline(y=obj.missing, linestyle="--", **kwargs)
-    plt.show()
-
-
-def plot_dTarget(obj, add=False, non_inform=True, **kwargs):
-    x_range = extend_range([obj.low, obj.high])
-    if not add:
-        plt.plot([], [])  # Create an empty plot
-        plt.xlim(x_range)
-        plt.ylim(0, 1)
-        plt.xlabel("Input")
-        plt.ylabel("Desirability")
-    plt.hlines(0, x_range[0], obj.low, **kwargs)
-    plt.hlines(0, obj.high, x_range[1], **kwargs)
-    input_values = np.linspace(obj.low, obj.high, 100)
-    output_values = obj.predict(input_values)
-    plt.plot(input_values, output_values, **kwargs)
-    if non_inform:
-        plt.axhline(y=obj.missing, linestyle="--", **kwargs)
-    plt.show()
-
-
-def plot_dCategorical(obj, non_inform=True, **kwargs):
-    plt.bar(range(len(obj.values)), list(obj.values.values()), tick_label=list(obj.values.keys()), **kwargs)
-    plt.ylabel("Desirability")
-    if non_inform:
-        plt.axhline(y=obj.missing, linestyle="--", **kwargs)
-    plt.show()
-
-
-def plot_dArb(obj, add=False, non_inform=True, **kwargs):
-    x_range = extend_range(obj.x)
-    if not add:
-        plt.plot([], [])  # Create an empty plot
-        plt.xlim(x_range)
-        plt.ylim(0, 1)
-        plt.xlabel("Input")
-        plt.ylabel("Desirability")
-    input_values = np.linspace(x_range[0], x_range[1], 100)
-    output_values = obj.predict(input_values)
-    plt.plot(input_values, output_values, **kwargs)
-    if non_inform:
-        plt.axhline(y=obj.missing, linestyle="--", **kwargs)
-    plt.show()
-
-
-def plot_dMax(obj, add=False, non_inform=True, **kwargs):
-    x_range = extend_range([obj.low, obj.high])
-    if not add:
-        plt.plot([], [])  # Create an empty plot
-        plt.xlim(x_range)
-        plt.ylim(0, 1)
-        plt.xlabel("Input")
-        plt.ylabel("Desirability")
-    plt.hlines(0, x_range[0], obj.low, **kwargs)
-    plt.hlines(1, obj.high, x_range[1], **kwargs)
-    input_values = np.linspace(obj.low, obj.high, 100)
-    output_values = obj.predict(input_values)
-    plt.plot(input_values, output_values, **kwargs)
-    if non_inform:
-        plt.axhline(y=obj.missing, linestyle="--", **kwargs)
-    plt.show()
 
 
 def conversion_pred(x):
