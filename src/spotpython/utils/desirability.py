@@ -284,6 +284,22 @@ class DOverall(DesirabilityBase):
         Returns:
             float or tuple: The overall desirability score, or a tuple of individual and overall desirabilities if `all=True`.
         """
+
+        # # Compute individual desirabilities
+        # individual_desirabilities = [obj.predict(np.array([value]))[0] for obj, value in zip(self.d_objs, newdata)]
+        # Updated: Compute individual desirabilities
+        # Ensure newdata is a NumPy array
+        newdata = np.array(newdata)
+
+        # BEGIN Modified in 0.27.2: Allow 1D array as input
+        # Reshape 1D array to 2D array with one row
+        if newdata.ndim == 1:
+            newdata = newdata.reshape(1, -1)
+        # Validate the shape of newdata
+        if newdata.shape[1] != len(self.d_objs):
+            raise ValueError("The number of columns in newdata must match the number of desirability objects.")
+        # END Modify
+
         # if isinstance(newdata, (list, np.ndarray)) and len(newdata) != len(self.d_objs):
         if isinstance(newdata, list) and len(newdata) != len(self.d_objs):
             print(f"newdata: {newdata}")
@@ -298,11 +314,6 @@ class DOverall(DesirabilityBase):
             print(f"len(self.d_objs): {len(self.d_objs)}")
             raise ValueError("The number of values must match the number of desirability objects.")
 
-        # # Compute individual desirabilities
-        # individual_desirabilities = [obj.predict(np.array([value]))[0] for obj, value in zip(self.d_objs, newdata)]
-        # Updated: Compute individual desirabilities
-        # Ensure newdata is a NumPy array
-        newdata = np.array(newdata)
         individual_desirabilities = [obj.predict(value) for obj, value in zip(self.d_objs, newdata.T)]
 
         # Compute the geometric mean of the individual desirabilities
