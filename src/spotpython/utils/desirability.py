@@ -3,8 +3,24 @@ import matplotlib.pyplot as plt
 
 
 class DesirabilityBase:
-    """
-    Base class for all desirability functions. Provides a method to print class attributes.
+    """Base class for all desirability functions.
+
+    Provides a method to print class attributes and extend the range of values.
+
+    Attributes:
+        None
+
+    Methods:
+        print_class_attributes(indent=0):
+            Prints the attributes of the class object in a generic and recursive manner.
+
+        extend_range(values, factor=0.05):
+            Extends the range of values by a given factor.
+
+    References:
+        Many thanks to Max Kuhn for his implementation of the 'desirability' package in R.
+        This class is based on the 'desirability' package in R, see:
+        https://cran.r-project.org/package=desirability
     """
 
     def print_class_attributes(self, indent=0):
@@ -30,6 +46,11 @@ class DesirabilityBase:
                 print(" " * indent + "]")
             else:
                 print(" " * indent + f"{attr}: {value}")
+
+    def extend_range(self, values, factor=0.05):
+        """Extend the range of values by a given factor."""
+        range_span = max(values) - min(values)
+        return [min(values) - factor * range_span, max(values) + factor * range_span]
 
 
 class DMax(DesirabilityBase):
@@ -70,7 +91,7 @@ class DMax(DesirabilityBase):
         return out
 
     def plot(self, add=False, non_inform=True, **kwargs):
-        x_range = extend_range([self.low, self.high])
+        x_range = self.extend_range([self.low, self.high])
         if not add:
             plt.plot([], [])  # Create an empty plot
             plt.xlim(x_range)
@@ -125,7 +146,7 @@ class DMin(DesirabilityBase):
         return out
 
     def plot(self, add=False, non_inform=True, **kwargs):
-        x_range = extend_range([self.low, self.high])
+        x_range = self.extend_range([self.low, self.high])
         if not add:
             plt.plot([], [])  # Create an empty plot
             plt.xlim(x_range)
@@ -187,7 +208,7 @@ class DTarget(DesirabilityBase):
         return out
 
     def plot(self, add=False, non_inform=True, **kwargs):
-        x_range = extend_range([self.low, self.high])
+        x_range = self.extend_range([self.low, self.high])
         if not add:
             plt.plot([], [])  # Create an empty plot
             plt.xlim(x_range)
@@ -246,7 +267,7 @@ class DArb(DesirabilityBase):
         return out
 
     def plot(self, add=False, non_inform=True, **kwargs):
-        x_range = extend_range(self.x)
+        x_range = self.extend_range(self.x)
         if not add:
             plt.plot([], [])  # Create an empty plot
             plt.xlim(x_range)
@@ -294,7 +315,7 @@ class DBox(DesirabilityBase):
         return out
 
     def plot(self, add=False, non_inform=True, **kwargs):
-        x_range = extend_range([self.low, self.high])
+        x_range = self.extend_range([self.low, self.high])
         if not add:
             plt.plot([], [])  # Create an empty plot
             plt.xlim(x_range)
@@ -478,12 +499,6 @@ class DesirabilityPrinter:
         for i, d_obj in enumerate(self.d, start=1):
             print("----")
             DesirabilityPrinter.print_dBox(d_obj, digits=digits, print_call=False)
-
-
-def extend_range(values, factor=0.05):
-    """Extend the range of values by a given factor."""
-    range_span = max(values) - min(values)
-    return [min(values) - factor * range_span, max(values) + factor * range_span]
 
 
 def conversion_pred(x):
