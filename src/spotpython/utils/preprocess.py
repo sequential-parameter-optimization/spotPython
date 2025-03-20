@@ -5,6 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, RobustScaler
 import numpy as np
 import pandas as pd
+from typing import List, Tuple, Union
 
 
 def get_num_cols(df: pd.DataFrame) -> list:
@@ -63,7 +64,7 @@ def get_cat_cols(df: pd.DataFrame) -> list:
 
 def generic_preprocess_df(
     df: pd.DataFrame,
-    target: str,
+    target: Union[str, List[str]],
     imputer_num=SimpleImputer(strategy="mean"),
     imputer_cat=SimpleImputer(strategy="most_frequent"),
     encoder_cat=OneHotEncoder(categories="auto", drop=None, handle_unknown="ignore", sparse_output=False),
@@ -72,21 +73,16 @@ def generic_preprocess_df(
     random_state=42,
     shuffle=True,
     n_jobs=None,
-) -> pd.DataFrame:
+) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
     """
     Preprocesses a DataFrame by handling numerical and categorical features,
     splitting the data into training and testing sets, and applying transformations.
-
-    This function performs the following steps:
-    - Separates the target column from the features.
-    - Identifies numerical and categorical columns.
-    - Applies imputers, encoders, and scalers to the respective columns.
-    - Splits the data into training and testing sets.
-    - Transforms the data using the specified preprocessing pipelines.
+    Supports single or multiple target columns.
 
     Args:
         df (pd.DataFrame): The input DataFrame to preprocess.
-        target (str): The name of the target column to predict.
+        target (Union[str, List[str]]): The name(s) of the target column(s) to predict.
+            Can be a single string or a list of strings.
         imputer_num (SimpleImputer, optional): Imputer for numerical columns.
             Defaults to `SimpleImputer(strategy="mean")`.
         imputer_cat (SimpleImputer, optional): Imputer for categorical columns.
@@ -103,15 +99,15 @@ def generic_preprocess_df(
             Defaults to None (1 job).
 
     Returns:
-        Tuple[np.ndarray, np.ndarray, pd.Series, pd.Series]:
+        Tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
             A tuple containing:
             - X_train (np.ndarray): Transformed training feature set.
             - X_test (np.ndarray): Transformed testing feature set.
-            - y_train (pd.Series): Training target values.
-            - y_test (pd.Series): Testing target values.
+            - y_train (pd.DataFrame): Training target values.
+            - y_test (pd.DataFrame): Testing target values.
 
     Raises:
-        ValueError: If the target column is not found in the DataFrame.
+        ValueError: If any of the target column(s) are not found in the DataFrame.
 
     Examples:
         >>> from spotpython.utils.preprocess import generic_preprocess_df
@@ -122,11 +118,12 @@ def generic_preprocess_df(
         ...     "age": [25, 30, np.nan, 35],
         ...     "gender": ["M", "F", "M", "F"],
         ...     "income": [50000, 60000, 55000, np.nan],
-        ...     "target": [1, 0, 1, 0]
+        ...     "target1": [1, 0, 1, 0],
+        ...     "target2": [0, 1, 0, 1]
         ... })
         >>> X_train, X_test, y_train, y_test = generic_preprocess_df(
         ...     df,
-        ...     target="target",
+        ...     target=["target1", "target2"],
         ...     imputer_num=SimpleImputer(strategy="mean"),
         ...     imputer_cat=SimpleImputer(strategy="most_frequent"),
         ...     encoder_cat=OneHotEncoder(),
@@ -137,15 +134,24 @@ def generic_preprocess_df(
     """
     if df.empty:
         raise ValueError("The input DataFrame is empty.")
-    if target not in df.columns:
-        raise ValueError(f"Target column '{target}' not found in the DataFrame.")
+
+    if isinstance(target, str):
+        target = [target]  # Convert to list for consistent handling
+
+    for t in target:
+        if t not in df.columns:
+            raise ValueError(f"Target column '{t}' not found in the DataFrame.")
+
     X = df.drop(target, axis=1)
     y = df[target]
+
     num_cols = get_num_cols(X)
     cat_cols = get_cat_cols(X)
     X[cat_cols] = X[cat_cols].astype(str)
+
     numerical_transformer = Pipeline(steps=[("imputer", imputer_num), ("scaler", scaler_num)])
     categorical_transformer = Pipeline(steps=[("imputer", imputer_cat), ("encoder", encoder_cat)])
+
     preprocessor = ColumnTransformer(
         transformers=[
             ("numerical", numerical_transformer, num_cols),
@@ -155,7 +161,9 @@ def generic_preprocess_df(
         sparse_threshold=0,
         n_jobs=n_jobs,
     )
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state, shuffle=shuffle)
+
     X_train = preprocessor.fit_transform(X_train)
     X_test = preprocessor.transform(X_test)
 
