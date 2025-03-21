@@ -786,24 +786,36 @@ def preprocess_df_for_ols(df, independent_var_columns, target_col) -> tuple:
     return X_encoded, y
 
 
-def get_combinations(z_ind: list) -> list:
+def get_combinations(ind_list: list, type="indices") -> list:
     """
     Generates all possible combinations of two targets from a list of target indices. Order is not important.
 
     Args:
-        z_ind (list): A list of target indices.
+        ind_list (list): A list of target indices.
 
     Returns:
         list: A list of tuples, where each tuple contains a combination of two target indices.
              The order of the targets within a tuple is not important, and each combination
              appears only once.
+        type (str): The type of output, either 'values' or 'indices'. Default is 'indices'.
 
     Examples:
         >>> from spotpython.utils.stats import get_combinations
-        >>> z_ind = [0, 1, 2, 30]
-        >>> combinations = get_combinations(z_ind)
-        >>> print(combinations)
-        [(0, 1), (0, 2), (0, 30), (1, 2), (1, 30), (2, 30)]
+        >>> ind_list = [0, 10, 20, 30]
+        >>> combinations = get_combinations(ind_list)
+        >>> combinations = get_combinations(ind_list, type='indices')
+            [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
+        >>> print(combinations, type='values')
+            [(0, 10), (0, 20), (0, 30), (1, 20), (1, 30), (2, 30)]
     """
-    combinations = [(z_ind[i], z_ind[j]) for i in range(len(z_ind)) for j in range(i + 1, len(z_ind))]
+    # check that ind_list is a list
+    if not isinstance(ind_list, list):
+        raise ValueError("ind_list must be a list.")
+    m = len(ind_list)
+    if type == "values":
+        combinations = [(ind_list[i], ind_list[j]) for i in range(m) for j in range(i + 1, m)]
+    elif type == "indices":
+        combinations = [(i, j) for i in range(m) for j in range(i + 1, m)]
+    else:
+        raise ValueError("type must be either 'values' or 'indices'.")
     return combinations
