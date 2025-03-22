@@ -7,9 +7,6 @@ class DesirabilityBase:
 
     Provides a method to print class attributes and extend the range of values.
 
-    Attributes:
-        None
-
     Methods:
         print_class_attributes(indent=0):
             Prints the attributes of the class object in a generic and recursive manner.
@@ -382,21 +379,22 @@ class DOverall(DesirabilityBase):
         Combines multiple desirability objects into an overall desirability function.
 
         Args:
-            *d_objs: Instances of desirability classes (e.g., DMax, DTarget, etc.).
+            *d_objs (obj):
+                Instances of desirability classes (e.g., DMax, DTarget, etc.).
         """
         valid_classes = (DMax, DMin, DTarget, DArb, DBox, DCategorical)
         # print the instanaces of desirability classes
-        print(f"d_objs: {d_objs}")
-        for obj in d_objs:
-            print(f"obj: {obj}")
-            print(f"isinstance(obj, valid_classes): {isinstance(obj, valid_classes)}")
+        # print(f"d_objs: {d_objs}")
+        # for obj in d_objs:
+        #     print(f"obj: {obj}")
+        #     print(f"isinstance(obj, valid_classes): {isinstance(obj, valid_classes)}")
 
         if not all(isinstance(obj, valid_classes) for obj in d_objs):
             raise ValueError("All objects must be instances of valid desirability classes.")
 
         self.d_objs = d_objs  # Store the desirability objects
 
-    def predict(self, newdata, all=False):
+    def predict(self, newdata, all=False) -> float:
         """
         Predicts the overall desirability based on the individual desirability objects.
 
@@ -405,7 +403,8 @@ class DOverall(DesirabilityBase):
             all (bool): Whether to return individual desirabilities along with the overall desirability.
 
         Returns:
-            float or tuple: The overall desirability score, or a tuple of individual and overall desirabilities if `all=True`.
+            float or tuple:
+                The overall desirability score, or a tuple of individual and overall desirabilities if `all=True`.
         """
 
         # # Compute individual desirabilities
@@ -501,7 +500,7 @@ class DesirabilityPrinter:
             DesirabilityPrinter.print_dBox(d_obj, digits=digits, print_call=False)
 
 
-def conversion_pred(x):
+def conversion_pred(x) -> float:
     """
     Predicts the percent conversion based on the input vector x.
 
@@ -514,7 +513,7 @@ def conversion_pred(x):
     return 81.09 + 1.0284 * x[0] + 4.043 * x[1] + 6.2037 * x[2] - 1.8366 * x[0] ** 2 + 2.9382 * x[1] ** 2 - 5.1915 * x[2] ** 2 + 2.2150 * x[0] * x[1] + 11.375 * x[0] * x[2] - 3.875 * x[1] * x[2]
 
 
-def activity_pred(x):
+def activity_pred(x) -> float:
     """
     Predicts the thermal activity based on the input vector x.
 
