@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.inspection import PartialDependenceDisplay
+from sklearn.model_selection import train_test_split
 
 
 def randorient(k, p, xi):
@@ -138,3 +141,74 @@ def screening(X, fun, xi, p, labels, range=None, print=False) -> pd.DataFrame:
         plt.gca().tick_params(labelsize=10)
         plt.grid(True)
         plt.show()
+
+
+def plot_all_partial_dependence(df, df_target, model="GradientBoostingRegressor", nrows=5, ncols=6, figsize=(20, 15)) -> None:
+    """
+    Generates Partial Dependence Plots (PDPs) for every feature in a DataFrame against a target variable,
+    arranged in a grid.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the features.
+        df_target (pd.Series): Series containing the target variable.
+        model (str, optional): Name of the model class to use (e.g., "GradientBoostingRegressor").
+                               Defaults to "GradientBoostingRegressor".
+        nrows (int, optional): Number of rows in the grid of subplots. Defaults to 5.
+        ncols (int, optional): Number of columns in the grid of subplots. Defaults to 6.
+        figsize (tuple, optional): Figure size (width, height) in inches. Defaults to (20, 15).
+
+    Returns:
+        None
+
+    Examples:
+        >>> form spotpython.utils.effects import plot_all_partial_dependence
+        >>> from sklearn.datasets import load_boston
+        >>> import pandas as pd
+        >>> data = load_boston()
+        >>> df = pd.DataFrame(data.data, columns=data.feature_names)
+        >>> df_target = pd.Series(data.target, name="target")
+        >>> plot_all_partial_dependence(df, df_target, model="GradientBoostingRegressor", nrows=5, ncols=6, figsize=(20, 15))
+
+    """
+
+    # Separate features and target
+    X = df
+    y = df_target  # Target variable is now a Series
+
+    # Split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Instantiate the model
+    if model == "GradientBoostingRegressor":
+        gb_model = GradientBoostingRegressor(random_state=42)
+    elif model == "RandomForestRegressor":
+        from sklearn.ensemble import RandomForestRegressor
+
+        gb_model = RandomForestRegressor(random_state=42)
+    elif model == "DecisionTreeRegressor":
+        from sklearn.tree import DecisionTreeRegressor
+
+        gb_model = DecisionTreeRegressor(random_state=42)
+    else:
+        raise ValueError(f"Unsupported model: {model}")
+
+    # Train model
+    gb_model.fit(X_train, y_train)
+
+    # Create subplots
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=figsize)
+    axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
+
+    # Generate PDP for each feature
+    features = X.columns
+    for i, feature in enumerate(features):
+        ax = axes[i]  # Select the axis for the current feature
+        PartialDependenceDisplay.from_estimator(gb_model, X_train, [feature], ax=ax)
+        ax.set_title(feature)  # Set the title of the subplot to the feature name
+
+    # Remove empty subplots if the number of features is less than nrows * ncols
+    for i in range(len(features), nrows * ncols):
+        fig.delaxes(axes[i])
+
+    plt.tight_layout()  # Adjust subplot parameters for a tight layout
+    plt.show()
