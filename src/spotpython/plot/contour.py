@@ -306,6 +306,7 @@ def plotModel(
             edgecolor="black",
             s=points_size,
             alpha=0.9,
+            zorder=10,  # Ensure points are rendered on top
         )
         ax_surface.scatter(
             X_points[above_mask, i],
@@ -315,6 +316,7 @@ def plotModel(
             edgecolor="black",
             s=points_size,
             alpha=0.9,
+            zorder=10,  # Ensure points are rendered on top
         )
         ax_surface.scatter(
             X_points[on_mask, i],
@@ -324,6 +326,7 @@ def plotModel(
             edgecolor="black",
             s=points_size,
             alpha=0.9,
+            zorder=10,  # Ensure points are rendered on top
         )
 
     # --- Optionally set aspect in 3D ---

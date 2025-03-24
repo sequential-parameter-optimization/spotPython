@@ -26,7 +26,7 @@ from numpy import sqrt
 from numpy import spacing
 from numpy import append
 from numpy import min, max
-from spotpython.utils.convert import get_shape, set_shape
+from spotpython.utils.convert import get_shape
 from spotpython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotpython.utils.compare import selectNew
 from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points
