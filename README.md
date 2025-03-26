@@ -18,7 +18,7 @@ Sequential Parameter Optimization in Python
 
 # spotpython Documentation
 
-* Hyperparameter-tuning Cookbook: A guide for scikit-learn, PyTorch, river, and spotpython. Available at [https://sequential-parameter-optimization.github.io/spotpython/](https://sequential-parameter-optimization.github.io/spotpython/).
+* Hyperparameter-tuning Cookbook: A guide for scikit-learn, PyTorch, river, and spotpython. Available at [https://sequential-parameter-optimization.github.io/spotPython/](https://sequential-parameter-optimization.github.io/spotpython/).
 
 * [Bartz-Beielstein (2023). PyTorch Hyperparameter Tuning --- A Tutorial for spotpython (Working Paper)](https://arxiv.org/abs/2305.11930).
 
