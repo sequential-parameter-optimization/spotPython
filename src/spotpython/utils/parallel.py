@@ -29,45 +29,50 @@ def evaluate_row(row: Union[np.ndarray, list], objective_function: Callable[[np.
     return objective_function(np.array([row]), fun_control)
 
 def parallel_objective_function(objective_function, X, num_cores, fun_control, method)->np.ndarray:
-        """
-        Executes an objective function in parallel using either multiprocessing or joblib.
-        Args:
-            objective_function (callable): The function to be evaluated for each row in `X`.
-            X (iterable): The input data, where each element represents a row to be processed.
-            num_cores (int): The number of CPU cores to use for parallel processing.
-            fun_control (dict): A dictionary of shared control parameters for the objective function.
-            method (str): The parallelization method to use. Options are:
-                - 'mp': Use Python's multiprocessing module.
-                - 'joblib': Use the joblib library.
-        Returns:
-            numpy.ndarray: A flattened array of results obtained by applying the objective function to each row in `X`.
-        Raises:
-            ValueError: If an unsupported `method` is provided.
-        Examples:
-            >>> from spotpython.utils.parallel import parallel_objective_function
-            >>> import numpy as np
-            >>> def sample_objective(row, control):
-            ...     return sum(row) + control.get('offset', 0)
-            >>> X = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-            >>> fun_control = {'offset': 10}
-            >>> parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method='mp')
-            array([16, 25, 34])
-            >>> parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method='joblib')
-            array([16, 25, 34])
-        """        
-        with Manager() as manager:  
-            shared_control = manager.dict(fun_control)
-            if method=='mp':
-                with Pool(processes=num_cores) as pool:
-                    results = pool.starmap(evaluate_row, [(row, objective_function, shared_control) for row in X])
-            elif method=='joblib':
-                results = Parallel(n_jobs=num_cores)(delayed(evaluate_row)(row, objective_function, shared_control) for row in X)
+    """
+    Executes an objective function in parallel using either multiprocessing or joblib.
+    
+    Args:
+        objective_function (callable): The function to be evaluated for each row in `X`.
+        X (iterable): The input data, where each element represents a row to be processed.
+        num_cores (int): The number of CPU cores to use for parallel processing.
+        fun_control (dict): A dictionary of shared control parameters for the objective function.
+        method (str): The parallelization method to use. Options are:
+            - 'mp': Use Python's multiprocessing module.
+            - 'joblib': Use the joblib library.
+    
+    Returns:
+        numpy.ndarray: A flattened array of results obtained by applying the objective function to each row in `X`.
+    
+    Raises:
+        ValueError: If an unsupported `method` is provided.
+    
+    Examples:
+        >>> from spotpython.utils.parallel import parallel_objective_function
+        >>> import numpy as np
+        >>> def sample_objective(row, control):
+        ...     return sum(row) + control.get('offset', 0)
+        >>> X = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+        >>> fun_control = {'offset': 10}
+        >>> parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method='mp')
+        array([16, 25, 34])
+        >>> parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method='joblib')
+        array([16, 25, 34])
+    """        
+    with Manager() as manager:  
+        shared_control = manager.dict(fun_control)
+        if method=='mp':
+            with Pool(processes=num_cores) as pool:
+                results = pool.starmap(evaluate_row, [(row, objective_function, shared_control) for row in X])
+        elif method=='joblib':
+            results = Parallel(n_jobs=num_cores)(delayed(evaluate_row)(row, objective_function, shared_control) for row in X)
 
-        return np.array(results).flatten()
+    return np.array(results).flatten()
 
 def make_parallel(obj_func, num_cores, method='mp')->Callable:
     """
     Creates a parallelized wrapper function for the given objective function.
+    
     Args:
         obj_func (callable): The objective function to be parallelized. 
             It should accept the same arguments as the wrapper function.
@@ -75,9 +80,11 @@ def make_parallel(obj_func, num_cores, method='mp')->Callable:
         method (str, optional): The parallelization method to use. 
             Defaults to 'mp' (multiprocessing). Other methods may be supported 
             depending on the implementation of `parallel_objective_function`.
+    
     Returns:
         callable: A wrapper function that executes the objective function 
         in parallel using the specified number of cores and method.
+    
     Examples:
         >>> from spotpython.utils.parallel import make_parallel
         >>> def sample_function(x):
