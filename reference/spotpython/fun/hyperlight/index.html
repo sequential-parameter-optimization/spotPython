@@ -1202,6 +1202,8 @@
       
         
       
+        
+      
     
     
       
@@ -1365,6 +1367,27 @@
   
   <span class="md-ellipsis">
     hypertorch
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multiobjectivefunctions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    multiobjectivefunctions
   </span>
   
 
@@ -4964,7 +4987,11 @@
 <span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
-<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">HyperLight</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Hyperparameter Tuning for Lightning.</span>
 
@@ -5040,19 +5067,21 @@
 
     <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Evaluates the function for the given input array X and control parameters.</span>
+<span class="sd">        Evaluates the function for the given input array X of shape (n,k)</span>
+<span class="sd">        and control parameters specified as a dict.</span>
 <span class="sd">        Calls the train_model function from spotpython.light.trainmodel</span>
 <span class="sd">        to train the model and evaluate the results.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            X (np.ndarray):</span>
-<span class="sd">                input array.</span>
+<span class="sd">                input array of shape (n, k) where n is the number of configurations evaluated</span>
+<span class="sd">                and k is the number of hyperparameters.</span>
 <span class="sd">            fun_control (dict):</span>
 <span class="sd">                dictionary containing control parameters for the hyperparameter tuning.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (np.ndarray):</span>
-<span class="sd">                array containing the evaluation results.</span>
+<span class="sd">                (n,) array containing the `n` evaluation results.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from math import inf</span>
@@ -5122,6 +5151,8 @@
             <span class="n">z_val</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
             <span class="c1"># Append, since several configurations can be evaluated at once.</span>
             <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_res</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
+        <span class="c1"># Finally, z_res is a 1-dim array</span>
+        <span class="c1"># of shape (n,) where n is the number of configurations evaluated.</span>
         <span class="k">return</span> <span class="n">z_res</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -5373,7 +5404,8 @@ input array with valid shape.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Evaluates the function for the given input array X and control parameters.
+      <p>Evaluates the function for the given input array X of shape (n,k)
+and control parameters specified as a dict.
 Calls the train_model function from spotpython.light.trainmodel
 to train the model and evaluate the results.</p>
 
@@ -5396,7 +5428,8 @@ to train the model and evaluate the results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>input array.</p>
+                <p>input array of shape (n, k) where n is the number of configurations evaluated
+and k is the number of hyperparameters.</p>
               </div>
             </td>
             <td>
@@ -5436,7 +5469,7 @@ to train the model and evaluate the results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>array containing the evaluation results.</p>
+                <p>(n,) array containing the <code>n</code> evaluation results.</p>
               </div>
             </td>
           </tr>
@@ -5569,21 +5602,27 @@ to train the model and evaluate the results.</p>
 <span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
-<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Evaluates the function for the given input array X and control parameters.</span>
+<span class="sd">    Evaluates the function for the given input array X of shape (n,k)</span>
+<span class="sd">    and control parameters specified as a dict.</span>
 <span class="sd">    Calls the train_model function from spotpython.light.trainmodel</span>
 <span class="sd">    to train the model and evaluate the results.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        X (np.ndarray):</span>
-<span class="sd">            input array.</span>
+<span class="sd">            input array of shape (n, k) where n is the number of configurations evaluated</span>
+<span class="sd">            and k is the number of hyperparameters.</span>
 <span class="sd">        fun_control (dict):</span>
 <span class="sd">            dictionary containing control parameters for the hyperparameter tuning.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (np.ndarray):</span>
-<span class="sd">            array containing the evaluation results.</span>
+<span class="sd">            (n,) array containing the `n` evaluation results.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from math import inf</span>
@@ -5653,6 +5692,8 @@ to train the model and evaluate the results.</p>
         <span class="n">z_val</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
         <span class="c1"># Append, since several configurations can be evaluated at once.</span>
         <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_res</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
+    <span class="c1"># Finally, z_res is a 1-dim array</span>
+    <span class="c1"># of shape (n,) where n is the number of configurations evaluated.</span>
     <span class="k">return</span> <span class="n">z_res</span>
 </code></pre></div></td></tr></table></div>
             </details>

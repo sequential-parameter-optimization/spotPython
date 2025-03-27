@@ -1200,6 +1200,8 @@
       
         
       
+        
+      
     
     
       
@@ -1285,6 +1287,27 @@
   
   <span class="md-ellipsis">
     hypertorch
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fun/multiobjectivefunctions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    multiobjectivefunctions
   </span>
   
 
@@ -4802,17 +4825,7 @@
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/repair.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 81</span>
-<span class="normal"> 82</span>
-<span class="normal"> 83</span>
-<span class="normal"> 84</span>
-<span class="normal"> 85</span>
-<span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 91</span>
 <span class="normal"> 92</span>
 <span class="normal"> 93</span>
 <span class="normal"> 94</span>
@@ -4854,7 +4867,17 @@
 <span class="normal">130</span>
 <span class="normal">131</span>
 <span class="normal">132</span>
-<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">apply_penalty_NA</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">penalty_NA</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">apply_penalty_NA</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">penalty_NA</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">sd</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Replaces NaN values in y with a penalty value of penalty_NA and issues a warning if necessary.</span>
 
@@ -4926,8 +4949,7 @@
 
       <p>Remove rows from X and y where y contains NaN values and issue a warning
     if the dimension of the returned y array is smaller than the dimension of the original y array.
-    Issues a ValueError if the dimension of the returned y array is less than 1 and
-    stop_on_zero_return is True.</p>
+    Handles both 1D (shape <code>(n,)</code>) and 2D (shape <code>(n, m)</code>) y arrays.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4962,7 +4984,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>y array</p>
+                <p>y array (can be 1D or 2D)</p>
               </div>
             </td>
             <td>
@@ -5003,7 +5025,7 @@ Default is False.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tuple[numpy.ndarray, np.ndarray]:
+                <p>Tuple[numpy.ndarray, numpy.ndarray]:
 X and y arrays with rows containing NaN values in y removed.</p>
               </div>
             </td>
@@ -5014,13 +5036,18 @@ X and y arrays with rows containing NaN values in y removed.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="go">    from spotpython.utils.repair import remove_nan</span>
-<span class="go">    X = np.array([[1, 2], [3, 4], [5, 6]])</span>
-<span class="go">    y = np.array([1, np.nan, 2])</span>
-<span class="go">    X_cleaned, y_cleaned = remove_nan(X, y)</span>
-<span class="go">    print(X_cleaned, y_cleaned)</span>
-<span class="go">    [[1 2]</span>
-<span class="go">     [5 6]] [1. 2.]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpython.utils.repair</span> <span class="kn">import</span> <span class="n">remove_nan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_cleaned</span><span class="p">,</span> <span class="n">y_cleaned</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">X_cleaned</span><span class="p">,</span> <span class="n">y_cleaned</span><span class="p">)</span>
+<span class="go">[[1 2]</span>
+<span class="go"> [5 6]] [1. 2.]</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_cleaned</span><span class="p">,</span> <span class="n">y_cleaned</span> <span class="o">=</span> <span class="n">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">X_cleaned</span><span class="p">,</span> <span class="n">y_cleaned</span><span class="p">)</span>
+<span class="go">[[1 2]] [[1. 2.]]</span>
 </code></pre></div>
 
             <details class="quote">
@@ -5073,51 +5100,71 @@ X and y arrays with rows containing NaN values in y removed.</p>
 <span class="normal">75</span>
 <span class="normal">76</span>
 <span class="normal">77</span>
-<span class="normal">78</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_nan</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stop_on_zero_return</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove rows from X and y where y contains NaN values and issue a warning</span>
 <span class="sd">        if the dimension of the returned y array is smaller than the dimension of the original y array.</span>
-<span class="sd">        Issues a ValueError if the dimension of the returned y array is less than 1 and</span>
-<span class="sd">        stop_on_zero_return is True.</span>
+<span class="sd">        Handles both 1D (shape `(n,)`) and 2D (shape `(n, m)`) y arrays.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        X (numpy.ndarray):</span>
 <span class="sd">            X array</span>
 <span class="sd">        y (numpy.ndarray):</span>
-<span class="sd">            y array</span>
+<span class="sd">            y array (can be 1D or 2D)</span>
 <span class="sd">        stop_on_zero_return (bool):</span>
 <span class="sd">            whether to stop if the returned dimension is less than 1.</span>
 <span class="sd">            Default is False.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Tuple[numpy.ndarray, np.ndarray]:</span>
+<span class="sd">        Tuple[numpy.ndarray, numpy.ndarray]:</span>
 <span class="sd">            X and y arrays with rows containing NaN values in y removed.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">            from spotpython.utils.repair import remove_nan</span>
-<span class="sd">            X = np.array([[1, 2], [3, 4], [5, 6]])</span>
-<span class="sd">            y = np.array([1, np.nan, 2])</span>
-<span class="sd">            X_cleaned, y_cleaned = remove_nan(X, y)</span>
-<span class="sd">            print(X_cleaned, y_cleaned)</span>
-<span class="sd">            [[1 2]</span>
-<span class="sd">             [5 6]] [1. 2.]</span>
+<span class="sd">        &gt;&gt;&gt; from spotpython.utils.repair import remove_nan</span>
+<span class="sd">        &gt;&gt;&gt; X = np.array([[1, 2], [3, 4], [5, 6]])</span>
+<span class="sd">        &gt;&gt;&gt; y = np.array([1, np.nan, 2])</span>
+<span class="sd">        &gt;&gt;&gt; X_cleaned, y_cleaned = remove_nan(X, y)</span>
+<span class="sd">        &gt;&gt;&gt; print(X_cleaned, y_cleaned)</span>
+<span class="sd">        [[1 2]</span>
+<span class="sd">         [5 6]] [1. 2.]</span>
+
+<span class="sd">        &gt;&gt;&gt; y = np.array([[1, 2], [np.nan, 4], [5, np.nan]])</span>
+<span class="sd">        &gt;&gt;&gt; X_cleaned, y_cleaned = remove_nan(X, y)</span>
+<span class="sd">        &gt;&gt;&gt; print(X_cleaned, y_cleaned)</span>
+<span class="sd">        [[1 2]] [[1. 2.]]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Get the original dimension of the y array</span>
     <span class="n">original_dim</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1"># Identify indices where y is not NaN</span>
-    <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="c1"># Identify rows where all elements in y are finite</span>
+    <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y must be a 1D or 2D array.&quot;</span><span class="p">)</span>
 
     <span class="c1"># Update X and y by removing rows with NaN in y</span>
     <span class="n">X_cleaned</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="n">y_cleaned</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+    <span class="n">y_cleaned</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">y</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
 
     <span class="c1"># Check if dimensions have been reduced</span>
     <span class="n">returned_dim</span> <span class="o">=</span> <span class="n">y_cleaned</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">returned_dim</span> <span class="o">&lt;</span> <span class="n">original_dim</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! The dimension of the returned y array is </span><span class="si">{</span><span class="n">y_cleaned</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span> <span class="sa">f</span><span class="s2">&quot;which is smaller than the original dimension </span><span class="si">{</span><span class="n">original_dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">!!! Check whether to continue with the reduced dimension is useful.&quot;</span><span class="p">)</span>
-    <span class="c1"># throw an error if the returned dimension is smaller than one</span>
+
+    <span class="c1"># Throw an error if the returned dimension is smaller than one</span>
     <span class="k">if</span> <span class="n">returned_dim</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">stop_on_zero_return</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;!!!! The dimension of the returned y array is less than 1. Check the input data.&quot;</span><span class="p">)</span>
 

@@ -1200,6 +1200,8 @@
       
         
       
+        
+      
     
     
       
@@ -1285,6 +1287,27 @@
   
   <span class="md-ellipsis">
     hypertorch
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../fun/multiobjectivefunctions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    multiobjectivefunctions
   </span>
   
 
@@ -4777,8 +4800,7 @@ It should accept a NumPy array and an additional control parameter.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/parallel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 6</span>
-<span class="normal"> 7</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
 <span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
@@ -4800,7 +4822,8 @@ It should accept a NumPy array and an additional control parameter.</p>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
-<span class="normal">29</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">objective_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">fun_control</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">29</span>
+<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">objective_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">fun_control</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates a single row using the provided objective function.</span>
 
@@ -4862,7 +4885,7 @@ It should accept a NumPy array and an additional control parameter.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The objective function to be parallelized. 
+                <p>The objective function to be parallelized.
 It should accept the same arguments as the wrapper function.</p>
               </div>
             </td>
@@ -4891,8 +4914,8 @@ It should accept the same arguments as the wrapper function.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The parallelization method to use. 
-Defaults to &lsquo;mp&rsquo; (multiprocessing). Other methods may be supported 
+                <p>The parallelization method to use.
+Defaults to &lsquo;mp&rsquo; (multiprocessing). Other methods may be supported
 depending on the implementation of <code>parallel_objective_function</code>.</p>
               </div>
             </td>
@@ -4919,7 +4942,7 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A wrapper function that executes the objective function </p>
+                <p>A wrapper function that executes the objective function</p>
               </div>
             </td>
           </tr>
@@ -4950,10 +4973,7 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/parallel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 72</span>
-<span class="normal"> 73</span>
-<span class="normal"> 74</span>
-<span class="normal"> 75</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 75</span>
 <span class="normal"> 76</span>
 <span class="normal"> 77</span>
 <span class="normal"> 78</span>
@@ -4980,20 +5000,24 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="normal"> 99</span>
 <span class="normal">100</span>
 <span class="normal">101</span>
-<span class="normal">102</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make_parallel</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;mp&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">Callable</span><span class="p">:</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make_parallel</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mp&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a parallelized wrapper function for the given objective function.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        obj_func (callable): The objective function to be parallelized. </span>
+<span class="sd">        obj_func (callable): The objective function to be parallelized.</span>
 <span class="sd">            It should accept the same arguments as the wrapper function.</span>
 <span class="sd">        num_cores (int): The number of cores to use for parallel processing.</span>
-<span class="sd">        method (str, optional): The parallelization method to use. </span>
-<span class="sd">            Defaults to &#39;mp&#39; (multiprocessing). Other methods may be supported </span>
+<span class="sd">        method (str, optional): The parallelization method to use.</span>
+<span class="sd">            Defaults to &#39;mp&#39; (multiprocessing). Other methods may be supported</span>
 <span class="sd">            depending on the implementation of `parallel_objective_function`.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        callable: A wrapper function that executes the objective function </span>
+<span class="sd">        callable: A wrapper function that executes the objective function</span>
 <span class="sd">        in parallel using the specified number of cores and method.</span>
 
 <span class="sd">    Examples:</span>
@@ -5007,6 +5031,7 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="sd">        [1, 4, 9, 16]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">parallel_wrap</span>
+
     <span class="k">def</span> <span class="nf">parallel_wrap</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">parallel_objective_function</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
 
@@ -5179,9 +5204,7 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/parallel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
@@ -5218,7 +5241,9 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
-<span class="normal">70</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_objective_function</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_objective_function</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes an objective function in parallel using either multiprocessing or joblib.</span>
 
@@ -5248,13 +5273,13 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="sd">        array([16, 25, 34])</span>
 <span class="sd">        &gt;&gt;&gt; parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method=&#39;joblib&#39;)</span>
 <span class="sd">        array([16, 25, 34])</span>
-<span class="sd">    &quot;&quot;&quot;</span>        
-    <span class="k">with</span> <span class="n">Manager</span><span class="p">()</span> <span class="k">as</span> <span class="n">manager</span><span class="p">:</span>  
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">Manager</span><span class="p">()</span> <span class="k">as</span> <span class="n">manager</span><span class="p">:</span>
         <span class="n">shared_control</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;mp&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;mp&quot;</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
                 <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">evaluate_row</span><span class="p">,</span> <span class="p">[(</span><span class="n">row</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">shared_control</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;joblib&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;joblib&quot;</span><span class="p">:</span>
             <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">evaluate_row</span><span class="p">)(</span><span class="n">row</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">shared_control</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">X</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
