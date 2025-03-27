@@ -78,7 +78,8 @@ def test_get_spot_attributes_as_df():
                             'var_type',
                             'var_y',
                             'verbosity',
-                            'y']
+                            'y',
+                            'y_mo']
 
     # Check that the DataFrame has the correct attributes
     assert list(df['Attribute Name']) == expected_attributes

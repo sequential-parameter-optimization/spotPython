@@ -4,6 +4,7 @@ from spotpython.spot.spot import Spot
 class MockSpot(Spot):
     def __init__(self, fun_control):
         self.fun_control = fun_control
+        self.y_mo = None
 
 def test_mo2so():
     # Case 1: Multi-objective with a user-defined function

@@ -347,6 +347,7 @@ class Spot:
         self.mean_X = None
         self.mean_y = None
         self.var_y = None
+        self.y_mo = None
 
     def _design_setup(self, design) -> None:
         """
@@ -1033,6 +1034,17 @@ class Spot:
 
         self.X = repair_non_numeric(X0, self.var_type)
 
+    def _store_mo(self, y_mo) -> None:
+        # store y_mo in self.y_mo (append new values)
+        if self.y_mo is None:            
+            self.y_mo = np.atleast_2d(y_mo)
+        else:  # append new values
+            print(f"y_mo: {y_mo}")
+            print(f"self.y_mo: {self.y_mo}")
+            print(f"y_mo.shape: {y_mo.shape}")
+            print(f"self.y_mo.shape: {self.y_mo.shape}")
+            self.y_mo = np.concatenate((self.y_mo, y_mo), axis=1)
+
     def _mo2so(self, y_mo) -> None:
         """
         Converts multi-objective values to a single-objective value by applying a user-defined
@@ -1056,6 +1068,8 @@ class Spot:
         n, k = get_shape(y_mo)
         # Ensure that y_mo is a (n, k) numpy array
         y_mo = np.atleast_2d(y_mo)
+        # TODO
+        # self._store_mo(y_mo)
         m = y_mo.shape[0]  # Number of objectives
         if m > 1:
             if self.fun_control["fun_mo2so"] is not None:
@@ -1124,6 +1138,7 @@ class Spot:
         logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: fun_control: %s", self.fun_control)
 
         y_mo = self.fun(X=X_all, fun_control=self.fun_control)
+
         #  Convert multi-objective values to single-objective values
         # TODO: Store y_mo in self.y_mo (append new values)
         self.y = self._mo2so(y_mo)
