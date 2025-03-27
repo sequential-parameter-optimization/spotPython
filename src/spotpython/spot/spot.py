@@ -792,6 +792,7 @@ class Spot:
 
         Args:
             X_start (numpy.ndarray, optional): initial design. Defaults to None.
+            The initial design must have shape (n, k), where n is the number of points and k is the number of dimensions.
 
         Returns:
             Spot: The `Spot` instance configured and updated based on the optimization process.
@@ -906,6 +907,7 @@ class Spot:
 
         Args:
             X_start (numpy.ndarray, optional): initial design. Defaults to None.
+            Must be of shape (n, k), where n is the number of points and k is the number of dimensions.
 
         Attributes:
             self.X (numpy.ndarray): initial design
@@ -965,7 +967,7 @@ class Spot:
 
         Args:
             X_start (numpy.ndarray, optional): User-provided starting points
-                for the design. Shape should be (n_samples, n_features).
+                for the design. Shape should be (n=n_samples, k=n_features).
                 Defaults to None.
 
         Returns:
@@ -975,7 +977,7 @@ class Spot:
         Raises:
             Exception: If the resulting design matrix has zero rows.
 
-        Note:
+        Notes:
             * If `X_start` is not in the expected shape, it is ignored.
 
         Examples:
@@ -1035,15 +1037,19 @@ class Spot:
         self.X = repair_non_numeric(X0, self.var_type)
 
     def _store_mo(self, y_mo) -> None:
-        # store y_mo in self.y_mo (append new values)
-        if self.y_mo is None:            
-            self.y_mo = np.atleast_2d(y_mo)
+        # store y_mo in self.y_mo (append new values) if mo, otherwise self.y_mo is None
+        if self.y_mo is None and y_mo.ndim == 2:
+            self.y_mo = y_mo
         else:  # append new values
-            print(f"y_mo: {y_mo}")
-            print(f"self.y_mo: {self.y_mo}")
-            print(f"y_mo.shape: {y_mo.shape}")
-            print(f"self.y_mo.shape: {self.y_mo.shape}")
-            self.y_mo = np.concatenate((self.y_mo, y_mo), axis=1)
+            # before stacking the arrays, check if the number of columns is the same in the mo case
+            if y_mo.ndim == 2 and self.y_mo.ndim == 2:
+                if self.y_mo.shape[1] != y_mo.shape[1]:
+                    print(f"Shape of y_mo: {y_mo.shape}")
+                    print(f"y_mo: {y_mo}")
+                    print(f"Shape of self.y_mo: {self.y_mo.shape}")
+                    print(f"self.y_mo: {self.y_mo}")
+                    raise ValueError(f"Number of columns (objectives) in y_mo ({y_mo.shape[1]}) " f"does not match the number of columns in self.y_mo ({self.y_mo.shape[1]})")
+                self.y_mo = np.vstack((self.y_mo, y_mo))
 
     def _mo2so(self, y_mo) -> None:
         """
@@ -1056,33 +1062,28 @@ class Spot:
 
         Args:
             y_mo (numpy.ndarray):
-                A 2D array of shape (m, n), where ``m`` is
-                the number of objectives  and ``n`` is the number of data points.
-
+                If multi-objective values are present, this is an array of shape (n, m), where ``m`` is
+                the number of objectives and ``n`` is the number of data points.
+                Otherwise, it is an array of shape (n,) with single-objective values.
         Returns:
             numpy.ndarray:
-                A 1D array of shape (n,) with single-objective values if ``m > 1``. If only one
-                objective is present (``m == 1``), no transformation is performed.
+                A 1D array of shape (n,) with single-objective values.
 
         """
-        n, k = get_shape(y_mo)
-        # Ensure that y_mo is a (n, k) numpy array
-        y_mo = np.atleast_2d(y_mo)
-        # TODO
-        # self._store_mo(y_mo)
-        m = y_mo.shape[0]  # Number of objectives
-        if m > 1:
+        n, m = get_shape(y_mo)
+        self._store_mo(y_mo)
+        # do not use m as a condition, because m can be None, use ndim instead
+        if y_mo.ndim == 2:
             if self.fun_control["fun_mo2so"] is not None:
                 y0 = self.fun_control["fun_mo2so"](y_mo)
             else:
-                # Select the first row of an (m, k) array
-                y0 = y_mo[0, :]
+                # Select the first column of an (n,m) array
+                if y_mo.size > 0:
+                    y0 = y_mo[:, 0]
+                else:
+                    y0 = y_mo
         else:
-            if k is None:
-                y0 = y_mo.flatten()
-            else:
-                y0 = y_mo  # Keep as 2D array for single-objective case
-
+            y0 = y_mo
         return y0
 
     def evaluate_initial_design(self) -> None:
@@ -1138,6 +1139,9 @@ class Spot:
         logger.debug("In Spot() evaluate_initial_design(), before calling self.fun: fun_control: %s", self.fun_control)
 
         y_mo = self.fun(X=X_all, fun_control=self.fun_control)
+        if self.verbosity > 1:
+            print(f"y_mo as returned from fun(): {y_mo}")
+            print(f"y_mo shape: {y_mo.shape}")
 
         #  Convert multi-objective values to single-objective values
         # TODO: Store y_mo in self.y_mo (append new values)
@@ -1470,9 +1474,8 @@ class Spot:
         # (S-18): Evaluating New Solutions:
         y_mo = self.fun(X=X_all, fun_control=self.fun_control)
         # Convert multi-objective values to single-objective values:
-        # TODO: Store y_mo in self.y_mo (append new values)
         y0 = self._mo2so(y_mo)
-
+        # Apply penalty for NA values works only on so values:
         y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         # Append New Solutions (only if they are not nan):
@@ -1709,6 +1712,7 @@ class Spot:
         # TODO: Store y_mo in self.y_mo (append new values)
         y_mo = self.fun(X=X_all, fun_control=self.fun_control)
         y0 = self._mo2so(y_mo)
+        # Apply penalty for NA values works only on so values:
         y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
         return X0, y0
@@ -2045,8 +2049,8 @@ class Spot:
             X_test = np.linspace(self.lower[0], self.upper[0], 100)
             y_mo = self.fun(X=X_test.reshape(-1, 1), fun_control=self.fun_control)
             # convert multi-objective values to single-objective values
-            # TODO: Store y_mo in self.y_mo (append new values)
             y_test = self._mo2so(y_mo)
+            # Apply penalty for NA values works only on so values:
             y_test = apply_penalty_NA(y_test, self.fun_control["penalty_NA"], verbosity=self.verbosity)
             if isinstance(self.surrogate, Kriging):
                 y_hat = self.surrogate.predict(X_test[:, np.newaxis], return_val="y")

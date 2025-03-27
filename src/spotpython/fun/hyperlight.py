@@ -88,19 +88,21 @@ class HyperLight:
 
     def fun(self, X: np.ndarray, fun_control: dict = None) -> np.ndarray:
         """
-        Evaluates the function for the given input array X and control parameters.
+        Evaluates the function for the given input array X of shape (n,k)
+        and control parameters specified as a dict.
         Calls the train_model function from spotpython.light.trainmodel
         to train the model and evaluate the results.
 
         Args:
             X (np.ndarray):
-                input array.
+                input array of shape (n, k) where n is the number of configurations evaluated
+                and k is the number of hyperparameters.
             fun_control (dict):
                 dictionary containing control parameters for the hyperparameter tuning.
 
         Returns:
             (np.ndarray):
-                array containing the evaluation results.
+                (n,) array containing the `n` evaluation results.
 
         Examples:
             >>> from math import inf
@@ -170,4 +172,6 @@ class HyperLight:
             z_val = fun_control["weights"] * df_eval
             # Append, since several configurations can be evaluated at once.
             z_res = np.append(z_res, z_val)
+        # Finally, z_res is a 1-dim array
+        # of shape (n,) where n is the number of configurations evaluated.
         return z_res

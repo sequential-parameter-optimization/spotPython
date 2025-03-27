@@ -30,48 +30,58 @@ def repair_non_numeric(X: np.ndarray, var_type: List[str]) -> np.ndarray:
 def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) -> Tuple[np.ndarray, np.ndarray]:
     """Remove rows from X and y where y contains NaN values and issue a warning
         if the dimension of the returned y array is smaller than the dimension of the original y array.
-        Issues a ValueError if the dimension of the returned y array is less than 1 and
-        stop_on_zero_return is True.
+        Handles both 1D (shape `(n,)`) and 2D (shape `(n, m)`) y arrays.
 
     Args:
         X (numpy.ndarray):
             X array
         y (numpy.ndarray):
-            y array
+            y array (can be 1D or 2D)
         stop_on_zero_return (bool):
             whether to stop if the returned dimension is less than 1.
             Default is False.
 
     Returns:
-        Tuple[numpy.ndarray, np.ndarray]:
+        Tuple[numpy.ndarray, numpy.ndarray]:
             X and y arrays with rows containing NaN values in y removed.
 
     Examples:
         >>> import numpy as np
-            from spotpython.utils.repair import remove_nan
-            X = np.array([[1, 2], [3, 4], [5, 6]])
-            y = np.array([1, np.nan, 2])
-            X_cleaned, y_cleaned = remove_nan(X, y)
-            print(X_cleaned, y_cleaned)
-            [[1 2]
-             [5 6]] [1. 2.]
+        >>> from spotpython.utils.repair import remove_nan
+        >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+        >>> y = np.array([1, np.nan, 2])
+        >>> X_cleaned, y_cleaned = remove_nan(X, y)
+        >>> print(X_cleaned, y_cleaned)
+        [[1 2]
+         [5 6]] [1. 2.]
+
+        >>> y = np.array([[1, 2], [np.nan, 4], [5, np.nan]])
+        >>> X_cleaned, y_cleaned = remove_nan(X, y)
+        >>> print(X_cleaned, y_cleaned)
+        [[1 2]] [[1. 2.]]
     """
     # Get the original dimension of the y array
     original_dim = y.shape[0]
 
-    # Identify indices where y is not NaN
-    ind = np.isfinite(y)
+    # Identify rows where all elements in y are finite
+    if y.ndim == 1:
+        ind = np.isfinite(y)
+    elif y.ndim == 2:
+        ind = np.all(np.isfinite(y), axis=0)
+    else:
+        raise ValueError("y must be a 1D or 2D array.")
 
     # Update X and y by removing rows with NaN in y
     X_cleaned = X[ind, :]
-    y_cleaned = y[ind]
+    y_cleaned = y[ind, :] if y.ndim == 2 else y[ind]
 
     # Check if dimensions have been reduced
     returned_dim = y_cleaned.shape[0]
     if returned_dim < original_dim:
         warnings.warn(f"\n!!! The dimension of the returned y array is {y_cleaned.shape[0]}, " f"which is smaller than the original dimension {original_dim}.")
         warnings.warn("\n!!! Check whether to continue with the reduced dimension is useful.")
-    # throw an error if the returned dimension is smaller than one
+
+    # Throw an error if the returned dimension is smaller than one
     if returned_dim < 1 and stop_on_zero_return:
         raise ValueError("!!!! The dimension of the returned y array is less than 1. Check the input data.")
 
