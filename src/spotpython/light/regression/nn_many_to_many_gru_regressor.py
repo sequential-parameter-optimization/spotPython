@@ -59,7 +59,7 @@ class ManyToManyGRU(nn.Module):
         self.output_layer = nn.Linear(fc_units, output_size)
         self.activation_fct = activation_fct
 
-    def forward(self, x, lengths):
+    def forward(self, x, lengths) -> torch.Tensor:
         """Forward pass of the ManyToManyGRU model.
 
         Args:

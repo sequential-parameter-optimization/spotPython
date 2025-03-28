@@ -791,8 +791,8 @@ class Spot:
             8. Show progress if needed
 
         Args:
-            X_start (numpy.ndarray, optional): initial design. Defaults to None.
-            The initial design must have shape (n, k), where n is the number of points and k is the number of dimensions.
+            X_start (numpy.ndarray, optional):
+                initial design. The initial design must have shape (n, k), where n is the number of points and k is the number of dimensions. Defaults to None.
 
         Returns:
             Spot: The `Spot` instance configured and updated based on the optimization process.
@@ -906,8 +906,9 @@ class Spot:
         Therefore, the design size is `init_size` + `X_start.shape[0]`.
 
         Args:
-            X_start (numpy.ndarray, optional): initial design. Defaults to None.
-            Must be of shape (n, k), where n is the number of points and k is the number of dimensions.
+            X_start (numpy.ndarray, optional):
+                initial design. Must be of shape (n, k), where n is the number
+                of points and k is the number of dimensions. Defaults to None.
 
         Attributes:
             self.X (numpy.ndarray): initial design
