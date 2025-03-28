@@ -673,7 +673,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline)
         ig_attr_test_sum = attribution_ig.detach().numpy().sum(0)
         ig_attr_test_norm_sum = ig_attr_test_sum / np.linalg.norm(ig_attr_test_sum, ord=1)
-        print("Integrated Gradients attribution sum:", ig_attr_test_norm_sum)
         attributions_dict["IntegratedGradients"] = ig_attr_test_norm_sum
 
     if "KernelShap" in fun_control["xai_methods"]:
@@ -681,7 +680,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline)
         ks_attr_test_sum = attribution_ks.detach().numpy().sum(0)
         ks_attr_test_norm_sum = ks_attr_test_sum / np.linalg.norm(ks_attr_test_sum, ord=1)
-        print("KernelShap attribution sum:", ks_attr_test_norm_sum)
         attributions_dict["KernelShap"] = ks_attr_test_norm_sum
 
     if "DeepLift" in fun_control["xai_methods"]:
@@ -689,7 +687,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline)
         dl_attr_test_sum = attribution_dl.detach().numpy().sum(0)
         dl_attr_test_norm_sum = dl_attr_test_sum / np.linalg.norm(dl_attr_test_sum, ord=1)
-        print("DeepLift attribution sum:", dl_attr_test_norm_sum)
         attributions_dict["DeepLift"] = dl_attr_test_norm_sum
 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]

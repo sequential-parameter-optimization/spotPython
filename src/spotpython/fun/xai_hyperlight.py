@@ -169,15 +169,15 @@ class XAI_HyperLight:
             # Multiply results by the weights. Positive weights mean that the result is to be minimized.
             # Negative weights mean that the result is to be maximized, e.g., accuracy.
             z_val = fun_control["weights"] * df_eval
-            xai_incons = fun_control["xai_weight"] * xai_attr
 
             # Append, since several configurations can be evaluated at once.
             z_res = np.append(z_res, z_val)
-            xai_res = np.append(xai_res, xai_incons)
+            xai_res = np.append(xai_res, xai_attr)
 
-            print("Performance loss: ", z_val)
-            print("XAI inconsistency: ", xai_incons)
+            # Combine z_res and xai_res into a single array
+            combined_res = np.column_stack((z_res, xai_res))
 
-            res = z_res + xai_res
+            # print("combined: ", combined_res)
+            # print("shape: ", combined_res.shape)
 
-        return res, z_res, xai_res
+        return combined_res
