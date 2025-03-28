@@ -180,4 +180,4 @@ class XAI_HyperLight:
 
             res = z_res + xai_res
 
-        return res
+        return res, z_res, xai_res
