@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pandas as pd
+from matplotlib import gridspec
 
 
 def simple_contour(
@@ -513,3 +515,207 @@ def plotCombinations(
             )
 
     return None
+
+
+def create_contour_plot(data, x_col, y_col, z_col, facet_col=None, aspect=1, as_table=True, figsize=(3, 3), levels=5, cmap="viridis"):
+    """
+    Creates contour plots similar to R's contourplot function using matplotlib.
+
+    Args:
+        data (pd.DataFrame): The DataFrame containing the data.
+        x_col (str): The name of the column to use for the x-axis.
+        y_col (str): The name of the column to use for the y-axis.
+        z_col (str): The name of the column to use for the z-axis (contour values).
+        facet_col (str, optional): The name of the column to use for faceting (creating subplots). Defaults to None.
+        aspect (float, optional): The aspect ratio of the plot. Defaults to 1.
+        as_table (bool, optional): Whether to arrange facets as a table. Defaults to True.
+        figsize (tuple, optional): The size of the figure. Defaults to (3, 3).
+        levels (int, optional): The number of contour levels. Defaults to 5.
+        cmap (str, optional): The colormap to use. Defaults to "viridis".
+
+    Returns:
+        None: Displays the contour plot(s).
+
+    Raises:
+        ValueError: If the specified columns are not found in the DataFrame.
+
+    Examples:
+        >>> from spotpython.plot.contour import create_contour_plot
+            import numpy as np
+            import pandas as pd
+            # Create a grid of x and y values
+            x = np.linspace(-5, 5, 100)
+            y = np.linspace(-5, 5, 100)
+            x_grid, y_grid = np.meshgrid(x, y)
+            # Calculate z = x^2 + y^2
+            z = x_grid**2 + y_grid**2
+            # Flatten the grid and create a DataFrame
+            data = pd.DataFrame({
+                'x': x_grid.flatten(),
+                'y': y_grid.flatten(),
+                'z': z.flatten()
+            })
+            # Create the contour plot
+            create_contour_plot(data, 'x', 'y', 'z', facet_col=None)
+        >>> # Create a contour plot with faceting
+            from spotpython.plot.contour import create_contour_plot
+            import numpy as np
+            import pandas as pd
+            # Create a grid of x and y values
+            x = np.linspace(-5, 5, 50)
+            y = np.linspace(-5, 5, 50)
+            x_grid, y_grid = np.meshgrid(x, y)
+            # Calculate z = x^2 + y^2 for two different facets
+            z1 = x_grid**2 + y_grid**2
+            z2 = (x_grid - 2)**2 + (y_grid - 2)**2
+            # Flatten the grids and create a DataFrame
+            data = pd.DataFrame({
+                'x': np.tile(x, len(y) * 2),  # Repeat x values for both facets
+                'y': np.repeat(y, len(x) * 2),  # Repeat y values for both facets
+                'z': np.concatenate([z1.flatten(), z2.flatten()]),  # Combine z values for both facets
+                'facet': ['Facet A'] * len(z1.flatten()) + ['Facet B'] * len(z2.flatten())  # Create facet column
+            })
+            # Create the contour plot with facets
+            create_contour_plot(data, 'x', 'y', 'z', facet_col='facet')
+    """
+
+    if facet_col:
+        facet_values = data[facet_col].unique()
+        num_facets = len(facet_values)
+
+        # Determine subplot layout
+        if as_table:
+            num_cols = int(np.ceil(np.sqrt(num_facets)))
+            num_rows = int(np.ceil(num_facets / num_cols))
+        else:
+            num_cols = num_facets
+            num_rows = 1
+
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(figsize[0] * num_cols, figsize[1] * num_rows))
+        axes = np.array(axes).flatten()  # Flatten the axes array for easy indexing
+
+        for i, facet_value in enumerate(facet_values):
+            ax = axes[i]
+            facet_data = data[data[facet_col] == facet_value]
+
+            # Create grid for contour plot
+            x = np.unique(facet_data[x_col])
+            y = np.unique(facet_data[y_col])
+            X, Y = np.meshgrid(x, y)
+            Z = facet_data.pivot_table(index=y_col, columns=x_col, values=z_col).values
+
+            # Plot contour
+            contour = ax.contour(X, Y, Z, levels=levels, cmap=cmap)  # Adjust levels and cmap as needed
+            ax.clabel(contour, inline=True, fontsize=8)
+
+            # Set labels and title
+            ax.set_xlabel(x_col)
+            ax.set_ylabel(y_col)
+            ax.set_title(f"{facet_col} = {np.round(facet_value,2)}")
+            ax.set_aspect(aspect)
+
+        # Remove empty subplots
+        for i in range(num_facets, len(axes)):
+            fig.delaxes(axes[i])
+
+        fig.tight_layout()
+        plt.show()
+
+    else:
+        # Create grid for contour plot
+        x = np.unique(data[x_col])
+        y = np.unique(data[y_col])
+        X, Y = np.meshgrid(x, y)
+        Z = data.pivot_table(index=y_col, columns=x_col, values=z_col).values
+
+        # Plot contour
+        fig, ax = plt.subplots(figsize=figsize)
+        contour = ax.contour(X, Y, Z, levels=10, cmap="viridis")  # Adjust levels and cmap as needed
+        ax.clabel(contour, inline=True, fontsize=8)
+
+        # Set labels and title
+        ax.set_xlabel(x_col)
+        ax.set_ylabel(y_col)
+        ax.set_title(f"Contour Plot of {z_col}")
+        ax.set_aspect(aspect)
+
+        plt.show()
+
+
+def mo_generate_plot_grid(variables, resolutions, functions):
+    """
+    Generate a grid of input variables and apply objective functions.
+
+    Args:
+        variables (dict): A dictionary where keys are variable names (e.g., "time", "temperature")
+                          and values are tuples of (min_value, max_value).
+        resolutions (dict): A dictionary where keys are variable names and values are the number of points.
+        functions (dict): A dictionary where keys are function names and values are callable functions.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the grid and the results of the objective functions.
+    """
+    # Create a meshgrid for all variables
+    grids = [np.linspace(variables[var][0], variables[var][1], resolutions[var]) for var in variables]
+    grid = np.array(np.meshgrid(*grids)).T.reshape(-1, len(variables))
+
+    # Create a DataFrame for the grid
+    plot_grid = pd.DataFrame(grid, columns=variables.keys())
+
+    # Apply each function to the grid
+    for func_name, func in functions.items():
+        plot_grid[func_name] = plot_grid.apply(lambda row: func(row.values), axis=1)
+
+    return plot_grid
+
+
+def mo_create_contour_plots(plot_grid, x_col, y_col, z_col, facet_col, z_label="Objective", cmap="viridis", levels=10):
+    """
+    Create contour plots for a given grid of data.
+
+    Args:
+        plot_grid (pd.DataFrame): The data containing the grid and objective values.
+        x_col (str): The column name for the x-axis.
+        y_col (str): The column name for the y-axis.
+        z_col (str): The column name for the z-axis (objective values).
+        facet_col (str): The column name for the facet (e.g., temperature).
+        z_label (str): Label for the colorbar.
+        cmap (str): Colormap for the contour plot.
+        levels (int): Number of contour levels.
+    """
+    unique_facets = plot_grid[facet_col].unique()
+    n_facets = len(unique_facets)
+
+    # Set up a grid of subplots
+    n_cols = 2
+    n_rows = (n_facets + 1) // n_cols
+    fig = plt.figure(figsize=(12, 5 * n_rows))
+    gs = gridspec.GridSpec(n_rows, n_cols + 1, width_ratios=[1] * n_cols + [0.05])  # Add space for colorbar
+
+    axes = [fig.add_subplot(gs[i // n_cols, i % n_cols]) for i in range(n_facets)]
+
+    for i, facet in enumerate(unique_facets):
+        # Filter data for the current facet
+        facet_data = plot_grid[plot_grid[facet_col] == facet]
+
+        # Pivot the data for contour plotting
+        pivot_table = facet_data.pivot(index=y_col, columns=x_col, values=z_col)
+
+        # Create the contour plot
+        ax = axes[i]
+        contour = ax.contourf(pivot_table.columns, pivot_table.index, pivot_table.values, cmap=cmap, levels=levels)  # x-axis  # y-axis  # z-axis
+        contour_lines = ax.contour(pivot_table.columns, pivot_table.index, pivot_table.values, colors="black", linewidths=0.5, levels=levels)
+        ax.clabel(contour_lines, inline=True, fontsize=8)  # Add labels to contour lines
+
+        # Set plot labels and title
+        ax.set_title(f"{facet_col} = {facet:.2f}")
+        ax.set_xlabel(x_col)
+        ax.set_ylabel(y_col)
+
+    # Add a colorbar to the right of the plots
+    cbar_ax = fig.add_subplot(gs[:, -1])  # Use the last column for the colorbar
+    fig.colorbar(contour, cax=cbar_ax, orientation="vertical", label=z_label)
+
+    # Adjust layout and show the plot
+    plt.tight_layout()
+    plt.show()
