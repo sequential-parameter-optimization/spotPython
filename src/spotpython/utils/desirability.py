@@ -1082,7 +1082,7 @@ def activity_pred(x) -> float:
     return 59.85 + 3.583 * x[0] + 0.2546 * x[1] + 2.2298 * x[2] + 0.83479 * x[0] ** 2 + 0.07484 * x[1] ** 2 + 0.05716 * x[2] ** 2 - 0.3875 * x[0] * x[1] - 0.375 * x[0] * x[2] + 0.3125 * x[1] * x[2]
 
 
-def rsm_opt(x, d_object, prediction_funcs, space="square"):
+def rsm_opt(x, d_object, prediction_funcs, space="square") -> float:
     """
     Optimization function to calculate desirability.
     Optimizers minimize, so we return negative desirability.

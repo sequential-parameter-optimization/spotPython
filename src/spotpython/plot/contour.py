@@ -517,7 +517,7 @@ def plotCombinations(
     return None
 
 
-def create_contour_plot(data, x_col, y_col, z_col, facet_col=None, aspect=1, as_table=True, figsize=(3, 3), levels=5, cmap="viridis"):
+def create_contour_plot(data, x_col, y_col, z_col, facet_col=None, aspect=1, as_table=True, figsize=(3, 3), levels=5, cmap="viridis") -> None:
     """
     Creates contour plots similar to R's contourplot function using matplotlib.
 
@@ -611,7 +611,7 @@ def create_contour_plot(data, x_col, y_col, z_col, facet_col=None, aspect=1, as_
             # Set labels and title
             ax.set_xlabel(x_col)
             ax.set_ylabel(y_col)
-            ax.set_title(f"{facet_col} = {np.round(facet_value,2)}")
+            ax.set_title(f"{facet_col} = {np.round(facet_value, 2)}")
             ax.set_aspect(aspect)
 
         # Remove empty subplots
@@ -630,7 +630,7 @@ def create_contour_plot(data, x_col, y_col, z_col, facet_col=None, aspect=1, as_
 
         # Plot contour
         fig, ax = plt.subplots(figsize=figsize)
-        contour = ax.contour(X, Y, Z, levels=10, cmap="viridis")  # Adjust levels and cmap as needed
+        contour = ax.contour(X, Y, Z, levels=levels, cmap="viridis")  # Adjust levels and cmap as needed
         ax.clabel(contour, inline=True, fontsize=8)
 
         # Set labels and title
@@ -642,7 +642,7 @@ def create_contour_plot(data, x_col, y_col, z_col, facet_col=None, aspect=1, as_
         plt.show()
 
 
-def mo_generate_plot_grid(variables, resolutions, functions):
+def mo_generate_plot_grid(variables, resolutions, functions) -> pd.DataFrame:
     """
     Generate a grid of input variables and apply objective functions.
 
@@ -669,53 +669,277 @@ def mo_generate_plot_grid(variables, resolutions, functions):
     return plot_grid
 
 
-def mo_create_contour_plots(plot_grid, x_col, y_col, z_col, facet_col, z_label="Objective", cmap="viridis", levels=10):
+def contour_plot(
+    data,
+    x_col,
+    y_col,
+    z_col,
+    facet_col=None,
+    aspect=1,
+    as_table=True,
+    figsize=(4, 4),
+    levels=10,
+    cmap="viridis",
+    highlight_point=None,
+    highlight_color="red",
+    highlight_size=50,
+    highlight_label=None,
+    highlight_legend_loc="upper right",
+    highlight_legend_fontsize=8,
+) -> None:
     """
-    Create contour plots for a given grid of data.
+    Creates contour plots (single or faceted) using matplotlib.
 
     Args:
-        plot_grid (pd.DataFrame): The data containing the grid and objective values.
-        x_col (str): The column name for the x-axis.
-        y_col (str): The column name for the y-axis.
-        z_col (str): The column name for the z-axis (objective values).
-        facet_col (str): The column name for the facet (e.g., temperature).
-        z_label (str): Label for the colorbar.
-        cmap (str): Colormap for the contour plot.
-        levels (int): Number of contour levels.
+        data (pd.DataFrame): The DataFrame containing the data.
+        x_col (str): The name of the column to use for the x-axis.
+        y_col (str): The name of the column to use for the y-axis.
+        z_col (str): The name of the column to use for the z-axis (contour values).
+        facet_col (str, optional): The name of the column to use for faceting (creating subplots). Defaults to None.
+        aspect (float, optional): The aspect ratio of the plot. Defaults to 1.
+        as_table (bool, optional): Whether to arrange facets as a table. Defaults to True.
+        figsize (tuple, optional): The size of the figure. Defaults to (4, 4).
+        levels (int, optional): The number of contour levels. Defaults to 5.
+        cmap (str, optional): The colormap to use. Defaults to "viridis".
+        highlight_point (np.array, optional): A 1-dimensional array specifying a single point [x, y] to highlight. Defaults to None.
+        highlight_color (str, optional): Color for the highlighted point. Defaults to "red".
+        highlight_size (int, optional): Size of the highlighted point. Defaults to 50.
+        highlight_label (str, optional): Label for the highlighted point. Defaults to "Highlighted Point".
+        highlight_legend_loc (str, optional): Location for the legend. Defaults to "upper right".
+        highlight_legend_fontsize (int, optional): Font size for the legend. Defaults to 8.
+
+    Returns:
+        None: Displays the contour plot(s).
     """
-    unique_facets = plot_grid[facet_col].unique()
-    n_facets = len(unique_facets)
+    if facet_col:
+        facet_values = data[facet_col].unique()
+        num_facets = len(facet_values)
 
-    # Set up a grid of subplots
-    n_cols = 2
-    n_rows = (n_facets + 1) // n_cols
-    fig = plt.figure(figsize=(12, 5 * n_rows))
-    gs = gridspec.GridSpec(n_rows, n_cols + 1, width_ratios=[1] * n_cols + [0.05])  # Add space for colorbar
+        # Determine subplot layout
+        if as_table:
+            num_cols = int(np.ceil(np.sqrt(num_facets)))
+            num_rows = int(np.ceil(num_facets / num_cols))
+        else:
+            num_cols = num_facets
+            num_rows = 1
 
-    axes = [fig.add_subplot(gs[i // n_cols, i % n_cols]) for i in range(n_facets)]
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(figsize[0] * num_cols, figsize[1] * num_rows))
+        axes = np.array(axes).flatten()  # Flatten the axes array for easy indexing
 
-    for i, facet in enumerate(unique_facets):
-        # Filter data for the current facet
-        facet_data = plot_grid[plot_grid[facet_col] == facet]
+        for i, facet_value in enumerate(facet_values):
+            ax = axes[i]
+            facet_data = data[data[facet_col] == facet_value]
 
-        # Pivot the data for contour plotting
-        pivot_table = facet_data.pivot(index=y_col, columns=x_col, values=z_col)
+            # Create grid for contour plot
+            x = np.unique(facet_data[x_col])
+            y = np.unique(facet_data[y_col])
+            X, Y = np.meshgrid(x, y)
+            Z = facet_data.pivot_table(index=y_col, columns=x_col, values=z_col).values
 
-        # Create the contour plot
-        ax = axes[i]
-        contour = ax.contourf(pivot_table.columns, pivot_table.index, pivot_table.values, cmap=cmap, levels=levels)  # x-axis  # y-axis  # z-axis
-        contour_lines = ax.contour(pivot_table.columns, pivot_table.index, pivot_table.values, colors="black", linewidths=0.5, levels=levels)
-        ax.clabel(contour_lines, inline=True, fontsize=8)  # Add labels to contour lines
+            # Plot contour
+            contour = ax.contour(X, Y, Z, levels=levels, cmap=cmap)
+            ax.clabel(contour, inline=True, fontsize=8)
 
-        # Set plot labels and title
-        ax.set_title(f"{facet_col} = {facet:.2f}")
+            # Highlight the specified point
+            if highlight_point is not None:
+                ax.scatter(highlight_point[0], highlight_point[1], color=highlight_color, s=highlight_size, label=highlight_label, zorder=10)
+                if highlight_label:
+                    ax.legend(loc=highlight_legend_loc, fontsize=highlight_legend_fontsize)
+
+            # Set labels and title
+            ax.set_xlabel(x_col)
+            ax.set_ylabel(y_col)
+            ax.set_title(f"{facet_col} = {np.round(facet_value, 2)}")
+            ax.set_aspect(aspect)
+
+        # Remove empty subplots
+        for i in range(num_facets, len(axes)):
+            fig.delaxes(axes[i])
+
+        fig.tight_layout()
+        plt.show()
+
+    else:
+        # Create grid for contour plot
+        x = np.unique(data[x_col])
+        y = np.unique(data[y_col])
+        X, Y = np.meshgrid(x, y)
+        Z = data.pivot_table(index=y_col, columns=x_col, values=z_col).values
+
+        # Plot contour
+        fig, ax = plt.subplots(figsize=figsize)
+        contour = ax.contour(X, Y, Z, levels=levels, cmap=cmap)
+        ax.clabel(contour, inline=True, fontsize=8)
+
+        # Highlight the specified point
+        if highlight_point is not None:
+            ax.scatter(highlight_point[0], highlight_point[1], color=highlight_color, s=highlight_size, label=highlight_label, zorder=10)
+            if highlight_label:
+                ax.legend(loc=highlight_legend_loc, fontsize=highlight_legend_fontsize)
+
+        # Set labels and title
         ax.set_xlabel(x_col)
         ax.set_ylabel(y_col)
+        ax.set_title(f"Contour Plot of {z_col}")
+        ax.set_aspect(aspect)
 
-    # Add a colorbar to the right of the plots
-    cbar_ax = fig.add_subplot(gs[:, -1])  # Use the last column for the colorbar
-    fig.colorbar(contour, cax=cbar_ax, orientation="vertical", label=z_label)
+        plt.show()
 
-    # Adjust layout and show the plot
-    plt.tight_layout()
-    plt.show()
+
+def contourf_plot(
+    data,
+    x_col,
+    y_col,
+    z_col,
+    facet_col=None,
+    aspect=1,
+    as_table=True,
+    figsize=(4, 4),
+    levels=10,
+    cmap="viridis",
+    show_contour_lines=True,
+    contour_line_color="black",
+    contour_line_width=0.5,
+    colorbar_orientation="vertical",
+    wspace=0.4,
+    hspace=0.4,
+    highlight_point=None,  # New argument to specify a single point to highlight
+    highlight_color="red",  # Color for the highlighted point
+    highlight_size=50,  # Size of the highlighted point
+    highlight_label=None,  # Label for the highlighted point
+    highlight_legend_loc="upper right",  # Legend location
+    highlight_legend_fontsize=8,  # Font size for the legend
+) -> None:
+    """
+    Creates filled contour plots (single or faceted) using matplotlib.
+
+    Args:
+        data (pd.DataFrame): The DataFrame containing the data.
+        x_col (str): The name of the column to use for the x-axis.
+        y_col (str): The name of the column to use for the y-axis.
+        z_col (str): The name of the column to use for the z-axis (contour values).
+        facet_col (str, optional): The name of the column to use for faceting (creating subplots). Defaults to None.
+        aspect (float, optional): The aspect ratio of the plot. Defaults to 1.
+        as_table (bool, optional): Whether to arrange facets as a table. Defaults to True.
+        figsize (tuple, optional): The size of the figure. Defaults to (4, 4).
+        levels (int, optional): The number of contour levels. Defaults to 10.
+        cmap (str, optional): The colormap to use. Defaults to "viridis".
+        show_contour_lines (bool, optional): Whether to overlay contour lines on the filled plot. Defaults to False.
+        contour_line_color (str, optional): Color of the contour lines. Defaults to "black".
+        contour_line_width (float, optional): Width of the contour lines. Defaults to 0.5.
+        colorbar_orientation (str, optional): Orientation of the colorbar ("vertical" or "horizontal"). Defaults to "vertical".
+        wspace (float, optional): Horizontal spacing between subplots. Defaults to 0.4.
+        hspace (float, optional): Vertical spacing between subplots. Defaults to 0.4.
+        highlight_point (np.array, optional): A 1-dimensional array specifying a single point [x, y] to highlight. Defaults to None.
+        highlight_color (str, optional): Color for the highlighted point. Defaults to "red".
+        highlight_size (int, optional): Size of the highlighted point. Defaults to 50.
+        highlight_label (str, optional): Label for the highlighted point. Defaults to None.
+        highlight_legend_loc (str, optional): Location for the legend. Defaults to "upper right".
+        highlight_legend_fontsize (int, optional): Font size for the legend. Defaults to 8.
+
+    Returns:
+        None: Displays the filled contour plot(s).
+    """
+    if facet_col:
+        facet_values = data[facet_col].unique()
+        num_facets = len(facet_values)
+
+        # Determine subplot layout
+        if as_table:
+            num_cols = int(np.ceil(np.sqrt(num_facets)))
+            num_rows = int(np.ceil(num_facets / num_cols))
+        else:
+            num_cols = num_facets
+            num_rows = 1
+
+        # Create figure with gridspec for colorbar placement
+        if colorbar_orientation == "vertical":
+            fig = plt.figure(figsize=(figsize[0] * num_cols, figsize[1] * num_rows))
+            spec = gridspec.GridSpec(num_rows, num_cols + 1, width_ratios=[1] * num_cols + [0.05], wspace=wspace, hspace=hspace)
+        else:  # Horizontal colorbar
+            fig = plt.figure(figsize=(figsize[0] * num_cols, figsize[1] * num_rows + 1))
+            spec = gridspec.GridSpec(num_rows + 1, num_cols, height_ratios=[1] * num_rows + [0.05], wspace=wspace, hspace=hspace)
+
+        axes = []
+        for row in range(num_rows):
+            for col in range(num_cols):
+                if row * num_cols + col < num_facets:
+                    axes.append(fig.add_subplot(spec[row, col]))
+
+        for i, facet_value in enumerate(facet_values):
+            ax = axes[i]
+            facet_data = data[data[facet_col] == facet_value]
+
+            # Create grid for contour plot
+            x = np.unique(facet_data[x_col])
+            y = np.unique(facet_data[y_col])
+            X, Y = np.meshgrid(x, y)
+            Z = facet_data.pivot_table(index=y_col, columns=x_col, values=z_col).values
+
+            # Plot filled contour
+            contour = ax.contourf(X, Y, Z, levels=levels, cmap=cmap)
+
+            # Optionally overlay contour lines
+            if show_contour_lines:
+                contour_lines = ax.contour(X, Y, Z, levels=levels, colors=contour_line_color, linewidths=contour_line_width)
+                ax.clabel(contour_lines, inline=True, fontsize=8)
+
+            # Highlight the specified point
+            if highlight_point is not None:
+                ax.scatter(highlight_point[0], highlight_point[1], color=highlight_color, s=highlight_size, label=highlight_label, zorder=10)
+                if highlight_label:
+                    ax.legend(loc=highlight_legend_loc, fontsize=highlight_legend_fontsize)
+
+            # Set labels and title
+            ax.set_xlabel(x_col)
+            ax.set_ylabel(y_col)
+            ax.set_title(f"{facet_col} = {np.round(facet_value, 2)}")
+            ax.set_aspect(aspect)
+
+        # Add colorbar
+        if colorbar_orientation == "vertical":
+            cbar_ax = fig.add_subplot(spec[:, -1])  # Last column for vertical colorbar
+        else:
+            cbar_ax = fig.add_subplot(spec[-1, :])  # Last row for horizontal colorbar
+        fig.colorbar(contour, cax=cbar_ax, orientation=colorbar_orientation, label=z_col)
+
+        plt.show()
+
+    else:
+        # Create grid for contour plot
+        x = np.unique(data[x_col])
+        y = np.unique(data[y_col])
+        X, Y = np.meshgrid(x, y)
+        Z = data.pivot_table(index=y_col, columns=x_col, values=z_col).values
+
+        # Create figure
+        fig, ax = plt.subplots(figsize=figsize)
+
+        # Plot filled contour
+        contour = ax.contourf(X, Y, Z, levels=levels, cmap=cmap)
+
+        # Optionally overlay contour lines
+        if show_contour_lines:
+            contour_lines = ax.contour(X, Y, Z, levels=levels, colors=contour_line_color, linewidths=contour_line_width)
+            ax.clabel(contour_lines, inline=True, fontsize=8)
+
+        # Highlight the specified point
+        if highlight_point is not None:
+            ax.scatter(highlight_point[0], highlight_point[1], color=highlight_color, s=highlight_size, label=highlight_label, zorder=10)
+            if highlight_label:
+                ax.legend(loc=highlight_legend_loc, fontsize=highlight_legend_fontsize)
+
+        # Set labels and title
+        ax.set_xlabel(x_col)
+        ax.set_ylabel(y_col)
+        ax.set_title(f"Filled Contour Plot of {z_col}")
+        ax.set_aspect(aspect)
+
+        # Add colorbar
+        if colorbar_orientation == "vertical":
+            cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])  # Position for vertical colorbar
+        else:
+            cbar_ax = fig.add_axes([0.15, 0.05, 0.7, 0.02])  # Position for horizontal colorbar
+        fig.colorbar(contour, cax=cbar_ax, orientation=colorbar_orientation, label=z_col)
+
+        plt.show()
