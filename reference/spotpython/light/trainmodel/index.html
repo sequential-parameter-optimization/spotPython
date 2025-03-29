@@ -2957,6 +2957,8 @@
       
         
       
+        
+      
     
     
       
@@ -2987,6 +2989,27 @@
             mo
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mo/functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    functions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3924,8 +3947,6 @@
       
         
       
-        
-      
     
     
       
@@ -4032,27 +4053,6 @@
   
   <span class="md-ellipsis">
     convert
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utils/desirability/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    desirability
   </span>
   
 
@@ -6270,10 +6270,7 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">729</span>
 <span class="normal">730</span>
 <span class="normal">731</span>
-<span class="normal">732</span>
-<span class="normal">733</span>
-<span class="normal">734</span>
-<span class="normal">735</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">732</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters. Performs feature attribution analysis and calculates consistency of these methods.</span>
 
@@ -6576,7 +6573,6 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
         <span class="n">attribution_ig</span> <span class="o">=</span> <span class="n">attr_ig</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
         <span class="n">ig_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_ig</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">ig_attr_test_norm_sum</span> <span class="o">=</span> <span class="n">ig_attr_test_sum</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ig_attr_test_sum</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Integrated Gradients attribution sum:&quot;</span><span class="p">,</span> <span class="n">ig_attr_test_norm_sum</span><span class="p">)</span>
         <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;IntegratedGradients&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ig_attr_test_norm_sum</span>
 
     <span class="k">if</span> <span class="s2">&quot;KernelShap&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
@@ -6584,7 +6580,6 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
         <span class="n">attribution_ks</span> <span class="o">=</span> <span class="n">attr_ks</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
         <span class="n">ks_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_ks</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">ks_attr_test_norm_sum</span> <span class="o">=</span> <span class="n">ks_attr_test_sum</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ks_attr_test_sum</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;KernelShap attribution sum:&quot;</span><span class="p">,</span> <span class="n">ks_attr_test_norm_sum</span><span class="p">)</span>
         <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;KernelShap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ks_attr_test_norm_sum</span>
 
     <span class="k">if</span> <span class="s2">&quot;DeepLift&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
@@ -6592,7 +6587,6 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
         <span class="n">attribution_dl</span> <span class="o">=</span> <span class="n">attr_dl</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
         <span class="n">dl_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_dl</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">dl_attr_test_norm_sum</span> <span class="o">=</span> <span class="n">dl_attr_test_sum</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dl_attr_test_sum</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DeepLift attribution sum:&quot;</span><span class="p">,</span> <span class="n">dl_attr_test_norm_sum</span><span class="p">)</span>
         <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;DeepLift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dl_attr_test_norm_sum</span>
 
     <span class="n">attributions_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">attributions_dict</span><span class="p">[</span><span class="n">method</span><span class="p">]</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]]</span>

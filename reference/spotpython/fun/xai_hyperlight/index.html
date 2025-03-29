@@ -2954,6 +2954,8 @@
       
         
       
+        
+      
     
     
       
@@ -2984,6 +2986,27 @@
             mo
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../mo/functions/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    functions
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -3921,8 +3944,6 @@
       
         
       
-        
-      
     
     
       
@@ -4029,27 +4050,6 @@
   
   <span class="md-ellipsis">
     convert
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../utils/desirability/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    desirability
   </span>
   
 
@@ -5200,18 +5200,18 @@
             <span class="c1"># Multiply results by the weights. Positive weights mean that the result is to be minimized.</span>
             <span class="c1"># Negative weights mean that the result is to be maximized, e.g., accuracy.</span>
             <span class="n">z_val</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
-            <span class="n">xai_incons</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">xai_attr</span>
 
             <span class="c1"># Append, since several configurations can be evaluated at once.</span>
             <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_res</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
-            <span class="n">xai_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xai_res</span><span class="p">,</span> <span class="n">xai_incons</span><span class="p">)</span>
+            <span class="n">xai_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xai_res</span><span class="p">,</span> <span class="n">xai_attr</span><span class="p">)</span>
 
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Performance loss: &quot;</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;XAI inconsistency: &quot;</span><span class="p">,</span> <span class="n">xai_incons</span><span class="p">)</span>
+            <span class="c1"># Combine z_res and xai_res into a single array</span>
+            <span class="n">combined_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">z_res</span><span class="p">,</span> <span class="n">xai_res</span><span class="p">))</span>
 
-            <span class="n">res</span> <span class="o">=</span> <span class="n">z_res</span> <span class="o">+</span> <span class="n">xai_res</span>
+            <span class="c1"># print(&quot;combined: &quot;, combined_res)</span>
+            <span class="c1"># print(&quot;shape: &quot;, combined_res.shape)</span>
 
-        <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">z_res</span><span class="p">,</span> <span class="n">xai_res</span>
+        <span class="k">return</span> <span class="n">combined_res</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -5751,18 +5751,18 @@ to train the model and evaluate the results.</p>
         <span class="c1"># Multiply results by the weights. Positive weights mean that the result is to be minimized.</span>
         <span class="c1"># Negative weights mean that the result is to be maximized, e.g., accuracy.</span>
         <span class="n">z_val</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_eval</span>
-        <span class="n">xai_incons</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_weight&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">xai_attr</span>
 
         <span class="c1"># Append, since several configurations can be evaluated at once.</span>
         <span class="n">z_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_res</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
-        <span class="n">xai_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xai_res</span><span class="p">,</span> <span class="n">xai_incons</span><span class="p">)</span>
+        <span class="n">xai_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xai_res</span><span class="p">,</span> <span class="n">xai_attr</span><span class="p">)</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Performance loss: &quot;</span><span class="p">,</span> <span class="n">z_val</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;XAI inconsistency: &quot;</span><span class="p">,</span> <span class="n">xai_incons</span><span class="p">)</span>
+        <span class="c1"># Combine z_res and xai_res into a single array</span>
+        <span class="n">combined_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">z_res</span><span class="p">,</span> <span class="n">xai_res</span><span class="p">))</span>
 
-        <span class="n">res</span> <span class="o">=</span> <span class="n">z_res</span> <span class="o">+</span> <span class="n">xai_res</span>
+        <span class="c1"># print(&quot;combined: &quot;, combined_res)</span>
+        <span class="c1"># print(&quot;shape: &quot;, combined_res.shape)</span>
 
-    <span class="k">return</span> <span class="n">res</span><span class="p">,</span> <span class="n">z_res</span><span class="p">,</span> <span class="n">xai_res</span>
+    <span class="k">return</span> <span class="n">combined_res</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
