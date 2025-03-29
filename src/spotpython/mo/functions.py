@@ -34,7 +34,7 @@ def conversion_pred(X) -> np.ndarray:
     )
 
 
-def activity_pred(X)-> np.ndarray:
+def activity_pred(X) -> np.ndarray:
     """
     Compute activity predictions for each row in the input array.
 
@@ -66,7 +66,7 @@ def activity_pred(X)-> np.ndarray:
     )
 
 
-def fun_myer16a(X, fun_control=None)-> np.ndarray:
+def fun_myer16a(X, fun_control=None) -> np.ndarray:
     """
     Compute both conversion and activity predictions for each row in the input array.
 
