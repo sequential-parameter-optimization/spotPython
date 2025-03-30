@@ -88,7 +88,7 @@ class MoHyperLight:
 
     def fun(self, X: np.ndarray, fun_control: dict = None) -> np.ndarray:
         """
-        Evaluates the function for the given input array X of shape (n,k)
+        Evaluates the function for the given input array X of shape (n, k)
         and control parameters specified as a dict.
         Calls the train_model function from spotpython.light.trainmodel
         to train the model and evaluate the results.
@@ -102,57 +102,22 @@ class MoHyperLight:
 
         Returns:
             (np.ndarray):
-                (n,) array containing the `n` evaluation results.
-
-        Examples:
-            >>> from math import inf
-                import numpy as np
-                from spotpython.data.diabetes import Diabetes
-                from spotpython.hyperdict.light_hyper_dict import LightHyperDict
-                from spotpython.fun.mohyperlight import MoHyperLight
-                from spotpython.utils.init import fun_control_init
-                from spotpython.utils.eda import print_exp_table
-                from spotpython.spot import spot
-                from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
-                PREFIX="000"
-                data_set = Diabetes()
-                fun_control = fun_control_init(
-                    PREFIX=PREFIX,
-                    save_experiment=True,
-                    fun_evals=inf,
-                    max_time=1,
-                    data_set = data_set,
-                    core_model_name="light.regression.NNLinearRegressor",
-                    hyperdict=LightHyperDict,
-                    _L_in=10,
-                    _L_out=1,
-                    TENSORBOARD_CLEAN=True,
-                    tensorboard_log=True,
-                    seed=42,)
-                print_exp_table(fun_control)
-                X = get_default_hyperparameters_as_array(fun_control)
-                # set epochs to 2^8:
-                X[0, 1] = 8
-                # set patience to 2^10:
-                X[0, 7] = 10
-                print(f"X: {X}")
-                # combine X and X to a np.array with shape (2, n_hyperparams)
-                # so that two values are returned
-                X = np.vstack((X, X))
-                hyper_light = MoHyperLight(seed=125, log_level=50)
-                hyper_light.fun(X, fun_control)
+                (2, n) array where the first row contains the evaluation results (z_res)
+                and the second row contains the extracted "epochs" values (epochs_res).
         """
         z_res = np.array([], dtype=float)
+        epochs_res = np.array([], dtype=float)  # Array to store "epochs" values
+
         self.check_X_shape(X=X, fun_control=fun_control)
         var_dict = assign_values(X, get_var_name(fun_control))
-        # type information and transformations are considered in generate_one_config_from_var_dict:
+
+        # Type information and transformations are considered in generate_one_config_from_var_dict:
         for config in generate_one_config_from_var_dict(var_dict, fun_control):
             if fun_control["show_config"]:
                 print("\nIn fun(): config:")
                 pprint.pprint(config)
             logger.debug(f"\nconfig: {config}")
-            # extract parameters like epochs, batch_size, lr, etc. from config
-            # config_id = generate_config_id(config)
+
             try:
                 logger.debug("fun: Calling train_model")
                 df_eval = train_model(config, fun_control)
@@ -167,11 +132,17 @@ class MoHyperLight:
                 logger.error(f"Error in fun(). Call to train_model failed. {err=}, {type(err)=}")
                 logger.error("Setting df_eval to np.nan")
                 df_eval = np.nan
+
             # Multiply results by the weights. Positive weights mean that the result is to be minimized.
             # Negative weights mean that the result is to be maximized, e.g., accuracy.
             z_val = fun_control["weights"] * df_eval
-            # Append, since several configurations can be evaluated at once.
-            z_res = np.append(z_res, z_val)
-        # Finally, z_res is a 1-dim array
-        # of shape (n,) where n is the number of configurations evaluated.
-        return z_res
+            z_res = np.append(z_res, z_val)  # Append evaluation result
+
+            # Extract "epochs" from the config and append to epochs_res
+            epochs_val = config.get("epochs", np.nan)  # Default to np.nan if "epochs" is not in config
+            epochs_res = np.append(epochs_res, epochs_val)
+
+        # Stack z_res and epochs_res into a (2, n) array
+        result = np.vstack((z_res, epochs_res))
+
+        return result
