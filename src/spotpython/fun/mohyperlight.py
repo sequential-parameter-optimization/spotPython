@@ -142,7 +142,9 @@ class MoHyperLight:
             epochs_val = config.get("epochs", np.nan)  # Default to np.nan if "epochs" is not in config
             epochs_res = np.append(epochs_res, epochs_val)
 
-        # Stack z_res and epochs_res into a (2, n) array
-        result = np.vstack((z_res, epochs_res))
+        # Stack z_res and epochs_res into a (n, 2) array
+        result = np.column_stack((z_res, epochs_res))
+        print(f"result.shape: {result.shape}")
+        print(f"result: {result}")
 
         return result

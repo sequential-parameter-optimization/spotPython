@@ -60,6 +60,8 @@ def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) 
         >>> print(X_cleaned, y_cleaned)
         [[1 2]] [[1. 2.]]
     """
+    print(f"remove_nan: X.shape={X.shape}, y.shape={y.shape}")
+    print(f"remove_nan: X={X},\n y={y}")
     # Get the original dimension of the y array
     original_dim = y.shape[0]
 
@@ -70,6 +72,7 @@ def remove_nan(X: np.ndarray, y: np.ndarray, stop_on_zero_return: bool = False) 
         ind = np.all(np.isfinite(y), axis=0)
     else:
         raise ValueError("y must be a 1D or 2D array.")
+    print(f"remove_nan: ind={ind}")
 
     # Update X and y by removing rows with NaN in y
     X_cleaned = X[ind, :]
