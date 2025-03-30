@@ -17,6 +17,8 @@ def plot_mo(
     pareto_label: bool = False,
     y_rf_color="blue",
     y_best_color="red",
+    x_axis_transformation: str = "id",  # New argument for x-axis transformation
+    y_axis_transformation: str = "id",  # New argument for y-axis transformation
 ) -> None:
     """
     Generates scatter plots for each combination of two targets from a multi-output prediction while highlighting Pareto optimal points.
@@ -34,6 +36,8 @@ def plot_mo(
         pareto_label (bool): If True, label Pareto points with their index. Defaults to False.
         y_rf_color (str): The color of the predicted points. Defaults to "blue".
         y_best_color (str): The color of the best point. Defaults to "red".
+        x_axis_transformation (str): Transformation for the x-axis. Options are "id" (linear), "log" (logarithmic), and "loglog" (log-log). Defaults to "id".
+        y_axis_transformation (str): Transformation for the y-axis. Options are "id" (linear), "log" (logarithmic), and "loglog" (log-log). Defaults to "id".
 
     Returns:
         None: Displays the plot.
@@ -66,57 +70,47 @@ def plot_mo(
 
         # Plot original data if provided
         if y_orig is not None:
-            # Determine Pareto optimal points for original data
             minimize = pareto == "min"
             pareto_mask_orig = is_pareto_efficient(y_orig[:, [i, j]], minimize)
-
-            # Plot all original points
             plt.scatter(y_orig[:, i], y_orig[:, j], edgecolor="w", c="gray", s=s, marker="o", alpha=a, label="Original Points")
-
-            # Highlight Pareto points for original data
             plt.scatter(y_orig[pareto_mask_orig, i], y_orig[pareto_mask_orig, j], edgecolor="k", c="gray", s=pareto_size, marker="o", alpha=a, label="Original Pareto")
-
-            # Label Pareto points for original data if requested
             if pareto_label:
                 for idx in np.where(pareto_mask_orig)[0]:
                     plt.text(y_orig[idx, i], y_orig[idx, j], str(idx), color="black", fontsize=8, ha="center", va="center")
-
-            # Draw Pareto front for original data if requested
             if pareto_front_orig:
                 sorted_indices_orig = np.argsort(y_orig[pareto_mask_orig, i])
                 plt.plot(y_orig[pareto_mask_orig, i][sorted_indices_orig], y_orig[pareto_mask_orig, j][sorted_indices_orig], "k-", alpha=a, label="Original Pareto Front")
 
         if y_rf is not None:
-            # Determine Pareto optimal points for predicted data
             minimize = pareto == "min"
             pareto_mask = is_pareto_efficient(y_rf[:, [i, j]], minimize)
-
-            # Plot all predicted points
             plt.scatter(y_rf[:, i], y_rf[:, j], edgecolor="w", c=y_rf_color, s=s, marker="^", alpha=a, label="Predicted Points")
-
-            # Highlight Pareto points for predicted data
             plt.scatter(y_rf[pareto_mask, i], y_rf[pareto_mask, j], edgecolor="k", c=y_rf_color, s=pareto_size, marker="s", alpha=a, label="Predicted Pareto")
-
-            # Label Pareto points for predicted data if requested
             if pareto_label:
                 for idx in np.where(pareto_mask)[0]:
                     plt.text(y_rf[idx, i], y_rf[idx, j], str(idx), color="black", fontsize=8, ha="center", va="center")
-
-            # Draw Pareto front for predicted data if requested
             if pareto_front:
                 sorted_indices = np.argsort(y_rf[pareto_mask, i])
                 plt.plot(
                     y_rf[pareto_mask, i][sorted_indices],
                     y_rf[pareto_mask, j][sorted_indices],
-                    linestyle="-",  # Specify the line style
-                    color=y_rf_color,  # Use the color specified by y_rf_color
+                    linestyle="-",
+                    color=y_rf_color,
                     alpha=a,
                     label="Predicted Pareto Front",
                 )
 
-        # Plot the best point, if provided
         if y_best is not None:
             plt.scatter(y_best[:, i], y_best[:, j], edgecolor="k", c=y_best_color, s=s, marker="D", alpha=1, label="Best")
+
+        # Apply axis transformations
+        if x_axis_transformation == "log":
+            plt.xscale("log")
+        if y_axis_transformation == "log":
+            plt.yscale("log")
+        if x_axis_transformation == "loglog" or y_axis_transformation == "loglog":
+            plt.xscale("log")
+            plt.yscale("log")
 
         plt.xlabel(target_names[i])
         plt.ylabel(target_names[j])
