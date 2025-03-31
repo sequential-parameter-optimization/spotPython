@@ -4752,7 +4752,7 @@
 
 
 <h2 id="spotpython.mo.plot.plot_mo" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plot_mo</span><span class="p">(</span><span class="n">target_names</span><span class="p">,</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">pareto</span><span class="p">,</span> <span class="n">y_rf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pareto_front</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_best</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">y_orig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pareto_front_orig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pareto_label</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_rf_color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">y_best_color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">plot_mo</span><span class="p">(</span><span class="n">target_names</span><span class="p">,</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">pareto</span><span class="p">,</span> <span class="n">y_rf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pareto_front</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_best</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">y_orig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pareto_front_orig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pareto_label</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">y_rf_color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">y_best_color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">x_axis_transformation</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">y_axis_transformation</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">)</span></code>
 
 <a href="#spotpython.mo.plot.plot_mo" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -4941,6 +4941,34 @@
                   <code>&#39;red&#39;</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code>x_axis_transformation</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Transformation for the x-axis. Options are &ldquo;id&rdquo; (linear), &ldquo;log&rdquo; (logarithmic), and &ldquo;loglog&rdquo; (log-log). Defaults to &ldquo;id&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;id&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>y_axis_transformation</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Transformation for the y-axis. Options are &ldquo;id&rdquo; (linear), &ldquo;log&rdquo; (logarithmic), and &ldquo;loglog&rdquo; (log-log). Defaults to &ldquo;id&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;id&#39;</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -5094,13 +5122,7 @@
 <span class="normal">117</span>
 <span class="normal">118</span>
 <span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_mo</span><span class="p">(</span>
+<span class="normal">120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_mo</span><span class="p">(</span>
     <span class="n">target_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">combinations</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
     <span class="n">pareto</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -5113,6 +5135,8 @@
     <span class="n">pareto_label</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">y_rf_color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
     <span class="n">y_best_color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+    <span class="n">x_axis_transformation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span>  <span class="c1"># New argument for x-axis transformation</span>
+    <span class="n">y_axis_transformation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span>  <span class="c1"># New argument for y-axis transformation</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates scatter plots for each combination of two targets from a multi-output prediction while highlighting Pareto optimal points.</span>
@@ -5130,6 +5154,8 @@
 <span class="sd">        pareto_label (bool): If True, label Pareto points with their index. Defaults to False.</span>
 <span class="sd">        y_rf_color (str): The color of the predicted points. Defaults to &quot;blue&quot;.</span>
 <span class="sd">        y_best_color (str): The color of the best point. Defaults to &quot;red&quot;.</span>
+<span class="sd">        x_axis_transformation (str): Transformation for the x-axis. Options are &quot;id&quot; (linear), &quot;log&quot; (logarithmic), and &quot;loglog&quot; (log-log). Defaults to &quot;id&quot;.</span>
+<span class="sd">        y_axis_transformation (str): Transformation for the y-axis. Options are &quot;id&quot; (linear), &quot;log&quot; (logarithmic), and &quot;loglog&quot; (log-log). Defaults to &quot;id&quot;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None: Displays the plot.</span>
@@ -5162,57 +5188,47 @@
 
         <span class="c1"># Plot original data if provided</span>
         <span class="k">if</span> <span class="n">y_orig</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Determine Pareto optimal points for original data</span>
             <span class="n">minimize</span> <span class="o">=</span> <span class="n">pareto</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span>
             <span class="n">pareto_mask_orig</span> <span class="o">=</span> <span class="n">is_pareto_efficient</span><span class="p">(</span><span class="n">y_orig</span><span class="p">[:,</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]],</span> <span class="n">minimize</span><span class="p">)</span>
-
-            <span class="c1"># Plot all original points</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_orig</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_orig</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Points&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Highlight Pareto points for original data</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_orig</span><span class="p">[</span><span class="n">pareto_mask_orig</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_orig</span><span class="p">[</span><span class="n">pareto_mask_orig</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">pareto_size</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Pareto&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Label Pareto points for original data if requested</span>
             <span class="k">if</span> <span class="n">pareto_label</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pareto_mask_orig</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">y_orig</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_orig</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Draw Pareto front for original data if requested</span>
             <span class="k">if</span> <span class="n">pareto_front_orig</span><span class="p">:</span>
                 <span class="n">sorted_indices_orig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">y_orig</span><span class="p">[</span><span class="n">pareto_mask_orig</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y_orig</span><span class="p">[</span><span class="n">pareto_mask_orig</span><span class="p">,</span> <span class="n">i</span><span class="p">][</span><span class="n">sorted_indices_orig</span><span class="p">],</span> <span class="n">y_orig</span><span class="p">[</span><span class="n">pareto_mask_orig</span><span class="p">,</span> <span class="n">j</span><span class="p">][</span><span class="n">sorted_indices_orig</span><span class="p">],</span> <span class="s2">&quot;k-&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Original Pareto Front&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">y_rf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># Determine Pareto optimal points for predicted data</span>
             <span class="n">minimize</span> <span class="o">=</span> <span class="n">pareto</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span>
             <span class="n">pareto_mask</span> <span class="o">=</span> <span class="n">is_pareto_efficient</span><span class="p">(</span><span class="n">y_rf</span><span class="p">[:,</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]],</span> <span class="n">minimize</span><span class="p">)</span>
-
-            <span class="c1"># Plot all predicted points</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_rf</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_rf</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">y_rf_color</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Predicted Points&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Highlight Pareto points for predicted data</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_rf</span><span class="p">[</span><span class="n">pareto_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_rf</span><span class="p">[</span><span class="n">pareto_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">y_rf_color</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">pareto_size</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Predicted Pareto&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Label Pareto points for predicted data if requested</span>
             <span class="k">if</span> <span class="n">pareto_label</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pareto_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
                     <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">y_rf</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_rf</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Draw Pareto front for predicted data if requested</span>
             <span class="k">if</span> <span class="n">pareto_front</span><span class="p">:</span>
                 <span class="n">sorted_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">y_rf</span><span class="p">[</span><span class="n">pareto_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
                     <span class="n">y_rf</span><span class="p">[</span><span class="n">pareto_mask</span><span class="p">,</span> <span class="n">i</span><span class="p">][</span><span class="n">sorted_indices</span><span class="p">],</span>
                     <span class="n">y_rf</span><span class="p">[</span><span class="n">pareto_mask</span><span class="p">,</span> <span class="n">j</span><span class="p">][</span><span class="n">sorted_indices</span><span class="p">],</span>
-                    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>  <span class="c1"># Specify the line style</span>
-                    <span class="n">color</span><span class="o">=</span><span class="n">y_rf_color</span><span class="p">,</span>  <span class="c1"># Use the color specified by y_rf_color</span>
+                    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">y_rf_color</span><span class="p">,</span>
                     <span class="n">alpha</span><span class="o">=</span><span class="n">a</span><span class="p">,</span>
                     <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Predicted Pareto Front&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
 
-        <span class="c1"># Plot the best point, if provided</span>
         <span class="k">if</span> <span class="n">y_best</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">y_best</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">y_best</span><span class="p">[:,</span> <span class="n">j</span><span class="p">],</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">y_best_color</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Best&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Apply axis transformations</span>
+        <span class="k">if</span> <span class="n">x_axis_transformation</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">y_axis_transformation</span> <span class="o">==</span> <span class="s2">&quot;log&quot;</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">x_axis_transformation</span> <span class="o">==</span> <span class="s2">&quot;loglog&quot;</span> <span class="ow">or</span> <span class="n">y_axis_transformation</span> <span class="o">==</span> <span class="s2">&quot;loglog&quot;</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
 
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">target_names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">target_names</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
