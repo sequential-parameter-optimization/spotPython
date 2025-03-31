@@ -142,6 +142,7 @@ class XAI_HyperLight:
         """
         z_res = np.array([], dtype=float)
         xai_res = np.array([], dtype=float)
+        xai_attr = np.nan
         self.check_X_shape(X=X, fun_control=fun_control)
         var_dict = assign_values(X, get_var_name(fun_control))
         # type information and transformations are considered in generate_one_config_from_var_dict:
