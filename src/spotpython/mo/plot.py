@@ -137,11 +137,12 @@ def plot_mo(
         plt.ylabel(target_names[j])
         plt.grid()
         plt.title(title)
-        plt.legend()
+        # Move the legend outside the plot
+        plt.legend(loc="center left", bbox_to_anchor=(1, 0.5))
         # Save or show the plot
         if filename:
             if filename.endswith(".pdf") or filename.endswith(".png"):
-                plt.savefig(filename, format=filename.split(".")[-1])
+                plt.savefig(filename, format=filename.split(".")[-1], bbox_inches="tight")
             else:
                 raise ValueError("Filename must have a valid suffix: '.pdf' or '.png'.")
         else:
