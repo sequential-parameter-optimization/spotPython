@@ -8,7 +8,12 @@ import copy
 import json
 from numpy.random import default_rng
 from spotpython.design.spacefilling import SpaceFilling
-from spotpython.build.kriging import Kriging
+
+# old Kriging with attribute "name" kriging
+from spotpython.build.kriging import Kriging as OldKriging
+
+# new Kriging without attribute "name" Kriging
+from spotpython.surrogate.kriging import Kriging
 from spotpython.utils.repair import apply_penalty_NA
 from spotpython.utils.seed import set_all_seeds
 import numpy as np
@@ -404,7 +409,6 @@ class Spot:
             self.surrogate = Kriging(
                 noise=self.surrogate_control["noise"],
                 var_type=self.surrogate_control["var_type"],
-                name="kriging",
                 seed=self.surrogate_control["seed"],
                 model_optimizer=self.surrogate_control["model_optimizer"],
                 model_fun_evals=self.surrogate_control["model_fun_evals"],
@@ -1919,7 +1923,7 @@ class Spot:
         """
         # Reshape x to have shape (1, -1) because the predict method expects a 2D array
         X = x.reshape(1, -1)
-        if isinstance(self.surrogate, Kriging):
+        if isinstance(self.surrogate, Kriging) and getattr(self.surrogate, "name", None) == "kriging":
             return self.surrogate.predict(X, return_val=self.infill_criterion)
         else:
             return self.surrogate.predict(X)
@@ -2053,7 +2057,7 @@ class Spot:
             y_test = self._mo2so(y_mo)
             # Apply penalty for NA values works only on so values:
             y_test = apply_penalty_NA(y_test, self.fun_control["penalty_NA"], verbosity=self.verbosity)
-            if isinstance(self.surrogate, Kriging):
+            if isinstance(self.surrogate, Kriging) and getattr(self.surrogate, "name", None) == "kriging":
                 y_hat = self.surrogate.predict(X_test[:, np.newaxis], return_val="y")
             else:
                 y_hat = self.surrogate.predict(X_test[:, np.newaxis])

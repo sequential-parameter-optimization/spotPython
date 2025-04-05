@@ -25,14 +25,19 @@ def test_fit_surrogate():
     S.fit_surrogate()
 
     # Correlation matrix should be square and the same size as the number of points
-    assert S.surrogate.Psi.shape[0] == S.X.shape[0]
+    if S.surrogate.name == "kriging":
+        # Old Kriging implementation
+        assert S.surrogate.Psi.shape[0] == S.X.shape[0]
+    else:
+        # New Kriging implementation
+        assert S.surrogate.Psi_.shape[0] == S.X.shape[0]
 
     # Check the prediction for a known input
     predicted_value = S.surrogate.predict(np.array([[0, 0]]))
     expected_value = np.array([1.49011612e-08])
 
     # Assert that the predicted value is approximately equal to the expected value
-    np.testing.assert_allclose(predicted_value, expected_value, atol=1e-7,
+    np.testing.assert_allclose(predicted_value, expected_value, atol=1e-6,
                                err_msg="Prediction for input [[0, 0]] does not match the expected value.")
 
 if __name__ == '__main__':

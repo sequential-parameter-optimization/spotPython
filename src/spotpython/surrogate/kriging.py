@@ -22,7 +22,32 @@ class Kriging(BaseEstimator, RegressorMixin):
         y_ (np.ndarray): The training target values (n,).
     """
 
-    def __init__(self, eps: float = None, penalty: float = 1e4, method="regression"):
+    def __init__(
+        self,
+        eps: float = None,
+        penalty: float = 1e4,
+        method="regression",
+        noise: bool = False,
+        var_type: List[str] = ["num"],
+        name: str = "Kriging",
+        seed: int = 124,
+        model_optimizer=None,
+        model_fun_evals: Optional[int] = None,
+        min_theta: float = -3.0,
+        max_theta: float = 2.0,
+        n_theta: int = 1,
+        theta_init_zero: bool = False,
+        p_val: float = 2.0,
+        n_p: int = 1,
+        optim_p: bool = False,
+        min_Lambda: float = 1e-9,
+        max_Lambda: float = 1.0,
+        log_level: int = 50,
+        spot_writer=None,
+        counter=None,
+        metric_factorial="canberra",
+        **kwargs,
+    ):
         """
         Initializes the Kriging model.
 
@@ -46,6 +71,31 @@ class Kriging(BaseEstimator, RegressorMixin):
                 raise ValueError("eps must be positive")
             self.eps = eps
         self.penalty = penalty
+
+        self.noise = noise
+        self.var_type = var_type
+        self.name = name
+        self.seed = seed
+        self.log_level = log_level
+        self.spot_writer = spot_writer
+        self.counter = counter
+        self.metric_factorial = metric_factorial
+        self.min_theta = min_theta
+        self.max_theta = max_theta
+        self.min_Lambda = min_Lambda
+        self.max_Lambda = max_Lambda
+        self.n_theta = n_theta
+        self.p_val = p_val
+        self.n_p = n_p
+        self.optim_p = optim_p
+        self.theta_init_zero = theta_init_zero
+        self.model_optimizer = model_optimizer
+        if self.model_optimizer is None:
+            self.model_optimizer = differential_evolution
+        self.model_fun_evals = model_fun_evals
+        if self.model_fun_evals is None:
+            self.model_fun_evals = 100
+
         self.logtheta_lambda_ = None
         self.U_ = None
         self.X_ = None
@@ -124,7 +174,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
         return self
 
-    def predict(self, X: np.ndarray, return_std=False, return_ei=False) -> np.ndarray:
+    def predict(self, X: np.ndarray, return_std=False, return_val: str = "y") -> np.ndarray:
         """
         Predicts the Kriging response at a set of points X. This method is compatible
         with scikit-learn and returns predictions for the input points.
@@ -135,10 +185,11 @@ class Kriging(BaseEstimator, RegressorMixin):
                 to predict the Kriging response.
             return_std (bool, optional):
                 If True, returns the standard deviation of the predictions as well.
+                Implememented for compatibility with scikit-learn.
                 Defaults to False.
-            return_ei (bool, optional):
-                If True, returns the expected improvement at each point.
-                Defaults to False.
+            return_val (str):
+                Specifies which prediction values to return.
+                It can be "y", "s", "ei", or "all".
 
         Returns:
             np.ndarray:
@@ -160,26 +211,28 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Predict responses
             >>> y_pred, sd, ei = model.predict(X_test)
             >>> print("Predictions:", y_pred)
-            >>> print("Standard deviations:", sd)
-            >>> print("Expected improvement:", ei)
         """
         self.return_std = return_std
-        self.return_ei = return_ei
         X = np.atleast_2d(X)
-        if return_std and return_ei:
+        if return_std:
+            # Return predictions and standard deviations
+            # Compatibility with scikit-learn
+            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
+            return np.array(predictions), np.array(std_devs)
+        if return_val == "s":
+            # Return only standard deviations
+            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
+            return np.array(std_devs)
+        elif return_val == "all":
             # Return predictions, standard deviations, and expected improvements
             predictions, std_devs, eis = zip(*[self._pred(x_i) for x_i in X])
             return np.array(predictions), np.array(std_devs), np.array(eis)
-        elif return_std:
-            # Return predictions and standard deviations
-            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
-            return np.array(predictions), np.array(std_devs)
-        elif return_ei:
-            # Return predictions and expected improvements
+        elif return_val == "ei":
+            # Return only neg. expected improvements
             predictions, eis = zip(*[(self._pred(x_i)[0], self._pred(x_i)[2]) for x_i in X])
-            return np.array(predictions), np.array(eis)
+            return -1.0 * np.array(eis)
         else:
-            # Return only predictions
+            # Return only predictions (case "y")
             predictions = [self._pred(x_i)[0] for x_i in X]
             return np.array(predictions)
 
