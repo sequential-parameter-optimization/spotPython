@@ -1,6 +1,3 @@
-from matplotlib import pyplot as plt
-
-
 def save_or_show_plot(plt, filename=None) -> None:
     """
     Save or show the plot based on the provided filename.

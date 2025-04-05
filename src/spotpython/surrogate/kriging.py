@@ -6,6 +6,9 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.special import erf
 import matplotlib.pyplot as plt
 from numpy import linspace, meshgrid, array
+import pylab
+from numpy import ravel
+from spotpython.utils.aggregate import aggregate_mean_var
 
 
 class Kriging(BaseEstimator, RegressorMixin):
@@ -159,16 +162,32 @@ class Kriging(BaseEstimator, RegressorMixin):
         y = np.asarray(y).flatten()
         self.X_ = X
         self.y_ = y
+        self.n, self.k = X.shape
+        # Calculate and store min and max of X
+        self.min_X = np.min(self.X_, axis=0)
+        self.max_X = np.max(self.X_, axis=0)
 
-        k = X.shape[1]
+        _, aggregated_mean_y, _ = aggregate_mean_var(X=self.X_, y=self.y_)
+        self.aggregated_mean_y = np.copy(aggregated_mean_y)
         if bounds is None:
             if self.method == "interpolation":
-                bounds = [(-3.0, 2.0)] * k
+                bounds = [(-3.0, 2.0)] * self.k
             else:
                 # regression and reinterpolation use lambda_ as well
-                bounds = [(-3.0, 2.0)] * k + [(-6.0, 0.0)]
+                bounds = [(-3.0, 2.0)] * self.k + [(-6.0, 0.0)]
 
         self.logtheta_lambda_, _ = self.max_likelihood(bounds)
+
+        # store theta and Lambda in log scale
+        if (self.method == "regression") or (self.method == "reinterpolation"):
+            # case noise is True
+            self.theta = self.logtheta_lambda_[:-1]
+            self.Lambda = self.logtheta_lambda_[-1]
+        else:
+            self.theta = self.logtheta_lambda_
+            self.Lambda = None
+        # store p for future use
+        self.p = 2
 
         # Once logtheta_lambda is found, compute the final correlation matrix
         self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
@@ -217,20 +236,25 @@ class Kriging(BaseEstimator, RegressorMixin):
         if return_std:
             # Return predictions and standard deviations
             # Compatibility with scikit-learn
+            self.return_std = True
             predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
             return np.array(predictions), np.array(std_devs)
         if return_val == "s":
             # Return only standard deviations
+            self.return_std = True
             predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
             return np.array(std_devs)
         elif return_val == "all":
             # Return predictions, standard deviations, and expected improvements
+            self.return_std = True
+            self.return_ei = True
             predictions, std_devs, eis = zip(*[self._pred(x_i) for x_i in X])
             return np.array(predictions), np.array(std_devs), np.array(eis)
         elif return_val == "ei":
             # Return only neg. expected improvements
+            self.return_ei = True
             predictions, eis = zip(*[(self._pred(x_i)[0], self._pred(x_i)[2]) for x_i in X])
-            return -1.0 * np.array(eis)
+            return np.array(eis)
         else:
             # Return only predictions (case "y")
             predictions = [self._pred(x_i)[0] for x_i in X]
@@ -259,6 +283,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         y = self.y_.flatten()
 
         if (self.method == "regression") or (self.method == "reinterpolation"):
+            # case noise is True
             theta = x[:-1]
             # theta is in log scale, so transform it back:
             theta = 10.0**theta
@@ -412,6 +437,108 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         result = differential_evolution(objective, bounds)
         return result.x, result.fun
+
+    def plot(self, show: Optional[bool] = True) -> None:
+        """
+        This function plots 1D and 2D surrogates.
+        Only for compatibility with the old Kriging implementation.
+
+        Args:
+            self (object):
+                The Kriging object.
+            show (bool):
+                If `True`, the plots are displayed.
+                If `False`, `plt.show()` should be called outside this function.
+
+        Returns:
+            None
+
+        Note:
+            * This method provides only a basic plot. For more advanced plots,
+                use the `plot_contour()` method of the `Spot` class.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init, design_control_init
+                # 1-dimensional example
+                fun = analytical().fun_sphere
+                fun_control=fun_control_init(lower = np.array([-1]),
+                                            upper = np.array([1]),
+                                            noise=False)
+                design_control=design_control_init(init_size=10)
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control)
+                S.initialize_design()
+                S.update_stats()
+                S.fit_surrogate()
+                S.surrogate.plot()
+                # 2-dimensional example
+                fun = analytical().fun_sphere
+                fun_control=fun_control_init(lower = np.array([-1, -1]),
+                                            upper = np.array([1, 1]),
+                                            noise=False)
+                design_control=design_control_init(init_size=10)
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control)
+                S.initialize_design()
+                S.update_stats()
+                S.fit_surrogate()
+                S.surrogate.plot()
+        """
+        if self.k == 1:
+            # TODO: Improve plot (add conf. interval etc.)
+            fig = pylab.figure(figsize=(9, 6))
+            n_grid = 100
+            x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
+            y = self.predict(x)
+            plt.figure()
+            plt.plot(x, y, "k")
+            if show:
+                plt.show()
+
+        if self.k == 2:
+            fig = pylab.figure(figsize=(9, 6))
+            n_grid = 100
+            x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
+            y = linspace(self.min_X[1], self.max_X[1], num=n_grid)
+            X, Y = meshgrid(x, y)
+            # Predict based on the optimized results
+            zz = array([self.predict(array([x, y]), return_val="all") for x, y in zip(ravel(X), ravel(Y))])
+            zs = zz[:, 0, :]
+            zse = zz[:, 1, :]
+            Z = zs.reshape(X.shape)
+            Ze = zse.reshape(X.shape)
+
+            nat_point_X = self.X_[:, 0]
+            nat_point_Y = self.X_[:, 1]
+            contour_levels = 30
+            ax = fig.add_subplot(224)
+            # plot predicted values:
+            pylab.contourf(X, Y, Ze, contour_levels, cmap="jet")
+            pylab.title("Error")
+            pylab.colorbar()
+            # plot observed points:
+            pylab.plot(nat_point_X, nat_point_Y, "ow")
+            #
+            ax = fig.add_subplot(223)
+            # plot predicted values:
+            plt.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet")
+            plt.title("Surrogate")
+            # plot observed points:
+            pylab.plot(nat_point_X, nat_point_Y, "ow", zorder=3)
+            pylab.colorbar()
+            #
+            ax = fig.add_subplot(221, projection="3d")
+            ax.plot_surface(X, Y, Z, rstride=3, cstride=3, alpha=0.9, cmap="jet")
+            #
+            ax = fig.add_subplot(222, projection="3d")
+            ax.plot_surface(X, Y, Ze, rstride=3, cstride=3, alpha=0.9, cmap="jet")
+            #
+            pylab.show()
 
 
 # Additional functions for plotting the Kriging surrogate model
