@@ -25,7 +25,7 @@ def test_ocba():
 #     [11  9 19  9  2]
 
 fun = Analytical().fun_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=2)
 fun_control = fun_control_init(
     lower=np.array([-1]),

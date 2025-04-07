@@ -718,7 +718,7 @@ def design_control_init(init_size=10, repeats=1) -> dict:
 
 def surrogate_control_init(
     log_level: int = 50,
-    noise=False,
+    method="regression",
     model_optimizer=differential_evolution,
     model_fun_evals=10000,
     min_theta=-3.0,
@@ -748,9 +748,10 @@ def surrogate_control_init(
              Default is -3.
         max_theta (float): The maximum value of theta. Note that the base10-logarithm is used.
             Default is 3.
-        noise (bool):
-            Whether the objective function is noisy or not. If Kriging, then a nugget is added.
-            Default is False. Note: Will be set in the Spot class.
+        method (str):
+            The method to be used for the surrogate model. Default is "regression".
+            Can be one of ["regression", "interpolation", "reinterpolation"].
+            Note: Will also be set in the Spot class, if None.
         n_theta (int):
             The number of theta values. If larger than 1 or set to the string "anisotropic",
             then the k theta values are used, where k is the problem dimension.
@@ -783,9 +784,9 @@ def surrogate_control_init(
     Note:
         * The surrogate_control dictionary is used in the Spot class. The following values
           are updated in the Spot class if they are None in the surrogate_control dictionary:
-            * `noise`: If the surrogate model dictionary is passed to the Spot class,
-              and the `noise` value is `None`, then the noise value is set in the
-              Spot class based on the value of `noise` in the Spot class fun_control dictionary.
+            * `method`: If the surrogate model dictionary is passed to the Spot class,
+              and the `method` value is `None`, then the method value is set in the
+              Spot class based on the value of `method` in the Spot class fun_control dictionary.
             * `var_type`: The `var_type` value is set in the Spot class based on the value
                of `var_type` in the Spot class fun_control dictionary and the dimension of the problem.
                If the Kriging model is used as a surrogate in the Spot class, the setting from
@@ -804,7 +805,7 @@ def surrogate_control_init(
     """
     surrogate_control = {
         "log_level": log_level,
-        "noise": noise,
+        "method": method,
         "model_optimizer": model_optimizer,
         "model_fun_evals": model_fun_evals,
         "min_theta": min_theta,

@@ -12,7 +12,7 @@ def test_repeats_1_1_0():
     """
 
 fun = MultiAnalytical(m=4).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=1)
 fun_control = fun_control_init(
     lower=np.array([-1]),
@@ -40,7 +40,7 @@ def test_repeats_1_1_1():
     """
 
 fun = MultiAnalytical(m=2).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=1)
 fun_control = fun_control_init(
     lower=np.array([-1]),
@@ -68,7 +68,7 @@ def test_repeats_2_1_0():
     """
 
 fun = MultiAnalytical(m=2).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=2)
 fun_control = fun_control_init(
     lower=np.array([-1]),
@@ -97,7 +97,7 @@ def test_repeats_1_2_0():
     """
 
 fun = MultiAnalytical(m=2).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=1)
 fun_control = fun_control_init(
     lower=np.array([-1]),
@@ -126,7 +126,7 @@ def test_repeats_1_2_1():
     """
 
 fun = MultiAnalytical(m=2).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=1)
 fun_control = fun_control_init(
     lower=np.array([-1]),
@@ -156,7 +156,7 @@ def test_repeats_2_2_1():
     """
 
 fun = MultiAnalytical(m=2).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=2)
 fun_control = fun_control_init(
     lower=np.array([-1]),
@@ -184,7 +184,7 @@ def test_repeats_2_2_2():
     """
 
 fun = MultiAnalytical(m=2).fun_mo_linear
-surrogate_control = surrogate_control_init(noise=True)
+surrogate_control = surrogate_control_init(method="regression")
 design_control = design_control_init(init_size=3, repeats=2)
 fun_control = fun_control_init(
     lower=np.array([-1]),

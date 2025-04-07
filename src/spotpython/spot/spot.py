@@ -374,12 +374,12 @@ class Spot:
     def _surrogate_control_setup(self) -> None:
         self.surrogate_control.update({"var_type": self.var_type})
         # Surrogate control updates:
-        # The default value for `noise` from the surrogate_control dictionary
+        # The default value for `method` from the surrogate_control dictionary
         # based on surrogate_control.init() is None. This value is updated
-        # to the value of the key "noise" from the fun_control dictionary.
+        # to the value of the key "method" from the fun_control dictionary.
         # If the value is set (i.e., not None), it is not updated.
-        if self.surrogate_control["noise"] is None:
-            self.surrogate_control.update({"noise": self.fun_control.noise})
+        if self.surrogate_control["method"] is None:
+            self.surrogate_control.update({"method": self.fun_control.method})
         if self.surrogate_control["model_fun_evals"] is None:
             self.surrogate_control.update({"model_fun_evals": self.optimizer_control["max_iter"]})
         # self.optimizer is not None here. If 1) the key "model_optimizer"
@@ -407,7 +407,7 @@ class Spot:
         if self.surrogate is None:
             # Call kriging with surrogate_control parameters:
             self.surrogate = Kriging(
-                noise=self.surrogate_control["noise"],
+                method=self.surrogate_control["method"],
                 var_type=self.surrogate_control["var_type"],
                 seed=self.surrogate_control["seed"],
                 model_optimizer=self.surrogate_control["model_optimizer"],
@@ -485,7 +485,7 @@ class Spot:
                 23         min_mean_y                                               None
                 24              min_y                                                0.0
                 25           n_points                                                  1
-                26              noise                                              False
+                26              noise                                               True
                 27         ocba_delta                                                  0
                 28  optimizer_control                    {'max_iter': 1000, 'seed': 125}
                 29            red_dim                                              False
@@ -495,7 +495,7 @@ class Spot:
                 33      show_progress                                               True
                 34        spot_writer                                               None
                 35          surrogate  <spotpython.build.kriging.Kriging object at 0x...
-                36  surrogate_control  {'noise': False, 'model_optimizer': <function ...
+                36  surrogate_control  {'method': "regession", 'model_optimizer': <function ...
                 37        tolerance_x                                                  0
                 38              upper                                                [1]
                 39           var_name                                               [x0]
@@ -2193,7 +2193,7 @@ class Spot:
                             ] )
                 from spotpython.utils.init import design_control_init, surrogate_control_init
                 design_control = design_control_init(init_size=INIT_SIZE)
-                surrogate_control = surrogate_control_init(noise=True,
+                surrogate_control = surrogate_control_init(method="regression",
                                                             n_theta=2)
                 from spotpython.fun.hyperlight import HyperLight
                 fun = HyperLight(log_level=50).fun

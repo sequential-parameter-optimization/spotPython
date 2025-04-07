@@ -5,10 +5,20 @@ from scipy.optimize import differential_evolution
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.special import erf
 import matplotlib.pyplot as plt
-from numpy import linspace, meshgrid, array
+from numpy import linspace, meshgrid, array, append
 import pylab
 from numpy import ravel
 from spotpython.utils.aggregate import aggregate_mean_var
+import logging
+
+logger = logging.getLogger(__name__)
+# configure the handler and formatter as needed
+py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
+py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+# add formatter to the handler
+py_handler.setFormatter(py_formatter)
+# add handler to the logger
+logger.addHandler(py_handler)
 
 
 class Kriging(BaseEstimator, RegressorMixin):
@@ -99,11 +109,18 @@ class Kriging(BaseEstimator, RegressorMixin):
         if self.model_fun_evals is None:
             self.model_fun_evals = 100
 
+        # Logging information
+        self.log = {}
+        self.log["negLnLike"] = []
+        self.log["theta"] = []
+        self.log["p"] = []
+        self.log["Lambda"] = []
+
         self.logtheta_lambda_ = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
-        self.NegLnLike_ = None
+        self.negLnLike = None
         self.Psi_ = None
         if method not in ["interpolation", "regression", "reinterpolation"]:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation']")
@@ -127,7 +144,43 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             dict: Parameter names not included in get_params() mapped to their values.
         """
-        return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "NegLnLike": self.NegLnLike_}
+        return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "negLnLike": self.negLnLike}
+
+    def _update_log(self) -> None:
+        """
+        If spot_writer is not None, this method writes the current values of
+        negLnLike, theta, p (if optim_p is True),
+        and Lambda (if method is not "interpolation") to the spot_writer object.
+
+        Args:
+            self (object): The Kriging object.
+
+        Returns:
+            None
+
+        """
+        self.log["negLnLike"] = append(self.log["negLnLike"], self.negLnLike)
+        self.log["theta"] = append(self.log["theta"], self.theta)
+        if self.optim_p:
+            self.log["p"] = append(self.log["p"], self.p)
+        if (self.method == "regression") or (self.method == "reinterpolation"):
+            self.log["Lambda"] = append(self.log["Lambda"], self.Lambda)
+        # get the length of the log
+        self.log_length = len(self.log["negLnLike"])
+        if self.spot_writer is not None:
+            negLnLike = self.negLnLike.copy()
+            self.spot_writer.add_scalar("spot_negLnLike", negLnLike, self.counter + self.log_length)
+            # add the self.n_theta theta values to the writer with one key "theta",
+            # i.e, the same key for all theta values
+            theta = self.theta.copy()
+            self.spot_writer.add_scalars("spot_theta", {f"theta_{i}": theta[i] for i in range(self.n_theta)}, self.counter + self.log_length)
+            if (self.method == "regression") or (self.method == "reinterpolation"):
+                Lambda = self.Lambda.copy()
+                self.spot_writer.add_scalar("spot_Lambda", Lambda, self.counter + self.log_length)
+            if self.optim_p:
+                p = self.p.copy()
+                self.spot_writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter + self.log_length)
+            self.spot_writer.flush()
 
     def fit(self, X: np.ndarray, y: np.ndarray, bounds: Optional[List[Tuple[float, float]]] = None) -> "Kriging":
         """
@@ -190,7 +243,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.p = 2
 
         # Once logtheta_lambda is found, compute the final correlation matrix
-        self.NegLnLike_, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
+        self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
+
+        # Update log with the current values
+        self._update_log()
         return self
 
     def predict(self, X: np.ndarray, return_std=False, return_val: str = "y") -> np.ndarray:
@@ -273,8 +329,8 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Returns:
             (float, np.ndarray, np.ndarray):
-                (NegLnLike, Psi, U) where:
-                - NegLnLike (float): The negative concentrated log-likelihood.
+                (negLnLike, Psi, U) where:
+                - negLnLike (float): The negative concentrated log-likelihood.
                 - Psi (np.ndarray): The correlation matrix.
                 - U (np.ndarray): The Cholesky factor (or None if ill-conditioned).
         """
@@ -329,8 +385,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         tresid = np.linalg.solve(U.T, tresid)
         SigmaSqr = (resid @ tresid) / n
 
-        NegLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
-        return NegLnLike, Psi, U
+        negLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
+        return negLnLike, Psi, U
 
     def _pred(self, x: np.ndarray) -> float:
         """
