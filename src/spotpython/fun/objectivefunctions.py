@@ -440,8 +440,9 @@ class Analytical:
         y = 1 / (1 + sum_squared_diff)
         return self._add_noise(y)
 
-    def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+    def fun_wingwt_to_nat(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
         r"""Wing weight function.
+        Converts coded values to natural values, before applying the original `fun_wingwt` function (Eq. 1.4 in [Forr08a]).
         Calculate the weight of an unpainted light aircraft wing based on design and operational parameters.
         This function implements the wing weight model from Forrester et al., which aims to predict
         the wing weight \( W \) using the following formula:
@@ -477,8 +478,8 @@ class Analytical:
         | \( \lambda \) | Taper ratio                            | 0.672    | 0.5     | 1       |
         | \( R_{tc} \)  | Aerofoil thickness to chord ratio      | 0.12     | 0.08    | 0.18    |
         | \( N_z \)     | Ultimate load factor                   | 3.8      | 2.5     | 6       |
-        | \( W_{dg} \)  | Flight design gross weight (lb)         | 2000     | 1700    | 2500    |
-        | \( W_p \)     | Paint weight \((\text{lb/ft}^2)\)                  | 0.064 |   0.025  | 0.08    |
+        | \( W_{dg} \)  | Flight design gross weight (lb)        | 2000     | 1700    | 2500    |
+        | \( W_p \)     | Paint weight \((\text{lb/ft}^2)\)      | 0.064 |   0.025  | 0.08    |
 
         Args:
             X (np.ndarray):
@@ -511,8 +512,93 @@ class Analytical:
         Wdg = X[:, 8] * 800 + 1700  # equivalent to (2500 - 1700) + 1700
         Wp = X[:, 9] * 0.055 + 0.025  # equivalent to (0.08 - 0.025) + 0.025
         # Calculate W for all rows in a vectorized manner
-        W = 0.036 * Sw**0.758 * Wfw**0.0035 * (A / np.cos(L) ** 2) ** 0.6 * q**0.006
-        W *= la**0.04 * (100 * Rtc / np.cos(L)) ** (-0.3) * (Nz * Wdg) ** (0.49)
+        W = 0.036 * Sw**0.758 * Wfw**0.0035
+        W *= (A / np.cos(L) ** 2) ** 0.6 * q**0.006
+        W *= la**0.04
+        print(f"W: {W}")
+        print(f"(100 * Rtc / np.cos(L)): {(100 * Rtc / np.cos(L))}")
+        W *= (100 * Rtc / np.cos(L)) ** (-0.3)
+        print(f"W: {W}")
+        W *= (Nz * Wdg) ** (0.49)
+        W += Sw * Wp
+        return self._add_noise(y=W)
+
+    def fun_wingwt(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        r"""Wing weight function. Returns coded, not natural values.
+        Calculate the weight of an unpainted light aircraft wing based on design and operational parameters.
+        This function implements the wing weight model from Forrester et al., which aims to predict
+        the wing weight \( W \) using the following formula:
+
+        \[
+        W = 0.036 \times S_W^{0.758} \times W_{fw}^{0.0035} \times \left( \frac{A}{\cos^2 \Lambda} \right)^{0.6}
+        \times q^{0.006} \times \lambda^{0.04} \times \left( \frac{100 \times R_{tc}}{\cos \Lambda} \right)^{-0.3}
+        \times (N_z \times W_{dg})^{0.49} + S_W \times W_p
+        \]
+
+        where:
+
+        - \( S_W \): Wing area \((\text{ft}^2)\)
+        - \( W_{fw} \): Weight of fuel in the wing (lb)
+        - \( A \): Aspect ratio
+        - \( \Lambda \): Quarter-chord sweep (degrees)
+        - \( q \): Dynamic pressure at cruise \((\text{lb/ft}^2)\)
+        - \( \lambda \): Taper ratio
+        - \( R_{tc} \): Aerofoil thickness to chord ratio
+        - \( N_z \): Ultimate load factor
+        - \( W_{dg} \): Flight design gross weight (lb)
+        - \( W_p \): Paint weight \((\text{lb/ft}^2)\)
+
+        Parameter Overview:
+
+        | Symbol    | Parameter                              | Baseline | Minimum | Maximum |
+        |-----------|----------------------------------------|----------|---------|---------|
+        | \( S_W \)     | Wing area \((\text{ft}^2)\)            | 174      | 150     | 200     |
+        | \( W_{fw} \)  | Weight of fuel in wing (lb)            | 252      | 220     | 300     |
+        | \( A \)       | Aspect ratio                          | 7.52     | 6       | 10      |
+        | \( \Lambda \) | Quarter-chord sweep (deg)              | 0        | -10     | 10      |
+        | \( q \)       | Dynamic pressure at cruise \((\text{lb/ft}^2)\) | 34       | 16      | 45      |
+        | \( \lambda \) | Taper ratio                            | 0.672    | 0.5     | 1       |
+        | \( R_{tc} \)  | Aerofoil thickness to chord ratio      | 0.12     | 0.08    | 0.18    |
+        | \( N_z \)     | Ultimate load factor                   | 3.8      | 2.5     | 6       |
+        | \( W_{dg} \)  | Flight design gross weight (lb)        | 2000     | 1700    | 2500    |
+        | \( W_p \)     | Paint weight \((\text{lb/ft}^2)\)      | 0.064 |   0.025  | 0.08    |
+
+        Args:
+            X (np.ndarray):
+                A 2D numpy array where each row contains 10 parameters for which the wing weight will be calculated.
+            fun_control (Optional[Dict]):
+                A dictionary with keys `sigma` (noise level) and `seed` (random seed)
+                for incorporating randomness if required. Default is `None`.
+
+        Returns:
+            np.ndarray:
+            A 1D numpy array with shape (n,) containing the calculated wing weight values.
+
+        Examples:
+            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> import numpy as np
+            >>> X = np.array([np.zeros(10), np.ones(10)])
+            >>> fun = analytical()
+            >>> fun.fun_wingwt(X)
+            array([158.28245046, 409.33182691])
+        """
+        X = self._prepare_input_data(X, fun_control)
+        Sw = X[:, 0]
+        Wfw = X[:, 1]
+        A = X[:, 2]
+        L = X[:, 3] * np.pi / 180
+        q = X[:, 4]
+        la = X[:, 5]
+        Rtc = X[:, 6]
+        Nz = X[:, 7]
+        Wdg = X[:, 8]
+        Wp = X[:, 9]
+        # Calculate W for all rows in a vectorized manner
+        W = 0.036 * Sw**0.758 * Wfw**0.0035
+        W *= (A / np.cos(L) ** 2) ** 0.6 * q**0.006
+        W *= la**0.04
+        W *= (100 * Rtc / np.cos(L)) ** (-0.3)
+        W *= (Nz * Wdg) ** (0.49)
         W += Sw * Wp
         return self._add_noise(y=W)
 

@@ -52,7 +52,7 @@ def screeningplan(k, p, xi, r):
     return X
 
 
-def screening(X, fun, xi, p, labels, range=None, print=False) -> pd.DataFrame:
+def screening(X, fun, xi, p, labels, bounds=None, print=False) -> pd.DataFrame:
     """Generates a DataFrame with elementary effect screening metrics.
 
     This function calculates the mean and standard deviation of the
@@ -68,7 +68,7 @@ def screening(X, fun, xi, p, labels, range=None, print=False) -> pd.DataFrame:
         p (int): Number of discrete levels along each dimension.
         labels (list of str): A list of variable names corresponding to
             the design variables.
-        range (np.ndarray): A 2xk matrix where the first row contains
+        bounds (np.ndarray): A 2xk matrix where the first row contains
             lower bounds and the second row contains upper bounds for
             each variable.
 
@@ -78,66 +78,74 @@ def screening(X, fun, xi, p, labels, range=None, print=False) -> pd.DataFrame:
             - 'mean': The mean of the elementary effects for each variable.
             - 'sd': The standard deviation of the elementary effects for
             each variable.
+        or None: If print is set to False, a plot of the results is
+            generated instead of returning a DataFrame.
 
     Examples:
         >>> import numpy as np
-        >>> from spotpython.fun.objectivefunctions import Analytical
-        >>> from spotpython.utils.effects import screening
-        >>>
-        >>> # Create a small test input with shape (n, 10)
-        >>> X_test = np.array([
-        ...     [0.0]*10,
-        ...     [1.0]*10
-        ... ])
-        >>> fun = Analytical()
-        >>> labels = ["x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10"]
-        >>> result = screening(X_test, fun.fun_wingwt, np.array([[0]*10, [1]*10]), 0.1, 3, labels)
-        >>> print
+            from spotpython.utils.effects import screening, screeningplan
+            from spotpython.fun.objectivefunctions import Analytical
+            fun = Analytical()
+            k = 10
+            p = 10
+            xi = 1
+            r = 25
+            X = screeningplan(k=k, p=p, xi=xi, r=r)  # shape (r x (k+1), k)
+            # Provide real-world bounds from the wing weight docs (2 x 10).
+            value_range = np.array([
+                [150, 220,   6, -10, 16, 0.5, 0.08, 2.5, 1700, 0.025],
+                [200, 300,  10,  10, 45, 1.0, 0.18, 6.0, 2500, 0.08 ],
+            ])
+            labels = [
+                "S_W", "W_fw", "A", "Lambda",
+                "q",   "lambda", "tc", "N_z",
+                "W_dg", "W_p"
+            ]
+            screening(
+                X=X,
+                fun=fun.fun_wingwt,
+                bounds=value_range,
+                xi=xi,
+                p=p,
+                labels=labels,
+                print=False,
+            )
     """
-    # Determine the number of design variables (k)
     k = X.shape[1]
-    # Determine the number of repetitions (r)
     r = X.shape[0] // (k + 1)
 
-    # Scale each design point to the given range and evaluate the objective function
+    # Scale each design point
     t = np.zeros(X.shape[0])
     for i in range(X.shape[0]):
-        if range is not None:
-            X[i, :] = range[0, :] + X[i, :] * (range[1, :] - range[0, :])
+        if bounds is not None:
+            X[i, :] = bounds[0, :] + X[i, :] * (bounds[1, :] - bounds[0, :])
         t[i] = fun(X[i, :])
 
-    # Calculate the elementary effects
+    # Elementary effects
     F = np.zeros((k, r))
     for i in range(r):
         for j in range(i * (k + 1), i * (k + 1) + k):
-            index = np.where(X[j, :] - X[j + 1, :] != 0)[0][0]
-            F[index, i] = (t[j + 1] - t[j]) / (xi / (p - 1))
+            idx = np.where(X[j, :] - X[j + 1, :] != 0)[0][0]
+            F[idx, i] = (t[j + 1] - t[j]) / (xi / (p - 1))
 
-    # Compute statistical measures
-    ssd = np.std(F, axis=1)
-    sm = np.abs(np.mean(F, axis=1))
+    # Statistical measures (divide by n)
+    ssd = np.std(F, axis=1, ddof=0)
+    sm = np.mean(F, axis=1)
 
     if print:
-        # sort the variables by decreasing mean
-        idx = np.argsort(-sm)
-        labels = [labels[i] for i in idx]
+        idx = np.argsort(-np.abs(sm))
+        sorted_labels = [labels[i] for i in idx]
         sm = sm[idx]
         ssd = ssd[idx]
-        df = pd.DataFrame({"varname": labels, "mean": sm, "sd": ssd})
-
+        df = pd.DataFrame({"varname": sorted_labels, "mean": sm, "sd": ssd})
         return df
     else:
-        # Generate plot
         plt.figure()
-
         for i in range(k):
             plt.text(sm[i], ssd[i], labels[i], fontsize=10)
-
         plt.axis([min(sm), 1.1 * max(sm), min(ssd), 1.1 * max(ssd)])
         plt.xlabel("Sample means")
         plt.ylabel("Sample standard deviations")
-        plt.gca().set_xlabel("Sample means")
-        plt.gca().set_ylabel("Sample standard deviations")
         plt.gca().tick_params(labelsize=10)
         plt.grid(True)
         plt.show()
