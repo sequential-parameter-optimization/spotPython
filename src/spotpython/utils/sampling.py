@@ -708,6 +708,7 @@ def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False, ve
         plt.title(f"Morris-Mitchell optimum plan found using q={q_list[best_idx]}")
         plt.xlabel("x_1")
         plt.ylabel("x_2")
+        plt.grid(True)
         plt.show()
 
     return X

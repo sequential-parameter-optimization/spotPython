@@ -135,6 +135,12 @@ def map_to_original_scale(X_search: Union[pd.DataFrame, np.ndarray], x_min: np.n
     if not isinstance(X_search, (pd.DataFrame, np.ndarray)):
         raise TypeError("X_search must be a Pandas DataFrame or a NumPy array.")
 
+    # if x_min or x_max are not numpy arrays, convert them to numpy arrays
+    if not isinstance(x_min, np.ndarray):
+        x_min = np.array(x_min)
+    if not isinstance(x_max, np.ndarray):
+        x_max = np.array(x_max)
+
     if len(x_min) != X_search.shape[1]:
         raise IndexError(f"x_min and X_search must have the same number of columns. x_min has {len(x_min)} columns and X_search has {X_search.shape[1]} columns.")
     if len(x_max) != X_search.shape[1]:
