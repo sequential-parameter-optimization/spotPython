@@ -229,7 +229,7 @@ def screening_print(X, fun, xi, p, labels, bounds=None) -> pd.DataFrame:
     return df
 
 
-def screening_plot(X, fun, xi, p, labels, bounds=None, show=True):
+def screening_plot(X, fun, xi, p, labels, bounds=None, show=True) -> None:
     """Generates a plot with elementary effect screening metrics.
 
     This function calculates the mean and standard deviation of the
@@ -237,27 +237,24 @@ def screening_plot(X, fun, xi, p, labels, bounds=None, show=True):
     the results.
 
     Args:
-        X (np.ndarray): The screening plan matrix, typically structured
-            within a [0,1]^k box.
-        fun (object): The objective function to evaluate at each
-            design point in the screening plan.
-        xi (float): The elementary effect step length factor.
-        p (int): Number of discrete levels along each dimension.
-        labels (list of str): A list of variable names corresponding to
-            the design variables.
-        bounds (np.ndarray): A 2xk matrix where the first row contains
-            lower bounds and the second row contains upper bounds for
-            each variable.
-        show: (bool): If True, the plot is displayed. Defaults to True.
+        X (np.ndarray):
+            The screening plan matrix, typically structured within a [0,1]^k box.
+        fun (object):
+            The objective function to evaluate at each design point in the screening plan.
+        xi (float):
+            The elementary effect step length factor.
+        p (int):
+            Number of discrete levels along each dimension.
+        labels (list of str):
+            A list of variable names corresponding to the design variables.
+        bounds (np.ndarray):
+            A 2xk matrix where the first row contains lower bounds and
+            the second row contains upper bounds for each variable.
+        show (bool):
+            If True, the plot is displayed. Defaults to True.
 
     Returns:
-        pd.DataFrame: A DataFrame containing three columns:
-            - 'varname': The name of each variable.
-            - 'mean': The mean of the elementary effects for each variable.
-            - 'sd': The standard deviation of the elementary effects for
-            each variable.
-        or None: If print is set to False, a plot of the results is
-            generated instead of returning a DataFrame.
+        None: The function generates a plot of the results.
 
     Examples:
         >>> import numpy as np
