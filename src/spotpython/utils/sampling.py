@@ -620,7 +620,7 @@ def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[flo
     return X_best
 
 
-def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False, verbosity=0, edges=0,  q_list = [1, 2, 5, 10, 20, 50, 100]) -> np.ndarray:
+def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False, verbosity=0, edges=0, q_list=[1, 2, 5, 10, 20, 50, 100]) -> np.ndarray:
     """
     Generates an optimized Latin hypercube by evolving the Morris-Mitchell
     criterion across multiple exponents (q values) and selecting the best plan.
@@ -680,7 +680,6 @@ def bestlh(n: int, k: int, population: int, iterations: int, p=1, plot=False, ve
         raise ValueError("Latin hypercubes are not defined for dim k < 2")
 
     # A list of exponents (q) to optimize
-   
 
     # Start with a random Latin hypercube
     X_start = rlh(n, k, edges=edges)

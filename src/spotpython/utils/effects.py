@@ -300,7 +300,7 @@ def screening_plot(X, fun, xi, p, labels, bounds=None, show=True) -> None:
         plt.show()
 
 
-def plot_all_partial_dependence(df, df_target, model="GradientBoostingRegressor", nrows=5, ncols=6, figsize=(20, 15)) -> None:
+def plot_all_partial_dependence(df, df_target, model="GradientBoostingRegressor", nrows=5, ncols=6, figsize=(20, 15), title="") -> None:
     """
     Generates Partial Dependence Plots (PDPs) for every feature in a DataFrame against a target variable,
     arranged in a grid.
@@ -313,6 +313,7 @@ def plot_all_partial_dependence(df, df_target, model="GradientBoostingRegressor"
         nrows (int, optional): Number of rows in the grid of subplots. Defaults to 5.
         ncols (int, optional): Number of columns in the grid of subplots. Defaults to 6.
         figsize (tuple, optional): Figure size (width, height) in inches. Defaults to (20, 15).
+        title (str, optional): Title for the subplots. Defaults to "".
 
     Returns:
         None
@@ -361,7 +362,7 @@ def plot_all_partial_dependence(df, df_target, model="GradientBoostingRegressor"
     for i, feature in enumerate(features):
         ax = axes[i]  # Select the axis for the current feature
         PartialDependenceDisplay.from_estimator(gb_model, X_train, [feature], ax=ax)
-        ax.set_title(feature)  # Set the title of the subplot to the feature name
+        ax.set_title(title)  # Set the title of the subplot to the feature name
 
     # Remove empty subplots if the number of features is less than nrows * ncols
     for i in range(len(features), nrows * ncols):

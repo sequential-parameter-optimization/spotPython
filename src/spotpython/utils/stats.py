@@ -532,7 +532,7 @@ def vif(X, sorted=True) -> pd.DataFrame:
 
 def condition_index(df) -> pd.DataFrame:
     """
-    Calculates the Condition Index for each feature in a DataFrame to assess multicollinearity.
+    Calculates the Condition Index for a DataFrame to assess multicollinearity.
 
     The Condition Index is computed based on the eigenvalues of the covariance matrix
     of the standardized data. High condition indices suggest potential multicollinearity issues.
@@ -542,9 +542,9 @@ def condition_index(df) -> pd.DataFrame:
 
     Returns:
         pandas.DataFrame: A DataFrame with the following columns:
-            - 'Feature': The name of the feature.
+            - 'Index': The index of the eigenvalue.
             - 'Eigenvalue': The eigenvalue of the covariance matrix.
-            - 'Condition Index': The Condition Index for the feature.
+            - 'Condition Index': The Condition Index for the eigenvalue.
 
     Examples:
         >>> from spotpython.utils.stats import condition_index
@@ -555,28 +555,27 @@ def condition_index(df) -> pd.DataFrame:
         ...     'x3': [1, 3, 5, 7, 9]
         ... })
         >>> condition_index(data)
-           Feature  Eigenvalue  Condition Index
-        0      x1    1.140000         1.000000
-        1      x2    0.000000              inf
-        2      x3    0.002857        20.000000
+           Index  Eigenvalue  Condition Index
+        0      0    1.140000         1.000000
+        1      1    0.000000              inf
+        2      2    0.002857        20.000000
     """
-    # Standardisieren der Daten
+    # Standardize the data
     X = df.values
     X_centered = X - np.mean(X, axis=0)
 
-    # Berechnung der Kovarianzmatrix
+    # Compute the covariance matrix
     covariance_matrix = np.cov(X_centered, rowvar=False)
 
-    # Berechnung der Eigenwerte der Kovarianzmatrix
+    # Compute the eigenvalues of the covariance matrix
     eigenvalues, _ = np.linalg.eigh(covariance_matrix)
 
-    # Berechnung des Condition Index
-    # Condition Index ist die Wurzel des Verhältnisses des größten Eigenwertes zum jeweiligen Eigenwert
+    # Handle division by zero for eigenvalues
     max_eigenvalue = max(eigenvalues)
-    condition_indices = np.sqrt(max_eigenvalue / eigenvalues)
+    condition_indices = np.array([np.sqrt(max_eigenvalue / ev) if ev > 0 else np.inf for ev in eigenvalues])
 
-    # Erstellen eines DataFrames zur Anzeige der Ergebnisse
-    condition_index_df = pd.DataFrame({"Feature": df.columns, "Eigenvalue": eigenvalues, "Condition Index": condition_indices})
+    # Create a DataFrame for the results
+    condition_index_df = pd.DataFrame({"Index": range(len(eigenvalues)), "Eigenvalue": eigenvalues, "Condition Index": condition_indices})
 
     return condition_index_df
 
