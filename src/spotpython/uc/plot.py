@@ -12,6 +12,7 @@ def plot_predictionintervals(
     y_test_pred_low,
     y_test_pred_high,
     suptitle: str,
+    figsize: tuple = (10, 10),  # Default figsize added
 ) -> None:
     """
     Plots prediction intervals for training and testing data.
@@ -31,37 +32,12 @@ def plot_predictionintervals(
         y_test_pred_low (array-like): Lower bounds of prediction intervals for the testing set.
         y_test_pred_high (array-like): Upper bounds of prediction intervals for the testing set.
         suptitle (str): The title for the entire figure.
+        figsize (tuple, optional): Size of the figure. Default is (10, 10).
 
     Returns:
         None: The function displays the plots but does not return any value.
-
-    Notes:
-        - The first subplot compares true and predicted values with error bars for both training
-          and testing data.
-        - The second subplot visualizes the width of prediction intervals as a function of true values.
-        - The third subplot orders the prediction interval widths and displays them for both
-          training and testing data.
-        - The fourth subplot shows histograms of the interval widths for training and testing data.
-
-    References:
-        Function adapted from: https://github.com/scikit-learn-contrib/MAPIE/blob/master/notebooks/regression/exoplanets.ipynb
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.uc.plot import plot_predictionintervals
-        >>> y_train = np.array([1, 2, 3, 4, 5])
-        >>> y_train_pred = np.array([1.1, 2.2, 3.3, 4.4, 5.5])
-        >>> y_train_pred_low = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
-        >>> y_train_pred_high = np.array([1.2, 2.4, 3.6, 4.8, 6.0])
-        >>> y_test = np.array([6, 7, 8])
-        >>> y_test_pred = np.array([6.1, 7.2, 8.3])
-        >>> y_test_pred_low = np.array([6.0, 7.0, 8.0])
-        >>> y_test_pred_high = np.array([6.2, 7.4, 8.6])
-        >>> suptitle = "Prediction Intervals"
-        >>> plot_predictionintervals(y_train, y_train_pred, y_train_pred_low, y_train_pred_high, y_test, y_test_pred, y_test_pred_low, y_test_pred_high, suptitle)
     """
-
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=figsize)  # Use figsize parameter
 
     ax1.errorbar(
         x=y_train,
