@@ -356,7 +356,7 @@ def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> 
         >>> # Calculate the space-fillingness metric with q=2, using Euclidean distances (p=2)
         >>> quality = mmphi(X, q=2, p=2)
         >>> print(quality)
-        # This value indicates how well points are spread out, with higher being better.
+        # This value indicates how well points are spread out, with smaller being better.
     """
     # Compute the distance multiplicities: J, and unique distances: d
     J, d = jd(X, p)
@@ -558,7 +558,7 @@ def mmlhs(X_start: np.ndarray, population: int, iterations: int, q: Optional[flo
 
     Examples:
         >>> import numpy as np
-        >>> from your_module import mmlhs
+        >>> from spotpython.utils.sampling import mmlhs
         >>> # Suppose we have an initial 4x2 plan
         >>> X_start = np.array([
         ...     [0, 0],
