@@ -316,6 +316,34 @@ class Kriging(BaseEstimator, RegressorMixin):
             predictions = [self._pred(x_i)[0] for x_i in X]
             return np.array(predictions)
 
+    def _kernel(self, X: np.ndarray, theta: np.ndarray, p: float) -> np.ndarray:
+        """
+        Computes the correlation matrix Psi using vectorized operations.
+
+        Args:
+            X (np.ndarray): Input data of shape (n_samples, n_features).
+            theta (np.ndarray): Theta parameters of shape (n_features,).
+            p (float): Power exponent.
+
+        Returns:
+            np.ndarray: The upper triangle of the correlation matrix Psi.
+        """
+        n_samples, n_features = X.shape
+        Psi = np.zeros((n_samples, n_samples), dtype=float)
+        # Calculate all pairwise differences:
+        # X_expanded_rows will have shape (n_samples, 1, n_features)
+        # X_expanded_cols will have shape (1, n_samples, n_features)
+        # diff will have shape (n_samples, n_samples, n_features)
+        diff = np.abs(X[:, np.newaxis, :] - X[np.newaxis, :, :]) ** p
+        # Apply theta and sum over features
+        # dist_matrix will have shape (n_samples, n_samples)
+        dist_matrix = np.sum(theta * diff, axis=2)
+        # Compute Psi using the exponential kernel
+        Psi = np.exp(-dist_matrix)
+        # Return only the upper triangle, as the matrix is symmetric
+        # and the diagonal will be handled later.
+        return np.triu(Psi, k=1)
+
     def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
@@ -359,13 +387,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         one = np.ones(n)
 
         # Build correlation matrix
-        Psi = np.zeros((n, n), dtype=float)
-        for i in range(n):
-            for j in range(i + 1, n):
-                dist_vec = np.abs(X[i, :] - X[j, :]) ** p
-                Psi[i, j] = np.exp(-np.sum(theta * dist_vec))
-
-        Psi = Psi + Psi.T + np.eye(n) + np.eye(n) * lambda_
+        Psi_upper_triangle = self._kernel(X, theta, p)
+        Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
 
         try:
             U = np.linalg.cholesky(Psi)
