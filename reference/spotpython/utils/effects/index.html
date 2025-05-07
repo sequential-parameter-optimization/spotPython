@@ -20,7 +20,7 @@
       
       
       <link rel="icon" href="../../../../images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.40">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.41">
     
     
       
@@ -28,7 +28,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.8c3ca2c6.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.0253249f.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
@@ -4829,7 +4829,7 @@
 
 
 <h2 id="spotpython.utils.effects.plot_all_partial_dependence" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plot_all_partial_dependence</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df_target</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;GradientBoostingRegressor&#39;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span></code>
+            <code class="highlight language-python"><span class="n">plot_all_partial_dependence</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df_target</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s1">&#39;GradientBoostingRegressor&#39;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
 <a href="#spotpython.utils.effects.plot_all_partial_dependence" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -4934,6 +4934,20 @@ arranged in a grid.</p>
             </td>
             <td>
                   <code>(20, 15)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>title</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Title for the subplots. Defaults to &ldquo;&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
             </td>
           </tr>
       </tbody>
@@ -5043,7 +5057,8 @@ arranged in a grid.</p>
 <span class="normal">368</span>
 <span class="normal">369</span>
 <span class="normal">370</span>
-<span class="normal">371</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_all_partial_dependence</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df_target</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;GradientBoostingRegressor&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">371</span>
+<span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_all_partial_dependence</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">df_target</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;GradientBoostingRegressor&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates Partial Dependence Plots (PDPs) for every feature in a DataFrame against a target variable,</span>
 <span class="sd">    arranged in a grid.</span>
@@ -5056,6 +5071,7 @@ arranged in a grid.</p>
 <span class="sd">        nrows (int, optional): Number of rows in the grid of subplots. Defaults to 5.</span>
 <span class="sd">        ncols (int, optional): Number of columns in the grid of subplots. Defaults to 6.</span>
 <span class="sd">        figsize (tuple, optional): Figure size (width, height) in inches. Defaults to (20, 15).</span>
+<span class="sd">        title (str, optional): Title for the subplots. Defaults to &quot;&quot;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
@@ -5104,7 +5120,7 @@ arranged in a grid.</p>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">features</span><span class="p">):</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># Select the axis for the current feature</span>
         <span class="n">PartialDependenceDisplay</span><span class="o">.</span><span class="n">from_estimator</span><span class="p">(</span><span class="n">gb_model</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="p">[</span><span class="n">feature</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>  <span class="c1"># Set the title of the subplot to the feature name</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>  <span class="c1"># Set the title of the subplot to the feature name</span>
 
     <span class="c1"># Remove empty subplots if the number of features is less than nrows * ncols</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="n">nrows</span> <span class="o">*</span> <span class="n">ncols</span><span class="p">):</span>
@@ -6126,7 +6142,7 @@ generated instead of returning a DataFrame.</p>
     <script id="__config" type="application/json">{"base": "../../../..", "features": ["content.code.copy", "navigation.tabs", "navigation.instant", "navigation.indexes"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.525ec568.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
       
         <script src="../../../../javascripts/mathjax.js"></script>
       
