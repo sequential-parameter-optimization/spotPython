@@ -5125,7 +5125,7 @@ It should accept a NumPy array and an additional control parameter.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">spotpython.utils.parallel</span> <span class="kn">import</span> <span class="n">evaluate_row</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">sample_objective</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">control</span><span class="p">):</span>
-<span class="gp">... </span>    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">+</span> <span class="n">control</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;offset&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">row</span> <span class="o">+</span> <span class="n">control</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;offset&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">row</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fun_control</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;offset&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">evaluate_row</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">sample_objective</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span>
@@ -5134,8 +5134,7 @@ It should accept a NumPy array and an additional control parameter.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/parallel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 7</span>
-<span class="normal"> 8</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 8</span>
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
@@ -5157,7 +5156,12 @@ It should accept a NumPy array and an additional control parameter.</p>
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
-<span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">objective_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">fun_control</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">objective_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">fun_control</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluates a single row using the provided objective function.</span>
 
@@ -5174,12 +5178,16 @@ It should accept a NumPy array and an additional control parameter.</p>
 <span class="sd">        &gt;&gt;&gt; from spotpython.utils.parallel import evaluate_row</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; def sample_objective(row, control):</span>
-<span class="sd">        ...     return sum(row) + control.get(&#39;offset&#39;, 0)</span>
+<span class="sd">        ...     return row + control.get(&#39;offset&#39;, 0)</span>
 <span class="sd">        &gt;&gt;&gt; row = [1, 2, 3]</span>
 <span class="sd">        &gt;&gt;&gt; fun_control = {&#39;offset&#39;: 10}</span>
 <span class="sd">        &gt;&gt;&gt; evaluate_row(row, sample_objective, fun_control)</span>
 <span class="sd">            array([11, 12, 13])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fun_control</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;seed&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">:</span>
+            <span class="n">seed</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span>
+            <span class="n">set_all_seeds</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">objective_function</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">row</span><span class="p">]),</span> <span class="n">fun_control</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -5307,10 +5315,7 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/parallel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 75</span>
-<span class="normal"> 76</span>
-<span class="normal"> 77</span>
-<span class="normal"> 78</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 78</span>
 <span class="normal"> 79</span>
 <span class="normal"> 80</span>
 <span class="normal"> 81</span>
@@ -5338,7 +5343,10 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="normal">103</span>
 <span class="normal">104</span>
 <span class="normal">105</span>
-<span class="normal">106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make_parallel</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mp&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">make_parallel</span><span class="p">(</span><span class="n">obj_func</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;mp&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a parallelized wrapper function for the given objective function.</span>
 
@@ -5538,12 +5546,7 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/parallel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">38</span>
 <span class="normal">39</span>
 <span class="normal">40</span>
 <span class="normal">41</span>
@@ -5577,7 +5580,10 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="normal">69</span>
 <span class="normal">70</span>
 <span class="normal">71</span>
-<span class="normal">72</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_objective_function</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_objective_function</span><span class="p">(</span><span class="n">objective_function</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">num_cores</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Executes an objective function in parallel using either multiprocessing or joblib.</span>
 
@@ -5608,13 +5614,11 @@ depending on the implementation of <code>parallel_objective_function</code>.</p>
 <span class="sd">        &gt;&gt;&gt; parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method=&#39;joblib&#39;)</span>
 <span class="sd">        array([16, 25, 34])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">Manager</span><span class="p">()</span> <span class="k">as</span> <span class="n">manager</span><span class="p">:</span>
-        <span class="n">shared_control</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="n">fun_control</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;mp&quot;</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
-                <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">evaluate_row</span><span class="p">,</span> <span class="p">[(</span><span class="n">row</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">shared_control</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;joblib&quot;</span><span class="p">:</span>
-            <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">evaluate_row</span><span class="p">)(</span><span class="n">row</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">shared_control</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">X</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;mp&quot;</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">starmap</span><span class="p">(</span><span class="n">evaluate_row</span><span class="p">,</span> <span class="p">[(</span><span class="n">row</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;joblib&quot;</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">num_cores</span><span class="p">)(</span><span class="n">delayed</span><span class="p">(</span><span class="n">evaluate_row</span><span class="p">)(</span><span class="n">row</span><span class="p">,</span> <span class="n">objective_function</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">X</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
