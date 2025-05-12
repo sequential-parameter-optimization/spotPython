@@ -1,7 +1,8 @@
-from multiprocessing import Pool, Manager
+from multiprocessing import Pool
 from joblib import Parallel, delayed
 import numpy as np
 from typing import Callable, Any, Union
+from spotpython.utils.seed import set_all_seeds
 
 
 def evaluate_row(row: Union[np.ndarray, list], objective_function: Callable[[np.ndarray, Any], Any], fun_control: Any) -> Any:
@@ -21,12 +22,16 @@ def evaluate_row(row: Union[np.ndarray, list], objective_function: Callable[[np.
         >>> from spotpython.utils.parallel import evaluate_row
         >>> import numpy as np
         >>> def sample_objective(row, control):
-        ...     return sum(row) + control.get('offset', 0)
+        ...     return row + control.get('offset', 0)
         >>> row = [1, 2, 3]
         >>> fun_control = {'offset': 10}
         >>> evaluate_row(row, sample_objective, fun_control)
             array([11, 12, 13])
     """
+    if fun_control is not None:
+        if "seed" in fun_control:
+            seed = fun_control["seed"]
+            set_all_seeds(seed)
     return objective_function(np.array([row]), fun_control)
 
 
@@ -61,13 +66,11 @@ def parallel_objective_function(objective_function, X, num_cores, fun_control, m
         >>> parallel_objective_function(sample_objective, X, num_cores=2, fun_control=fun_control, method='joblib')
         array([16, 25, 34])
     """
-    with Manager() as manager:
-        shared_control = manager.dict(fun_control)
-        if method == "mp":
-            with Pool(processes=num_cores) as pool:
-                results = pool.starmap(evaluate_row, [(row, objective_function, shared_control) for row in X])
-        elif method == "joblib":
-            results = Parallel(n_jobs=num_cores)(delayed(evaluate_row)(row, objective_function, shared_control) for row in X)
+    if method == "mp":
+        with Pool(processes=num_cores) as pool:
+            results = pool.starmap(evaluate_row, [(row, objective_function, fun_control) for row in X])
+    elif method == "joblib":
+        results = Parallel(n_jobs=num_cores)(delayed(evaluate_row)(row, objective_function, fun_control) for row in X)
 
     return np.array(results).flatten()
 

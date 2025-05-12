@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 from spotpython.utils.parallel import evaluate_row
 
