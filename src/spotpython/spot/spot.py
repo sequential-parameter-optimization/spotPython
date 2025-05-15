@@ -8,6 +8,7 @@ import copy
 import json
 from numpy.random import default_rng
 from spotpython.design.spacefilling import SpaceFilling
+from multiprocessing import set_start_method
 
 # old Kriging with attribute "name" kriging
 from spotpython.build.kriging import Kriging as OldKriging
@@ -55,6 +56,8 @@ from spotpython.utils.file import load_result
 # matplotlib.use("TkAgg")
 # matplotlib.use("Agg")
 
+# for multiprocessing:
+set_start_method("spawn")
 
 logger = logging.getLogger(__name__)
 # configure the handler and formatter as needed
