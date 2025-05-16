@@ -56,6 +56,14 @@ from spotpython.utils.file import load_result
 # matplotlib.use("TkAgg")
 # matplotlib.use("Agg")
 
+
+# for multiprocessing:
+# check if context is already set to "spawn"
+# if not, set it to "spawn"
+# Check if the context is already set to "spawn"
+if get_start_method(allow_none=True) != "spawn":
+    set_start_method("spawn", force=True)
+
 logger = logging.getLogger(__name__)
 # configure the handler and formatter as needed
 py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
@@ -201,13 +209,6 @@ class Spot:
         self.design_control = design_control
         self.optimizer_control = optimizer_control
         self.surrogate_control = surrogate_control
-
-        # for multiprocessing:
-        # check if context is already set to "spawn"
-        # if not, set it to "spawn"
-        # Check if the context is already set to "spawn"
-        if get_start_method(allow_none=True) != "spawn":
-            set_start_method("spawn", force=True)
 
         # small value:
         self.eps = sqrt(spacing(1))
