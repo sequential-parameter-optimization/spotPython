@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from spotpython.hyperparameters.optimizer import optimizer_handler
 import torchmetrics.functional.regression
+import torch.optim as optim
 
 
 class NNFunnelRegressor(L.LightningModule):
@@ -117,10 +118,15 @@ class NNFunnelRegressor(L.LightningModule):
 
         for i in range(self.hparams.num_layers):
             out_features = max(hidden_size // 2, 8)  # Enforce minimum of 8 units
-            layers += [
-                nn.Linear(in_features, hidden_size),
-                self.hparams.act_fn,
-                nn.Dropout(self.hparams.dropout_prob),]
+            
+            layers.append(nn.Linear(in_features, hidden_size))
+            
+            if self.hparams.batch_norm:
+                layers.append(nn.BatchNorm1d(hidden_size))  # Add BatchNorm if enabled
+            
+            layers.append(self.hparams.act_fn)
+            layers.append(nn.Dropout(self.hparams.dropout_prob))
+            
             in_features = hidden_size
             hidden_size = out_features
 
@@ -258,4 +264,22 @@ class NNFunnelRegressor(L.LightningModule):
         """
         # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
-        return optimizer
+        
+        # If the lr_sched hyperparameter is set to True, we will use a learning rate scheduler.
+        if self.hparams.lr_sched:
+            num_milestones = 3  # Number of milestones to divide the epochs
+            milestones = [int(self.hparams.epochs / (num_milestones + 1) * (i + 1)) for i in range(num_milestones)]
+            scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=milestones, gamma=0.1)  # Decay factor
+
+            lr_scheduler_config = {
+                "scheduler": scheduler,
+                "interval": "epoch",
+                "frequency": 1,
+            }
+            return {
+                "optimizer": optimizer,
+                "lr_scheduler": lr_scheduler_config,
+            }
+        #  If the lr_sched hyperparameter is not set to True, we return the optimizer only.
+        else:
+            return optimizer
