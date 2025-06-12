@@ -110,7 +110,6 @@ class NNFunnelRegressor(L.LightningModule):
         if self.hparams.l1 < 8:
             raise ValueError("l1 must be at least 8")
 
-
         layers = []
         in_features = self._L_in
         hidden_size = self.hparams.l1
@@ -118,15 +117,15 @@ class NNFunnelRegressor(L.LightningModule):
 
         for i in range(self.hparams.num_layers):
             out_features = max(hidden_size // 2, 8)  # Enforce minimum of 8 units
-            
+
             layers.append(nn.Linear(in_features, hidden_size))
-            
+
             if self.hparams.batch_norm:
                 layers.append(nn.BatchNorm1d(hidden_size))  # Add BatchNorm if enabled
-            
+
             layers.append(self.hparams.act_fn)
             layers.append(nn.Dropout(self.hparams.dropout_prob))
-            
+
             in_features = hidden_size
             hidden_size = out_features
 
@@ -264,7 +263,7 @@ class NNFunnelRegressor(L.LightningModule):
         """
         # optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
         optimizer = optimizer_handler(optimizer_name=self.hparams.optimizer, params=self.parameters(), lr_mult=self.hparams.lr_mult)
-        
+
         # If the lr_sched hyperparameter is set to True, we will use a learning rate scheduler.
         if self.hparams.lr_sched:
             num_milestones = 3  # Number of milestones to divide the epochs

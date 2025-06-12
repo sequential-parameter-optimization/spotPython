@@ -311,7 +311,7 @@ def mm(X1: np.ndarray, X2: np.ndarray, p: Optional[float] = 1.0) -> int:
         return c[idx]
 
 
-def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> float:
+def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0, verbosity=0) -> float:
     """
     Calculates the Morris-Mitchell sampling plan quality criterion.
 
@@ -324,6 +324,9 @@ def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> 
         p (float, optional):
             The distance norm to use. For example, p=1 is Manhattan (L1),
             p=2 is Euclidean (L2). Defaults to 1.0.
+        verbosity (int, optional):
+            If set to 1, prints additional information about the computation.
+            Defaults to 0 (no additional output).
 
     Returns:
         float:
@@ -358,8 +361,15 @@ def mmphi(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 1.0) -> 
         >>> print(quality)
         # This value indicates how well points are spread out, with smaller being better.
     """
+    # check that X has unique rows
+    if X.shape[0] != len(np.unique(X, axis=0)):
+        # issue a warning if there are duplicate rows
+        print("Warning: X contains duplicate rows. This may affect the space-fillingness metric.")
+        # make X unique
+        X = np.unique(X, axis=0)
     # Compute the distance multiplicities: J, and unique distances: d
     J, d = jd(X, p)
+    print(f"J: {J}, d: {d}") if verbosity > 0 else None
 
     # Summation of J[i] * d[i]^(-q), then raised to 1/q
     # This follows the Morris-Mitchell definition.
