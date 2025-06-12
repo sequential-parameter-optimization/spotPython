@@ -881,3 +881,73 @@ def subset(X: np.ndarray, ns: int) -> Tuple[np.ndarray, np.ndarray]:
             Xs[j, :] = orig_point
 
     return Xs, Xr
+
+
+def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 2.0) -> float:
+    """
+    Calculates a size-invariant Morris-Mitchell criterion.
+
+    This "intensive" version of the criterion allows for the comparison of
+    sampling plans with different sample sizes by normalizing for the number
+    of point pairs. A smaller value indicates a better (more space-filling)
+    design.
+
+    Args:
+        X (np.ndarray):
+            A 2D array representing the sampling plan (shape: (n, d)).
+        q (float, optional):
+            The exponent used in the computation of the metric. Defaults to 2.0.
+        p (float, optional):
+            The distance norm to use (e.g., p=1 for Manhattan, p=2 for Euclidean).
+            Defaults to 2.0.
+
+    Returns:
+        float:
+            The size-invariant space-fillingness metric. Smaller is better.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.utils.sampling import mmphi_intensive
+        >>> # Create a simple 3-point sampling plan in 2D
+        >>> X = np.array([
+        ...     [0.0, 0.0],
+        ...     [0.5, 0.5],
+        ...     [1.0, 1.0]
+        ... ])
+        >>> # Calculate the intensive space-fillingness metric with q=2, using Euclidean distances (p=2)
+        >>> quality = mmphi_intensive(X, q=2, p=2)
+        >>> print(quality)
+    """
+    # Ensure there are no duplicate points
+    if X.shape[0] != len(np.unique(X, axis=0)):
+        X = np.unique(X, axis=0)
+
+    n_points = X.shape[0]
+
+    # The criterion is not well-defined for fewer than 2 points.
+    if n_points < 2:
+        return np.inf
+
+    # Get the unique distances and their multiplicities
+    J, d = jd(X, p=p)
+
+    # If all points are identical, the design is infinitely bad.
+    if d.size == 0:
+        return np.inf
+
+    # Calculate the number of unique pairs of points
+    M = n_points * (n_points - 1) / 2
+
+    try:
+        # Calculate the sum term of the original mmphi
+        sum_term = np.sum(J * (d ** (-q)))
+        # Normalize the sum by M before taking the final root
+        intensive_phiq = (sum_term / M) ** (1.0 / q)
+    except ZeroDivisionError:
+        return np.inf
+    except FloatingPointError:
+        return np.inf
+    except Exception:
+        return np.inf
+
+    return intensive_phiq
