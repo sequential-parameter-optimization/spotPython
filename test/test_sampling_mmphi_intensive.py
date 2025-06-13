@@ -29,7 +29,7 @@ def test_mmphi_intensive_basic(monkeypatch):
         vals, counts = np.unique(np.round(dists, 8), return_counts=True)
         return counts, vals
     monkeypatch.setattr(sampling, "jd", real_jd)
-    val = mmphi_intensive(X, q=2.0, p=2.0)
+    val, J, d = mmphi_intensive(X, q=2.0, p=2.0)
     assert np.isscalar(val)
     assert val > 0
     if orig_jd:
@@ -39,11 +39,11 @@ def test_mmphi_intensive_duplicates(monkeypatch):
     # All points identical: should return np.inf
     X = np.ones((4, 2))
     monkeypatch.setattr(sampling, "jd", lambda X, p=2.0: (np.array([]), np.array([])))
-    val = mmphi_intensive(X)
+    val, J, d = mmphi_intensive(X)
     assert val == np.inf
 
 def test_mmphi_intensive_too_few_points():
     # Only one point: should return np.inf
     X = np.array([[0.5, 0.5]])
-    val = mmphi_intensive(X)
+    val, J, d = mmphi_intensive(X)
     assert val == np.inf

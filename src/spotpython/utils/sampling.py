@@ -883,7 +883,7 @@ def subset(X: np.ndarray, ns: int) -> Tuple[np.ndarray, np.ndarray]:
     return Xs, Xr
 
 
-def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 2.0) -> float:
+def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] = 2.0) -> tuple[float, np.ndarray, np.ndarray]:
     """
     Calculates a size-invariant Morris-Mitchell criterion.
 
@@ -902,8 +902,11 @@ def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] 
             Defaults to 2.0.
 
     Returns:
-        float:
-            The size-invariant space-fillingness metric. Smaller is better.
+        tuple[float, np.ndarray, np.ndarray]:
+            A tuple containing:
+            - intensive_phiq: The intensive space-fillingness metric.
+            - J: Multiplicities of distances.
+            - d: Unique distances.
 
     Examples:
         >>> import numpy as np
@@ -915,7 +918,7 @@ def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] 
         ...     [1.0, 1.0]
         ... ])
         >>> # Calculate the intensive space-fillingness metric with q=2, using Euclidean distances (p=2)
-        >>> quality = mmphi_intensive(X, q=2, p=2)
+        >>> quality, J, d = mmphi_intensive(X, q=2, p=2)
         >>> print(quality)
     """
     # Ensure there are no duplicate points
@@ -926,14 +929,14 @@ def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] 
 
     # The criterion is not well-defined for fewer than 2 points.
     if n_points < 2:
-        return np.inf
+        return np.inf, 0, 0
 
     # Get the unique distances and their multiplicities
     J, d = jd(X, p=p)
 
     # If all points are identical, the design is infinitely bad.
     if d.size == 0:
-        return np.inf
+        return np.inf, J, d
 
     # Calculate the number of unique pairs of points
     M = n_points * (n_points - 1) / 2
@@ -950,7 +953,7 @@ def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] 
     except Exception:
         return np.inf
 
-    return intensive_phiq
+    return intensive_phiq, J, d
 
 
 def mmphi_intensive_update(X: np.ndarray, new_point: np.ndarray, J: np.ndarray, d: np.ndarray, q: float = 2.0, p: float = 2.0) -> tuple[float, np.ndarray, np.ndarray]:
@@ -967,6 +970,18 @@ def mmphi_intensive_update(X: np.ndarray, new_point: np.ndarray, J: np.ndarray, 
 
     Returns:
         tuple[float, np.ndarray, np.ndarray]: Updated intensive_phiq, updated_J, updated_d.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.utils.sampling import mmphi_intensive_update
+        >>> # Existing design with 3 points in 2D
+        >>> X = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+        >>> phiq, J, d = mmphi_intensive(X, q=2, p=2)
+        >>> # New point to add
+        >>> new_point = np.array([0.1, 0.1])
+        >>> # Update the intensive criterion
+        >>> updated_phiq, updated_J, updated_d = mmphi_intensive_update(X, new_point, J, d, q=2, p=2)
+
     """
     n_points = X.shape[0]
     if n_points < 1:
