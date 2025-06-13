@@ -1,9 +1,9 @@
 import numpy as np
 from numpy import mgrid
-from .designs import designs
+from spotpython.design.designs import Designs
 
 
-class factorial(designs):
+class factorial(Designs):
     """
     Super class for factorial designs.
 

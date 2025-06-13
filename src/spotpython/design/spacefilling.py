@@ -3,6 +3,7 @@ from scipy.stats.qmc import LatinHypercube
 from spotpython.utils.transform import scale
 from typing import Optional, Union
 from spotpython.design.designs import Designs
+from scipy.stats import qmc
 
 
 class SpaceFilling(Designs):
@@ -94,3 +95,33 @@ class SpaceFilling(Designs):
         sample = self.sampler.random(n=n)
         des = scale(sample, lower, upper)
         return np.repeat(des, repeats, axis=0)
+
+    def generate_qms_lhs_design(self, n_points: int, seed: Optional[int] = None) -> np.ndarray:
+        """Generates a Latin Hypercube Sampling design using the `scipy.stats.qmc` module.
+        Generates a Latin Hypercube Sampling (LHS) design with the specified number of points
+        and dimensions.
+
+        Args:
+            n_points (int): The number of points to generate.
+            seed (Optional[int]):
+                Seed for the random number generator to ensure reproducibility.
+                Defaults to None. If None, uses the seed specified during initialization.
+
+        Returns:
+            np.ndarray: An array of shape (n_points, n_dim) containing the generated Latin Hypercube Sampling points.
+
+        Notes:
+            - The Latin Hypercube Sampling is generated with a specified number of points and dimensions.
+            - The points are uniformly distributed across the unit hypercube [0, 1]^n_dim.
+
+        Examples:
+            >>> from spotpython.design.spacefilling import SpaceFilling
+            >>> lhs_design = SpaceFilling(k=3, seed=42)
+            >>> lhs_points = lhs_design.generate_qms_lhs_design(n_points=10)
+            >>> print(lhs_points.shape)
+            (10, 3)
+        """
+        if seed is None:
+            seed = self.seed
+        sampler = qmc.LatinHypercube(d=self.k, seed=seed)
+        return sampler.random(n=n_points)
