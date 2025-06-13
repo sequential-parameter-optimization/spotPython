@@ -951,3 +951,44 @@ def mmphi_intensive(X: np.ndarray, q: Optional[float] = 2.0, p: Optional[float] 
         return np.inf
 
     return intensive_phiq
+
+
+def mmphi_intensive_update(X: np.ndarray, new_point: np.ndarray, J: np.ndarray, d: np.ndarray, q: float = 2.0, p: float = 2.0) -> tuple[float, np.ndarray, np.ndarray]:
+    """
+    Updates the Morris-Mitchell intensive criterion for n+1 points by adding a new point to the design.
+
+    Args:
+        X (np.ndarray): Existing sampling plan (shape: (n, d)).
+        new_point (np.ndarray): New point to add (shape: (d,)).
+        J (np.ndarray): Multiplicities of distances for the existing design.
+        d (np.ndarray): Unique distances for the existing design.
+        q (float): Exponent used in the computation of the metric. Defaults to 2.0.
+        p (float): Distance norm to use (e.g., p=1 for Manhattan, p=2 for Euclidean). Defaults to 2.0.
+
+    Returns:
+        tuple[float, np.ndarray, np.ndarray]: Updated intensive_phiq, updated_J, updated_d.
+    """
+    n_points = X.shape[0]
+    if n_points < 1:
+        raise ValueError("The existing design must contain at least one point.")
+
+    # Compute distances between the new point and all existing points
+    new_distances = np.array([np.linalg.norm(new_point - X[i], ord=p) for i in range(n_points)])
+
+    # Combine old distances and new distances into a single list
+    all_distances = []
+    for dist, count in zip(d, J):
+        all_distances.extend([dist] * count)
+    all_distances.extend(new_distances)
+
+    # Find unique distances and their counts
+    updated_d, updated_J = np.unique(all_distances, return_counts=True)
+
+    # Calculate the number of unique pairs of points
+    M = (n_points + 1) * n_points / 2
+
+    # Compute the updated intensive_phiq
+    sum_term = np.sum(updated_J * (updated_d ** (-q)))
+    intensive_phiq = (sum_term / M) ** (1.0 / q)
+
+    return intensive_phiq, updated_J, updated_d
