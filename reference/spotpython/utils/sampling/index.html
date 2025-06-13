@@ -4751,6 +4751,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#spotpython.utils.sampling.mmphi_intensive_update" class="md-nav__link">
+    <span class="md-ellipsis">
+      mmphi_intensive_update
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#spotpython.utils.sampling.mmsort" class="md-nav__link">
     <span class="md-ellipsis">
       mmsort
@@ -5145,6 +5154,15 @@
   <a href="#spotpython.utils.sampling.mmphi_intensive" class="md-nav__link">
     <span class="md-ellipsis">
       mmphi_intensive
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spotpython.utils.sampling.mmphi_intensive_update" class="md-nav__link">
+    <span class="md-ellipsis">
+      mmphi_intensive_update
     </span>
   </a>
   
@@ -7454,6 +7472,226 @@ Defaults to 2.0.</p>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
 
     <span class="k">return</span> <span class="n">intensive_phiq</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="spotpython.utils.sampling.mmphi_intensive_update" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">mmphi_intensive_update</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">new_point</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span></code>
+
+<a href="#spotpython.utils.sampling.mmphi_intensive_update" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Updates the Morris-Mitchell intensive criterion for n+1 points by adding a new point to the design.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>X</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Existing sampling plan (shape: (n, d)).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>new_point</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>New point to add (shape: (d,)).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>J</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Multiplicities of distances for the existing design.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>d</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Unique distances for the existing design.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>q</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Exponent used in the computation of the metric. Defaults to 2.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>p</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Distance norm to use (e.g., p=1 for Manhattan, p=2 for Euclidean). Defaults to 2.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2.0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>tuple[float, <span title="numpy.ndarray">ndarray</span>, <span title="numpy.ndarray">ndarray</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>tuple[float, np.ndarray, np.ndarray]: Updated intensive_phiq, updated_J, updated_d.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>spotpython/utils/sampling.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">956</span>
+<span class="normal">957</span>
+<span class="normal">958</span>
+<span class="normal">959</span>
+<span class="normal">960</span>
+<span class="normal">961</span>
+<span class="normal">962</span>
+<span class="normal">963</span>
+<span class="normal">964</span>
+<span class="normal">965</span>
+<span class="normal">966</span>
+<span class="normal">967</span>
+<span class="normal">968</span>
+<span class="normal">969</span>
+<span class="normal">970</span>
+<span class="normal">971</span>
+<span class="normal">972</span>
+<span class="normal">973</span>
+<span class="normal">974</span>
+<span class="normal">975</span>
+<span class="normal">976</span>
+<span class="normal">977</span>
+<span class="normal">978</span>
+<span class="normal">979</span>
+<span class="normal">980</span>
+<span class="normal">981</span>
+<span class="normal">982</span>
+<span class="normal">983</span>
+<span class="normal">984</span>
+<span class="normal">985</span>
+<span class="normal">986</span>
+<span class="normal">987</span>
+<span class="normal">988</span>
+<span class="normal">989</span>
+<span class="normal">990</span>
+<span class="normal">991</span>
+<span class="normal">992</span>
+<span class="normal">993</span>
+<span class="normal">994</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">mmphi_intensive_update</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">new_point</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">J</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the Morris-Mitchell intensive criterion for n+1 points by adding a new point to the design.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (np.ndarray): Existing sampling plan (shape: (n, d)).</span>
+<span class="sd">        new_point (np.ndarray): New point to add (shape: (d,)).</span>
+<span class="sd">        J (np.ndarray): Multiplicities of distances for the existing design.</span>
+<span class="sd">        d (np.ndarray): Unique distances for the existing design.</span>
+<span class="sd">        q (float): Exponent used in the computation of the metric. Defaults to 2.0.</span>
+<span class="sd">        p (float): Distance norm to use (e.g., p=1 for Manhattan, p=2 for Euclidean). Defaults to 2.0.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple[float, np.ndarray, np.ndarray]: Updated intensive_phiq, updated_J, updated_d.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_points</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The existing design must contain at least one point.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Compute distances between the new point and all existing points</span>
+    <span class="n">new_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">new_point</span> <span class="o">-</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">ord</span><span class="o">=</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_points</span><span class="p">)])</span>
+
+    <span class="c1"># Combine old distances and new distances into a single list</span>
+    <span class="n">all_distances</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dist</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">J</span><span class="p">):</span>
+        <span class="n">all_distances</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">dist</span><span class="p">]</span> <span class="o">*</span> <span class="n">count</span><span class="p">)</span>
+    <span class="n">all_distances</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_distances</span><span class="p">)</span>
+
+    <span class="c1"># Find unique distances and their counts</span>
+    <span class="n">updated_d</span><span class="p">,</span> <span class="n">updated_J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">all_distances</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the number of unique pairs of points</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_points</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="c1"># Compute the updated intensive_phiq</span>
+    <span class="n">sum_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">updated_J</span> <span class="o">*</span> <span class="p">(</span><span class="n">updated_d</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">q</span><span class="p">)))</span>
+    <span class="n">intensive_phiq</span> <span class="o">=</span> <span class="p">(</span><span class="n">sum_term</span> <span class="o">/</span> <span class="n">M</span><span class="p">)</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">q</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">intensive_phiq</span><span class="p">,</span> <span class="n">updated_J</span><span class="p">,</span> <span class="n">updated_d</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
