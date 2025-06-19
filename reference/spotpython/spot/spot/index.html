@@ -5878,7 +5878,7 @@ Default value is <code>optimizer_control_init()</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>surrogate model. If <code>None</code>, spotpython&rsquo;s <code>kriging</code> is used. Default value is <code>None</code>.</p>
+                <p>surrogate model. If <code>None</code>, spotpython&rsquo;s <code>Kriging</code> is used. Default value is <code>None</code>.</p>
               </div>
             </td>
             <td>
@@ -8825,7 +8825,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            information about the optimizer stored as a dictionary.</span>
 <span class="sd">            Default value is `optimizer_control_init()`.</span>
 <span class="sd">        surrogate (object):</span>
-<span class="sd">            surrogate model. If `None`, spotpython&#39;s `kriging` is used. Default value is `None`.</span>
+<span class="sd">            surrogate model. If `None`, spotpython&#39;s `Kriging` is used. Default value is `None`.</span>
 <span class="sd">        surrogate_control (Dict[str, Union[int, float]]):</span>
 <span class="sd">            surrogate model information stored as a dictionary.</span>
 <span class="sd">            Default value is `surrogate_control_init()`.</span>
@@ -9122,7 +9122,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="c1"># Surrogate related information:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span> <span class="o">=</span> <span class="n">surrogate</span>
         <span class="c1"># If no surrogate model is specified, use the internal</span>
-        <span class="c1"># spotpython kriging surrogate:</span>
+        <span class="c1"># spotpython Kriging surrogate:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Call kriging with surrogate_control parameters:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span> <span class="o">=</span> <span class="n">Kriging</span><span class="p">(</span>
@@ -9213,7 +9213,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                32        show_models                                              False</span>
 <span class="sd">                33      show_progress                                               True</span>
 <span class="sd">                34        spot_writer                                               None</span>
-<span class="sd">                35          surrogate  &lt;spotpython.build.kriging.Kriging object at 0x...</span>
+<span class="sd">                35          surrogate  &lt;spotpython.surrogate.kriging.Kriging object at 0x...</span>
 <span class="sd">                36  surrogate_control  {&#39;method&#39;: &quot;regession&quot;, &#39;model_optimizer&#39;: &lt;function ...</span>
 <span class="sd">                37        tolerance_x                                                  0</span>
 <span class="sd">                38              upper                                                [1]</span>
@@ -10625,7 +10625,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,</span>
 <span class="sd">        if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`</span>
-<span class="sd">        if the internal surrogate `kriging` is selected.</span>
+<span class="sd">        if the internal surrogate `Kriging` is selected.</span>
 <span class="sd">        This method is passed to the optimizer in `suggest_new_X`, i.e., the optimizer is called via</span>
 <span class="sd">        `self.optimizer(func=self.infill)`.</span>
 
@@ -10642,7 +10642,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Reshape x to have shape (1, -1) because the predict method expects a 2D array</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">Kriging</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;kriging&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">Kriging</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">return_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infill_criterion</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
@@ -13384,7 +13384,7 @@ by <code>repair_non_numeric()</code> and <code>selectNew()</code>.</p>
 <span class="go">    32        show_models                                              False</span>
 <span class="go">    33      show_progress                                               True</span>
 <span class="go">    34        spot_writer                                               None</span>
-<span class="go">    35          surrogate  &lt;spotpython.build.kriging.Kriging object at 0x...</span>
+<span class="go">    35          surrogate  &lt;spotpython.surrogate.kriging.Kriging object at 0x...</span>
 <span class="go">    36  surrogate_control  {&#39;method&#39;: &quot;regession&quot;, &#39;model_optimizer&#39;: &lt;function ...</span>
 <span class="go">    37        tolerance_x                                                  0</span>
 <span class="go">    38              upper                                                [1]</span>
@@ -13544,7 +13544,7 @@ by <code>repair_non_numeric()</code> and <code>selectNew()</code>.</p>
 <span class="sd">            32        show_models                                              False</span>
 <span class="sd">            33      show_progress                                               True</span>
 <span class="sd">            34        spot_writer                                               None</span>
-<span class="sd">            35          surrogate  &lt;spotpython.build.kriging.Kriging object at 0x...</span>
+<span class="sd">            35          surrogate  &lt;spotpython.surrogate.kriging.Kriging object at 0x...</span>
 <span class="sd">            36  surrogate_control  {&#39;method&#39;: &quot;regession&quot;, &#39;model_optimizer&#39;: &lt;function ...</span>
 <span class="sd">            37        tolerance_x                                                  0</span>
 <span class="sd">            38              upper                                                [1]</span>
@@ -13949,7 +13949,7 @@ If <code>noise == True</code>, the mean values are returned.</p>
 
       <p>Infill (acquisition) function. Evaluates one point on the surrogate via <code>surrogate.predict(x.reshape(1,-1))</code>,
 if <code>sklearn</code> surrogates are used or <code>surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)</code>
-if the internal surrogate <code>kriging</code> is selected.
+if the internal surrogate <code>Kriging</code> is selected.
 This method is passed to the optimizer in <code>suggest_new_X</code>, i.e., the optimizer is called via
 <code>self.optimizer(func=self.infill)</code>.</p>
 
@@ -14042,7 +14042,7 @@ infill criterion is calculated in natural units.</p>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,</span>
 <span class="sd">    if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`</span>
-<span class="sd">    if the internal surrogate `kriging` is selected.</span>
+<span class="sd">    if the internal surrogate `Kriging` is selected.</span>
 <span class="sd">    This method is passed to the optimizer in `suggest_new_X`, i.e., the optimizer is called via</span>
 <span class="sd">    `self.optimizer(func=self.infill)`.</span>
 
@@ -14059,7 +14059,7 @@ infill criterion is calculated in natural units.</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Reshape x to have shape (1, -1) because the predict method expects a 2D array</span>
     <span class="n">X</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">Kriging</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;kriging&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">Kriging</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">return_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">infill_criterion</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
