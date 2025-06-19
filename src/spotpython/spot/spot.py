@@ -11,7 +11,7 @@ from spotpython.design.spacefilling import SpaceFilling
 from multiprocessing import set_start_method, get_start_method
 
 # old Kriging with attribute "name" kriging
-from spotpython.build.kriging import Kriging as OldKriging
+# from spotpython.build.kriging import Kriging as OldKriging
 
 # new Kriging without attribute "name" Kriging
 from spotpython.surrogate.kriging import Kriging
@@ -114,7 +114,7 @@ class Spot:
             information about the optimizer stored as a dictionary.
             Default value is `optimizer_control_init()`.
         surrogate (object):
-            surrogate model. If `None`, spotpython's `kriging` is used. Default value is `None`.
+            surrogate model. If `None`, spotpython's `Kriging` is used. Default value is `None`.
         surrogate_control (Dict[str, Union[int, float]]):
             surrogate model information stored as a dictionary.
             Default value is `surrogate_control_init()`.
@@ -411,7 +411,7 @@ class Spot:
         # Surrogate related information:
         self.surrogate = surrogate
         # If no surrogate model is specified, use the internal
-        # spotpython kriging surrogate:
+        # spotpython Kriging surrogate:
         if self.surrogate is None:
             # Call kriging with surrogate_control parameters:
             self.surrogate = Kriging(
@@ -502,7 +502,7 @@ class Spot:
                 32        show_models                                              False
                 33      show_progress                                               True
                 34        spot_writer                                               None
-                35          surrogate  <spotpython.build.kriging.Kriging object at 0x...
+                35          surrogate  <spotpython.surrogate.kriging.Kriging object at 0x...
                 36  surrogate_control  {'method': "regession", 'model_optimizer': <function ...
                 37        tolerance_x                                                  0
                 38              upper                                                [1]
@@ -1914,7 +1914,7 @@ class Spot:
         """
         Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,
         if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`
-        if the internal surrogate `kriging` is selected.
+        if the internal surrogate `Kriging` is selected.
         This method is passed to the optimizer in `suggest_new_X`, i.e., the optimizer is called via
         `self.optimizer(func=self.infill)`.
 
@@ -1931,7 +1931,7 @@ class Spot:
         """
         # Reshape x to have shape (1, -1) because the predict method expects a 2D array
         X = x.reshape(1, -1)
-        if isinstance(self.surrogate, Kriging) and getattr(self.surrogate, "name", None) == "kriging":
+        if isinstance(self.surrogate, Kriging) and getattr(self.surrogate, "name", None) == "Kriging":
             return self.surrogate.predict(X, return_val=self.infill_criterion)
         else:
             return self.surrogate.predict(X)

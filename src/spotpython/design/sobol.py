@@ -1,7 +1,6 @@
 import numpy as np
 from spotpython.design.designs import Designs
 from scipy.stats import qmc
-from typing import Optional
 
 
 class Sobol(Designs):
