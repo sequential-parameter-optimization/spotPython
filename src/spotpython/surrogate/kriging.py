@@ -194,11 +194,17 @@ class Kriging(BaseEstimator, RegressorMixin):
             y (np.ndarray):
                 Target values of shape (n_samples,) or (n_samples, 1).
             bounds (Optional[List[Tuple[float, float]]]):
-                Bounds for each dimension of log(theta). If None, defaults to [(-3, 2)] * n_features.
+                Bounds for each dimension of log(theta). If None, defaults to
+                [(-3, 2)] * n_features for interpolation, or
+                [(-3, 2)] * n_features + [(-6, 0)] for regression/reinterpolation.
 
         Returns:
             Kriging:
                 The fitted Kriging model instance (self).
+
+        Raises:
+            ValueError: If input data has invalid shape or contains invalid values.
+            RuntimeError: If optimization fails or correlation matrix is singular.
 
         Examples:
             >>> import numpy as np
@@ -211,42 +217,141 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> model.fit(X_train, y_train)
             >>> print("Fitted log(theta):", model.logtheta_lambda_)
         """
-        X = np.asarray(X)
-        y = np.asarray(y).flatten()
-        self.X_ = X
-        self.y_ = y
+        # Input validation and preprocessing
+        X = np.asarray(X, dtype=np.float64)
+        y = np.asarray(y, dtype=np.float64).flatten()
+
+        # Validate input shapes
+        if X.ndim != 2:
+            raise ValueError(f"X must be a 2D array, got {X.ndim}D array with shape {X.shape}")
+
+        if y.ndim != 1:
+            raise ValueError(f"y must be a 1D array, got {y.ndim}D array with shape {y.shape}")
+
+        if X.shape[0] != y.shape[0]:
+            raise ValueError(f"Number of samples in X ({X.shape[0]}) must match number of samples in y ({y.shape[0]})")
+
+        # Check for minimum number of samples
+        if X.shape[0] < 2:
+            raise ValueError("At least 2 samples are required for fitting")
+
+        # Check for invalid values
+        if not np.all(np.isfinite(X)):
+            raise ValueError("X contains non-finite values (NaN or inf)")
+
+        if not np.all(np.isfinite(y)):
+            raise ValueError("y contains non-finite values (NaN or inf)")
+
+        # Store training data FIRST before aggregation
+        self.X_ = X.copy()  # Create a copy to avoid external modifications
+        self.y_ = y.copy()
         self.n, self.k = X.shape
-        # Calculate and store min and max of X
+
+        # Calculate and store min and max of X for plotting and validation
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)
 
-        _, aggregated_mean_y, _ = aggregate_mean_var(X=self.X_, y=self.y_)
-        self.aggregated_mean_y = np.copy(aggregated_mean_y)
+        # Aggregate data for duplicates (if any) - NOW self.X_ and self.y_ are available
+        try:
+            _, aggregated_mean_y, _ = aggregate_mean_var(X=self.X_, y=self.y_)
+            self.aggregated_mean_y = np.copy(aggregated_mean_y)
+        except Exception as e:
+            raise RuntimeError(f"Failed to aggregate training data: {e}")
+
+        # Check for duplicate rows (which can cause numerical issues)
+        if X.shape[0] > 1:
+            unique_rows = np.unique(X, axis=0)
+            if len(unique_rows) != X.shape[0] and self.method == "interpolation":
+                logger.warning(f"Found {X.shape[0] - len(unique_rows)} duplicate rows in X. " "This may cause numerical issues with interpolation method.")
+
+        # Check for zero variance in any dimension
+        if np.any(self.max_X - self.min_X == 0):
+            zero_var_dims = np.where(self.max_X - self.min_X == 0)[0]
+            logger.warning(f"Zero variance detected in dimensions {zero_var_dims}. " "This may cause numerical issues.")
+
+        # Set optimization bounds
         if bounds is None:
             if self.method == "interpolation":
-                bounds = [(-3.0, 2.0)] * self.k
+                bounds = [(self.min_theta, self.max_theta)] * self.k
             else:
                 # regression and reinterpolation use lambda_ as well
-                bounds = [(-3.0, 2.0)] * self.k + [(-6.0, 0.0)]
+                bounds = [(self.min_theta, self.max_theta)] * self.k + [(np.log10(self.min_Lambda), np.log10(self.max_Lambda))]
+        else:
+            # Validate user-provided bounds
+            expected_length = self.k if self.method == "interpolation" else self.k + 1
+            if len(bounds) != expected_length:
+                raise ValueError(f"bounds must have length {expected_length} for method '{self.method}', " f"got {len(bounds)}")
 
-        self.logtheta_lambda_, _ = self.max_likelihood(bounds)
+            # Validate individual bounds
+            for i, (low, high) in enumerate(bounds):
+                if not (isinstance(low, (int, float)) and isinstance(high, (int, float))):
+                    raise ValueError(f"bounds[{i}] must contain numeric values")
+                if low >= high:
+                    raise ValueError(f"bounds[{i}]: lower bound ({low}) must be less than upper bound ({high})")
 
-        # store theta and Lambda in log scale
+        # Optimize hyperparameters
+        try:
+            logger.info(f"Starting hyperparameter optimization with bounds: {bounds}")
+            self.logtheta_lambda_, final_likelihood = self.max_likelihood(bounds)
+            logger.info(f"Optimization completed. Final likelihood: {final_likelihood}")
+        except Exception as e:
+            raise RuntimeError(f"Hyperparameter optimization failed: {e}")
+
+        # Validate optimization results
+        if not np.all(np.isfinite(self.logtheta_lambda_)):
+            raise RuntimeError("Optimization resulted in non-finite hyperparameters")
+
+        # Extract and store theta and Lambda parameters
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # case noise is True
             self.theta = self.logtheta_lambda_[:-1]
             self.Lambda = self.logtheta_lambda_[-1]
         else:
             self.theta = self.logtheta_lambda_
             self.Lambda = None
-        # store p for future use
+
+        # Store p for future use (currently fixed at 2)
         self.p = 2
 
-        # Once logtheta_lambda is found, compute the final correlation matrix
-        self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
+        # Compute final correlation matrix and validate
+        try:
+            self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
 
-        # Update log with the current values
-        self._update_log()
+            # Check if correlation matrix is well-conditioned
+            if self.U_ is None:
+                raise RuntimeError("Failed to compute Cholesky decomposition of correlation matrix")
+
+            # Check condition number
+            if hasattr(self, "Psi_") and self.Psi_ is not None:
+                try:
+                    cond_num = np.linalg.cond(self.Psi_)
+                    if cond_num > 1e12:
+                        logger.warning(f"Correlation matrix is ill-conditioned (condition number: {cond_num:.2e})")
+                except np.linalg.LinAlgError:
+                    logger.warning("Could not compute condition number of correlation matrix")
+
+        except Exception as e:
+            raise RuntimeError(f"Failed to compute final correlation matrix: {e}")
+
+        # Final validation
+        if not np.isfinite(self.negLnLike):
+            raise RuntimeError("Final likelihood is not finite")
+
+        # Update logging information
+        try:
+            self._update_log()
+        except Exception as e:
+            logger.warning(f"Failed to update log: {e}")
+
+        # Log fitting summary
+        logger.info("Kriging model fitted successfully:")
+        logger.info(f"  - Method: {self.method}")
+        logger.info(f"  - Training samples: {self.n}")
+        logger.info(f"  - Features: {self.k}")
+        logger.info(f"  - Final negative log-likelihood: {self.negLnLike:.6f}")
+        logger.info(f"  - Theta parameters: {self.theta}")
+        if self.Lambda is not None:
+            logger.info(f"  - Lambda parameter: {self.Lambda:.6f}")
+
         return self
 
     def predict(self, X: np.ndarray, return_std=False, return_val: str = "y") -> np.ndarray:
