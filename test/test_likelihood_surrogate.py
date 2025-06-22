@@ -17,6 +17,7 @@ def test_likelihood_basic(method, x_shape):
     model.y_ = y
     model.eps = 1e-6
     model.penalty = 12345.0
+    model.n_theta = 1
 
     # log10(theta) = 0, log10(lambda) = -3 for regression/reinterpolation
     if method == "interpolation":
