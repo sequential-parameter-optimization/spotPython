@@ -6,15 +6,16 @@ def test_infill():
     from spotpython.fun.objectivefunctions import Analytical
     from spotpython.spot.spot import Spot
     from spotpython.utils.repair import repair_non_numeric
-    from spotpython.utils.init import fun_control_init
+    from spotpython.utils.init import fun_control_init, surrogate_control_init
     from sklearn import linear_model
     import pytest
 
     fun = Analytical().fun_sphere
 
     fun_control = fun_control_init(lower=np.array([-10, -1]), upper=np.array([10, 1]))
+    surrogate_control = surrogate_control_init(method="interpolation")
 
-    spot_test = Spot(fun=fun, fun_control=fun_control)
+    spot_test = Spot(fun=fun, fun_control=fun_control, surrogate_control=surrogate_control)
 
     # (S-2) Initial Design:
     spot_test.X = spot_test.generate_design(

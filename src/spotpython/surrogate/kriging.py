@@ -29,7 +29,7 @@ class Kriging(BaseEstimator, RegressorMixin):
     Attributes:
         eps (float): A small regularization term to reduce ill-conditioning.
         penalty (float): The penalty value used if the correlation matrix is ill-conditioned.
-        logtheta_lambda_ (np.ndarray): Best-fit log(theta) parameters from fit().
+        logtheta_lambda_p (np.ndarray): Best-fit log(theta) parameters from fit().
         U_ (np.ndarray): The Cholesky factor of the correlation matrix after fit().
         X_ (np.ndarray): The training input data (n x d).
         y_ (np.ndarray): The training target values (n,).
@@ -53,6 +53,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         p_val: float = 2.0,
         n_p: int = 1,
         optim_p: bool = False,
+        min_p=1.0,
+        max_p=2.0,
         min_Lambda: float = 1e-9,
         max_Lambda: float = 1.0,
         log_level: int = 50,
@@ -97,6 +99,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.max_theta = max_theta
         self.min_Lambda = min_Lambda
         self.max_Lambda = max_Lambda
+        self.min_p = min_p
+        self.max_p = max_p
         self.n_theta = n_theta
         self.p_val = p_val
         self.n_p = n_p
@@ -116,7 +120,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.log["p"] = []
         self.log["Lambda"] = []
 
-        self.logtheta_lambda_ = None
+        self.logtheta_lambda_p = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
@@ -144,7 +148,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             dict: Parameter names not included in get_params() mapped to their values.
         """
-        return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "negLnLike": self.negLnLike}
+        return {"log_theta_lambda": self.logtheta_lambda_p, "U": self.U_, "X": self.X_, "y": self.y_, "negLnLike": self.negLnLike}
 
     def _update_log(self) -> None:
         """
@@ -215,8 +219,30 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Initialize and fit the Kriging model
             >>> model = Kriging()
             >>> model.fit(X_train, y_train)
-            >>> print("Fitted log(theta):", model.logtheta_lambda_)
+            >>> print("Fitted log(theta):", model.logtheta_lambda_p)
         """
+        # Validate and prepare input data
+        X, y = self._validate_and_prepare_data(X, y)
+
+        # Store training data and compute statistics
+        self._store_training_data(X, y)
+
+        # Aggregate data and check for issues
+        self._aggregate_and_validate_data()
+
+        # Set up optimization bounds
+        bounds = self._setup_optimization_bounds(bounds)
+
+        # Optimize hyperparameters
+        self._optimize_hyperparameters(bounds)
+
+        # Finalize model fitting
+        self._finalize_fitting()
+
+        return self
+
+    def _validate_and_prepare_data(self, X: np.ndarray, y: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        """Validate and prepare input data for fitting."""
         # Input validation and preprocessing
         X = np.asarray(X, dtype=np.float64)
         y = np.asarray(y, dtype=np.float64).flatten()
@@ -242,6 +268,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         if not np.all(np.isfinite(y)):
             raise ValueError("y contains non-finite values (NaN or inf)")
 
+        return X, y
+
+    def _store_training_data(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Store training data and compute basic statistics."""
         # Store training data FIRST before aggregation
         self.X_ = X.copy()  # Create a copy to avoid external modifications
         self.y_ = y.copy()
@@ -251,7 +281,9 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)
 
-        # Aggregate data for duplicates (if any) - NOW self.X_ and self.y_ are available
+    def _aggregate_and_validate_data(self) -> None:
+        """Aggregate data for duplicates and validate for potential issues."""
+        # Aggregate data for duplicates (if any)
         try:
             _, aggregated_mean_y, _ = aggregate_mean_var(X=self.X_, y=self.y_)
             self.aggregated_mean_y = np.copy(aggregated_mean_y)
@@ -259,90 +291,176 @@ class Kriging(BaseEstimator, RegressorMixin):
             raise RuntimeError(f"Failed to aggregate training data: {e}")
 
         # Check for duplicate rows (which can cause numerical issues)
-        if X.shape[0] > 1:
-            unique_rows = np.unique(X, axis=0)
-            if len(unique_rows) != X.shape[0] and self.method == "interpolation":
-                logger.warning(f"Found {X.shape[0] - len(unique_rows)} duplicate rows in X. " "This may cause numerical issues with interpolation method.")
+        self._check_duplicate_rows()
 
         # Check for zero variance in any dimension
+        self._check_zero_variance()
+
+    def _check_duplicate_rows(self) -> None:
+        """Check for duplicate rows and warn if found with interpolation method."""
+        if self.X_.shape[0] > 1:
+            unique_rows = np.unique(self.X_, axis=0)
+            if len(unique_rows) != self.X_.shape[0] and self.method == "interpolation":
+                logger.warning(f"Found {self.X_.shape[0] - len(unique_rows)} duplicate rows in X. " "This may cause numerical issues with interpolation method.")
+
+    def _check_zero_variance(self) -> None:
+        """Check for zero variance in any dimension and warn if found."""
         if np.any(self.max_X - self.min_X == 0):
             zero_var_dims = np.where(self.max_X - self.min_X == 0)[0]
             logger.warning(f"Zero variance detected in dimensions {zero_var_dims}. " "This may cause numerical issues.")
 
-        # Set optimization bounds
+    def _setup_optimization_bounds(self, bounds: Optional[List[Tuple[float, float]]]) -> List[Tuple[float, float]]:
+        """Set up optimization bounds for hyperparameters."""
         if bounds is None:
-            if self.method == "interpolation":
-                bounds = [(self.min_theta, self.max_theta)] * self.k
-            else:
-                # regression and reinterpolation use lambda_ as well
-                bounds = [(self.min_theta, self.max_theta)] * self.k + [(np.log10(self.min_Lambda), np.log10(self.max_Lambda))]
+            return self._get_default_bounds()
         else:
-            # Validate user-provided bounds
-            expected_length = self.k if self.method == "interpolation" else self.k + 1
-            if len(bounds) != expected_length:
-                raise ValueError(f"bounds must have length {expected_length} for method '{self.method}', " f"got {len(bounds)}")
+            self._validate_user_bounds(bounds)
+            return bounds
 
-            # Validate individual bounds
-            for i, (low, high) in enumerate(bounds):
-                if not (isinstance(low, (int, float)) and isinstance(high, (int, float))):
-                    raise ValueError(f"bounds[{i}] must contain numeric values")
-                if low >= high:
-                    raise ValueError(f"bounds[{i}]: lower bound ({low}) must be less than upper bound ({high})")
+    def _get_default_bounds(self) -> List[Tuple[float, float]]:
+        """
+        Get default optimization bounds based on method and whether p is optimized.
 
-        # Optimize hyperparameters
+        Returns:
+            List[Tuple[float, float]]: List of bounds for each parameter:
+                - theta bounds: [(-3, 2)] * k or [(-3, 2)] * n_theta
+                - lambda bounds: [(-6, 0)] if regression/reinterpolation
+                - p bounds: [(0, 2)] * k or [(0, 2)] * n_p if optim_p is True
+        """
+        # Set theta bounds based on n_theta
+        n_theta = self.n_theta if hasattr(self, "n_theta") else self.k
+        theta_bounds = [(self.min_theta, self.max_theta)] * n_theta
+
+        # Initialize bounds with theta bounds
+        bounds = theta_bounds
+
+        # Add lambda bounds for regression/reinterpolation
+        if self.method != "interpolation":
+            bounds += [(np.log10(self.min_Lambda), np.log10(self.max_Lambda))]
+
+        # Add p bounds if optimization is enabled
+        if self.optim_p:
+            # Number of p values to optimize (either 1 or k)
+            n_p = self.n_p if hasattr(self, "n_p") else self.k
+            bounds += [(self.min_p, self.max_p)] * n_p
+        return bounds
+
+    def _extract_parameters(self) -> None:
+        """
+        Extract theta, Lambda, and p parameters from optimization results.
+        Updates self.theta, self.Lambda, and self.p based on optimization results.
+        """
+        current_idx = 0
+
+        # Extract theta parameters
+        n_theta = self.n_theta if hasattr(self, "n_theta") else self.k
+        self.theta = self.logtheta_lambda_p[current_idx : current_idx + n_theta]
+        current_idx += n_theta
+
+        # Extract lambda parameter for regression/reinterpolation
+        if self.method in ["regression", "reinterpolation"]:
+            self.Lambda = self.logtheta_lambda_p[current_idx]
+            current_idx += 1
+        else:
+            self.Lambda = None
+
+        # Extract p parameter(s) if optimized
+        if self.optim_p:
+            n_p = self.n_p if hasattr(self, "n_p") else self.k
+            self.p = self.logtheta_lambda_p[current_idx : current_idx + n_p]
+        else:
+            # Use default p value if not optimized
+            n_p = self.n_p if hasattr(self, "n_p") else self.k
+            self.p = np.array([self.p_val] * n_p)
+
+    def _validate_user_bounds(self, bounds: List[Tuple[float, float]]) -> None:
+        """Validate user-provided bounds."""
+        # Calculate expected number of parameters
+        n_theta = self.n_theta if hasattr(self, "n_theta") else self.k
+        n_lambda = 1 if self.method != "interpolation" else 0
+        n_p = self.n_p if (self.optim_p and hasattr(self, "n_p")) else 0
+        expected_length = n_theta + n_lambda + n_p
+
+        if len(bounds) != expected_length:
+            raise ValueError(
+                f"bounds must have length {expected_length} " f"(n_theta={n_theta} + n_lambda={n_lambda} + n_p={n_p}) " f"for method '{self.method}' and optim_p={self.optim_p}, " f"got {len(bounds)}"
+            )
+
+        # Validate individual bounds
+        for i, (low, high) in enumerate(bounds):
+            if not (isinstance(low, (int, float)) and isinstance(high, (int, float))):
+                raise ValueError(f"bounds[{i}] must contain numeric values")
+            if low >= high:
+                raise ValueError(f"bounds[{i}]: lower bound ({low}) must be less than upper bound ({high})")
+
+    def _optimize_hyperparameters(self, bounds: List[Tuple[float, float]]) -> None:
+        """Optimize hyperparameters using differential evolution."""
         try:
             logger.info(f"Starting hyperparameter optimization with bounds: {bounds}")
-            self.logtheta_lambda_, final_likelihood = self.max_likelihood(bounds)
+            self.logtheta_lambda_p, final_likelihood = self.max_likelihood(bounds)
             logger.info(f"Optimization completed. Final likelihood: {final_likelihood}")
         except Exception as e:
             raise RuntimeError(f"Hyperparameter optimization failed: {e}")
 
         # Validate optimization results
-        if not np.all(np.isfinite(self.logtheta_lambda_)):
+        if not np.all(np.isfinite(self.logtheta_lambda_p)):
             raise RuntimeError("Optimization resulted in non-finite hyperparameters")
 
+    def _finalize_fitting(self) -> None:
+        """Finalize the fitting process by extracting parameters and validating results."""
         # Extract and store theta and Lambda parameters
-        if (self.method == "regression") or (self.method == "reinterpolation"):
-            self.theta = self.logtheta_lambda_[:-1]
-            self.Lambda = self.logtheta_lambda_[-1]
-        else:
-            self.theta = self.logtheta_lambda_
-            self.Lambda = None
+        self._extract_parameters()
 
         # Store p for future use (currently fixed at 2)
         self.p = 2
 
         # Compute final correlation matrix and validate
-        try:
-            self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
-
-            # Check if correlation matrix is well-conditioned
-            if self.U_ is None:
-                raise RuntimeError("Failed to compute Cholesky decomposition of correlation matrix")
-
-            # Check condition number
-            if hasattr(self, "Psi_") and self.Psi_ is not None:
-                try:
-                    cond_num = np.linalg.cond(self.Psi_)
-                    if cond_num > 1e12:
-                        logger.warning(f"Correlation matrix is ill-conditioned (condition number: {cond_num:.2e})")
-                except np.linalg.LinAlgError:
-                    logger.warning("Could not compute condition number of correlation matrix")
-
-        except Exception as e:
-            raise RuntimeError(f"Failed to compute final correlation matrix: {e}")
+        self._compute_final_correlation_matrix()
 
         # Final validation
         if not np.isfinite(self.negLnLike):
             raise RuntimeError("Final likelihood is not finite")
 
         # Update logging information
+        self._update_fitting_log()
+
+        # Log fitting summary
+        self._log_fitting_summary()
+
+    def _compute_final_correlation_matrix(self) -> None:
+        """Compute final correlation matrix and validate its properties."""
+        try:
+            self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_p)
+
+            # Check if correlation matrix is well-conditioned
+            if self.U_ is None:
+                raise RuntimeError("Failed to compute Cholesky decomposition of correlation matrix")
+
+            # Check condition number
+            self._check_correlation_matrix_condition()
+
+        except Exception as e:
+            raise RuntimeError(f"Failed to compute final correlation matrix: {e}")
+
+    def _check_correlation_matrix_condition(self) -> None:
+        """Check the condition number of the correlation matrix."""
+        if hasattr(self, "Psi_") and self.Psi_ is not None:
+            try:
+                cond_num = np.linalg.cond(self.Psi_)
+                if cond_num > 1e12:
+                    logger.warning(f"Correlation matrix is ill-conditioned (condition number: {cond_num:.2e})")
+            except np.linalg.LinAlgError:
+                logger.warning("Could not compute condition number of correlation matrix")
+
+    def _update_fitting_log(self) -> None:
+        """Update logging information after fitting."""
         try:
             self._update_log()
         except Exception as e:
             logger.warning(f"Failed to update log: {e}")
 
-        # Log fitting summary
+    def _log_fitting_summary(self) -> None:
+        """Log a summary of the fitting process."""
         logger.info("Kriging model fitted successfully:")
         logger.info(f"  - Method: {self.method}")
         logger.info(f"  - Training samples: {self.n}")
@@ -351,8 +469,6 @@ class Kriging(BaseEstimator, RegressorMixin):
         logger.info(f"  - Theta parameters: {self.theta}")
         if self.Lambda is not None:
             logger.info(f"  - Lambda parameter: {self.Lambda:.6f}")
-
-        return self
 
     def predict(self, X: np.ndarray, return_std=False, return_val: str = "y") -> np.ndarray:
         """
@@ -452,13 +568,14 @@ class Kriging(BaseEstimator, RegressorMixin):
     def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
-        of log(theta) parameters using a power exponent p=1.99. Returns the
-        negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.
+        of log(theta), lambda, and p parameters.
 
         Args:
             x (np.ndarray):
-                1D array of log(theta) parameters of length k. If self.method is "regression" or
-                "reinterpolation", length is k+1 and the last element of x is the log(noise) parameter.
+                1D array containing:
+                - log(theta) parameters of length k or n_theta
+                - log(lambda) parameter (if method is "regression" or "reinterpolation")
+                - p parameters of length n_p (if optim_p is True)
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -471,27 +588,39 @@ class Kriging(BaseEstimator, RegressorMixin):
         X = self.X_
         y = self.y_.flatten()
 
-        if (self.method == "regression") or (self.method == "reinterpolation"):
-            # case noise is True
-            theta = x[:-1]
-            # theta is in log scale, so transform it back:
-            theta = 10.0**theta
-            lambda_ = x[-1]
-            # lambda is in log scale, so transform it back:
-            lambda_ = 10.0**lambda_
+        # Initialize index for parameter extraction
+        current_idx = 0
+
+        # Extract theta parameters (always present)
+        n_theta = self.n_theta if hasattr(self, "n_theta") else self.k
+        theta = x[current_idx : current_idx + n_theta]
+        theta = 10.0**theta  # Transform from log scale
+        current_idx += n_theta
+
+        # Extract lambda parameter if needed
+        if self.method in ["regression", "reinterpolation"]:
+            lambda_ = x[current_idx]
+            lambda_ = 10.0**lambda_  # Transform from log scale
+            current_idx += 1
         elif self.method == "interpolation":
-            theta = x
-            theta = 10.0**theta
-            # use the original, untransformed eps:
+            # For interpolation, lambda is not used, so we set it to eps
             lambda_ = self.eps
         else:
-            raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
+            raise ValueError(f"Invalid method: {self.method}. Must be 'interpolation', 'regression', or 'reinterpolation'.")
 
-        p = 1.99
+        # Extract p parameter(s) if optimized, otherwise use default
+        if self.optim_p:
+            n_p = self.n_p if hasattr(self, "n_p") else self.k
+            p = x[current_idx : current_idx + n_p]
+            current_idx += n_p
+        else:
+            n_p = self.n_p if hasattr(self, "n_p") else self.k
+            p = np.array([self.p_val] * n_p)
+
         n = X.shape[0]
         one = np.ones(n)
 
-        # Build correlation matrix
+        # Build correlation matrix using the p value(s)
         Psi_upper_triangle = self._kernel(X, theta, p)
         Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
 
@@ -532,20 +661,12 @@ class Kriging(BaseEstimator, RegressorMixin):
         X = self.X_
         y = self.y_.flatten()
 
-        if self.method == "interpolation":
-            theta = self.logtheta_lambda_
-            theta = 10.0**theta
-            # lambda is not transformed back:
-            lambda_ = self.eps
-        else:
-            theta = self.logtheta_lambda_[:-1]
-            theta = 10.0**theta
-            lambda_ = self.logtheta_lambda_[-1]
-            lambda_ = 10.0**lambda_
+        # Use stored parameters
+        theta = 10.0**self.theta  # Transform from log scale
+        lambda_ = self.Lambda if self.Lambda is not None else self.eps
+        p = self.p
 
         U = self.U_
-
-        p = 1.99
         n = X.shape[0]
         one = np.ones(n)
 
@@ -566,22 +687,16 @@ class Kriging(BaseEstimator, RegressorMixin):
             dist_vec = np.abs(X[i, :] - x) ** p
             psi[i] = np.exp(-np.sum(theta * dist_vec))
 
-        # Compute SigmaSqr and SSqr
         if (self.method == "interpolation") or (self.method == "regression"):
             SigmaSqr = (resid @ resid_tilde) / n
-            # Compute SSqr
             psi_tilde = np.linalg.solve(U, psi)
             psi_tilde = np.linalg.solve(U.T, psi_tilde)
-            # Eq. (3.1) in [forr08a] without lambda:
             SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
         else:
             # method is "reinterpolation"
             Psi_adjusted = self.Psi_ - np.eye(n) * lambda_ + np.eye(n) * self.eps
             SigmaSqr = (resid @ np.linalg.solve(U.T, np.linalg.solve(U, Psi_adjusted @ resid_tilde))) / n
-            # Compute Uint (Cholesky factor of the adjusted Psi matrix)
             Uint = np.linalg.cholesky(Psi_adjusted)
-
-            # Compute SSqr
             psi_tilde = np.linalg.solve(Uint, psi)
             psi_tilde = np.linalg.solve(Uint.T, psi_tilde)
             SSqr = SigmaSqr * (1 - psi @ psi_tilde)
@@ -608,15 +723,16 @@ class Kriging(BaseEstimator, RegressorMixin):
         over the range of log(theta) specified by bounds.
 
         Args:
-            bounds (List[Tuple[float, float]]): Sequence of (low, high) bounds for log(theta).
+            bounds (List[Tuple[float, float]]):
+                Sequence of (low, high) bounds for log(theta), lambda, and p parameters.
 
         Returns:
-            (np.ndarray, float): (best_x, best_fun) where best_x is the
-            optimal log(theta) array and best_fun is the minimized negative log-likelihood.
+            (np.ndarray, float):
+                (best_x, best_fun) where best_x is the optimal log(theta), lambada, p array and best_fun is the minimized negative log-likelihood.
         """
 
-        def objective(logtheta_lambda):
-            neg_ln_like, _, _ = self.likelihood(logtheta_lambda)
+        def objective(logtheta_lambda_p):
+            neg_ln_like, _, _ = self.likelihood(logtheta_lambda_p)
             return neg_ln_like
 
         result = differential_evolution(objective, bounds)
