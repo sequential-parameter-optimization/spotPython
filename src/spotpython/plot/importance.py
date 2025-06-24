@@ -115,7 +115,7 @@ def generate_imp(X_train, X_test, y_train, y_test, random_state=42, n_repeats=10
     return perm_imp
 
 
-def plot_importances(df_mdi, perm_imp, X_test, target_name=None, feature_names=None, k=10, show=True) -> None:
+def plot_importances(df_mdi, perm_imp, X_test, target_name=None, feature_names=None, k=10, figsize=(12, 8), show=True) -> None:
     """
     Plots the impurity-based and permutation-based feature importances for a given classifier.
 
@@ -132,6 +132,8 @@ def plot_importances(df_mdi, perm_imp, X_test, target_name=None, feature_names=N
             List of feature names for labeling. Defaults to None.
         k (int, optional):
             Number of top features to display based on importance. Default is 10.
+        figsize (tuple, optional):
+            Size of the figure (width, height) in inches. Default is (12, 8).
         show (bool, optional):
             If True, displays the plot immediately. Default is True.
 
@@ -151,12 +153,11 @@ def plot_importances(df_mdi, perm_imp, X_test, target_name=None, feature_names=N
         >>> y_test_series = pd.Series(y_test)
         >>> df_mdi = generate_mdi(X_train_df, y_train_series)
         >>> perm_imp = generate_imp(X_train_df, X_test_df, y_train_series, y_test_series)
-        >>> plot_importances(df_mdi, perm_imp, X_test_df)
-
+        >>> plot_importances(df_mdi, perm_imp, X_test_df, figsize=(15, 10))
     """
 
     # Plot impurity-based importances for top-k features
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
 
     sorted_mdi_importances = df_mdi.set_index("Feature")["Importance"]
     sorted_mdi_importances[:k].sort_values().plot.barh(ax=ax1)
