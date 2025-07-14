@@ -2625,7 +2625,7 @@ class Spot:
             print("Importance requires more than one theta values (n_theta>1).")
         return output
 
-    def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True, tkagg=False) -> None:
+    def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True, tkagg=False, figsize=(9, 6)) -> None:
         """Plot the importance of each variable.
 
         Args:
@@ -2637,6 +2637,10 @@ class Spot:
                 The dpi of the plot.
             show (bool):
                 Show the plot. Default is `True`.
+            tkagg (bool):
+                Use TkAgg backend. Default is `False`.
+            figsize (tuple):
+                Figure size (width, height) in inches. Default is (9, 6).
 
         Returns:
             None
@@ -2644,9 +2648,14 @@ class Spot:
         if self.surrogate.n_theta > 1:
             if tkagg:
                 matplotlib.use("TkAgg")
+
+            # Create figure with specified size
+            plt.figure(figsize=figsize)
+
             theta = np.power(10, self.surrogate.theta)
             imp = 100 * theta / np.max(theta)
             idx = np.where(imp > threshold)[0]
+
             if self.var_name is None:
                 plt.bar(range(len(imp[idx])), imp[idx])
                 plt.xticks(range(len(imp[idx])), ["x" + str(i) for i in idx])
@@ -2654,6 +2663,7 @@ class Spot:
                 var_name = [self.var_name[i] for i in idx]
                 plt.bar(range(len(imp[idx])), imp[idx])
                 plt.xticks(range(len(imp[idx])), var_name)
+
             if filename is not None:
                 plt.savefig(filename, bbox_inches="tight", dpi=dpi)
             if show:
