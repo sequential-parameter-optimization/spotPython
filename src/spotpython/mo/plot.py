@@ -27,6 +27,7 @@ def plot_mo(
     y_add_label="Add",
     y_add2_label="Add2",
     filename: str = None,
+    figsize: tuple = (9, 6),
 ) -> None:
     """
     Generates scatter plots for each combination of two targets from a multi-output prediction while highlighting Pareto optimal points.
@@ -54,7 +55,9 @@ def plot_mo(
         x_axis_transformation (str): Transformation for the x-axis. Options are "id" (linear), "log" (logarithmic), and "loglog" (log-log). Defaults to "id".
         y_axis_transformation (str): Transformation for the y-axis. Options are "id" (linear), "log" (logarithmic), and "loglog" (log-log). Defaults to "id".
         filename (str, optional):
-            If provided, saves the plot to the specified file.  Supports "pdf" and "png" formats. Defaults to None.
+            If provided, saves the plot to the specified file. Supports "pdf" and "png" formats. Defaults to None.
+        figsize (tuple):
+            Figure size (width, height) in inches. Default is (9, 6).
 
     Returns:
         None: Displays or saves the plot.
@@ -78,7 +81,8 @@ def plot_mo(
         y_orig = y_orig.values
 
     for i, j in combinations:
-        plt.figure()
+        # Create figure with specified size
+        plt.figure(figsize=figsize)
         s = 50  # Base size for points
         pareto_size = s  # Size for Pareto points
         if pareto_label:
