@@ -2572,23 +2572,102 @@ class Spot:
         Returns:
             output (list):
                 list of results. If the surrogate has more than one theta values,
-                the importance is calculated. Otherwise, a list of zeros is returned.
+                the importance is calculated. Otherwise, an empty list is returned.
 
+        Examples:
+            >>> import numpy as np
+            >>> from spotpython.fun.objectivefunctions import Analytical
+            >>> from spotpython.spot import spot
+            >>> from spotpython.utils.init import (
+            ...     fun_control_init,
+            ...     surrogate_control_init,
+            ...     design_control_init
+            ... )
+            >>> # Create test function (3D sphere function)
+            >>> fun = Analytical().fun_sphere
+            >>> # Setup control parameters
+            >>> fun_control = fun_control_init(
+            ...     lower=np.array([-1, -1, -1]),
+            ...     upper=np.array([1, 1, 1]),
+            ...     fun_evals=20,
+            ...     var_name=["x1", "x2", "x3"],
+            ... )
+            >>> # Setup design with initial size
+            >>> design_control = design_control_init(init_size=10)
+            >>> # Setup surrogate model with multiple theta values
+            >>> surrogate_control = surrogate_control_init(
+            ...     n_theta="anisotropic",
+            ...     method="interpolation"
+            ... )
+            >>> # Initialize and run spot
+            >>> S = spot.Spot(
+            ...     fun=fun,
+            ...     fun_control=fun_control,
+            ...     design_control=design_control,
+            ...     surrogate_control=surrogate_control
+            ... )
+            >>> S.run()
+            >>> # Get importance values
+            >>> importance = S.get_importance()
+            >>> for var, imp in zip(S.all_var_name, importance):
+            ...     print(f"{var}: {imp:.2f}%")
+            x1: 100.00%
+            x2: 85.32%
+            x3: 76.15%
+            >>> # Try with single theta (should return zeros)
+            >>> surrogate_control = surrogate_control_init(
+            ...     n_theta=1,
+            ...     method="interpolation"
+            ... )
+            >>> S2 = spot.Spot(
+            ...     fun=fun,
+            ...     fun_control=fun_control,
+            ...     design_control=design_control,
+            ...     surrogate_control=surrogate_control
+            ... )
+            >>> S2.run()
+            >>> importance2 = S2.get_importance()
+            >>> print(importance2)
+            []
         """
-        if self.surrogate.n_theta > 1 and self.var_name is not None:
-            output = [0] * len(self.all_var_name)
-            theta = np.power(10, self.surrogate.theta)
-            imp = 100 * theta / np.max(theta)
-            ind = find_indices(A=self.var_name, B=self.all_var_name)
-            j = 0
-            for i in ind:
-                output[i] = imp[j]
-                j = j + 1
-            return output
+        # Check if surrogate exists
+        if not hasattr(self, "surrogate"):
+            print("No surrogate model available.")
+            return []
+
+        # Check if surrogate has n_theta attribute
+        if not hasattr(self.surrogate, "n_theta"):
+            print("Surrogate model does not have n_theta attribute.")
+            return []
+
+        # Check if surrogate has theta attribute for multi-theta models
+        if self.surrogate.n_theta > 1 and not hasattr(self.surrogate, "theta"):
+            print("Surrogate model does not have theta attribute.")
+            return []
+
+        # Check if all required attributes exist for importance calculation
+        if not hasattr(self, "all_var_name"):
+            print("Variable names (all_var_name) not available.")
+            return []
+
+        if self.surrogate.n_theta > 1 and hasattr(self, "var_name") and self.var_name is not None:
+            try:
+                output = [0] * len(self.all_var_name)
+                theta = np.power(10, self.surrogate.theta)
+                imp = 100 * theta / np.max(theta)
+                ind = find_indices(A=self.var_name, B=self.all_var_name)
+
+                j = 0
+                for i in ind:
+                    output[i] = imp[j]
+                    j = j + 1
+                return output
+            except Exception as e:
+                print(f"Error calculating importance values: {str(e)}")
+                return []
         else:
-            print("Importance requires more than one theta values (n_theta>1).")
-            # return a list of zeros of length len(all_var_name)
-            return [0] * len(self.all_var_name)
+            print("Importance requires more than one theta values (n_theta>1) and valid variable names.")
+            return []
 
     def print_importance(self, threshold=0.1, print_screen=True) -> list:
         """Print importance of each variable and return the results as a list.
