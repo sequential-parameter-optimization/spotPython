@@ -5948,7 +5948,18 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">367</span>
 <span class="normal">368</span>
 <span class="normal">369</span>
-<span class="normal">370</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters.</span>
 
@@ -6078,7 +6089,18 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="c1">#   This allows accessing the latest checkpoint in a deterministic manner.</span>
     <span class="c1">#   Default: None.</span>
     <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id_with_timestamp</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">)</span>
-    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">EarlyStopping</span><span class="p">(</span>
+            <span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span>
+            <span class="n">divergence_threshold</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;divergence_threshold&quot;</span><span class="p">],</span>
+            <span class="n">check_finite</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;check_finite&quot;</span><span class="p">],</span>
+            <span class="n">stopping_threshold</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;stopping_threshold&quot;</span><span class="p">],</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">timestamp</span><span class="p">:</span>
         <span class="c1"># add ModelCheckpoint only if timestamp is False</span>
         <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">)</span>
@@ -6406,18 +6428,7 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/light/trainmodel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">384</span>
 <span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
@@ -6765,7 +6776,29 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">729</span>
 <span class="normal">730</span>
 <span class="normal">731</span>
-<span class="normal">732</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters. Performs feature attribution analysis and calculates consistency of these methods.</span>
 
@@ -6895,7 +6928,18 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="c1">#   This allows accessing the latest checkpoint in a deterministic manner.</span>
     <span class="c1">#   Default: None.</span>
     <span class="n">config_id</span> <span class="o">=</span> <span class="n">generate_config_id_with_timestamp</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">timestamp</span><span class="p">)</span>
-    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">EarlyStopping</span><span class="p">(</span>
+            <span class="n">monitor</span><span class="o">=</span><span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+            <span class="n">patience</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">],</span>
+            <span class="n">divergence_threshold</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;divergence_threshold&quot;</span><span class="p">],</span>
+            <span class="n">check_finite</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;check_finite&quot;</span><span class="p">],</span>
+            <span class="n">stopping_threshold</span><span class="o">=</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;stopping_threshold&quot;</span><span class="p">],</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;min&quot;</span><span class="p">,</span>
+            <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">timestamp</span><span class="p">:</span>
         <span class="c1"># add ModelCheckpoint only if timestamp is False</span>
         <span class="n">dirpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;CHECKPOINT_PATH&quot;</span><span class="p">],</span> <span class="n">config_id</span><span class="p">)</span>
