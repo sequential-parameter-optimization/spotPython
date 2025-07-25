@@ -27,12 +27,14 @@ def fun_control_init(
     PREFIX=None,
     TENSORBOARD_CLEAN=False,
     accelerator="auto",
+    check_finite=True,
     collate_fn_name=None,
     converters=None,
     core_model=None,
     core_model_name=None,
     data=None,
     data_full_train=None,
+    divergence_threshold=None,
     hacky=False,  # !TODO: Documentation
     data_val=None,
     data_dir="./data",
@@ -90,6 +92,7 @@ def fun_control_init(
     shuffle_val=False,
     shuffle_test=False,
     sigma=0.0,
+    stopping_threshold=None,
     strategy="auto",
     surrogate=None,
     target_column=None,
@@ -129,6 +132,9 @@ def fun_control_init(
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
             Default is "auto".
+        check_finite (bool):
+            When set True, stops training when the monitor becomes NaN or infinite.
+            Default is True.
         collate_fn_name (str):
             The name of the collate function. Default is None.
         converters (dict):
@@ -164,6 +170,9 @@ def fun_control_init(
             Default is 1. Can be "auto" or an integer.
         design (object):
             The experimental design object. Default is None.
+        divergence_threshold (float):
+            Stop training as soon as the monitored quantity becomes worse than this threshold.
+            Default is None.
         enable_progress_bar (bool):
             Whether to enable the progress bar or not.
         eval (str):
@@ -284,6 +293,9 @@ def fun_control_init(
             Whether the test data were shuffled or not. Default is False.
         surrogate (object):
             The surrogate model object. Default is None.
+        stopping_threshold (float):
+            Stop training immediately once the monitored quantity reaches this threshold.
+            Default is None.
         strategy (str):
             The strategy to use. Default is "auto".
         target_column (str):
@@ -355,6 +367,7 @@ def fun_control_init(
                 '_L_out': 11,
                 '_L_cond': None,
                 'accelerator': "auto",
+                'check_finite': True,
                 'core_model': None,
                 'core_model_name': None,
                 'data': None,
@@ -362,6 +375,7 @@ def fun_control_init(
                 'db_dict_name': None,
                 'device': None,
                 'devices': "auto",
+                'divergence_threshold': None,
                 'enable_progress_bar': False,
                 'eval': None,
                 'horizon': 7,
@@ -391,6 +405,7 @@ def fun_control_init(
                 'show_batch_interval': 1000000,
                 'shuffle': None,
                 'sigma': 0.0,
+                'stopping_threshold': None,
                 'target_column': None,
                 'target_type': None,
                 'train': None,
@@ -425,6 +440,7 @@ def fun_control_init(
         "_L_cond": _L_cond,
         "_torchmetric": _torchmetric,
         "accelerator": accelerator,
+        "check_finite": check_finite,
         "collate_fn_name": collate_fn_name,
         "converters": converters,
         "core_model": core_model,
@@ -433,6 +449,7 @@ def fun_control_init(
         "data": data,
         "data_dir": data_dir,
         "data_full_train": data_full_train,
+        "divergence_threshold": divergence_threshold,
         "hacky": hacky,
         "data_module": data_module,
         "data_set": data_set,
@@ -497,6 +514,7 @@ def fun_control_init(
         "shuffle_val": shuffle_val,
         "shuffle_test": shuffle_test,
         "sigma": sigma,
+        "stopping_threshold": stopping_threshold,
         "spot_tensorboard_path": spot_tensorboard_path,
         "strategy": strategy,
         "target_column": target_column,

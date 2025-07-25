@@ -1936,7 +1936,9 @@ class Spot:
         else:
             return self.surrogate.predict(X)
 
-    def plot_progress(self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300, tkagg=False) -> None:
+    def plot_progress(
+        self, show=True, log_x=False, log_y=False, filename="plot.png", style=["ko", "k", "ro-"], dpi=300, tkagg=False, title="Objective function value over iterations", y_label="y"
+    ) -> None:
         """Plot the progress of the hyperparameter tuning (optimization).
 
         Args:
@@ -1951,6 +1953,10 @@ class Spot:
             style (list):
                 Style of the plot. Default: ['k', 'ro-'], i.e., the initial points are plotted as a black line
                 and the subsequent points as red dots connected by a line.
+            title (str):
+                Title of the plot. Default: "Objective function value over iterations".
+            y_label (str):
+                Label for the y-axis. Default: "y".
 
         Returns:
             None
@@ -2012,6 +2018,10 @@ class Spot:
             ax.set_xscale("log")
         if log_y:
             ax.set_yscale("log")
+        # add a grid
+        ax.grid(True, which="both", linestyle="--", linewidth=0.5)
+        ax.set_ylabel(y_label)
+        ax.set_title(title)
         if filename is not None:
             pylab.savefig(filename, dpi=dpi, bbox_inches="tight")
         if show:

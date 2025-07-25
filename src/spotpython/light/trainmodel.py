@@ -185,7 +185,18 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   This allows accessing the latest checkpoint in a deterministic manner.
     #   Default: None.
     config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
-    callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
+    callbacks = [
+        EarlyStopping(
+            monitor="val_loss",
+            patience=config["patience"],
+            divergence_threshold=fun_control["divergence_threshold"],
+            check_finite=fun_control["check_finite"],
+            stopping_threshold=fun_control["stopping_threshold"],
+            mode="min",
+            strict=False,
+            verbose=False,
+        )
+    ]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False
         dirpath = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
@@ -500,7 +511,18 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     #   This allows accessing the latest checkpoint in a deterministic manner.
     #   Default: None.
     config_id = generate_config_id_with_timestamp(config=config, timestamp=timestamp)
-    callbacks = [EarlyStopping(monitor="val_loss", patience=config["patience"], mode="min", strict=False, verbose=False)]
+    callbacks = [
+        EarlyStopping(
+            monitor="val_loss",
+            patience=config["patience"],
+            divergence_threshold=fun_control["divergence_threshold"],
+            check_finite=fun_control["check_finite"],
+            stopping_threshold=fun_control["stopping_threshold"],
+            mode="min",
+            strict=False,
+            verbose=False,
+        )
+    ]
     if not timestamp:
         # add ModelCheckpoint only if timestamp is False
         dirpath = os.path.join(fun_control["CHECKPOINT_PATH"], config_id)
