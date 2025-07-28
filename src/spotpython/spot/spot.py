@@ -232,11 +232,6 @@ class Spot:
         # Additional self attributes updates:
         self._set_additional_attributes()
 
-        # Bounds are internal, because they are functions of self.lower and self.upper
-        # and used by the optimizer:
-        de_bounds = []
-        for j in range(self.lower.size):
-            de_bounds.append([self.lower[j], self.upper[j]])
         self.set_de_bounds()
 
         self._design_setup(design)
@@ -332,7 +327,8 @@ class Spot:
 
     def _set_var_type(self) -> None:
         """
-        Set the variable types. If the variable types are not specified,
+        Set the variable types based on the fun_control dictionary.
+        If the variable types are not specified,
         all variable types are forced to 'num'.
         """
         self.var_type = self.fun_control["var_type"]
@@ -345,7 +341,8 @@ class Spot:
 
     def _set_var_name(self) -> None:
         """
-        Set the variable names. If the variable names are not specified,
+        Set the variable names based on the fun_control dictionary.
+        If the variable names are not specified,
         all variable names are set to x0, x1, x2, ...
         """
         self.var_name = self.fun_control["var_name"]
