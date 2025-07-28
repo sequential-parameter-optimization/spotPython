@@ -237,7 +237,7 @@ class Spot:
         de_bounds = []
         for j in range(self.lower.size):
             de_bounds.append([self.lower[j], self.upper[j]])
-        self.de_bounds = de_bounds
+        self.set_de_bounds()
 
         self._design_setup(design)
 
@@ -249,7 +249,7 @@ class Spot:
         # because the writer is passed to the surrogate model:
         self._init_spot_writer()
 
-        self._surrogate_setup(surrogate)
+        self.surrogate_setup(surrogate)
 
         if self.fun_control.get("save_experiment"):
             self.save_experiment(verbosity=self.verbosity)
@@ -261,6 +261,33 @@ class Spot:
         logger.debug("In Spot() init(): optimizer_control: %s", self.optimizer_control)
         logger.debug("In Spot() init(): surrogate_control: %s", self.surrogate_control)
         logger.debug("In Spot() init(): self.get_spot_attributes_as_df(): %s", self.get_spot_attributes_as_df())
+
+    def set_de_bounds(self) -> None:
+        """Set the bounds for the differential evolution optimizer.
+        The bounds are internal, because they are functions of self.lower and self.upper
+        and used by the optimizer. They are stored in self.de_bounds as a list of lists,
+        where each inner list contains the lower and upper bound for one dimension.
+
+        Returns:
+            None
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
+                fun_control = fun_control_init(
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1])
+                )
+                S = spot.Spot(fun=lambda x: x, fun_control=fun_control)
+                S.set_de_bounds()
+                print(S.de_bounds)
+                [[-1, 1], [-1, 1]]
+        """
+        de_bounds = []
+        for j in range(self.lower.size):
+            de_bounds.append([self.lower[j], self.upper[j]])
+        self.de_bounds = de_bounds
 
     def _set_fun(self, fun):
         """Set the objective function.
@@ -285,6 +312,7 @@ class Spot:
     def _set_bounds_and_dim(self) -> None:
         """
         Set the lower and upper bounds and the number of dimensions.
+        These are based on the fun_control dictionary.
 
         Returns:
             (NoneType): None
@@ -407,7 +435,73 @@ class Spot:
             if self.surrogate_control["n_theta"] > 1:
                 self.surrogate_control.update({"n_theta": self.k})
 
-    def _surrogate_setup(self, surrogate) -> None:
+    def surrogate_setup(self, surrogate) -> None:
+        """Set up the surrogate model for the optimization process.
+        This method initializes the surrogate model. If no surrogate model is provided,
+        it creates an internal Kriging surrogate with parameters specified in surrogate_control.
+
+        Args:
+            surrogate (object, optional):
+                A surrogate model object. If None, an internal Kriging model is created.
+                Defaults to None.
+
+        Returns:
+            None
+
+        Note:
+            If no surrogate is provided, a Kriging model is initialized with the following parameters
+            from surrogate_control:
+                - method: The Kriging method (e.g., "interpolation" or "regression")
+                - var_type: Variable types for each dimension
+                - seed: Random seed for reproducibility
+                - model_optimizer: Optimizer for model parameter tuning
+                - model_fun_evals: Number of function evaluations for model optimization
+                - min/max_theta: Bounds for theta parameters
+                - n_theta: Number of theta parameters
+                - theta_init_zero: Whether to initialize theta at zero
+                - p_val: Power parameter p value
+                - n_p: Number of p parameters
+                - optim_p: Whether to optimize p parameters
+                - min/max_Lambda: Bounds for lambda parameters
+                - metric_factorial: Metric for factorial parameters
+
+        Examples:
+            >>> import numpy as np
+            >>> from spotpython.fun.objectivefunctions import Analytical
+            >>> from spotpython.spot import spot
+            >>> from spotpython.utils.init import (
+            ...     fun_control_init,
+            ...     surrogate_control_init,
+            ...     design_control_init
+            ... )
+            >>> # Setup with default Kriging surrogate
+            >>> fun_control = fun_control_init(
+            ...     lower=np.array([-1, -1]),
+            ...     upper=np.array([1, 1])
+            ... )
+            >>> surrogate_control = surrogate_control_init(
+            ...     method="interpolation",
+            ...     n_theta="anisotropic"
+            ... )
+            >>> S = spot.Spot(
+            ...     fun=Analytical().fun_sphere,
+            ...     fun_control=fun_control,
+            ...     surrogate_control=surrogate_control
+            ... )
+            >>> print(S.surrogate.n_theta)
+            2
+
+            >>> # Setup with custom surrogate
+            >>> from sklearn.gaussian_process import GaussianProcessRegressor
+            >>> custom_surrogate = GaussianProcessRegressor()
+            >>> S2 = spot.Spot(
+            ...     fun=Analytical().fun_sphere,
+            ...     fun_control=fun_control,
+            ...     surrogate=custom_surrogate
+            ... )
+            >>> print(type(S2.surrogate).__name__)
+            'GaussianProcessRegressor'
+        """
         # Surrogate related information:
         self.surrogate = surrogate
         # If no surrogate model is specified, use the internal
