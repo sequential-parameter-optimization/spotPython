@@ -714,7 +714,7 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
     attributions = np.stack(attributions_list, axis=1)
 
-    if fun_control["xai_metric"] not in {"max_diff", "variance", "spearman"}:
+    if fun_control["xai_metric"] not in {"max_diff", "variance", "spearman", "spearman+variance"}:
         print("Invalid or missing xai_metric. Setting it to 'max_diff'.")
         fun_control["xai_metric"] = "max_diff"
 
@@ -748,6 +748,32 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
 
         print("Spearman rank correlation matrix:\n", spearman_matrix)
         print("Consistency Score (Mean Spearman Correlation):", -result_xai)
+
+    if fun_control["xai_metric"] == "spearman+variance":
+        # Compute Spearman mean
+        num_methods = attributions.shape[1]
+        spearman_matrix = np.zeros((num_methods, num_methods))
+
+        for i in range(num_methods):
+            for j in range(i + 1, num_methods):
+                corr, _ = spearmanr(attributions[:, i], attributions[:, j])
+                spearman_matrix[i, j] = corr
+                spearman_matrix[j, i] = corr
+
+        upper_triangle_values = spearman_matrix[np.triu_indices(num_methods, k=1)]
+        mean_spearman = np.mean(upper_triangle_values)
+
+        # Compute attribution variance across methods for each feature
+        variance = np.var(attributions, axis=1).mean()  # mean over features
+
+        # Combine both (λ is a trade-off hyperparameter you define)
+        lambda_variance = fun_control["lambda_variance"] if "lambda_variance" in fun_control else 1.0
+        result_xai = -mean_spearman + lambda_variance * variance
+
+        print("Mean Spearman correlation:", mean_spearman)
+        print("Mean Variance:", variance)
+        print("Variance Weight:", lambda_variance)
+        print("Combined XAI loss: ", result_xai)
 
     # -------------------------------------------------------------------------------------------------------------------
 
