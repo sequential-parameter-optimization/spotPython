@@ -6798,7 +6798,33 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">751</span>
 <span class="normal">752</span>
 <span class="normal">753</span>
-<span class="normal">754</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters. Performs feature attribution analysis and calculates consistency of these methods.</span>
 
@@ -7131,7 +7157,7 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="n">attributions_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">attributions_dict</span><span class="p">[</span><span class="n">method</span><span class="p">]</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]]</span>
     <span class="n">attributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">attributions_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;max_diff&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;spearman&quot;</span><span class="p">}:</span>
+    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;max_diff&quot;</span><span class="p">,</span> <span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="s2">&quot;spearman&quot;</span><span class="p">,</span> <span class="s2">&quot;spearman+variance&quot;</span><span class="p">}:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid or missing xai_metric. Setting it to &#39;max_diff&#39;.&quot;</span><span class="p">)</span>
         <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;max_diff&quot;</span>
 
@@ -7165,6 +7191,32 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Spearman rank correlation matrix:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">spearman_matrix</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Consistency Score (Mean Spearman Correlation):&quot;</span><span class="p">,</span> <span class="o">-</span><span class="n">result_xai</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;spearman+variance&quot;</span><span class="p">:</span>
+        <span class="c1"># Compute Spearman mean</span>
+        <span class="n">num_methods</span> <span class="o">=</span> <span class="n">attributions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">spearman_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_methods</span><span class="p">,</span> <span class="n">num_methods</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_methods</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_methods</span><span class="p">):</span>
+                <span class="n">corr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">spearmanr</span><span class="p">(</span><span class="n">attributions</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">attributions</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+                <span class="n">spearman_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">corr</span>
+                <span class="n">spearman_matrix</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">corr</span>
+
+        <span class="n">upper_triangle_values</span> <span class="o">=</span> <span class="n">spearman_matrix</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">triu_indices</span><span class="p">(</span><span class="n">num_methods</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+        <span class="n">mean_spearman</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">upper_triangle_values</span><span class="p">)</span>
+
+        <span class="c1"># Compute attribution variance across methods for each feature</span>
+        <span class="n">variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">attributions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>  <span class="c1"># mean over features</span>
+
+        <span class="c1"># Combine both (λ is a trade-off hyperparameter you define)</span>
+        <span class="n">lambda_variance</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;lambda_variance&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;lambda_variance&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">result_xai</span> <span class="o">=</span> <span class="o">-</span><span class="n">mean_spearman</span> <span class="o">+</span> <span class="n">lambda_variance</span> <span class="o">*</span> <span class="n">variance</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean Spearman correlation:&quot;</span><span class="p">,</span> <span class="n">mean_spearman</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mean Variance:&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Variance Weight:&quot;</span><span class="p">,</span> <span class="n">lambda_variance</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Combined XAI loss: &quot;</span><span class="p">,</span> <span class="n">result_xai</span><span class="p">)</span>
 
     <span class="c1"># -------------------------------------------------------------------------------------------------------------------</span>
 
