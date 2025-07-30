@@ -5458,8 +5458,10 @@ items.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Calculates the consistency of XAI methods by computing the mean of the upper triangle
-of the correlation matrix of the provided attributions.</p>
+      <p>Calculate the consistency between different XAI methods.
+Computes the pairwise correlation between different XAI methods&rsquo; attributions
+and returns their mean correlation as a measure of consistency. A higher value
+indicates greater agreement between different XAI methods.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5480,8 +5482,9 @@ of the correlation matrix of the provided attributions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Array of shape (n_methods, n_features) containing 
-                       the attributions from different XAI methods.</p>
+                <p>Array of shape (n_methods, n_features) containing
+feature importance scores from different XAI methods. Each row represents
+a different XAI method&rsquo;s attributions, and each column represents a feature.</p>
               </div>
             </td>
             <td>
@@ -5503,19 +5506,49 @@ of the correlation matrix of the provided attributions.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>float</code></td>            <td>
+                  <code>float</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Mean value of the upper triangle of the correlation matrix.</p>
+                <p>Mean correlation between XAI methods, ranging from -1 to 1.
+- 1: Perfect consistency between methods
+- 0: No consistency between methods
+- -1: Perfect negative consistency between methods</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Three XAI methods&#39; attributions for four features</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">attributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>  <span class="c1"># Method 1</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>  <span class="c1"># Method 2</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>   <span class="c1"># Method 3</span>
+<span class="gp">... </span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">consistency</span> <span class="o">=</span> <span class="n">calculate_xai_consistency</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;XAI Consistency: </span><span class="si">{</span><span class="n">consistency</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">Attribution Correlation Matrix:</span>
+<span class="go">[[ 1.    0.97  0.98]</span>
+<span class="go"> [ 0.97  1.    0.99]</span>
+<span class="go"> [ 0.98  0.99  1.  ]]</span>
+<span class="go">XAI Consistency: 0.98</span>
+</code></pre></div>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The correlation matrix is computed using numpy&rsquo;s corrcoef function, which
+calculates Pearson correlation coefficients. Only the upper triangle of
+the correlation matrix is used to avoid counting correlations twice.</p>
+</details>
             <details class="quote">
               <summary>Source code in <code>spotpython/utils/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">201</span>
+<span class="normal">202</span>
 <span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
@@ -5538,30 +5571,81 @@ of the correlation matrix of the provided attributions.</p>
 <span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span>
-<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_xai_consistency</span><span class="p">(</span><span class="n">attributions</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculates the consistency of XAI methods by computing the mean of the upper triangle</span>
-<span class="sd">        of the correlation matrix of the provided attributions.</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_xai_consistency</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the consistency between different XAI methods.</span>
+<span class="sd">    Computes the pairwise correlation between different XAI methods&#39; attributions</span>
+<span class="sd">    and returns their mean correlation as a measure of consistency. A higher value</span>
+<span class="sd">    indicates greater agreement between different XAI methods.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            attributions (np.ndarray): Array of shape (n_methods, n_features) containing </span>
-<span class="sd">                                       the attributions from different XAI methods.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        attributions (np.ndarray): Array of shape (n_methods, n_features) containing</span>
+<span class="sd">            feature importance scores from different XAI methods. Each row represents</span>
+<span class="sd">            a different XAI method&#39;s attributions, and each column represents a feature.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            float: Mean value of the upper triangle of the correlation matrix.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">global_attr_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
-        <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">global_attr_np</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attribution Correlation Matrix:&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Mean correlation between XAI methods, ranging from -1 to 1.</span>
+<span class="sd">            - 1: Perfect consistency between methods</span>
+<span class="sd">            - 0: No consistency between methods</span>
+<span class="sd">            - -1: Perfect negative consistency between methods</span>
 
-        <span class="c1"># Calculate the mean of the upper triangle of the correlation matrix</span>
-        <span class="n">upper_triangle_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices_from</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">upper_triangle_values</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="p">[</span><span class="n">upper_triangle_indices</span><span class="p">]</span>
-        <span class="n">result_xai</span> <span class="o">=</span> <span class="n">upper_triangle_values</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;XAI Consistency (mean of upper triangle of correlation matrix):&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">result_xai</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result_xai</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Three XAI methods&#39; attributions for four features</span>
+<span class="sd">        &gt;&gt;&gt; attributions = np.array([</span>
+<span class="sd">        ...     [0.1, 0.2, 0.3, 0.4],  # Method 1</span>
+<span class="sd">        ...     [0.2, 0.3, 0.4, 0.5],  # Method 2</span>
+<span class="sd">        ...     [0.0, 0.1, 0.2, 0.3]   # Method 3</span>
+<span class="sd">        ... ])</span>
+<span class="sd">        &gt;&gt;&gt; consistency = calculate_xai_consistency(attributions)</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;XAI Consistency: {consistency:.2f}&quot;)</span>
+<span class="sd">        Attribution Correlation Matrix:</span>
+<span class="sd">        [[ 1.    0.97  0.98]</span>
+<span class="sd">         [ 0.97  1.    0.99]</span>
+<span class="sd">         [ 0.98  0.99  1.  ]]</span>
+<span class="sd">        XAI Consistency: 0.98</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        The correlation matrix is computed using numpy&#39;s corrcoef function, which</span>
+<span class="sd">        calculates Pearson correlation coefficients. Only the upper triangle of</span>
+<span class="sd">        the correlation matrix is used to avoid counting correlations twice.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">global_attr_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
+    <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">global_attr_np</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attribution Correlation Matrix:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the mean of the upper triangle of the correlation matrix</span>
+    <span class="n">upper_triangle_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices_from</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">upper_triangle_values</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="p">[</span><span class="n">upper_triangle_indices</span><span class="p">]</span>
+    <span class="n">result_xai</span> <span class="o">=</span> <span class="n">upper_triangle_values</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;XAI Consistency (mean of upper triangle of correlation matrix):&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">result_xai</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result_xai</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
