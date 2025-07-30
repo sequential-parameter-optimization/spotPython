@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.linalg import LinAlgError
+from numpy.linalg import LinAlgError, cond
 from typing import Dict, Tuple, List, Optional
 from scipy.optimize import differential_evolution
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -8,16 +8,7 @@ import matplotlib.pyplot as plt
 from numpy import linspace, meshgrid, array, append
 import pylab
 from numpy import ravel
-import logging
-
-logger = logging.getLogger(__name__)
-# configure the handler and formatter as needed
-py_handler = logging.FileHandler(f"{__name__}.log", mode="w")
-py_formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-# add formatter to the handler
-py_handler.setFormatter(py_formatter)
-# add handler to the logger
-logger.addHandler(py_handler)
+from scipy.spatial.distance import cdist, pdist, squareform
 
 
 class Kriging(BaseEstimator, RegressorMixin):
@@ -240,16 +231,12 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         # store theta and Lambda in log scale
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # case noise is True
-            # self.theta = self.logtheta_lambda_[:-1]
-            # self.Lambda = self.logtheta_lambda_[-1]
             # select the first n_theta values from logtheta_lambda_:
             self.theta = self.logtheta_lambda_[: self.n_theta]
             self.Lambda = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
             if self.optim_p:
                 self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         else:
-            # self.theta = self.logtheta_lambda_
             self.theta = self.logtheta_lambda_[: self.n_theta]
             self.Lambda = None
             if self.optim_p:
@@ -329,6 +316,87 @@ class Kriging(BaseEstimator, RegressorMixin):
             predictions = [self._pred(x_i)[0] for x_i in X]
             return np.array(predictions)
 
+    def build_Psi(self) -> None:
+        """
+        Constructs a new (n x n) correlation matrix Psi to reflect new data
+        or a change in hyperparameters.
+        This method uses `theta`, `p`, and coded `X` values to construct the
+        correlation matrix as described in [Forr08a, p.57].
+
+        Attributes:
+            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
+            cnd_Psi (float): Condition number of Psi.
+            inf_Psi (bool): True if Psi is infinite, False otherwise.
+
+        Raises:
+            LinAlgError: If building Psi fails.
+
+        Examples:
+            >>> from spotpython.build.kriging import Kriging
+                import numpy as np
+                nat_X = np.array([[0], [1]])
+                nat_y = np.array([0, 1])
+                n=1
+                p=1
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                print(S.nat_X)
+                print(S.nat_y)
+                S._set_theta_values()
+                print(f"S.theta: {S.theta}")
+                S._initialize_matrices()
+                S._set_de_bounds()
+                new_theta_p_Lambda = S._optimize_model()
+                S._extract_from_bounds(new_theta_p_Lambda)
+                print(f"S.theta: {S.theta}")
+                S.build_Psi()
+                print(f"S.Psi: {S.Psi}")
+                    [[0]
+                    [1]]
+                    [0 1]
+                    S.theta: [0.]
+                    S.theta: [1.60036366]
+                    S.Psi: [[1.00000001e+00 4.96525625e-18]
+                    [4.96525625e-18 1.00000001e+00]]
+        """
+        try:
+            n, k = self.X_.shape
+            theta10 = np.power(10.0, self.theta)
+
+            # Ensure theta has the correct length
+            if self.n_theta == 1:
+                theta10 = theta10 * np.ones(k)
+
+            # Initialize the Psi matrix
+            Psi = np.zeros((n, n), dtype=np.float64)
+
+            # Calculate the distance matrix using ordered variables
+            if self.ordered_mask.any():
+                X_ordered = self.nat_X[:, self.ordered_mask]
+                D_ordered = squareform(pdist(X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]))
+                Psi += D_ordered
+
+            # Add the contribution of factor variables to the distance matrix
+            if self.factor_mask.any():
+                X_factor = self.nat_X[:, self.factor_mask]
+                D_factor = squareform(pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]))
+                Psi += D_factor
+
+            # Calculate correlation from distance
+            Psi = np.exp(-Psi)
+            # Check for infinite values
+            self.inf_Psi = np.isinf(Psi).any()
+            # Calculate condition number
+            self.cnd_Psi = cond(Psi)
+
+            # Return only the upper triangle, as the matrix is symmetric
+            # and the diagonal will be handled later.
+            return np.triu(Psi, k=1)
+        except LinAlgError as err:
+            print("Building Psi failed. Error: %s, Type: %s", err, type(err))
+            raise
+
     def _kernel(self, X: np.ndarray, theta: np.ndarray, p: float) -> np.ndarray:
         """
         Computes the correlation matrix Psi using vectorized operations.
@@ -380,38 +448,33 @@ class Kriging(BaseEstimator, RegressorMixin):
         y = self.y_.flatten()
 
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # case noise is True
             # theta = x[:-1]
-            theta = x[: self.n_theta]
-            # theta is in log scale, so transform it back:
-            theta = 10.0**theta
+            self.theta = x[: self.n_theta]
             # lambda_ = x[-1]
             lambda_ = x[self.n_theta : self.n_theta + 1]
             # lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
-                p = x[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
-            else:
-                p = self.p_val
+                self.p_val = x[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
             # theta = x
-            theta = x[: self.n_theta]
-            theta = 10.0**theta
+            self.theta = x[: self.n_theta]
             # use the original, untransformed eps:
             lambda_ = self.eps
             if self.optim_p:
-                p = x[self.n_theta : self.n_theta + self.n_p]
-            else:
-                p = self.p_val
+                self.p_val = x[self.n_theta : self.n_theta + self.n_p]
         else:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
-        # p = 1.99
         n = X.shape[0]
         one = np.ones(n)
+        theta = self.theta
+        # theta is in log scale, so transform it back:
+        theta10 = 10.0**theta
+        p = self.p_val
+        # Build correlation matrix (preparation for build_Psi())
+        Psi_upper_triangle = self._kernel(X, theta10, p)
 
-        # Build correlation matrix
-        Psi_upper_triangle = self._kernel(X, theta, p)
         Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
 
         try:
@@ -435,6 +498,69 @@ class Kriging(BaseEstimator, RegressorMixin):
         negLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
         return negLnLike, Psi, U
 
+    def build_psi_vec(self, x: np.ndarray) -> None:
+        """
+        Build the psi vector required for predictive methods.
+
+        Args:
+            x (ndarray): Point to calculate the psi vector for.
+
+        Returns:
+            None
+
+        Modifies:
+            self.psi (np.ndarray): Updates the psi vector.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.build.kriging import Kriging
+                X_train = np.array([[1., 2.],
+                                    [2., 4.],
+                                    [3., 6.]])
+                y_train = np.array([1., 2., 3.])
+                S = Kriging(name='kriging',
+                            seed=123,
+                            log_level=50,
+                            n_theta=1,
+                            noise=False,
+                            cod_type="norm")
+                S.fit(X_train, y_train)
+                # force theta to simple values:
+                S.theta = np.array([0.0])
+                nat_X = np.array([1., 0.])
+                S.psi = np.zeros((S.n, 1))
+                S.build_psi_vec(nat_X)
+                res = np.array([[np.exp(-4)],
+                    [np.exp(-17)],
+                    [np.exp(-40)]])
+                assert np.array_equal(S.psi, res)
+                print(f"S.psi: {S.psi}")
+                print(f"Control value res: {res}")
+        """
+        try:
+            self.psi = np.zeros((self.n, 1))
+            theta10 = np.power(10.0, self.theta)
+            if self.n_theta == 1:
+                theta10 = theta10 * np.ones(self.k)
+
+            D = np.zeros(self.n)
+
+            # Compute ordered distance contributions
+            if self.ordered_mask.any():
+                X_ordered = self.nat_X[:, self.ordered_mask]
+                x_ordered = x[self.ordered_mask]
+                D += cdist(x_ordered.reshape(1, -1), X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]).ravel()
+            # Compute factor distance contributions
+            if self.factor_mask.any():
+                X_factor = self.nat_X[:, self.factor_mask]
+                x_factor = x[self.factor_mask]
+                D += cdist(x_factor.reshape(1, -1), X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]).ravel()
+
+            self.psi = np.exp(-D).reshape(-1, 1)
+
+        except np.linalg.LinAlgError as err:
+            print("Building psi failed due to a linear algebra error: %s. Error type: %s", err, type(err))
+
     def _pred(self, x: np.ndarray) -> float:
         """
         Computes a single-point Kriging prediction using the correlation matrix
@@ -448,51 +574,29 @@ class Kriging(BaseEstimator, RegressorMixin):
             float: The standard deviation of the prediction.
             float: The NEGATIVE expected improvement at x.
         """
-        X = self.X_
         y = self.y_.flatten()
 
-        # if self.method == "interpolation":
-        #     theta = self.logtheta_lambda_
-        #     theta = 10.0**theta
-        #     # lambda is not transformed back:
-        #     lambda_ = self.eps
-        # else:
-        #     theta = self.logtheta_lambda_[:-1]
-        #     theta = 10.0**theta
-        #     lambda_ = self.logtheta_lambda_[-1]
-        #     lambda_ = 10.0**lambda_
-
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # case noise is True
             # theta = x[:-1]
-            theta = self.logtheta_lambda_[: self.n_theta]
-            # theta is in log scale, so transform it back:
-            theta = 10.0**theta
+            self.theta = self.logtheta_lambda_[: self.n_theta]
             # lambda_ = x[-1]
             lambda_ = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
             # lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
-                p = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
-            else:
-                p = self.p_val
+                self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
             # theta = x
-            theta = self.logtheta_lambda_[: self.n_theta]
-            theta = 10.0**theta
+            self.theta = self.logtheta_lambda_[: self.n_theta]
             # use the original, untransformed eps:
             lambda_ = self.eps
             if self.optim_p:
-                p = self.logtheta_lambda_[self.n_theta : self.n_theta + self.n_p]
-            else:
-                p = self.p_val
+                self.p_val = self.logtheta_lambda_[self.n_theta : self.n_theta + self.n_p]
         else:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
         U = self.U_
-
-        # p = 1.99
-        n = X.shape[0]
+        n = self.X_.shape[0]
         one = np.ones(n)
 
         # Compute mu
@@ -506,11 +610,16 @@ class Kriging(BaseEstimator, RegressorMixin):
         resid_tilde = np.linalg.solve(U, resid)
         resid_tilde = np.linalg.solve(U.T, resid_tilde)
 
-        # Build psi
+        # Build psi (preparation for build_psi_vec())
+        X = self.X_
+        p = self.p_val
+        theta = self.theta
+        # theta is in log scale, so transform it back:
+        theta10 = 10.0**theta
         psi = np.ones(n)
         for i in range(n):
             dist_vec = np.abs(X[i, :] - x) ** p
-            psi[i] = np.exp(-np.sum(theta * dist_vec))
+            psi[i] = np.exp(-np.sum(theta10 * dist_vec))
 
         # Compute SigmaSqr and SSqr
         if (self.method == "interpolation") or (self.method == "regression"):
@@ -669,305 +778,3 @@ class Kriging(BaseEstimator, RegressorMixin):
             ax.plot_surface(X, Y, Ze, rstride=3, cstride=3, alpha=0.9, cmap="jet")
             #
             pylab.show()
-
-
-# Additional functions for plotting the Kriging surrogate model
-# ------------------------------------------------------------
-
-
-def plot1d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True) -> None:
-    """
-    Plots the 1D Kriging surrogate model.
-
-    Args:
-        model (object): A fitted Kriging model.
-        X (np.ndarray): Training input data of shape (n_samples, 1).
-        y (np.ndarray): Training target values of shape (n_samples,).
-        show (bool): If True, displays the plot. Defaults to True.
-
-    Returns:
-        None
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.surrogate.kriging import Kriging
-        >>> # Training data
-        >>> X_train = np.array([[0.0], [0.5], [1.0]])
-        >>> y_train = np.array([0.1, 0.2, 0.3])
-        >>> # Initialize and fit the Kriging model
-        >>> model = Kriging().fit(X_train, y_train)
-        >>> # Plot the 1D Kriging surrogate
-        >>> plot1d(model, X_train, y_train)
-    """
-    if X.shape[1] != 1:
-        raise ValueError("plot1d is only supported for 1D input data.")
-
-    _ = plt.figure(figsize=(9, 6))
-    n_grid = 100
-    x = linspace(X[:, 0].min(), X[:, 0].max(), num=n_grid).reshape(-1, 1)
-    y_pred, y_std = model.predict(x, return_std=True)
-
-    plt.plot(x, y_pred, "k", label="Prediction")
-    plt.fill_between(
-        x.ravel(),
-        y_pred - 1.96 * y_std,
-        y_pred + 1.96 * y_std,
-        alpha=0.2,
-        label="95% Confidence Interval",
-    )
-    plt.scatter(X, y, color="red", label="Training Data")
-    plt.xlabel("X")
-    plt.ylabel("Prediction")
-    plt.title("1D Kriging Surrogate")
-    plt.legend()
-    if show:
-        plt.show()
-
-
-def plot2d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True, alpha=0.8) -> None:
-    """
-    Plots the 2D Kriging surrogate model.
-
-    Args:
-        model (object): A fitted Kriging model.
-        X (np.ndarray): Training input data of shape (n_samples, 2).
-        y (np.ndarray): Training target values of shape (n_samples,).
-        show (bool): If True, displays the plot. Defaults to True.
-        alpha (float): Transparency level for 3D surface plots. Defaults to 0.8.
-
-    Returns:
-        None
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.surrogate.kriging import Kriging
-        >>> # Training data
-        >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
-        >>> y_train = np.array([0.1, 0.2, 0.3])
-        >>> # Initialize and fit the Kriging model
-        >>> model = Kriging().fit(X_train, y_train)
-        >>> # Plot the 2D Kriging surrogate
-        >>> plot2d(model, X_train, y_train)
-    """
-    if X.shape[1] != 2:
-        raise ValueError("plot2d is only supported for 2D input data.")
-
-    fig = plt.figure(figsize=(12, 10))
-    n_grid = 100
-    x1 = linspace(X[:, 0].min(), X[:, 0].max(), num=n_grid)
-    x2 = linspace(X[:, 1].min(), X[:, 1].max(), num=n_grid)
-    X1, X2 = meshgrid(x1, x2)
-    grid_points = array([X1.ravel(), X2.ravel()]).T
-
-    y_pred, y_std = model.predict(grid_points, return_std=True)
-    Z_pred = y_pred.reshape(X1.shape)
-    Z_std = y_std.reshape(X1.shape)
-
-    # Plot predicted values
-    ax1 = fig.add_subplot(221, projection="3d")
-    ax1.plot_surface(X1, X2, Z_pred, cmap="viridis", alpha=alpha)
-    ax1.set_title("Prediction Surface")
-    ax1.set_xlabel("X1")
-    ax1.set_ylabel("X2")
-    ax1.set_zlabel("Prediction")
-
-    # Plot prediction error
-    ax2 = fig.add_subplot(222, projection="3d")
-    ax2.plot_surface(X1, X2, Z_std, cmap="viridis", alpha=alpha)
-    ax2.set_title("Prediction Error Surface")
-    ax2.set_xlabel("X1")
-    ax2.set_ylabel("X2")
-    ax2.set_zlabel("Error")
-
-    # Contour plot of predicted values
-    ax3 = fig.add_subplot(223)
-    contour = ax3.contourf(X1, X2, Z_pred, cmap="viridis", levels=30)
-    plt.colorbar(contour, ax=ax3)
-    ax3.scatter(X[:, 0], X[:, 1], color="red", label="Training Data")
-    ax3.set_title("Prediction Contour")
-    ax3.set_xlabel("X1")
-    ax3.set_ylabel("X2")
-    ax3.legend()
-
-    # Contour plot of prediction error
-    ax4 = fig.add_subplot(224)
-    contour = ax4.contourf(X1, X2, Z_std, cmap="viridis", levels=30)
-    plt.colorbar(contour, ax=ax4)
-    ax4.scatter(X[:, 0], X[:, 1], color="red", label="Training Data")
-    ax4.set_title("Error Contour")
-    ax4.set_xlabel("X1")
-    ax4.set_ylabel("X2")
-    ax4.legend()
-
-    if show:
-        plt.show()
-
-
-def plotkd(
-    model,
-    X: np.ndarray,
-    y: np.ndarray,
-    i: int,
-    j: int,
-    show: Optional[bool] = True,
-    alpha=0.8,
-    eps=1e-3,
-    var_names: Optional[List[str]] = None,
-) -> None:
-    """
-    Plots the Kriging surrogate model for k-dimensional input data by varying two dimensions (i, j).
-
-    Args:
-        model (object): A fitted Kriging model.
-        X (np.ndarray): Training input data of shape (n_samples, k).
-        y (np.ndarray): Training target values of shape (n_samples,).
-        i (int): The first dimension to vary.
-        j (int): The second dimension to vary.
-        show (bool): If True, displays the plot. Defaults to True.
-        alpha (float): Transparency level for 3D surface plots. Defaults to 0.8.
-        eps (float): Tolerance for considering points as "on the surface". Defaults to 1e-3.
-        var_names (List[str], optional): A list of three strings for axis labels.
-            The first entry is for the x-axis, the second for the y-axis, and the third for the z-axis.
-            If empty or None, default axis labels are used.
-
-    Returns:
-        None
-
-    Examples:
-        >>> import numpy as np
-        >>> from spotpython.surrogate.kriging import Kriging, plotkd
-        >>> # Training data
-        >>> X_train = np.array([[0.0, 0.0, 0.0], [0.5, 0.5, 0.5], [1.0, 1.0, 1.0]])
-        >>> y_train = np.array([0.1, 0.2, 0.3])
-        >>> # Initialize and fit the Kriging model
-        >>> model = Kriging().fit(X_train, y_train)
-        >>> # Plot the 3D Kriging surrogate
-        >>> plotkd(model, X_train, y_train, 0, 1)
-    """
-    k = X.shape[1]
-    if i >= k or j >= k:
-        raise ValueError(f"Dimensions i and j must be less than the number of features (k={k}).")
-    if i == j:
-        raise ValueError("Dimensions i and j must be different.")
-
-    # Compute the mean values for all dimensions
-    mean_values = X.mean(axis=0)
-
-    # Create a grid for the two varied dimensions
-    n_grid = 100
-    x_i = linspace(X[:, i].min(), X[:, i].max(), num=n_grid)
-    x_j = linspace(X[:, j].min(), X[:, j].max(), num=n_grid)
-    X_i, X_j = meshgrid(x_i, x_j)
-
-    # Prepare the grid points for prediction
-    grid_points = np.zeros((X_i.size, k))
-    grid_points[:, i] = X_i.ravel()
-    grid_points[:, j] = X_j.ravel()
-
-    # Set the remaining dimensions to their mean values
-    for dim in range(k):
-        if dim != i and dim != j:
-            grid_points[:, dim] = mean_values[dim]
-
-    # Predict the values and standard deviations
-    y_pred, y_std = model.predict(grid_points, return_std=True)
-    Z_pred = y_pred.reshape(X_i.shape)
-    Z_std = y_std.reshape(X_i.shape)
-
-    # Plot the results
-    fig = plt.figure(figsize=(12, 10))
-
-    # Plot predicted values
-    ax1 = fig.add_subplot(221, projection="3d")
-    ax1.plot_surface(X_i, X_j, Z_pred, cmap="viridis", alpha=alpha)
-    ax1.set_title("Prediction Surface")
-    ax1.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax1.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
-    ax1.set_zlabel(var_names[2] if var_names else "Prediction")
-
-    # Add input points to the prediction surface
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
-
-        ax1.scatter(x_point, y_point, z_actual, color=color, s=50, edgecolor="black")
-
-    # Plot prediction error
-    ax2 = fig.add_subplot(222, projection="3d")
-    ax2.plot_surface(X_i, X_j, Z_std, cmap="viridis", alpha=alpha)
-    ax2.set_title("Prediction Error Surface")
-    ax2.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax2.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
-    ax2.set_zlabel(var_names[2] if var_names else "Error")
-
-    # Add input points to the error surface
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
-
-        ax2.scatter(x_point, y_point, abs(z_actual - z_predicted), color=color, s=50, edgecolor="black")
-
-    # Contour plot of predicted values
-    ax3 = fig.add_subplot(223)
-    contour = ax3.contourf(X_i, X_j, Z_pred, cmap="viridis", levels=30)
-    plt.colorbar(contour, ax=ax3)
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
-
-        ax3.scatter(x_point, y_point, color=color, s=50, edgecolor="black")
-    ax3.set_title("Prediction Contour")
-    ax3.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax3.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
-
-    # Contour plot of prediction error
-    ax4 = fig.add_subplot(224)
-    contour = ax4.contourf(X_i, X_j, Z_std, cmap="viridis", levels=30)
-    plt.colorbar(contour, ax=ax4)
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
-
-        ax4.scatter(x_point, y_point, color=color, s=50, edgecolor="black")
-    ax4.set_title("Error Contour")
-    ax4.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax4.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
-
-    if show:
-        plt.show()
