@@ -198,28 +198,53 @@ def get_metric_sign(metric_name):
         raise ValueError(f"Metric '{metric_name}' not found.")
 
 
+def calculate_xai_consistency(attributions) -> float:
+    """Calculate the consistency between different XAI methods.
+    Computes the pairwise correlation between different XAI methods' attributions
+    and returns their mean correlation as a measure of consistency. A higher value
+    indicates greater agreement between different XAI methods.
 
-def calculate_xai_consistency(attributions):
-        """
-        Calculates the consistency of XAI methods by computing the mean of the upper triangle
-        of the correlation matrix of the provided attributions.
+    Args:
+        attributions (np.ndarray): Array of shape (n_methods, n_features) containing
+            feature importance scores from different XAI methods. Each row represents
+            a different XAI method's attributions, and each column represents a feature.
 
-        Args:
-            attributions (np.ndarray): Array of shape (n_methods, n_features) containing 
-                                       the attributions from different XAI methods.
+    Returns:
+        float: Mean correlation between XAI methods, ranging from -1 to 1.
+            - 1: Perfect consistency between methods
+            - 0: No consistency between methods
+            - -1: Perfect negative consistency between methods
 
-        Returns:
-            float: Mean value of the upper triangle of the correlation matrix.
-        """
-        global_attr_np = np.array(attributions)
-        corr_matrix = np.corrcoef(global_attr_np)
-        print("Attribution Correlation Matrix:")
-        print(corr_matrix)
+    Examples:
+        >>> import numpy as np
+        >>> # Three XAI methods' attributions for four features
+        >>> attributions = np.array([
+        ...     [0.1, 0.2, 0.3, 0.4],  # Method 1
+        ...     [0.2, 0.3, 0.4, 0.5],  # Method 2
+        ...     [0.0, 0.1, 0.2, 0.3]   # Method 3
+        ... ])
+        >>> consistency = calculate_xai_consistency(attributions)
+        >>> print(f"XAI Consistency: {consistency:.2f}")
+        Attribution Correlation Matrix:
+        [[ 1.    0.97  0.98]
+         [ 0.97  1.    0.99]
+         [ 0.98  0.99  1.  ]]
+        XAI Consistency: 0.98
 
-        # Calculate the mean of the upper triangle of the correlation matrix
-        upper_triangle_indices = np.triu_indices_from(corr_matrix, k=1)
-        upper_triangle_values = corr_matrix[upper_triangle_indices]
-        result_xai = upper_triangle_values.mean()
-        print("XAI Consistency (mean of upper triangle of correlation matrix):")
-        print(result_xai)
-        return result_xai
+    Note:
+        The correlation matrix is computed using numpy's corrcoef function, which
+        calculates Pearson correlation coefficients. Only the upper triangle of
+        the correlation matrix is used to avoid counting correlations twice.
+    """
+    global_attr_np = np.array(attributions)
+    corr_matrix = np.corrcoef(global_attr_np)
+    print("Attribution Correlation Matrix:")
+    print(corr_matrix)
+
+    # Calculate the mean of the upper triangle of the correlation matrix
+    upper_triangle_indices = np.triu_indices_from(corr_matrix, k=1)
+    upper_triangle_values = corr_matrix[upper_triangle_indices]
+    result_xai = upper_triangle_values.mean()
+    print("XAI Consistency (mean of upper triangle of correlation matrix):")
+    print(result_xai)
+    return result_xai

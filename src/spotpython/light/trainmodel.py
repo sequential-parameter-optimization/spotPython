@@ -726,10 +726,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
 
     result_xai = calculate_xai_consistency(attributions)
 
-
-
     # -------------------------------------------------------------------------------------------------------------------
 
     return result["val_loss"], result_xai
-
-
