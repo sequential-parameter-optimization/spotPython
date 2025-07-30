@@ -196,3 +196,30 @@ def get_metric_sign(metric_name):
         return +1
     else:
         raise ValueError(f"Metric '{metric_name}' not found.")
+
+
+
+def calculate_xai_consistency(attributions):
+        """
+        Calculates the consistency of XAI methods by computing the mean of the upper triangle
+        of the correlation matrix of the provided attributions.
+
+        Args:
+            attributions (np.ndarray): Array of shape (n_methods, n_features) containing 
+                                       the attributions from different XAI methods.
+
+        Returns:
+            float: Mean value of the upper triangle of the correlation matrix.
+        """
+        global_attr_np = np.array(attributions)
+        corr_matrix = np.corrcoef(global_attr_np)
+        print("Attribution Correlation Matrix:")
+        print(corr_matrix)
+
+        # Calculate the mean of the upper triangle of the correlation matrix
+        upper_triangle_indices = np.triu_indices_from(corr_matrix, k=1)
+        upper_triangle_values = corr_matrix[upper_triangle_indices]
+        result_xai = upper_triangle_values.mean()
+        print("XAI Consistency (mean of upper triangle of correlation matrix):")
+        print(result_xai)
+        return result_xai

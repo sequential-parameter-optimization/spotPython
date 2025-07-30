@@ -1,6 +1,7 @@
 import lightning as L
 from spotpython.data.lightdatamodule import LightDataModule, PadSequenceManyToMany
 from spotpython.utils.eda import generate_config_id
+from spotpython.utils.metrics import calculate_xai_consistency
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.callbacks import ModelCheckpoint
@@ -694,87 +695,41 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         attr_ig = IntegratedGradients(model)
         attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline)
         ig_attr_test_sum = attribution_ig.detach().numpy().sum(0)
-        ig_attr_test_norm_sum = ig_attr_test_sum / np.linalg.norm(ig_attr_test_sum, ord=1)
-        attributions_dict["IntegratedGradients"] = ig_attr_test_norm_sum
+        row_sum_ig = np.sum(ig_attr_test_sum, axis=0)
+        if row_sum_ig == 0:
+            row_sum_ig += 1e-10
+        scaled_attribution_ig = ig_attr_test_sum / row_sum_ig
+        attributions_dict["IntegratedGradients"] = scaled_attribution_ig
 
     if "KernelShap" in fun_control["xai_methods"]:
         attr_ks = KernelShap(model)
         attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline)
         ks_attr_test_sum = attribution_ks.detach().numpy().sum(0)
-        ks_attr_test_norm_sum = ks_attr_test_sum / np.linalg.norm(ks_attr_test_sum, ord=1)
-        attributions_dict["KernelShap"] = ks_attr_test_norm_sum
+        row_sum_ks = np.sum(ks_attr_test_sum, axis=0)
+        if row_sum_ks == 0:
+            row_sum_ks += 1e-10
+        scaled_attribution_ks = ks_attr_test_sum / row_sum_ks
+        attributions_dict["KernelShap"] = scaled_attribution_ks
 
     if "DeepLift" in fun_control["xai_methods"]:
         attr_dl = DeepLift(model)
         attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline)
         dl_attr_test_sum = attribution_dl.detach().numpy().sum(0)
-        dl_attr_test_norm_sum = dl_attr_test_sum / np.linalg.norm(dl_attr_test_sum, ord=1)
-        attributions_dict["DeepLift"] = dl_attr_test_norm_sum
+        row_sum_dl = np.sum(dl_attr_test_sum, axis=0)
+        if row_sum_dl == 0:
+            row_sum_dl += 1e-10
+        scaled_attribution_dl = dl_attr_test_sum / row_sum_dl
+        attributions_dict["DeepLift"] = scaled_attribution_dl
 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
-    attributions = np.stack(attributions_list, axis=1)
+    attributions = np.stack(attributions_list, axis=0)
 
-    if fun_control["xai_metric"] not in {"max_diff", "variance", "spearman", "spearman+variance"}:
-        print("Invalid or missing xai_metric. Setting it to 'max_diff'.")
-        fun_control["xai_metric"] = "max_diff"
+    result_xai = calculate_xai_consistency(attributions)
 
-    if fun_control["xai_metric"] == "max_diff":
-        # Compute the max difference of the attribution methods for each feature
-        result_xai = np.max(attributions, axis=1) - np.min(attributions, axis=1)
-        print("Maximum differences of feature attribution methods:", result_xai)
-        result_xai = result_xai.sum()
 
-    if fun_control["xai_metric"] == "variance":
-        result_xai = np.var(attributions, axis=1)
-        print("Variance of feature attribution methods:", result_xai)
-        result_xai = result_xai.sum()
-
-    if fun_control["xai_metric"] == "spearman":
-        num_methods = attributions.shape[1]
-        spearman_matrix = np.zeros((num_methods, num_methods))  # Store correlation values
-
-        for i in range(num_methods):
-            for j in range(i + 1, num_methods):  # Only compute upper triangle
-                corr, _ = spearmanr(attributions[:, i], attributions[:, j])  # Compute Spearman correlation
-                spearman_matrix[i, j] = corr
-                spearman_matrix[j, i] = corr  # Mirror value in symmetric matrix
-
-        # Extract upper triangular values (excluding diagonal)
-        upper_triangle_values = spearman_matrix[np.triu_indices(num_methods, k=1)]
-
-        # Compute mean correlation as the consistency score
-        # Negative sign to use the result as loss of the objective function for minimization
-        result_xai = -np.mean(upper_triangle_values)
-
-        print("Spearman rank correlation matrix:\n", spearman_matrix)
-        print("Consistency Score (Mean Spearman Correlation):", -result_xai)
-
-    if fun_control["xai_metric"] == "spearman+variance":
-        # Compute Spearman mean
-        num_methods = attributions.shape[1]
-        spearman_matrix = np.zeros((num_methods, num_methods))
-
-        for i in range(num_methods):
-            for j in range(i + 1, num_methods):
-                corr, _ = spearmanr(attributions[:, i], attributions[:, j])
-                spearman_matrix[i, j] = corr
-                spearman_matrix[j, i] = corr
-
-        upper_triangle_values = spearman_matrix[np.triu_indices(num_methods, k=1)]
-        mean_spearman = np.mean(upper_triangle_values)
-
-        # Compute attribution variance across methods for each feature
-        variance = np.var(attributions, axis=1).mean()  # mean over features
-
-        # Combine both (λ is a trade-off hyperparameter you define)
-        lambda_variance = fun_control["lambda_variance"] if "lambda_variance" in fun_control else 1.0
-        result_xai = -mean_spearman + lambda_variance * variance
-
-        print("Mean Spearman correlation:", mean_spearman)
-        print("Mean Variance:", variance)
-        print("Variance Weight:", lambda_variance)
-        print("Combined XAI loss: ", result_xai)
 
     # -------------------------------------------------------------------------------------------------------------------
 
     return result["val_loss"], result_xai
+
+
