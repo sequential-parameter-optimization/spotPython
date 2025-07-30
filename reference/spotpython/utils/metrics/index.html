@@ -4669,6 +4669,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#spotpython.utils.metrics.calculate_xai_consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      calculate_xai_consistency
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#spotpython.utils.metrics.get_metric_sign" class="md-nav__link">
     <span class="md-ellipsis">
       get_metric_sign
@@ -5195,6 +5204,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#spotpython.utils.metrics.calculate_xai_consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      calculate_xai_consistency
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#spotpython.utils.metrics.get_metric_sign" class="md-nav__link">
     <span class="md-ellipsis">
       get_metric_sign
@@ -5423,6 +5441,127 @@ items.</p>
         <span class="k">return</span> <span class="mf">0.0</span>
 
     <span class="k">return</span> <span class="n">score</span> <span class="o">/</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">actual</span><span class="p">),</span> <span class="n">k</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="spotpython.utils.metrics.calculate_xai_consistency" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">calculate_xai_consistency</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span></code>
+
+<a href="#spotpython.utils.metrics.calculate_xai_consistency" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Calculates the consistency of XAI methods by computing the mean of the upper triangle
+of the correlation matrix of the provided attributions.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>attributions</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Array of shape (n_methods, n_features) containing 
+                       the attributions from different XAI methods.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>float</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Mean value of the upper triangle of the correlation matrix.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>spotpython/utils/metrics.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_xai_consistency</span><span class="p">(</span><span class="n">attributions</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the consistency of XAI methods by computing the mean of the upper triangle</span>
+<span class="sd">        of the correlation matrix of the provided attributions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attributions (np.ndarray): Array of shape (n_methods, n_features) containing </span>
+<span class="sd">                                       the attributions from different XAI methods.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Mean value of the upper triangle of the correlation matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">global_attr_np</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
+        <span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">global_attr_np</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Attribution Correlation Matrix:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the mean of the upper triangle of the correlation matrix</span>
+        <span class="n">upper_triangle_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">triu_indices_from</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">upper_triangle_values</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="p">[</span><span class="n">upper_triangle_indices</span><span class="p">]</span>
+        <span class="n">result_xai</span> <span class="o">=</span> <span class="n">upper_triangle_values</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;XAI Consistency (mean of upper triangle of correlation matrix):&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">result_xai</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result_xai</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
