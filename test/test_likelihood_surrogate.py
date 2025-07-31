@@ -18,6 +18,8 @@ def test_likelihood_basic(method, x_shape):
     model.eps = 1e-6
     model.penalty = 12345.0
     model.n_theta = 1
+    model.n, model.k = model.X_.shape
+    model._set_variable_types()
 
     # log10(theta) = 0, log10(lambda) = -3 for regression/reinterpolation
     if method == "interpolation":
@@ -51,6 +53,8 @@ def test_likelihood_invalid_method():
     model = Kriging(method="regression")
     model.X_ = X
     model.y_ = y
+    model.n, model.k = model.X_.shape
+    model._set_variable_types()
     # Set an invalid method
     model.method = "invalid"
     with pytest.raises(ValueError):
@@ -64,6 +68,8 @@ def test_likelihood_ill_conditioned_returns_penalty():
     model.X_ = X
     model.y_ = y
     model.eps = 0.0  # No regularization
+    model.n, model.k = model.X_.shape
+    model._set_variable_types()
     x = np.zeros(1)
     negLnLike, Psi, U = model.likelihood(x)
     assert negLnLike == 99999.0

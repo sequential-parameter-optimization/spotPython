@@ -129,6 +129,52 @@ class Kriging(BaseEstimator, RegressorMixin):
         eps = np.finfo(float).eps
         return np.sqrt(eps)
 
+    def _set_variable_types(self) -> None:
+        """
+        Set the variable types for the class instance.
+        This method sets the variable types for the class instance based
+        on the `var_type` attribute. If the length of `var_type` is less
+        than `k`, all variable types are forced to 'num' and a warning is logged.
+        The method then creates Boolean masks for each variable
+        type ('num', 'factor', 'int', 'ordered') using numpy arrays, e.g.,
+        `num_mask = array([ True,  True])` if two numerical variables are present.
+
+        Args:
+            self (object): The Kriging object.
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+                nat_y = np.array([1, 2, 3])
+                var_type = ["num", "int", "float"]
+                n_theta=2
+                n_p=2
+                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                assert S.var_type == ["num", "int", "float"]
+                assert S.num_mask.all() == False
+                assert S.factor_mask.all() == False
+                assert S.int_mask.all() == False
+                assert S.ordered_mask.all() == True
+                assert np.all(S.num_mask == np.array([True, False, False]))
+                assert np.all(S.int_mask == np.array([False, True, False]))
+                assert np.all(S.ordered_mask == np.array([True, True, True]))
+
+        Returns:
+            None
+        """
+        # Ensure var_type has appropriate length by defaulting to 'num'
+        if len(self.var_type) < self.k:
+            self.var_type = ["num"] * self.k  # Corrected to fill with 'num' instead of duplicating
+        # Create masks for each type using numpy vectorized operations
+        var_type_array = np.array(self.var_type)
+        self.num_mask = var_type_array == "num"
+        self.factor_mask = var_type_array == "factor"
+        self.int_mask = var_type_array == "int"
+        self.ordered_mask = np.isin(var_type_array, ["int", "num", "float"])
+
     def get_model_params(self) -> Dict[str, float]:
         """
         Get the model parameters (in addition to sklearn's get_params method).
@@ -210,6 +256,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.X_ = X
         self.y_ = y
         self.n, self.k = self.X_.shape
+        self._set_variable_types()
         if self.n_theta is None:
             self.n_theta = self.k
         # Calculate and store min and max of X
@@ -373,13 +420,13 @@ class Kriging(BaseEstimator, RegressorMixin):
 
             # Calculate the distance matrix using ordered variables
             if self.ordered_mask.any():
-                X_ordered = self.nat_X[:, self.ordered_mask]
+                X_ordered = self.X_[:, self.ordered_mask]
                 D_ordered = squareform(pdist(X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]))
                 Psi += D_ordered
 
             # Add the contribution of factor variables to the distance matrix
             if self.factor_mask.any():
-                X_factor = self.nat_X[:, self.factor_mask]
+                X_factor = self.X_[:, self.factor_mask]
                 D_factor = squareform(pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]))
                 Psi += D_factor
 
@@ -468,12 +515,16 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         n = X.shape[0]
         one = np.ones(n)
-        theta = self.theta
+
+        # Build the correlation matrix Psi (modified in 0.31.0)
+        # theta = self.theta
         # theta is in log scale, so transform it back:
-        theta10 = 10.0**theta
-        p = self.p_val
+        # theta10 = 10.0**theta
+        # p = self.p_val
         # Build correlation matrix (preparation for build_Psi())
-        Psi_upper_triangle = self._kernel(X, theta10, p)
+        # Psi_upper_triangle = self._kernel(X, theta10, p)
+
+        Psi_upper_triangle = self.build_Psi()
 
         Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
 
@@ -538,25 +589,27 @@ class Kriging(BaseEstimator, RegressorMixin):
                 print(f"Control value res: {res}")
         """
         try:
-            self.psi = np.zeros((self.n, 1))
+            n = self.X_.shape[0]
+            psi = np.zeros(n)
             theta10 = np.power(10.0, self.theta)
             if self.n_theta == 1:
                 theta10 = theta10 * np.ones(self.k)
 
-            D = np.zeros(self.n)
+            D = np.zeros(n)
 
             # Compute ordered distance contributions
             if self.ordered_mask.any():
-                X_ordered = self.nat_X[:, self.ordered_mask]
+                X_ordered = self.X_[:, self.ordered_mask]
                 x_ordered = x[self.ordered_mask]
                 D += cdist(x_ordered.reshape(1, -1), X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]).ravel()
             # Compute factor distance contributions
             if self.factor_mask.any():
-                X_factor = self.nat_X[:, self.factor_mask]
+                X_factor = self.X_[:, self.factor_mask]
                 x_factor = x[self.factor_mask]
                 D += cdist(x_factor.reshape(1, -1), X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]).ravel()
 
-            self.psi = np.exp(-D).reshape(-1, 1)
+            psi = np.exp(-D)
+            return psi
 
         except np.linalg.LinAlgError as err:
             print("Building psi failed due to a linear algebra error: %s. Error type: %s", err, type(err))
@@ -610,16 +663,18 @@ class Kriging(BaseEstimator, RegressorMixin):
         resid_tilde = np.linalg.solve(U, resid)
         resid_tilde = np.linalg.solve(U.T, resid_tilde)
 
-        # Build psi (preparation for build_psi_vec())
-        X = self.X_
-        p = self.p_val
-        theta = self.theta
-        # theta is in log scale, so transform it back:
-        theta10 = 10.0**theta
-        psi = np.ones(n)
-        for i in range(n):
-            dist_vec = np.abs(X[i, :] - x) ** p
-            psi[i] = np.exp(-np.sum(theta10 * dist_vec))
+        # Build psi (modified in 0.31.0)
+        # X = self.X_
+        # p = self.p_val
+        # theta = self.theta
+        # # theta is in log scale, so transform it back:
+        # theta10 = 10.0**theta
+        # psi = np.ones(n)
+        # for i in range(n):
+        #     dist_vec = np.abs(X[i, :] - x) ** p
+        #     psi[i] = np.exp(-np.sum(theta10 * dist_vec))
+
+        psi = self.build_psi_vec(x)
 
         # Compute SigmaSqr and SSqr
         if (self.method == "interpolation") or (self.method == "regression"):
