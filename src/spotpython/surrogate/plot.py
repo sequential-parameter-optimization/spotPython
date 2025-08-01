@@ -292,3 +292,70 @@ def plotkd(model, X: np.ndarray, y: np.ndarray, i: int, j: int, show: Optional[b
 
     if show:
         plt.show()
+
+
+def plot_3d_contour(
+    plot_data: dict,
+    var_name=None,
+    i=0,
+    j=1,
+    show=True,
+    filename=None,
+    contour_levels=10,
+    dpi=200,
+    title=None,
+    figsize=(12, 6),
+    tkagg=False,
+) -> None:
+    """
+    Plot the contour and 3D surface using prepared data.
+
+    Args:
+        plot_data (dict): Output from prepare_plot().
+        var_name (list or None): List of variable names, or None.
+        i (int, optional): Index of the first dimension to plot. Default is 0.
+        j (int, optional): Index of the second dimension to plot. Default is 1.
+        show (bool, optional): Whether to display the plot interactively. Default is True.
+        filename (str, optional): If provided, saves the plot to this file. Default is None.
+        contour_levels (int, optional): Number of contour levels. Default is 10.
+        dpi (int, optional): Dots per inch for saved figure. Default is 200.
+        title (str, optional): Title for the plot. Default is None.
+        figsize (tuple, optional): Figure size in inches (width, height). Default is (12, 6).
+        tkagg (bool, optional): If True, use TkAgg backend for matplotlib. Default is False.
+
+    Returns:
+        None
+
+    Examples:
+        >>> plot_data = S.prepare_plot(i=0, j=1)
+        >>> plot__3d_contour(plot_data, var_name=S.var_name, i=0, j=1, title="Surrogate Contour Plot")
+    """
+    import matplotlib
+    import pylab
+
+    X_combined = plot_data["X_combined"]
+    Y_combined = plot_data["Y_combined"]
+    Z_combined = plot_data["Z_combined"]
+    min_z = plot_data["min_z"]
+    max_z = plot_data["max_z"]
+
+    if tkagg:
+        matplotlib.use("TkAgg")
+    fig = pylab.figure(figsize=figsize)
+
+    ax_3d = fig.add_subplot(121, projection="3d")
+    ax_3d.plot_surface(X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
+
+    if var_name is None:
+        ax_3d.set_xlabel(f"x{i}")
+        ax_3d.set_ylabel(f"x{j}")
+    else:
+        ax_3d.set_xlabel(f"x{i}: {var_name[i]}")
+        ax_3d.set_ylabel(f"x{j}: {var_name[j]}")
+
+    ax_contour = fig.add_subplot(122)
+    if title is not None:
+        ax_3d.set_title(title)
+
+    contour = ax_contour.contourf(X_combined, Y_combined, Z_combined, levels=contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
+    pylab.colorbar(contour, ax=ax_contour)

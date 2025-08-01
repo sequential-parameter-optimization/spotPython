@@ -51,6 +51,7 @@ import plotly.graph_objects as go
 from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
 from spotpython.utils.file import load_result
+from spotpython.surrogate.plot import plot_3d_contour
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -187,7 +188,7 @@ class Spot:
                         optimizer_control=optimizer_control)
             spot.run()
             spot.plot_progress()
-            spot.prepare_plot_contour(i=0, j=1)
+            spot.plot_contour(i=0, j=1)
             spot.plot_importance()
     """
 
@@ -2431,8 +2432,7 @@ class Spot:
                     result.append(max_value)
         return result
 
-
-    def prepare_plot_contour(
+    def plot_contour(
         self,
         i=0,
         j=1,
@@ -2482,7 +2482,7 @@ class Spot:
             use_min=use_min,
             use_max=use_max,
         )
-        self.plot_contour(
+        plot_3d_contour(
             plot_data,
             i=i,
             j=j,
@@ -2578,83 +2578,6 @@ class Spot:
             "max_z": max_z,
         }
 
-    def plot_contour(
-        self,
-        plot_data: dict,
-        i=0,
-        j=1,
-        show=True,
-        filename=None,
-        contour_levels=10,
-        dpi=200,
-        title=None,
-        figsize=(12, 6),
-        tkagg=False,
-    ) -> None:
-        """
-        Plot the contour and 3D surface using prepared data.
-
-        Args:
-            plot_data (dict): Output from prepare_plot().
-            i (int, optional): Index of the first dimension to plot. Default is 0.
-            j (int, optional): Index of the second dimension to plot. Default is 1.
-            show (bool, optional): Whether to display the plot interactively. Default is True.
-            filename (str, optional): If provided, saves the plot to this file. Default is None.
-            contour_levels (int, optional): Number of contour levels. Default is 10.
-            dpi (int, optional): Dots per inch for saved figure. Default is 200.
-            title (str, optional): Title for the plot. Default is None.
-            figsize (tuple, optional): Figure size in inches (width, height). Default is (12, 6).
-            tkagg (bool, optional): If True, use TkAgg backend for matplotlib. Default is False.
-
-        Returns:
-            None
-
-        Examples:
-            >>> plot_data = S.prepare_plot(i=0, j=1)
-            >>> S.plot_contour(plot_data, i=0, j=1, title="Surrogate Contour Plot")
-        """
-        X_combined = plot_data["X_combined"]
-        Y_combined = plot_data["Y_combined"]
-        Z_combined = plot_data["Z_combined"]
-        min_z = plot_data["min_z"]
-        max_z = plot_data["max_z"]
-
-        if tkagg:
-            matplotlib.use("TkAgg")
-        fig = pylab.figure(figsize=figsize)
-
-        ax_3d = fig.add_subplot(121, projection="3d")
-        ax_3d.plot_surface(X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
-
-        if self.var_name is None:
-            ax_3d.set_xlabel(f"x{i}")
-            ax_3d.set_ylabel(f"x{j}")
-        else:
-            ax_3d.set_xlabel(f"x{i}: {self.var_name[i]}")
-            ax_3d.set_ylabel(f"x{j}: {self.var_name[j]}")
-
-        ax_contour = fig.add_subplot(122)
-        if title is not None:
-            ax_3d.set_title(title)
-
-        contour = ax_contour.contourf(X_combined, Y_combined, Z_combined, levels=contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
-        pylab.colorbar(contour, ax=ax_contour)
-
-        if self.var_name is None:
-            ax_contour.set_xlabel(f"x{i}")
-            ax_contour.set_ylabel(f"x{j}")
-        else:
-            ax_contour.set_xlabel(f"x{i}: {self.var_name[i]}")
-            ax_contour.set_ylabel(f"x{j}: {self.var_name[j]}")
-
-        if title is not None:
-            ax_contour.set_title(title)
-        if filename:
-            pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0)
-
-        if show:
-            pylab.show()
-
     def plot_important_hyperparameter_contour(
         self,
         threshold=0.0,
@@ -2672,7 +2595,7 @@ class Spot:
     ) -> None:
         """
         Plot the contour of important hyperparameters.
-        Calls `prepare_plot_contour` for each pair of important hyperparameters.
+        Calls `plot_contour` for each pair of important hyperparameters.
         Importance can be specified by the threshold.
 
         Args:
@@ -2759,7 +2682,7 @@ class Spot:
                         filename_full = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
                     else:
                         filename_full = None
-                    self.prepare_plot_contour(
+                    self.plot_contour(
                         i=i,
                         j=j,
                         min_z=min_z,
