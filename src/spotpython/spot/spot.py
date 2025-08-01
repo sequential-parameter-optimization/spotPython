@@ -2448,6 +2448,7 @@ class Spot:
         use_min=False,
         use_max=True,
         tkagg=False,
+        cmap="jet",
     ) -> None:
         """
         Plot the contour and 3D surface for any pair of dimensions of the surrogate model.
@@ -2471,11 +2472,12 @@ class Spot:
             use_min (bool, optional): If True, fix hidden dimensions to their minimum values. Default is False.
             use_max (bool, optional): If True, fix hidden dimensions to their maximum values. Default is True.
             tkagg (bool, optional): If True, use TkAgg backend for matplotlib. Default is False.
+            cmap (str, optional): Colormap to use for the contour plot. Default is "jet".
 
         Returns:
             None
         """
-        plot_data = self.prepare_plot(
+        X, Y, Z = self.prepare_plot(
             i=i,
             j=j,
             n_grid=n_grid,
@@ -2483,7 +2485,12 @@ class Spot:
             use_max=use_max,
         )
         plot_3d_contour(
-            plot_data,
+            X=X,
+            Y=Y,
+            Z=Z,
+            vmin=min_z if min_z is not None else np.min(Z),
+            vmax=max_z if max_z is not None else np.max(Z),
+            var_name=self.var_name,
             i=i,
             j=j,
             show=show,
@@ -2493,6 +2500,7 @@ class Spot:
             title=title,
             figsize=figsize,
             tkagg=tkagg,
+            cmap=cmap,
         )
 
     def prepare_plot(
@@ -2523,7 +2531,7 @@ class Spot:
         def generate_mesh_grid(lower, upper, grid_points):
             x = np.linspace(lower[i], upper[i], num=grid_points)
             y = np.linspace(lower[j], upper[j], num=grid_points)
-            return np.meshgrid(x, y), x, y
+            return np.meshgrid(x, y)
 
         def validate_types(var_type, lower, upper):
             if var_type is not None:
@@ -2540,7 +2548,7 @@ class Spot:
             Z = np.array(predictions).reshape(X.shape)
             return Z
 
-        (X, Y), x, y = generate_mesh_grid(self.lower, self.upper, n_grid)
+        (X, Y) = generate_mesh_grid(self.lower, self.upper, n_grid)
         validate_types(self.var_type, self.lower, self.upper)
 
         z00 = np.array([self.lower, self.upper])
@@ -2567,16 +2575,7 @@ class Spot:
         else:
             raise ValueError("No data to plot.")
 
-        min_z = np.min(Z_combined)
-        max_z = np.max(Z_combined)
-
-        return {
-            "X_combined": X_combined,
-            "Y_combined": Y_combined,
-            "Z_combined": Z_combined,
-            "min_z": min_z,
-            "max_z": max_z,
-        }
+        return X_combined, Y_combined, Z_combined
 
     def plot_important_hyperparameter_contour(
         self,
