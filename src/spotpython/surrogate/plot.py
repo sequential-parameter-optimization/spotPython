@@ -132,17 +132,7 @@ def plot2d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True, alp
         plt.show()
 
 
-def plotkd(
-    model,
-    X: np.ndarray,
-    y: np.ndarray,
-    i: int,
-    j: int,
-    show: Optional[bool] = True,
-    alpha=0.8,
-    eps=1e-3,
-    var_names: Optional[List[str]] = None,
-) -> None:
+def plotkd(model, X: np.ndarray, y: np.ndarray, i: int, j: int, show: Optional[bool] = True, alpha=0.8, eps=1e-3, var_names: Optional[List[str]] = None, cmap="jet") -> None:
     """
     Plots the Kriging surrogate model for k-dimensional input data by varying two dimensions (i, j).
 
@@ -158,6 +148,7 @@ def plotkd(
         var_names (List[str], optional): A list of three strings for axis labels.
             The first entry is for the x-axis, the second for the y-axis, and the third for the z-axis.
             If empty or None, default axis labels are used.
+        cmap (str): Colormap for the surface plots. Defaults to "jet".
 
     Returns:
         None
@@ -209,7 +200,7 @@ def plotkd(
 
     # Plot predicted values
     ax1 = fig.add_subplot(221, projection="3d")
-    ax1.plot_surface(X_i, X_j, Z_pred, cmap="viridis", alpha=alpha)
+    ax1.plot_surface(X_i, X_j, Z_pred, cmap=cmap, alpha=alpha)
     ax1.set_title("Prediction Surface")
     ax1.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
     ax1.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
@@ -233,7 +224,7 @@ def plotkd(
 
     # Plot prediction error
     ax2 = fig.add_subplot(222, projection="3d")
-    ax2.plot_surface(X_i, X_j, Z_std, cmap="viridis", alpha=alpha)
+    ax2.plot_surface(X_i, X_j, Z_std, cmap=cmap, alpha=alpha)
     ax2.set_title("Prediction Error Surface")
     ax2.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
     ax2.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
@@ -257,7 +248,7 @@ def plotkd(
 
     # Contour plot of predicted values
     ax3 = fig.add_subplot(223)
-    contour = ax3.contourf(X_i, X_j, Z_pred, cmap="viridis", levels=30)
+    contour = ax3.contourf(X_i, X_j, Z_pred, cmap=cmap, levels=30)
     plt.colorbar(contour, ax=ax3)
     for idx in range(X.shape[0]):
         x_point = X[idx, i]
@@ -279,7 +270,7 @@ def plotkd(
 
     # Contour plot of prediction error
     ax4 = fig.add_subplot(224)
-    contour = ax4.contourf(X_i, X_j, Z_std, cmap="viridis", levels=30)
+    contour = ax4.contourf(X_i, X_j, Z_std, cmap=cmap, levels=30)
     plt.colorbar(contour, ax=ax4)
     for idx in range(X.shape[0]):
         x_point = X[idx, i]

@@ -187,7 +187,7 @@ class Spot:
                         optimizer_control=optimizer_control)
             spot.run()
             spot.plot_progress()
-            spot.plot_contour(i=0, j=1)
+            spot.prepare_plot_contour(i=0, j=1)
             spot.plot_importance()
     """
 
@@ -2431,63 +2431,114 @@ class Spot:
                     result.append(max_value)
         return result
 
-    def plot_contour(
+
+    def prepare_plot_contour(
         self,
         i=0,
         j=1,
         min_z=None,
         max_z=None,
         show=True,
+        title=None,
         filename=None,
         n_grid=50,
         contour_levels=10,
         dpi=200,
-        title="",
-        figsize=(12, 6),
+        figsize=(12, 5),
         use_min=False,
         use_max=True,
         tkagg=False,
     ) -> None:
-        """Plot the contour of any dimension."""
+        """
+        Plot the contour and 3D surface for any pair of dimensions of the surrogate model.
+        This method visualizes the surrogate model's predictions over a grid for two selected dimensions.
+        It creates both a filled contour plot and a 3D surface plot, allowing users to inspect the surrogate's
+        response surface. The remaining dimensions are fixed to either their minimum or maximum values, depending
+        on the `use_min` and `use_max` flags.
+
+        Args:
+            i (int, optional): Index of the first dimension to plot. Default is 0.
+            j (int, optional): Index of the second dimension to plot. Default is 1.
+            min_z (float, optional): Minimum value for the color scale (z-axis). If None, determined automatically.
+            max_z (float, optional): Maximum value for the color scale (z-axis). If None, determined automatically.
+            show (bool, optional): Whether to display the plot interactively. Default is True.
+            filename (str, optional): If provided, saves the plot to this file. Default is None.
+            n_grid (int, optional): Number of grid points per dimension. Default is 50.
+            contour_levels (int, optional): Number of contour levels. Default is 10.
+            dpi (int, optional): Dots per inch for saved figure. Default is 200.
+            title (str, optional): Title for the plot. Default is None.
+            figsize (tuple, optional): Figure size in inches (width, height). Default is (12, 6).
+            use_min (bool, optional): If True, fix hidden dimensions to their minimum values. Default is False.
+            use_max (bool, optional): If True, fix hidden dimensions to their maximum values. Default is True.
+            tkagg (bool, optional): If True, use TkAgg backend for matplotlib. Default is False.
+
+        Returns:
+            None
+        """
+        plot_data = self.prepare_plot(
+            i=i,
+            j=j,
+            n_grid=n_grid,
+            use_min=use_min,
+            use_max=use_max,
+        )
+        self.plot_contour(
+            plot_data,
+            i=i,
+            j=j,
+            show=show,
+            filename=filename,
+            contour_levels=contour_levels,
+            dpi=dpi,
+            title=title,
+            figsize=figsize,
+            tkagg=tkagg,
+        )
+
+    def prepare_plot(
+        self,
+        i=0,
+        j=1,
+        n_grid=50,
+        use_min=False,
+        use_max=True,
+    ) -> dict:
+        """
+        Prepare mesh grid and surrogate predictions for contour and 3D surface plotting.
+
+        Args:
+            i (int, optional): Index of the first dimension to plot. Default is 0.
+            j (int, optional): Index of the second dimension to plot. Default is 1.
+            n_grid (int, optional): Number of grid points per dimension. Default is 50.
+            use_min (bool, optional): If True, fix hidden dimensions to their minimum values. Default is False.
+            use_max (bool, optional): If True, fix hidden dimensions to their maximum values. Default is True.
+
+        Returns:
+            dict: Dictionary containing X_combined, Y_combined, Z_combined, min_z, max_z.
+
+        Examples:
+            >>> plot_data = S.prepare_plot(i=0, j=1)
+        """
 
         def generate_mesh_grid(lower, upper, grid_points):
-            """Generate a mesh grid for the given range."""
             x = np.linspace(lower[i], upper[i], num=grid_points)
             y = np.linspace(lower[j], upper[j], num=grid_points)
             return np.meshgrid(x, y), x, y
 
         def validate_types(var_type, lower, upper):
-            """Validate if the dimensions of var_type, lower, and upper are the same."""
             if var_type is not None:
                 if len(var_type) != len(lower) or len(var_type) != len(upper):
                     raise ValueError("The dimensions of var_type, lower, and upper must be the same.")
 
-        def setup_plot():
-            """Setup the plot with specified figure size."""
-            fig = pylab.figure(figsize=figsize)
-            return fig
-
         def predict_contour_values(X, Y, z0):
-            """Predict contour values based on the surrogate model."""
             grid_points = np.c_[np.ravel(X), np.ravel(Y)]
             predictions = []
-
             for x, y in grid_points:
                 adjusted_z0 = self.chg(x, y, z0.copy(), i, j)
                 prediction = self.surrogate.predict(np.array([adjusted_z0]))
                 predictions.append(prediction[0])
-
             Z = np.array(predictions).reshape(X.shape)
             return Z
-
-        def plot_contour_subplots(X, Y, Z, ax, min_z, max_z, contour_levels):
-            """Plot the contour and 3D surface subplots."""
-            contour = ax.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
-            pylab.colorbar(contour, ax=ax)
-
-        if tkagg:
-            matplotlib.use("TkAgg")
-        fig = setup_plot()
 
         (X, Y), x, y = generate_mesh_grid(self.lower, self.upper, n_grid)
         validate_types(self.var_type, self.lower, self.upper)
@@ -2509,27 +2560,70 @@ class Spot:
             X_list.append(X)
             Y_list.append(Y)
 
-        if Z_list:  # Ensure that there is at least one Z to stack
+        if Z_list:
             Z_combined = np.vstack(Z_list)
             X_combined = np.vstack(X_list)
             Y_combined = np.vstack(Y_list)
-
-        if min_z is None:
-            min_z = np.min(Z_combined)
-        if max_z is None:
-            max_z = np.max(Z_combined)
-
-        ax_contour = fig.add_subplot(221)
-        plot_contour_subplots(X_combined, Y_combined, Z_combined, ax_contour, min_z, max_z, contour_levels)
-
-        if self.var_name is None:
-            ax_contour.set_xlabel(f"x{i}")
-            ax_contour.set_ylabel(f"x{j}")
         else:
-            ax_contour.set_xlabel(f"x{i}: {self.var_name[i]}")
-            ax_contour.set_ylabel(f"x{j}: {self.var_name[j]}")
+            raise ValueError("No data to plot.")
 
-        ax_3d = fig.add_subplot(222, projection="3d")
+        min_z = np.min(Z_combined)
+        max_z = np.max(Z_combined)
+
+        return {
+            "X_combined": X_combined,
+            "Y_combined": Y_combined,
+            "Z_combined": Z_combined,
+            "min_z": min_z,
+            "max_z": max_z,
+        }
+
+    def plot_contour(
+        self,
+        plot_data: dict,
+        i=0,
+        j=1,
+        show=True,
+        filename=None,
+        contour_levels=10,
+        dpi=200,
+        title=None,
+        figsize=(12, 6),
+        tkagg=False,
+    ) -> None:
+        """
+        Plot the contour and 3D surface using prepared data.
+
+        Args:
+            plot_data (dict): Output from prepare_plot().
+            i (int, optional): Index of the first dimension to plot. Default is 0.
+            j (int, optional): Index of the second dimension to plot. Default is 1.
+            show (bool, optional): Whether to display the plot interactively. Default is True.
+            filename (str, optional): If provided, saves the plot to this file. Default is None.
+            contour_levels (int, optional): Number of contour levels. Default is 10.
+            dpi (int, optional): Dots per inch for saved figure. Default is 200.
+            title (str, optional): Title for the plot. Default is None.
+            figsize (tuple, optional): Figure size in inches (width, height). Default is (12, 6).
+            tkagg (bool, optional): If True, use TkAgg backend for matplotlib. Default is False.
+
+        Returns:
+            None
+
+        Examples:
+            >>> plot_data = S.prepare_plot(i=0, j=1)
+            >>> S.plot_contour(plot_data, i=0, j=1, title="Surrogate Contour Plot")
+        """
+        X_combined = plot_data["X_combined"]
+        Y_combined = plot_data["Y_combined"]
+        Z_combined = plot_data["Z_combined"]
+        min_z = plot_data["min_z"]
+        max_z = plot_data["max_z"]
+
+        if tkagg:
+            matplotlib.use("TkAgg")
+        fig = pylab.figure(figsize=figsize)
+
+        ax_3d = fig.add_subplot(121, projection="3d")
         ax_3d.plot_surface(X_combined, Y_combined, Z_combined, rstride=3, cstride=3, alpha=0.9, cmap="jet", vmin=min_z, vmax=max_z)
 
         if self.var_name is None:
@@ -2539,8 +2633,22 @@ class Spot:
             ax_3d.set_xlabel(f"x{i}: {self.var_name[i]}")
             ax_3d.set_ylabel(f"x{j}: {self.var_name[j]}")
 
-        plt.title(title)
+        ax_contour = fig.add_subplot(122)
+        if title is not None:
+            ax_3d.set_title(title)
 
+        contour = ax_contour.contourf(X_combined, Y_combined, Z_combined, levels=contour_levels, zorder=1, cmap="jet", vmin=min_z, vmax=max_z)
+        pylab.colorbar(contour, ax=ax_contour)
+
+        if self.var_name is None:
+            ax_contour.set_xlabel(f"x{i}")
+            ax_contour.set_ylabel(f"x{j}")
+        else:
+            ax_contour.set_xlabel(f"x{i}: {self.var_name[i]}")
+            ax_contour.set_ylabel(f"x{j}: {self.var_name[j]}")
+
+        if title is not None:
+            ax_contour.set_title(title)
         if filename:
             pylab.savefig(filename, bbox_inches="tight", dpi=dpi, pad_inches=0)
 
@@ -2564,7 +2672,7 @@ class Spot:
     ) -> None:
         """
         Plot the contour of important hyperparameters.
-        Calls `plot_contour` for each pair of important hyperparameters.
+        Calls `prepare_plot_contour` for each pair of important hyperparameters.
         Importance can be specified by the threshold.
 
         Args:
@@ -2651,7 +2759,7 @@ class Spot:
                         filename_full = filename + "_contour_" + str(i) + "_" + str(j) + ".png"
                     else:
                         filename_full = None
-                    self.plot_contour(
+                    self.prepare_plot_contour(
                         i=i,
                         j=j,
                         min_z=min_z,
