@@ -9,6 +9,7 @@ from numpy import linspace, meshgrid, array, append
 import pylab
 from numpy import ravel
 from scipy.spatial.distance import cdist, pdist, squareform
+from spotpython.surrogate.plot import plotkd
 
 
 class Kriging(BaseEstimator, RegressorMixin):
@@ -732,7 +733,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         result = differential_evolution(objective, bounds)
         return result.x, result.fun
 
-    def plot(self, show: Optional[bool] = True) -> None:
+    def plot(self, i: int = 0, j: int = 1, show: Optional[bool] = True) -> None:
         """
         This function plots 1D and 2D surrogates.
         Only for compatibility with the old Kriging implementation.
@@ -740,6 +741,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         Args:
             self (object):
                 The Kriging object.
+            i (int):
+                The index of the first variable to plot.
+            j (int):
+                The index of the second variable to plot.
             show (bool):
                 If `True`, the plots are displayed.
                 If `False`, `plt.show()` should be called outside this function.
@@ -793,43 +798,5 @@ class Kriging(BaseEstimator, RegressorMixin):
             plt.plot(x, y, "k")
             if show:
                 plt.show()
-
-        if self.k == 2:
-            fig = pylab.figure(figsize=(9, 6))
-            n_grid = 100
-            x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
-            y = linspace(self.min_X[1], self.max_X[1], num=n_grid)
-            X, Y = meshgrid(x, y)
-            # Predict based on the optimized results
-            zz = array([self.predict(array([x, y]), return_val="all") for x, y in zip(ravel(X), ravel(Y))])
-            zs = zz[:, 0, :]
-            zse = zz[:, 1, :]
-            Z = zs.reshape(X.shape)
-            Ze = zse.reshape(X.shape)
-
-            nat_point_X = self.X_[:, 0]
-            nat_point_Y = self.X_[:, 1]
-            contour_levels = 30
-            ax = fig.add_subplot(224)
-            # plot predicted values:
-            pylab.contourf(X, Y, Ze, contour_levels, cmap="jet")
-            pylab.title("Error")
-            pylab.colorbar()
-            # plot observed points:
-            pylab.plot(nat_point_X, nat_point_Y, "ow")
-            #
-            ax = fig.add_subplot(223)
-            # plot predicted values:
-            plt.contourf(X, Y, Z, contour_levels, zorder=1, cmap="jet")
-            plt.title("Surrogate")
-            # plot observed points:
-            pylab.plot(nat_point_X, nat_point_Y, "ow", zorder=3)
-            pylab.colorbar()
-            #
-            ax = fig.add_subplot(221, projection="3d")
-            ax.plot_surface(X, Y, Z, rstride=3, cstride=3, alpha=0.9, cmap="jet")
-            #
-            ax = fig.add_subplot(222, projection="3d")
-            ax.plot_surface(X, Y, Ze, rstride=3, cstride=3, alpha=0.9, cmap="jet")
-            #
-            pylab.show()
+        else:
+            plotkd(model=self, X=self.X_, y=self.y_, i=i, j=j, show=show)
