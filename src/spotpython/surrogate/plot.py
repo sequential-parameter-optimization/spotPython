@@ -134,14 +134,67 @@ def error_color(z_actual: float, z_predicted: float, eps: float = 1e-4, max_erro
     return f"#{grey:02x}{grey:02x}{grey:02x}"
 
 
-def plot_3d_surface(
-    ax: "matplotlib.axes.Axes",
+def plot_error_points(
+    ax,
     X: np.ndarray,
     y: np.ndarray,
     model,
     i: int,
     j: int,
+    eps: float = 1e-4,
+    max_error: float = 1e-3,
+    var_names: Optional[List[str]] = None,
+    title: Optional[str] = None,
+    z_mode: str = "actual",  # "actual", "error", or None
+) -> None:
+    """
+    Scatter input points colored by prediction error.
+
+    Args:
+        ax (matplotlib.axes.Axes): The matplotlib axis to plot on.
+        X (np.ndarray): Input data, shape (n_samples, k).
+        y (np.ndarray): Target values, shape (n_samples,).
+        model (object): Fitted model with predict().
+        i (int): Index of first varied dimension.
+        j (int): Index of second varied dimension.
+        eps (float): Tolerance for coloring points based on prediction error.
+        max_error (float): Maximum error for color scaling.
+        var_names (list of str or None): List of axis labels or None.
+        title (str or None): Title for the plot.
+        z_mode (str): "actual" for z_actual (for 3D), "error" for abs error (for 3D error surface), or None (for 2D).
+    """
+    n, k = X.shape
+    check_ij(i, j, k)
+    for idx in range(n):
+        x_point = X[idx, i]
+        y_point_ = X[idx, j]
+        z_actual = y[idx]
+        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
+        color = error_color(z_actual, z_predicted, eps, max_error)
+        if z_mode == "actual":
+            ax.scatter(x_point, y_point_, z_actual, color=color, s=50, edgecolor="black")
+        elif z_mode == "error":
+            ax.scatter(x_point, y_point_, abs(z_actual - z_predicted), color=color, s=50, edgecolor="black")
+        else:
+            ax.scatter(x_point, y_point_, color=color, s=50, edgecolor="black")
+    if title is not None:
+        ax.set_title(title)
+    if var_names is not None:
+        ax.set_xlabel(var_names[0])
+        ax.set_ylabel(var_names[1])
+    else:
+        ax.set_xlabel(f"Dimension {i}")
+        ax.set_ylabel(f"Dimension {j}")
+
+
+def plot_3d_surface(
     Z,
+    i: int,
+    j: int,
+    ax: "matplotlib.axes.Axes",
+    X: np.ndarray = None,
+    y: np.ndarray = None,
+    model=None,
     surface_label: str = "Prediction Surface",
     zlabel: str = "Prediction",
     var_names: Optional[List[str]] = None,
@@ -150,18 +203,19 @@ def plot_3d_surface(
     max_error: float = 1e-3,
     cmap: str = "jet",
     error_surface: bool = False,
+    add_points: bool = False,
 ) -> None:
     """
     Plot a 3D surface and scatter input points, colored by prediction error.
 
     Args:
+        Z (tuple or np.ndarray): Surface values to plot, shape matching meshgrid.
+        i (int): Index of first varied dimension.
+        j (int): Index of second varied dimension.
         ax (matplotlib.axes.Axes): Matplotlib 3D axis.
         X (np.ndarray): Input data, shape (n_samples, k).
         y (np.ndarray): Target values, shape (n_samples,).
         model (object): Fitted model with predict().
-        i (int): Index of first varied dimension.
-        j (int): Index of second varied dimension.
-        Z (tuple or np.ndarray): Surface values to plot, shape matching meshgrid.
         surface_label (str): Title for the surface.
         zlabel (str): Label for the z-axis.
         var_names (list of str or None): List of axis labels or None.
@@ -170,6 +224,7 @@ def plot_3d_surface(
         max_error (float): Maximum error for color scaling.
         cmap (str): Colormap for the surface.
         error_surface (bool): If True, scatter z is abs(y_actual - y_predicted).
+        add_points (bool): If True, adds scatter points to the surface plot.
 
     Returns:
         None
@@ -179,71 +234,70 @@ def plot_3d_surface(
     ax.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
     ax.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
     ax.set_zlabel(var_names[2] if var_names else zlabel)
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-        if error_surface:
-            z_scatter = abs(z_actual - z_predicted)
-        else:
-            z_scatter = z_actual
-        color = error_color(z_actual, z_predicted, eps, max_error)
-        ax.scatter(x_point, y_point, z_scatter, color=color, s=50, edgecolor="black")
+    if add_points and X is not None and y is not None and model is not None:
+        plot_error_points(ax, X, y, model, i, j, eps, max_error, var_names, z_mode="error" if error_surface else "actual")
 
 
 def plot_contour(
-    ax,
     X_i: np.ndarray,
     X_j: np.ndarray,
     Z: np.ndarray,
-    X: np.ndarray,
-    y: np.ndarray,
-    model,
     i: int,
     j: int,
+    ax: "matplotlib.axes.Axes",
+    X: np.ndarray = None,
+    y: np.ndarray = None,
+    model=None,
     eps: float = 1e-4,
     max_error: float = 1e-3,
     var_names: Optional[List[str]] = None,
     cmap: str = "jet",
     levels: int = 30,
     title: str = "Prediction Contour",
+    add_points: bool = False,
 ) -> None:
     """
     Plot a filled contour plot with scatter points colored by prediction error.
 
     Args:
-        ax (matplotlib.axes.Axes): The matplotlib axis to plot on.
         X_i (np.ndarray): Meshgrid for the i-th dimension.
         X_j (np.ndarray): Meshgrid for the j-th dimension.
         Z (np.ndarray): Contour values (predicted or error), shape matching meshgrid.
+        i (int): Index of first varied dimension.
+        j (int): Index of second varied dimension.
+        ax (matplotlib.axes.Axes): The matplotlib axis to plot on.
         X (np.ndarray): Input data, shape (n_samples, k).
         y (np.ndarray): Target values, shape (n_samples,).
         model (object): Fitted model with predict().
-        i (int): Index of first varied dimension.
-        j (int): Index of second varied dimension.
         eps (float): Tolerance for coloring points based on prediction error.
         max_error (float): Maximum error for color scaling.
         var_names (list of str or None): List of axis labels or None.
         cmap (str): Colormap for the contour plot.
         levels (int): Number of contour levels.
         title (str): Title for the plot.
+        add_points (bool): If True, adds scatter points to the contour plot.
 
     Returns:
         None
     """
     contour = ax.contourf(X_i, X_j, Z, cmap=cmap, levels=levels)
     plt.colorbar(contour, ax=ax)
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-        color = error_color(z_actual, z_predicted, eps, max_error)
-        ax.scatter(x_point, y_point, color=color, s=50, edgecolor="black")
-    ax.set_title(title)
-    ax.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
+    if add_points and X is not None and y is not None and model is not None:
+        plot_error_points(ax, X, y, model, i, j, eps, max_error, var_names, title, z_mode=None)
+
+
+def check_ij(i: int, j: int, k: int) -> None:
+    """
+    Check if indices i and j are valid for the number of features k.
+    Args:
+        i (int): Index of the first dimension.
+        j (int): Index of the second dimension.
+        k (int): Total number of features.
+    """
+    if i >= k or j >= k:
+        raise ValueError(f"Dimensions i and j must be less than the number of features (k={k}).")
+    if i == j:
+        raise ValueError("Dimensions i and j must be different.")
 
 
 def plotkd(
@@ -291,11 +345,7 @@ def plotkd(
 
     """
     k = X.shape[1]
-    if i >= k or j >= k:
-        raise ValueError(f"Dimensions i and j must be less than the number of features (k={k}).")
-    if i == j:
-        raise ValueError("Dimensions i and j must be different.")
-
+    check_ij(i, j, k)
     X_i, X_j, grid_points = generate_mesh_grid(X, i, j, n_grid)
 
     # Predict the values and standard deviations
@@ -308,13 +358,13 @@ def plotkd(
     # Plot predicted values
     ax1 = fig.add_subplot(221, projection="3d")
     plot_3d_surface(
+        (X_i, X_j, Z_pred),
+        i,
+        j,
         ax1,
         X,
         y,
         model,
-        i,
-        j,
-        (X_i, X_j, Z_pred),
         surface_label="Prediction Surface",
         zlabel="Prediction",
         var_names=var_names,
@@ -328,13 +378,13 @@ def plotkd(
     # Plot prediction error
     ax2 = fig.add_subplot(222, projection="3d")
     plot_3d_surface(
+        (X_i, X_j, Z_std),
+        i,
+        j,
         ax2,
         X,
         y,
         model,
-        i,
-        j,
-        (X_i, X_j, Z_std),
         surface_label="Prediction Error Surface",
         zlabel="Error",
         var_names=var_names,
@@ -348,15 +398,15 @@ def plotkd(
     # Contour plot of predicted values
     ax3 = fig.add_subplot(223)
     plot_contour(
-        ax3,
         X_i,
         X_j,
         Z_pred,
+        i,
+        j,
+        ax3,
         X,
         y,
         model,
-        i,
-        j,
         eps=eps,
         max_error=max_error,
         var_names=var_names,
@@ -368,15 +418,15 @@ def plotkd(
     # Contour plot of prediction error
     ax4 = fig.add_subplot(224)
     plot_contour(
-        ax4,
         X_i,
         X_j,
         Z_std,
+        i,
+        j,
+        ax4,
         X,
         y,
         model,
-        i,
-        j,
         eps=eps,
         max_error=max_error,
         var_names=var_names,
