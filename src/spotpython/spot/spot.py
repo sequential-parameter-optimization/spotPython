@@ -51,7 +51,7 @@ import plotly.graph_objects as go
 from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
 from spotpython.utils.file import load_result
-from spotpython.surrogate.plot import plot_3d_contour
+from spotpython.surrogate.plot import plot_3d_contour, plotkd
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -2432,7 +2432,111 @@ class Spot:
                     result.append(max_value)
         return result
 
+    def prepare_plot(
+        self,
+        i=0,
+        j=1,
+        n_grid=50,
+        use_min=False,
+        use_max=True,
+    ) -> dict:
+        """
+        Prepare mesh grid and surrogate predictions for contour and 3D surface plotting.
+
+        Args:
+            i (int, optional): Index of the first dimension to plot. Default is 0.
+            j (int, optional): Index of the second dimension to plot. Default is 1.
+            n_grid (int, optional): Number of grid points per dimension. Default is 50.
+            use_min (bool, optional): If True, fix hidden dimensions to their minimum values. Default is False.
+            use_max (bool, optional): If True, fix hidden dimensions to their maximum values. Default is True.
+
+        Returns:
+            (tuple): A tuple containing:
+                - X (numpy.ndarray): Mesh grid for the first dimension.
+                - Y (numpy.ndarray): Mesh grid for the second dimension.
+                - Z (numpy.ndarray): Surrogate predictions over the grid.
+
+        Examples:
+            >>> plot_data = S.prepare_plot(i=0, j=1)
+        """
+
+        def generate_mesh_grid(lower, upper, grid_points):
+            x = np.linspace(lower[i], upper[i], num=grid_points)
+            y = np.linspace(lower[j], upper[j], num=grid_points)
+            return np.meshgrid(x, y)
+
+        def validate_types(var_type, lower, upper):
+            if var_type is not None:
+                if len(var_type) != len(lower) or len(var_type) != len(upper):
+                    raise ValueError("The dimensions of var_type, lower, and upper must be the same.")
+
+        def predict_contour_values(X, Y, z0):
+            grid_points = np.c_[np.ravel(X), np.ravel(Y)]
+            predictions = []
+            for x, y in grid_points:
+                adjusted_z0 = self.chg(x, y, z0.copy(), i, j)
+                prediction = self.surrogate.predict(np.array([adjusted_z0]))
+                predictions.append(prediction[0])
+            Z = np.array(predictions).reshape(X.shape)
+            return Z
+
+        (X, Y) = generate_mesh_grid(self.lower, self.upper, n_grid)
+        validate_types(self.var_type, self.lower, self.upper)
+
+        z00 = np.array([self.lower, self.upper])
+        Z_list, X_list, Y_list = [], [], []
+
+        if use_min:
+            z0_min = self.process_z00(z00, use_min=True)
+            Z_min = predict_contour_values(X, Y, z0_min)
+            Z_list.append(Z_min)
+            X_list.append(X)
+            Y_list.append(Y)
+
+        if use_max:
+            z0_max = self.process_z00(z00, use_min=False)
+            Z_max = predict_contour_values(X, Y, z0_max)
+            Z_list.append(Z_max)
+            X_list.append(X)
+            Y_list.append(Y)
+
+        if Z_list:
+            Z_combined = np.vstack(Z_list)
+            X_combined = np.vstack(X_list)
+            Y_combined = np.vstack(Y_list)
+        else:
+            raise ValueError("No data to plot.")
+
+        return X_combined, Y_combined, Z_combined
+
     def plot_contour(
+        self,
+        i=0,
+        j=1,
+        min_z=None,
+        max_z=None,
+        show=True,
+        title=None,
+        filename=None,
+        n_grid=50,
+        contour_levels=10,
+        dpi=200,
+        figsize=(12, 5),
+        use_min=False,
+        use_max=True,
+        tkagg=False,
+        cmap="jet",
+    ) -> None:
+        """
+        Plot the contour and 3D surface for any pair of dimensions of the surrogate model.
+        This method visualizes the surrogate model's predictions over a grid for two selected dimensions.
+        It creates both a filled contour plot and a 3D surface plot, allowing users to inspect the surrogate's
+        response surface. The remaining dimensions are fixed to either their minimum or maximum values, depending
+        on the `use_min` and `use_max` flags.
+        """
+        plotkd(model=self.surrogate, X=self.X, y=self.y, i=i, j=j, num=n_grid)
+
+    def plot_contour_old(
         self,
         i=0,
         j=1,
@@ -2502,80 +2606,6 @@ class Spot:
             tkagg=tkagg,
             cmap=cmap,
         )
-
-    def prepare_plot(
-        self,
-        i=0,
-        j=1,
-        n_grid=50,
-        use_min=False,
-        use_max=True,
-    ) -> dict:
-        """
-        Prepare mesh grid and surrogate predictions for contour and 3D surface plotting.
-
-        Args:
-            i (int, optional): Index of the first dimension to plot. Default is 0.
-            j (int, optional): Index of the second dimension to plot. Default is 1.
-            n_grid (int, optional): Number of grid points per dimension. Default is 50.
-            use_min (bool, optional): If True, fix hidden dimensions to their minimum values. Default is False.
-            use_max (bool, optional): If True, fix hidden dimensions to their maximum values. Default is True.
-
-        Returns:
-            dict: Dictionary containing X_combined, Y_combined, Z_combined, min_z, max_z.
-
-        Examples:
-            >>> plot_data = S.prepare_plot(i=0, j=1)
-        """
-
-        def generate_mesh_grid(lower, upper, grid_points):
-            x = np.linspace(lower[i], upper[i], num=grid_points)
-            y = np.linspace(lower[j], upper[j], num=grid_points)
-            return np.meshgrid(x, y)
-
-        def validate_types(var_type, lower, upper):
-            if var_type is not None:
-                if len(var_type) != len(lower) or len(var_type) != len(upper):
-                    raise ValueError("The dimensions of var_type, lower, and upper must be the same.")
-
-        def predict_contour_values(X, Y, z0):
-            grid_points = np.c_[np.ravel(X), np.ravel(Y)]
-            predictions = []
-            for x, y in grid_points:
-                adjusted_z0 = self.chg(x, y, z0.copy(), i, j)
-                prediction = self.surrogate.predict(np.array([adjusted_z0]))
-                predictions.append(prediction[0])
-            Z = np.array(predictions).reshape(X.shape)
-            return Z
-
-        (X, Y) = generate_mesh_grid(self.lower, self.upper, n_grid)
-        validate_types(self.var_type, self.lower, self.upper)
-
-        z00 = np.array([self.lower, self.upper])
-        Z_list, X_list, Y_list = [], [], []
-
-        if use_min:
-            z0_min = self.process_z00(z00, use_min=True)
-            Z_min = predict_contour_values(X, Y, z0_min)
-            Z_list.append(Z_min)
-            X_list.append(X)
-            Y_list.append(Y)
-
-        if use_max:
-            z0_max = self.process_z00(z00, use_min=False)
-            Z_max = predict_contour_values(X, Y, z0_max)
-            Z_list.append(Z_max)
-            X_list.append(X)
-            Y_list.append(Y)
-
-        if Z_list:
-            Z_combined = np.vstack(Z_list)
-            X_combined = np.vstack(X_list)
-            Y_combined = np.vstack(Y_list)
-        else:
-            raise ValueError("No data to plot.")
-
-        return X_combined, Y_combined, Z_combined
 
     def plot_important_hyperparameter_contour(
         self,

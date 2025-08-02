@@ -34,8 +34,8 @@ def plot1d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True) -> 
         raise ValueError("plot1d is only supported for 1D input data.")
 
     _ = plt.figure(figsize=(9, 6))
-    n_grid = 100
-    x = linspace(X[:, 0].min(), X[:, 0].max(), num=n_grid).reshape(-1, 1)
+    num = 100
+    x = linspace(X[:, 0].min(), X[:, 0].max(), num=num).reshape(-1, 1)
     y_pred, y_std = model.predict(x, return_std=True)
 
     plt.plot(x, y_pred, "k", label="Prediction")
@@ -55,30 +55,47 @@ def plot1d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True) -> 
         plt.show()
 
 
-def generate_mesh_grid(X: np.ndarray, i: int, j: int, n_grid: int = 100):
+def generate_mesh_grid(
+    X: Optional[np.ndarray] = None,
+    i: int = 0,
+    j: int = 1,
+    num: int = 100,
+    lower: Optional[np.ndarray] = None,
+    upper: Optional[np.ndarray] = None,
+):
     """
-    Generate a mesh grid for two selected dimensions of X, and fill the remaining dimensions with their mean values.
+    Generate a mesh grid for two selected dimensions, filling remaining dimensions with their mean values
+    (if X is given) or the mean of the lower and upper bound (if lower and upper are given).
 
     Args:
-        X (np.ndarray): Input data of shape (n_samples, k).
+        X (np.ndarray, optional): Input data of shape (n_samples, k). Required if lower/upper are not given.
         i (int): Index of the first dimension to vary.
         j (int): Index of the second dimension to vary.
-        n_grid (int): Number of grid points per dimension.
+        num (int): Number of grid points per dimension.
+        lower (np.ndarray, optional): Lower bounds for each dimension (shape (k,)).
+        upper (np.ndarray, optional): Upper bounds for each dimension (shape (k,)).
 
     Returns:
         X_i (np.ndarray): Meshgrid for the i-th dimension.
         X_j (np.ndarray): Meshgrid for the j-th dimension.
-        grid_points (np.ndarray): Grid points of shape (n_grid*n_grid, k) for prediction.
+        grid_points (np.ndarray): Grid points of shape (num*num, k) for prediction.
     """
-    k = X.shape[1]
-    mean_values = X.mean(axis=0)
+    # Check that exactly one of (X) or (lower and upper) is provided
+    if (X is not None and (lower is not None or upper is not None)) or (X is None and (lower is None or upper is None)):
+        raise ValueError("Provide either X or both lower and upper, but not both or neither.")
 
-    # Create a grid for the two varied dimensions
-    x_i = linspace(X[:, i].min(), X[:, i].max(), num=n_grid)
-    x_j = linspace(X[:, j].min(), X[:, j].max(), num=n_grid)
+    if X is not None:
+        k = X.shape[1]
+        mean_values = X.mean(axis=0)
+        x_i = linspace(X[:, i].min(), X[:, i].max(), num=num)
+        x_j = linspace(X[:, j].min(), X[:, j].max(), num=num)
+    else:
+        k = len(lower)
+        mean_values = (np.array(lower) + np.array(upper)) / 2.0
+        x_i = linspace(lower[i], upper[i], num=num)
+        x_j = linspace(lower[j], upper[j], num=num)
+
     X_i, X_j = meshgrid(x_i, x_j)
-
-    # Prepare the grid points for prediction
     grid_points = np.zeros((X_i.size, k))
     grid_points[:, i] = X_i.ravel()
     grid_points[:, j] = X_j.ravel()
@@ -318,7 +335,7 @@ def plotkd(
     max_error: float = 1e-3,
     var_names: Optional[List[str]] = None,
     cmap: str = "jet",
-    n_grid: int = 100,
+    num: int = 100,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     add_points: bool = False,
@@ -338,7 +355,7 @@ def plotkd(
         max_error (float): Maximum error for color scaling. Default is 1e-3.
         var_names (list of str, optional): List of variable names for axis labeling. If None, generic labels are used.
         cmap (str): Colormap for the surface and contour plots. Default is "jet".
-        n_grid (int): Number of grid points per dimension for the mesh grid. Default is 100.
+        num (int): Number of grid points per dimension for the mesh grid. Default is 100.
         vmin (float, optional): Minimum value for the color scale. If None, determined from predictions.
         vmax (float, optional): Maximum value for the color scale. If None, determined from predictions.
         add_points (bool): If True, adds scatter points to the surface and contour plots. Default is False.
@@ -358,7 +375,7 @@ def plotkd(
     """
     k = X.shape[1]
     check_ij(i, j, k)
-    X_i, X_j, grid_points = generate_mesh_grid(X, i, j, n_grid)
+    X_i, X_j, grid_points = generate_mesh_grid(X, i, j, num)
 
     # Predict the values and standard deviations
     y_pred, y_std = model.predict(grid_points, return_std=True)
@@ -491,7 +508,7 @@ def plot_3d_contour(X, Y, Z, vmin, vmax, var_name=None, i=0, j=1, show=True, fil
     Examples:
         >>> # Example 1: Using output from Spot
         >>> # Assume S is a Spot object with a fitted surrogate
-        >>> plot_data = S.prepare_plot(i=0, j=1, n_grid=100)
+        >>> plot_data = S.prepare_plot(i=0, j=1, num=100)
         >>> from spotpython.surrogate.plot import plot_3d_contour
         >>> plot_3d_contour(
         ...     plot_data,
