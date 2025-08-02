@@ -204,6 +204,8 @@ def plot_3d_surface(
     cmap: str = "jet",
     error_surface: bool = False,
     add_points: bool = False,
+    vmin: float = None,
+    vmax: float = None,
 ) -> None:
     """
     Plot a 3D surface and scatter input points, colored by prediction error.
@@ -229,7 +231,7 @@ def plot_3d_surface(
     Returns:
         None
     """
-    ax.plot_surface(*Z[:2], Z[2], cmap=cmap, alpha=alpha) if isinstance(Z, tuple) else ax.plot_surface(Z[0], Z[1], Z[2], cmap=cmap, alpha=alpha)
+    ax.plot_surface(*Z[:2], Z[2], cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax) if isinstance(Z, tuple) else ax.plot_surface(Z[0], Z[1], Z[2], cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax)
     ax.set_title(surface_label)
     ax.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
     ax.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
@@ -238,7 +240,7 @@ def plot_3d_surface(
         plot_error_points(ax, X, y, model, i, j, eps, max_error, var_names, z_mode="error" if error_surface else "actual")
 
 
-def plot_contour(
+def plot_contour_and_err(
     X_i: np.ndarray,
     X_j: np.ndarray,
     Z: np.ndarray,
@@ -255,6 +257,8 @@ def plot_contour(
     levels: int = 30,
     title: str = "Prediction Contour",
     add_points: bool = False,
+    vmin: float = None,
+    vmax: float = None,
 ) -> None:
     """
     Plot a filled contour plot with scatter points colored by prediction error.
@@ -276,11 +280,13 @@ def plot_contour(
         levels (int): Number of contour levels.
         title (str): Title for the plot.
         add_points (bool): If True, adds scatter points to the contour plot.
+        vmin (float): Minimum value for color scaling.
+        vmax (float): Maximum value for color scaling.
 
     Returns:
         None
     """
-    contour = ax.contourf(X_i, X_j, Z, cmap=cmap, levels=levels)
+    contour = ax.contourf(X_i, X_j, Z, cmap=cmap, levels=levels, vmin=vmin, vmax=vmax)
     plt.colorbar(contour, ax=ax)
     if add_points and X is not None and y is not None and model is not None:
         plot_error_points(ax, X, y, model, i, j, eps, max_error, var_names, title, z_mode=None)
@@ -313,6 +319,9 @@ def plotkd(
     var_names: Optional[List[str]] = None,
     cmap: str = "jet",
     n_grid: int = 100,
+    vmin: Optional[float] = None,
+    vmax: Optional[float] = None,
+    add_points: bool = False,
 ) -> None:
     """
     Plots the Kriging surrogate model for k-dimensional input data by varying two dimensions (i, j).
@@ -330,6 +339,9 @@ def plotkd(
         var_names (list of str, optional): List of variable names for axis labeling. If None, generic labels are used.
         cmap (str): Colormap for the surface and contour plots. Default is "jet".
         n_grid (int): Number of grid points per dimension for the mesh grid. Default is 100.
+        vmin (float, optional): Minimum value for the color scale. If None, determined from predictions.
+        vmax (float, optional): Maximum value for the color scale. If None, determined from predictions.
+        add_points (bool): If True, adds scatter points to the surface and contour plots. Default is False.
 
     Examples:
         >>> import numpy as np
@@ -373,6 +385,9 @@ def plotkd(
         max_error=max_error,
         cmap=cmap,
         error_surface=False,
+        vmin=vmin,
+        vmax=vmax,
+        add_points=add_points,
     )
 
     # Plot prediction error
@@ -393,11 +408,14 @@ def plotkd(
         max_error=max_error,
         cmap=cmap,
         error_surface=True,
+        vmin=vmin,
+        vmax=vmax,
+        add_points=add_points,
     )
 
     # Contour plot of predicted values
     ax3 = fig.add_subplot(223)
-    plot_contour(
+    plot_contour_and_err(
         X_i,
         X_j,
         Z_pred,
@@ -413,11 +431,14 @@ def plotkd(
         cmap=cmap,
         levels=30,
         title="Prediction Contour",
+        vmin=vmin,
+        vmax=vmax,
+        add_points=add_points,
     )
 
     # Contour plot of prediction error
     ax4 = fig.add_subplot(224)
-    plot_contour(
+    plot_contour_and_err(
         X_i,
         X_j,
         Z_std,
@@ -433,6 +454,9 @@ def plotkd(
         cmap=cmap,
         levels=30,
         title="Error Contour",
+        vmin=vmin,
+        vmax=vmax,
+        add_points=add_points,
     )
 
     if show:
