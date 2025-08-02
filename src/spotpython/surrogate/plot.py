@@ -91,7 +91,50 @@ def generate_mesh_grid(X: np.ndarray, i: int, j: int, n_grid: int = 100):
     return X_i, X_j, grid_points
 
 
-def plot_values(
+def simple_error_color(z_actual: float, z_predicted: float, eps: float = 1e-3) -> str:
+    """
+    Returns a color string based on the error between actual and predicted values.
+
+    Args:
+        z_actual (float): The actual value.
+        z_predicted (float): The predicted value.
+        eps (float): Tolerance for considering values as close. Default is 1e-3.
+
+    Returns:
+        str: "black" if actual > predicted + eps,
+             "white" if actual < predicted - eps,
+             "grey" otherwise.
+    """
+    # predicted value is smaller than actual value
+    if z_actual > z_predicted + eps:
+        return "black"
+    # predicted value is larger than actual value
+    elif z_actual < z_predicted - eps:
+        return "white"
+    # predicted value is close to actual value
+    else:
+        return "grey"
+
+
+def error_color(z_actual: float, z_predicted: float, eps: float = 1e-4, max_error: float = 1e-3) -> str:
+    """
+    Returns a grayscale color string based on the error between actual and predicted values.
+    Underprediction (z_predicted < z_actual) is black, overprediction is white, zero error is gray.
+    The mapping is linear between -max_error (black) and +max_error (white).
+    """
+    diff = z_predicted - z_actual
+    if abs(diff) <= eps:
+        scale = 0.5  # gray
+    else:
+        # Clamp diff to [-max_error, max_error]
+        diff = max(-max_error, min(diff, max_error))
+        scale = 0.5 + 0.5 * (diff / max_error)
+    scale = min(max(scale, 0.0), 1.0)
+    grey = int(scale * 255)
+    return f"#{grey:02x}{grey:02x}{grey:02x}"
+
+
+def plot_3d_surface(
     ax: "matplotlib.axes.Axes",
     X: np.ndarray,
     y: np.ndarray,
@@ -103,7 +146,8 @@ def plot_values(
     zlabel: str = "Prediction",
     var_names: Optional[List[str]] = None,
     alpha: float = 0.8,
-    eps: float = 1e-3,
+    eps: float = 1e-4,
+    max_error: float = 1e-3,
     cmap: str = "jet",
     error_surface: bool = False,
 ) -> None:
@@ -123,6 +167,7 @@ def plot_values(
         var_names (list of str or None): List of axis labels or None.
         alpha (float): Surface transparency.
         eps (float): Tolerance for error coloring.
+        max_error (float): Maximum error for color scaling.
         cmap (str): Colormap for the surface.
         error_surface (bool): If True, scatter z is abs(y_actual - y_predicted).
 
@@ -143,13 +188,62 @@ def plot_values(
             z_scatter = abs(z_actual - z_predicted)
         else:
             z_scatter = z_actual
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
+        color = error_color(z_actual, z_predicted, eps, max_error)
         ax.scatter(x_point, y_point, z_scatter, color=color, s=50, edgecolor="black")
+
+
+def plot_contour(
+    ax,
+    X_i: np.ndarray,
+    X_j: np.ndarray,
+    Z: np.ndarray,
+    X: np.ndarray,
+    y: np.ndarray,
+    model,
+    i: int,
+    j: int,
+    eps: float = 1e-4,
+    max_error: float = 1e-3,
+    var_names: Optional[List[str]] = None,
+    cmap: str = "jet",
+    levels: int = 30,
+    title: str = "Prediction Contour",
+) -> None:
+    """
+    Plot a filled contour plot with scatter points colored by prediction error.
+
+    Args:
+        ax (matplotlib.axes.Axes): The matplotlib axis to plot on.
+        X_i (np.ndarray): Meshgrid for the i-th dimension.
+        X_j (np.ndarray): Meshgrid for the j-th dimension.
+        Z (np.ndarray): Contour values (predicted or error), shape matching meshgrid.
+        X (np.ndarray): Input data, shape (n_samples, k).
+        y (np.ndarray): Target values, shape (n_samples,).
+        model (object): Fitted model with predict().
+        i (int): Index of first varied dimension.
+        j (int): Index of second varied dimension.
+        eps (float): Tolerance for coloring points based on prediction error.
+        max_error (float): Maximum error for color scaling.
+        var_names (list of str or None): List of axis labels or None.
+        cmap (str): Colormap for the contour plot.
+        levels (int): Number of contour levels.
+        title (str): Title for the plot.
+
+    Returns:
+        None
+    """
+    contour = ax.contourf(X_i, X_j, Z, cmap=cmap, levels=levels)
+    plt.colorbar(contour, ax=ax)
+    for idx in range(X.shape[0]):
+        x_point = X[idx, i]
+        y_point = X[idx, j]
+        z_actual = y[idx]
+        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
+        color = error_color(z_actual, z_predicted, eps, max_error)
+        ax.scatter(x_point, y_point, color=color, s=50, edgecolor="black")
+    ax.set_title(title)
+    ax.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
+    ax.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
 
 
 def plotkd(
@@ -159,10 +253,11 @@ def plotkd(
     i: int = 0,
     j: int = 1,
     show: Optional[bool] = True,
-    alpha=0.8,
-    eps=1e-3,
+    alpha: float = 0.8,
+    eps: float = 1e-4,
+    max_error: float = 1e-3,
     var_names: Optional[List[str]] = None,
-    cmap="jet",
+    cmap: str = "jet",
     n_grid: int = 100,
 ) -> None:
     """
@@ -176,10 +271,24 @@ def plotkd(
         j (int): Index of the second dimension to vary. Default is 1.
         show (bool): If True, displays the plot. Default is True.
         alpha (float): Transparency of the surface plot. Default is 0.8.
-        eps (float): Tolerance for coloring points based on prediction error. Default is 1e-3.
+        eps (float): Tolerance for coloring points based on prediction error. Default is 1e-4.
+        max_error (float): Maximum error for color scaling. Default is 1e-3.
         var_names (list of str, optional): List of variable names for axis labeling. If None, generic labels are used.
         cmap (str): Colormap for the surface and contour plots. Default is "jet".
         n_grid (int): Number of grid points per dimension for the mesh grid. Default is 100.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.surrogate.kriging import Kriging
+        >>> from spotpython.surrogate.plot import plotkd
+        >>> # Training data
+        >>> X_train = np.random.rand(100, 3)  # 100 samples with 3 dimensions
+        >>> y_train = np.sin(X_train[:, 0]) + np.cos(X_train[:, 1]) + X_train[:, 2]  # Example target function
+        >>> # Initialize and fit the Kriging model
+        >>> model = Kriging().fit(X_train, y_train)
+        >>> # Plot the Kriging surrogate for dimensions 0 and 1
+        >>> plotkd(model, X_train, y_train, i=0, j=1, show=True)
+
     """
     k = X.shape[1]
     if i >= k or j >= k:
@@ -198,7 +307,7 @@ def plotkd(
 
     # Plot predicted values
     ax1 = fig.add_subplot(221, projection="3d")
-    plot_values(
+    plot_3d_surface(
         ax1,
         X,
         y,
@@ -211,13 +320,14 @@ def plotkd(
         var_names=var_names,
         alpha=alpha,
         eps=eps,
+        max_error=max_error,
         cmap=cmap,
         error_surface=False,
     )
 
     # Plot prediction error
     ax2 = fig.add_subplot(222, projection="3d")
-    plot_values(
+    plot_3d_surface(
         ax2,
         X,
         y,
@@ -230,49 +340,50 @@ def plotkd(
         var_names=var_names,
         alpha=alpha,
         eps=eps,
+        max_error=max_error,
         cmap=cmap,
         error_surface=True,
     )
 
     # Contour plot of predicted values
     ax3 = fig.add_subplot(223)
-    contour = ax3.contourf(X_i, X_j, Z_pred, cmap=cmap, levels=30)
-    plt.colorbar(contour, ax=ax3)
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
-        ax3.scatter(x_point, y_point, color=color, s=50, edgecolor="black")
-    ax3.set_title("Prediction Contour")
-    ax3.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax3.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
+    plot_contour(
+        ax3,
+        X_i,
+        X_j,
+        Z_pred,
+        X,
+        y,
+        model,
+        i,
+        j,
+        eps=eps,
+        max_error=max_error,
+        var_names=var_names,
+        cmap=cmap,
+        levels=30,
+        title="Prediction Contour",
+    )
 
     # Contour plot of prediction error
     ax4 = fig.add_subplot(224)
-    contour = ax4.contourf(X_i, X_j, Z_std, cmap=cmap, levels=30)
-    plt.colorbar(contour, ax=ax4)
-    for idx in range(X.shape[0]):
-        x_point = X[idx, i]
-        y_point = X[idx, j]
-        z_actual = y[idx]
-        z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-        if z_actual > z_predicted + eps:
-            color = "red"
-        elif z_actual < z_predicted - eps:
-            color = "green"
-        else:
-            color = "white"
-        ax4.scatter(x_point, y_point, color=color, s=50, edgecolor="black")
-    ax4.set_title("Error Contour")
-    ax4.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax4.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
+    plot_contour(
+        ax4,
+        X_i,
+        X_j,
+        Z_std,
+        X,
+        y,
+        model,
+        i,
+        j,
+        eps=eps,
+        max_error=max_error,
+        var_names=var_names,
+        cmap=cmap,
+        levels=30,
+        title="Error Contour",
+    )
 
     if show:
         plt.show()
