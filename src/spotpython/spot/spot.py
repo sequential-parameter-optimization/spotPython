@@ -51,7 +51,7 @@ import plotly.graph_objects as go
 from typing import Callable
 from spotpython.utils.numpy2json import NumpyEncoder
 from spotpython.utils.file import load_result
-from spotpython.surrogate.plot import plot_3d_contour, plotkd
+from spotpython.surrogate.plot import plotkd
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -2528,84 +2528,9 @@ class Spot:
         cmap="jet",
     ) -> None:
         """
-        Plot the contour and 3D surface for any pair of dimensions of the surrogate model.
-        This method visualizes the surrogate model's predictions over a grid for two selected dimensions.
-        It creates both a filled contour plot and a 3D surface plot, allowing users to inspect the surrogate's
-        response surface. The remaining dimensions are fixed to either their minimum or maximum values, depending
-        on the `use_min` and `use_max` flags.
+        Plot a contour plot of the surrogate model for two hyperparameters.
         """
-        plotkd(model=self.surrogate, X=self.X, y=self.y, i=i, j=j, num=n_grid)
-
-    def plot_contour_old(
-        self,
-        i=0,
-        j=1,
-        min_z=None,
-        max_z=None,
-        show=True,
-        title=None,
-        filename=None,
-        n_grid=50,
-        contour_levels=10,
-        dpi=200,
-        figsize=(12, 5),
-        use_min=False,
-        use_max=True,
-        tkagg=False,
-        cmap="jet",
-    ) -> None:
-        """
-        Plot the contour and 3D surface for any pair of dimensions of the surrogate model.
-        This method visualizes the surrogate model's predictions over a grid for two selected dimensions.
-        It creates both a filled contour plot and a 3D surface plot, allowing users to inspect the surrogate's
-        response surface. The remaining dimensions are fixed to either their minimum or maximum values, depending
-        on the `use_min` and `use_max` flags.
-
-        Args:
-            i (int, optional): Index of the first dimension to plot. Default is 0.
-            j (int, optional): Index of the second dimension to plot. Default is 1.
-            min_z (float, optional): Minimum value for the color scale (z-axis). If None, determined automatically.
-            max_z (float, optional): Maximum value for the color scale (z-axis). If None, determined automatically.
-            show (bool, optional): Whether to display the plot interactively. Default is True.
-            filename (str, optional): If provided, saves the plot to this file. Default is None.
-            n_grid (int, optional): Number of grid points per dimension. Default is 50.
-            contour_levels (int, optional): Number of contour levels. Default is 10.
-            dpi (int, optional): Dots per inch for saved figure. Default is 200.
-            title (str, optional): Title for the plot. Default is None.
-            figsize (tuple, optional): Figure size in inches (width, height). Default is (12, 6).
-            use_min (bool, optional): If True, fix hidden dimensions to their minimum values. Default is False.
-            use_max (bool, optional): If True, fix hidden dimensions to their maximum values. Default is True.
-            tkagg (bool, optional): If True, use TkAgg backend for matplotlib. Default is False.
-            cmap (str, optional): Colormap to use for the contour plot. Default is "jet".
-
-        Returns:
-            None
-        """
-        X, Y, Z = self.prepare_plot(
-            i=i,
-            j=j,
-            n_grid=n_grid,
-            use_min=use_min,
-            use_max=use_max,
-        )
-        plot_3d_contour(
-            X=X,
-            Y=Y,
-            Z=Z,
-            vmin=min_z if min_z is not None else np.min(Z),
-            vmax=max_z if max_z is not None else np.max(Z),
-            var_name=self.var_name,
-            i=i,
-            j=j,
-            show=show,
-            filename=filename,
-            contour_levels=contour_levels,
-            dpi=dpi,
-            title=title,
-            figsize=figsize,
-            tkagg=tkagg,
-            cmap=cmap,
-        )
+        plotkd(model=self.surrogate, X=self.X, y=self.y, i=i, j=j, num=n_grid, var_type=self.var_type)
 
     def plot_important_hyperparameter_contour(
         self,

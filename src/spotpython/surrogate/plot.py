@@ -56,12 +56,7 @@ def plot1d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True) -> 
 
 
 def generate_mesh_grid(
-    X: Optional[np.ndarray] = None,
-    i: int = 0,
-    j: int = 1,
-    num: int = 100,
-    lower: Optional[np.ndarray] = None,
-    upper: Optional[np.ndarray] = None,
+    X: Optional[np.ndarray] = None, i: int = 0, j: int = 1, num: int = 100, lower: Optional[np.ndarray] = None, upper: Optional[np.ndarray] = None, var_type: Optional[List[str]] = None
 ):
     """
     Generate a mesh grid for two selected dimensions, filling remaining dimensions with their mean values
@@ -74,6 +69,7 @@ def generate_mesh_grid(
         num (int): Number of grid points per dimension.
         lower (np.ndarray, optional): Lower bounds for each dimension (shape (k,)).
         upper (np.ndarray, optional): Upper bounds for each dimension (shape (k,)).
+        var_type (list of str, optional): List of variable types for each dimension. Can be either "num", "int", or "factor".
 
     Returns:
         X_i (np.ndarray): Meshgrid for the i-th dimension.
@@ -94,6 +90,17 @@ def generate_mesh_grid(
         mean_values = (np.array(lower) + np.array(upper)) / 2.0
         x_i = linspace(lower[i], upper[i], num=num)
         x_j = linspace(lower[j], upper[j], num=num)
+
+    # Masked rounding (using floor) for integer or factor variables
+    if var_type is not None:
+        # For x_i
+        if hasattr(x_i, "__len__"):
+            mask_i = np.array([var_type[i] != "num"] * len(x_i))
+            x_i = np.where(mask_i, np.floor(x_i), x_i)
+        # For x_j
+        if hasattr(x_j, "__len__"):
+            mask_j = np.array([var_type[j] != "num"] * len(x_j))
+            x_j = np.where(mask_j, np.floor(x_j), x_j)
 
     X_i, X_j = meshgrid(x_i, x_j)
     grid_points = np.zeros((X_i.size, k))
@@ -334,6 +341,7 @@ def plotkd(
     eps: float = 1e-4,
     max_error: float = 1e-3,
     var_names: Optional[List[str]] = None,
+    var_type: Optional[List[str]] = None,
     cmap: str = "jet",
     num: int = 100,
     vmin: Optional[float] = None,
@@ -354,6 +362,7 @@ def plotkd(
         eps (float): Tolerance for coloring points based on prediction error. Default is 1e-4.
         max_error (float): Maximum error for color scaling. Default is 1e-3.
         var_names (list of str, optional): List of variable names for axis labeling. If None, generic labels are used.
+        var_type (list of str, optional): List of variable types for each dimension. Can be either "num", "int", or "factor".
         cmap (str): Colormap for the surface and contour plots. Default is "jet".
         num (int): Number of grid points per dimension for the mesh grid. Default is 100.
         vmin (float, optional): Minimum value for the color scale. If None, determined from predictions.
@@ -375,7 +384,7 @@ def plotkd(
     """
     k = X.shape[1]
     check_ij(i, j, k)
-    X_i, X_j, grid_points = generate_mesh_grid(X, i, j, num)
+    X_i, X_j, grid_points = generate_mesh_grid(X, i, j, num, var_type=var_type)
 
     # Predict the values and standard deviations
     y_pred, y_std = model.predict(grid_points, return_std=True)

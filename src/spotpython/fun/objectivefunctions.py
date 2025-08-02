@@ -49,7 +49,7 @@ class Analytical:
             self.fun_control["seed"] = self.seed
 
     def __repr__(self) -> str:
-        return f"analytical(offset={self.offset}, sigma={self.sigma}, seed={self.seed})"
+        return f"Analytical(offset={self.offset}, sigma={self.sigma}, seed={self.seed})"
 
     def _prepare_input_data(self, X, fun_control):
         if fun_control is not None:
@@ -67,17 +67,17 @@ class Analytical:
         containing the noisy data.
 
         Args:
-            self (analytical): analytical class object.
+            self (Analytical): Analytical class object.
             y (List[float]): Input data.
 
         Returns:
             np.ndarray: Noisy data.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
                 import numpy as np
                 y = np.array([1, 2, 3, 4, 5])
-                fun = analytical(sigma=1.0, seed=123)
+                fun = Analytical(sigma=1.0, seed=123)
                 fun._add_noise(y)
             array([0.01087865, 1.63221335, 4.28792526, 4.19397442, 5.9202309 ])
 
@@ -117,10 +117,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
                 import numpy as np
                 X = np.array([[0, 0, 0], [0, 0, 1], [0, 0, 2]])
-                fun = analytical()
+                fun = Analytical()
                 fun.fun_branin_factor(X)
                 array([55.60211264, 65.60211264, 45.60211264])
         """
@@ -230,10 +230,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_sphere(X)
             array([14., 77.])
 
@@ -256,10 +256,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6], [-1, -1, -1]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_cubed(X)
             array([ 36., 405., -3.])
         """
@@ -283,10 +283,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_forrester(X)
             array([  0.        ,  11.99999999])
         """
@@ -324,13 +324,13 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
                 pi = np.pi
                 X = np.array([[0,0],
                     [-pi, 12.275],
                     [pi, 2.275],
                     [9.42478, 2.475]])
-                fun = analytical()
+                fun = Analytical()
                 fun.fun_branin(X)
                 array([55.60211264,  0.39788736,  0.39788736,  0.39788736])
 
@@ -362,10 +362,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_branin_modified(X)
             array([  0.        ,  11.99999999])
 
@@ -398,10 +398,10 @@ class Analytical:
             (np.ndarray): A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_sin_cos(X)
             array([-1.        , -0.41614684])
         """
@@ -425,10 +425,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3], [4, 5, 6]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_runge(X)
             array([0.0625    , 0.015625  , 0.00390625])
 
@@ -493,10 +493,10 @@ class Analytical:
             A 1D numpy array with shape (n,) containing the calculated wing weight values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([np.zeros(10), np.ones(10)])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_wingwt(X)
             array([158.28245046, 409.33182691])
         """
@@ -575,10 +575,10 @@ class Analytical:
             A 1D numpy array with shape (n,) containing the calculated wing weight values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([np.zeros(10), np.ones(10)])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_wingwt(X)
             array([158.28245046, 409.33182691])
         """
@@ -612,10 +612,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9], [4, 5, 6, 7, 8, 9, 10, 11, 12]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_xsin(X)
             array([0.84147098, 0.90929743, 0.14112001])
 
@@ -634,10 +634,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2,], [4, 5 ]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_rosen(X)
             array([24,  0])
         """
@@ -660,10 +660,10 @@ class Analytical:
             np.ndarray: A 1D numpy array with shape (n,) containing the calculated values.
 
         Examples:
-            >>> from spotpython.fun.objectivefunctions import analytical
+            >>> from spotpython.fun.objectivefunctions import Analytical
             >>> import numpy as np
             >>> X = np.array([[1, 2,], [4, 5 ]])
-            >>> fun = analytical()
+            >>> fun = Analytical()
             >>> fun.fun_random_error(X)
             array([24,  0])
 

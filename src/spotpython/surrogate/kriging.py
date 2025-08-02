@@ -5,9 +5,7 @@ from scipy.optimize import differential_evolution
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.special import erf
 import matplotlib.pyplot as plt
-from numpy import linspace, meshgrid, array, append
-import pylab
-from numpy import ravel
+from numpy import linspace, append
 from scipy.spatial.distance import cdist, pdist, squareform
 from spotpython.surrogate.plot import plotkd
 
@@ -789,8 +787,6 @@ class Kriging(BaseEstimator, RegressorMixin):
                 S.surrogate.plot()
         """
         if self.k == 1:
-            # TODO: Improve plot (add conf. interval etc.)
-            fig = pylab.figure(figsize=(9, 6))
             n_grid = 100
             x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
             y = self.predict(x)
@@ -799,4 +795,4 @@ class Kriging(BaseEstimator, RegressorMixin):
             if show:
                 plt.show()
         else:
-            plotkd(model=self, X=self.X_, y=self.y_, i=i, j=j, show=show)
+            plotkd(model=self, X=self.X_, y=self.y_, i=i, j=j, show=show, var_type=self.var_type)
