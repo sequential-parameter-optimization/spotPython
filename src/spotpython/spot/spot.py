@@ -2637,20 +2637,8 @@ class Spot:
                 number of contour levels. Default is 10.
             dpi (int):
                 dpi of the plot. Default is 200.
-            use_min (bool):
-                Use the minimum value for determing the hidden dimensions in the plot for categorical and
-                integer parameters.
-                In 3d-plots, only two variables can be independent. The remaining input variables are set
-                to their minimum value.
-                Default is `False`.
-                If use_min and use_max are both `True`, both values are used.
-            use_max (bool):
-                Use the minimum value for determing the hidden dimensions in the plot for categorical and
-                integer parameters.
-                In 3d-plots, only two variables can be independent. The remaining input variables are set
-                to their minimum value.
-                Default is `True`.
-                If use_min and use_max are both `True`, both values are used.
+            use_min (bool): Deprecated in 0.31.12.
+            use_max (bool): Deprecated in 0.31.12.
 
         Returns:
             None.
@@ -2712,8 +2700,6 @@ class Spot:
                         n_grid=n_grid,
                         contour_levels=contour_levels,
                         dpi=dpi,
-                        use_max=use_max,
-                        use_min=use_min,
                         tkagg=tkagg,
                     )
 
