@@ -75,6 +75,20 @@ def generate_mesh_grid(
         X_i (np.ndarray): Meshgrid for the i-th dimension.
         X_j (np.ndarray): Meshgrid for the j-th dimension.
         grid_points (np.ndarray): Grid points of shape (num*num, k) for prediction.
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.surrogate.plot import generate_mesh_grid
+        >>> # Example 1: Using input data
+        >>> X = np.random.rand(4, 3)  # 5 samples with 3 dimensions
+        >>> print(f"X:\n{X}")
+        >>> X_i, X_j, grid_points = generate_mesh_grid(X, i=0, j=1, num=5)
+        >>> print(f"X_i:\n{X_i},\nX_j:\n{X_j},\ngrid_points:\n{grid_points}")
+        >>> # Example 2: Using lower and upper bounds
+        >>> lower = np.array([-5, 0, 0])
+        >>> upper = np.array([10, 15, 3])
+        >>> X_i, X_j, grid_points = generate_mesh_grid(lower=lower, upper=upper, i=0, j=1, num=5)
+        >>> print(f"X_i:\n{X_i},\nX_j:\n{X_j},\ngrid_points:\n{grid_points}")
     """
     # Check that exactly one of (X) or (lower and upper) is provided
     if (X is not None and (lower is not None or upper is not None)) or (X is None and (lower is None or upper is None)):
@@ -91,17 +105,6 @@ def generate_mesh_grid(
         x_i = linspace(lower[i], upper[i], num=num)
         x_j = linspace(lower[j], upper[j], num=num)
 
-    # Masked rounding (using floor) for integer or factor variables
-    if var_type is not None:
-        # For x_i
-        if hasattr(x_i, "__len__"):
-            mask_i = np.array([var_type[i] != "num"] * len(x_i))
-            x_i = np.where(mask_i, np.floor(x_i), x_i)
-        # For x_j
-        if hasattr(x_j, "__len__"):
-            mask_j = np.array([var_type[j] != "num"] * len(x_j))
-            x_j = np.where(mask_j, np.floor(x_j), x_j)
-
     X_i, X_j = meshgrid(x_i, x_j)
     grid_points = np.zeros((X_i.size, k))
     grid_points[:, i] = X_i.ravel()
@@ -111,6 +114,10 @@ def generate_mesh_grid(
     for dim in range(k):
         if dim != i and dim != j:
             grid_points[:, dim] = mean_values[dim]
+
+    # Apply floor to mean_values for non-"num" columns if var_type is provided
+    if var_type is not None:
+        grid_points = np.where(np.array([vt != "num" for vt in var_type]), np.floor(grid_points + 0.5), grid_points)
 
     return X_i, X_j, grid_points
 
@@ -167,7 +174,7 @@ def plot_error_points(
     j: int,
     eps: float = 1e-4,
     max_error: float = 1e-3,
-    var_names: Optional[List[str]] = None,
+    var_name: Optional[List[str]] = None,
     title: Optional[str] = None,
     z_mode: str = "actual",  # "actual", "error", or None
 ) -> None:
@@ -183,7 +190,7 @@ def plot_error_points(
         j (int): Index of second varied dimension.
         eps (float): Tolerance for coloring points based on prediction error.
         max_error (float): Maximum error for color scaling.
-        var_names (list of str or None): List of axis labels or None.
+        var_name (list of str or None): List of axis labels or None.
         title (str or None): Title for the plot.
         z_mode (str): "actual" for z_actual (for 3D), "error" for abs error (for 3D error surface), or None (for 2D).
     """
@@ -203,9 +210,9 @@ def plot_error_points(
             ax.scatter(x_point, y_point_, color=color, s=50, edgecolor="black")
     if title is not None:
         ax.set_title(title)
-    if var_names is not None:
-        ax.set_xlabel(var_names[0])
-        ax.set_ylabel(var_names[1])
+    if var_name is not None:
+        ax.set_xlabel(var_name[0])
+        ax.set_ylabel(var_name[1])
     else:
         ax.set_xlabel(f"Dimension {i}")
         ax.set_ylabel(f"Dimension {j}")
@@ -220,8 +227,8 @@ def plot_3d_surface(
     y: np.ndarray = None,
     model=None,
     surface_label: str = "Prediction Surface",
-    zlabel: str = "Prediction",
-    var_names: Optional[List[str]] = None,
+    zlabel: str = "y",
+    var_name: Optional[List[str]] = None,
     alpha: float = 0.8,
     eps: float = 1e-4,
     max_error: float = 1e-3,
@@ -244,7 +251,7 @@ def plot_3d_surface(
         model (object): Fitted model with predict().
         surface_label (str): Title for the surface.
         zlabel (str): Label for the z-axis.
-        var_names (list of str or None): List of axis labels or None.
+        var_name (list of str or None): List of axis labels or None.
         alpha (float): Surface transparency.
         eps (float): Tolerance for error coloring.
         max_error (float): Maximum error for color scaling.
@@ -257,11 +264,11 @@ def plot_3d_surface(
     """
     ax.plot_surface(*Z[:2], Z[2], cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax) if isinstance(Z, tuple) else ax.plot_surface(Z[0], Z[1], Z[2], cmap=cmap, alpha=alpha, vmin=vmin, vmax=vmax)
     ax.set_title(surface_label)
-    ax.set_xlabel(var_names[0] if var_names else f"Dimension {i}")
-    ax.set_ylabel(var_names[1] if var_names else f"Dimension {j}")
-    ax.set_zlabel(var_names[2] if var_names else zlabel)
+    ax.set_xlabel(var_name[i] if var_name else f"Dimension {i}")
+    ax.set_ylabel(var_name[j] if var_name else f"Dimension {j}")
+    ax.set_zlabel(zlabel)
     if add_points and X is not None and y is not None and model is not None:
-        plot_error_points(ax, X, y, model, i, j, eps, max_error, var_names, z_mode="error" if error_surface else "actual")
+        plot_error_points(ax, X, y, model, i, j, eps, max_error, var_name, z_mode="error" if error_surface else "actual")
 
 
 def plot_contour_and_err(
@@ -276,7 +283,7 @@ def plot_contour_and_err(
     model=None,
     eps: float = 1e-4,
     max_error: float = 1e-3,
-    var_names: Optional[List[str]] = None,
+    var_name: Optional[List[str]] = None,
     cmap: str = "jet",
     levels: int = 30,
     title: str = "Prediction Contour",
@@ -299,7 +306,7 @@ def plot_contour_and_err(
         model (object): Fitted model with predict().
         eps (float): Tolerance for coloring points based on prediction error.
         max_error (float): Maximum error for color scaling.
-        var_names (list of str or None): List of axis labels or None.
+        var_name (list of str or None): List of axis labels or None.
         cmap (str): Colormap for the contour plot.
         levels (int): Number of contour levels.
         title (str): Title for the plot.
@@ -311,9 +318,11 @@ def plot_contour_and_err(
         None
     """
     contour = ax.contourf(X_i, X_j, Z, cmap=cmap, levels=levels, vmin=vmin, vmax=vmax)
+    ax.set_xlabel(var_name[i] if var_name else f"Dimension {i}")
+    ax.set_ylabel(var_name[j] if var_name else f"Dimension {j}")
     plt.colorbar(contour, ax=ax)
     if add_points and X is not None and y is not None and model is not None:
-        plot_error_points(ax, X, y, model, i, j, eps, max_error, var_names, title, z_mode=None)
+        plot_error_points(ax, X, y, model, i, j, eps, max_error, var_name, title, z_mode=None)
 
 
 def check_ij(i: int, j: int, k: int) -> None:
@@ -340,7 +349,7 @@ def plotkd(
     alpha: float = 0.8,
     eps: float = 1e-4,
     max_error: float = 1e-3,
-    var_names: Optional[List[str]] = None,
+    var_name: Optional[List[str]] = None,
     var_type: Optional[List[str]] = None,
     cmap: str = "jet",
     num: int = 100,
@@ -361,7 +370,7 @@ def plotkd(
         alpha (float): Transparency of the surface plot. Default is 0.8.
         eps (float): Tolerance for coloring points based on prediction error. Default is 1e-4.
         max_error (float): Maximum error for color scaling. Default is 1e-3.
-        var_names (list of str, optional): List of variable names for axis labeling. If None, generic labels are used.
+        var_name (list of str, optional): List of variable names for axis labeling. If None, generic labels are used.
         var_type (list of str, optional): List of variable types for each dimension. Can be either "num", "int", or "factor".
         cmap (str): Colormap for the surface and contour plots. Default is "jet".
         num (int): Number of grid points per dimension for the mesh grid. Default is 100.
@@ -405,7 +414,7 @@ def plotkd(
         model,
         surface_label="Prediction Surface",
         zlabel="Prediction",
-        var_names=var_names,
+        var_name=var_name,
         alpha=alpha,
         eps=eps,
         max_error=max_error,
@@ -428,7 +437,7 @@ def plotkd(
         model,
         surface_label="Prediction Error Surface",
         zlabel="Error",
-        var_names=var_names,
+        var_name=var_name,
         alpha=alpha,
         eps=eps,
         max_error=max_error,
@@ -453,7 +462,7 @@ def plotkd(
         model,
         eps=eps,
         max_error=max_error,
-        var_names=var_names,
+        var_name=var_name,
         cmap=cmap,
         levels=30,
         title="Prediction Contour",
@@ -476,7 +485,7 @@ def plotkd(
         model,
         eps=eps,
         max_error=max_error,
-        var_names=var_names,
+        var_name=var_name,
         cmap=cmap,
         levels=30,
         title="Error Contour",

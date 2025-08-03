@@ -2530,7 +2530,7 @@ class Spot:
         """
         Plot a contour plot of the surrogate model for two hyperparameters.
         """
-        plotkd(model=self.surrogate, X=self.X, y=self.y, i=i, j=j, num=n_grid, var_type=self.var_type)
+        plotkd(model=self.surrogate, X=self.X, y=self.y, i=i, j=j, num=n_grid, var_name=self.var_name, var_type=self.var_type)
 
     def plot_important_hyperparameter_contour(
         self,
