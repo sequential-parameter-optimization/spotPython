@@ -2518,19 +2518,84 @@ class Spot:
         show=True,
         title=None,
         filename=None,
-        n_grid=50,
-        contour_levels=10,
+        n_grid=100,
+        contour_levels=25,
         dpi=200,
         figsize=(12, 5),
-        use_min=False,
-        use_max=True,
+        use_floor=True,
         tkagg=False,
         cmap="jet",
+        grid_visible=True,
+        alpha=0.8,
+        eps: float = 1e-4,
+        max_error: float = 1e-3,
+        add_points: bool = True,
     ) -> None:
         """
         Plot a contour plot of the surrogate model for two hyperparameters.
+        Args:
+            i (int):
+                index of the first hyperparameter to plot.
+            j (int):
+                index of the second hyperparameter to plot.
+            min_z (float, optional):
+                minimum value for the z-axis. If `None`, the minimum value is calculated from the surrogate predictions.
+            max_z (float, optional):
+                maximum value for the z-axis. If `None`, the maximum value is calculated from the surrogate predictions.
+            show (bool):
+                whether to show the plot. Default is `True`.
+            title (str, optional):
+                title of the plot. If `None`, a default title is used.
+            filename (str, optional):
+                filename to save the plot. If `None`, the plot is not saved.
+            n_grid (int):
+                number of grid points for the contour plot. Default is 100.
+            contour_levels (int):
+                number of contour levels. Default is 25.
+            dpi (int):
+                dots per inch for the saved plot. Default is 200.
+            figsize (tuple):
+                size of the figure for the plot. Default is (12, 5).
+            use_floor (bool):
+                If `True`, the floor values of the other hyperparameters are used for plotting. If `False`, the ceiling values are used. Default is `True`.
+            tkagg (bool):
+                If `True`, use the TkAgg backend for matplotlib. Default is `False`.
+            cmap (str):
+                Colormap to use for the contour plot. Default is "jet".
+            grid_visible (bool):
+                If `True`, show the grid in the contour plot. Default is `True`.
+            alpha (float):
+                Transparency level for the contour lines. Default is 0.8.
+            eps (float):
+                Small value to avoid division by zero in the surrogate predictions. Default is 1e-4.
+            max_error (float):
+                Maximum error allowed in the surrogate predictions. Default is 1e-3.
+            use_floor (bool):
+                If `True`, use the minimum values of the other hyperparameters for plotting. If `False`, use the maximum values. Default is `True`.
+            add_points (bool):
+                If `True`, add the points from the surrogate model to the contour plot. Default is `True`.
         """
-        plotkd(model=self.surrogate, X=self.X, y=self.y, i=i, j=j, num=n_grid, var_name=self.var_name, var_type=self.var_type)
+        plotkd(
+            model=self.surrogate,
+            X=self.X,
+            y=self.y,
+            i=i,
+            j=j,
+            num=n_grid,
+            var_name=self.var_name,
+            var_type=self.var_type,
+            grid_visible=grid_visible,
+            contour_levels=contour_levels,
+            cmap=cmap,
+            alpha=alpha,
+            eps=eps,
+            max_error=max_error,
+            use_floor=use_floor,
+            vmin=min_z,
+            vmax=max_z,
+            show=show,
+            add_points=add_points,
+        )
 
     def plot_important_hyperparameter_contour(
         self,
@@ -2540,8 +2605,8 @@ class Spot:
         max_imp=None,
         title="",
         scale_global=False,
-        n_grid=50,
-        contour_levels=10,
+        n_grid=100,
+        contour_levels=25,
         dpi=200,
         use_min=False,
         use_max=True,

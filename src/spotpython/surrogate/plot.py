@@ -56,7 +56,14 @@ def plot1d(model, X: np.ndarray, y: np.ndarray, show: Optional[bool] = True) -> 
 
 
 def generate_mesh_grid(
-    X: Optional[np.ndarray] = None, i: int = 0, j: int = 1, num: int = 100, lower: Optional[np.ndarray] = None, upper: Optional[np.ndarray] = None, var_type: Optional[List[str]] = None
+    X: Optional[np.ndarray] = None,
+    i: int = 0,
+    j: int = 1,
+    num: int = 100,
+    lower: Optional[np.ndarray] = None,
+    upper: Optional[np.ndarray] = None,
+    var_type: Optional[List[str]] = None,
+    use_floor: bool = True,
 ):
     """
     Generate a mesh grid for two selected dimensions, filling remaining dimensions with their mean values
@@ -70,6 +77,7 @@ def generate_mesh_grid(
         lower (np.ndarray, optional): Lower bounds for each dimension (shape (k,)).
         upper (np.ndarray, optional): Upper bounds for each dimension (shape (k,)).
         var_type (list of str, optional): List of variable types for each dimension. Can be either "num", "int", or "factor".
+        use_floor (bool): If True, applies floor to non-numeric variables. Default is True.
 
     Returns:
         X_i (np.ndarray): Meshgrid for the i-th dimension.
@@ -117,7 +125,10 @@ def generate_mesh_grid(
 
     # Apply floor to mean_values for non-"num" columns if var_type is provided
     if var_type is not None:
-        grid_points = np.where(np.array([vt != "num" for vt in var_type]), np.floor(grid_points + 0.5), grid_points)
+        if use_floor:
+            grid_points = np.where(np.array([vt != "num" for vt in var_type]), np.floor(grid_points + 0.5), grid_points)
+        else:
+            grid_points = np.where(np.array([vt != "num" for vt in var_type]), np.ceil(grid_points - 0.5), grid_points)
 
     return X_i, X_j, grid_points
 
@@ -152,8 +163,23 @@ def error_color(z_actual: float, z_predicted: float, eps: float = 1e-4, max_erro
     Returns a grayscale color string based on the error between actual and predicted values.
     Underprediction (z_predicted < z_actual) is black, overprediction is white, zero error is gray.
     The mapping is linear between -max_error (black) and +max_error (white).
+
+    Args:
+        z_actual (float): The actual value.
+        z_predicted (float): The predicted value.
+        eps (float): Tolerance for considering values as close. Default is 1e-4.
+        max_error (float): Maximum error for color scaling. Default is 1e-3.
+
+    Returns:
+        str: Hex color string in the format "#RRGGBB".
+        str: Edge color indicating overprediction or underprediction.
+            "black" for overprediction, "white" for underprediction.
     """
     diff = z_predicted - z_actual
+    if diff > 0:
+        edge_color = "black"  # prediction is too large (overprediction)
+    else:
+        edge_color = "grey"  # prediction is too small (underprediction)
     if abs(diff) <= eps:
         scale = 0.5  # gray
     else:
@@ -162,7 +188,7 @@ def error_color(z_actual: float, z_predicted: float, eps: float = 1e-4, max_erro
         scale = 0.5 + 0.5 * (diff / max_error)
     scale = min(max(scale, 0.0), 1.0)
     grey = int(scale * 255)
-    return f"#{grey:02x}{grey:02x}{grey:02x}"
+    return f"#{grey:02x}{grey:02x}{grey:02x}", edge_color
 
 
 def plot_error_points(
@@ -176,7 +202,8 @@ def plot_error_points(
     max_error: float = 1e-3,
     var_name: Optional[List[str]] = None,
     title: Optional[str] = None,
-    z_mode: str = "actual",  # "actual", "error", or None
+    z_mode: str = "actual",  # "actual", "error", or None,
+    s: int = 25,
 ) -> None:
     """
     Scatter input points colored by prediction error.
@@ -193,6 +220,7 @@ def plot_error_points(
         var_name (list of str or None): List of axis labels or None.
         title (str or None): Title for the plot.
         z_mode (str): "actual" for z_actual (for 3D), "error" for abs error (for 3D error surface), or None (for 2D).
+        s (int): Size of the scatter points. Default is 25.
     """
     n, k = X.shape
     check_ij(i, j, k)
@@ -201,13 +229,13 @@ def plot_error_points(
         y_point_ = X[idx, j]
         z_actual = y[idx]
         z_predicted = model.predict(X[idx].reshape(1, -1))[0]
-        color = error_color(z_actual, z_predicted, eps, max_error)
+        color, edge_color = error_color(z_actual, z_predicted, eps, max_error)
         if z_mode == "actual":
-            ax.scatter(x_point, y_point_, z_actual, color=color, s=50, edgecolor="black")
+            ax.scatter(x_point, y_point_, z_actual, color=color, s=s, edgecolor=edge_color)
         elif z_mode == "error":
-            ax.scatter(x_point, y_point_, abs(z_actual - z_predicted), color=color, s=50, edgecolor="black")
+            ax.scatter(x_point, y_point_, abs(z_actual - z_predicted), color=color, s=s, edgecolor=edge_color)
         else:
-            ax.scatter(x_point, y_point_, color=color, s=50, edgecolor="black")
+            ax.scatter(x_point, y_point_, color=color, s=s, edgecolor="black")
     if title is not None:
         ax.set_title(title)
     if var_name is not None:
@@ -252,7 +280,7 @@ def plot_3d_surface(
         surface_label (str): Title for the surface.
         zlabel (str): Label for the z-axis.
         var_name (list of str or None): List of axis labels or None.
-        alpha (float): Surface transparency.
+        alpha (float): Surface transparency. alpha=1.0 is fully opaque, alpha=0.0 is fully transparent. Default is 0.8.
         eps (float): Tolerance for error coloring.
         max_error (float): Maximum error for color scaling.
         cmap (str): Colormap for the surface.
@@ -290,6 +318,7 @@ def plot_contour_and_err(
     add_points: bool = False,
     vmin: float = None,
     vmax: float = None,
+    grid_visible: bool = True,
 ) -> None:
     """
     Plot a filled contour plot with scatter points colored by prediction error.
@@ -313,6 +342,7 @@ def plot_contour_and_err(
         add_points (bool): If True, adds scatter points to the contour plot.
         vmin (float): Minimum value for color scaling.
         vmax (float): Maximum value for color scaling.
+        grid_visible (bool): If True, displays a grid on the plot.
 
     Returns:
         None
@@ -320,6 +350,8 @@ def plot_contour_and_err(
     contour = ax.contourf(X_i, X_j, Z, cmap=cmap, levels=levels, vmin=vmin, vmax=vmax)
     ax.set_xlabel(var_name[i] if var_name else f"Dimension {i}")
     ax.set_ylabel(var_name[j] if var_name else f"Dimension {j}")
+    # add a grid
+    ax.grid(visible=grid_visible)
     plt.colorbar(contour, ax=ax)
     if add_points and X is not None and y is not None and model is not None:
         plot_error_points(ax, X, y, model, i, j, eps, max_error, var_name, title, z_mode=None)
@@ -356,6 +388,9 @@ def plotkd(
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
     add_points: bool = False,
+    grid_visible: bool = True,
+    contour_levels: int = 30,
+    use_floor: bool = True,
 ) -> None:
     """
     Plots the Kriging surrogate model for k-dimensional input data by varying two dimensions (i, j).
@@ -377,6 +412,9 @@ def plotkd(
         vmin (float, optional): Minimum value for the color scale. If None, determined from predictions.
         vmax (float, optional): Maximum value for the color scale. If None, determined from predictions.
         add_points (bool): If True, adds scatter points to the surface and contour plots. Default is False.
+        grid_visible (bool): If True, displays a grid on the contour plots. Default is True.
+        contour_levels (int): Number of contour levels in the filled contour plot. Default is 30.
+        use_floor (bool): If True, applies floor to non-numeric variables. Default is True.
 
     Examples:
         >>> import numpy as np
@@ -393,7 +431,7 @@ def plotkd(
     """
     k = X.shape[1]
     check_ij(i, j, k)
-    X_i, X_j, grid_points = generate_mesh_grid(X, i, j, num, var_type=var_type)
+    X_i, X_j, grid_points = generate_mesh_grid(X, i, j, num, var_type=var_type, use_floor=use_floor)
 
     # Predict the values and standard deviations
     y_pred, y_std = model.predict(grid_points, return_std=True)
@@ -402,7 +440,7 @@ def plotkd(
 
     fig = plt.figure(figsize=(12, 10))
 
-    # Plot predicted values
+    # Plot predicted values. Add_ppoints=False to avoid adding points in the 3D surface plot
     ax1 = fig.add_subplot(221, projection="3d")
     plot_3d_surface(
         (X_i, X_j, Z_pred),
@@ -422,10 +460,10 @@ def plotkd(
         error_surface=False,
         vmin=vmin,
         vmax=vmax,
-        add_points=add_points,
+        add_points=False,
     )
 
-    # Plot prediction error
+    # Plot prediction error. Add_points=False to avoid adding points in the 3D surface plot
     ax2 = fig.add_subplot(222, projection="3d")
     plot_3d_surface(
         (X_i, X_j, Z_std),
@@ -445,7 +483,7 @@ def plotkd(
         error_surface=True,
         vmin=vmin,
         vmax=vmax,
-        add_points=add_points,
+        add_points=False,
     )
 
     # Contour plot of predicted values
@@ -464,11 +502,12 @@ def plotkd(
         max_error=max_error,
         var_name=var_name,
         cmap=cmap,
-        levels=30,
+        levels=contour_levels,
         title="Prediction Contour",
         vmin=vmin,
         vmax=vmax,
         add_points=add_points,
+        grid_visible=grid_visible,
     )
 
     # Contour plot of prediction error
@@ -487,11 +526,12 @@ def plotkd(
         max_error=max_error,
         var_name=var_name,
         cmap=cmap,
-        levels=30,
+        levels=contour_levels,
         title="Error Contour",
         vmin=vmin,
         vmax=vmax,
         add_points=add_points,
+        grid_visible=grid_visible,
     )
 
     if show:
