@@ -239,8 +239,8 @@ def plot_error_points(
     if title is not None:
         ax.set_title(title)
     if var_name is not None:
-        ax.set_xlabel(var_name[0])
-        ax.set_ylabel(var_name[1])
+        ax.set_xlabel(var_name[i])
+        ax.set_ylabel(var_name[j])
     else:
         ax.set_xlabel(f"Dimension {i}")
         ax.set_ylabel(f"Dimension {j}")
