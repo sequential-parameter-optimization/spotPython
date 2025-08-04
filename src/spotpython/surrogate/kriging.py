@@ -731,7 +731,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         result = differential_evolution(objective, bounds)
         return result.x, result.fun
 
-    def plot(self, i: int = 0, j: int = 1, show: Optional[bool] = True) -> None:
+    def plot(self, i: int = 0, j: int = 1, show: Optional[bool] = True, add_points: bool = True) -> None:
         """
         This function plots 1D and 2D surrogates.
         Only for compatibility with the old Kriging implementation.
@@ -746,6 +746,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             show (bool):
                 If `True`, the plots are displayed.
                 If `False`, `plt.show()` should be called outside this function.
+            add_points (bool):
+                If `True`, the points from the design are added to the plot.
 
         Returns:
             None
@@ -795,4 +797,4 @@ class Kriging(BaseEstimator, RegressorMixin):
             if show:
                 plt.show()
         else:
-            plotkd(model=self, X=self.X_, y=self.y_, i=i, j=j, show=show, var_type=self.var_type)
+            plotkd(model=self, X=self.X_, y=self.y_, i=i, j=j, show=show, var_type=self.var_type, add_points=True)
