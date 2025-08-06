@@ -3,7 +3,7 @@ from numpy import mgrid
 from spotpython.design.designs import Designs
 
 
-class factorial(Designs):
+class Factorial(Designs):
     """
     Super class for factorial designs.
 
