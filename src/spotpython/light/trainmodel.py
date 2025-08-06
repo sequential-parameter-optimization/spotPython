@@ -1,7 +1,7 @@
 import lightning as L
 from spotpython.data.lightdatamodule import LightDataModule, PadSequenceManyToMany
 from spotpython.utils.eda import generate_config_id
-from spotpython.utils.metrics import calculate_xai_consistency
+from spotpython.utils.metrics import calculate_xai_consistency_corr, calculate_xai_consistency_cosine, calculate_xai_consistency_euclidean
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.callbacks import ModelCheckpoint
@@ -694,38 +694,38 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     if "IntegratedGradients" in fun_control["xai_methods"]:
         attr_ig = IntegratedGradients(model)
         attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline)
-        ig_attr_test_sum = attribution_ig.detach().numpy().sum(0)
-        row_sum_ig = np.sum(ig_attr_test_sum, axis=0)
-        if row_sum_ig == 0:
-            row_sum_ig += 1e-10
-        scaled_attribution_ig = ig_attr_test_sum / row_sum_ig
-        attributions_dict["IntegratedGradients"] = scaled_attribution_ig
+        ig_attr_test_sum = attribution_ig.detach().numpy().sum(axis=0)
+        l2_norm = np.linalg.norm(ig_attr_test_sum)
+        l2_normalized_ig = ig_attr_test_sum / l2_norm if l2_norm != 0 else ig_attr_test_sum
+        attributions_dict["IntegratedGradients"] = l2_normalized_ig
 
     if "KernelShap" in fun_control["xai_methods"]:
         attr_ks = KernelShap(model)
         attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline)
-        ks_attr_test_sum = attribution_ks.detach().numpy().sum(0)
-        row_sum_ks = np.sum(ks_attr_test_sum, axis=0)
-        if row_sum_ks == 0:
-            row_sum_ks += 1e-10
-        scaled_attribution_ks = ks_attr_test_sum / row_sum_ks
-        attributions_dict["KernelShap"] = scaled_attribution_ks
+        ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
+        l2_norm = np.linalg.norm(ks_attr_test_sum)
+        l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
+        attributions_dict["KernelShap"] = l2_normalized_ks
 
     if "DeepLift" in fun_control["xai_methods"]:
         attr_dl = DeepLift(model)
         attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline)
-        dl_attr_test_sum = attribution_dl.detach().numpy().sum(0)
-        row_sum_dl = np.sum(dl_attr_test_sum, axis=0)
-        if row_sum_dl == 0:
-            row_sum_dl += 1e-10
-        scaled_attribution_dl = dl_attr_test_sum / row_sum_dl
-        attributions_dict["DeepLift"] = scaled_attribution_dl
+        dl_attr_test_sum = attribution_dl.detach().numpy().sum(axis=0)
+        l2_norm = np.linalg.norm(dl_attr_test_sum)
+        l2_normalized_dl = dl_attr_test_sum / l2_norm if l2_norm != 0 else dl_attr_test_sum
+        attributions_dict["DeepLift"] = l2_normalized_dl
 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
     attributions = np.stack(attributions_list, axis=0)
 
-    result_xai = calculate_xai_consistency(attributions)
-
-    # -------------------------------------------------------------------------------------------------------------------
+    # Calculate corr:
+    if fun_control["xai_metric"] not in ["corr", "cosine", "euclidean"]:
+        raise ValueError(f"Invalid xai_metric: {fun_control['xai_metric']}. Valid metrics are: 'corr', 'cosine', 'euclidean'")
+    if fun_control["xai_metric"] == "corr":
+        result_xai = calculate_xai_consistency_corr(attributions)
+    elif fun_control["xai_metric"] == "cosine":
+        result_xai = calculate_xai_consistency_cosine(attributions)
+    elif fun_control["xai_metric"] == "euclidean":
+        result_xai = calculate_xai_consistency_euclidean(attributions)
 
     return result["val_loss"], result_xai
