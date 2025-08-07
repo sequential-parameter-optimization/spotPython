@@ -29,7 +29,7 @@ def test_to_red():
                                      show_progress=True,
                                      log_level=50),
         design_control=design_control_init(init_size=ni),
-        surrogate_control=surrogate_control_init(n_theta=2),
+        surrogate_control=surrogate_control_init(),
     )
     spot_1.run()
     assert spot_1.lower.size == 2

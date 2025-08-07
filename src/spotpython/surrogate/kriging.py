@@ -22,6 +22,23 @@ class Kriging(BaseEstimator, RegressorMixin):
         U_ (np.ndarray): The Cholesky factor of the correlation matrix after fit().
         X_ (np.ndarray): The training input data (n x d).
         y_ (np.ndarray): The training target values (n,).
+        negLnLike (float): The negative log-likelihood of the model.
+        Psi_ (np.ndarray): The correlation matrix after fit().
+        method (str): The fitting method used, can be "interpolation", "regression", or "reinterpolation".
+        isotropic (bool): Whether the model is isotropic or not.
+
+    Methods:
+        __init__: Initializes the Kriging model with hyperparameters.
+        _get_eps: Returns the square root of machine epsilon.
+        _set_variable_types: Sets variable types for the model.
+        get_model_params: Returns additional model parameters not included in get_params().
+        _update_log: Updates the log with current model parameters.
+        fit: Fits the Kriging model to training data X and y.
+        predict: Predicts the Kriging response at a set of points X.
+        build_Psi: Constructs a new correlation matrix Psi.
+        likelihood: Computes the negative concentrated log-likelihood and correlation matrix.
+        build_psi_vec: Builds the psi vector for predictive methods.
+        _pred: Computes a single-point Kriging prediction.
     """
 
     def __init__(
@@ -37,7 +54,6 @@ class Kriging(BaseEstimator, RegressorMixin):
         model_fun_evals: Optional[int] = None,
         min_theta: float = -3.0,
         max_theta: float = 2.0,
-        n_theta: int = None,
         theta_init_zero: bool = False,
         p_val: float = 2.0,
         n_p: int = 1,
@@ -50,6 +66,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         spot_writer=None,
         counter=None,
         metric_factorial="canberra",
+        isotropic: bool = False,
         **kwargs,
     ):
         """
@@ -66,6 +83,9 @@ class Kriging(BaseEstimator, RegressorMixin):
                 not positive-definite. Defaults to 1e4.
             method (str, optional):
                 The type how the model uis fitted. Can be "interpolation", "regression", or "reinterpolation". Defaults to "regression".
+            isotropic (bool, optional):
+                If True, the model is isotropic, meaning all variables are treated equally (only one theta value is used).
+                If False, the model can handle different theta values, one for each dimension. Defaults to False.
         """
         if eps is None:
             self.eps = self._get_eps()
@@ -90,7 +110,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.max_Lambda = max_Lambda
         self.min_p = min_p
         self.max_p = max_p
-        self.n_theta = n_theta
+        self.n_theta = None  # Will be set in fit()
+        self.isotropic = isotropic
         self.p_val = p_val
         self.n_p = n_p
         self.optim_p = optim_p
@@ -256,8 +277,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.y_ = y
         self.n, self.k = self.X_.shape
         self._set_variable_types()
-        if self.n_theta is None:
+        if self.isotropic:
+            # If isotropic, set n_theta to 1
+            self.n_theta = 1
+            print(f"Isotropic model: n_theta set to {self.n_theta}")
+        else:
             self.n_theta = self.k
+            print(f"Anisotropic model: n_theta set to {self.n_theta}")
         # Calculate and store min and max of X
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)

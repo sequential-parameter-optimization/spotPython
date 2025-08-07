@@ -41,7 +41,7 @@ def test_build_U():
     S_spot.min_y = min(y)
     S_spot.min_X = X[argmin(y)]
     # Kriging:
-    S = Kriging(name="kriging", seed=124, n_theta=2, noise=True, cod_type="norm")
+    S = Kriging(name="kriging", seed=124, noise=True, cod_type="norm")
     S.nat_X = copy.deepcopy(X)
     S.nat_y = copy.deepcopy(y)
     S.n = S.nat_X.shape[0]

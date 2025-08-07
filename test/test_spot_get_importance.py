@@ -20,7 +20,6 @@ def setup_spot_with_anisotropic():
     )
     design_control = design_control_init(init_size=10)
     surrogate_control = surrogate_control_init(
-        n_theta="anisotropic",
         method="interpolation"
     )
     S = spot.Spot(
@@ -44,7 +43,7 @@ def setup_spot_with_single_theta():
     )
     design_control = design_control_init(init_size=10)
     surrogate_control = surrogate_control_init(
-        n_theta=1,
+        isotropic=True,
         method="interpolation"
     )
     S = spot.Spot(

@@ -5,7 +5,7 @@ from spotpython.build import Kriging
 def test_set_variable_types_valid():
     # Create a Kriging instance with valid var_type
     var_type = ["num", "int", "float"]
-    S = Kriging(var_type=var_type, seed=124, n_theta=2, n_p=2, optim_p=True, noise=True)
+    S = Kriging(var_type=var_type, seed=124, n_p=2, optim_p=True, noise=True)
 
     # Initialize variables
     nat_X = np.array([[1, 2], [3, 4], [5, 6]])
@@ -25,7 +25,7 @@ def test_set_variable_types_valid():
 def test_set_variable_types_default():
     # Create a Kriging instance with var_type shorter than k
     var_type = ["num"]
-    S = Kriging(var_type=var_type, seed=124, n_theta=2, n_p=2, optim_p=True, noise=True)
+    S = Kriging(var_type=var_type, seed=124, n_p=2, optim_p=True, noise=True)
 
     # Initialize variables (k = 2, because the dim is 2)
     nat_X = np.array([[1, 2], [3, 4], [5, 6]])
@@ -47,7 +47,7 @@ def test_set_variable_types_default():
 def test_set_variable_types_mixed():
     # Create a Kriging instance with mixed var_type
     var_type = ["num", "factor", "int"]
-    S = Kriging(var_type=var_type, seed=124, n_theta=2, n_p=2, optim_p=True, noise=True)
+    S = Kriging(var_type=var_type, seed=124, n_p=2, optim_p=True, noise=True)
 
     # Initialize variables
     nat_X = np.array([[1, 2], [3, 4], [5, 6]])

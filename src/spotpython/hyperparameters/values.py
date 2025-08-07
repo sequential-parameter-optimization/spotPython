@@ -1470,8 +1470,7 @@ def get_tuned_hyperparameters(spot_tuner, fun_control=None) -> dict:
                         ] )
             from spotpython.utils.init import design_control_init, surrogate_control_init
             design_control = design_control_init(init_size=INIT_SIZE)
-            surrogate_control = surrogate_control_init(noise=True,
-                                                        n_theta=2)
+            surrogate_control = surrogate_control_init(noise=True)
             from spotpython.fun.hyperlight import HyperLight
             fun = HyperLight(log_level=50).fun
             from spotpython.spot import spot

@@ -14,7 +14,7 @@ def test_plot_progress():
         lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=fun_evals, tolerance_x=np.sqrt(np.spacing(1))
     )
     design_control = design_control_init(init_size=ni)
-    surrogate_control = surrogate_control_init(n_theta=3)
+    surrogate_control = surrogate_control_init()
     S = Spot(
         fun=fun,
         fun_control=fun_control,
@@ -43,7 +43,7 @@ def test_plot_progress_n_init():
         lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=fun_evals, tolerance_x=np.sqrt(np.spacing(1))
     )
     design_control = design_control_init(init_size=ni)
-    surrogate_control = surrogate_control_init(n_theta=3)
+    surrogate_control = surrogate_control_init()
     S = Spot(
         fun=fun,
         fun_control=fun_control,

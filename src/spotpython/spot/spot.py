@@ -171,7 +171,6 @@ class Spot:
                         model_fun_evals=10000,
                         min_theta=-3,
                         max_theta=3,
-                        n_theta=2,
                         theta_init_zero=False,
                         n_p=1,
                         optim_p=False,
@@ -422,17 +421,6 @@ class Spot:
         if self.surrogate_control["model_optimizer"] is None or self.optimizer is not None:
             self.surrogate_control.update({"model_optimizer": self.optimizer})
 
-        # if self.surrogate_control["n_theta"] is a string and == isotropic, use 1 theta value:
-        if isinstance(self.surrogate_control["n_theta"], str):
-            if self.surrogate_control["n_theta"] == "anisotropic":
-                self.surrogate_control.update({"n_theta": self.k})
-            else:
-                # case "isotropic":
-                self.surrogate_control.update({"n_theta": 1})
-        if isinstance(self.surrogate_control["n_theta"], int):
-            if self.surrogate_control["n_theta"] > 1:
-                self.surrogate_control.update({"n_theta": self.k})
-
     def surrogate_setup(self, surrogate) -> None:
         """Set up the surrogate model for the optimization process.
         This method initializes the surrogate model. If no surrogate model is provided,
@@ -455,7 +443,6 @@ class Spot:
                 - model_optimizer: Optimizer for model parameter tuning
                 - model_fun_evals: Number of function evaluations for model optimization
                 - min/max_theta: Bounds for theta parameters
-                - n_theta: Number of theta parameters
                 - theta_init_zero: Whether to initialize theta at zero
                 - p_val: Power parameter p value
                 - n_p: Number of p parameters
@@ -479,15 +466,14 @@ class Spot:
             ... )
             >>> surrogate_control = surrogate_control_init(
             ...     method="interpolation",
-            ...     n_theta="anisotropic"
             ... )
             >>> S = spot.Spot(
             ...     fun=Analytical().fun_sphere,
             ...     fun_control=fun_control,
             ...     surrogate_control=surrogate_control
             ... )
-            >>> print(S.surrogate.n_theta)
-            2
+            >>> print(S.surrogate.isotropic)
+            False
 
             >>> # Setup with custom surrogate
             >>> from sklearn.gaussian_process import GaussianProcessRegressor
@@ -514,7 +500,7 @@ class Spot:
                 model_fun_evals=self.surrogate_control["model_fun_evals"],
                 min_theta=self.surrogate_control["min_theta"],
                 max_theta=self.surrogate_control["max_theta"],
-                n_theta=self.surrogate_control["n_theta"],
+                isotropic=self.surrogate_control["isotropic"],
                 theta_init_zero=self.surrogate_control["theta_init_zero"],
                 p_val=self.surrogate_control["p_val"],
                 n_p=self.surrogate_control["n_p"],
@@ -2072,7 +2058,7 @@ class Spot:
                     tolerance_x = np.sqrt(np.spacing(1))
                     )
                 design_control=design_control_init(init_size=ni)
-                surrogate_control=surrogate_control_init(n_theta=3)
+                surrogate_control=surrogate_control_init()
                 S = spot.Spot(fun=fun,
                             fun_control=fun_control
                             design_control=design_control,
@@ -2303,8 +2289,7 @@ class Spot:
                             ] )
                 from spotpython.utils.init import design_control_init, surrogate_control_init
                 design_control = design_control_init(init_size=INIT_SIZE)
-                surrogate_control = surrogate_control_init(method="regression",
-                                                            n_theta=2)
+                surrogate_control = surrogate_control_init(method="regression")
                 from spotpython.fun.hyperlight import HyperLight
                 fun = HyperLight(log_level=50).fun
                 from spotpython.spot import spot
@@ -2662,7 +2647,7 @@ class Spot:
                     tolerance_x = np.sqrt(np.spacing(1))
                     )
                 design_control=design_control_init(init_size=ni)
-                surrogate_control=surrogate_control_init(n_theta=3)
+                surrogate_control=surrogate_control_init)
                 S = spot.Spot(fun=fun,
                             fun_control=fun_control,
                             design_control=design_control,
@@ -2733,7 +2718,6 @@ class Spot:
             >>> design_control = design_control_init(init_size=10)
             >>> # Setup surrogate model with multiple theta values
             >>> surrogate_control = surrogate_control_init(
-            ...     n_theta="anisotropic",
             ...     method="interpolation"
             ... )
             >>> # Initialize and run spot
@@ -2753,7 +2737,7 @@ class Spot:
             x3: 76.15%
             >>> # Try with single theta (should return zeros)
             >>> surrogate_control = surrogate_control_init(
-            ...     n_theta=1,
+            ...     isotropie=True,
             ...     method="interpolation"
             ... )
             >>> S2 = spot.Spot(
@@ -2772,14 +2756,14 @@ class Spot:
             print("No surrogate model available.")
             return []
 
-        # Check if surrogate has n_theta attribute
-        if not hasattr(self.surrogate, "n_theta"):
-            print("Surrogate model does not have n_theta attribute.")
+        # Check if surrogate has theta attribute for multi-theta models
+        if not hasattr(self.surrogate, "theta"):
+            print("Surrogate model does not have theta attribute.")
             return []
 
-        # Check if surrogate has theta attribute for multi-theta models
-        if self.surrogate.n_theta > 1 and not hasattr(self.surrogate, "theta"):
-            print("Surrogate model does not have theta attribute.")
+        # Check if surrogate is not isotropic
+        if self.surrogate.isotropic:
+            print("Surrogate model is isotropic.")
             return []
 
         # Check if all required attributes exist for importance calculation
@@ -2838,7 +2822,7 @@ class Spot:
                             print(var_name[i] + ": ", imp[i])
                     output.append([var_name[i], imp[i]])
         else:
-            print("Importance requires more than one theta values (n_theta>1).")
+            print("Importance requires more than one theta value (n_theta>1).")
         return output
 
     def plot_importance(self, threshold=0.1, filename=None, dpi=300, show=True, tkagg=False, figsize=(9, 6)) -> None:
@@ -2917,7 +2901,7 @@ class Spot:
                     tolerance_x = np.sqrt(np.spacing(1))
                     )
                 design_control=design_control_init(init_size=ni)
-                surrogate_control=surrogate_control_init(n_theta=3)
+                surrogate_control=surrogate_control_init()
                 S = spot.Spot(fun=fun,
                             fun_control=fun_control,
                             design_control=design_control,

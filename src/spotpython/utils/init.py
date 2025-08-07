@@ -739,7 +739,7 @@ def surrogate_control_init(
     model_fun_evals=10000,
     min_theta=-3.0,  # log10
     max_theta=2.0,  # log10
-    n_theta="anisotropic",
+    isotropic=False,
     p_val=2.0,
     n_p=1,
     optim_p=False,
@@ -764,14 +764,15 @@ def surrogate_control_init(
              Default is -3.
         max_theta (float): The maximum value of theta. Note that the base10-logarithm is used.
             Default is 3.
+        isotropic (bool):
+            Whether to use isotropic or anisotropic theta values. If True, the theta values are
+            isotropic, i.e., the same value is used for all dimensions. If False,
+            the theta values are anisotropic, i.e., different values are used for each dimension.
+            Default is False.
         method (str):
             The method to be used for the surrogate model. Default is "regression".
             Can be one of ["regression", "interpolation", "reinterpolation"].
             Note: Will also be set in the Spot class, if None.
-        n_theta (int):
-            The number of theta values. If larger than 1 or set to the string "anisotropic",
-            then the k theta values are used, where k is the problem dimension.
-            This is handled in spot.py. Default is "anisotropic".
         p_val (float):
                 p value. Used as an initial value if optim_p = True. Otherwise as a constant. Defaults to 2.0.
         n_p (int):
@@ -807,11 +808,8 @@ def surrogate_control_init(
                of `var_type` in the Spot class fun_control dictionary and the dimension of the problem.
                If the Kriging model is used as a surrogate in the Spot class, the setting from
                 surrogate_control_init() is overwritten.
-            * `n_theta`: If self.surrogate_control["n_theta"] > 1,
-               use k theta values, where k is the problem dimension specified in the Spot class.
-               The problem dimension is set in the Spot class based on the
-               length of the lower bounds.
-        * This value `model_fun_evals` will used for the optimization of the surrogate model, e.g., theta values.
+            * `isotropic`: If the `isotropic` value is set to `True`, then the theta values are isotropic, i.e., the same value is used for all dimensions. If it is set to `False`, then the theta values are anisotropic, i.e., different values are used for each dimension.
+        * The value `model_fun_evals` will used for the optimization of the surrogate model, e.g., theta values.
           Differential evaluation uses `maxiter = 1000` and sets the number of function evaluations to
           (maxiter + 1) * popsize * N, which results in 1000 * 15 * k,
           because the default popsize is 15 and N is the number of parameters. This is already sufficient
@@ -826,7 +824,7 @@ def surrogate_control_init(
         "model_fun_evals": model_fun_evals,
         "min_theta": min_theta,
         "max_theta": max_theta,
-        "n_theta": n_theta,
+        "isotropic": isotropic,
         "p_val": p_val,
         "n_p": n_p,
         "optim_p": optim_p,

@@ -10,7 +10,7 @@ def test_set_de_bounds():
 
     # Without Noise:
 
-    S = Kriging(name="kriging", seed=123, log_level=50, n_theta=1, noise=False, cod_type="norm")
+    S = Kriging(name="kriging", seed=123, log_level=50, isotropic=True, noise=False, cod_type="norm")
     S.fit(X_train, y_train)
     res = [[S.min_theta, S.max_theta]]
     S._set_de_bounds()
@@ -33,7 +33,7 @@ def test_set_de_bounds():
 
     # With Noise:
 
-    S = Kriging(name="kriging", seed=123, log_level=50, n_theta=1, noise=True, cod_type="norm")
+    S = Kriging(name="kriging", seed=123, log_level=50, isotropic=True, noise=True, cod_type="norm")
     S.fit(X_train, y_train)
 
     res = [[S.min_theta, S.max_theta], [S.min_Lambda, S.max_Lambda]]

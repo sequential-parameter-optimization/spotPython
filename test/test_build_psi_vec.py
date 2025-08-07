@@ -8,7 +8,7 @@ def test_build_psi_vec():
     X_train = np.array([[1.0, 2.0], [2.0, 4.0], [3.0, 6.0]])
     y_train = np.array([1.0, 2.0, 3.0])
 
-    S = Kriging(name="kriging", seed=123, log_level=50, n_theta=1, noise=False, cod_type="norm")
+    S = Kriging(name="kriging", seed=123, log_level=50, isotropic=True, noise=False, cod_type="norm")
     S.fit(X_train, y_train)
 
     # force theta to simple values:

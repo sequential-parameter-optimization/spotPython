@@ -5,7 +5,7 @@ from spotpython.build import Kriging
 
 def test_initialize_matrices():
     # Create a Kriging instance
-    S = Kriging(seed=124, n_theta=2, n_p=2, optim_p=True, noise=True)
+    S = Kriging(seed=124, n_p=2, optim_p=True, noise=True)
 
     # Initialize variables
     nat_X = np.array([[1, 2], [3, 4], [5, 6]])
@@ -37,7 +37,7 @@ def test_initialize_matrices():
 
 def test_initialize_matrices_adjust_n_p():
     # Create a Kriging instance with n_p greater than k
-    S = Kriging(seed=124, n_theta=2, n_p=3, optim_p=True, noise=True)
+    S = Kriging(seed=124, n_p=3, optim_p=True, noise=True)
 
     # Initialize variables
     nat_X = np.array([[1, 2], [3, 4], [5, 6]])

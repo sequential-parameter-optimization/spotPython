@@ -8,7 +8,7 @@ def test_is_any():
     nat_y = np.array([0, 1])
     n = 1
     p = 1
-    S = Kriging(seed=124, n_theta=n, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
+    S = Kriging(seed=124, isotropic=True, n_p=p, optim_p=True, noise=False, theta_init_zero=True)
     S._initialize_variables(nat_X, nat_y)
     S._set_variable_types()
     S._set_theta_values()
