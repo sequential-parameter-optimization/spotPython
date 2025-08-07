@@ -6054,7 +6054,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="go">                model_fun_evals=10000,</span>
 <span class="go">                min_theta=-3,</span>
 <span class="go">                max_theta=3,</span>
-<span class="go">                n_theta=2,</span>
 <span class="go">                theta_init_zero=False,</span>
 <span class="go">                n_p=1,</span>
 <span class="go">                optim_p=False,</span>
@@ -9036,7 +9035,42 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">3034</span>
 <span class="normal">3035</span>
 <span class="normal">3036</span>
-<span class="normal">3037</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
+<span class="normal">3037</span>
+<span class="normal">3038</span>
+<span class="normal">3039</span>
+<span class="normal">3040</span>
+<span class="normal">3041</span>
+<span class="normal">3042</span>
+<span class="normal">3043</span>
+<span class="normal">3044</span>
+<span class="normal">3045</span>
+<span class="normal">3046</span>
+<span class="normal">3047</span>
+<span class="normal">3048</span>
+<span class="normal">3049</span>
+<span class="normal">3050</span>
+<span class="normal">3051</span>
+<span class="normal">3052</span>
+<span class="normal">3053</span>
+<span class="normal">3054</span>
+<span class="normal">3055</span>
+<span class="normal">3056</span>
+<span class="normal">3057</span>
+<span class="normal">3058</span>
+<span class="normal">3059</span>
+<span class="normal">3060</span>
+<span class="normal">3061</span>
+<span class="normal">3062</span>
+<span class="normal">3063</span>
+<span class="normal">3064</span>
+<span class="normal">3065</span>
+<span class="normal">3066</span>
+<span class="normal">3067</span>
+<span class="normal">3068</span>
+<span class="normal">3069</span>
+<span class="normal">3070</span>
+<span class="normal">3071</span>
+<span class="normal">3072</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Spot base class to handle the following tasks in a uniform manner:</span>
 
@@ -9132,7 +9166,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                        model_fun_evals=10000,</span>
 <span class="sd">                        min_theta=-3,</span>
 <span class="sd">                        max_theta=3,</span>
-<span class="sd">                        n_theta=2,</span>
 <span class="sd">                        theta_init_zero=False,</span>
 <span class="sd">                        n_p=1,</span>
 <span class="sd">                        optim_p=False,</span>
@@ -9383,17 +9416,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;model_optimizer&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;model_optimizer&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">})</span>
 
-        <span class="c1"># if self.surrogate_control[&quot;n_theta&quot;] is a string and == isotropic, use 1 theta value:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;anisotropic&quot;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;n_theta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">})</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># case &quot;isotropic&quot;:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;n_theta&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;n_theta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">})</span>
-
     <span class="k">def</span> <span class="nf">surrogate_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surrogate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the surrogate model for the optimization process.</span>
 <span class="sd">        This method initializes the surrogate model. If no surrogate model is provided,</span>
@@ -9416,7 +9438,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                - model_optimizer: Optimizer for model parameter tuning</span>
 <span class="sd">                - model_fun_evals: Number of function evaluations for model optimization</span>
 <span class="sd">                - min/max_theta: Bounds for theta parameters</span>
-<span class="sd">                - n_theta: Number of theta parameters</span>
 <span class="sd">                - theta_init_zero: Whether to initialize theta at zero</span>
 <span class="sd">                - p_val: Power parameter p value</span>
 <span class="sd">                - n_p: Number of p parameters</span>
@@ -9440,15 +9461,14 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            ... )</span>
 <span class="sd">            &gt;&gt;&gt; surrogate_control = surrogate_control_init(</span>
 <span class="sd">            ...     method=&quot;interpolation&quot;,</span>
-<span class="sd">            ...     n_theta=&quot;anisotropic&quot;</span>
 <span class="sd">            ... )</span>
 <span class="sd">            &gt;&gt;&gt; S = spot.Spot(</span>
 <span class="sd">            ...     fun=Analytical().fun_sphere,</span>
 <span class="sd">            ...     fun_control=fun_control,</span>
 <span class="sd">            ...     surrogate_control=surrogate_control</span>
 <span class="sd">            ... )</span>
-<span class="sd">            &gt;&gt;&gt; print(S.surrogate.n_theta)</span>
-<span class="sd">            2</span>
+<span class="sd">            &gt;&gt;&gt; print(S.surrogate.isotropic)</span>
+<span class="sd">            False</span>
 
 <span class="sd">            &gt;&gt;&gt; # Setup with custom surrogate</span>
 <span class="sd">            &gt;&gt;&gt; from sklearn.gaussian_process import GaussianProcessRegressor</span>
@@ -9475,7 +9495,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                 <span class="n">model_fun_evals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;model_fun_evals&quot;</span><span class="p">],</span>
                 <span class="n">min_theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;min_theta&quot;</span><span class="p">],</span>
                 <span class="n">max_theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;max_theta&quot;</span><span class="p">],</span>
-                <span class="n">n_theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">],</span>
+                <span class="n">isotropic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;isotropic&quot;</span><span class="p">],</span>
                 <span class="n">theta_init_zero</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;theta_init_zero&quot;</span><span class="p">],</span>
                 <span class="n">p_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;p_val&quot;</span><span class="p">],</span>
                 <span class="n">n_p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_p&quot;</span><span class="p">],</span>
@@ -11033,7 +11053,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                    tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="sd">                    )</span>
 <span class="sd">                design_control=design_control_init(init_size=ni)</span>
-<span class="sd">                surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="sd">                surrogate_control=surrogate_control_init()</span>
 <span class="sd">                S = spot.Spot(fun=fun,</span>
 <span class="sd">                            fun_control=fun_control</span>
 <span class="sd">                            design_control=design_control,</span>
@@ -11264,8 +11284,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                            ] )</span>
 <span class="sd">                from spotpython.utils.init import design_control_init, surrogate_control_init</span>
 <span class="sd">                design_control = design_control_init(init_size=INIT_SIZE)</span>
-<span class="sd">                surrogate_control = surrogate_control_init(method=&quot;regression&quot;,</span>
-<span class="sd">                                                            n_theta=2)</span>
+<span class="sd">                surrogate_control = surrogate_control_init(method=&quot;regression&quot;)</span>
 <span class="sd">                from spotpython.fun.hyperlight import HyperLight</span>
 <span class="sd">                fun = HyperLight(log_level=50).fun</span>
 <span class="sd">                from spotpython.spot import spot</span>
@@ -11479,19 +11498,84 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-        <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">n_grid</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">contour_levels</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
         <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-        <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_floor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">,</span>
+        <span class="n">grid_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span>
+        <span class="n">max_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+        <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Plot a contour plot of the surrogate model for two hyperparameters.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            i (int):</span>
+<span class="sd">                index of the first hyperparameter to plot.</span>
+<span class="sd">            j (int):</span>
+<span class="sd">                index of the second hyperparameter to plot.</span>
+<span class="sd">            min_z (float, optional):</span>
+<span class="sd">                minimum value for the z-axis. If `None`, the minimum value is calculated from the surrogate predictions.</span>
+<span class="sd">            max_z (float, optional):</span>
+<span class="sd">                maximum value for the z-axis. If `None`, the maximum value is calculated from the surrogate predictions.</span>
+<span class="sd">            show (bool):</span>
+<span class="sd">                whether to show the plot. Default is `True`.</span>
+<span class="sd">            title (str, optional):</span>
+<span class="sd">                title of the plot. If `None`, a default title is used.</span>
+<span class="sd">            filename (str, optional):</span>
+<span class="sd">                filename to save the plot. If `None`, the plot is not saved.</span>
+<span class="sd">            n_grid (int):</span>
+<span class="sd">                number of grid points for the contour plot. Default is 100.</span>
+<span class="sd">            contour_levels (int):</span>
+<span class="sd">                number of contour levels. Default is 25.</span>
+<span class="sd">            dpi (int):</span>
+<span class="sd">                dots per inch for the saved plot. Default is 200.</span>
+<span class="sd">            figsize (tuple):</span>
+<span class="sd">                size of the figure for the plot. Default is (12, 5).</span>
+<span class="sd">            use_floor (bool):</span>
+<span class="sd">                If `True`, the floor values of the other hyperparameters are used for plotting. If `False`, the ceiling values are used. Default is `True`.</span>
+<span class="sd">            tkagg (bool):</span>
+<span class="sd">                If `True`, use the TkAgg backend for matplotlib. Default is `False`.</span>
+<span class="sd">            cmap (str):</span>
+<span class="sd">                Colormap to use for the contour plot. Default is &quot;jet&quot;.</span>
+<span class="sd">            grid_visible (bool):</span>
+<span class="sd">                If `True`, show the grid in the contour plot. Default is `True`.</span>
+<span class="sd">            alpha (float):</span>
+<span class="sd">                Transparency level for the contour lines. Default is 0.8.</span>
+<span class="sd">            eps (float):</span>
+<span class="sd">                Small value to avoid division by zero in the surrogate predictions. Default is 1e-4.</span>
+<span class="sd">            max_error (float):</span>
+<span class="sd">                Maximum error allowed in the surrogate predictions. Default is 1e-3.</span>
+<span class="sd">            use_floor (bool):</span>
+<span class="sd">                If `True`, use the minimum values of the other hyperparameters for plotting. If `False`, use the maximum values. Default is `True`.</span>
+<span class="sd">            add_points (bool):</span>
+<span class="sd">                If `True`, add the points from the surrogate model to the contour plot. Default is `True`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">plotkd</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">var_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span>
+        <span class="n">plotkd</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span>
+            <span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+            <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
+            <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span>
+            <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span>
+            <span class="n">var_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">,</span>
+            <span class="n">grid_visible</span><span class="o">=</span><span class="n">grid_visible</span><span class="p">,</span>
+            <span class="n">contour_levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+            <span class="n">max_error</span><span class="o">=</span><span class="n">max_error</span><span class="p">,</span>
+            <span class="n">use_floor</span><span class="o">=</span><span class="n">use_floor</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span>
+            <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
+            <span class="n">add_points</span><span class="o">=</span><span class="n">add_points</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -11501,8 +11585,8 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
         <span class="n">max_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">scale_global</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-        <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">n_grid</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">contour_levels</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
         <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
         <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -11533,20 +11617,8 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                number of contour levels. Default is 10.</span>
 <span class="sd">            dpi (int):</span>
 <span class="sd">                dpi of the plot. Default is 200.</span>
-<span class="sd">            use_min (bool):</span>
-<span class="sd">                Use the minimum value for determing the hidden dimensions in the plot for categorical and</span>
-<span class="sd">                integer parameters.</span>
-<span class="sd">                In 3d-plots, only two variables can be independent. The remaining input variables are set</span>
-<span class="sd">                to their minimum value.</span>
-<span class="sd">                Default is `False`.</span>
-<span class="sd">                If use_min and use_max are both `True`, both values are used.</span>
-<span class="sd">            use_max (bool):</span>
-<span class="sd">                Use the minimum value for determing the hidden dimensions in the plot for categorical and</span>
-<span class="sd">                integer parameters.</span>
-<span class="sd">                In 3d-plots, only two variables can be independent. The remaining input variables are set</span>
-<span class="sd">                to their minimum value.</span>
-<span class="sd">                Default is `True`.</span>
-<span class="sd">                If use_min and use_max are both `True`, both values are used.</span>
+<span class="sd">            use_min (bool): Deprecated in 0.31.12.</span>
+<span class="sd">            use_max (bool): Deprecated in 0.31.12.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None.</span>
@@ -11570,7 +11642,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                    tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="sd">                    )</span>
 <span class="sd">                design_control=design_control_init(init_size=ni)</span>
-<span class="sd">                surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="sd">                surrogate_control=surrogate_control_init)</span>
 <span class="sd">                S = spot.Spot(fun=fun,</span>
 <span class="sd">                            fun_control=fun_control,</span>
 <span class="sd">                            design_control=design_control,</span>
@@ -11608,8 +11680,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                         <span class="n">n_grid</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span>
                         <span class="n">contour_levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
                         <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
-                        <span class="n">use_max</span><span class="o">=</span><span class="n">use_max</span><span class="p">,</span>
-                        <span class="n">use_min</span><span class="o">=</span><span class="n">use_min</span><span class="p">,</span>
                         <span class="n">tkagg</span><span class="o">=</span><span class="n">tkagg</span><span class="p">,</span>
                     <span class="p">)</span>
 
@@ -11643,7 +11713,6 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            &gt;&gt;&gt; design_control = design_control_init(init_size=10)</span>
 <span class="sd">            &gt;&gt;&gt; # Setup surrogate model with multiple theta values</span>
 <span class="sd">            &gt;&gt;&gt; surrogate_control = surrogate_control_init(</span>
-<span class="sd">            ...     n_theta=&quot;anisotropic&quot;,</span>
 <span class="sd">            ...     method=&quot;interpolation&quot;</span>
 <span class="sd">            ... )</span>
 <span class="sd">            &gt;&gt;&gt; # Initialize and run spot</span>
@@ -11663,7 +11732,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            x3: 76.15%</span>
 <span class="sd">            &gt;&gt;&gt; # Try with single theta (should return zeros)</span>
 <span class="sd">            &gt;&gt;&gt; surrogate_control = surrogate_control_init(</span>
-<span class="sd">            ...     n_theta=1,</span>
+<span class="sd">            ...     isotropie=True,</span>
 <span class="sd">            ...     method=&quot;interpolation&quot;</span>
 <span class="sd">            ... )</span>
 <span class="sd">            &gt;&gt;&gt; S2 = spot.Spot(</span>
@@ -11682,14 +11751,14 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No surrogate model available.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="c1"># Check if surrogate has n_theta attribute</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;n_theta&quot;</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have n_theta attribute.&quot;</span><span class="p">)</span>
+        <span class="c1"># Check if surrogate has theta attribute for multi-theta models</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have theta attribute.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="c1"># Check if surrogate has theta attribute for multi-theta models</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have theta attribute.&quot;</span><span class="p">)</span>
+        <span class="c1"># Check if surrogate is not isotropic</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model is isotropic.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
         <span class="c1"># Check if all required attributes exist for importance calculation</span>
@@ -11748,7 +11817,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
                             <span class="nb">print</span><span class="p">(</span><span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">imp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                     <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">imp</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importance requires more than one theta values (n_theta&gt;1).&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importance requires more than one theta value (n_theta&gt;1).&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span>
 
     <span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -11827,7 +11896,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">                    tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="sd">                    )</span>
 <span class="sd">                design_control=design_control_init(init_size=ni)</span>
-<span class="sd">                surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="sd">                surrogate_control=surrogate_control_init()</span>
 <span class="sd">                S = spot.Spot(fun=fun,</span>
 <span class="sd">                            fun_control=fun_control,</span>
 <span class="sd">                            design_control=design_control,</span>
@@ -12161,7 +12230,22 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2348</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2333</span>
+<span class="normal">2334</span>
+<span class="normal">2335</span>
+<span class="normal">2336</span>
+<span class="normal">2337</span>
+<span class="normal">2338</span>
+<span class="normal">2339</span>
+<span class="normal">2340</span>
+<span class="normal">2341</span>
+<span class="normal">2342</span>
+<span class="normal">2343</span>
+<span class="normal">2344</span>
+<span class="normal">2345</span>
+<span class="normal">2346</span>
+<span class="normal">2347</span>
+<span class="normal">2348</span>
 <span class="normal">2349</span>
 <span class="normal">2350</span>
 <span class="normal">2351</span>
@@ -12192,22 +12276,7 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="normal">2376</span>
 <span class="normal">2377</span>
 <span class="normal">2378</span>
-<span class="normal">2379</span>
-<span class="normal">2380</span>
-<span class="normal">2381</span>
-<span class="normal">2382</span>
-<span class="normal">2383</span>
-<span class="normal">2384</span>
-<span class="normal">2385</span>
-<span class="normal">2386</span>
-<span class="normal">2387</span>
-<span class="normal">2388</span>
-<span class="normal">2389</span>
-<span class="normal">2390</span>
-<span class="normal">2391</span>
-<span class="normal">2392</span>
-<span class="normal">2393</span>
-<span class="normal">2394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">2379</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">chg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Change the values of elements at indices `i` and `j` in the array `z0` to `x` and `y`, respectively.</span>
 
@@ -12336,7 +12405,21 @@ and handling NaN values. The results are stored in <code>self.X</code> and <code
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1194</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1180</span>
+<span class="normal">1181</span>
+<span class="normal">1182</span>
+<span class="normal">1183</span>
+<span class="normal">1184</span>
+<span class="normal">1185</span>
+<span class="normal">1186</span>
+<span class="normal">1187</span>
+<span class="normal">1188</span>
+<span class="normal">1189</span>
+<span class="normal">1190</span>
+<span class="normal">1191</span>
+<span class="normal">1192</span>
+<span class="normal">1193</span>
+<span class="normal">1194</span>
 <span class="normal">1195</span>
 <span class="normal">1196</span>
 <span class="normal">1197</span>
@@ -12395,21 +12478,7 @@ and handling NaN values. The results are stored in <code>self.X</code> and <code
 <span class="normal">1250</span>
 <span class="normal">1251</span>
 <span class="normal">1252</span>
-<span class="normal">1253</span>
-<span class="normal">1254</span>
-<span class="normal">1255</span>
-<span class="normal">1256</span>
-<span class="normal">1257</span>
-<span class="normal">1258</span>
-<span class="normal">1259</span>
-<span class="normal">1260</span>
-<span class="normal">1261</span>
-<span class="normal">1262</span>
-<span class="normal">1263</span>
-<span class="normal">1264</span>
-<span class="normal">1265</span>
-<span class="normal">1266</span>
-<span class="normal">1267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_initial_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">evaluate_initial_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Evaluate the initial design.</span>
 
@@ -12668,7 +12737,21 @@ other surrogate models can be used as well.</li>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1348</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1334</span>
+<span class="normal">1335</span>
+<span class="normal">1336</span>
+<span class="normal">1337</span>
+<span class="normal">1338</span>
+<span class="normal">1339</span>
+<span class="normal">1340</span>
+<span class="normal">1341</span>
+<span class="normal">1342</span>
+<span class="normal">1343</span>
+<span class="normal">1344</span>
+<span class="normal">1345</span>
+<span class="normal">1346</span>
+<span class="normal">1347</span>
+<span class="normal">1348</span>
 <span class="normal">1349</span>
 <span class="normal">1350</span>
 <span class="normal">1351</span>
@@ -12731,21 +12814,7 @@ other surrogate models can be used as well.</li>
 <span class="normal">1408</span>
 <span class="normal">1409</span>
 <span class="normal">1410</span>
-<span class="normal">1411</span>
-<span class="normal">1412</span>
-<span class="normal">1413</span>
-<span class="normal">1414</span>
-<span class="normal">1415</span>
-<span class="normal">1416</span>
-<span class="normal">1417</span>
-<span class="normal">1418</span>
-<span class="normal">1419</span>
-<span class="normal">1420</span>
-<span class="normal">1421</span>
-<span class="normal">1422</span>
-<span class="normal">1423</span>
-<span class="normal">1424</span>
-<span class="normal">1425</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_surrogate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_surrogate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit surrogate model. The surrogate model</span>
 <span class="sd">    is fitted to the data stored in `self.X` and `self.y`.</span>
@@ -12963,7 +13032,21 @@ other surrogate models can be used as well.</li>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1844</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1830</span>
+<span class="normal">1831</span>
+<span class="normal">1832</span>
+<span class="normal">1833</span>
+<span class="normal">1834</span>
+<span class="normal">1835</span>
+<span class="normal">1836</span>
+<span class="normal">1837</span>
+<span class="normal">1838</span>
+<span class="normal">1839</span>
+<span class="normal">1840</span>
+<span class="normal">1841</span>
+<span class="normal">1842</span>
+<span class="normal">1843</span>
+<span class="normal">1844</span>
 <span class="normal">1845</span>
 <span class="normal">1846</span>
 <span class="normal">1847</span>
@@ -12984,21 +13067,7 @@ other surrogate models can be used as well.</li>
 <span class="normal">1862</span>
 <span class="normal">1863</span>
 <span class="normal">1864</span>
-<span class="normal">1865</span>
-<span class="normal">1866</span>
-<span class="normal">1867</span>
-<span class="normal">1868</span>
-<span class="normal">1869</span>
-<span class="normal">1870</span>
-<span class="normal">1871</span>
-<span class="normal">1872</span>
-<span class="normal">1873</span>
-<span class="normal">1874</span>
-<span class="normal">1875</span>
-<span class="normal">1876</span>
-<span class="normal">1877</span>
-<span class="normal">1878</span>
-<span class="normal">1879</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_design</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">1865</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_design</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a design with `size` points in the interval [lower, upper].</span>
 
 <span class="sd">    Args:</span>
@@ -13109,7 +13178,21 @@ y0 (numpy.ndarray): function value at X</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1773</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1759</span>
+<span class="normal">1760</span>
+<span class="normal">1761</span>
+<span class="normal">1762</span>
+<span class="normal">1763</span>
+<span class="normal">1764</span>
+<span class="normal">1765</span>
+<span class="normal">1766</span>
+<span class="normal">1767</span>
+<span class="normal">1768</span>
+<span class="normal">1769</span>
+<span class="normal">1770</span>
+<span class="normal">1771</span>
+<span class="normal">1772</span>
+<span class="normal">1773</span>
 <span class="normal">1774</span>
 <span class="normal">1775</span>
 <span class="normal">1776</span>
@@ -13145,21 +13228,7 @@ y0 (numpy.ndarray): function value at X</p>
 <span class="normal">1806</span>
 <span class="normal">1807</span>
 <span class="normal">1808</span>
-<span class="normal">1809</span>
-<span class="normal">1810</span>
-<span class="normal">1811</span>
-<span class="normal">1812</span>
-<span class="normal">1813</span>
-<span class="normal">1814</span>
-<span class="normal">1815</span>
-<span class="normal">1816</span>
-<span class="normal">1817</span>
-<span class="normal">1818</span>
-<span class="normal">1819</span>
-<span class="normal">1820</span>
-<span class="normal">1821</span>
-<span class="normal">1822</span>
-<span class="normal">1823</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_random_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">1809</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">generate_random_point</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a random point in the design space.</span>
 
 <span class="sd">    Returns:</span>
@@ -13276,7 +13345,6 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">design_control</span> <span class="o">=</span> <span class="n">design_control_init</span><span class="p">(</span><span class="n">init_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Setup surrogate model with multiple theta values</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">surrogate_control_init</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">n_theta</span><span class="o">=</span><span class="s2">&quot;anisotropic&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;interpolation&quot;</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize and run spot</span>
@@ -13296,7 +13364,7 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 <span class="go">x3: 76.15%</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Try with single theta (should return zeros)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">surrogate_control_init</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">n_theta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">isotropie</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;interpolation&quot;</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">S2</span> <span class="o">=</span> <span class="n">spot</span><span class="o">.</span><span class="n">Spot</span><span class="p">(</span>
@@ -13313,43 +13381,7 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2655</span>
-<span class="normal">2656</span>
-<span class="normal">2657</span>
-<span class="normal">2658</span>
-<span class="normal">2659</span>
-<span class="normal">2660</span>
-<span class="normal">2661</span>
-<span class="normal">2662</span>
-<span class="normal">2663</span>
-<span class="normal">2664</span>
-<span class="normal">2665</span>
-<span class="normal">2666</span>
-<span class="normal">2667</span>
-<span class="normal">2668</span>
-<span class="normal">2669</span>
-<span class="normal">2670</span>
-<span class="normal">2671</span>
-<span class="normal">2672</span>
-<span class="normal">2673</span>
-<span class="normal">2674</span>
-<span class="normal">2675</span>
-<span class="normal">2676</span>
-<span class="normal">2677</span>
-<span class="normal">2678</span>
-<span class="normal">2679</span>
-<span class="normal">2680</span>
-<span class="normal">2681</span>
-<span class="normal">2682</span>
-<span class="normal">2683</span>
-<span class="normal">2684</span>
-<span class="normal">2685</span>
-<span class="normal">2686</span>
-<span class="normal">2687</span>
-<span class="normal">2688</span>
-<span class="normal">2689</span>
-<span class="normal">2690</span>
-<span class="normal">2691</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2691</span>
 <span class="normal">2692</span>
 <span class="normal">2693</span>
 <span class="normal">2694</span>
@@ -13414,7 +13446,42 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 <span class="normal">2753</span>
 <span class="normal">2754</span>
 <span class="normal">2755</span>
-<span class="normal">2756</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">2756</span>
+<span class="normal">2757</span>
+<span class="normal">2758</span>
+<span class="normal">2759</span>
+<span class="normal">2760</span>
+<span class="normal">2761</span>
+<span class="normal">2762</span>
+<span class="normal">2763</span>
+<span class="normal">2764</span>
+<span class="normal">2765</span>
+<span class="normal">2766</span>
+<span class="normal">2767</span>
+<span class="normal">2768</span>
+<span class="normal">2769</span>
+<span class="normal">2770</span>
+<span class="normal">2771</span>
+<span class="normal">2772</span>
+<span class="normal">2773</span>
+<span class="normal">2774</span>
+<span class="normal">2775</span>
+<span class="normal">2776</span>
+<span class="normal">2777</span>
+<span class="normal">2778</span>
+<span class="normal">2779</span>
+<span class="normal">2780</span>
+<span class="normal">2781</span>
+<span class="normal">2782</span>
+<span class="normal">2783</span>
+<span class="normal">2784</span>
+<span class="normal">2785</span>
+<span class="normal">2786</span>
+<span class="normal">2787</span>
+<span class="normal">2788</span>
+<span class="normal">2789</span>
+<span class="normal">2790</span>
+<span class="normal">2791</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Returns:</span>
@@ -13444,7 +13511,6 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 <span class="sd">        &gt;&gt;&gt; design_control = design_control_init(init_size=10)</span>
 <span class="sd">        &gt;&gt;&gt; # Setup surrogate model with multiple theta values</span>
 <span class="sd">        &gt;&gt;&gt; surrogate_control = surrogate_control_init(</span>
-<span class="sd">        ...     n_theta=&quot;anisotropic&quot;,</span>
 <span class="sd">        ...     method=&quot;interpolation&quot;</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; # Initialize and run spot</span>
@@ -13464,7 +13530,7 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 <span class="sd">        x3: 76.15%</span>
 <span class="sd">        &gt;&gt;&gt; # Try with single theta (should return zeros)</span>
 <span class="sd">        &gt;&gt;&gt; surrogate_control = surrogate_control_init(</span>
-<span class="sd">        ...     n_theta=1,</span>
+<span class="sd">        ...     isotropie=True,</span>
 <span class="sd">        ...     method=&quot;interpolation&quot;</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; S2 = spot.Spot(</span>
@@ -13483,14 +13549,14 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No surrogate model available.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-    <span class="c1"># Check if surrogate has n_theta attribute</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;n_theta&quot;</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have n_theta attribute.&quot;</span><span class="p">)</span>
+    <span class="c1"># Check if surrogate has theta attribute for multi-theta models</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have theta attribute.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-    <span class="c1"># Check if surrogate has theta attribute for multi-theta models</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have theta attribute.&quot;</span><span class="p">)</span>
+    <span class="c1"># Check if surrogate is not isotropic</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model is isotropic.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="c1"># Check if all required attributes exist for importance calculation</span>
@@ -13734,7 +13800,21 @@ by <code>repair_non_numeric()</code> and <code>selectNew()</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">789</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span>
+<span class="normal">781</span>
+<span class="normal">782</span>
+<span class="normal">783</span>
+<span class="normal">784</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span>
+<span class="normal">788</span>
+<span class="normal">789</span>
 <span class="normal">790</span>
 <span class="normal">791</span>
 <span class="normal">792</span>
@@ -13813,21 +13893,7 @@ by <code>repair_non_numeric()</code> and <code>selectNew()</code>.</p>
 <span class="normal">865</span>
 <span class="normal">866</span>
 <span class="normal">867</span>
-<span class="normal">868</span>
-<span class="normal">869</span>
-<span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
-<span class="normal">875</span>
-<span class="normal">876</span>
-<span class="normal">877</span>
-<span class="normal">878</span>
-<span class="normal">879</span>
-<span class="normal">880</span>
-<span class="normal">881</span>
-<span class="normal">882</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_new_X0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">868</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_new_X0</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate new design points for the optimization process.</span>
 <span class="sd">    This method attempts to suggest and repair new design points using the surrogate model</span>
@@ -14037,7 +14103,21 @@ by <code>repair_non_numeric()</code> and <code>selectNew()</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">530</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
 <span class="normal">531</span>
 <span class="normal">532</span>
 <span class="normal">533</span>
@@ -14104,21 +14184,7 @@ by <code>repair_non_numeric()</code> and <code>selectNew()</code>.</p>
 <span class="normal">594</span>
 <span class="normal">595</span>
 <span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
-<span class="normal">600</span>
-<span class="normal">601</span>
-<span class="normal">602</span>
-<span class="normal">603</span>
-<span class="normal">604</span>
-<span class="normal">605</span>
-<span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_spot_attributes_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="normal">597</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_spot_attributes_as_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get all attributes of the spot object as a pandas dataframe.</span>
 
 <span class="sd">    Returns:</span>
@@ -14330,8 +14396,7 @@ If <code>noise == True</code>, the mean values are returned.</p>
 <span class="go">                ] )</span>
 <span class="go">    from spotpython.utils.init import design_control_init, surrogate_control_init</span>
 <span class="go">    design_control = design_control_init(init_size=INIT_SIZE)</span>
-<span class="go">    surrogate_control = surrogate_control_init(method=&quot;regression&quot;,</span>
-<span class="go">                                                n_theta=2)</span>
+<span class="go">    surrogate_control = surrogate_control_init(method=&quot;regression&quot;)</span>
 <span class="go">    from spotpython.fun.hyperlight import HyperLight</span>
 <span class="go">    fun = HyperLight(log_level=50).fun</span>
 <span class="go">    from spotpython.spot import spot</span>
@@ -14354,7 +14419,21 @@ If <code>noise == True</code>, the mean values are returned.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2238</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2224</span>
+<span class="normal">2225</span>
+<span class="normal">2226</span>
+<span class="normal">2227</span>
+<span class="normal">2228</span>
+<span class="normal">2229</span>
+<span class="normal">2230</span>
+<span class="normal">2231</span>
+<span class="normal">2232</span>
+<span class="normal">2233</span>
+<span class="normal">2234</span>
+<span class="normal">2235</span>
+<span class="normal">2236</span>
+<span class="normal">2237</span>
+<span class="normal">2238</span>
 <span class="normal">2239</span>
 <span class="normal">2240</span>
 <span class="normal">2241</span>
@@ -14447,22 +14526,7 @@ If <code>noise == True</code>, the mean values are returned.</p>
 <span class="normal">2328</span>
 <span class="normal">2329</span>
 <span class="normal">2330</span>
-<span class="normal">2331</span>
-<span class="normal">2332</span>
-<span class="normal">2333</span>
-<span class="normal">2334</span>
-<span class="normal">2335</span>
-<span class="normal">2336</span>
-<span class="normal">2337</span>
-<span class="normal">2338</span>
-<span class="normal">2339</span>
-<span class="normal">2340</span>
-<span class="normal">2341</span>
-<span class="normal">2342</span>
-<span class="normal">2343</span>
-<span class="normal">2344</span>
-<span class="normal">2345</span>
-<span class="normal">2346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">2331</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_tuned_hyperparameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fun_control</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the tuned hyperparameter values from the run.</span>
 <span class="sd">    If `noise == True`, the mean values are returned.</span>
 
@@ -14530,8 +14594,7 @@ If <code>noise == True</code>, the mean values are returned.</p>
 <span class="sd">                        ] )</span>
 <span class="sd">            from spotpython.utils.init import design_control_init, surrogate_control_init</span>
 <span class="sd">            design_control = design_control_init(init_size=INIT_SIZE)</span>
-<span class="sd">            surrogate_control = surrogate_control_init(method=&quot;regression&quot;,</span>
-<span class="sd">                                                        n_theta=2)</span>
+<span class="sd">            surrogate_control = surrogate_control_init(method=&quot;regression&quot;)</span>
 <span class="sd">            from spotpython.fun.hyperlight import HyperLight</span>
 <span class="sd">            fun = HyperLight(log_level=50).fun</span>
 <span class="sd">            from spotpython.spot import spot</span>
@@ -14655,7 +14718,21 @@ infill criterion is calculated in natural units.</p>
 </details>
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2005</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1991</span>
+<span class="normal">1992</span>
+<span class="normal">1993</span>
+<span class="normal">1994</span>
+<span class="normal">1995</span>
+<span class="normal">1996</span>
+<span class="normal">1997</span>
+<span class="normal">1998</span>
+<span class="normal">1999</span>
+<span class="normal">2000</span>
+<span class="normal">2001</span>
+<span class="normal">2002</span>
+<span class="normal">2003</span>
+<span class="normal">2004</span>
+<span class="normal">2005</span>
 <span class="normal">2006</span>
 <span class="normal">2007</span>
 <span class="normal">2008</span>
@@ -14665,21 +14742,7 @@ infill criterion is calculated in natural units.</p>
 <span class="normal">2012</span>
 <span class="normal">2013</span>
 <span class="normal">2014</span>
-<span class="normal">2015</span>
-<span class="normal">2016</span>
-<span class="normal">2017</span>
-<span class="normal">2018</span>
-<span class="normal">2019</span>
-<span class="normal">2020</span>
-<span class="normal">2021</span>
-<span class="normal">2022</span>
-<span class="normal">2023</span>
-<span class="normal">2024</span>
-<span class="normal">2025</span>
-<span class="normal">2026</span>
-<span class="normal">2027</span>
-<span class="normal">2028</span>
-<span class="normal">2029</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">2015</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">infill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Infill (acquisition) function. Evaluates one point on the surrogate via `surrogate.predict(x.reshape(1,-1))`,</span>
 <span class="sd">    if `sklearn` surrogates are used or `surrogate.predict(x.reshape(1,-1), return_val=self.infill_criterion)`</span>
@@ -14838,7 +14901,21 @@ of points and k is the number of dimensions. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1006</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 992</span>
+<span class="normal"> 993</span>
+<span class="normal"> 994</span>
+<span class="normal"> 995</span>
+<span class="normal"> 996</span>
+<span class="normal"> 997</span>
+<span class="normal"> 998</span>
+<span class="normal"> 999</span>
+<span class="normal">1000</span>
+<span class="normal">1001</span>
+<span class="normal">1002</span>
+<span class="normal">1003</span>
+<span class="normal">1004</span>
+<span class="normal">1005</span>
+<span class="normal">1006</span>
 <span class="normal">1007</span>
 <span class="normal">1008</span>
 <span class="normal">1009</span>
@@ -14882,21 +14959,7 @@ of points and k is the number of dimensions. Defaults to None.</p>
 <span class="normal">1047</span>
 <span class="normal">1048</span>
 <span class="normal">1049</span>
-<span class="normal">1050</span>
-<span class="normal">1051</span>
-<span class="normal">1052</span>
-<span class="normal">1053</span>
-<span class="normal">1054</span>
-<span class="normal">1055</span>
-<span class="normal">1056</span>
-<span class="normal">1057</span>
-<span class="normal">1058</span>
-<span class="normal">1059</span>
-<span class="normal">1060</span>
-<span class="normal">1061</span>
-<span class="normal">1062</span>
-<span class="normal">1063</span>
-<span class="normal">1064</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_design</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1050</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_design</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize design. Generate and evaluate initial design.</span>
 <span class="sd">    If `X_start` is not `None`, append it to the initial design.</span>
@@ -15097,7 +15160,21 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1066</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1052</span>
+<span class="normal">1053</span>
+<span class="normal">1054</span>
+<span class="normal">1055</span>
+<span class="normal">1056</span>
+<span class="normal">1057</span>
+<span class="normal">1058</span>
+<span class="normal">1059</span>
+<span class="normal">1060</span>
+<span class="normal">1061</span>
+<span class="normal">1062</span>
+<span class="normal">1063</span>
+<span class="normal">1064</span>
+<span class="normal">1065</span>
+<span class="normal">1066</span>
 <span class="normal">1067</span>
 <span class="normal">1068</span>
 <span class="normal">1069</span>
@@ -15159,21 +15236,7 @@ Defaults to None.</p>
 <span class="normal">1125</span>
 <span class="normal">1126</span>
 <span class="normal">1127</span>
-<span class="normal">1128</span>
-<span class="normal">1129</span>
-<span class="normal">1130</span>
-<span class="normal">1131</span>
-<span class="normal">1132</span>
-<span class="normal">1133</span>
-<span class="normal">1134</span>
-<span class="normal">1135</span>
-<span class="normal">1136</span>
-<span class="normal">1137</span>
-<span class="normal">1138</span>
-<span class="normal">1139</span>
-<span class="normal">1140</span>
-<span class="normal">1141</span>
-<span class="normal">1142</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">initialize_design_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize the design matrix for the optimization process.</span>
 <span class="sd">    This method generates an initial design matrix, optionally</span>
@@ -15355,7 +15418,7 @@ Defaults to None.</p>
 <span class="go">        tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="go">        )</span>
 <span class="go">    design_control=design_control_init(init_size=ni)</span>
-<span class="go">    surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="go">    surrogate_control=surrogate_control_init()</span>
 <span class="go">    S = spot.Spot(fun=fun,</span>
 <span class="go">                fun_control=fun_control,</span>
 <span class="go">                design_control=design_control,</span>
@@ -15366,42 +15429,7 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2837</span>
-<span class="normal">2838</span>
-<span class="normal">2839</span>
-<span class="normal">2840</span>
-<span class="normal">2841</span>
-<span class="normal">2842</span>
-<span class="normal">2843</span>
-<span class="normal">2844</span>
-<span class="normal">2845</span>
-<span class="normal">2846</span>
-<span class="normal">2847</span>
-<span class="normal">2848</span>
-<span class="normal">2849</span>
-<span class="normal">2850</span>
-<span class="normal">2851</span>
-<span class="normal">2852</span>
-<span class="normal">2853</span>
-<span class="normal">2854</span>
-<span class="normal">2855</span>
-<span class="normal">2856</span>
-<span class="normal">2857</span>
-<span class="normal">2858</span>
-<span class="normal">2859</span>
-<span class="normal">2860</span>
-<span class="normal">2861</span>
-<span class="normal">2862</span>
-<span class="normal">2863</span>
-<span class="normal">2864</span>
-<span class="normal">2865</span>
-<span class="normal">2866</span>
-<span class="normal">2867</span>
-<span class="normal">2868</span>
-<span class="normal">2869</span>
-<span class="normal">2870</span>
-<span class="normal">2871</span>
-<span class="normal">2872</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2872</span>
 <span class="normal">2873</span>
 <span class="normal">2874</span>
 <span class="normal">2875</span>
@@ -15419,7 +15447,42 @@ Defaults to None.</p>
 <span class="normal">2887</span>
 <span class="normal">2888</span>
 <span class="normal">2889</span>
-<span class="normal">2890</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="normal">2890</span>
+<span class="normal">2891</span>
+<span class="normal">2892</span>
+<span class="normal">2893</span>
+<span class="normal">2894</span>
+<span class="normal">2895</span>
+<span class="normal">2896</span>
+<span class="normal">2897</span>
+<span class="normal">2898</span>
+<span class="normal">2899</span>
+<span class="normal">2900</span>
+<span class="normal">2901</span>
+<span class="normal">2902</span>
+<span class="normal">2903</span>
+<span class="normal">2904</span>
+<span class="normal">2905</span>
+<span class="normal">2906</span>
+<span class="normal">2907</span>
+<span class="normal">2908</span>
+<span class="normal">2909</span>
+<span class="normal">2910</span>
+<span class="normal">2911</span>
+<span class="normal">2912</span>
+<span class="normal">2913</span>
+<span class="normal">2914</span>
+<span class="normal">2915</span>
+<span class="normal">2916</span>
+<span class="normal">2917</span>
+<span class="normal">2918</span>
+<span class="normal">2919</span>
+<span class="normal">2920</span>
+<span class="normal">2921</span>
+<span class="normal">2922</span>
+<span class="normal">2923</span>
+<span class="normal">2924</span>
+<span class="normal">2925</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">parallel_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parallel plot.</span>
 
@@ -15451,7 +15514,7 @@ Defaults to None.</p>
 <span class="sd">                tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="sd">                )</span>
 <span class="sd">            design_control=design_control_init(init_size=ni)</span>
-<span class="sd">            surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="sd">            surrogate_control=surrogate_control_init()</span>
 <span class="sd">            S = spot.Spot(fun=fun,</span>
 <span class="sd">                        fun_control=fun_control,</span>
 <span class="sd">                        design_control=design_control,</span>
@@ -15483,18 +15546,74 @@ Defaults to None.</p>
 
 
 <h3 id="spotpython.spot.spot.Spot.plot_contour" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plot_contour</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">plot_contour</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_z</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">use_floor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">grid_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">max_error</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">add_points</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
 <a href="#spotpython.spot.spot.Spot.plot_contour" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
     <div class="doc doc-contents ">
 
-      <p>Plot a contour plot of the surrogate model for two hyperparameters.</p>
+      <p>Plot a contour plot of the surrogate model for two hyperparameters.
+Args:
+    i (int):
+        index of the first hyperparameter to plot.
+    j (int):
+        index of the second hyperparameter to plot.
+    min_z (float, optional):
+        minimum value for the z-axis. If <code>None</code>, the minimum value is calculated from the surrogate predictions.
+    max_z (float, optional):
+        maximum value for the z-axis. If <code>None</code>, the maximum value is calculated from the surrogate predictions.
+    show (bool):
+        whether to show the plot. Default is <code>True</code>.
+    title (str, optional):
+        title of the plot. If <code>None</code>, a default title is used.
+    filename (str, optional):
+        filename to save the plot. If <code>None</code>, the plot is not saved.
+    n_grid (int):
+        number of grid points for the contour plot. Default is 100.
+    contour_levels (int):
+        number of contour levels. Default is 25.
+    dpi (int):
+        dots per inch for the saved plot. Default is 200.
+    figsize (tuple):
+        size of the figure for the plot. Default is (12, 5).
+    use_floor (bool):
+        If <code>True</code>, the floor values of the other hyperparameters are used for plotting. If <code>False</code>, the ceiling values are used. Default is <code>True</code>.
+    tkagg (bool):
+        If <code>True</code>, use the TkAgg backend for matplotlib. Default is <code>False</code>.
+    cmap (str):
+        Colormap to use for the contour plot. Default is &ldquo;jet&rdquo;.
+    grid_visible (bool):
+        If <code>True</code>, show the grid in the contour plot. Default is <code>True</code>.
+    alpha (float):
+        Transparency level for the contour lines. Default is 0.8.
+    eps (float):
+        Small value to avoid division by zero in the surrogate predictions. Default is 1e-4.
+    max_error (float):
+        Maximum error allowed in the surrogate predictions. Default is 1e-3.
+    use_floor (bool):
+        If <code>True</code>, use the minimum values of the other hyperparameters for plotting. If <code>False</code>, use the maximum values. Default is <code>True</code>.
+    add_points (bool):
+        If <code>True</code>, add the points from the surrogate model to the contour plot. Default is <code>True</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2512</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2497</span>
+<span class="normal">2498</span>
+<span class="normal">2499</span>
+<span class="normal">2500</span>
+<span class="normal">2501</span>
+<span class="normal">2502</span>
+<span class="normal">2503</span>
+<span class="normal">2504</span>
+<span class="normal">2505</span>
+<span class="normal">2506</span>
+<span class="normal">2507</span>
+<span class="normal">2508</span>
+<span class="normal">2509</span>
+<span class="normal">2510</span>
+<span class="normal">2511</span>
+<span class="normal">2512</span>
 <span class="normal">2513</span>
 <span class="normal">2514</span>
 <span class="normal">2515</span>
@@ -15515,7 +15634,57 @@ Defaults to None.</p>
 <span class="normal">2530</span>
 <span class="normal">2531</span>
 <span class="normal">2532</span>
-<span class="normal">2533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
+<span class="normal">2533</span>
+<span class="normal">2534</span>
+<span class="normal">2535</span>
+<span class="normal">2536</span>
+<span class="normal">2537</span>
+<span class="normal">2538</span>
+<span class="normal">2539</span>
+<span class="normal">2540</span>
+<span class="normal">2541</span>
+<span class="normal">2542</span>
+<span class="normal">2543</span>
+<span class="normal">2544</span>
+<span class="normal">2545</span>
+<span class="normal">2546</span>
+<span class="normal">2547</span>
+<span class="normal">2548</span>
+<span class="normal">2549</span>
+<span class="normal">2550</span>
+<span class="normal">2551</span>
+<span class="normal">2552</span>
+<span class="normal">2553</span>
+<span class="normal">2554</span>
+<span class="normal">2555</span>
+<span class="normal">2556</span>
+<span class="normal">2557</span>
+<span class="normal">2558</span>
+<span class="normal">2559</span>
+<span class="normal">2560</span>
+<span class="normal">2561</span>
+<span class="normal">2562</span>
+<span class="normal">2563</span>
+<span class="normal">2564</span>
+<span class="normal">2565</span>
+<span class="normal">2566</span>
+<span class="normal">2567</span>
+<span class="normal">2568</span>
+<span class="normal">2569</span>
+<span class="normal">2570</span>
+<span class="normal">2571</span>
+<span class="normal">2572</span>
+<span class="normal">2573</span>
+<span class="normal">2574</span>
+<span class="normal">2575</span>
+<span class="normal">2576</span>
+<span class="normal">2577</span>
+<span class="normal">2578</span>
+<span class="normal">2579</span>
+<span class="normal">2580</span>
+<span class="normal">2581</span>
+<span class="normal">2582</span>
+<span class="normal">2583</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -15524,19 +15693,84 @@ Defaults to None.</p>
     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">n_grid</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">contour_levels</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
     <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
-    <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_floor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet&quot;</span><span class="p">,</span>
+    <span class="n">grid_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span>
+    <span class="n">max_error</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot a contour plot of the surrogate model for two hyperparameters.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        i (int):</span>
+<span class="sd">            index of the first hyperparameter to plot.</span>
+<span class="sd">        j (int):</span>
+<span class="sd">            index of the second hyperparameter to plot.</span>
+<span class="sd">        min_z (float, optional):</span>
+<span class="sd">            minimum value for the z-axis. If `None`, the minimum value is calculated from the surrogate predictions.</span>
+<span class="sd">        max_z (float, optional):</span>
+<span class="sd">            maximum value for the z-axis. If `None`, the maximum value is calculated from the surrogate predictions.</span>
+<span class="sd">        show (bool):</span>
+<span class="sd">            whether to show the plot. Default is `True`.</span>
+<span class="sd">        title (str, optional):</span>
+<span class="sd">            title of the plot. If `None`, a default title is used.</span>
+<span class="sd">        filename (str, optional):</span>
+<span class="sd">            filename to save the plot. If `None`, the plot is not saved.</span>
+<span class="sd">        n_grid (int):</span>
+<span class="sd">            number of grid points for the contour plot. Default is 100.</span>
+<span class="sd">        contour_levels (int):</span>
+<span class="sd">            number of contour levels. Default is 25.</span>
+<span class="sd">        dpi (int):</span>
+<span class="sd">            dots per inch for the saved plot. Default is 200.</span>
+<span class="sd">        figsize (tuple):</span>
+<span class="sd">            size of the figure for the plot. Default is (12, 5).</span>
+<span class="sd">        use_floor (bool):</span>
+<span class="sd">            If `True`, the floor values of the other hyperparameters are used for plotting. If `False`, the ceiling values are used. Default is `True`.</span>
+<span class="sd">        tkagg (bool):</span>
+<span class="sd">            If `True`, use the TkAgg backend for matplotlib. Default is `False`.</span>
+<span class="sd">        cmap (str):</span>
+<span class="sd">            Colormap to use for the contour plot. Default is &quot;jet&quot;.</span>
+<span class="sd">        grid_visible (bool):</span>
+<span class="sd">            If `True`, show the grid in the contour plot. Default is `True`.</span>
+<span class="sd">        alpha (float):</span>
+<span class="sd">            Transparency level for the contour lines. Default is 0.8.</span>
+<span class="sd">        eps (float):</span>
+<span class="sd">            Small value to avoid division by zero in the surrogate predictions. Default is 1e-4.</span>
+<span class="sd">        max_error (float):</span>
+<span class="sd">            Maximum error allowed in the surrogate predictions. Default is 1e-3.</span>
+<span class="sd">        use_floor (bool):</span>
+<span class="sd">            If `True`, use the minimum values of the other hyperparameters for plotting. If `False`, use the maximum values. Default is `True`.</span>
+<span class="sd">        add_points (bool):</span>
+<span class="sd">            If `True`, add the points from the surrogate model to the contour plot. Default is `True`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">plotkd</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span> <span class="n">var_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">)</span>
+    <span class="n">plotkd</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span>
+        <span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+        <span class="n">i</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
+        <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span>
+        <span class="n">var_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">,</span>
+        <span class="n">var_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var_type</span><span class="p">,</span>
+        <span class="n">grid_visible</span><span class="o">=</span><span class="n">grid_visible</span><span class="p">,</span>
+        <span class="n">contour_levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+        <span class="n">max_error</span><span class="o">=</span><span class="n">max_error</span><span class="p">,</span>
+        <span class="n">use_floor</span><span class="o">=</span><span class="n">use_floor</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="n">min_z</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="n">max_z</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
+        <span class="n">add_points</span><span class="o">=</span><span class="n">add_points</span><span class="p">,</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -15680,49 +15914,49 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2793</span>
-<span class="normal">2794</span>
-<span class="normal">2795</span>
-<span class="normal">2796</span>
-<span class="normal">2797</span>
-<span class="normal">2798</span>
-<span class="normal">2799</span>
-<span class="normal">2800</span>
-<span class="normal">2801</span>
-<span class="normal">2802</span>
-<span class="normal">2803</span>
-<span class="normal">2804</span>
-<span class="normal">2805</span>
-<span class="normal">2806</span>
-<span class="normal">2807</span>
-<span class="normal">2808</span>
-<span class="normal">2809</span>
-<span class="normal">2810</span>
-<span class="normal">2811</span>
-<span class="normal">2812</span>
-<span class="normal">2813</span>
-<span class="normal">2814</span>
-<span class="normal">2815</span>
-<span class="normal">2816</span>
-<span class="normal">2817</span>
-<span class="normal">2818</span>
-<span class="normal">2819</span>
-<span class="normal">2820</span>
-<span class="normal">2821</span>
-<span class="normal">2822</span>
-<span class="normal">2823</span>
-<span class="normal">2824</span>
-<span class="normal">2825</span>
-<span class="normal">2826</span>
-<span class="normal">2827</span>
-<span class="normal">2828</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2828</span>
 <span class="normal">2829</span>
 <span class="normal">2830</span>
 <span class="normal">2831</span>
 <span class="normal">2832</span>
 <span class="normal">2833</span>
 <span class="normal">2834</span>
-<span class="normal">2835</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2835</span>
+<span class="normal">2836</span>
+<span class="normal">2837</span>
+<span class="normal">2838</span>
+<span class="normal">2839</span>
+<span class="normal">2840</span>
+<span class="normal">2841</span>
+<span class="normal">2842</span>
+<span class="normal">2843</span>
+<span class="normal">2844</span>
+<span class="normal">2845</span>
+<span class="normal">2846</span>
+<span class="normal">2847</span>
+<span class="normal">2848</span>
+<span class="normal">2849</span>
+<span class="normal">2850</span>
+<span class="normal">2851</span>
+<span class="normal">2852</span>
+<span class="normal">2853</span>
+<span class="normal">2854</span>
+<span class="normal">2855</span>
+<span class="normal">2856</span>
+<span class="normal">2857</span>
+<span class="normal">2858</span>
+<span class="normal">2859</span>
+<span class="normal">2860</span>
+<span class="normal">2861</span>
+<span class="normal">2862</span>
+<span class="normal">2863</span>
+<span class="normal">2864</span>
+<span class="normal">2865</span>
+<span class="normal">2866</span>
+<span class="normal">2867</span>
+<span class="normal">2868</span>
+<span class="normal">2869</span>
+<span class="normal">2870</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the importance of each variable.</span>
 
 <span class="sd">    Args:</span>
@@ -15775,7 +16009,7 @@ Defaults to None.</p>
 
 
 <h3 id="spotpython.spot.spot.Spot.plot_important_hyperparameter_contour" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">scale_global</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">plot_important_hyperparameter_contour</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">max_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">scale_global</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_grid</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">contour_levels</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#spotpython.spot.spot.Spot.plot_important_hyperparameter_contour" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -15894,7 +16128,7 @@ than <code>max_imp</code>, only the max_imp important ones are selected.</p>
               </div>
             </td>
             <td>
-                  <code>50</code>
+                  <code>100</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -15908,7 +16142,7 @@ than <code>max_imp</code>, only the max_imp important ones are selected.</p>
               </div>
             </td>
             <td>
-                  <code>10</code>
+                  <code>25</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -15932,12 +16166,7 @@ than <code>max_imp</code>, only the max_imp important ones are selected.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Use the minimum value for determing the hidden dimensions in the plot for categorical and
-integer parameters.
-In 3d-plots, only two variables can be independent. The remaining input variables are set
-to their minimum value.
-Default is <code>False</code>.
-If use_min and use_max are both <code>True</code>, both values are used.</p>
+                <p>Deprecated in 0.31.12.</p>
               </div>
             </td>
             <td>
@@ -15951,12 +16180,7 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Use the minimum value for determing the hidden dimensions in the plot for categorical and
-integer parameters.
-In 3d-plots, only two variables can be independent. The remaining input variables are set
-to their minimum value.
-Default is <code>True</code>.
-If use_min and use_max are both <code>True</code>, both values are used.</p>
+                <p>Deprecated in 0.31.12.</p>
               </div>
             </td>
             <td>
@@ -16009,7 +16233,7 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
 <span class="go">        tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="go">        )</span>
 <span class="go">    design_control=design_control_init(init_size=ni)</span>
-<span class="go">    surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="go">    surrogate_control=surrogate_control_init)</span>
 <span class="go">    S = spot.Spot(fun=fun,</span>
 <span class="go">                fun_control=fun_control,</span>
 <span class="go">                design_control=design_control,</span>
@@ -16020,57 +16244,7 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2535</span>
-<span class="normal">2536</span>
-<span class="normal">2537</span>
-<span class="normal">2538</span>
-<span class="normal">2539</span>
-<span class="normal">2540</span>
-<span class="normal">2541</span>
-<span class="normal">2542</span>
-<span class="normal">2543</span>
-<span class="normal">2544</span>
-<span class="normal">2545</span>
-<span class="normal">2546</span>
-<span class="normal">2547</span>
-<span class="normal">2548</span>
-<span class="normal">2549</span>
-<span class="normal">2550</span>
-<span class="normal">2551</span>
-<span class="normal">2552</span>
-<span class="normal">2553</span>
-<span class="normal">2554</span>
-<span class="normal">2555</span>
-<span class="normal">2556</span>
-<span class="normal">2557</span>
-<span class="normal">2558</span>
-<span class="normal">2559</span>
-<span class="normal">2560</span>
-<span class="normal">2561</span>
-<span class="normal">2562</span>
-<span class="normal">2563</span>
-<span class="normal">2564</span>
-<span class="normal">2565</span>
-<span class="normal">2566</span>
-<span class="normal">2567</span>
-<span class="normal">2568</span>
-<span class="normal">2569</span>
-<span class="normal">2570</span>
-<span class="normal">2571</span>
-<span class="normal">2572</span>
-<span class="normal">2573</span>
-<span class="normal">2574</span>
-<span class="normal">2575</span>
-<span class="normal">2576</span>
-<span class="normal">2577</span>
-<span class="normal">2578</span>
-<span class="normal">2579</span>
-<span class="normal">2580</span>
-<span class="normal">2581</span>
-<span class="normal">2582</span>
-<span class="normal">2583</span>
-<span class="normal">2584</span>
-<span class="normal">2585</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2585</span>
 <span class="normal">2586</span>
 <span class="normal">2587</span>
 <span class="normal">2588</span>
@@ -16138,7 +16312,43 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
 <span class="normal">2650</span>
 <span class="normal">2651</span>
 <span class="normal">2652</span>
-<span class="normal">2653</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span>
+<span class="normal">2653</span>
+<span class="normal">2654</span>
+<span class="normal">2655</span>
+<span class="normal">2656</span>
+<span class="normal">2657</span>
+<span class="normal">2658</span>
+<span class="normal">2659</span>
+<span class="normal">2660</span>
+<span class="normal">2661</span>
+<span class="normal">2662</span>
+<span class="normal">2663</span>
+<span class="normal">2664</span>
+<span class="normal">2665</span>
+<span class="normal">2666</span>
+<span class="normal">2667</span>
+<span class="normal">2668</span>
+<span class="normal">2669</span>
+<span class="normal">2670</span>
+<span class="normal">2671</span>
+<span class="normal">2672</span>
+<span class="normal">2673</span>
+<span class="normal">2674</span>
+<span class="normal">2675</span>
+<span class="normal">2676</span>
+<span class="normal">2677</span>
+<span class="normal">2678</span>
+<span class="normal">2679</span>
+<span class="normal">2680</span>
+<span class="normal">2681</span>
+<span class="normal">2682</span>
+<span class="normal">2683</span>
+<span class="normal">2684</span>
+<span class="normal">2685</span>
+<span class="normal">2686</span>
+<span class="normal">2687</span>
+<span class="normal">2688</span>
+<span class="normal">2689</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_important_hyperparameter_contour</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">threshold</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -16146,8 +16356,8 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
     <span class="n">max_imp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">scale_global</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">n_grid</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="n">contour_levels</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">n_grid</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">contour_levels</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
     <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
     <span class="n">use_min</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">use_max</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -16178,20 +16388,8 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
 <span class="sd">            number of contour levels. Default is 10.</span>
 <span class="sd">        dpi (int):</span>
 <span class="sd">            dpi of the plot. Default is 200.</span>
-<span class="sd">        use_min (bool):</span>
-<span class="sd">            Use the minimum value for determing the hidden dimensions in the plot for categorical and</span>
-<span class="sd">            integer parameters.</span>
-<span class="sd">            In 3d-plots, only two variables can be independent. The remaining input variables are set</span>
-<span class="sd">            to their minimum value.</span>
-<span class="sd">            Default is `False`.</span>
-<span class="sd">            If use_min and use_max are both `True`, both values are used.</span>
-<span class="sd">        use_max (bool):</span>
-<span class="sd">            Use the minimum value for determing the hidden dimensions in the plot for categorical and</span>
-<span class="sd">            integer parameters.</span>
-<span class="sd">            In 3d-plots, only two variables can be independent. The remaining input variables are set</span>
-<span class="sd">            to their minimum value.</span>
-<span class="sd">            Default is `True`.</span>
-<span class="sd">            If use_min and use_max are both `True`, both values are used.</span>
+<span class="sd">        use_min (bool): Deprecated in 0.31.12.</span>
+<span class="sd">        use_max (bool): Deprecated in 0.31.12.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None.</span>
@@ -16215,7 +16413,7 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
 <span class="sd">                tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="sd">                )</span>
 <span class="sd">            design_control=design_control_init(init_size=ni)</span>
-<span class="sd">            surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="sd">            surrogate_control=surrogate_control_init)</span>
 <span class="sd">            S = spot.Spot(fun=fun,</span>
 <span class="sd">                        fun_control=fun_control,</span>
 <span class="sd">                        design_control=design_control,</span>
@@ -16253,8 +16451,6 @@ If use_min and use_max are both <code>True</code>, both values are used.</p>
                     <span class="n">n_grid</span><span class="o">=</span><span class="n">n_grid</span><span class="p">,</span>
                     <span class="n">contour_levels</span><span class="o">=</span><span class="n">contour_levels</span><span class="p">,</span>
                     <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span>
-                    <span class="n">use_max</span><span class="o">=</span><span class="n">use_max</span><span class="p">,</span>
-                    <span class="n">use_min</span><span class="o">=</span><span class="n">use_min</span><span class="p">,</span>
                     <span class="n">tkagg</span><span class="o">=</span><span class="n">tkagg</span><span class="p">,</span>
                 <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -16386,7 +16582,21 @@ S.plot_model()
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2122</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2108</span>
+<span class="normal">2109</span>
+<span class="normal">2110</span>
+<span class="normal">2111</span>
+<span class="normal">2112</span>
+<span class="normal">2113</span>
+<span class="normal">2114</span>
+<span class="normal">2115</span>
+<span class="normal">2116</span>
+<span class="normal">2117</span>
+<span class="normal">2118</span>
+<span class="normal">2119</span>
+<span class="normal">2120</span>
+<span class="normal">2121</span>
+<span class="normal">2122</span>
 <span class="normal">2123</span>
 <span class="normal">2124</span>
 <span class="normal">2125</span>
@@ -16446,21 +16656,7 @@ S.plot_model()
 <span class="normal">2179</span>
 <span class="normal">2180</span>
 <span class="normal">2181</span>
-<span class="normal">2182</span>
-<span class="normal">2183</span>
-<span class="normal">2184</span>
-<span class="normal">2185</span>
-<span class="normal">2186</span>
-<span class="normal">2187</span>
-<span class="normal">2188</span>
-<span class="normal">2189</span>
-<span class="normal">2190</span>
-<span class="normal">2191</span>
-<span class="normal">2192</span>
-<span class="normal">2193</span>
-<span class="normal">2194</span>
-<span class="normal">2195</span>
-<span class="normal">2196</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2182</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_max</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot the model fit for 1-dim objective functions.</span>
 
@@ -16711,7 +16907,7 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="go">        tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="go">        )</span>
 <span class="go">    design_control=design_control_init(init_size=ni)</span>
-<span class="go">    surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="go">    surrogate_control=surrogate_control_init()</span>
 <span class="go">    S = spot.Spot(fun=fun,</span>
 <span class="go">                fun_control=fun_control</span>
 <span class="go">                design_control=design_control,</span>
@@ -16722,7 +16918,21 @@ and the subsequent points as red dots connected by a line.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2031</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2017</span>
+<span class="normal">2018</span>
+<span class="normal">2019</span>
+<span class="normal">2020</span>
+<span class="normal">2021</span>
+<span class="normal">2022</span>
+<span class="normal">2023</span>
+<span class="normal">2024</span>
+<span class="normal">2025</span>
+<span class="normal">2026</span>
+<span class="normal">2027</span>
+<span class="normal">2028</span>
+<span class="normal">2029</span>
+<span class="normal">2030</span>
+<span class="normal">2031</span>
 <span class="normal">2032</span>
 <span class="normal">2033</span>
 <span class="normal">2034</span>
@@ -16797,21 +17007,7 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">2103</span>
 <span class="normal">2104</span>
 <span class="normal">2105</span>
-<span class="normal">2106</span>
-<span class="normal">2107</span>
-<span class="normal">2108</span>
-<span class="normal">2109</span>
-<span class="normal">2110</span>
-<span class="normal">2111</span>
-<span class="normal">2112</span>
-<span class="normal">2113</span>
-<span class="normal">2114</span>
-<span class="normal">2115</span>
-<span class="normal">2116</span>
-<span class="normal">2117</span>
-<span class="normal">2118</span>
-<span class="normal">2119</span>
-<span class="normal">2120</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
+<span class="normal">2106</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot_progress</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_x</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log_y</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;plot.png&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ko&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;ro-&quot;</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">tkagg</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Objective function value over iterations&quot;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="s2">&quot;y&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the progress of the hyperparameter tuning (optimization).</span>
@@ -16855,7 +17051,7 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="sd">                tolerance_x = np.sqrt(np.spacing(1))</span>
 <span class="sd">                )</span>
 <span class="sd">            design_control=design_control_init(init_size=ni)</span>
-<span class="sd">            surrogate_control=surrogate_control_init(n_theta=3)</span>
+<span class="sd">            surrogate_control=surrogate_control_init()</span>
 <span class="sd">            S = spot.Spot(fun=fun,</span>
 <span class="sd">                        fun_control=fun_control</span>
 <span class="sd">                        design_control=design_control,</span>
@@ -17038,7 +17234,22 @@ and the subsequent points as red dots connected by a line.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2435</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2420</span>
+<span class="normal">2421</span>
+<span class="normal">2422</span>
+<span class="normal">2423</span>
+<span class="normal">2424</span>
+<span class="normal">2425</span>
+<span class="normal">2426</span>
+<span class="normal">2427</span>
+<span class="normal">2428</span>
+<span class="normal">2429</span>
+<span class="normal">2430</span>
+<span class="normal">2431</span>
+<span class="normal">2432</span>
+<span class="normal">2433</span>
+<span class="normal">2434</span>
+<span class="normal">2435</span>
 <span class="normal">2436</span>
 <span class="normal">2437</span>
 <span class="normal">2438</span>
@@ -17098,22 +17309,7 @@ and the subsequent points as red dots connected by a line.</p>
 <span class="normal">2492</span>
 <span class="normal">2493</span>
 <span class="normal">2494</span>
-<span class="normal">2495</span>
-<span class="normal">2496</span>
-<span class="normal">2497</span>
-<span class="normal">2498</span>
-<span class="normal">2499</span>
-<span class="normal">2500</span>
-<span class="normal">2501</span>
-<span class="normal">2502</span>
-<span class="normal">2503</span>
-<span class="normal">2504</span>
-<span class="normal">2505</span>
-<span class="normal">2506</span>
-<span class="normal">2507</span>
-<span class="normal">2508</span>
-<span class="normal">2509</span>
-<span class="normal">2510</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_plot</span><span class="p">(</span>
+<span class="normal">2495</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prepare_plot</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">j</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -17276,40 +17472,40 @@ and the subsequent points as red dots connected by a line.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2758</span>
-<span class="normal">2759</span>
-<span class="normal">2760</span>
-<span class="normal">2761</span>
-<span class="normal">2762</span>
-<span class="normal">2763</span>
-<span class="normal">2764</span>
-<span class="normal">2765</span>
-<span class="normal">2766</span>
-<span class="normal">2767</span>
-<span class="normal">2768</span>
-<span class="normal">2769</span>
-<span class="normal">2770</span>
-<span class="normal">2771</span>
-<span class="normal">2772</span>
-<span class="normal">2773</span>
-<span class="normal">2774</span>
-<span class="normal">2775</span>
-<span class="normal">2776</span>
-<span class="normal">2777</span>
-<span class="normal">2778</span>
-<span class="normal">2779</span>
-<span class="normal">2780</span>
-<span class="normal">2781</span>
-<span class="normal">2782</span>
-<span class="normal">2783</span>
-<span class="normal">2784</span>
-<span class="normal">2785</span>
-<span class="normal">2786</span>
-<span class="normal">2787</span>
-<span class="normal">2788</span>
-<span class="normal">2789</span>
-<span class="normal">2790</span>
-<span class="normal">2791</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2793</span>
+<span class="normal">2794</span>
+<span class="normal">2795</span>
+<span class="normal">2796</span>
+<span class="normal">2797</span>
+<span class="normal">2798</span>
+<span class="normal">2799</span>
+<span class="normal">2800</span>
+<span class="normal">2801</span>
+<span class="normal">2802</span>
+<span class="normal">2803</span>
+<span class="normal">2804</span>
+<span class="normal">2805</span>
+<span class="normal">2806</span>
+<span class="normal">2807</span>
+<span class="normal">2808</span>
+<span class="normal">2809</span>
+<span class="normal">2810</span>
+<span class="normal">2811</span>
+<span class="normal">2812</span>
+<span class="normal">2813</span>
+<span class="normal">2814</span>
+<span class="normal">2815</span>
+<span class="normal">2816</span>
+<span class="normal">2817</span>
+<span class="normal">2818</span>
+<span class="normal">2819</span>
+<span class="normal">2820</span>
+<span class="normal">2821</span>
+<span class="normal">2822</span>
+<span class="normal">2823</span>
+<span class="normal">2824</span>
+<span class="normal">2825</span>
+<span class="normal">2826</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print importance of each variable and return the results as a list.</span>
 
 <span class="sd">    Args:</span>
@@ -17341,7 +17537,7 @@ and the subsequent points as red dots connected by a line.</p>
                         <span class="nb">print</span><span class="p">(</span><span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">imp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">var_name</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">imp</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importance requires more than one theta values (n_theta&gt;1).&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importance requires more than one theta value (n_theta&gt;1).&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -17426,7 +17622,21 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2198</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2184</span>
+<span class="normal">2185</span>
+<span class="normal">2186</span>
+<span class="normal">2187</span>
+<span class="normal">2188</span>
+<span class="normal">2189</span>
+<span class="normal">2190</span>
+<span class="normal">2191</span>
+<span class="normal">2192</span>
+<span class="normal">2193</span>
+<span class="normal">2194</span>
+<span class="normal">2195</span>
+<span class="normal">2196</span>
+<span class="normal">2197</span>
+<span class="normal">2198</span>
 <span class="normal">2199</span>
 <span class="normal">2200</span>
 <span class="normal">2201</span>
@@ -17450,21 +17660,7 @@ If <code>noise == True</code>, additionally the following values are printed:</l
 <span class="normal">2219</span>
 <span class="normal">2220</span>
 <span class="normal">2221</span>
-<span class="normal">2222</span>
-<span class="normal">2223</span>
-<span class="normal">2224</span>
-<span class="normal">2225</span>
-<span class="normal">2226</span>
-<span class="normal">2227</span>
-<span class="normal">2228</span>
-<span class="normal">2229</span>
-<span class="normal">2230</span>
-<span class="normal">2231</span>
-<span class="normal">2232</span>
-<span class="normal">2233</span>
-<span class="normal">2234</span>
-<span class="normal">2235</span>
-<span class="normal">2236</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">2222</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">print_screen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print results from the run:</span>
 <span class="sd">        1. min y</span>
 <span class="sd">        2. min X</span>
@@ -17603,7 +17799,22 @@ spot.process_z00(z00)
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2396</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2381</span>
+<span class="normal">2382</span>
+<span class="normal">2383</span>
+<span class="normal">2384</span>
+<span class="normal">2385</span>
+<span class="normal">2386</span>
+<span class="normal">2387</span>
+<span class="normal">2388</span>
+<span class="normal">2389</span>
+<span class="normal">2390</span>
+<span class="normal">2391</span>
+<span class="normal">2392</span>
+<span class="normal">2393</span>
+<span class="normal">2394</span>
+<span class="normal">2395</span>
+<span class="normal">2396</span>
 <span class="normal">2397</span>
 <span class="normal">2398</span>
 <span class="normal">2399</span>
@@ -17625,22 +17836,7 @@ spot.process_z00(z00)
 <span class="normal">2415</span>
 <span class="normal">2416</span>
 <span class="normal">2417</span>
-<span class="normal">2418</span>
-<span class="normal">2419</span>
-<span class="normal">2420</span>
-<span class="normal">2421</span>
-<span class="normal">2422</span>
-<span class="normal">2423</span>
-<span class="normal">2424</span>
-<span class="normal">2425</span>
-<span class="normal">2426</span>
-<span class="normal">2427</span>
-<span class="normal">2428</span>
-<span class="normal">2429</span>
-<span class="normal">2430</span>
-<span class="normal">2431</span>
-<span class="normal">2432</span>
-<span class="normal">2433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">process_z00</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z00</span><span class="p">,</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="normal">2418</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">process_z00</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z00</span><span class="p">,</span> <span class="n">use_min</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Process each entry in the `z00` array according to the corresponding type</span>
 <span class="sd">    in the `self.var_type` list.</span>
 <span class="sd">    Specifically, if the type is &quot;float&quot;, the function will calculate the mean of the two `z00` values.</span>
@@ -17816,7 +18012,21 @@ The optimization process is controlled by the following steps:
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">884</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
 <span class="normal">885</span>
 <span class="normal">886</span>
 <span class="normal">887</span>
@@ -17908,21 +18118,7 @@ The optimization process is controlled by the following steps:
 <span class="normal">973</span>
 <span class="normal">974</span>
 <span class="normal">975</span>
-<span class="normal">976</span>
-<span class="normal">977</span>
-<span class="normal">978</span>
-<span class="normal">979</span>
-<span class="normal">980</span>
-<span class="normal">981</span>
-<span class="normal">982</span>
-<span class="normal">983</span>
-<span class="normal">984</span>
-<span class="normal">985</span>
-<span class="normal">986</span>
-<span class="normal">987</span>
-<span class="normal">988</span>
-<span class="normal">989</span>
-<span class="normal">990</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Spot</span><span class="p">:</span>
+<span class="normal">976</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_start</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Spot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Run the surrogate based optimization.</span>
 <span class="sd">    The optimization process is controlled by the following steps:</span>
@@ -18170,7 +18366,21 @@ Default is &ldquo;file_io&rdquo;.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1626</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1612</span>
+<span class="normal">1613</span>
+<span class="normal">1614</span>
+<span class="normal">1615</span>
+<span class="normal">1616</span>
+<span class="normal">1617</span>
+<span class="normal">1618</span>
+<span class="normal">1619</span>
+<span class="normal">1620</span>
+<span class="normal">1621</span>
+<span class="normal">1622</span>
+<span class="normal">1623</span>
+<span class="normal">1624</span>
+<span class="normal">1625</span>
+<span class="normal">1626</span>
 <span class="normal">1627</span>
 <span class="normal">1628</span>
 <span class="normal">1629</span>
@@ -18216,21 +18426,7 @@ Default is &ldquo;file_io&rdquo;.</p>
 <span class="normal">1669</span>
 <span class="normal">1670</span>
 <span class="normal">1671</span>
-<span class="normal">1672</span>
-<span class="normal">1673</span>
-<span class="normal">1674</span>
-<span class="normal">1675</span>
-<span class="normal">1676</span>
-<span class="normal">1677</span>
-<span class="normal">1678</span>
-<span class="normal">1679</span>
-<span class="normal">1680</span>
-<span class="normal">1681</span>
-<span class="normal">1682</span>
-<span class="normal">1683</span>
-<span class="normal">1684</span>
-<span class="normal">1685</span>
-<span class="normal">1686</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unpickleables</span><span class="o">=</span><span class="s2">&quot;file_io&quot;</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1672</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_experiment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unpickleables</span><span class="o">=</span><span class="s2">&quot;file_io&quot;</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save the experiment to a file.</span>
 <span class="sd">    If no filename is provided, the filename is generated based on the PREFIX using the</span>
@@ -18414,7 +18610,21 @@ Default is <code>True</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1596</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1582</span>
+<span class="normal">1583</span>
+<span class="normal">1584</span>
+<span class="normal">1585</span>
+<span class="normal">1586</span>
+<span class="normal">1587</span>
+<span class="normal">1588</span>
+<span class="normal">1589</span>
+<span class="normal">1590</span>
+<span class="normal">1591</span>
+<span class="normal">1592</span>
+<span class="normal">1593</span>
+<span class="normal">1594</span>
+<span class="normal">1595</span>
+<span class="normal">1596</span>
 <span class="normal">1597</span>
 <span class="normal">1598</span>
 <span class="normal">1599</span>
@@ -18428,21 +18638,7 @@ Default is <code>True</code>.</p>
 <span class="normal">1607</span>
 <span class="normal">1608</span>
 <span class="normal">1609</span>
-<span class="normal">1610</span>
-<span class="normal">1611</span>
-<span class="normal">1612</span>
-<span class="normal">1613</span>
-<span class="normal">1614</span>
-<span class="normal">1615</span>
-<span class="normal">1616</span>
-<span class="normal">1617</span>
-<span class="normal">1618</span>
-<span class="normal">1619</span>
-<span class="normal">1620</span>
-<span class="normal">1621</span>
-<span class="normal">1622</span>
-<span class="normal">1623</span>
-<span class="normal">1624</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1610</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save the results to a file.</span>
 <span class="sd">    If filename is not provided, the filename is generated based on the PREFIX using the</span>
@@ -18533,7 +18729,8 @@ where each inner list contains the lower and upper bound for one dimension.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">261</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">260</span>
+<span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
@@ -18557,8 +18754,7 @@ where each inner list contains the lower and upper bound for one dimension.</p>
 <span class="normal">282</span>
 <span class="normal">283</span>
 <span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_de_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_de_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the bounds for the differential evolution optimizer.</span>
 <span class="sd">    The bounds are internal, because they are functions of self.lower and self.upper</span>
 <span class="sd">    and used by the optimizer. They are stored in self.de_bounds as a list of lists,</span>
@@ -18673,24 +18869,24 @@ in the file with the name <code>self.progress_file</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1825</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1811</span>
+<span class="normal">1812</span>
+<span class="normal">1813</span>
+<span class="normal">1814</span>
+<span class="normal">1815</span>
+<span class="normal">1816</span>
+<span class="normal">1817</span>
+<span class="normal">1818</span>
+<span class="normal">1819</span>
+<span class="normal">1820</span>
+<span class="normal">1821</span>
+<span class="normal">1822</span>
+<span class="normal">1823</span>
+<span class="normal">1824</span>
+<span class="normal">1825</span>
 <span class="normal">1826</span>
 <span class="normal">1827</span>
-<span class="normal">1828</span>
-<span class="normal">1829</span>
-<span class="normal">1830</span>
-<span class="normal">1831</span>
-<span class="normal">1832</span>
-<span class="normal">1833</span>
-<span class="normal">1834</span>
-<span class="normal">1835</span>
-<span class="normal">1836</span>
-<span class="normal">1837</span>
-<span class="normal">1838</span>
-<span class="normal">1839</span>
-<span class="normal">1840</span>
-<span class="normal">1841</span>
-<span class="normal">1842</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">show_progress_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_start</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1828</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">show_progress_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout_start</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Show progress bar if `show_progress` is `True`. If</span>
 <span class="sd">    self.progress_file is not `None`, the progress bar is saved</span>
 <span class="sd">    in the file with the name `self.progress_file`.</span>
@@ -18807,7 +19003,21 @@ The method <code>infill()</code> is used as the objective function.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1925</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1911</span>
+<span class="normal">1912</span>
+<span class="normal">1913</span>
+<span class="normal">1914</span>
+<span class="normal">1915</span>
+<span class="normal">1916</span>
+<span class="normal">1917</span>
+<span class="normal">1918</span>
+<span class="normal">1919</span>
+<span class="normal">1920</span>
+<span class="normal">1921</span>
+<span class="normal">1922</span>
+<span class="normal">1923</span>
+<span class="normal">1924</span>
+<span class="normal">1925</span>
 <span class="normal">1926</span>
 <span class="normal">1927</span>
 <span class="normal">1928</span>
@@ -18871,21 +19081,7 @@ The method <code>infill()</code> is used as the objective function.</p>
 <span class="normal">1986</span>
 <span class="normal">1987</span>
 <span class="normal">1988</span>
-<span class="normal">1989</span>
-<span class="normal">1990</span>
-<span class="normal">1991</span>
-<span class="normal">1992</span>
-<span class="normal">1993</span>
-<span class="normal">1994</span>
-<span class="normal">1995</span>
-<span class="normal">1996</span>
-<span class="normal">1997</span>
-<span class="normal">1998</span>
-<span class="normal">1999</span>
-<span class="normal">2000</span>
-<span class="normal">2001</span>
-<span class="normal">2002</span>
-<span class="normal">2003</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">1989</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">suggest_new_X</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute `n_points` new infill points in natural units.</span>
 <span class="sd">    These diffrent points are computed by the optimizer using increasing seed.</span>
@@ -19049,7 +19245,6 @@ from surrogate_control:
     - model_optimizer: Optimizer for model parameter tuning
     - model_fun_evals: Number of function evaluations for model optimization
     - min/max_theta: Bounds for theta parameters
-    - n_theta: Number of theta parameters
     - theta_init_zero: Whether to initialize theta at zero
     - p_val: Power parameter p value
     - n_p: Number of p parameters
@@ -19074,15 +19269,14 @@ from surrogate_control:
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">surrogate_control</span> <span class="o">=</span> <span class="n">surrogate_control_init</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;interpolation&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">n_theta</span><span class="o">=</span><span class="s2">&quot;anisotropic&quot;</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">S</span> <span class="o">=</span> <span class="n">spot</span><span class="o">.</span><span class="n">Spot</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">fun</span><span class="o">=</span><span class="n">Analytical</span><span class="p">()</span><span class="o">.</span><span class="n">fun_sphere</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">fun_control</span><span class="o">=</span><span class="n">fun_control</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">surrogate_control</span><span class="o">=</span><span class="n">surrogate_control</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">n_theta</span><span class="p">)</span>
-<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">isotropic</span><span class="p">)</span>
+<span class="go">False</span>
 </code></pre></div>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Setup with custom surrogate</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="kn">import</span> <span class="n">GaussianProcessRegressor</span>
@@ -19098,7 +19292,19 @@ from surrogate_control:
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">436</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
 <span class="normal">437</span>
 <span class="normal">438</span>
 <span class="normal">439</span>
@@ -19176,21 +19382,7 @@ from surrogate_control:
 <span class="normal">511</span>
 <span class="normal">512</span>
 <span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">surrogate_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surrogate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">514</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">surrogate_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">surrogate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up the surrogate model for the optimization process.</span>
 <span class="sd">    This method initializes the surrogate model. If no surrogate model is provided,</span>
 <span class="sd">    it creates an internal Kriging surrogate with parameters specified in surrogate_control.</span>
@@ -19212,7 +19404,6 @@ from surrogate_control:
 <span class="sd">            - model_optimizer: Optimizer for model parameter tuning</span>
 <span class="sd">            - model_fun_evals: Number of function evaluations for model optimization</span>
 <span class="sd">            - min/max_theta: Bounds for theta parameters</span>
-<span class="sd">            - n_theta: Number of theta parameters</span>
 <span class="sd">            - theta_init_zero: Whether to initialize theta at zero</span>
 <span class="sd">            - p_val: Power parameter p value</span>
 <span class="sd">            - n_p: Number of p parameters</span>
@@ -19236,15 +19427,14 @@ from surrogate_control:
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; surrogate_control = surrogate_control_init(</span>
 <span class="sd">        ...     method=&quot;interpolation&quot;,</span>
-<span class="sd">        ...     n_theta=&quot;anisotropic&quot;</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; S = spot.Spot(</span>
 <span class="sd">        ...     fun=Analytical().fun_sphere,</span>
 <span class="sd">        ...     fun_control=fun_control,</span>
 <span class="sd">        ...     surrogate_control=surrogate_control</span>
 <span class="sd">        ... )</span>
-<span class="sd">        &gt;&gt;&gt; print(S.surrogate.n_theta)</span>
-<span class="sd">        2</span>
+<span class="sd">        &gt;&gt;&gt; print(S.surrogate.isotropic)</span>
+<span class="sd">        False</span>
 
 <span class="sd">        &gt;&gt;&gt; # Setup with custom surrogate</span>
 <span class="sd">        &gt;&gt;&gt; from sklearn.gaussian_process import GaussianProcessRegressor</span>
@@ -19271,7 +19461,7 @@ from surrogate_control:
             <span class="n">model_fun_evals</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;model_fun_evals&quot;</span><span class="p">],</span>
             <span class="n">min_theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;min_theta&quot;</span><span class="p">],</span>
             <span class="n">max_theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;max_theta&quot;</span><span class="p">],</span>
-            <span class="n">n_theta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">],</span>
+            <span class="n">isotropic</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;isotropic&quot;</span><span class="p">],</span>
             <span class="n">theta_init_zero</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;theta_init_zero&quot;</span><span class="p">],</span>
             <span class="n">p_val</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;p_val&quot;</span><span class="p">],</span>
             <span class="n">n_p</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate_control</span><span class="p">[</span><span class="s2">&quot;n_p&quot;</span><span class="p">],</span>
@@ -19391,7 +19581,21 @@ self.all_lower (numpy.ndarray):
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">699</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
 <span class="normal">700</span>
 <span class="normal">701</span>
 <span class="normal">702</span>
@@ -19437,21 +19641,7 @@ self.all_lower (numpy.ndarray):
 <span class="normal">742</span>
 <span class="normal">743</span>
 <span class="normal">744</span>
-<span class="normal">745</span>
-<span class="normal">746</span>
-<span class="normal">747</span>
-<span class="normal">748</span>
-<span class="normal">749</span>
-<span class="normal">750</span>
-<span class="normal">751</span>
-<span class="normal">752</span>
-<span class="normal">753</span>
-<span class="normal">754</span>
-<span class="normal">755</span>
-<span class="normal">756</span>
-<span class="normal">757</span>
-<span class="normal">758</span>
-<span class="normal">759</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_all_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">745</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_all_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Expands reduced-dimensional design points back to their full-dimensional representation</span>
 <span class="sd">    by reinserting fixed values for dimensions that were removed during the dimensionality</span>
@@ -19619,7 +19809,21 @@ by reinserting the fixed dimensions. Otherwise, it returns the input design poin
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">761</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
 <span class="normal">762</span>
 <span class="normal">763</span>
 <span class="normal">764</span>
@@ -19631,21 +19835,7 @@ by reinserting the fixed dimensions. Otherwise, it returns the input design poin
 <span class="normal">770</span>
 <span class="normal">771</span>
 <span class="normal">772</span>
-<span class="normal">773</span>
-<span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span>
-<span class="normal">778</span>
-<span class="normal">779</span>
-<span class="normal">780</span>
-<span class="normal">781</span>
-<span class="normal">782</span>
-<span class="normal">783</span>
-<span class="normal">784</span>
-<span class="normal">785</span>
-<span class="normal">786</span>
-<span class="normal">787</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_all_dim_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="normal">773</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_all_dim_if_needed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Conditionally expand reduced-dimensional design points back to their full-dimensional representation,</span>
 <span class="sd">    if dimensionality reduction was performed.</span>
@@ -19876,7 +20066,21 @@ is set to True, and the count of dimensions (<code>k</code>) is updated accordin
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">613</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
 <span class="normal">614</span>
 <span class="normal">615</span>
 <span class="normal">616</span>
@@ -19946,21 +20150,7 @@ is set to True, and the count of dimensions (<code>k</code>) is updated accordin
 <span class="normal">680</span>
 <span class="normal">681</span>
 <span class="normal">682</span>
-<span class="normal">683</span>
-<span class="normal">684</span>
-<span class="normal">685</span>
-<span class="normal">686</span>
-<span class="normal">687</span>
-<span class="normal">688</span>
-<span class="normal">689</span>
-<span class="normal">690</span>
-<span class="normal">691</span>
-<span class="normal">692</span>
-<span class="normal">693</span>
-<span class="normal">694</span>
-<span class="normal">695</span>
-<span class="normal">696</span>
-<span class="normal">697</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_red_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">683</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_red_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reduces the dimensionality of the optimization problem by removing dimensions</span>
 <span class="sd">    where lower and upper bounds are equal, indicating that those variables are fixed.</span>
@@ -20272,7 +20462,21 @@ If <code>noise</code> is <code>True</code>, additionally the following steps
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1427</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1413</span>
+<span class="normal">1414</span>
+<span class="normal">1415</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
+<span class="normal">1418</span>
+<span class="normal">1419</span>
+<span class="normal">1420</span>
+<span class="normal">1421</span>
+<span class="normal">1422</span>
+<span class="normal">1423</span>
+<span class="normal">1424</span>
+<span class="normal">1425</span>
+<span class="normal">1426</span>
+<span class="normal">1427</span>
 <span class="normal">1428</span>
 <span class="normal">1429</span>
 <span class="normal">1430</span>
@@ -20425,21 +20629,7 @@ If <code>noise</code> is <code>True</code>, additionally the following steps
 <span class="normal">1577</span>
 <span class="normal">1578</span>
 <span class="normal">1579</span>
-<span class="normal">1580</span>
-<span class="normal">1581</span>
-<span class="normal">1582</span>
-<span class="normal">1583</span>
-<span class="normal">1584</span>
-<span class="normal">1585</span>
-<span class="normal">1586</span>
-<span class="normal">1587</span>
-<span class="normal">1588</span>
-<span class="normal">1589</span>
-<span class="normal">1590</span>
-<span class="normal">1591</span>
-<span class="normal">1592</span>
-<span class="normal">1593</span>
-<span class="normal">1594</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1580</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_design</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update design. Generate and evaluate new design points.</span>
 <span class="sd">    It is basically a call to the method `get_new_X0()`.</span>
@@ -20786,7 +20976,21 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1306</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1292</span>
+<span class="normal">1293</span>
+<span class="normal">1294</span>
+<span class="normal">1295</span>
+<span class="normal">1296</span>
+<span class="normal">1297</span>
+<span class="normal">1298</span>
+<span class="normal">1299</span>
+<span class="normal">1300</span>
+<span class="normal">1301</span>
+<span class="normal">1302</span>
+<span class="normal">1303</span>
+<span class="normal">1304</span>
+<span class="normal">1305</span>
+<span class="normal">1306</span>
 <span class="normal">1307</span>
 <span class="normal">1308</span>
 <span class="normal">1309</span>
@@ -20812,21 +21016,7 @@ If <code>noise</code> is <code>True</code>, additionally the following stats are
 <span class="normal">1329</span>
 <span class="normal">1330</span>
 <span class="normal">1331</span>
-<span class="normal">1332</span>
-<span class="normal">1333</span>
-<span class="normal">1334</span>
-<span class="normal">1335</span>
-<span class="normal">1336</span>
-<span class="normal">1337</span>
-<span class="normal">1338</span>
-<span class="normal">1339</span>
-<span class="normal">1340</span>
-<span class="normal">1341</span>
-<span class="normal">1342</span>
-<span class="normal">1343</span>
-<span class="normal">1344</span>
-<span class="normal">1345</span>
-<span class="normal">1346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1332</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update the following stats:</span>
 <span class="sd">    1. `min_y`, 2. `min_X`, and 3. `counter`</span>
@@ -20909,7 +21099,21 @@ is a tensorboard writer that writes the data to a tensorboard file.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/spot/spot.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1269</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1255</span>
+<span class="normal">1256</span>
+<span class="normal">1257</span>
+<span class="normal">1258</span>
+<span class="normal">1259</span>
+<span class="normal">1260</span>
+<span class="normal">1261</span>
+<span class="normal">1262</span>
+<span class="normal">1263</span>
+<span class="normal">1264</span>
+<span class="normal">1265</span>
+<span class="normal">1266</span>
+<span class="normal">1267</span>
+<span class="normal">1268</span>
+<span class="normal">1269</span>
 <span class="normal">1270</span>
 <span class="normal">1271</span>
 <span class="normal">1272</span>
@@ -20930,21 +21134,7 @@ is a tensorboard writer that writes the data to a tensorboard file.</p>
 <span class="normal">1287</span>
 <span class="normal">1288</span>
 <span class="normal">1289</span>
-<span class="normal">1290</span>
-<span class="normal">1291</span>
-<span class="normal">1292</span>
-<span class="normal">1293</span>
-<span class="normal">1294</span>
-<span class="normal">1295</span>
-<span class="normal">1296</span>
-<span class="normal">1297</span>
-<span class="normal">1298</span>
-<span class="normal">1299</span>
-<span class="normal">1300</span>
-<span class="normal">1301</span>
-<span class="normal">1302</span>
-<span class="normal">1303</span>
-<span class="normal">1304</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_initial_tensorboard_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write_initial_tensorboard_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Writes initial design data using the spot_writer. The spot_writer</span>
 <span class="sd">    is a tensorboard writer that writes the data to a tensorboard file.</span>
 
