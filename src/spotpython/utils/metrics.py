@@ -26,6 +26,7 @@
 
 import numpy as np
 from spotpython.utils.convert import series_to_array
+from sklearn.metrics.pairwise import euclidean_distances
 
 
 def apk(actual, predicted, k=10):
@@ -198,43 +199,17 @@ def get_metric_sign(metric_name):
         raise ValueError(f"Metric '{metric_name}' not found.")
 
 
-def calculate_xai_consistency(attributions) -> float:
-    """Calculate the consistency between different XAI methods.
-    Computes the pairwise correlation between different XAI methods' attributions
-    and returns their mean correlation as a measure of consistency. A higher value
-    indicates greater agreement between different XAI methods.
+def calculate_xai_consistency_corr(attributions):
+    """
+    Calculates the consistency of XAI methods by computing the mean of the upper triangle
+    of the correlation matrix of the provided attributions.
 
     Args:
         attributions (np.ndarray): Array of shape (n_methods, n_features) containing
-            feature importance scores from different XAI methods. Each row represents
-            a different XAI method's attributions, and each column represents a feature.
+                                   the attributions from different XAI methods.
 
     Returns:
-        float: Mean correlation between XAI methods, ranging from -1 to 1.
-            - 1: Perfect consistency between methods
-            - 0: No consistency between methods
-            - -1: Perfect negative consistency between methods
-
-    Examples:
-        >>> import numpy as np
-        >>> # Three XAI methods' attributions for four features
-        >>> attributions = np.array([
-        ...     [0.1, 0.2, 0.3, 0.4],  # Method 1
-        ...     [0.2, 0.3, 0.4, 0.5],  # Method 2
-        ...     [0.0, 0.1, 0.2, 0.3]   # Method 3
-        ... ])
-        >>> consistency = calculate_xai_consistency(attributions)
-        >>> print(f"XAI Consistency: {consistency:.2f}")
-        Attribution Correlation Matrix:
-        [[ 1.    0.97  0.98]
-         [ 0.97  1.    0.99]
-         [ 0.98  0.99  1.  ]]
-        XAI Consistency: 0.98
-
-    Note:
-        The correlation matrix is computed using numpy's corrcoef function, which
-        calculates Pearson correlation coefficients. Only the upper triangle of
-        the correlation matrix is used to avoid counting correlations twice.
+        float: Mean value of the upper triangle of the correlation matrix.
     """
     global_attr_np = np.array(attributions)
     corr_matrix = np.corrcoef(global_attr_np)
@@ -246,5 +221,57 @@ def calculate_xai_consistency(attributions) -> float:
     upper_triangle_values = corr_matrix[upper_triangle_indices]
     result_xai = upper_triangle_values.mean()
     print("XAI Consistency (mean of upper triangle of correlation matrix):")
+    print(result_xai)
+    return result_xai
+
+
+def calculate_xai_consistency_cosine(attributions):
+    """
+    Calculates the consistency of XAI methods by computing the mean of the upper triangle
+    of the cosine similarity matrix of the provided attributions.
+
+    Args:
+        attributions (np.ndarray): Array of shape (n_methods, n_features) containing
+                                   the attributions from different XAI methods.
+
+    Returns:
+        float: Mean value of the upper triangle of the cosine similarity matrix.
+    """
+    global_attr_np = np.array(attributions)
+    cosine_sim_matrix = np.array([[np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)) for b in global_attr_np] for a in global_attr_np])
+    print("Attribution Cosine Similarity Matrix:")
+    print(cosine_sim_matrix)
+
+    # Calculate the mean of the upper triangle of the cosine similarity matrix
+    upper_triangle_indices = np.triu_indices_from(cosine_sim_matrix, k=1)
+    upper_triangle_values = cosine_sim_matrix[upper_triangle_indices]
+    result_xai = upper_triangle_values.mean()
+    print("XAI Consistency (mean of upper triangle of cosine similarity matrix):")
+    print(result_xai)
+    return result_xai
+
+
+def calculate_xai_consistency_euclidean(attributions):
+    """
+    Calculates the consistency of XAI methods by computing the mean of the upper triangle
+    of the Euclidean distance matrix of the provided attributions.
+
+    Args:
+        attributions (np.ndarray): Array of shape (n_methods, n_features) containing
+                                   the attributions from different XAI methods.
+
+    Returns:
+        float: Mean value of the upper triangle of the Euclidean distance matrix.
+    """
+    global_attr_np = np.array(attributions)
+    euclidean_dist_matrix = euclidean_distances(global_attr_np)
+    print("Attribution Euclidean Distance Matrix:")
+    print(euclidean_dist_matrix)
+
+    # Calculate the mean of the upper triangle of the Euclidean distance matrix
+    upper_triangle_indices = np.triu_indices_from(euclidean_dist_matrix, k=1)
+    upper_triangle_values = euclidean_dist_matrix[upper_triangle_indices]
+    result_xai = upper_triangle_values.mean()
+    print("XAI Consistency (mean of upper triangle of Euclidean distance matrix):")
     print(result_xai)
     return result_xai
