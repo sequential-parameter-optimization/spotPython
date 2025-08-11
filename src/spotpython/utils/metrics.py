@@ -27,6 +27,8 @@
 import numpy as np
 from spotpython.utils.convert import series_to_array
 from sklearn.metrics.pairwise import euclidean_distances
+from scipy.stats import spearmanr
+
 
 
 def apk(actual, predicted, k=10):
@@ -275,3 +277,32 @@ def calculate_xai_consistency_euclidean(attributions):
     print("XAI Consistency (mean of upper triangle of Euclidean distance matrix):")
     print(result_xai)
     return result_xai
+
+def calculate_xai_consistency_spearman(attributions):
+    """
+    Calculates the consistency of XAI methods using Spearman rank correlation.
+    
+    Args:
+        attributions (np.ndarray): shape (n_methods, n_features)
+    
+    Returns:
+        float: Mean of upper triangle of Spearman correlation matrix (excluding diagonal)
+    """
+    attributions = np.array(attributions)
+    n_methods = attributions.shape[0]
+
+    spearman_corr_matrix = np.zeros((n_methods, n_methods))
+    for i in range(n_methods):
+        for j in range(n_methods):
+            corr = spearmanr(attributions[i], attributions[j]).correlation
+            if np.isnan(corr):
+                corr = 0.0
+            spearman_corr_matrix[i, j] = corr
+
+    upper_triangle_values = spearman_corr_matrix[np.triu_indices(n_methods, k=1)]
+    print("Attribution Spearman Correlation Matrix:")
+    print(spearman_corr_matrix)
+
+    print("XAI Consistency (mean of upper triangle of Spearman correlation matrix):")
+    print(upper_triangle_values.mean())
+    return upper_triangle_values.mean()

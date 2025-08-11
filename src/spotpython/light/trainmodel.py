@@ -1,7 +1,7 @@
 import lightning as L
 from spotpython.data.lightdatamodule import LightDataModule, PadSequenceManyToMany
 from spotpython.utils.eda import generate_config_id
-from spotpython.utils.metrics import calculate_xai_consistency_corr, calculate_xai_consistency_cosine, calculate_xai_consistency_euclidean
+from spotpython.utils.metrics import calculate_xai_consistency_corr, calculate_xai_consistency_cosine, calculate_xai_consistency_euclidean, calculate_xai_consistency_spearman
 from pytorch_lightning.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.callbacks import ModelCheckpoint
@@ -723,13 +723,15 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     attributions = np.stack(attributions_list, axis=0)
 
     # Calculate corr:
-    if fun_control["xai_metric"] not in ["corr", "cosine", "euclidean"]:
-        raise ValueError(f"Invalid xai_metric: {fun_control['xai_metric']}. Valid metrics are: 'corr', 'cosine', 'euclidean'")
+    if fun_control["xai_metric"] not in ["corr", "cosine", "euclidean", "spearman"]:
+        raise ValueError(f"Invalid xai_metric: {fun_control['xai_metric']}. Valid metrics are: 'corr', 'cosine', 'euclidean', 'spearman'")
     if fun_control["xai_metric"] == "corr":
         result_xai = calculate_xai_consistency_corr(attributions)
     elif fun_control["xai_metric"] == "cosine":
         result_xai = calculate_xai_consistency_cosine(attributions)
     elif fun_control["xai_metric"] == "euclidean":
         result_xai = calculate_xai_consistency_euclidean(attributions)
+    elif fun_control["xai_metric"] == "spearman":
+        result_xai = calculate_xai_consistency_spearman(attributions)
 
     return result["val_loss"], result_xai
