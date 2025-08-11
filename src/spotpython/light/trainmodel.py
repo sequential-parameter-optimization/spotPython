@@ -653,7 +653,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     # Perform feature attribution analysis
     model = trainer.model
     print("MODEL :", model)
-    model.eval()
 
     # Get the validation dataloader from the LightningDataModule
     val_dataloader: DataLoader = dm.val_dataloader()  # Fetch validation data loader
@@ -668,9 +667,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         X_val_list.append(X_batch)
         y_val_list.append(y_batch)
 
-    # Concatenate all batches into single tensors
-    X_val_tensor = torch.cat(X_val_list, dim=0).to(model.device)
-
     # Perform feature attribution analysis
 
     # Check if at least 2 elements are in list fun_control["xai_methods"]
@@ -683,6 +679,11 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         if method not in valid_xai_methods:
             raise ValueError(f"Invalid XAI method: {method}. Valid methods are: {valid_xai_methods}")
 
+    # Ensure the model is in evaluation mode    
+    model.eval()
+    X_val_tensor = torch.cat(X_val_list, dim=0).to(model.device)
+    X_val_tensor.requires_grad_()  
+
     # Dictionary to store attributions
     attributions_dict = {}
 
@@ -692,29 +693,31 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         print("Baseline is None. Using training mean as baseline.")
     baseline = fun_control["xai_baseline"]
 
-    if "IntegratedGradients" in fun_control["xai_methods"]:
-        attr_ig = IntegratedGradients(model)
-        attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline)
-        ig_attr_test_sum = attribution_ig.detach().numpy().sum(axis=0)
-        l2_norm = np.linalg.norm(ig_attr_test_sum)
-        l2_normalized_ig = ig_attr_test_sum / l2_norm if l2_norm != 0 else ig_attr_test_sum
-        attributions_dict["IntegratedGradients"] = l2_normalized_ig
+    with torch.enable_grad():
+        if "IntegratedGradients" in fun_control["xai_methods"]:
+            attr_ig = IntegratedGradients(model)
+            attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline, n_steps=100, internal_batch_size=64)
+            vec = attribution_ig.detach().cpu().numpy().sum(axis=0)
+            l2 = np.linalg.norm(vec)
+            attributions_dict["IntegratedGradients"] = vec / l2 if l2 != 0 else vec
 
-    if "KernelShap" in fun_control["xai_methods"]:
-        attr_ks = KernelShap(model)
-        attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline)
-        ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
-        l2_norm = np.linalg.norm(ks_attr_test_sum)
-        l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
-        attributions_dict["KernelShap"] = l2_normalized_ks
+        if "KernelShap" in fun_control["xai_methods"]:
+            attr_ks = KernelShap(model)
+            samples_ks = 100 * X_val_tensor.shape[1]
+            print("KernelShap: Using", samples_ks, "samples for attribution.")
+            attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline, n_samples=samples_ks, perturbations_per_eval=64)
+            ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
+            l2_norm = np.linalg.norm(ks_attr_test_sum)
+            l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
+            attributions_dict["KernelShap"] = l2_normalized_ks
 
-    if "DeepLift" in fun_control["xai_methods"]:
-        attr_dl = DeepLift(model)
-        attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline)
-        dl_attr_test_sum = attribution_dl.detach().numpy().sum(axis=0)
-        l2_norm = np.linalg.norm(dl_attr_test_sum)
-        l2_normalized_dl = dl_attr_test_sum / l2_norm if l2_norm != 0 else dl_attr_test_sum
-        attributions_dict["DeepLift"] = l2_normalized_dl
+        if "DeepLift" in fun_control["xai_methods"]:
+            attr_dl = DeepLift(model)
+            attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline)
+            dl_attr_test_sum = attribution_dl.detach().numpy().sum(axis=0)
+            l2_norm = np.linalg.norm(dl_attr_test_sum)
+            l2_normalized_dl = dl_attr_test_sum / l2_norm if l2_norm != 0 else dl_attr_test_sum
+            attributions_dict["DeepLift"] = l2_normalized_dl
 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
     attributions = np.stack(attributions_list, axis=0)
