@@ -687,8 +687,9 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     attributions_dict = {}
 
     if fun_control["xai_baseline"] is None:
-        fun_control["xai_baseline"] = torch.zeros_like(X_val_tensor)
-        print("Baseline is None. Using zeros as baseline.")
+        X_train_mean = X_val_tensor.mean(dim=0)
+        fun_control["xai_baseline"] = X_train_mean.unsqueeze(0)
+        print("Baseline is None. Using training mean as baseline.")
     baseline = fun_control["xai_baseline"]
 
     if "IntegratedGradients" in fun_control["xai_methods"]:
