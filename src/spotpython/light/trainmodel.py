@@ -696,7 +696,7 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     with torch.enable_grad():
         if "IntegratedGradients" in fun_control["xai_methods"]:
             attr_ig = IntegratedGradients(model)
-            attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline, n_steps=100, internal_batch_size=64)
+            attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline)
             vec = attribution_ig.detach().cpu().numpy().sum(axis=0)
             l2 = np.linalg.norm(vec)
             attributions_dict["IntegratedGradients"] = vec / l2 if l2 != 0 else vec
