@@ -654,12 +654,23 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     model = trainer.model
     print("MODEL :", model)
 
-    # Get the validation dataloader from the LightningDataModule
+    # Get the validation and train dataloader from the LightningDataModule
+    train_dataloader: DataLoader = dm.train_dataloader()  # Fetch train data loader
     val_dataloader: DataLoader = dm.val_dataloader()  # Fetch validation data loader
 
     # Collect all validation data
     X_val_list = []
     y_val_list = []
+
+    # Collect all train data
+    X_train_list = []
+    y_train_list = []
+
+    # Iterate over the train dataloader to gather all data
+    for batch in train_dataloader:
+        X_batch, y_batch = batch  # Extract inputs and labels
+        X_train_list.append(X_batch)
+        y_train_list.append(y_batch)
 
     # Iterate over the validation dataloader to gather all data
     for batch in val_dataloader:
@@ -679,8 +690,8 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         if method not in valid_xai_methods:
             raise ValueError(f"Invalid XAI method: {method}. Valid methods are: {valid_xai_methods}")
 
-    # Ensure the model is in evaluation mode    
-    model.eval()
+    X_train_tensor = torch.cat(X_train_list, dim=0).to(model.device)
+    X_train_tensor.requires_grad_()
     X_val_tensor = torch.cat(X_val_list, dim=0).to(model.device)
     X_val_tensor.requires_grad_()  
 
@@ -688,10 +699,36 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     attributions_dict = {}
 
     if fun_control["xai_baseline"] is None:
-        X_train_mean = X_val_tensor.mean(dim=0)
+        X_train_mean = X_train_tensor.mean(dim=0)
         fun_control["xai_baseline"] = X_train_mean.unsqueeze(0)
         print("Baseline is None. Using training mean as baseline.")
     baseline = fun_control["xai_baseline"]
+
+    # Use a subset of the validation data for attribution
+    if fun_control["xai_subset_size"] is not None:
+        N_total = X_val_tensor.size(0)
+        N_attr = min(fun_control["xai_subset_size"], N_total)
+        print(f"Using a subset of {N_attr} samples for attribution analysis out of {N_total} total samples.")
+        g = torch.Generator(device=X_val_tensor.device) 
+        g.manual_seed(fun_control["seed"])                              
+        perm = torch.randperm(N_total, generator=g,  
+                      device=X_val_tensor.device)[:N_attr]
+        X_val_tensor = X_val_tensor[perm]  
+
+    # Ensure the model is in evaluation mode    
+    model.eval()
+
+    if "KernelShap" in fun_control["xai_methods"]:
+            attr_ks = KernelShap(model)
+            n_features = X_val_tensor.shape[1]
+            samples_ks = min(2000, 100 * n_features)  # Adjust number of samples based on features, maximum 2000
+            print("KernelShap: Using", samples_ks, "samples for attribution.")
+            with torch.no_grad():
+                attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline, n_samples=samples_ks, perturbations_per_eval=64)
+            ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
+            l2_norm = np.linalg.norm(ks_attr_test_sum)
+            l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
+            attributions_dict["KernelShap"] = l2_normalized_ks
 
     with torch.enable_grad():
         if "IntegratedGradients" in fun_control["xai_methods"]:
@@ -700,16 +737,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
             vec = attribution_ig.detach().cpu().numpy().sum(axis=0)
             l2 = np.linalg.norm(vec)
             attributions_dict["IntegratedGradients"] = vec / l2 if l2 != 0 else vec
-
-        if "KernelShap" in fun_control["xai_methods"]:
-            attr_ks = KernelShap(model)
-            samples_ks = 100 * X_val_tensor.shape[1]
-            print("KernelShap: Using", samples_ks, "samples for attribution.")
-            attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline, n_samples=samples_ks, perturbations_per_eval=64)
-            ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
-            l2_norm = np.linalg.norm(ks_attr_test_sum)
-            l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
-            attributions_dict["KernelShap"] = l2_normalized_ks
 
         if "DeepLift" in fun_control["xai_methods"]:
             attr_dl = DeepLift(model)
