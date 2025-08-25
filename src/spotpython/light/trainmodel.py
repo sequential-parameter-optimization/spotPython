@@ -693,7 +693,7 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     X_train_tensor = torch.cat(X_train_list, dim=0).to(model.device)
     X_train_tensor.requires_grad_()
     X_val_tensor = torch.cat(X_val_list, dim=0).to(model.device)
-    X_val_tensor.requires_grad_()  
+    X_val_tensor.requires_grad_()
 
     # Dictionary to store attributions
     attributions_dict = {}
@@ -709,38 +709,39 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         N_total = X_val_tensor.size(0)
         N_attr = min(fun_control["xai_subset_size"], N_total)
         print(f"Using a subset of {N_attr} samples for attribution analysis out of {N_total} total samples.")
-        g = torch.Generator(device=X_val_tensor.device) 
-        g.manual_seed(fun_control["seed"])                              
-        perm = torch.randperm(N_total, generator=g,  
-                      device=X_val_tensor.device)[:N_attr]
-        X_val_tensor = X_val_tensor[perm]  
+        g = torch.Generator(device=X_val_tensor.device)
+        g.manual_seed(fun_control["seed"])
+        perm = torch.randperm(N_total, generator=g, device=X_val_tensor.device)[:N_attr]
+        X_val_tensor = X_val_tensor[perm]
 
-    # Ensure the model is in evaluation mode    
+    # Ensure the model is in evaluation mode
     model.eval()
 
+    target = fun_control.get("xai_target", None)
+
     if "KernelShap" in fun_control["xai_methods"]:
-            attr_ks = KernelShap(model)
-            n_features = X_val_tensor.shape[1]
-            samples_ks = min(2000, 100 * n_features)  # Adjust number of samples based on features, maximum 2000
-            print("KernelShap: Using", samples_ks, "samples for attribution.")
-            with torch.no_grad():
-                attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline, n_samples=samples_ks, perturbations_per_eval=64)
-            ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
-            l2_norm = np.linalg.norm(ks_attr_test_sum)
-            l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
-            attributions_dict["KernelShap"] = l2_normalized_ks
+        attr_ks = KernelShap(model)
+        n_features = X_val_tensor.shape[1]
+        samples_ks = min(2000, 100 * n_features)  # Adjust number of samples based on features, maximum 2000
+        print("KernelShap: Using", samples_ks, "samples for attribution.")
+        with torch.no_grad():
+            attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline, n_samples=samples_ks, perturbations_per_eval=64, target=target)
+        ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
+        l2_norm = np.linalg.norm(ks_attr_test_sum)
+        l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
+        attributions_dict["KernelShap"] = l2_normalized_ks
 
     with torch.enable_grad():
         if "IntegratedGradients" in fun_control["xai_methods"]:
             attr_ig = IntegratedGradients(model)
-            attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline)
+            attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline, target=target)
             vec = attribution_ig.detach().cpu().numpy().sum(axis=0)
             l2 = np.linalg.norm(vec)
             attributions_dict["IntegratedGradients"] = vec / l2 if l2 != 0 else vec
 
         if "DeepLift" in fun_control["xai_methods"]:
             attr_dl = DeepLift(model)
-            attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline)
+            attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline, target=target)
             dl_attr_test_sum = attribution_dl.detach().numpy().sum(axis=0)
             l2_norm = np.linalg.norm(dl_attr_test_sum)
             l2_normalized_dl = dl_attr_test_sum / l2_norm if l2_norm != 0 else dl_attr_test_sum
