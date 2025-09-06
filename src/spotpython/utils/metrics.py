@@ -201,7 +201,7 @@ def get_metric_sign(metric_name):
         raise ValueError(f"Metric '{metric_name}' not found.")
 
 
-def calculate_xai_consistency_corr(attributions):
+def calculate_xai_consistency_corr(attributions) -> float:
     """
     Calculates the consistency of XAI methods by computing the mean of the upper triangle
     of the correlation matrix of the provided attributions.
@@ -227,7 +227,7 @@ def calculate_xai_consistency_corr(attributions):
     return result_xai
 
 
-def calculate_xai_consistency_cosine(attributions):
+def calculate_xai_consistency_cosine(attributions) -> float:
     """
     Calculates the consistency of XAI methods by computing the mean of the upper triangle
     of the cosine similarity matrix of the provided attributions.
@@ -253,7 +253,7 @@ def calculate_xai_consistency_cosine(attributions):
     return result_xai
 
 
-def calculate_xai_consistency_euclidean(attributions):
+def calculate_xai_consistency_euclidean(attributions) -> float:
     """
     Calculates the consistency of XAI methods by computing the mean of the upper triangle
     of the Euclidean distance matrix of the provided attributions.
@@ -278,7 +278,7 @@ def calculate_xai_consistency_euclidean(attributions):
     print(result_xai)
     return result_xai
 
-def calculate_xai_consistency_spearman(attributions):
+def calculate_xai_consistency_spearman(attributions) -> float:
     """
     Calculates the consistency of XAI methods using Spearman rank correlation.
     
