@@ -469,34 +469,6 @@ class Kriging(BaseEstimator, RegressorMixin):
             print("Building Psi failed. Error: %s, Type: %s", err, type(err))
             raise
 
-    def _kernel(self, X: np.ndarray, theta: np.ndarray, p: float) -> np.ndarray:
-        """
-        Computes the correlation matrix Psi using vectorized operations.
-
-        Args:
-            X (np.ndarray): Input data of shape (n_samples, n_features).
-            theta (np.ndarray): Theta parameters of shape (n_features,).
-            p (float): Power exponent.
-
-        Returns:
-            np.ndarray: The upper triangle of the correlation matrix Psi.
-        """
-        n_samples, n_features = X.shape
-        Psi = np.zeros((n_samples, n_samples), dtype=float)
-        # Calculate all pairwise differences:
-        # X_expanded_rows will have shape (n_samples, 1, n_features)
-        # X_expanded_cols will have shape (1, n_samples, n_features)
-        # diff will have shape (n_samples, n_samples, n_features)
-        diff = np.abs(X[:, np.newaxis, :] - X[np.newaxis, :, :]) ** p
-        # Apply theta and sum over features
-        # dist_matrix will have shape (n_samples, n_samples)
-        dist_matrix = np.sum(theta * diff, axis=2)
-        # Compute Psi using the exponential kernel
-        Psi = np.exp(-dist_matrix)
-        # Return only the upper triangle, as the matrix is symmetric
-        # and the diagonal will be handled later.
-        return np.triu(Psi, k=1)
-
     def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
@@ -540,14 +512,6 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         n = X.shape[0]
         one = np.ones(n)
-
-        # Build the correlation matrix Psi (modified in 0.31.0)
-        # theta = self.theta
-        # theta is in log scale, so transform it back:
-        # theta10 = 10.0**theta
-        # p = self.p_val
-        # Build correlation matrix (preparation for build_Psi())
-        # Psi_upper_triangle = self._kernel(X, theta10, p)
 
         Psi_upper_triangle = self.build_Psi()
 
@@ -655,16 +619,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         y = self.y_.flatten()
 
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # theta = x[:-1]
             self.theta = self.logtheta_lambda_[: self.n_theta]
-            # lambda_ = x[-1]
             lambda_ = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
             # lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
                 self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
-            # theta = x
             self.theta = self.logtheta_lambda_[: self.n_theta]
             # use the original, untransformed eps:
             lambda_ = self.eps
@@ -687,17 +648,6 @@ class Kriging(BaseEstimator, RegressorMixin):
         resid = y - one * mu
         resid_tilde = np.linalg.solve(U, resid)
         resid_tilde = np.linalg.solve(U.T, resid_tilde)
-
-        # Build psi (modified in 0.31.0)
-        # X = self.X_
-        # p = self.p_val
-        # theta = self.theta
-        # # theta is in log scale, so transform it back:
-        # theta10 = 10.0**theta
-        # psi = np.ones(n)
-        # for i in range(n):
-        #     dist_vec = np.abs(X[i, :] - x) ** p
-        #     psi[i] = np.exp(-np.sum(theta10 * dist_vec))
 
         psi = self.build_psi_vec(x)
 

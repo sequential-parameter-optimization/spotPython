@@ -30,7 +30,6 @@ from sklearn.metrics.pairwise import euclidean_distances
 from scipy.stats import spearmanr
 
 
-
 def apk(actual, predicted, k=10):
     """
     Computes the average precision at k.
@@ -278,13 +277,14 @@ def calculate_xai_consistency_euclidean(attributions) -> float:
     print(result_xai)
     return result_xai
 
+
 def calculate_xai_consistency_spearman(attributions) -> float:
     """
     Calculates the consistency of XAI methods using Spearman rank correlation.
-    
+
     Args:
         attributions (np.ndarray): shape (n_methods, n_features)
-    
+
     Returns:
         float: Mean of upper triangle of Spearman correlation matrix (excluding diagonal)
     """
