@@ -2161,6 +2161,8 @@
       
         
       
+        
+      
     
     
       
@@ -2204,6 +2206,27 @@
   
   <span class="md-ellipsis">
     netlightbasemapk
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../classification/nn_funnel_classifier/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nn_funnel_classifier
   </span>
   
 
@@ -6751,7 +6774,41 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
 <span class="normal">728</span>
 <span class="normal">729</span>
 <span class="normal">730</span>
-<span class="normal">731</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span>
+<span class="normal">737</span>
+<span class="normal">738</span>
+<span class="normal">739</span>
+<span class="normal">740</span>
+<span class="normal">741</span>
+<span class="normal">742</span>
+<span class="normal">743</span>
+<span class="normal">744</span>
+<span class="normal">745</span>
+<span class="normal">746</span>
+<span class="normal">747</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span>
+<span class="normal">755</span>
+<span class="normal">756</span>
+<span class="normal">757</span>
+<span class="normal">758</span>
+<span class="normal">759</span>
+<span class="normal">760</span>
+<span class="normal">761</span>
+<span class="normal">762</span>
+<span class="normal">763</span>
+<span class="normal">764</span>
+<span class="normal">765</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">train_model_xai</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">fun_control</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trains a model using the given configuration and function control parameters. Performs feature attribution analysis and calculates consistency of these methods.</span>
 
@@ -7022,23 +7079,30 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
     <span class="c1"># Perform feature attribution analysis</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">model</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MODEL :&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
 
-    <span class="c1"># Get the validation dataloader from the LightningDataModule</span>
+    <span class="c1"># Get the validation and train dataloader from the LightningDataModule</span>
+    <span class="n">train_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">()</span>  <span class="c1"># Fetch train data loader</span>
     <span class="n">val_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">()</span>  <span class="c1"># Fetch validation data loader</span>
 
     <span class="c1"># Collect all validation data</span>
     <span class="n">X_val_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">y_val_list</span> <span class="o">=</span> <span class="p">[]</span>
 
+    <span class="c1"># Collect all train data</span>
+    <span class="n">X_train_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_train_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate over the train dataloader to gather all data</span>
+    <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">train_dataloader</span><span class="p">:</span>
+        <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="o">=</span> <span class="n">batch</span>  <span class="c1"># Extract inputs and labels</span>
+        <span class="n">X_train_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
+        <span class="n">y_train_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_batch</span><span class="p">)</span>
+
     <span class="c1"># Iterate over the validation dataloader to gather all data</span>
     <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">val_dataloader</span><span class="p">:</span>
         <span class="n">X_batch</span><span class="p">,</span> <span class="n">y_batch</span> <span class="o">=</span> <span class="n">batch</span>  <span class="c1"># Extract inputs and labels</span>
         <span class="n">X_val_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X_batch</span><span class="p">)</span>
         <span class="n">y_val_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_batch</span><span class="p">)</span>
-
-    <span class="c1"># Concatenate all batches into single tensors</span>
-    <span class="n">X_val_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">X_val_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="c1"># Perform feature attribution analysis</span>
 
@@ -7052,50 +7116,77 @@ If False, the string &ldquo;_TRAIN&rdquo; is appended to the config id.</p>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_xai_methods</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid XAI method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">. Valid methods are: </span><span class="si">{</span><span class="n">valid_xai_methods</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+    <span class="n">X_train_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">X_train_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">X_train_tensor</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">()</span>
+    <span class="n">X_val_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">X_val_list</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">X_val_tensor</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">()</span>
+
     <span class="c1"># Dictionary to store attributions</span>
     <span class="n">attributions_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_baseline&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Baseline is None. Using zeros as baseline.&quot;</span><span class="p">)</span>
+        <span class="n">X_train_mean</span> <span class="o">=</span> <span class="n">X_train_tensor</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_train_mean</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Baseline is None. Using training mean as baseline.&quot;</span><span class="p">)</span>
     <span class="n">baseline</span> <span class="o">=</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_baseline&quot;</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="s2">&quot;IntegratedGradients&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
-        <span class="n">attr_ig</span> <span class="o">=</span> <span class="n">IntegratedGradients</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="n">attribution_ig</span> <span class="o">=</span> <span class="n">attr_ig</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
-        <span class="n">ig_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_ig</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">row_sum_ig</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ig_attr_test_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">row_sum_ig</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">row_sum_ig</span> <span class="o">+=</span> <span class="mf">1e-10</span>
-        <span class="n">scaled_attribution_ig</span> <span class="o">=</span> <span class="n">ig_attr_test_sum</span> <span class="o">/</span> <span class="n">row_sum_ig</span>
-        <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;IntegratedGradients&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaled_attribution_ig</span>
+    <span class="c1"># Use a subset of the validation data for attribution</span>
+    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_subset_size&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">N_total</span> <span class="o">=</span> <span class="n">X_val_tensor</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">N_attr</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_subset_size&quot;</span><span class="p">],</span> <span class="n">N_total</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using a subset of </span><span class="si">{</span><span class="n">N_attr</span><span class="si">}</span><span class="s2"> samples for attribution analysis out of </span><span class="si">{</span><span class="n">N_total</span><span class="si">}</span><span class="s2"> total samples.&quot;</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">X_val_tensor</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">])</span>
+        <span class="n">perm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">N_total</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">g</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">X_val_tensor</span><span class="o">.</span><span class="n">device</span><span class="p">)[:</span><span class="n">N_attr</span><span class="p">]</span>
+        <span class="n">X_val_tensor</span> <span class="o">=</span> <span class="n">X_val_tensor</span><span class="p">[</span><span class="n">perm</span><span class="p">]</span>
+
+    <span class="c1"># Ensure the model is in evaluation mode</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="n">fun_control</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;xai_target&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s2">&quot;KernelShap&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
         <span class="n">attr_ks</span> <span class="o">=</span> <span class="n">KernelShap</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="n">attribution_ks</span> <span class="o">=</span> <span class="n">attr_ks</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
-        <span class="n">ks_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_ks</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">row_sum_ks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ks_attr_test_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">row_sum_ks</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">row_sum_ks</span> <span class="o">+=</span> <span class="mf">1e-10</span>
-        <span class="n">scaled_attribution_ks</span> <span class="o">=</span> <span class="n">ks_attr_test_sum</span> <span class="o">/</span> <span class="n">row_sum_ks</span>
-        <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;KernelShap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaled_attribution_ks</span>
+        <span class="n">n_features</span> <span class="o">=</span> <span class="n">X_val_tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">samples_ks</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">n_features</span><span class="p">)</span>  <span class="c1"># Adjust number of samples based on features, maximum 2000</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;KernelShap: Using&quot;</span><span class="p">,</span> <span class="n">samples_ks</span><span class="p">,</span> <span class="s2">&quot;samples for attribution.&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">attribution_ks</span> <span class="o">=</span> <span class="n">attr_ks</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="n">samples_ks</span><span class="p">,</span> <span class="n">perturbations_per_eval</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">ks_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_ks</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">l2_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ks_attr_test_sum</span><span class="p">)</span>
+        <span class="n">l2_normalized_ks</span> <span class="o">=</span> <span class="n">ks_attr_test_sum</span> <span class="o">/</span> <span class="n">l2_norm</span> <span class="k">if</span> <span class="n">l2_norm</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">ks_attr_test_sum</span>
+        <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;KernelShap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">l2_normalized_ks</span>
 
-    <span class="k">if</span> <span class="s2">&quot;DeepLift&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
-        <span class="n">attr_dl</span> <span class="o">=</span> <span class="n">DeepLift</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-        <span class="n">attribution_dl</span> <span class="o">=</span> <span class="n">attr_dl</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">)</span>
-        <span class="n">dl_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_dl</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">row_sum_dl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dl_attr_test_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">row_sum_dl</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">row_sum_dl</span> <span class="o">+=</span> <span class="mf">1e-10</span>
-        <span class="n">scaled_attribution_dl</span> <span class="o">=</span> <span class="n">dl_attr_test_sum</span> <span class="o">/</span> <span class="n">row_sum_dl</span>
-        <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;DeepLift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaled_attribution_dl</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">enable_grad</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;IntegratedGradients&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
+            <span class="n">attr_ig</span> <span class="o">=</span> <span class="n">IntegratedGradients</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">attribution_ig</span> <span class="o">=</span> <span class="n">attr_ig</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">vec</span> <span class="o">=</span> <span class="n">attribution_ig</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">l2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+            <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;IntegratedGradients&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vec</span> <span class="o">/</span> <span class="n">l2</span> <span class="k">if</span> <span class="n">l2</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">vec</span>
+
+        <span class="k">if</span> <span class="s2">&quot;DeepLift&quot;</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]:</span>
+            <span class="n">attr_dl</span> <span class="o">=</span> <span class="n">DeepLift</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">attribution_dl</span> <span class="o">=</span> <span class="n">attr_dl</span><span class="o">.</span><span class="n">attribute</span><span class="p">(</span><span class="n">X_val_tensor</span><span class="p">,</span> <span class="n">baselines</span><span class="o">=</span><span class="n">baseline</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">dl_attr_test_sum</span> <span class="o">=</span> <span class="n">attribution_dl</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">l2_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dl_attr_test_sum</span><span class="p">)</span>
+            <span class="n">l2_normalized_dl</span> <span class="o">=</span> <span class="n">dl_attr_test_sum</span> <span class="o">/</span> <span class="n">l2_norm</span> <span class="k">if</span> <span class="n">l2_norm</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">dl_attr_test_sum</span>
+            <span class="n">attributions_dict</span><span class="p">[</span><span class="s2">&quot;DeepLift&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">l2_normalized_dl</span>
 
     <span class="n">attributions_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">attributions_dict</span><span class="p">[</span><span class="n">method</span><span class="p">]</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_methods&quot;</span><span class="p">]]</span>
     <span class="n">attributions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">attributions_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="n">result_xai</span> <span class="o">=</span> <span class="n">calculate_xai_consistency</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
-
-    <span class="c1"># -------------------------------------------------------------------------------------------------------------------</span>
+    <span class="c1"># Calculate corr:</span>
+    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;corr&quot;</span><span class="p">,</span> <span class="s2">&quot;cosine&quot;</span><span class="p">,</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="s2">&quot;spearman&quot;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid xai_metric: </span><span class="si">{</span><span class="n">fun_control</span><span class="p">[</span><span class="s1">&#39;xai_metric&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">. Valid metrics are: &#39;corr&#39;, &#39;cosine&#39;, &#39;euclidean&#39;, &#39;spearman&#39;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;corr&quot;</span><span class="p">:</span>
+        <span class="n">result_xai</span> <span class="o">=</span> <span class="n">calculate_xai_consistency_corr</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;cosine&quot;</span><span class="p">:</span>
+        <span class="n">result_xai</span> <span class="o">=</span> <span class="n">calculate_xai_consistency_cosine</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">:</span>
+        <span class="n">result_xai</span> <span class="o">=</span> <span class="n">calculate_xai_consistency_euclidean</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fun_control</span><span class="p">[</span><span class="s2">&quot;xai_metric&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;spearman&quot;</span><span class="p">:</span>
+        <span class="n">result_xai</span> <span class="o">=</span> <span class="n">calculate_xai_consistency_spearman</span><span class="p">(</span><span class="n">attributions</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;val_loss&quot;</span><span class="p">],</span> <span class="n">result_xai</span>
 </code></pre></div></td></tr></table></div>
