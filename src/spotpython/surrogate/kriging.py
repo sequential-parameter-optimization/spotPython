@@ -1,5 +1,6 @@
 import numpy as np
-from numpy.linalg import LinAlgError, cond
+from numpy.linalg import LinAlgError, cond, svd
+from numpy.random import RandomState
 from typing import Dict, Tuple, List, Optional
 from scipy.optimize import differential_evolution
 from sklearn.base import BaseEstimator, RegressorMixin
@@ -26,6 +27,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         Psi_ (np.ndarray): The correlation matrix after fit().
         method (str): The fitting method used, can be "interpolation", "regression", or "reinterpolation".
         isotropic (bool): Whether the model is isotropic or not.
+        approximation (str or None): Approximation method used, e.g., "nystroem" or None. Defaults to None.
+        n_components_nystroem (int or None): Number of components for Nyström approximation. Defaults to None.
 
     Methods:
         __init__: Initializes the Kriging model with hyperparameters.
@@ -67,6 +70,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         counter=None,
         metric_factorial="canberra",
         isotropic: bool = False,
+        approximation: Optional[str] = None,  # Default is None
+        n_components_nystroem: Optional[int] = None,  # Number of components for Nyström
         **kwargs,
     ):
         """
@@ -90,14 +95,12 @@ class Kriging(BaseEstimator, RegressorMixin):
         if eps is None:
             self.eps = self._get_eps()
         else:
-            # check if eps is positive
             if eps <= 0:
                 raise ValueError("eps must be positive")
             self.eps = eps
         self.penalty = penalty
-
         self.noise = noise
-        self.var_type = var_type
+        self.var_type = var_type  # Store original variable types from input
         self.name = name
         self.seed = seed
         self.log_level = log_level
@@ -110,7 +113,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.max_Lambda = max_Lambda
         self.min_p = min_p
         self.max_p = max_p
-        self.n_theta = None  # Will be set in fit()
+        self.n_theta = None  # Will be set in fit() based on self.k_orig
         self.isotropic = isotropic
         self.p_val = p_val
         self.n_p = n_p
@@ -123,7 +126,6 @@ class Kriging(BaseEstimator, RegressorMixin):
         if self.model_fun_evals is None:
             self.model_fun_evals = 100
 
-        # Logging information
         self.log = {}
         self.log["negLnLike"] = []
         self.log["theta"] = []
@@ -132,7 +134,7 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         self.logtheta_lambda_ = None
         self.U_ = None
-        self.X_ = None
+        self.X_ = None  # Training data for the Kriging model (could be Nyström features)
         self.y_ = None
         self.negLnLike = None
         self.Psi_ = None
@@ -142,6 +144,27 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.return_ei = False
         self.return_std = False
 
+        # Nyström specific initializations
+        if approximation is not None and approximation.lower() not in ["nystroem"]:
+            raise ValueError("approximation must be 'nystroem' or None")
+        self.approximation = approximation.lower() if approximation is not None else None
+        self.n_components_nystroem = n_components_nystroem
+        self._nystroem_X_subset = None  # Stores the actual subset of original X points
+        self._nystroem_components_sqrt_inv = None  # Stores U_m @ Sigma_m^{-1/2} from SVD of K_mm
+        self._nystroem_n_components_actual = None  # Actual components used after filtering small eigenvalues
+        self.rng = RandomState(seed)  # Random number generator for reproducible sampling
+
+        # Attributes to store original input dimensions and masks [7]
+        self.k_orig = None  # Original number of features
+        self.ordered_mask_orig = None
+        self.factor_mask_orig = None
+
+        # Attributes for the Kriging model's feature space (could be Nyström transformed)
+        self.k_orig = None  # Current number of features for the Kriging model
+        self.var_type_kriging = None  # Variable types for the Kriging model's feature space
+        self.ordered_mask_kriging = None
+        self.factor_mask_kriging = None
+
     def _get_eps(self) -> float:
         """
         Returns the square root of the machine epsilon.
@@ -149,51 +172,34 @@ class Kriging(BaseEstimator, RegressorMixin):
         eps = np.finfo(float).eps
         return np.sqrt(eps)
 
-    def _set_variable_types(self) -> None:
+    def _set_variable_types(self, k_original: int) -> None:
         """
-        Set the variable types for the class instance.
-        This method sets the variable types for the class instance based
-        on the `var_type` attribute. If the length of `var_type` is less
-        than `k`, all variable types are forced to 'num' and a warning is logged.
-        The method then creates Boolean masks for each variable
-        type ('num', 'factor', 'int', 'ordered') using numpy arrays, e.g.,
-        `num_mask = array([ True,  True])` if two numerical variables are present.
-
-        Args:
-            self (object): The Kriging object.
-
-        Examples:
-            >>> from spotpython.build import Kriging
-                import numpy as np
-                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
-                nat_y = np.array([1, 2, 3])
-                var_type = ["num", "int", "float"]
-                n_theta=2
-                n_p=2
-                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
-                S._initialize_variables(nat_X, nat_y)
-                S._set_variable_types()
-                assert S.var_type == ["num", "int", "float"]
-                assert S.num_mask.all() == False
-                assert S.factor_mask.all() == False
-                assert S.int_mask.all() == False
-                assert S.ordered_mask.all() == True
-                assert np.all(S.num_mask == np.array([True, False, False]))
-                assert np.all(S.int_mask == np.array([False, True, False]))
-                assert np.all(S.ordered_mask == np.array([True, True, True]))
-
-        Returns:
-            None
+        Set variable types and masks for the ORIGINAL input data.
+        These are used when computing kernels for Nyström transformation. [7]
         """
-        # Ensure var_type has appropriate length by defaulting to 'num'
-        if len(self.var_type) < self.k:
-            self.var_type = ["num"] * self.k  # Corrected to fill with 'num' instead of duplicating
-        # Create masks for each type using numpy vectorized operations
-        var_type_array = np.array(self.var_type)
-        self.num_mask = var_type_array == "num"
-        self.factor_mask = var_type_array == "factor"
-        self.int_mask = var_type_array == "int"
-        self.ordered_mask = np.isin(var_type_array, ["int", "num", "float"])
+        self.k_orig = k_original
+        if len(self.var_type) < k_original:
+            self.var_type = ["num"] * k_original
+        var_type_array_orig = np.array(self.var_type)
+        self.ordered_mask_orig = np.isin(var_type_array_orig, ["int", "num", "float"])
+        self.factor_mask_orig = var_type_array_orig == "factor"
+
+    def _set_kriging_model_feature_types(self, k_current: int) -> None:
+        """
+        Set variable types and masks for the Kriging model's current feature space.
+        These are used when the Kriging model operates on its (possibly transformed) X_.
+        """
+        self.k_orig = k_current
+        # If Nyström is used, features are always numerical
+        if self.approximation == "nystroem":
+            self.var_type_kriging = ["num"] * k_current
+            self.ordered_mask_kriging = np.array([True] * k_current)
+            self.factor_mask_kriging = np.array([False] * k_current)
+        else:
+            # For standard Kriging, use original masks and types
+            self.var_type_kriging = self.var_type
+            self.ordered_mask_kriging = self.ordered_mask_orig
+            self.factor_mask_kriging = self.factor_mask_orig
 
     def get_model_params(self) -> Dict[str, float]:
         """
@@ -242,11 +248,40 @@ class Kriging(BaseEstimator, RegressorMixin):
                 self.spot_writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter + self.log_length)
             self.spot_writer.flush()
 
+    def _compute_kernel_matrix_for_original_features(self, X1: np.ndarray, X2: np.ndarray, theta10_for_kernel: np.ndarray) -> np.ndarray:
+        """
+        Computes the kernel (correlation) matrix between two sets of ORIGINAL features X1 and X2,
+        respecting original variable types (ordered/factor).
+        This helper is specifically for the Nyström transformation stage.
+        """
+        # TODO: Check if n1, n2 are correct:
+        n1 = X1.shape[0]
+        n2 = X2.shape[0]
+        D = np.zeros((n1, n2), dtype=np.float64)
+
+        if self.ordered_mask_orig.any():
+            X1_ordered = X1[:, self.ordered_mask_orig]
+            X2_ordered = X2[:, self.ordered_mask_orig]
+            # Ensure theta10_for_kernel has the correct length for ordered variables
+            theta10_ordered = theta10_for_kernel[self.ordered_mask_orig] if theta10_for_kernel.size > 1 else theta10_for_kernel * np.ones(X1_ordered.shape[1])
+            D_ordered = cdist(X1_ordered, X2_ordered, metric="sqeuclidean", w=theta10_ordered)
+            D += D_ordered
+
+        if self.factor_mask_orig.any():
+            X1_factor = X1[:, self.factor_mask_orig]
+            X2_factor = X2[:, self.factor_mask_orig]
+            # Ensure theta10_for_kernel has the correct length for factor variables
+            theta10_factor = theta10_for_kernel[self.factor_mask_orig] if theta10_for_kernel.size > 1 else theta10_for_kernel * np.ones(X1_factor.shape[1])
+            D_factor = cdist(X1_factor, X2_factor, metric=self.metric_factorial, w=theta10_factor)
+            D += D_factor
+
+        return np.exp(-D)
+
     def fit(self, X: np.ndarray, y: np.ndarray, bounds: Optional[List[Tuple[float, float]]] = None) -> "Kriging":
         """
-        Fits the Kriging model to training data X and y. This method is compatible
-        with scikit-learn and uses differential evolution to optimize the hyperparameters
-        (log(theta)).
+        Fits the Kriging model to training data X and y. This method is compatible with scikit-learn and
+        uses differential evolution to optimize the hyperparameters (log(theta)).
+        If 'approximation' is set to 'nystroem', the input data X is first transformed using Nyström approximation.
 
         Args:
             X (np.ndarray):
@@ -259,45 +294,89 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             Kriging:
                 The fitted Kriging model instance (self).
-
-        Examples:
-            >>> import numpy as np
-            >>> from spotpython.surrogate.kriging import Kriging
-            >>> # Training data
-            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
-            >>> y_train = np.array([0.1, 0.2, 0.3])
-            >>> # Initialize and fit the Kriging model
-            >>> model = Kriging()
-            >>> model.fit(X_train, y_train)
-            >>> print("Fitted log(theta):", model.logtheta_lambda_)
         """
-        X = np.asarray(X)
-        y = np.asarray(y).flatten()
-        self.X_ = X
-        self.y_ = y
-        self.n, self.k = self.X_.shape
-        self._set_variable_types()
+        X_orig = np.asarray(X)
+        y_orig = np.asarray(y).flatten()
+
+        self.n_orig, k_orig_val = X_orig.shape  # Store original dimensions
+        self._set_variable_types(k_orig_val)  # Set masks for original feature space
+
+        # Nyström Approximation Preprocessing
+        if self.approximation == "nystroem":
+            if self.n_components_nystroem is None:
+                self.n_components_nystroem = min(self.n_orig, 100)  # Default to 100 or n_orig if smaller
+            if not (1 <= self.n_components_nystroem <= self.n_orig):
+                raise ValueError(f"n_components_nystroem must be between 1 and n_samples ({self.n_orig}), got {self.n_components_nystroem}")
+
+            # Sample subset for Nyström
+            self._nystroem_X_subset_indices = self.rng.choice(self.n_orig, size=self.n_components_nystroem, replace=False)
+            self._nystroem_X_subset = X_orig[self._nystroem_X_subset_indices]
+
+            # Use initial theta (e.g., 10^0 = 1 for all original dimensions) for Nyström kernel computation
+            # The actual Kriging theta will be optimized later for the Nyström features.
+            initial_theta_for_nystroem = np.power(10.0, np.zeros(self.k_orig))
+
+            # Compute K_mm (kernel matrix of sampled points)
+            K_mm = self._compute_kernel_matrix_for_original_features(self._nystroem_X_subset, self._nystroem_X_subset, initial_theta_for_nystroem)
+
+            # Regularization for K_mm to ensure numerical stability before SVD
+            K_mm += self._get_eps() * np.eye(K_mm.shape)
+
+            # Perform SVD on K_mm
+            U_mm, s_mm, _ = svd(K_mm)
+
+            # Filter small eigenvalues and determine actual components
+            valid_s = s_mm > self._get_eps()  # Threshold for eigenvalues
+            self._nystroem_n_components_actual = np.sum(valid_s)
+
+            if self._nystroem_n_components_actual == 0:
+                print("Warning: All Nyström eigenvalues are effectively zero. Falling back to standard Kriging.")
+                # If no valid components, fall back to standard Kriging
+                self.approximation = None
+                self.X_ = X_orig
+                self.y_ = y_orig
+                self._set_kriging_model_feature_types(self.k_orig)  # Set Kriging masks for original features
+            else:
+                # Compute components_sqrt_inv = U_mm @ diag(1 / sqrt(s_mm))
+                self._nystroem_components_sqrt_inv = U_mm[:, valid_s] @ np.diag(1.0 / np.sqrt(s_mm[valid_s]))
+
+                # Transform original X to Nyström features
+                K_nm = self._compute_kernel_matrix_for_original_features(X_orig, self._nystroem_X_subset, initial_theta_for_nystroem)
+                X_nystroem = K_nm @ self._nystroem_components_sqrt_inv
+
+                self.X_ = X_nystroem
+                self.y_ = y_orig  # y remains the same
+                self._set_kriging_model_feature_types(self.X_.shape[1])  # Set Kriging masks for Nyström features
+                # print(f"Nyström approximation applied. Original dimensions: {self.k_orig}, Nyström features: {self.k_orig}")
+
+        else:  # Standard Kriging (approximation is None)
+            self.X_ = X_orig
+            self.y_ = y_orig
+            self._set_kriging_model_feature_types(self.k_orig)  # Set Kriging masks for original features
+            # print(f"Standard Kriging. Dimensions: {self.k_orig}")
+
+        self.n = self.X_.shape[0]  # Update n for the (possibly transformed) X_
+
+        # Kriging fitting part (operates on self.X_ which might be Nyström features)
         if self.isotropic:
-            # If isotropic, set n_theta to 1
             self.n_theta = 1
-            print(f"Isotropic model: n_theta set to {self.n_theta}")
+            # print(f"Isotropic model: n_theta set to {self.n_theta}")
         else:
-            self.n_theta = self.k
-            print(f"Anisotropic model: n_theta set to {self.n_theta}")
-        # Calculate and store min and max of X
+            self.n_theta = self.k_orig  # n_theta based on current Kriging feature dimension
+            # print(f"Anisotropic model: n_theta set to {self.n_theta}")
+
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)
+
         if bounds is None:
             if self.method == "interpolation":
-                bounds = [(self.min_theta, self.max_theta)] * self.k
+                bounds = [(self.min_theta, self.max_theta)] * self.k_orig
             else:
-                # regression and reinterpolation use lambda_ as well
-                bounds = [(self.min_theta, self.max_theta)] * self.k + [(self.min_Lambda, self.max_Lambda)]
-        # Add p bounds if optimization is enabled
+                bounds = [(self.min_theta, self.max_theta)] * self.k_orig + [(self.min_Lambda, self.max_Lambda)]
+
         if self.optim_p:
-            # Number of p values to optimize (either 1 or k)
-            n_p = self.n_p if hasattr(self, "n_p") else self.k
-            bounds += [(self.min_p, self.max_p)] * n_p
+            n_p_to_optimize = self.n_p if self.n_p == 1 else self.k_orig  # Number of p values to optimize (1 or k)
+            bounds += [(self.min_p, self.max_p)] * n_p_to_optimize
 
         self.logtheta_lambda_, _ = self.max_likelihood(bounds)
 
@@ -323,8 +402,9 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def predict(self, X: np.ndarray, return_std=False, return_val: str = "y") -> np.ndarray:
         """
-        Predicts the Kriging response at a set of points X. This method is compatible
-        with scikit-learn and returns predictions for the input points.
+        Predicts the Kriging response at a set of points X. This method is compatible with scikit-learn.
+        If 'approximation' is set to 'nystroem', the input data X is first transformed using
+        the Nyström components learned during fitting.
 
         Args:
             X (np.ndarray):
@@ -332,11 +412,12 @@ class Kriging(BaseEstimator, RegressorMixin):
                 to predict the Kriging response.
             return_std (bool, optional):
                 If True, returns the standard deviation of the predictions as well.
-                Implememented for compatibility with scikit-learn.
+                Implemented for compatibility with scikit-learn.
                 Defaults to False.
             return_val (str):
                 Specifies which prediction values to return.
                 It can be "y", "s", "ei", or "all".
+                Defaults to "y".
 
         Returns:
             np.ndarray:
@@ -359,46 +440,61 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> y_pred, sd, ei = model.predict(X_test)
             >>> print("Predictions:", y_pred)
         """
+        X_pred_orig = np.atleast_2d(X)
+
+        if self.approximation == "nystroem":
+            if self._nystroem_components_sqrt_inv is None or self._nystroem_X_subset is None:
+                raise RuntimeError("Kriging model with Nyström approximation is not fitted yet. Call fit() first.")
+
+            # Use the same initial theta for Nyström kernel computation as in fit()
+            initial_theta_for_nystroem = np.power(10.0, np.zeros(self.k_orig))
+
+            # Transform prediction points using the fitted Nyström components
+            K_test_subset = self._compute_kernel_matrix_for_original_features(X_pred_orig, self._nystroem_X_subset, initial_theta_for_nystroem)
+            X_pred_for_kriging = K_test_subset @ self._nystroem_components_sqrt_inv
+        else:
+            X_pred_for_kriging = X_pred_orig
+
         self.return_std = return_std
-        X = np.atleast_2d(X)
+
+        # Original predict logic using X_pred_for_kriging
         if return_std:
             # Return predictions and standard deviations
             # Compatibility with scikit-learn
             self.return_std = True
-            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
+            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X_pred_for_kriging])
             return np.array(predictions), np.array(std_devs)
         if return_val == "s":
             # Return only standard deviations
             self.return_std = True
-            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X])
+            predictions, std_devs = zip(*[self._pred(x_i)[:2] for x_i in X_pred_for_kriging])
             return np.array(std_devs)
         elif return_val == "all":
             # Return predictions, standard deviations, and expected improvements
             self.return_std = True
             self.return_ei = True
-            predictions, std_devs, eis = zip(*[self._pred(x_i) for x_i in X])
+            predictions, std_devs, eis = zip(*[self._pred(x_i) for x_i in X_pred_for_kriging])
             return np.array(predictions), np.array(std_devs), np.array(eis)
         elif return_val == "ei":
             # Return only neg. expected improvements
             self.return_ei = True
-            predictions, eis = zip(*[(self._pred(x_i)[0], self._pred(x_i)[2]) for x_i in X])
+            predictions, eis = zip(*[(self._pred(x_i)[0], self._pred(x_i)[2]) for x_i in X_pred_for_kriging])
             return np.array(eis)
         else:
             # Return only predictions (case "y")
-            predictions = [self._pred(x_i)[0] for x_i in X]
+            predictions = [self._pred(x_i)[0] for x_i in X_pred_for_kriging]
             return np.array(predictions)
 
-    def build_Psi(self) -> None:
+    def build_Psi(self) -> np.ndarray:
         """
-        Constructs a new (n x n) correlation matrix Psi to reflect new data
-        or a change in hyperparameters.
+        Constructs a new (n x n) correlation matrix Psi to reflect new data or a change in hyperparameters.
+        Operates on the Kriging model's current feature space (self.X_).
         This method uses `theta`, `p`, and coded `X` values to construct the
         correlation matrix as described in [Forr08a, p.57].
 
-        Attributes:
-            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
-            cnd_Psi (float): Condition number of Psi.
-            inf_Psi (bool): True if Psi is infinite, False otherwise.
+        Returns:
+            np.ndarray:
+                Upper triangular part of the correlation matrix Psi (excluding diagonal).
 
         Raises:
             LinAlgError: If building Psi fails.
@@ -431,28 +527,30 @@ class Kriging(BaseEstimator, RegressorMixin):
                     S.theta: [1.60036366]
                     S.Psi: [[1.00000001e+00 4.96525625e-18]
                     [4.96525625e-18 1.00000001e+00]]
+
         """
         try:
-            n, k = self.X_.shape
+            n, k_current = self.X_.shape
             theta10 = np.power(10.0, self.theta)
 
-            # Ensure theta has the correct length
             if self.n_theta == 1:
-                theta10 = theta10 * np.ones(k)
+                theta10 = theta10 * np.ones(k_current)  # Ensure theta10 matches current feature dimension
 
-            # Initialize the Psi matrix
             Psi = np.zeros((n, n), dtype=np.float64)
 
-            # Calculate the distance matrix using ordered variables
-            if self.ordered_mask.any():
-                X_ordered = self.X_[:, self.ordered_mask]
-                D_ordered = squareform(pdist(X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]))
+            # Use Kriging model's own masks (self.ordered_mask_kriging, self.factor_mask_kriging)
+            # These masks are set in _set_kriging_model_feature_types based on whether Nyström is active.
+            if self.ordered_mask_kriging.any():
+                X_ordered_for_kriging = self.X_[:, self.ordered_mask_kriging]
+                theta10_ordered_for_kriging = theta10[self.ordered_mask_kriging]
+                D_ordered = squareform(pdist(X_ordered_for_kriging, metric="sqeuclidean", w=theta10_ordered_for_kriging))
                 Psi += D_ordered
 
             # Add the contribution of factor variables to the distance matrix
-            if self.factor_mask.any():
-                X_factor = self.X_[:, self.factor_mask]
-                D_factor = squareform(pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]))
+            if self.factor_mask_kriging.any():
+                X_factor_for_kriging = self.X_[:, self.factor_mask_kriging]
+                theta10_factor_for_kriging = theta10[self.factor_mask_kriging]
+                D_factor = squareform(pdist(X_factor_for_kriging, metric=self.metric_factorial, w=theta10_factor_for_kriging))
                 Psi += D_factor
 
             # Calculate correlation from distance
@@ -461,12 +559,11 @@ class Kriging(BaseEstimator, RegressorMixin):
             self.inf_Psi = np.isinf(Psi).any()
             # Calculate condition number
             self.cnd_Psi = cond(Psi)
-
             # Return only the upper triangle, as the matrix is symmetric
             # and the diagonal will be handled later.
             return np.triu(Psi, k=1)
         except LinAlgError as err:
-            print("Building Psi failed. Error: %s, Type: %s", err, type(err))
+            print(f"Building Psi failed. Error: {err}, Type: {type(err)}")
             raise
 
     def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
@@ -538,18 +635,16 @@ class Kriging(BaseEstimator, RegressorMixin):
         negLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
         return negLnLike, Psi, U
 
-    def build_psi_vec(self, x: np.ndarray) -> None:
+    def build_psi_vec(self, x: np.ndarray) -> np.ndarray:
         """
         Build the psi vector required for predictive methods.
+        Operates on a single point 'x' in the Kriging model's current feature space.
 
         Args:
-            x (ndarray): Point to calculate the psi vector for.
+            x (np.ndarray): 1D array of length k for the point at which to compute psi.
 
         Returns:
-            None
-
-        Modifies:
-            self.psi (np.ndarray): Updates the psi vector.
+            np.ndarray: The psi vector of shape (n,).
 
         Examples:
             >>> import numpy as np
@@ -578,30 +673,34 @@ class Kriging(BaseEstimator, RegressorMixin):
                 print(f"Control value res: {res}")
         """
         try:
-            n = self.X_.shape[0]
+            n, k_current = self.X_.shape
             psi = np.zeros(n)
             theta10 = np.power(10.0, self.theta)
+
             if self.n_theta == 1:
-                theta10 = theta10 * np.ones(self.k)
+                theta10 = theta10 * np.ones(k_current)
 
             D = np.zeros(n)
 
-            # Compute ordered distance contributions
-            if self.ordered_mask.any():
-                X_ordered = self.X_[:, self.ordered_mask]
-                x_ordered = x[self.ordered_mask]
-                D += cdist(x_ordered.reshape(1, -1), X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]).ravel()
-            # Compute factor distance contributions
-            if self.factor_mask.any():
-                X_factor = self.X_[:, self.factor_mask]
-                x_factor = x[self.factor_mask]
-                D += cdist(x_factor.reshape(1, -1), X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]).ravel()
+            # Use Kriging model's own masks (self.ordered_mask_kriging, self.factor_mask_kriging)
+            # These masks are set in _set_kriging_model_feature_types based on whether Nyström is active.
+            if self.ordered_mask_kriging.any():
+                X_ordered_for_kriging = self.X_[:, self.ordered_mask_kriging]
+                x_ordered_for_kriging = x[self.ordered_mask_kriging]
+                theta10_ordered_for_kriging = theta10[self.ordered_mask_kriging]
+                D += cdist(x_ordered_for_kriging.reshape(1, -1), X_ordered_for_kriging, metric="sqeuclidean", w=theta10_ordered_for_kriging).ravel()
+
+            if self.factor_mask_kriging.any():
+                X_factor_for_kriging = self.X_[:, self.factor_mask_kriging]
+                x_factor_for_kriging = x[self.factor_mask_kriging]
+                theta10_factor_for_kriging = theta10[self.factor_mask_kriging]
+                D += cdist(x_factor_for_kriging.reshape(1, -1), X_factor_for_kriging, metric=self.metric_factorial, w=theta10_factor_for_kriging).ravel()
 
             psi = np.exp(-D)
             return psi
-
         except np.linalg.LinAlgError as err:
-            print("Building psi failed due to a linear algebra error: %s. Error type: %s", err, type(err))
+            print(f"Building psi failed due to a linear algebra error: {err}. Error type: {type(err)}")
+            raise
 
     def _pred(self, x: np.ndarray) -> float:
         """
@@ -671,11 +770,13 @@ class Kriging(BaseEstimator, RegressorMixin):
             psi_tilde = np.linalg.solve(Uint.T, psi_tilde)
             SSqr = SigmaSqr * (1 - psi @ psi_tilde)
 
+        SSqr = SSqr.item()
         # Compute s
         s = np.abs(SSqr) ** 0.5
 
         # Final prediction
         f = mu + psi @ resid_tilde
+        # print(f"Prediction at {x}: f={f}, s={s}, SigmaSqr={SigmaSqr}, SSqr={SSqr}")
 
         # Compute ExpImp
         if self.return_ei:
@@ -683,9 +784,9 @@ class Kriging(BaseEstimator, RegressorMixin):
             EITermOne = (yBest - f) * (0.5 + 0.5 * erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
             EITermTwo = s * (1 / np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((yBest - f) ** 2 / SSqr))
             ExpImp = np.log10(EITermOne + EITermTwo + self.eps)
-            return float(f), float(s), float(-ExpImp)
+            return f.item(), s.item(), (-ExpImp).item()
         else:
-            return float(f), float(s)
+            return f.item(), s.item()
 
     def max_likelihood(self, bounds: List[Tuple[float, float]]) -> Tuple[np.ndarray, float]:
         """
@@ -704,6 +805,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             neg_ln_like, _, _ = self.likelihood(logtheta_lambda)
             return neg_ln_like
 
+        # result = differential_evolution(objective, bounds, seed=self.seed, maxiter=self.model_fun_evals)
+        # print(f"bounds for differential_evolution: {bounds}")
         result = differential_evolution(objective, bounds)
         return result.x, result.fun
 
@@ -764,7 +867,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 S.fit_surrogate()
                 S.surrogate.plot()
         """
-        if self.k == 1:
+        if self.k_orig == 1:
             n_grid = 100
             x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
             y = self.predict(x)

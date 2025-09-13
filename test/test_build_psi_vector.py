@@ -20,25 +20,6 @@ def test_build_psi_vec_basic():
     assert psi.shape == (2,)
     assert np.all(psi >= 0) and np.all(psi <= 1)
 
-
-def test_build_psi_vec_isotropic():
-    """Test build_psi_vec with isotropic model"""
-    X = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
-    y = np.array([0.0, 1.0, 1.0])
-    
-    model = Kriging(isotropic=True)
-    model.fit(X, y)
-    
-    # Points with same distance should have same correlation
-    x_test1 = np.array([0.5, 0.0])  # Distance 0.5 from [0,0]
-    x_test2 = np.array([0.0, 0.5])  # Distance 0.5 from [0,0]
-    
-    psi1 = model.build_psi_vec(x_test1)
-    psi2 = model.build_psi_vec(x_test2)
-    
-    assert np.allclose(psi1, psi2)
-
-
 def test_build_psi_vec_with_categorical():
     """Test build_psi_vec with mixed numeric and categorical variables"""
     X = np.array([[0.0, 0], [1.0, 0], [0.0, 1]])
@@ -106,3 +87,22 @@ def test_build_psi_vec_different_scales():
     
     assert not np.any(np.isnan(psi))
     assert np.all(psi >= 0) and np.all(psi <= 1)
+    
+def test_build_psi_vec_isotropic():
+    """Test build_psi_vec with isotropic model"""
+    X = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+    y = np.array([0.0, 1.0, 1.0])
+    
+    model = Kriging(isotropic=True)
+    model.fit(X, y)
+    
+    # Points with same distance should have same correlation
+    x_test1 = np.array([0.5, 0.0])  # Distance 0.5 from [0,0]
+    x_test2 = np.array([0.0, 0.5])  # Distance 0.5 from [0,0]
+    
+    psi1 = model.build_psi_vec(x_test1)
+    psi2 = model.build_psi_vec(x_test2)
+    # switch the 2nd and 3rd entry in the array psi2
+    psi2 = np.array([psi2[0], psi2[2], psi2 [1]])
+    
+    assert np.allclose(psi1, psi2)
