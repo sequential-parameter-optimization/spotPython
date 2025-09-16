@@ -142,6 +142,11 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.return_ei = False
         self.return_std = False
 
+        # Nyström-specific attributes
+        self.landmarks_ = None
+        self.W_cho_ = None  # Cholesky factor of W matrix
+        self.nystrom_alpha_ = None  # Solved term for Nyström prediction
+
     def _get_eps(self) -> float:
         """
         Returns the square root of the machine epsilon.
@@ -541,14 +546,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         n = X.shape[0]
         one = np.ones(n)
 
-        # Build the correlation matrix Psi (modified in 0.31.0)
-        # theta = self.theta
-        # theta is in log scale, so transform it back:
-        # theta10 = 10.0**theta
-        # p = self.p_val
-        # Build correlation matrix (preparation for build_Psi())
-        # Psi_upper_triangle = self._kernel(X, theta10, p)
-
+        # Build the correlation matrix Psi
         Psi_upper_triangle = self.build_Psi()
 
         Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
