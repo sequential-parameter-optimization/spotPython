@@ -718,34 +718,65 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     model.eval()
 
     target = fun_control.get("xai_target", None)
-
+    
     if "KernelShap" in fun_control["xai_methods"]:
         attr_ks = KernelShap(model)
         n_features = X_val_tensor.shape[1]
-        samples_ks = min(2000, 100 * n_features)  # Adjust number of samples based on features, maximum 2000
+        samples_ks = min(2000, 100 * n_features)
         print("KernelShap: Using", samples_ks, "samples for attribution.")
         with torch.no_grad():
-            attribution_ks = attr_ks.attribute(X_val_tensor, baselines=baseline, n_samples=samples_ks, perturbations_per_eval=64, target=target)
-        ks_attr_test_sum = attribution_ks.detach().numpy().sum(axis=0)
-        l2_norm = np.linalg.norm(ks_attr_test_sum)
-        l2_normalized_ks = ks_attr_test_sum / l2_norm if l2_norm != 0 else ks_attr_test_sum
+            attribution_ks = attr_ks.attribute(
+                X_val_tensor,
+                baselines=baseline,
+                n_samples=samples_ks,
+                perturbations_per_eval=64,,
+                target=target,
+                show_progress=False,
+            )
+        ks_sum = attribution_ks.detach().cpu().numpy().sum(axis=0)
+        # Remove NaN and Inf values
+        ks_sum = np.nan_to_num(ks_sum, nan=0.0, posinf=0.0, neginf=0.0)
+        # Safe normalization (no division by ~0)
+        l2_norm = np.linalg.norm(ks_sum)
+        if not np.isfinite(l2_norm) or l2_norm < 1e-12:
+            l2_normalized_ks = np.zeros_like(ks_sum)
+        else:
+            l2_normalized_ks = ks_sum / l2_norm
         attributions_dict["KernelShap"] = l2_normalized_ks
 
-    with torch.enable_grad():
-        if "IntegratedGradients" in fun_control["xai_methods"]:
-            attr_ig = IntegratedGradients(model)
-            attribution_ig = attr_ig.attribute(X_val_tensor, baselines=baseline, target=target)
-            vec = attribution_ig.detach().cpu().numpy().sum(axis=0)
-            l2 = np.linalg.norm(vec)
-            attributions_dict["IntegratedGradients"] = vec / l2 if l2 != 0 else vec
+    if "IntegratedGradients" in fun_control["xai_methods"]:
+        attr_ig = IntegratedGradients(model)
+        # IG braucht Gradienten ⇒ enable_grad
+        with torch.enable_grad():
+            attribution_ig = attr_ig.attribute(
+                X_val_tensor,
+                baselines=baseline,
+                target=target,
+            )
+        ig_sum = attribution_ig.detach().cpu().numpy().sum(axis=0)
+        ig_sum = np.nan_to_num(ig_sum, nan=0.0, posinf=0.0, neginf=0.0)
+        l2 = np.linalg.norm(ig_sum)
+        if not np.isfinite(l2) or l2 < 1e-12:
+            attributions_dict["IntegratedGradients"] = np.zeros_like(ig_sum)
+        else:
+            attributions_dict["IntegratedGradients"] = ig_sum / l2
 
-        if "DeepLift" in fun_control["xai_methods"]:
-            attr_dl = DeepLift(model)
-            attribution_dl = attr_dl.attribute(X_val_tensor, baselines=baseline, target=target)
-            dl_attr_test_sum = attribution_dl.detach().numpy().sum(axis=0)
-            l2_norm = np.linalg.norm(dl_attr_test_sum)
-            l2_normalized_dl = dl_attr_test_sum / l2_norm if l2_norm != 0 else dl_attr_test_sum
-            attributions_dict["DeepLift"] = l2_normalized_dl
+    if "DeepLift" in fun_control["xai_methods"]:
+        attr_dl = DeepLift(model)
+        with torch.enable_grad():  # DeepLIFT via Backprop
+            attribution_dl = attr_dl.attribute(
+                X_val_tensor,
+                baselines=baseline,
+                target=target,
+            )
+        dl_sum = attribution_dl.detach().cpu().numpy().sum(axis=0)
+        dl_sum = np.nan_to_num(dl_sum, nan=0.0, posinf=0.0, neginf=0.0)
+        l2_norm = np.linalg.norm(dl_sum)
+        if not np.isfinite(l2_norm) or l2_norm < 1e-12:
+            l2_normalized_dl = np.zeros_like(dl_sum)
+        else:
+            l2_normalized_dl = dl_sum / l2_norm
+        attributions_dict["DeepLift"] = l2_normalized_dl
 
     attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
     attributions = np.stack(attributions_list, axis=0)
