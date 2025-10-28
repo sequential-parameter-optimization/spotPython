@@ -9,9 +9,6 @@ from torch.utils.data import DataLoader
 from captum.attr import IntegratedGradients, DeepLift, KernelShap
 import torch
 import os
-from scipy.stats import spearmanr
-
-
 import numpy as np
 
 
@@ -407,7 +404,7 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
             from spotpython.utils.eda import print_exp_table
             from spotpython.hyperparameters.values import get_default_hyperparameters_as_array
             from spotpython.hyperparameters.values import assign_values, generate_one_config_from_var_dict, get_var_name
-            from spotpython.light.trainmodel import train_model
+            from spotpython.light.trainmodel import train_model_xai
             import pprint
             PREFIX="000"
             data_set = Diabetes()
@@ -718,7 +715,7 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     model.eval()
 
     target = fun_control.get("xai_target", None)
-    
+
     if "KernelShap" in fun_control["xai_methods"]:
         attr_ks = KernelShap(model)
         n_features = X_val_tensor.shape[1]
@@ -729,7 +726,7 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
                 X_val_tensor,
                 baselines=baseline,
                 n_samples=samples_ks,
-                perturbations_per_eval=64,,
+                perturbations_per_eval=64,
                 target=target,
                 show_progress=False,
             )
