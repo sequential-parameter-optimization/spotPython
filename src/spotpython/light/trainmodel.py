@@ -129,7 +129,6 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
         )
     else:
         dm = fun_control["data_module"]
-    dm.setup()  # Manually call setup to prepare the datasets
 
     model = build_model_instance(config, fun_control)
     # TODO: Check if this is necessary or if this is handled by the trainer
@@ -239,7 +238,7 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
                 gradient_clip_algorithm="norm",
             )
 
-            trainer.fit(model=model, train_dataloaders=train_dl, val_dataloaders=test_dl, ckpt_path=None)
+            trainer.fit(model=model, train_dataloaders=train_dl, ckpt_path=None)
             result = trainer.validate(model=model, dataloaders=test_dl, ckpt_path=None, verbose=verbose)
             result = result[0]
 
@@ -351,13 +350,10 @@ def train_model(config: dict, fun_control: dict, timestamp: bool = True) -> floa
     #   Could also be one of two special keywords "last" and "hpc".
     #   If there is no checkpoint file at the path, an exception is raised.
     try:
-        trainer.fit(model=model, train_dataloaders=dm.train_dataloader(), val_dataloaders=dm.val_dataloader(), ckpt_path=None)
+        trainer.fit(model=model, datamodule=dm, ckpt_path=None)
     except Exception as e:
         print(f"train_model(): trainer.fit failed with exception: {e}")
-        return None
     # Test best model on validation and test set
-    # The validate and test methods expect a datamodule or dataloaders.
-    # Using the datamodule is cleaner.
     verbose = fun_control["verbosity"] > 0
 
     # Validate the model
@@ -459,7 +455,6 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
         )
     else:
         dm = fun_control["data_module"]
-    dm.setup()  # Manually call setup to prepare the datasets
 
     model = build_model_instance(config, fun_control)
     # TODO: Check if this is necessary or if this is handled by the trainer
@@ -624,13 +619,10 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     #   Could also be one of two special keywords "last" and "hpc".
     #   If there is no checkpoint file at the path, an exception is raised.
     try:
-        trainer.fit(model=model, train_dataloaders=dm.train_dataloader(), val_dataloaders=dm.val_dataloader(), ckpt_path=None)
+        trainer.fit(model=model, datamodule=dm, ckpt_path=None)
     except Exception as e:
         print(f"train_model(): trainer.fit failed with exception: {e}")
-        return None
     # Test best model on validation and test set
-    # The validate and test methods expect a datamodule or dataloaders.
-    # Using the datamodule is cleaner.
     verbose = fun_control["verbosity"] > 0
 
     # Validate the model
