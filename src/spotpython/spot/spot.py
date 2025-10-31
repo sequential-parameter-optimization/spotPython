@@ -2751,19 +2751,14 @@ class Spot:
             >>> print(importance2)
             []
         """
-        # Check if surrogate exists
-        if not hasattr(self, "surrogate"):
+        # Check if surrogate exists and surrogate is not None
+        if not hasattr(self, "surrogate") or self.surrogate is None:
             print("No surrogate model available.")
             return []
 
-        # Check if surrogate has theta attribute for multi-theta models
-        if not hasattr(self.surrogate, "theta"):
-            print("Surrogate model does not have theta attribute.")
-            return []
-
-        # Check if surrogate is not isotropic
-        if self.surrogate.isotropic:
-            print("Surrogate model is isotropic.")
+        # check if surrogate name is "Kriging"
+        if not (isinstance(self.surrogate, Kriging) and getattr(self.surrogate, "name", None) in ["Kriging"]):
+            print("Importance calculation is only available for Kriging surrogate models.")
             return []
 
         # Check if all required attributes exist for importance calculation
@@ -2771,7 +2766,12 @@ class Spot:
             print("Variable names (all_var_name) not available.")
             return []
 
-        if self.surrogate.n_theta > 1 and hasattr(self, "var_name") and self.var_name is not None:
+        n_theta = self.surrogate.get_params()["n_theta"]
+        if n_theta is None:
+            print("Number of theta values (n_theta) not available. Check if surrogate is fitted.")
+            return []
+
+        if n_theta > 1 and hasattr(self, "var_name") and self.var_name is not None:
             try:
                 output = [0] * len(self.all_var_name)
                 theta = np.power(10, self.surrogate.theta)

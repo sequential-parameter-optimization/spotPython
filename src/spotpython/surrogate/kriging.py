@@ -46,12 +46,12 @@ class Kriging(BaseEstimator, RegressorMixin):
         eps: float = None,
         penalty: float = 1e4,
         method="regression",
-        noise: bool = False,
         var_type: List[str] = ["num"],
         name: str = "Kriging",
         seed: int = 124,
         model_optimizer=None,
         model_fun_evals: Optional[int] = None,
+        n_theta: Optional[int] = None,
         min_theta: float = -3.0,
         max_theta: float = 2.0,
         theta_init_zero: bool = False,
@@ -67,6 +67,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         counter=None,
         metric_factorial="canberra",
         isotropic: bool = False,
+        theta: Optional[np.ndarray] = None,
+        Lambda: Optional[float] = None,
         **kwargs,
     ):
         """
@@ -83,9 +85,63 @@ class Kriging(BaseEstimator, RegressorMixin):
                 not positive-definite. Defaults to 1e4.
             method (str, optional):
                 The type how the model uis fitted. Can be "interpolation", "regression", or "reinterpolation". Defaults to "regression".
+            var_type (List[str], optional):
+                List specifying the variable types for each input dimension.
+                Possible values are "num", "int", "factor", and "ordered".
+                Defaults to ["num"].
+            name (str, optional):
+                Name of the Kriging model instance. Defaults to "Kriging".
+            seed (int, optional):
+                Random seed for reproducibility. Defaults to 124.
+            model_optimizer (callable, optional):
+                Optimization algorithm for hyperparameter tuning. Defaults to
+                scipy.optimize.differential_evolution.
+            model_fun_evals (int, optional):
+                Maximum number of function evaluations for the optimizer.
+                Defaults to 100.
+            n_theta (int, optional):
+                Number of theta values to be used. If None, it will be set during fitting.
+                Defaults to None.
+            min_theta (float, optional):
+                Minimum bound for log(theta) during optimization. Defaults to -3.0.
+            max_theta (float, optional):
+                Maximum bound for log(theta) during optimization. Defaults to 2.0.
+            theta_init_zero (bool, optional):
+                If True, initializes theta values to zero before fitting.
+                Defaults to False.
+            p_val (float, optional):
+                Initial power exponent value for the correlation function. Defaults to 2.0.
+            n_p (int, optional):
+                Number of p values to be used. Defaults to 1.
+            optim_p (bool, optional):
+                If True, optimizes the p values during fitting. Defaults to False.
+            min_p (float, optional):
+                Minimum bound for p during optimization. Defaults to 1.0.
+            max_p (float, optional):
+                Maximum bound for p during optimization. Defaults to 2.0.
+            min_Lambda (float, optional):
+                Minimum bound for log(Lambda) during optimization. Defaults to -9.0.
+            max_Lambda (float, optional):
+                Maximum bound for log(Lambda) during optimization. Defaults to 2.0.
+            log_level (int, optional):
+                Logging level for the model. Defaults to 0 (no logging).
+            spot_writer (object, optional):
+                Writer object for logging (e.g., TensorBoard writer). Defaults to None.
+            counter (int, optional):
+                Counter for logging iterations. Defaults to None.
+            metric_factorial (str, optional):
+                Metric to be used for factorial design. Defaults to "canberra".
             isotropic (bool, optional):
                 If True, the model is isotropic, meaning all variables are treated equally (only one theta value is used).
                 If False, the model can handle different theta values, one for each dimension. Defaults to False.
+            theta (np.ndarray, optional):
+                Currently ignored. Initial theta values for the model. If None, theta values are initialized during fitting.
+                Defaults to None.
+            Lambda (float, optional):
+                Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting.
+                Defaults to None.
+            **kwargs:
+                Additional keyword arguments.
         """
         if eps is None:
             self.eps = self._get_eps()
@@ -95,8 +151,6 @@ class Kriging(BaseEstimator, RegressorMixin):
                 raise ValueError("eps must be positive")
             self.eps = eps
         self.penalty = penalty
-
-        self.noise = noise
         self.var_type = var_type
         self.name = name
         self.seed = seed
@@ -110,12 +164,14 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.max_Lambda = max_Lambda
         self.min_p = min_p
         self.max_p = max_p
-        self.n_theta = None  # Will be set in fit()
+        self.n_theta = n_theta  # Will be set during fit
         self.isotropic = isotropic
         self.p_val = p_val
         self.n_p = n_p
         self.optim_p = optim_p
         self.theta_init_zero = theta_init_zero
+        self.theta = theta
+        self.Lambda = Lambda
         self.model_optimizer = model_optimizer
         if self.model_optimizer is None:
             self.model_optimizer = differential_evolution
@@ -175,7 +231,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 var_type = ["num", "int", "float"]
                 n_theta=2
                 n_p=2
-                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
+                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True)
                 S._initialize_variables(nat_X, nat_y)
                 S._set_variable_types()
                 assert S.var_type == ["num", "int", "float"]
@@ -207,7 +263,26 @@ class Kriging(BaseEstimator, RegressorMixin):
         This method is NOT required for scikit-learn compatibility.
 
         Returns:
-            dict: Parameter names not included in get_params() mapped to their values.
+            dict:
+                Parameter names not included in get_params() mapped to their values. This includes the following keys:
+                    - "log_theta_lambda"
+                    - "U"
+                    - "X"
+                    - "y"
+                    - "negLnLike"
+
+        Examples:
+            >>> import numpy as np
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> # Training data
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> # Initialize and fit the Kriging model
+            >>> model = Kriging()
+            >>> model.fit(X_train, y_train)
+            >>> # get theta values of the fitted model
+            >>> X_values = model.get_model_params()["X"]
+            >>> print("X values:", X_values)
         """
         return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "negLnLike": self.negLnLike}
 
@@ -247,6 +322,15 @@ class Kriging(BaseEstimator, RegressorMixin):
                 self.spot_writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter + self.log_length)
             self.spot_writer.flush()
 
+    def set_theta(self) -> None:
+        if self.isotropic:
+            # If isotropic, set n_theta to 1
+            self.n_theta = 1
+            print(f"Isotropic model: n_theta set to {self.n_theta}")
+        else:
+            self.n_theta = self.k
+            print(f"Anisotropic model: n_theta set to {self.n_theta}")
+
     def fit(self, X: np.ndarray, y: np.ndarray, bounds: Optional[List[Tuple[float, float]]] = None) -> "Kriging":
         """
         Fits the Kriging model to training data X and y. This method is compatible
@@ -282,13 +366,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.y_ = y
         self.n, self.k = self.X_.shape
         self._set_variable_types()
-        if self.isotropic:
-            # If isotropic, set n_theta to 1
-            self.n_theta = 1
-            print(f"Isotropic model: n_theta set to {self.n_theta}")
-        else:
-            self.n_theta = self.k
-            print(f"Anisotropic model: n_theta set to {self.n_theta}")
+        if self.n_theta is None:
+            self.set_theta()
         # Calculate and store min and max of X
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)
@@ -415,7 +494,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 nat_y = np.array([0, 1])
                 n=1
                 p=1
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
+                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True)
                 S._initialize_variables(nat_X, nat_y)
                 S._set_variable_types()
                 print(S.nat_X)
@@ -574,42 +653,41 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def build_psi_vec(self, x: np.ndarray) -> None:
         """
-        Build the psi vector required for predictive methods.
+                Build the psi vector required for predictive methods.
 
-        Args:
-            x (ndarray): Point to calculate the psi vector for.
+                Args:
+                    x (ndarray): Point to calculate the psi vector for.
 
-        Returns:
-            None
+                Returns:
+                    None
 
-        Modifies:
-            self.psi (np.ndarray): Updates the psi vector.
+                Modifies:
+                    self.psi (np.ndarray): Updates the psi vector.
 
-        Examples:
-            >>> import numpy as np
-                from spotpython.build.kriging import Kriging
-                X_train = np.array([[1., 2.],
-                                    [2., 4.],
-                                    [3., 6.]])
-                y_train = np.array([1., 2., 3.])
-                S = Kriging(name='kriging',
-                            seed=123,
-                            log_level=50,
-                            n_theta=1,
-                            noise=False,
-                            cod_type="norm")
-                S.fit(X_train, y_train)
-                # force theta to simple values:
-                S.theta = np.array([0.0])
-                nat_X = np.array([1., 0.])
-                S.psi = np.zeros((S.n, 1))
-                S.build_psi_vec(nat_X)
-                res = np.array([[np.exp(-4)],
-                    [np.exp(-17)],
-                    [np.exp(-40)]])
-                assert np.array_equal(S.psi, res)
-                print(f"S.psi: {S.psi}")
-                print(f"Control value res: {res}")
+                Examples:
+                    >>> import numpy as np
+                        from spotpython.build.kriging import Kriging
+                        X_train = np.array([[1., 2.],
+                                            [2., 4.],
+                                            [3., 6.]])
+                        y_train = np.array([1., 2., 3.])
+                        S = Kriging(name='kriging',
+                                    seed=123,
+                                    log_level=50,
+                                    n_theta=1,
+        ^                           cod_type="norm")
+                        S.fit(X_train, y_train)
+                        # force theta to simple values:
+                        S.theta = np.array([0.0])
+                        nat_X = np.array([1., 0.])
+                        S.psi = np.zeros((S.n, 1))
+                        S.build_psi_vec(nat_X)
+                        res = np.array([[np.exp(-4)],
+                            [np.exp(-17)],
+                            [np.exp(-40)]])
+                        assert np.array_equal(S.psi, res)
+                        print(f"S.psi: {S.psi}")
+                        print(f"Control value res: {res}")
         """
         try:
             n = self.X_.shape[0]
