@@ -801,14 +801,16 @@ def surrogate_control_init(
     Note:
         * The surrogate_control dictionary is used in the Spot class. The following values
           are updated in the Spot class if they are None in the surrogate_control dictionary:
-            * `method`: If the surrogate model dictionary is passed to the Spot class,
+            * `method`:
+                If the surrogate model dictionary is passed to the Spot class,
               and the `method` value is `None`, then the method value is set in the
               Spot class based on the value of `method` in the Spot class fun_control dictionary.
-            * `var_type`: The `var_type` value is set in the Spot class based on the value
-               of `var_type` in the Spot class fun_control dictionary and the dimension of the problem.
+            * `var_type`:
+                The `var_type` value is set in the Spot class based on the value of `var_type` in the Spot class fun_control dictionary and the dimension of the problem.
                If the Kriging model is used as a surrogate in the Spot class, the setting from
                 surrogate_control_init() is overwritten.
-            * `isotropic`: If the `isotropic` value is set to `True`, then the theta values are isotropic, i.e., the same value is used for all dimensions. If it is set to `False`, then the theta values are anisotropic, i.e., different values are used for each dimension.
+            * `isotropic`:
+                If `True`, then the theta values are isotropic (same value for all dimensions). If `False`, then they are anisotropic (different values for each dimension).
         * The value `model_fun_evals` will used for the optimization of the surrogate model, e.g., theta values.
           Differential evaluation uses `maxiter = 1000` and sets the number of function evaluations to
           (maxiter + 1) * popsize * N, which results in 1000 * 15 * k,

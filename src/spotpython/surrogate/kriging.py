@@ -135,11 +135,9 @@ class Kriging(BaseEstimator, RegressorMixin):
                 If True, the model is isotropic, meaning all variables are treated equally (only one theta value is used).
                 If False, the model can handle different theta values, one for each dimension. Defaults to False.
             theta (np.ndarray, optional):
-                Currently ignored. Initial theta values for the model. If None, theta values are initialized during fitting.
-                Defaults to None.
+                Initial theta values for the model. If None, theta values are initialized during fitting. Note that theta is in log10 scale. Defaults to None.
             Lambda (float, optional):
-                Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting.
-                Defaults to None.
+                Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting. Note that Lambda is in log10 scale. Defaults to None.
             **kwargs:
                 Additional keyword arguments.
         """
@@ -258,8 +256,7 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def get_model_params(self) -> Dict[str, float]:
         """
-        Get the model parameters (in addition to sklearn's get_params method).
-
+        Get the (internal) model parameters (in addition to sklearn's get_params method).
         This method is NOT required for scikit-learn compatibility.
 
         Returns:
@@ -358,7 +355,10 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Initialize and fit the Kriging model
             >>> model = Kriging()
             >>> model.fit(X_train, y_train)
-            >>> print("Fitted log(theta):", model.logtheta_lambda_)
+            >>> for param, value in model.get_params(deep=True).items():
+            >>>     print(f"{param} -> {value}")
+            >>> theta_values = model.get_params()["theta"]
+            >>> print("Fitted theta values:", theta_values)
         """
         X = np.asarray(X)
         y = np.asarray(y).flatten()
@@ -553,34 +553,6 @@ class Kriging(BaseEstimator, RegressorMixin):
             print("Building Psi failed. Error: %s, Type: %s", err, type(err))
             raise
 
-    def _kernel(self, X: np.ndarray, theta: np.ndarray, p: float) -> np.ndarray:
-        """
-        Computes the correlation matrix Psi using vectorized operations.
-
-        Args:
-            X (np.ndarray): Input data of shape (n_samples, n_features).
-            theta (np.ndarray): Theta parameters of shape (n_features,).
-            p (float): Power exponent.
-
-        Returns:
-            np.ndarray: The upper triangle of the correlation matrix Psi.
-        """
-        n_samples, n_features = X.shape
-        Psi = np.zeros((n_samples, n_samples), dtype=float)
-        # Calculate all pairwise differences:
-        # X_expanded_rows will have shape (n_samples, 1, n_features)
-        # X_expanded_cols will have shape (1, n_samples, n_features)
-        # diff will have shape (n_samples, n_samples, n_features)
-        diff = np.abs(X[:, np.newaxis, :] - X[np.newaxis, :, :]) ** p
-        # Apply theta and sum over features
-        # dist_matrix will have shape (n_samples, n_samples)
-        dist_matrix = np.sum(theta * diff, axis=2)
-        # Compute Psi using the exponential kernel
-        Psi = np.exp(-dist_matrix)
-        # Return only the upper triangle, as the matrix is symmetric
-        # and the diagonal will be handled later.
-        return np.triu(Psi, k=1)
-
     def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
@@ -653,41 +625,41 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def build_psi_vec(self, x: np.ndarray) -> None:
         """
-                Build the psi vector required for predictive methods.
+        Build the psi vector required for predictive methods.
 
-                Args:
-                    x (ndarray): Point to calculate the psi vector for.
+        Args:
+            x (ndarray): Point to calculate the psi vector for.
 
-                Returns:
-                    None
+        Returns:
+            None
 
-                Modifies:
-                    self.psi (np.ndarray): Updates the psi vector.
+        Modifies:
+            self.psi (np.ndarray): Updates the psi vector.
 
-                Examples:
-                    >>> import numpy as np
-                        from spotpython.build.kriging import Kriging
-                        X_train = np.array([[1., 2.],
-                                            [2., 4.],
-                                            [3., 6.]])
-                        y_train = np.array([1., 2., 3.])
-                        S = Kriging(name='kriging',
-                                    seed=123,
-                                    log_level=50,
-                                    n_theta=1,
-        ^                           cod_type="norm")
-                        S.fit(X_train, y_train)
-                        # force theta to simple values:
-                        S.theta = np.array([0.0])
-                        nat_X = np.array([1., 0.])
-                        S.psi = np.zeros((S.n, 1))
-                        S.build_psi_vec(nat_X)
-                        res = np.array([[np.exp(-4)],
-                            [np.exp(-17)],
-                            [np.exp(-40)]])
-                        assert np.array_equal(S.psi, res)
-                        print(f"S.psi: {S.psi}")
-                        print(f"Control value res: {res}")
+        Examples:
+            >>> import numpy as np
+                from spotpython.build.kriging import Kriging
+                X_train = np.array([[1., 2.],
+                                    [2., 4.],
+                                    [3., 6.]])
+                y_train = np.array([1., 2., 3.])
+                S = Kriging(name='kriging',
+                            seed=123,
+                            log_level=50,
+                            n_theta=1,
+                            cod_type="norm")
+                S.fit(X_train, y_train)
+                # force theta to simple values:
+                S.theta = np.array([0.0])
+                nat_X = np.array([1., 0.])
+                S.psi = np.zeros((S.n, 1))
+                S.build_psi_vec(nat_X)
+                res = np.array([[np.exp(-4)],
+                    [np.exp(-17)],
+                    [np.exp(-40)]])
+                assert np.array_equal(S.psi, res)
+                print(f"S.psi: {S.psi}")
+                print(f"Control value res: {res}")
         """
         try:
             n = self.X_.shape[0]
@@ -763,17 +735,6 @@ class Kriging(BaseEstimator, RegressorMixin):
         resid = y - one * mu
         resid_tilde = np.linalg.solve(U, resid)
         resid_tilde = np.linalg.solve(U.T, resid_tilde)
-
-        # Build psi (modified in 0.31.0)
-        # X = self.X_
-        # p = self.p_val
-        # theta = self.theta
-        # # theta is in log scale, so transform it back:
-        # theta10 = 10.0**theta
-        # psi = np.ones(n)
-        # for i in range(n):
-        #     dist_vec = np.abs(X[i, :] - x) ** p
-        #     psi[i] = np.exp(-np.sum(theta10 * dist_vec))
 
         psi = self.build_psi_vec(x)
 
