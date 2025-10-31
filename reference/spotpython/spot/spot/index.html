@@ -12266,19 +12266,14 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
 <span class="sd">            &gt;&gt;&gt; print(importance2)</span>
 <span class="sd">            []</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Check if surrogate exists</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;surrogate&quot;</span><span class="p">):</span>
+        <span class="c1"># Check if surrogate exists and surrogate is not None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;surrogate&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No surrogate model available.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="c1"># Check if surrogate has theta attribute for multi-theta models</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have theta attribute.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">[]</span>
-
-        <span class="c1"># Check if surrogate is not isotropic</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model is isotropic.&quot;</span><span class="p">)</span>
+        <span class="c1"># check if surrogate name is &quot;Kriging&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">Kriging</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Kriging&quot;</span><span class="p">]):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importance calculation is only available for Kriging surrogate models.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
         <span class="c1"># Check if all required attributes exist for importance calculation</span>
@@ -12286,7 +12281,12 @@ E. Bartz, T. Bartz-Beielstein, M. Zaefferer, and O. Mersmann, Eds. Springer, 202
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Variable names (all_var_name) not available.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">[]</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;var_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">get_params</span><span class="p">()[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">n_theta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of theta values (n_theta) not available. Check if surrogate is fitted.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">n_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;var_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_var_name</span><span class="p">)</span>
                 <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
@@ -14091,19 +14091,14 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
 <span class="sd">        &gt;&gt;&gt; print(importance2)</span>
 <span class="sd">        []</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Check if surrogate exists</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;surrogate&quot;</span><span class="p">):</span>
+    <span class="c1"># Check if surrogate exists and surrogate is not None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;surrogate&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No surrogate model available.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-    <span class="c1"># Check if surrogate has theta attribute for multi-theta models</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model does not have theta attribute.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[]</span>
-
-    <span class="c1"># Check if surrogate is not isotropic</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Surrogate model is isotropic.&quot;</span><span class="p">)</span>
+    <span class="c1"># check if surrogate name is &quot;Kriging&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="n">Kriging</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Kriging&quot;</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importance calculation is only available for Kriging surrogate models.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[]</span>
 
     <span class="c1"># Check if all required attributes exist for importance calculation</span>
@@ -14111,7 +14106,12 @@ the importance is calculated. Otherwise, an empty list is returned.</p>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Variable names (all_var_name) not available.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;var_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">get_params</span><span class="p">()[</span><span class="s2">&quot;n_theta&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_theta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of theta values (n_theta) not available. Check if surrogate is fitted.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">n_theta</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;var_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_var_name</span><span class="p">)</span>
             <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">surrogate</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>

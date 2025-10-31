@@ -5998,7 +5998,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
       </thead>
       <tbody>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="__init__(eps=None, penalty=10000.0, method='regression', noise=False, var_type=['num'], name='Kriging', seed=124, model_optimizer=None, model_fun_evals=None, min_theta=-3.0, max_theta=2.0, theta_init_zero=False, p_val=2.0, n_p=1, optim_p=False, min_p=1.0, max_p=2.0, min_Lambda=-9.0, max_Lambda=0.0, log_level=50, spot_writer=None, counter=None, metric_factorial='canberra', isotropic=False, **kwargs) (spotpython.surrogate.kriging.Kriging.__init__)" href="#spotpython.surrogate.kriging.Kriging.__init__">__init__</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="__init__(eps=None, penalty=10000.0, method='regression', var_type=['num'], name='Kriging', seed=124, model_optimizer=None, model_fun_evals=None, n_theta=None, min_theta=-3.0, max_theta=2.0, theta_init_zero=False, p_val=2.0, n_p=1, optim_p=False, min_p=1.0, max_p=2.0, min_Lambda=-9.0, max_Lambda=0.0, log_level=50, spot_writer=None, counter=None, metric_factorial='canberra', isotropic=False, theta=None, Lambda=None, **kwargs) (spotpython.surrogate.kriging.Kriging.__init__)" href="#spotpython.surrogate.kriging.Kriging.__init__">__init__</a></code></td>
               <td>
                 <div class="doc-md-description">
                   <p>Initializes the Kriging model with hyperparameters.</p>
@@ -6908,7 +6908,85 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="normal">821</span>
 <span class="normal">822</span>
 <span class="normal">823</span>
-<span class="normal">824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Kriging</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Kriging</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A scikit-learn compatible Kriging model class for regression tasks.</span>
 <span class="sd">    Provides methods for likelihood evaluation, predictions, and hyperparameter optimization.</span>
@@ -6944,12 +7022,12 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
         <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e4</span><span class="p">,</span>
         <span class="n">method</span><span class="o">=</span><span class="s2">&quot;regression&quot;</span><span class="p">,</span>
-        <span class="n">noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">var_type</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">],</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">,</span>
         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">124</span><span class="p">,</span>
         <span class="n">model_optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">model_fun_evals</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">n_theta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">min_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span>
         <span class="n">max_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
         <span class="n">theta_init_zero</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -6965,6 +7043,8 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
         <span class="n">counter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">metric_factorial</span><span class="o">=</span><span class="s2">&quot;canberra&quot;</span><span class="p">,</span>
         <span class="n">isotropic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">theta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">Lambda</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -6981,9 +7061,63 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">                not positive-definite. Defaults to 1e4.</span>
 <span class="sd">            method (str, optional):</span>
 <span class="sd">                The type how the model uis fitted. Can be &quot;interpolation&quot;, &quot;regression&quot;, or &quot;reinterpolation&quot;. Defaults to &quot;regression&quot;.</span>
+<span class="sd">            var_type (List[str], optional):</span>
+<span class="sd">                List specifying the variable types for each input dimension.</span>
+<span class="sd">                Possible values are &quot;num&quot;, &quot;int&quot;, &quot;factor&quot;, and &quot;ordered&quot;.</span>
+<span class="sd">                Defaults to [&quot;num&quot;].</span>
+<span class="sd">            name (str, optional):</span>
+<span class="sd">                Name of the Kriging model instance. Defaults to &quot;Kriging&quot;.</span>
+<span class="sd">            seed (int, optional):</span>
+<span class="sd">                Random seed for reproducibility. Defaults to 124.</span>
+<span class="sd">            model_optimizer (callable, optional):</span>
+<span class="sd">                Optimization algorithm for hyperparameter tuning. Defaults to</span>
+<span class="sd">                scipy.optimize.differential_evolution.</span>
+<span class="sd">            model_fun_evals (int, optional):</span>
+<span class="sd">                Maximum number of function evaluations for the optimizer.</span>
+<span class="sd">                Defaults to 100.</span>
+<span class="sd">            n_theta (int, optional):</span>
+<span class="sd">                Number of theta values to be used. If None, it will be set during fitting.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            min_theta (float, optional):</span>
+<span class="sd">                Minimum bound for log(theta) during optimization. Defaults to -3.0.</span>
+<span class="sd">            max_theta (float, optional):</span>
+<span class="sd">                Maximum bound for log(theta) during optimization. Defaults to 2.0.</span>
+<span class="sd">            theta_init_zero (bool, optional):</span>
+<span class="sd">                If True, initializes theta values to zero before fitting.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            p_val (float, optional):</span>
+<span class="sd">                Initial power exponent value for the correlation function. Defaults to 2.0.</span>
+<span class="sd">            n_p (int, optional):</span>
+<span class="sd">                Number of p values to be used. Defaults to 1.</span>
+<span class="sd">            optim_p (bool, optional):</span>
+<span class="sd">                If True, optimizes the p values during fitting. Defaults to False.</span>
+<span class="sd">            min_p (float, optional):</span>
+<span class="sd">                Minimum bound for p during optimization. Defaults to 1.0.</span>
+<span class="sd">            max_p (float, optional):</span>
+<span class="sd">                Maximum bound for p during optimization. Defaults to 2.0.</span>
+<span class="sd">            min_Lambda (float, optional):</span>
+<span class="sd">                Minimum bound for log(Lambda) during optimization. Defaults to -9.0.</span>
+<span class="sd">            max_Lambda (float, optional):</span>
+<span class="sd">                Maximum bound for log(Lambda) during optimization. Defaults to 2.0.</span>
+<span class="sd">            log_level (int, optional):</span>
+<span class="sd">                Logging level for the model. Defaults to 0 (no logging).</span>
+<span class="sd">            spot_writer (object, optional):</span>
+<span class="sd">                Writer object for logging (e.g., TensorBoard writer). Defaults to None.</span>
+<span class="sd">            counter (int, optional):</span>
+<span class="sd">                Counter for logging iterations. Defaults to None.</span>
+<span class="sd">            metric_factorial (str, optional):</span>
+<span class="sd">                Metric to be used for factorial design. Defaults to &quot;canberra&quot;.</span>
 <span class="sd">            isotropic (bool, optional):</span>
 <span class="sd">                If True, the model is isotropic, meaning all variables are treated equally (only one theta value is used).</span>
 <span class="sd">                If False, the model can handle different theta values, one for each dimension. Defaults to False.</span>
+<span class="sd">            theta (np.ndarray, optional):</span>
+<span class="sd">                Currently ignored. Initial theta values for the model. If None, theta values are initialized during fitting.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            Lambda (float, optional):</span>
+<span class="sd">                Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            **kwargs:</span>
+<span class="sd">                Additional keyword arguments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">eps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_eps</span><span class="p">()</span>
@@ -6993,8 +7127,6 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;eps must be positive&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span> <span class="o">=</span> <span class="n">var_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
@@ -7008,12 +7140,14 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
         <span class="bp">self</span><span class="o">.</span><span class="n">max_Lambda</span> <span class="o">=</span> <span class="n">max_Lambda</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_p</span> <span class="o">=</span> <span class="n">min_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span> <span class="o">=</span> <span class="n">max_p</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Will be set in fit()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="n">n_theta</span>  <span class="c1"># Will be set during fit</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span> <span class="o">=</span> <span class="n">isotropic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">p_val</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span> <span class="o">=</span> <span class="n">n_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span> <span class="o">=</span> <span class="n">optim_p</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">theta_init_zero</span> <span class="o">=</span> <span class="n">theta_init_zero</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="n">Lambda</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">model_optimizer</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">differential_evolution</span>
@@ -7073,7 +7207,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">                var_type = [&quot;num&quot;, &quot;int&quot;, &quot;float&quot;]</span>
 <span class="sd">                n_theta=2</span>
 <span class="sd">                n_p=2</span>
-<span class="sd">                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)</span>
+<span class="sd">                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True)</span>
 <span class="sd">                S._initialize_variables(nat_X, nat_y)</span>
 <span class="sd">                S._set_variable_types()</span>
 <span class="sd">                assert S.var_type == [&quot;num&quot;, &quot;int&quot;, &quot;float&quot;]</span>
@@ -7105,7 +7239,26 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">        This method is NOT required for scikit-learn compatibility.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            dict: Parameter names not included in get_params() mapped to their values.</span>
+<span class="sd">            dict:</span>
+<span class="sd">                Parameter names not included in get_params() mapped to their values. This includes the following keys:</span>
+<span class="sd">                    - &quot;log_theta_lambda&quot;</span>
+<span class="sd">                    - &quot;U&quot;</span>
+<span class="sd">                    - &quot;X&quot;</span>
+<span class="sd">                    - &quot;y&quot;</span>
+<span class="sd">                    - &quot;negLnLike&quot;</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            &gt;&gt;&gt; from spotpython.surrogate.kriging import Kriging</span>
+<span class="sd">            &gt;&gt;&gt; # Training data</span>
+<span class="sd">            &gt;&gt;&gt; X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])</span>
+<span class="sd">            &gt;&gt;&gt; y_train = np.array([0.1, 0.2, 0.3])</span>
+<span class="sd">            &gt;&gt;&gt; # Initialize and fit the Kriging model</span>
+<span class="sd">            &gt;&gt;&gt; model = Kriging()</span>
+<span class="sd">            &gt;&gt;&gt; model.fit(X_train, y_train)</span>
+<span class="sd">            &gt;&gt;&gt; # get theta values of the fitted model</span>
+<span class="sd">            &gt;&gt;&gt; X_values = model.get_model_params()[&quot;X&quot;]</span>
+<span class="sd">            &gt;&gt;&gt; print(&quot;X values:&quot;, X_values)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;log_theta_lambda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span> <span class="s2">&quot;negLnLike&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">}</span>
 
@@ -7145,6 +7298,15 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
                 <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">add_scalars</span><span class="p">(</span><span class="s2">&quot;spot_p&quot;</span><span class="p">,</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;p_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">)},</span> <span class="bp">self</span><span class="o">.</span><span class="n">counter</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">log_length</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spot_writer</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_theta</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
+            <span class="c1"># If isotropic, set n_theta to 1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Isotropic model: n_theta set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Anisotropic model: n_theta set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fits the Kriging model to training data X and y. This method is compatible</span>
@@ -7180,13 +7342,8 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
         <span class="bp">self</span><span class="o">.</span><span class="n">y_</span> <span class="o">=</span> <span class="n">y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_variable_types</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
-            <span class="c1"># If isotropic, set n_theta to 1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Isotropic model: n_theta set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Anisotropic model: n_theta set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_theta</span><span class="p">()</span>
         <span class="c1"># Calculate and store min and max of X</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -7313,7 +7470,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">                nat_y = np.array([0, 1])</span>
 <span class="sd">                n=1</span>
 <span class="sd">                p=1</span>
-<span class="sd">                S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)</span>
+<span class="sd">                S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True)</span>
 <span class="sd">                S._initialize_variables(nat_X, nat_y)</span>
 <span class="sd">                S._set_variable_types()</span>
 <span class="sd">                print(S.nat_X)</span>
@@ -7472,42 +7629,41 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 
     <span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build the psi vector required for predictive methods.</span>
+<span class="sd">                Build the psi vector required for predictive methods.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            x (ndarray): Point to calculate the psi vector for.</span>
+<span class="sd">                Args:</span>
+<span class="sd">                    x (ndarray): Point to calculate the psi vector for.</span>
 
-<span class="sd">        Returns:</span>
-<span class="sd">            None</span>
+<span class="sd">                Returns:</span>
+<span class="sd">                    None</span>
 
-<span class="sd">        Modifies:</span>
-<span class="sd">            self.psi (np.ndarray): Updates the psi vector.</span>
+<span class="sd">                Modifies:</span>
+<span class="sd">                    self.psi (np.ndarray): Updates the psi vector.</span>
 
-<span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">                from spotpython.build.kriging import Kriging</span>
-<span class="sd">                X_train = np.array([[1., 2.],</span>
-<span class="sd">                                    [2., 4.],</span>
-<span class="sd">                                    [3., 6.]])</span>
-<span class="sd">                y_train = np.array([1., 2., 3.])</span>
-<span class="sd">                S = Kriging(name=&#39;kriging&#39;,</span>
-<span class="sd">                            seed=123,</span>
-<span class="sd">                            log_level=50,</span>
-<span class="sd">                            n_theta=1,</span>
-<span class="sd">                            noise=False,</span>
-<span class="sd">                            cod_type=&quot;norm&quot;)</span>
-<span class="sd">                S.fit(X_train, y_train)</span>
-<span class="sd">                # force theta to simple values:</span>
-<span class="sd">                S.theta = np.array([0.0])</span>
-<span class="sd">                nat_X = np.array([1., 0.])</span>
-<span class="sd">                S.psi = np.zeros((S.n, 1))</span>
-<span class="sd">                S.build_psi_vec(nat_X)</span>
-<span class="sd">                res = np.array([[np.exp(-4)],</span>
-<span class="sd">                    [np.exp(-17)],</span>
-<span class="sd">                    [np.exp(-40)]])</span>
-<span class="sd">                assert np.array_equal(S.psi, res)</span>
-<span class="sd">                print(f&quot;S.psi: {S.psi}&quot;)</span>
-<span class="sd">                print(f&quot;Control value res: {res}&quot;)</span>
+<span class="sd">                Examples:</span>
+<span class="sd">                    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                        from spotpython.build.kriging import Kriging</span>
+<span class="sd">                        X_train = np.array([[1., 2.],</span>
+<span class="sd">                                            [2., 4.],</span>
+<span class="sd">                                            [3., 6.]])</span>
+<span class="sd">                        y_train = np.array([1., 2., 3.])</span>
+<span class="sd">                        S = Kriging(name=&#39;kriging&#39;,</span>
+<span class="sd">                                    seed=123,</span>
+<span class="sd">                                    log_level=50,</span>
+<span class="sd">                                    n_theta=1,</span>
+<span class="sd">        ^                           cod_type=&quot;norm&quot;)</span>
+<span class="sd">                        S.fit(X_train, y_train)</span>
+<span class="sd">                        # force theta to simple values:</span>
+<span class="sd">                        S.theta = np.array([0.0])</span>
+<span class="sd">                        nat_X = np.array([1., 0.])</span>
+<span class="sd">                        S.psi = np.zeros((S.n, 1))</span>
+<span class="sd">                        S.build_psi_vec(nat_X)</span>
+<span class="sd">                        res = np.array([[np.exp(-4)],</span>
+<span class="sd">                            [np.exp(-17)],</span>
+<span class="sd">                            [np.exp(-40)]])</span>
+<span class="sd">                        assert np.array_equal(S.psi, res)</span>
+<span class="sd">                        print(f&quot;S.psi: {S.psi}&quot;)</span>
+<span class="sd">                        print(f&quot;Control value res: {res}&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -7740,7 +7896,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 
 
 <h3 id="spotpython.surrogate.kriging.Kriging.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mf">10000.0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">var_type</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Kriging&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span> <span class="n">model_optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_fun_evals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_theta</span><span class="o">=-</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">max_theta</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">theta_init_zero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">p_val</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">n_p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">optim_p</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">min_Lambda</span><span class="o">=-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">max_Lambda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">spot_writer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">counter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric_factorial</span><span class="o">=</span><span class="s1">&#39;canberra&#39;</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="mf">10000.0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;regression&#39;</span><span class="p">,</span> <span class="n">var_type</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;num&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Kriging&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">124</span><span class="p">,</span> <span class="n">model_optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_fun_evals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_theta</span><span class="o">=-</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">max_theta</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">theta_init_zero</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">p_val</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">n_p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">optim_p</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">max_p</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">min_Lambda</span><span class="o">=-</span><span class="mf">9.0</span><span class="p">,</span> <span class="n">max_Lambda</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">spot_writer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">counter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metric_factorial</span><span class="o">=</span><span class="s1">&#39;canberra&#39;</span><span class="p">,</span> <span class="n">isotropic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Lambda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#spotpython.surrogate.kriging.Kriging.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -7815,6 +7971,332 @@ not positive-definite. Defaults to 1e4.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>var_type</code>
+            </td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List specifying the variable types for each input dimension.
+Possible values are &ldquo;num&rdquo;, &ldquo;int&rdquo;, &ldquo;factor&rdquo;, and &ldquo;ordered&rdquo;.
+Defaults to [&ldquo;num&rdquo;].</p>
+              </div>
+            </td>
+            <td>
+                  <code>[&#39;num&#39;]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the Kriging model instance. Defaults to &ldquo;Kriging&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;Kriging&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>seed</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Random seed for reproducibility. Defaults to 124.</p>
+              </div>
+            </td>
+            <td>
+                  <code>124</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>model_optimizer</code>
+            </td>
+            <td>
+                  <code><span title="callable">callable</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimization algorithm for hyperparameter tuning. Defaults to
+scipy.optimize.differential_evolution.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>model_fun_evals</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of function evaluations for the optimizer.
+Defaults to 100.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_theta</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of theta values to be used. If None, it will be set during fitting.
+Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>min_theta</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum bound for log(theta) during optimization. Defaults to -3.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>-3.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_theta</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum bound for log(theta) during optimization. Defaults to 2.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>theta_init_zero</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, initializes theta values to zero before fitting.
+Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>p_val</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Initial power exponent value for the correlation function. Defaults to 2.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_p</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of p values to be used. Defaults to 1.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optim_p</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If True, optimizes the p values during fitting. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>min_p</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum bound for p during optimization. Defaults to 1.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_p</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum bound for p during optimization. Defaults to 2.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>min_Lambda</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum bound for log(Lambda) during optimization. Defaults to -9.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>-9.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_Lambda</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum bound for log(Lambda) during optimization. Defaults to 2.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>log_level</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Logging level for the model. Defaults to 0 (no logging).</p>
+              </div>
+            </td>
+            <td>
+                  <code>50</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>spot_writer</code>
+            </td>
+            <td>
+                  <code><span title="object">object</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Writer object for logging (e.g., TensorBoard writer). Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>counter</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Counter for logging iterations. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>metric_factorial</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Metric to be used for factorial design. Defaults to &ldquo;canberra&rdquo;.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;canberra&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>isotropic</code>
             </td>
             <td>
@@ -7828,6 +8310,55 @@ If False, the model can handle different theta values, one for each dimension. D
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>theta</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Currently ignored. Initial theta values for the model. If None, theta values are initialized during fitting.
+Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>Lambda</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting.
+Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional keyword arguments.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
             </td>
           </tr>
       </tbody>
@@ -7940,17 +8471,73 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="normal">145</span>
 <span class="normal">146</span>
 <span class="normal">147</span>
-<span class="normal">148</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">penalty</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e4</span><span class="p">,</span>
     <span class="n">method</span><span class="o">=</span><span class="s2">&quot;regression&quot;</span><span class="p">,</span>
-    <span class="n">noise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">var_type</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;num&quot;</span><span class="p">],</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">124</span><span class="p">,</span>
     <span class="n">model_optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">model_fun_evals</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">n_theta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">min_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span>
     <span class="n">max_theta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
     <span class="n">theta_init_zero</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -7966,6 +8553,8 @@ If False, the model can handle different theta values, one for each dimension. D
     <span class="n">counter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">metric_factorial</span><span class="o">=</span><span class="s2">&quot;canberra&quot;</span><span class="p">,</span>
     <span class="n">isotropic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">theta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">Lambda</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -7982,9 +8571,63 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="sd">            not positive-definite. Defaults to 1e4.</span>
 <span class="sd">        method (str, optional):</span>
 <span class="sd">            The type how the model uis fitted. Can be &quot;interpolation&quot;, &quot;regression&quot;, or &quot;reinterpolation&quot;. Defaults to &quot;regression&quot;.</span>
+<span class="sd">        var_type (List[str], optional):</span>
+<span class="sd">            List specifying the variable types for each input dimension.</span>
+<span class="sd">            Possible values are &quot;num&quot;, &quot;int&quot;, &quot;factor&quot;, and &quot;ordered&quot;.</span>
+<span class="sd">            Defaults to [&quot;num&quot;].</span>
+<span class="sd">        name (str, optional):</span>
+<span class="sd">            Name of the Kriging model instance. Defaults to &quot;Kriging&quot;.</span>
+<span class="sd">        seed (int, optional):</span>
+<span class="sd">            Random seed for reproducibility. Defaults to 124.</span>
+<span class="sd">        model_optimizer (callable, optional):</span>
+<span class="sd">            Optimization algorithm for hyperparameter tuning. Defaults to</span>
+<span class="sd">            scipy.optimize.differential_evolution.</span>
+<span class="sd">        model_fun_evals (int, optional):</span>
+<span class="sd">            Maximum number of function evaluations for the optimizer.</span>
+<span class="sd">            Defaults to 100.</span>
+<span class="sd">        n_theta (int, optional):</span>
+<span class="sd">            Number of theta values to be used. If None, it will be set during fitting.</span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        min_theta (float, optional):</span>
+<span class="sd">            Minimum bound for log(theta) during optimization. Defaults to -3.0.</span>
+<span class="sd">        max_theta (float, optional):</span>
+<span class="sd">            Maximum bound for log(theta) during optimization. Defaults to 2.0.</span>
+<span class="sd">        theta_init_zero (bool, optional):</span>
+<span class="sd">            If True, initializes theta values to zero before fitting.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        p_val (float, optional):</span>
+<span class="sd">            Initial power exponent value for the correlation function. Defaults to 2.0.</span>
+<span class="sd">        n_p (int, optional):</span>
+<span class="sd">            Number of p values to be used. Defaults to 1.</span>
+<span class="sd">        optim_p (bool, optional):</span>
+<span class="sd">            If True, optimizes the p values during fitting. Defaults to False.</span>
+<span class="sd">        min_p (float, optional):</span>
+<span class="sd">            Minimum bound for p during optimization. Defaults to 1.0.</span>
+<span class="sd">        max_p (float, optional):</span>
+<span class="sd">            Maximum bound for p during optimization. Defaults to 2.0.</span>
+<span class="sd">        min_Lambda (float, optional):</span>
+<span class="sd">            Minimum bound for log(Lambda) during optimization. Defaults to -9.0.</span>
+<span class="sd">        max_Lambda (float, optional):</span>
+<span class="sd">            Maximum bound for log(Lambda) during optimization. Defaults to 2.0.</span>
+<span class="sd">        log_level (int, optional):</span>
+<span class="sd">            Logging level for the model. Defaults to 0 (no logging).</span>
+<span class="sd">        spot_writer (object, optional):</span>
+<span class="sd">            Writer object for logging (e.g., TensorBoard writer). Defaults to None.</span>
+<span class="sd">        counter (int, optional):</span>
+<span class="sd">            Counter for logging iterations. Defaults to None.</span>
+<span class="sd">        metric_factorial (str, optional):</span>
+<span class="sd">            Metric to be used for factorial design. Defaults to &quot;canberra&quot;.</span>
 <span class="sd">        isotropic (bool, optional):</span>
 <span class="sd">            If True, the model is isotropic, meaning all variables are treated equally (only one theta value is used).</span>
 <span class="sd">            If False, the model can handle different theta values, one for each dimension. Defaults to False.</span>
+<span class="sd">        theta (np.ndarray, optional):</span>
+<span class="sd">            Currently ignored. Initial theta values for the model. If None, theta values are initialized during fitting.</span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        Lambda (float, optional):</span>
+<span class="sd">            Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting.</span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        **kwargs:</span>
+<span class="sd">            Additional keyword arguments.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">eps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_eps</span><span class="p">()</span>
@@ -7994,8 +8637,6 @@ If False, the model can handle different theta values, one for each dimension. D
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;eps must be positive&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">penalty</span> <span class="o">=</span> <span class="n">penalty</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">noise</span> <span class="o">=</span> <span class="n">noise</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">var_type</span> <span class="o">=</span> <span class="n">var_type</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
@@ -8009,12 +8650,14 @@ If False, the model can handle different theta values, one for each dimension. D
     <span class="bp">self</span><span class="o">.</span><span class="n">max_Lambda</span> <span class="o">=</span> <span class="n">max_Lambda</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">min_p</span> <span class="o">=</span> <span class="n">min_p</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span> <span class="o">=</span> <span class="n">max_p</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Will be set in fit()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="n">n_theta</span>  <span class="c1"># Will be set during fit</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span> <span class="o">=</span> <span class="n">isotropic</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">p_val</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span> <span class="o">=</span> <span class="n">n_p</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span> <span class="o">=</span> <span class="n">optim_p</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">theta_init_zero</span> <span class="o">=</span> <span class="n">theta_init_zero</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="n">Lambda</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">model_optimizer</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_optimizer</span> <span class="o">=</span> <span class="n">differential_evolution</span>
@@ -8145,7 +8788,7 @@ correlation matrix as described in [Forr08a, p.57].</p>
 <span class="go">    nat_y = np.array([0, 1])</span>
 <span class="go">    n=1</span>
 <span class="go">    p=1</span>
-<span class="go">    S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)</span>
+<span class="go">    S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True)</span>
 <span class="go">    S._initialize_variables(nat_X, nat_y)</span>
 <span class="go">    S._set_variable_types()</span>
 <span class="go">    print(S.nat_X)</span>
@@ -8171,86 +8814,86 @@ correlation matrix as described in [Forr08a, p.57].</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span>
-<span class="normal">428</span>
-<span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span>
-<span class="normal">432</span>
-<span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
-<span class="normal">448</span>
-<span class="normal">449</span>
-<span class="normal">450</span>
-<span class="normal">451</span>
-<span class="normal">452</span>
-<span class="normal">453</span>
-<span class="normal">454</span>
-<span class="normal">455</span>
-<span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span>
-<span class="normal">469</span>
-<span class="normal">470</span>
-<span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span>
+<span class="normal">505</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span>
+<span class="normal">535</span>
+<span class="normal">536</span>
+<span class="normal">537</span>
+<span class="normal">538</span>
+<span class="normal">539</span>
+<span class="normal">540</span>
+<span class="normal">541</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a new (n x n) correlation matrix Psi to reflect new data</span>
 <span class="sd">    or a change in hyperparameters.</span>
@@ -8272,7 +8915,7 @@ correlation matrix as described in [Forr08a, p.57].</p>
 <span class="sd">            nat_y = np.array([0, 1])</span>
 <span class="sd">            n=1</span>
 <span class="sd">            p=1</span>
-<span class="sd">            S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)</span>
+<span class="sd">            S=Kriging(name=&#39;kriging&#39;, seed=124, n_theta=n, n_p=p, optim_p=True)</span>
 <span class="sd">            S._initialize_variables(nat_X, nat_y)</span>
 <span class="sd">            S._set_variable_types()</span>
 <span class="sd">            print(S.nat_X)</span>
@@ -8347,199 +8990,145 @@ correlation matrix as described in [Forr08a, p.57].</p>
 
     <div class="doc doc-contents ">
 
-        <p>Build the psi vector required for predictive methods.</p>
+        <pre><code>    Build the psi vector required for predictive methods.
 
+    Args:
+        x (ndarray): Point to calculate the psi vector for.
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>x</code>
-            </td>
-            <td>
-                  <code><span title="ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Point to calculate the psi vector for.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+    Returns:
+        None
 
+    Modifies:
+        self.psi (np.ndarray): Updates the psi vector.
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>None</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="modifies" open>
-  <summary>Modifies</summary>
-  <p>self.psi (np.ndarray): Updates the psi vector.</p>
-</details>
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="go">    from spotpython.build.kriging import Kriging</span>
-<span class="go">    X_train = np.array([[1., 2.],</span>
-<span class="go">                        [2., 4.],</span>
-<span class="go">                        [3., 6.]])</span>
-<span class="go">    y_train = np.array([1., 2., 3.])</span>
-<span class="go">    S = Kriging(name=&#39;kriging&#39;,</span>
-<span class="go">                seed=123,</span>
-<span class="go">                log_level=50,</span>
-<span class="go">                n_theta=1,</span>
-<span class="go">                noise=False,</span>
-<span class="go">                cod_type=&quot;norm&quot;)</span>
-<span class="go">    S.fit(X_train, y_train)</span>
-<span class="go">    # force theta to simple values:</span>
-<span class="go">    S.theta = np.array([0.0])</span>
-<span class="go">    nat_X = np.array([1., 0.])</span>
-<span class="go">    S.psi = np.zeros((S.n, 1))</span>
-<span class="go">    S.build_psi_vec(nat_X)</span>
-<span class="go">    res = np.array([[np.exp(-4)],</span>
-<span class="go">        [np.exp(-17)],</span>
-<span class="go">        [np.exp(-40)]])</span>
-<span class="go">    assert np.array_equal(S.psi, res)</span>
-<span class="go">    print(f&quot;S.psi: {S.psi}&quot;)</span>
-<span class="go">    print(f&quot;Control value res: {res}&quot;)</span>
-</code></pre></div>
+    Examples:
+        &gt;&gt;&gt; import numpy as np
+            from spotpython.build.kriging import Kriging
+            X_train = np.array([[1., 2.],
+                                [2., 4.],
+                                [3., 6.]])
+            y_train = np.array([1., 2., 3.])
+            S = Kriging(name='kriging',
+                        seed=123,
+                        log_level=50,
+                        n_theta=1,
+</code></pre>
+<p>^                           cod_type=&rdquo;norm&rdquo;)
+                S.fit(X_train, y_train)
+                # force theta to simple values:
+                S.theta = np.array([0.0])
+                nat_X = np.array([1., 0.])
+                S.psi = np.zeros((S.n, 1))
+                S.build_psi_vec(nat_X)
+                res = np.array([[np.exp(-4)],
+                    [np.exp(-17)],
+                    [np.exp(-40)]])
+                assert np.array_equal(S.psi, res)
+                print(f&rdquo;S.psi: {S.psi}&rdquo;)
+                print(f&rdquo;Control value res: {res}&rdquo;)</p>
 
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span>
-<span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
-<span class="normal">600</span>
-<span class="normal">601</span>
-<span class="normal">602</span>
-<span class="normal">603</span>
-<span class="normal">604</span>
-<span class="normal">605</span>
-<span class="normal">606</span>
-<span class="normal">607</span>
-<span class="normal">608</span>
-<span class="normal">609</span>
-<span class="normal">610</span>
-<span class="normal">611</span>
-<span class="normal">612</span>
-<span class="normal">613</span>
-<span class="normal">614</span>
-<span class="normal">615</span>
-<span class="normal">616</span>
-<span class="normal">617</span>
-<span class="normal">618</span>
-<span class="normal">619</span>
-<span class="normal">620</span>
-<span class="normal">621</span>
-<span class="normal">622</span>
-<span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
-<span class="normal">628</span>
-<span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
-<span class="normal">635</span>
-<span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">654</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span>
+<span class="normal">662</span>
+<span class="normal">663</span>
+<span class="normal">664</span>
+<span class="normal">665</span>
+<span class="normal">666</span>
+<span class="normal">667</span>
+<span class="normal">668</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span>
+<span class="normal">692</span>
+<span class="normal">693</span>
+<span class="normal">694</span>
+<span class="normal">695</span>
+<span class="normal">696</span>
+<span class="normal">697</span>
+<span class="normal">698</span>
+<span class="normal">699</span>
+<span class="normal">700</span>
+<span class="normal">701</span>
+<span class="normal">702</span>
+<span class="normal">703</span>
+<span class="normal">704</span>
+<span class="normal">705</span>
+<span class="normal">706</span>
+<span class="normal">707</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span>
+<span class="normal">715</span>
+<span class="normal">716</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Build the psi vector required for predictive methods.</span>
+<span class="sd">            Build the psi vector required for predictive methods.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        x (ndarray): Point to calculate the psi vector for.</span>
+<span class="sd">            Args:</span>
+<span class="sd">                x (ndarray): Point to calculate the psi vector for.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        None</span>
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
 
-<span class="sd">    Modifies:</span>
-<span class="sd">        self.psi (np.ndarray): Updates the psi vector.</span>
+<span class="sd">            Modifies:</span>
+<span class="sd">                self.psi (np.ndarray): Updates the psi vector.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">            from spotpython.build.kriging import Kriging</span>
-<span class="sd">            X_train = np.array([[1., 2.],</span>
-<span class="sd">                                [2., 4.],</span>
-<span class="sd">                                [3., 6.]])</span>
-<span class="sd">            y_train = np.array([1., 2., 3.])</span>
-<span class="sd">            S = Kriging(name=&#39;kriging&#39;,</span>
-<span class="sd">                        seed=123,</span>
-<span class="sd">                        log_level=50,</span>
-<span class="sd">                        n_theta=1,</span>
-<span class="sd">                        noise=False,</span>
-<span class="sd">                        cod_type=&quot;norm&quot;)</span>
-<span class="sd">            S.fit(X_train, y_train)</span>
-<span class="sd">            # force theta to simple values:</span>
-<span class="sd">            S.theta = np.array([0.0])</span>
-<span class="sd">            nat_X = np.array([1., 0.])</span>
-<span class="sd">            S.psi = np.zeros((S.n, 1))</span>
-<span class="sd">            S.build_psi_vec(nat_X)</span>
-<span class="sd">            res = np.array([[np.exp(-4)],</span>
-<span class="sd">                [np.exp(-17)],</span>
-<span class="sd">                [np.exp(-40)]])</span>
-<span class="sd">            assert np.array_equal(S.psi, res)</span>
-<span class="sd">            print(f&quot;S.psi: {S.psi}&quot;)</span>
-<span class="sd">            print(f&quot;Control value res: {res}&quot;)</span>
+<span class="sd">            Examples:</span>
+<span class="sd">                &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                    from spotpython.build.kriging import Kriging</span>
+<span class="sd">                    X_train = np.array([[1., 2.],</span>
+<span class="sd">                                        [2., 4.],</span>
+<span class="sd">                                        [3., 6.]])</span>
+<span class="sd">                    y_train = np.array([1., 2., 3.])</span>
+<span class="sd">                    S = Kriging(name=&#39;kriging&#39;,</span>
+<span class="sd">                                seed=123,</span>
+<span class="sd">                                log_level=50,</span>
+<span class="sd">                                n_theta=1,</span>
+<span class="sd">    ^                           cod_type=&quot;norm&quot;)</span>
+<span class="sd">                    S.fit(X_train, y_train)</span>
+<span class="sd">                    # force theta to simple values:</span>
+<span class="sd">                    S.theta = np.array([0.0])</span>
+<span class="sd">                    nat_X = np.array([1., 0.])</span>
+<span class="sd">                    S.psi = np.zeros((S.n, 1))</span>
+<span class="sd">                    S.build_psi_vec(nat_X)</span>
+<span class="sd">                    res = np.array([[np.exp(-4)],</span>
+<span class="sd">                        [np.exp(-17)],</span>
+<span class="sd">                        [np.exp(-40)]])</span>
+<span class="sd">                    assert np.array_equal(S.psi, res)</span>
+<span class="sd">                    print(f&quot;S.psi: {S.psi}&quot;)</span>
+<span class="sd">                    print(f&quot;Control value res: {res}&quot;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -8689,84 +9278,79 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
-<span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fits the Kriging model to training data X and y. This method is compatible</span>
 <span class="sd">    with scikit-learn and uses differential evolution to optimize the hyperparameters</span>
@@ -8801,13 +9385,8 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
     <span class="bp">self</span><span class="o">.</span><span class="n">y_</span> <span class="o">=</span> <span class="n">y</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="o">.</span><span class="n">shape</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_set_variable_types</span><span class="p">()</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isotropic</span><span class="p">:</span>
-        <span class="c1"># If isotropic, set n_theta to 1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Isotropic model: n_theta set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Anisotropic model: n_theta set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_theta</span><span class="p">()</span>
     <span class="c1"># Calculate and store min and max of X</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">min_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -8880,7 +9459,12 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Parameter names not included in get_params() mapped to their values.</p>
+                <p>Parameter names not included in get_params() mapped to their values. This includes the following keys:
+    - &ldquo;log_theta_lambda&rdquo;
+    - &ldquo;U&rdquo;
+    - &ldquo;X&rdquo;
+    - &ldquo;y&rdquo;
+    - &ldquo;negLnLike&rdquo;</p>
               </div>
             </td>
           </tr>
@@ -8888,25 +9472,78 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
     </table>
 
 
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">spotpython.surrogate.kriging</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kriging</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Training data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize and fit the Kriging model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">Kriging</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># get theta values of the fitted model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_values</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_model_params</span><span class="p">()[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X values:&quot;</span><span class="p">,</span> <span class="n">X_values</span><span class="p">)</span>
+</code></pre></div>
+
+
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_model_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_model_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the model parameters (in addition to sklearn&#39;s get_params method).</span>
 
 <span class="sd">    This method is NOT required for scikit-learn compatibility.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict: Parameter names not included in get_params() mapped to their values.</span>
+<span class="sd">        dict:</span>
+<span class="sd">            Parameter names not included in get_params() mapped to their values. This includes the following keys:</span>
+<span class="sd">                - &quot;log_theta_lambda&quot;</span>
+<span class="sd">                - &quot;U&quot;</span>
+<span class="sd">                - &quot;X&quot;</span>
+<span class="sd">                - &quot;y&quot;</span>
+<span class="sd">                - &quot;negLnLike&quot;</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; from spotpython.surrogate.kriging import Kriging</span>
+<span class="sd">        &gt;&gt;&gt; # Training data</span>
+<span class="sd">        &gt;&gt;&gt; X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])</span>
+<span class="sd">        &gt;&gt;&gt; y_train = np.array([0.1, 0.2, 0.3])</span>
+<span class="sd">        &gt;&gt;&gt; # Initialize and fit the Kriging model</span>
+<span class="sd">        &gt;&gt;&gt; model = Kriging()</span>
+<span class="sd">        &gt;&gt;&gt; model.fit(X_train, y_train)</span>
+<span class="sd">        &gt;&gt;&gt; # get theta values of the fitted model</span>
+<span class="sd">        &gt;&gt;&gt; X_values = model.get_model_params()[&quot;X&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; print(&quot;X values:&quot;, X_values)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;log_theta_lambda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span> <span class="s2">&quot;negLnLike&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
@@ -8991,75 +9628,75 @@ negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.<
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">505</span>
-<span class="normal">506</span>
-<span class="normal">507</span>
-<span class="normal">508</span>
-<span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span>
-<span class="normal">512</span>
-<span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
-<span class="normal">538</span>
-<span class="normal">539</span>
-<span class="normal">540</span>
-<span class="normal">541</span>
-<span class="normal">542</span>
-<span class="normal">543</span>
-<span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
-<span class="normal">567</span>
-<span class="normal">568</span>
-<span class="normal">569</span>
-<span class="normal">570</span>
-<span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span>
+<span class="normal">617</span>
+<span class="normal">618</span>
+<span class="normal">619</span>
+<span class="normal">620</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span>
+<span class="normal">644</span>
+<span class="normal">645</span>
+<span class="normal">646</span>
+<span class="normal">647</span>
+<span class="normal">648</span>
+<span class="normal">649</span>
+<span class="normal">650</span>
+<span class="normal">651</span>
+<span class="normal">652</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the negative of the concentrated log-likelihood for a given set</span>
 <span class="sd">    of log(theta) parameters using a power exponent p=1.99. Returns the</span>
@@ -9215,25 +9852,25 @@ over the range of log(theta) specified by bounds.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">738</span>
-<span class="normal">739</span>
-<span class="normal">740</span>
-<span class="normal">741</span>
-<span class="normal">742</span>
-<span class="normal">743</span>
-<span class="normal">744</span>
-<span class="normal">745</span>
-<span class="normal">746</span>
-<span class="normal">747</span>
-<span class="normal">748</span>
-<span class="normal">749</span>
-<span class="normal">750</span>
-<span class="normal">751</span>
-<span class="normal">752</span>
-<span class="normal">753</span>
-<span class="normal">754</span>
-<span class="normal">755</span>
-<span class="normal">756</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">max_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span>
+<span class="normal">824</span>
+<span class="normal">825</span>
+<span class="normal">826</span>
+<span class="normal">827</span>
+<span class="normal">828</span>
+<span class="normal">829</span>
+<span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">max_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maximizes the Kriging likelihood function using differential evolution</span>
 <span class="sd">    over the range of log(theta) specified by bounds.</span>
@@ -9436,73 +10073,73 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">758</span>
-<span class="normal">759</span>
-<span class="normal">760</span>
-<span class="normal">761</span>
-<span class="normal">762</span>
-<span class="normal">763</span>
-<span class="normal">764</span>
-<span class="normal">765</span>
-<span class="normal">766</span>
-<span class="normal">767</span>
-<span class="normal">768</span>
-<span class="normal">769</span>
-<span class="normal">770</span>
-<span class="normal">771</span>
-<span class="normal">772</span>
-<span class="normal">773</span>
-<span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span>
-<span class="normal">778</span>
-<span class="normal">779</span>
-<span class="normal">780</span>
-<span class="normal">781</span>
-<span class="normal">782</span>
-<span class="normal">783</span>
-<span class="normal">784</span>
-<span class="normal">785</span>
-<span class="normal">786</span>
-<span class="normal">787</span>
-<span class="normal">788</span>
-<span class="normal">789</span>
-<span class="normal">790</span>
-<span class="normal">791</span>
-<span class="normal">792</span>
-<span class="normal">793</span>
-<span class="normal">794</span>
-<span class="normal">795</span>
-<span class="normal">796</span>
-<span class="normal">797</span>
-<span class="normal">798</span>
-<span class="normal">799</span>
-<span class="normal">800</span>
-<span class="normal">801</span>
-<span class="normal">802</span>
-<span class="normal">803</span>
-<span class="normal">804</span>
-<span class="normal">805</span>
-<span class="normal">806</span>
-<span class="normal">807</span>
-<span class="normal">808</span>
-<span class="normal">809</span>
-<span class="normal">810</span>
-<span class="normal">811</span>
-<span class="normal">812</span>
-<span class="normal">813</span>
-<span class="normal">814</span>
-<span class="normal">815</span>
-<span class="normal">816</span>
-<span class="normal">817</span>
-<span class="normal">818</span>
-<span class="normal">819</span>
-<span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span>
-<span class="normal">823</span>
-<span class="normal">824</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span>
+<span class="normal">902</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function plots 1D and 2D surrogates.</span>
 <span class="sd">    Only for compatibility with the old Kriging implementation.</span>
@@ -9711,72 +10348,72 @@ of shape (n_samples,).</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span>
-<span class="normal">350</span>
-<span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span>
-<span class="normal">363</span>
-<span class="normal">364</span>
-<span class="normal">365</span>
-<span class="normal">366</span>
-<span class="normal">367</span>
-<span class="normal">368</span>
-<span class="normal">369</span>
-<span class="normal">370</span>
-<span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span>
-<span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
+<span class="normal">426</span>
+<span class="normal">427</span>
+<span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span>
+<span class="normal">448</span>
+<span class="normal">449</span>
+<span class="normal">450</span>
+<span class="normal">451</span>
+<span class="normal">452</span>
+<span class="normal">453</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predicts the Kriging response at a set of points X. This method is compatible</span>
 <span class="sd">    with scikit-learn and returns predictions for the input points.</span>
