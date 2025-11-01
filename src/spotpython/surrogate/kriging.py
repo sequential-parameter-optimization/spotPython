@@ -344,6 +344,21 @@ class Kriging(BaseEstimator, RegressorMixin):
             theta10 = theta10 * np.ones(self.k)
         return theta10
 
+    def _reshape_X(self, X: np.ndarray) -> np.ndarray:
+        # Ensure X has shape (n_samples, n_features=self.k)
+        X = np.asarray(X)
+        if X.ndim == 1:
+            X = X.reshape(-1, self.k)
+        else:
+            if X.shape[1] != self.k:
+                if X.shape[0] == self.k:  # common case: row/col swap for 1D
+                    X = X.T
+                elif self.k == 1:
+                    X = X.reshape(-1, 1)
+                else:
+                    raise ValueError(f"X has shape {X.shape}, expected (*, {self.k}).")
+        return X
+
     def fit(self, X: np.ndarray, y: np.ndarray, bounds: Optional[List[Tuple[float, float]]] = None) -> "Kriging":
         """
         Fits the Kriging model to training data X and y. This method is compatible
@@ -461,19 +476,7 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> print("Predictions:", y_pred)
         """
         self.return_std = return_std
-        X = np.asarray(X)
-
-        # Ensure X has shape (n_samples, n_features=self.k)
-        if X.ndim == 1:
-            X = X.reshape(-1, self.k)
-        else:
-            if X.shape[1] != self.k:
-                if X.shape[0] == self.k:  # common case: row/col swap for 1D
-                    X = X.T
-                elif self.k == 1:
-                    X = X.reshape(-1, 1)
-                else:
-                    raise ValueError(f"X has shape {X.shape}, expected (*, {self.k}).")
+        X = self._reshape_X(X)
 
         if return_std:
             # Return predictions and standard deviations
