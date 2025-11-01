@@ -5897,13 +5897,13 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="spotpython.surrogate.kriging.Kriging.logtheta_lambda_">logtheta_lambda_</span></code></td>
+            <td><code><span title="spotpython.surrogate.kriging.Kriging.logtheta_loglambda_p_">logtheta_loglambda_p_</span></code></td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Best-fit log(theta) parameters from fit().</p>
+                <p>Best-fit log(theta), log(lambda), and p parameters from fit().</p>
               </div>
             </td>
           </tr>
@@ -6955,7 +6955,17 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="normal">868</span>
 <span class="normal">869</span>
 <span class="normal">870</span>
-<span class="normal">871</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Kriging</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Kriging</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A scikit-learn compatible Kriging model class for regression tasks.</span>
 <span class="sd">    Provides methods for likelihood evaluation, predictions, and hyperparameter optimization.</span>
@@ -6963,7 +6973,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">    Attributes:</span>
 <span class="sd">        eps (float): A small regularization term to reduce ill-conditioning.</span>
 <span class="sd">        penalty (float): The penalty value used if the correlation matrix is ill-conditioned.</span>
-<span class="sd">        logtheta_lambda_ (np.ndarray): Best-fit log(theta) parameters from fit().</span>
+<span class="sd">        logtheta_loglambda_p_ (np.ndarray): Best-fit log(theta), log(lambda), and p parameters from fit().</span>
 <span class="sd">        U_ (np.ndarray): The Cholesky factor of the correlation matrix after fit().</span>
 <span class="sd">        X_ (np.ndarray): The training input data (n x d).</span>
 <span class="sd">        y_ (np.ndarray): The training target values (n,).</span>
@@ -7037,7 +7047,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">            name (str, optional):</span>
 <span class="sd">                Name of the Kriging model instance. Defaults to &quot;Kriging&quot;.</span>
 <span class="sd">            seed (int, optional):</span>
-<span class="sd">                Random seed for reproducibility. Defaults to 124.</span>
+<span class="sd">                Random seed for reproducibility. Used by the optimizer. Defaults to 124.</span>
 <span class="sd">            model_optimizer (callable, optional):</span>
 <span class="sd">                Optimization algorithm for hyperparameter tuning. Defaults to</span>
 <span class="sd">                scipy.optimize.differential_evolution.</span>
@@ -7129,7 +7139,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="s2">&quot;Lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">U_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y_</span> <span class="o">=</span> <span class="kc">None</span>
@@ -7228,7 +7238,17 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">            &gt;&gt;&gt; X_values = model.get_model_params()[&quot;X&quot;]</span>
 <span class="sd">            &gt;&gt;&gt; print(&quot;X values:&quot;, X_values)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;log_theta_lambda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span> <span class="s2">&quot;negLnLike&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span> <span class="s2">&quot;inf_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inf_Psi</span><span class="p">,</span> <span class="s2">&quot;cnd_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnd_Psi</span><span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+            <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+            <span class="s2">&quot;logtheta_loglambda_p_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">,</span>
+            <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span><span class="p">,</span>
+            <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span>
+            <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span>
+            <span class="s2">&quot;negLnLike&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span>
+            <span class="s2">&quot;inf_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inf_Psi</span><span class="p">,</span>
+            <span class="s2">&quot;cnd_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnd_Psi</span><span class="p">,</span>
+        <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -7334,24 +7354,24 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
             <span class="n">n_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_p&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
             <span class="n">bounds</span> <span class="o">+=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span><span class="p">)]</span> <span class="o">*</span> <span class="n">n_p</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_likelihood</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_likelihood</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
 
         <span class="c1"># store theta and Lambda in log scale</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;reinterpolation&quot;</span><span class="p">):</span>
-            <span class="c1"># select the first n_theta values from logtheta_lambda_:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># select the first n_theta values from logtheta_loglambda_p_:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;method must be one of &#39;interpolation&#39;, &#39;regression&#39;, or &#39;reinterpolation&#39;&quot;</span><span class="p">)</span>
 
         <span class="c1"># Once logtheta_lambda is found, compute the final correlation matrix</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Psi_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Psi_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">)</span>
 
         <span class="c1"># Update log with the current values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_log</span><span class="p">()</span>
@@ -7641,18 +7661,18 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;reinterpolation&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
-            <span class="n">lambda_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
+            <span class="n">lambda_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
             <span class="c1"># lambda is in log scale, so transform it back:</span>
             <span class="n">lambda_</span> <span class="o">=</span> <span class="mf">10.0</span><span class="o">**</span><span class="n">lambda_</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
             <span class="c1"># use the original, untransformed eps:</span>
             <span class="n">lambda_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;method must be one of &#39;interpolation&#39;, &#39;regression&#39;, or &#39;reinterpolation&#39;&quot;</span><span class="p">)</span>
 
@@ -7735,11 +7755,11 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">                print(&quot;Minimized negative log-likelihood:&quot;, best_fun)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-            <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_loglambda_p_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_loglambda_p_</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">neg_ln_like</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">fun</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -7950,7 +7970,7 @@ Defaults to [&ldquo;num&rdquo;].</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Random seed for reproducibility. Defaults to 124.</p>
+                <p>Random seed for reproducibility. Used by the optimizer. Defaults to 124.</p>
               </div>
             </td>
             <td>
@@ -8512,7 +8532,7 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="sd">        name (str, optional):</span>
 <span class="sd">            Name of the Kriging model instance. Defaults to &quot;Kriging&quot;.</span>
 <span class="sd">        seed (int, optional):</span>
-<span class="sd">            Random seed for reproducibility. Defaults to 124.</span>
+<span class="sd">            Random seed for reproducibility. Used by the optimizer. Defaults to 124.</span>
 <span class="sd">        model_optimizer (callable, optional):</span>
 <span class="sd">            Optimization algorithm for hyperparameter tuning. Defaults to</span>
 <span class="sd">            scipy.optimize.differential_evolution.</span>
@@ -8604,7 +8624,7 @@ If False, the model can handle different theta values, one for each dimension. D
     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="s2">&quot;p&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="s2">&quot;Lambda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">U_</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">X_</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">y_</span> <span class="o">=</span> <span class="kc">None</span>
@@ -8670,17 +8690,7 @@ If False, the model can handle different theta values, one for each dimension. D
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">495</span>
-<span class="normal">496</span>
-<span class="normal">497</span>
-<span class="normal">498</span>
-<span class="normal">499</span>
-<span class="normal">500</span>
-<span class="normal">501</span>
-<span class="normal">502</span>
-<span class="normal">503</span>
-<span class="normal">504</span>
-<span class="normal">505</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">505</span>
 <span class="normal">506</span>
 <span class="normal">507</span>
 <span class="normal">508</span>
@@ -8731,7 +8741,17 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="normal">553</span>
 <span class="normal">554</span>
 <span class="normal">555</span>
-<span class="normal">556</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a new (n x n) correlation matrix Psi to reflect new data</span>
 <span class="sd">    or a change in hyperparameters.</span>
@@ -8838,17 +8858,7 @@ If False, the model can handle different theta values, one for each dimension. D
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">635</span>
-<span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span>
-<span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">645</span>
 <span class="normal">646</span>
 <span class="normal">647</span>
 <span class="normal">648</span>
@@ -8884,7 +8894,17 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="normal">678</span>
 <span class="normal">679</span>
 <span class="normal">680</span>
-<span class="normal">681</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">681</span>
+<span class="normal">682</span>
+<span class="normal">683</span>
+<span class="normal">684</span>
+<span class="normal">685</span>
+<span class="normal">686</span>
+<span class="normal">687</span>
+<span class="normal">688</span>
+<span class="normal">689</span>
+<span class="normal">690</span>
+<span class="normal">691</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Build the psi vector required for predictive methods.</span>
 
@@ -9057,17 +9077,7 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">347</span>
 <span class="normal">348</span>
 <span class="normal">349</span>
 <span class="normal">350</span>
@@ -9133,7 +9143,17 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
 <span class="normal">410</span>
 <span class="normal">411</span>
 <span class="normal">412</span>
-<span class="normal">413</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Kriging&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fits the Kriging model to training data X and y. This method is compatible</span>
 <span class="sd">    with scikit-learn and uses differential evolution to optimize the hyperparameters</span>
@@ -9188,24 +9208,24 @@ with scikit-learn and uses differential evolution to optimize the hyperparameter
         <span class="n">n_p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;n_p&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
         <span class="n">bounds</span> <span class="o">+=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_p</span><span class="p">)]</span> <span class="o">*</span> <span class="n">n_p</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_likelihood</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_likelihood</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
 
     <span class="c1"># store theta and Lambda in log scale</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span><span class="p">]</span>
     <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;reinterpolation&quot;</span><span class="p">):</span>
-        <span class="c1"># select the first n_theta values from logtheta_lambda_:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># select the first n_theta values from logtheta_loglambda_p_:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;interpolation&quot;</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lambda</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optim_p</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">p_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_theta</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_p</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;method must be one of &#39;interpolation&#39;, &#39;regression&#39;, or &#39;reinterpolation&#39;&quot;</span><span class="p">)</span>
 
     <span class="c1"># Once logtheta_lambda is found, compute the final correlation matrix</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Psi_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Psi_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">)</span>
 
     <span class="c1"># Update log with the current values</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_update_log</span><span class="p">()</span>
@@ -9307,7 +9327,17 @@ This method is NOT required for scikit-learn compatibility.</p>
 <span class="normal">283</span>
 <span class="normal">284</span>
 <span class="normal">285</span>
-<span class="normal">286</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_model_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_model_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the (internal) model parameters (in addition to sklearn&#39;s get_params method).</span>
 <span class="sd">    This method is NOT required for scikit-learn compatibility.</span>
@@ -9336,7 +9366,17 @@ This method is NOT required for scikit-learn compatibility.</p>
 <span class="sd">        &gt;&gt;&gt; X_values = model.get_model_params()[&quot;X&quot;]</span>
 <span class="sd">        &gt;&gt;&gt; print(&quot;X values:&quot;, X_values)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;log_theta_lambda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_lambda_</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span> <span class="s2">&quot;negLnLike&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span> <span class="s2">&quot;inf_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inf_Psi</span><span class="p">,</span> <span class="s2">&quot;cnd_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnd_Psi</span><span class="p">}</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+        <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+        <span class="s2">&quot;logtheta_loglambda_p_&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logtheta_loglambda_p_</span><span class="p">,</span>
+        <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">U_</span><span class="p">,</span>
+        <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span>
+        <span class="s2">&quot;negLnLike&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">negLnLike</span><span class="p">,</span>
+        <span class="s2">&quot;inf_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inf_Psi</span><span class="p">,</span>
+        <span class="s2">&quot;cnd_Psi&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnd_Psi</span><span class="p">,</span>
+    <span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -9388,17 +9428,7 @@ This method is NOT required for scikit-learn compatibility.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
-<span class="normal">567</span>
-<span class="normal">568</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">568</span>
 <span class="normal">569</span>
 <span class="normal">570</span>
 <span class="normal">571</span>
@@ -9463,7 +9493,17 @@ This method is NOT required for scikit-learn compatibility.</p>
 <span class="normal">630</span>
 <span class="normal">631</span>
 <span class="normal">632</span>
-<span class="normal">633</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">633</span>
+<span class="normal">634</span>
+<span class="normal">635</span>
+<span class="normal">636</span>
+<span class="normal">637</span>
+<span class="normal">638</span>
+<span class="normal">639</span>
+<span class="normal">640</span>
+<span class="normal">641</span>
+<span class="normal">642</span>
+<span class="normal">643</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the negative of the concentrated log-likelihood for a given set</span>
 <span class="sd">    of log(theta) parameters. Returns the negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.</span>
@@ -9641,17 +9681,7 @@ over the range of log(theta) specified by bounds.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">767</span>
-<span class="normal">768</span>
-<span class="normal">769</span>
-<span class="normal">770</span>
-<span class="normal">771</span>
-<span class="normal">772</span>
-<span class="normal">773</span>
-<span class="normal">774</span>
-<span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">777</span>
 <span class="normal">778</span>
 <span class="normal">779</span>
 <span class="normal">780</span>
@@ -9672,7 +9702,17 @@ over the range of log(theta) specified by bounds.</p>
 <span class="normal">795</span>
 <span class="normal">796</span>
 <span class="normal">797</span>
-<span class="normal">798</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">max_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">798</span>
+<span class="normal">799</span>
+<span class="normal">800</span>
+<span class="normal">801</span>
+<span class="normal">802</span>
+<span class="normal">803</span>
+<span class="normal">804</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">max_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maximizes the Kriging likelihood function using differential evolution</span>
 <span class="sd">    over the range of log(theta) specified by bounds.</span>
@@ -9698,11 +9738,11 @@ over the range of log(theta) specified by bounds.</p>
 <span class="sd">            print(&quot;Minimized negative log-likelihood:&quot;, best_fun)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_loglambda_p_</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_loglambda_p_</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">neg_ln_like</span>
 
-    <span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">fun</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -9888,17 +9928,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">800</span>
-<span class="normal">801</span>
-<span class="normal">802</span>
-<span class="normal">803</span>
-<span class="normal">804</span>
-<span class="normal">805</span>
-<span class="normal">806</span>
-<span class="normal">807</span>
-<span class="normal">808</span>
-<span class="normal">809</span>
-<span class="normal">810</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">810</span>
 <span class="normal">811</span>
 <span class="normal">812</span>
 <span class="normal">813</span>
@@ -9959,7 +9989,17 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="normal">868</span>
 <span class="normal">869</span>
 <span class="normal">870</span>
-<span class="normal">871</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function plots 1D and 2D surrogates.</span>
 <span class="sd">    Only for compatibility with the old Kriging implementation.</span>
@@ -10173,17 +10213,7 @@ of shape (n_samples,).</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span>
-<span class="normal">424</span>
-<span class="normal">425</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
@@ -10251,7 +10281,17 @@ of shape (n_samples,).</p>
 <span class="normal">490</span>
 <span class="normal">491</span>
 <span class="normal">492</span>
-<span class="normal">493</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span>
+<span class="normal">496</span>
+<span class="normal">497</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predicts the Kriging response at a set of points X. This method is compatible</span>
 <span class="sd">    with scikit-learn and returns predictions for the input points.</span>
