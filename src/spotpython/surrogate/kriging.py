@@ -364,6 +364,11 @@ class Kriging(BaseEstimator, RegressorMixin):
         Fits the Kriging model to training data X and y. This method is compatible
         with scikit-learn and uses differential evolution to optimize the hyperparameters
         (log(theta)).
+        Fitting pipeline (Forrester, Ch. 2–3):
+          - Set masks and θ dimensionality (isotropic → n_theta=1, else n_theta=k).
+          - Assemble bounds on [log10 θ] (+ [log10 λ] for regression/reinterpolation; + p if enabled).
+          - Maximize the concentrated likelihood (Ch. 3) to get [log10 θ, log10 λ, p].
+          - Build R and store U, μ-related quantities implicitly via U (used at prediction).
 
         Args:
             X (np.ndarray):
@@ -402,6 +407,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         # Calculate and store min and max of X
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)
+
+        # Bounds: [θ] for interpolation; [θ, λ] for regression/reinterpolation; [+ p] if optim_p
         if bounds is None:
             if self.method == "interpolation":
                 bounds = [(self.min_theta, self.max_theta)] * self.k
@@ -414,9 +421,11 @@ class Kriging(BaseEstimator, RegressorMixin):
             n_p = self.n_p if hasattr(self, "n_p") else self.k
             bounds += [(self.min_p, self.max_p)] * n_p
 
+        # ML optimization (Forrester, Ch. 3)
         self.logtheta_loglambda_p_, _ = self.max_likelihood(bounds)
 
         # store theta and Lambda in log scale
+        # Store parameters on log10 scale; convert to linear only where needed
         self.theta = self.logtheta_loglambda_p_[: self.n_theta]
         if (self.method == "regression") or (self.method == "reinterpolation"):
             # select the first n_theta values from logtheta_loglambda_p_:
@@ -431,6 +440,7 @@ class Kriging(BaseEstimator, RegressorMixin):
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
         # Once logtheta_lambda is found, compute the final correlation matrix
+        # Finalize: compute R and its Cholesky at the found hyperparameters
         self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_loglambda_p_)
 
         # Update log with the current values
@@ -441,6 +451,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Predicts the Kriging response at a set of points X. This method is compatible
         with scikit-learn and returns predictions for the input points.
+        Batch prediction wrapper around _pred:
+          - Shapes normalized so X is (n_samples, k).
+          - Forrester (Ch. 3/6): returns f̂(x), and optionally s(x) and EI
+            (EI returned as −log10(EI) internally for stability).
 
         Args:
             X (np.ndarray):
@@ -513,7 +527,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         correlation matrix as described in [Forr08a, p.57].
 
         Notes:
-            Returns only the upper triangle, as the matrix is symmetric and the diagonal will be handled later.
+            - Correlation follows the stationary Gaussian kernel used in Kriging:
+              R = exp(-D), with D a weighted distance. See Forrester et al. (2008),
+                Ch. 2, correlation modelling.
+            - The code builds D as a sum of per-dimension distance contributions
+              scaled by 10**theta (theta is stored in log10), then applies exp(-D).
+            - Returns only the upper triangle; the symmetric and diagonal parts
+              are handled by the caller.
 
         Attributes:
             Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
@@ -537,25 +557,30 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         try:
             n, k = self.X_.shape
+            # weights: 10**theta; isotropic expands to k values
             theta10 = self._get_theta10_from_logtheta()
 
             # Initialize the Psi matrix
             Psi = np.zeros((n, n), dtype=np.float64)
 
             # Calculate the distance matrix using ordered variables
+            # Ordered/numeric part: squared Euclidean with weights (Forrester, Ch. 2)
             if self.ordered_mask.any():
                 X_ordered = self.X_[:, self.ordered_mask]
                 D_ordered = squareform(pdist(X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]))
                 Psi += D_ordered
 
+            # Factorial part: categorical metric wrapped by exp(-D) (still stationary envelope)
             # Add the contribution of factor variables to the distance matrix
             if self.factor_mask.any():
                 X_factor = self.X_[:, self.factor_mask]
                 D_factor = squareform(pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]))
                 Psi += D_factor
 
-            # Calculate correlation from distance
+            # Correlation from distance: R = exp(-D) (Forrester, Ch. 2)
             Psi = np.exp(-Psi)
+
+            # Diagnostics (not in Forrester): inf/cond for stability
             # Check for infinite values
             self.inf_Psi = np.isinf(Psi).any()
             # Calculate condition number
@@ -572,6 +597,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Computes the negative of the concentrated log-likelihood for a given set
         of log(theta) parameters. Returns the negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.
+        Negative concentrated log-likelihood (Forrester, Ch. 3):
+          - Given R (here Psi with diagonal and nugget), μ = (1^T R^{-1} y)/(1^T R^{-1} 1),
+            σ^2 = (r^T R^{-1} r)/n with r = y - 1·μ,
+          - Concentrated −log L = (n/2) log(σ^2) + (1/2) log |R| (constants omitted).
 
         Args:
             x (np.ndarray):
@@ -601,16 +630,18 @@ class Kriging(BaseEstimator, RegressorMixin):
         X = self.X_
         y = self.y_.flatten()
 
+        # First entries are log10(theta); optionally followed by log10(lambda) and p
         self.theta = x[: self.n_theta]
 
         if (self.method == "regression") or (self.method == "reinterpolation"):
             lambda_ = x[self.n_theta : self.n_theta + 1]
-            # lambda is in log scale, so transform it back:
+            # nugget on linear scale; lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
                 self.p_val = x[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
             # use the original, untransformed eps:
+            # small “nugget” for interpolation (Forrester, sec. on interpolation)
             lambda_ = self.eps
             if self.optim_p:
                 self.p_val = x[self.n_theta : self.n_theta + self.n_p]
@@ -620,34 +651,45 @@ class Kriging(BaseEstimator, RegressorMixin):
         n = X.shape[0]
         one = np.ones(n)
 
-        # Build the correlation matrix Psi
+        # Build the correlation matrix Psi.
+        # Build correlation R = upper + upper^T + I + λ I (Forrester, Ch. 3)
         Psi_upper_triangle = self.build_Psi()
         Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
 
+        # Cholesky factorization R = U U^T
         try:
             U = np.linalg.cholesky(Psi)
         except LinAlgError:
+            # Penalize ill-conditioning (implementation detail)
             return self.penalty, Psi, None
 
+        # log |R| via Cholesky (Forrester, Ch. 3)
         LnDetPsi = 2.0 * np.sum(np.log(np.abs(np.diag(U))))
 
+        # R^{-1}y and R^{-1}1 via triangular solves
         temp_y = np.linalg.solve(U, y)
         temp_one = np.linalg.solve(U, one)
         vy = np.linalg.solve(U.T, temp_y)
         vone = np.linalg.solve(U.T, temp_one)
 
+        # μ̂ (ordinary Kriging constant mean) (Forrester, Ch. 3)
         mu = (one @ vy) / (one @ vone)
+
+        # σ̂^2 (concentrated variance) (Forrester, Ch. 3)
         resid = y - one * mu
         tresid = np.linalg.solve(U, resid)
         tresid = np.linalg.solve(U.T, tresid)
         SigmaSqr = (resid @ tresid) / n
 
+        # Concentrated −log L (Forrester, Ch. 3)
         negLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
         return negLnLike, Psi, U
 
     def build_psi_vec(self, x: np.ndarray) -> None:
         """
         Build the psi vector required for predictive methods.
+        ψ(x) := [exp(-D(x, x_i))]_{i=1..n}, i.e., correlation between a new x and the training sites
+        using the same D as for R (Forrester, Ch. 2).
 
         Args:
             x (ndarray): Point to calculate the psi vector for.
@@ -677,16 +719,19 @@ class Kriging(BaseEstimator, RegressorMixin):
             D = np.zeros(n)
 
             # Compute ordered distance contributions
+            # Ordered contributions to D(x, X) (weighted squared Euclidean)
             if self.ordered_mask.any():
                 X_ordered = self.X_[:, self.ordered_mask]
                 x_ordered = x[self.ordered_mask]
                 D += cdist(x_ordered.reshape(1, -1), X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]).ravel()
             # Compute factor distance contributions
+            # Factorial contributions (categorical distance)
             if self.factor_mask.any():
                 X_factor = self.X_[:, self.factor_mask]
                 x_factor = x[self.factor_mask]
                 D += cdist(x_factor.reshape(1, -1), X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]).ravel()
 
+            # Forrester, Ch. 2: R = exp(-D)
             psi = np.exp(-D)
             return psi
 
@@ -697,6 +742,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Computes a single-point Kriging prediction using the correlation matrix
         information. Internal helper method.
+        Ordinary Kriging predictor (Forrester, Ch. 3):
+          - f̂(x) = μ̂ + ψ(x)^T R^{-1} (y − 1 μ̂)
+          - s^2(x) ~ σ̂^2 [1 + λ − ψ(x)^T R^{-1} ψ(x)]
+            Note: The classic OK variance includes a mean-uncertainty term
+            (1 − 1^T R^{-1} ψ)^2 / (1^T R^{-1} 1). This implementation uses a
+            simplified form common in engineering Kriging codes.
+        Expected improvement (EI) (Forrester, Ch. 6) computed for minimization.
 
         Args:
             x (np.ndarray): 1D array of length k for the point at which to predict.
@@ -708,6 +760,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         y = self.y_.flatten()
 
+        # Load θ and λ (λ transformed to linear scale where needed)
         if (self.method == "regression") or (self.method == "reinterpolation"):
             self.theta = self.logtheta_loglambda_p_[: self.n_theta]
             lambda_ = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + 1]
@@ -729,12 +782,14 @@ class Kriging(BaseEstimator, RegressorMixin):
         one = np.ones(n)
 
         # Compute mu
+        # μ̂ via backsolves (Forrester, Ch. 3)
         y_tilde = np.linalg.solve(U, y)
         y_tilde = np.linalg.solve(U.T, y_tilde)
         one_tilde = np.linalg.solve(U, one)
         one_tilde = np.linalg.solve(U.T, one_tilde)
         mu = (one @ y_tilde) / (one @ one_tilde)
 
+        # Residual backsolve for R^{-1}(y − 1 μ̂)
         resid = y - one * mu
         resid_tilde = np.linalg.solve(U, resid)
         resid_tilde = np.linalg.solve(U.T, resid_tilde)
@@ -742,15 +797,21 @@ class Kriging(BaseEstimator, RegressorMixin):
         psi = self.build_psi_vec(x)
 
         # Compute SigmaSqr and SSqr
+        # σ̂^2 (Forrester, Ch. 3)
+        # Note: identical to likelihood computation to maintain consistency
+        #       (up to small numerical differences).
         if (self.method == "interpolation") or (self.method == "regression"):
             SigmaSqr = (resid @ resid_tilde) / n
             # Compute SSqr
+            # s^2(x) ≈ σ̂^2 [1 + λ − ψ^T R^{-1} ψ]
             psi_tilde = np.linalg.solve(U, psi)
             psi_tilde = np.linalg.solve(U.T, psi_tilde)
             # Eq. (3.1) in [forr08a] without lambda:
+            # cf. Forrester (Ch. 3) variance structure; simplified here
             SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
         else:
             # method is "reinterpolation"
+            # Reinterpolation: variance with nugget removed and ε added in R for the variance solve
             Psi_adjusted = self.Psi_ - np.eye(n) * lambda_ + np.eye(n) * self.eps
             SigmaSqr = (resid @ np.linalg.solve(U.T, np.linalg.solve(U, Psi_adjusted @ resid_tilde))) / n
             # Compute Uint (Cholesky factor of the adjusted Psi matrix)
@@ -765,9 +826,12 @@ class Kriging(BaseEstimator, RegressorMixin):
         s = np.abs(SSqr) ** 0.5
 
         # Final prediction
+        # f̂(x) (Forrester, Ch. 3)
         f = mu + psi @ resid_tilde
 
         # Compute ExpImp
+        # EI (minimization), following standard closed form (Forrester, Ch. 6).
+        # Implementation uses erf for Φ and returns −log10(EI) for numerical stability.
         if self.return_ei:
             yBest = np.min(y)
             EITermOne = (yBest - f) * (0.5 + 0.5 * erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
@@ -781,6 +845,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Maximizes the Kriging likelihood function using differential evolution
         over the range of log(theta) specified by bounds.
+        Hyperparameter estimation via maximum likelihood (Forrester, Ch. 3).
+        Objective is the concentrated −log L above, optimized with differential evolution.
 
         Args:
             bounds (List[Tuple[float, float]]): Sequence of (low, high) bounds for log(theta).
@@ -807,6 +873,7 @@ class Kriging(BaseEstimator, RegressorMixin):
             neg_ln_like, _, _ = self.likelihood(logtheta_loglambda_p_)
             return neg_ln_like
 
+        # Use keyword args for easier test patching
         result = differential_evolution(func=objective, bounds=bounds, seed=self.seed)
         return result.x, result.fun
 
