@@ -6925,7 +6925,37 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="normal">838</span>
 <span class="normal">839</span>
 <span class="normal">840</span>
-<span class="normal">841</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Kriging</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Kriging</span><span class="p">(</span><span class="n">BaseEstimator</span><span class="p">,</span> <span class="n">RegressorMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A scikit-learn compatible Kriging model class for regression tasks.</span>
 <span class="sd">    Provides methods for likelihood evaluation, predictions, and hyperparameter optimization.</span>
@@ -7366,7 +7396,20 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">            &gt;&gt;&gt; print(&quot;Predictions:&quot;, y_pred)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">return_std</span> <span class="o">=</span> <span class="n">return_std</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># Ensure X has shape (n_samples, n_features=self.k)</span>
+        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>  <span class="c1"># common case: row/col swap for 1D</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X has shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected (*, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">return_std</span><span class="p">:</span>
             <span class="c1"># Return predictions and standard deviations</span>
             <span class="c1"># Compatibility with scikit-learn</span>
@@ -7464,8 +7507,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 
 <span class="sd">        Args:</span>
 <span class="sd">            x (np.ndarray):</span>
-<span class="sd">                1D array of log(theta) parameters of length k. If self.method is &quot;regression&quot; or</span>
-<span class="sd">                &quot;reinterpolation&quot;, length is k+1 and the last element of x is the log(noise) parameter.</span>
+<span class="sd">                1D array of log(theta), log(Lambda) (if method is &quot;regression&quot; or &quot;reinterpolation&quot;), and p values (if optim_p is True).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (float, np.ndarray, np.ndarray):</span>
@@ -7677,11 +7719,24 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 
 <span class="sd">        Returns:</span>
 <span class="sd">            (np.ndarray, float): (best_x, best_fun) where best_x is the</span>
-<span class="sd">            optimal log(theta) array and best_fun is the minimized negative log-likelihood.</span>
+<span class="sd">            optimal [log(theta) log(lambda) p] array and best_fun is the minimized negative log-likelihood.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">                from spotpython.surrogate.kriging import Kriging</span>
+<span class="sd">                # Training data</span>
+<span class="sd">                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])</span>
+<span class="sd">                y_train = np.array([0.1, 0.2, 0.3])</span>
+<span class="sd">                # Fit the Kriging model</span>
+<span class="sd">                model = Kriging().fit(X_train, y_train)</span>
+<span class="sd">                bounds = [(-3.0, 2.0), (-3.0, 2.0), (-9.0, 2.0)] # Example bounds for log(theta) and log(lambda)</span>
+<span class="sd">                best_x, best_fun = model.max_likelihood(bounds)</span>
+<span class="sd">                print(&quot;Optimal parameters (log(theta),log(theta), log(lambda)):&quot;, best_x)</span>
+<span class="sd">                print(&quot;Minimized negative log-likelihood:&quot;, best_fun)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_lambda</span><span class="p">):</span>
-            <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_lambda</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">neg_ln_like</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
@@ -7708,9 +7763,9 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 
-<span class="sd">        Note:</span>
-<span class="sd">            * This method provides only a basic plot. For more advanced plots,</span>
-<span class="sd">                use the `plot_contour()` method of the `Spot` class.</span>
+<span class="sd">        Notes:</span>
+<span class="sd">            * This method is a wrapper around the `plotkd` function for 2D plots.</span>
+<span class="sd">            * For 1D plots, it generates a line plot of the surrogate model.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; import numpy as np</span>
@@ -7718,7 +7773,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">                from spotpython.spot import spot</span>
 <span class="sd">                from spotpython.utils.init import fun_control_init, design_control_init</span>
 <span class="sd">                # 1-dimensional example</span>
-<span class="sd">                fun = analytical().fun_sphere</span>
+<span class="sd">                fun = Analytical().fun_sphere</span>
 <span class="sd">                fun_control=fun_control_init(lower = np.array([-1]),</span>
 <span class="sd">                                            upper = np.array([1]),</span>
 <span class="sd">                                            noise=False)</span>
@@ -7731,7 +7786,7 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">                S.fit_surrogate()</span>
 <span class="sd">                S.surrogate.plot()</span>
 <span class="sd">                # 2-dimensional example</span>
-<span class="sd">                fun = analytical().fun_sphere</span>
+<span class="sd">                fun = Analytical().fun_sphere</span>
 <span class="sd">                fun_control=fun_control_init(lower = np.array([-1, -1]),</span>
 <span class="sd">                                            upper = np.array([1, 1]),</span>
 <span class="sd">                                            noise=False)</span>
@@ -7746,10 +7801,15 @@ Provides methods for likelihood evaluation, predictions, and hyperparameter opti
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">n_grid</span> <span class="o">=</span> <span class="mi">100</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
+            <span class="c1"># add the original points</span>
+            <span class="k">if</span> <span class="n">add_points</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+            <span class="c1"># add grid</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -8610,20 +8670,7 @@ If False, the model can handle different theta values, one for each dimension. D
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">482</span>
-<span class="normal">483</span>
-<span class="normal">484</span>
-<span class="normal">485</span>
-<span class="normal">486</span>
-<span class="normal">487</span>
-<span class="normal">488</span>
-<span class="normal">489</span>
-<span class="normal">490</span>
-<span class="normal">491</span>
-<span class="normal">492</span>
-<span class="normal">493</span>
-<span class="normal">494</span>
-<span class="normal">495</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">495</span>
 <span class="normal">496</span>
 <span class="normal">497</span>
 <span class="normal">498</span>
@@ -8671,7 +8718,20 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="normal">540</span>
 <span class="normal">541</span>
 <span class="normal">542</span>
-<span class="normal">543</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span>
+<span class="normal">549</span>
+<span class="normal">550</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_Psi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a new (n x n) correlation matrix Psi to reflect new data</span>
 <span class="sd">    or a change in hyperparameters.</span>
@@ -8778,19 +8838,7 @@ If False, the model can handle different theta values, one for each dimension. D
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">623</span>
-<span class="normal">624</span>
-<span class="normal">625</span>
-<span class="normal">626</span>
-<span class="normal">627</span>
-<span class="normal">628</span>
-<span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
-<span class="normal">635</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">635</span>
 <span class="normal">636</span>
 <span class="normal">637</span>
 <span class="normal">638</span>
@@ -8824,7 +8872,19 @@ If False, the model can handle different theta values, one for each dimension. D
 <span class="normal">666</span>
 <span class="normal">667</span>
 <span class="normal">668</span>
-<span class="normal">669</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">669</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span>
+<span class="normal">678</span>
+<span class="normal">679</span>
+<span class="normal">680</span>
+<span class="normal">681</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">build_psi_vec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Build the psi vector required for predictive methods.</span>
 
@@ -9299,8 +9359,7 @@ This method is NOT required for scikit-learn compatibility.</p>
 
     Args:
         x (np.ndarray):
-            1D array of log(theta) parameters of length k. If self.method is "regression" or
-            "reinterpolation", length is k+1 and the last element of x is the log(noise) parameter.
+            1D array of log(theta), log(Lambda) (if method is "regression" or "reinterpolation"), and p values (if optim_p is True).
 
     Returns:
         (float, np.ndarray, np.ndarray):
@@ -9329,20 +9388,7 @@ This method is NOT required for scikit-learn compatibility.</p>
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">558</span>
 <span class="normal">559</span>
 <span class="normal">560</span>
 <span class="normal">561</span>
@@ -9405,15 +9451,26 @@ This method is NOT required for scikit-learn compatibility.</p>
 <span class="normal">618</span>
 <span class="normal">619</span>
 <span class="normal">620</span>
-<span class="normal">621</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="normal">621</span>
+<span class="normal">622</span>
+<span class="normal">623</span>
+<span class="normal">624</span>
+<span class="normal">625</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span>
+<span class="normal">633</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Computes the negative of the concentrated log-likelihood for a given set</span>
 <span class="sd">    of log(theta) parameters. Returns the negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (np.ndarray):</span>
-<span class="sd">            1D array of log(theta) parameters of length k. If self.method is &quot;regression&quot; or</span>
-<span class="sd">            &quot;reinterpolation&quot;, length is k+1 and the last element of x is the log(noise) parameter.</span>
+<span class="sd">            1D array of log(theta), log(Lambda) (if method is &quot;regression&quot; or &quot;reinterpolation&quot;), and p values (if optim_p is True).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (float, np.ndarray, np.ndarray):</span>
@@ -9559,7 +9616,7 @@ over the range of log(theta) specified by bounds.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>optimal log(theta) array and best_fun is the minimized negative log-likelihood.</p>
+                <p>optimal [log(theta) log(lambda) p] array and best_fun is the minimized negative log-likelihood.</p>
               </div>
             </td>
           </tr>
@@ -9567,27 +9624,55 @@ over the range of log(theta) specified by bounds.</p>
     </table>
 
 
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="go">    from spotpython.surrogate.kriging import Kriging</span>
+<span class="go">    # Training data</span>
+<span class="go">    X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])</span>
+<span class="go">    y_train = np.array([0.1, 0.2, 0.3])</span>
+<span class="go">    # Fit the Kriging model</span>
+<span class="go">    model = Kriging().fit(X_train, y_train)</span>
+<span class="go">    bounds = [(-3.0, 2.0), (-3.0, 2.0), (-9.0, 2.0)] # Example bounds for log(theta) and log(lambda)</span>
+<span class="go">    best_x, best_fun = model.max_likelihood(bounds)</span>
+<span class="go">    print(&quot;Optimal parameters (log(theta),log(theta), log(lambda)):&quot;, best_x)</span>
+<span class="go">    print(&quot;Minimized negative log-likelihood:&quot;, best_fun)</span>
+</code></pre></div>
+
+
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">755</span>
-<span class="normal">756</span>
-<span class="normal">757</span>
-<span class="normal">758</span>
-<span class="normal">759</span>
-<span class="normal">760</span>
-<span class="normal">761</span>
-<span class="normal">762</span>
-<span class="normal">763</span>
-<span class="normal">764</span>
-<span class="normal">765</span>
-<span class="normal">766</span>
-<span class="normal">767</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">767</span>
 <span class="normal">768</span>
 <span class="normal">769</span>
 <span class="normal">770</span>
 <span class="normal">771</span>
 <span class="normal">772</span>
-<span class="normal">773</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">max_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="normal">773</span>
+<span class="normal">774</span>
+<span class="normal">775</span>
+<span class="normal">776</span>
+<span class="normal">777</span>
+<span class="normal">778</span>
+<span class="normal">779</span>
+<span class="normal">780</span>
+<span class="normal">781</span>
+<span class="normal">782</span>
+<span class="normal">783</span>
+<span class="normal">784</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span>
+<span class="normal">788</span>
+<span class="normal">789</span>
+<span class="normal">790</span>
+<span class="normal">791</span>
+<span class="normal">792</span>
+<span class="normal">793</span>
+<span class="normal">794</span>
+<span class="normal">795</span>
+<span class="normal">796</span>
+<span class="normal">797</span>
+<span class="normal">798</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">max_likelihood</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Maximizes the Kriging likelihood function using differential evolution</span>
 <span class="sd">    over the range of log(theta) specified by bounds.</span>
@@ -9597,11 +9682,24 @@ over the range of log(theta) specified by bounds.</p>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (np.ndarray, float): (best_x, best_fun) where best_x is the</span>
-<span class="sd">        optimal log(theta) array and best_fun is the minimized negative log-likelihood.</span>
+<span class="sd">        optimal [log(theta) log(lambda) p] array and best_fun is the minimized negative log-likelihood.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            from spotpython.surrogate.kriging import Kriging</span>
+<span class="sd">            # Training data</span>
+<span class="sd">            X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])</span>
+<span class="sd">            y_train = np.array([0.1, 0.2, 0.3])</span>
+<span class="sd">            # Fit the Kriging model</span>
+<span class="sd">            model = Kriging().fit(X_train, y_train)</span>
+<span class="sd">            bounds = [(-3.0, 2.0), (-3.0, 2.0), (-9.0, 2.0)] # Example bounds for log(theta) and log(lambda)</span>
+<span class="sd">            best_x, best_fun = model.max_likelihood(bounds)</span>
+<span class="sd">            print(&quot;Optimal parameters (log(theta),log(theta), log(lambda)):&quot;, best_x)</span>
+<span class="sd">            print(&quot;Minimized negative log-likelihood:&quot;, best_fun)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_lambda</span><span class="p">):</span>
-        <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_lambda</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">objective</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="n">neg_ln_like</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">likelihood</span><span class="p">(</span><span class="n">logtheta_loglambda_p</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">neg_ln_like</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="n">differential_evolution</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
@@ -9746,11 +9844,11 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
     </table>
 
 
-<details class="note" open>
-  <summary>Note</summary>
+<details class="notes" open>
+  <summary>Notes</summary>
   <ul>
-<li>This method provides only a basic plot. For more advanced plots,
-    use the <code>plot_contour()</code> method of the <code>Spot</code> class.</li>
+<li>This method is a wrapper around the <code>plotkd</code> function for 2D plots.</li>
+<li>For 1D plots, it generates a line plot of the surrogate model.</li>
 </ul>
 </details>
 
@@ -9760,7 +9858,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="go">    from spotpython.spot import spot</span>
 <span class="go">    from spotpython.utils.init import fun_control_init, design_control_init</span>
 <span class="go">    # 1-dimensional example</span>
-<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    fun = Analytical().fun_sphere</span>
 <span class="go">    fun_control=fun_control_init(lower = np.array([-1]),</span>
 <span class="go">                                upper = np.array([1]),</span>
 <span class="go">                                noise=False)</span>
@@ -9773,7 +9871,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="go">    S.fit_surrogate()</span>
 <span class="go">    S.surrogate.plot()</span>
 <span class="go">    # 2-dimensional example</span>
-<span class="go">    fun = analytical().fun_sphere</span>
+<span class="go">    fun = Analytical().fun_sphere</span>
 <span class="go">    fun_control=fun_control_init(lower = np.array([-1, -1]),</span>
 <span class="go">                                upper = np.array([1, 1]),</span>
 <span class="go">                                noise=False)</span>
@@ -9790,32 +9888,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 
             <details class="quote">
               <summary>Source code in <code>spotpython/surrogate/kriging.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">775</span>
-<span class="normal">776</span>
-<span class="normal">777</span>
-<span class="normal">778</span>
-<span class="normal">779</span>
-<span class="normal">780</span>
-<span class="normal">781</span>
-<span class="normal">782</span>
-<span class="normal">783</span>
-<span class="normal">784</span>
-<span class="normal">785</span>
-<span class="normal">786</span>
-<span class="normal">787</span>
-<span class="normal">788</span>
-<span class="normal">789</span>
-<span class="normal">790</span>
-<span class="normal">791</span>
-<span class="normal">792</span>
-<span class="normal">793</span>
-<span class="normal">794</span>
-<span class="normal">795</span>
-<span class="normal">796</span>
-<span class="normal">797</span>
-<span class="normal">798</span>
-<span class="normal">799</span>
-<span class="normal">800</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">800</span>
 <span class="normal">801</span>
 <span class="normal">802</span>
 <span class="normal">803</span>
@@ -9856,7 +9929,37 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="normal">838</span>
 <span class="normal">839</span>
 <span class="normal">840</span>
-<span class="normal">841</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">add_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function plots 1D and 2D surrogates.</span>
 <span class="sd">    Only for compatibility with the old Kriging implementation.</span>
@@ -9877,9 +9980,9 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
 
-<span class="sd">    Note:</span>
-<span class="sd">        * This method provides only a basic plot. For more advanced plots,</span>
-<span class="sd">            use the `plot_contour()` method of the `Spot` class.</span>
+<span class="sd">    Notes:</span>
+<span class="sd">        * This method is a wrapper around the `plotkd` function for 2D plots.</span>
+<span class="sd">        * For 1D plots, it generates a line plot of the surrogate model.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
@@ -9887,7 +9990,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="sd">            from spotpython.spot import spot</span>
 <span class="sd">            from spotpython.utils.init import fun_control_init, design_control_init</span>
 <span class="sd">            # 1-dimensional example</span>
-<span class="sd">            fun = analytical().fun_sphere</span>
+<span class="sd">            fun = Analytical().fun_sphere</span>
 <span class="sd">            fun_control=fun_control_init(lower = np.array([-1]),</span>
 <span class="sd">                                        upper = np.array([1]),</span>
 <span class="sd">                                        noise=False)</span>
@@ -9900,7 +10003,7 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="sd">            S.fit_surrogate()</span>
 <span class="sd">            S.surrogate.plot()</span>
 <span class="sd">            # 2-dimensional example</span>
-<span class="sd">            fun = analytical().fun_sphere</span>
+<span class="sd">            fun = Analytical().fun_sphere</span>
 <span class="sd">            fun_control=fun_control_init(lower = np.array([-1, -1]),</span>
 <span class="sd">                                        upper = np.array([1, 1]),</span>
 <span class="sd">                                        noise=False)</span>
@@ -9915,10 +10018,15 @@ If <code>False</code>, <code>plt.show()</code> should be called outside this fun
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">n_grid</span> <span class="o">=</span> <span class="mi">100</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_X</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">num</span><span class="o">=</span><span class="n">n_grid</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
+        <span class="c1"># add the original points</span>
+        <span class="k">if</span> <span class="n">add_points</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+        <span class="c1"># add grid</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
@@ -10130,7 +10238,20 @@ of shape (n_samples,).</p>
 <span class="normal">477</span>
 <span class="normal">478</span>
 <span class="normal">479</span>
-<span class="normal">480</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
+<span class="normal">484</span>
+<span class="normal">485</span>
+<span class="normal">486</span>
+<span class="normal">487</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">return_std</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_val</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predicts the Kriging response at a set of points X. This method is compatible</span>
 <span class="sd">    with scikit-learn and returns predictions for the input points.</span>
@@ -10169,7 +10290,20 @@ of shape (n_samples,).</p>
 <span class="sd">        &gt;&gt;&gt; print(&quot;Predictions:&quot;, y_pred)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">return_std</span> <span class="o">=</span> <span class="n">return_std</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="c1"># Ensure X has shape (n_samples, n_features=self.k)</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">:</span>  <span class="c1"># common case: row/col swap for 1D</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X has shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected (*, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">return_std</span><span class="p">:</span>
         <span class="c1"># Return predictions and standard deviations</span>
         <span class="c1"># Compatibility with scikit-learn</span>
