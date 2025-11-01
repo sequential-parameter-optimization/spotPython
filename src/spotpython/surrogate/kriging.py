@@ -451,7 +451,20 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> print("Predictions:", y_pred)
         """
         self.return_std = return_std
-        X = np.atleast_2d(X)
+        X = np.asarray(X)
+
+        # Ensure X has shape (n_samples, n_features=self.k)
+        if X.ndim == 1:
+            X = X.reshape(-1, self.k)
+        else:
+            if X.shape[1] != self.k:
+                if X.shape[0] == self.k:  # common case: row/col swap for 1D
+                    X = X.T
+                elif self.k == 1:
+                    X = X.reshape(-1, 1)
+                else:
+                    raise ValueError(f"X has shape {X.shape}, expected (*, {self.k}).")
+
         if return_std:
             # Return predictions and standard deviations
             # Compatibility with scikit-learn
@@ -549,8 +562,7 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Args:
             x (np.ndarray):
-                1D array of log(theta) parameters of length k. If self.method is "regression" or
-                "reinterpolation", length is k+1 and the last element of x is the log(noise) parameter.
+                1D array of log(theta), log(Lambda) (if method is "regression" or "reinterpolation"), and p values (if optim_p is True).
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -762,11 +774,24 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Returns:
             (np.ndarray, float): (best_x, best_fun) where best_x is the
-            optimal log(theta) array and best_fun is the minimized negative log-likelihood.
+            optimal [log(theta) log(lambda) p] array and best_fun is the minimized negative log-likelihood.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                bounds = [(-3.0, 2.0), (-3.0, 2.0), (-9.0, 2.0)] # Example bounds for log(theta) and log(lambda)
+                best_x, best_fun = model.max_likelihood(bounds)
+                print("Optimal parameters (log(theta),log(theta), log(lambda)):", best_x)
+                print("Minimized negative log-likelihood:", best_fun)
         """
 
-        def objective(logtheta_lambda):
-            neg_ln_like, _, _ = self.likelihood(logtheta_lambda)
+        def objective(logtheta_loglambda_p: np.ndarray) -> float:
+            neg_ln_like, _, _ = self.likelihood(logtheta_loglambda_p)
             return neg_ln_like
 
         result = differential_evolution(objective, bounds)
@@ -793,9 +818,9 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             None
 
-        Note:
-            * This method provides only a basic plot. For more advanced plots,
-                use the `plot_contour()` method of the `Spot` class.
+        Notes:
+            * This method is a wrapper around the `plotkd` function for 2D plots.
+            * For 1D plots, it generates a line plot of the surrogate model.
 
         Examples:
             >>> import numpy as np
@@ -803,7 +828,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 from spotpython.spot import spot
                 from spotpython.utils.init import fun_control_init, design_control_init
                 # 1-dimensional example
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control=fun_control_init(lower = np.array([-1]),
                                             upper = np.array([1]),
                                             noise=False)
@@ -816,7 +841,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 S.fit_surrogate()
                 S.surrogate.plot()
                 # 2-dimensional example
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control=fun_control_init(lower = np.array([-1, -1]),
                                             upper = np.array([1, 1]),
                                             noise=False)
@@ -831,10 +856,15 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         if self.k == 1:
             n_grid = 100
-            x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
+            x = linspace(self.min_X[0], self.max_X[0], num=n_grid).reshape(-1, 1)
             y = self.predict(x)
             plt.figure()
-            plt.plot(x, y, "k")
+            plt.plot(x.ravel(), y, "k")
+            # add the original points
+            if add_points:
+                plt.plot(self.X_[:, 0], self.y_, "ro")
+            # add grid
+            plt.grid()
             if show:
                 plt.show()
         else:
