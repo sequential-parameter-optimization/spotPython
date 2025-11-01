@@ -1,108 +1,117 @@
-def test_build_Psi():
+import numpy as np
+import pytest
+from scipy.spatial.distance import pdist
+from spotpython.surrogate.kriging import Kriging
+
+
+def _init_model_for_build_psi(X, var_type=None, n_theta=1, theta10=None, metric_factorial="canberra"):
     """
-    Test build_Psi
+    Helper to initialize a Kriging instance minimally for build_Psi() without running fit().
     """
-    from spotpython.build.kriging import Kriging
-    import numpy as np
-    import copy
-    from numpy import argmin
-    from numpy import ones, zeros, log, var, float64
-    from numpy import empty_like
-    from numpy import array
-    from spotpython.design.spacefilling import SpaceFilling
-    from spotpython.fun.objectivefunctions import Analytical
-    from spotpython.spot import spot
-    from spotpython.utils.repair import repair_non_numeric
-    from spotpython.utils.init import (
-        fun_control_init,
-        surrogate_control_init,
-        design_control_init,
-    )
+    model = Kriging(var_type=var_type or ["num"], metric_factorial=metric_factorial)
+    X = np.asarray(X, dtype=np.float64)
+    model.X_ = X
+    model.n, model.k = X.shape
 
-    # number of points:
-    ni = 7
+    # Ensure masks are set
+    model._set_variable_types()
 
-    fun = Analytical().fun_sphere
-    fun_control = fun_control_init(
-        lower=np.array([-1, -1]), upper=np.array([1, 1]), fun_evals=25, noise=False, log_level=50
-    )
-    design_control = design_control_init(init_size=ni)
-    surrogate_control = surrogate_control_init()
+    # Configure n_theta and theta (in log10 scale)
+    model.n_theta = n_theta
+    if theta10 is None:
+        theta10 = np.ones(1 if n_theta == 1 else model.k, dtype=np.float64)
+    theta10 = np.asarray(theta10, dtype=np.float64)
+    model.theta = np.log10(theta10)
 
-    # Spot: to generate initial design
-    S_spot = spot.Spot(
-        fun=fun, fun_control=fun_control, design_control=design_control, surrogate_control=surrogate_control
-    )
+    return model
 
-    X = S_spot.generate_design(
-        size=S_spot.design_control["init_size"],
-        repeats=S_spot.design_control["repeats"],
-        lower=S_spot.lower,
-        upper=S_spot.upper,
-    )
-    X = repair_non_numeric(X, S_spot.var_type)
-    # (S-3): Eval initial design:
-    y = fun(X)
-    S_spot.min_y = min(y)
-    S_spot.min_X = X[argmin(y)]
-    # Kriging:
 
-    S = Kriging(name="kriging", seed=124, noise=True, cod_type="norm")
-    S.nat_X = copy.deepcopy(X)
-    S.nat_y = copy.deepcopy(y)
-    S.n = S.nat_X.shape[0]
-    S.k = S.nat_X.shape[1]
-    S.cod_X = empty_like(S.nat_X)
-    S.cod_y = empty_like(S.nat_y)
-    # assume all variable types are "num" if "num" is
-    # specified once:
-    if len(S.var_type) == 1:
-        S.var_type = S.var_type * S.k
-    S.num_mask = array(list(map(lambda x: x == "num", S.var_type)))
-    S.factor_mask = array(list(map(lambda x: x == "factor", S.var_type)))
-    S.int_mask = array(list(map(lambda x: x == "int", S.var_type)))
-    S.ordered_mask = array(list(map(lambda x: x == "num" or x == "int" or x == "float", S.var_type)))
-    S._initialize_variables(S.nat_X, S.nat_y)
-    S.theta = zeros(S.n_theta)
-    # TODO: Currently not used:
-    S.x0_theta = ones((S.n_theta,)) * S.n / (100 * S.k)
-    S.p = ones(S.n_p) * 2.0
-    S.pen_val = S.n * log(var(S.nat_y)) + 1e4
-    S.negLnLike = None
-    S.gen = SpaceFilling(k=S.k, seed=S.seed)
-    # matrix related
-    S.LnDetPsi = None
-    S.Psi = zeros((S.n, S.n), dtype=float64)
-    S.psi = zeros((S.n, 1))
-    S.one = ones(S.n)
-    S.mu = None
-    S.U = None
-    S.SigmaSqr = None
-    S.Lambda = None
-    # build_Psi() and build_U() are called in fun_likelihood
-    S._set_de_bounds()
-    if S.model_optimizer.__name__ == "dual_annealing":
-        result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
-    elif S.model_optimizer.__name__ == "differential_evolution":
-        result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds, maxiter=S.model_fun_evals, seed=S.seed)
-    elif S.model_optimizer.__name__ == "direct":
-        result = S.model_optimizer(
-            func=S.fun_likelihood,
-            bounds=S.de_bounds,
-            # maxfun=S.model_fun_evals,
-            eps=1e-2,
-        )
-    elif S.model_optimizer.__name__ == "shgo":
-        result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
-    elif S.model_optimizer.__name__ == "basinhopping":
-        result = S.model_optimizer(func=S.fun_likelihood, x0=S.min_X)
-    else:
-        result = S.model_optimizer(func=S.fun_likelihood, bounds=S.de_bounds)
-    # Finally, set new theta and p values and update the surrogate again
-    # for new_theta_p_Lambda in de_results["x"]:
-    new_theta_p_Lambda = result["x"]
-    S._extract_from_bounds(new_theta_p_Lambda)
-    S.build_Psi()
-    assert S.Psi.shape[0] == ni
-    assert S.Psi.shape[1] == ni
-    assert (S.Psi == S.Psi.T).all()
+def test_build_Psi_ordered_isotropic_upper_triangle_values():
+    # 1D numeric, isotropic (n_theta=1), weight=1
+    X = np.array([[0.0], [1.0], [2.0]], dtype=np.float64)
+    model = _init_model_for_build_psi(X, var_type=["num"], n_theta=1, theta10=[1.0])
+
+    # Build Psi upper triangle
+    Psi_upper = model.build_Psi()
+
+    # Expected weighted sqeuclidean distances (isotropic weight=1):
+    # (0,1): 1^2 = 1
+    # (0,2): 2^2 = 4
+    # (1,2): 1^2 = 1
+    e = np.exp
+    expected = np.array([
+        [0.0, e(-1.0), e(-4.0)],
+        [0.0, 0.0,    e(-1.0)],
+        [0.0, 0.0,    0.0],
+    ])
+    assert Psi_upper.shape == (3, 3)
+    assert np.allclose(Psi_upper, expected, atol=1e-12)
+    assert not model.inf_Psi
+    assert np.isfinite(model.cnd_Psi)
+
+
+def test_build_Psi_ordered_anisotropic_weighting():
+    # 2D numeric, anisotropic (n_theta=k), weights = [2.0, 0.5]
+    X = np.array([
+        [0.0, 0.0],  # 0
+        [1.0, 0.0],  # 1
+        [0.0, 2.0],  # 2
+    ], dtype=np.float64)
+    model = _init_model_for_build_psi(X, var_type=["num", "num"], n_theta=2, theta10=[2.0, 0.5])
+
+    Psi_upper = model.build_Psi()
+
+    # Weighted sqeuclidean distances:
+    # (0,1): [1,0] -> 2*1^2 + 0.5*0^2 = 2
+    # (0,2): [0,2] -> 2*0^2 + 0.5*2^2 = 2
+    # (1,2): [1,-2] -> 2*1^2 + 0.5*2^2 = 2 + 2 = 4
+    e = np.exp
+    expected = np.array([
+        [0.0, e(-2.0), e(-2.0)],
+        [0.0, 0.0,     e(-4.0)],
+        [0.0, 0.0,     0.0],
+    ])
+    assert Psi_upper.shape == (3, 3)
+    assert np.allclose(Psi_upper, expected, atol=1e-12)
+    assert not model.inf_Psi
+    assert np.isfinite(model.cnd_Psi)
+
+
+def test_build_Psi_with_factor_mask_executes_and_values():
+    # Check if SciPy supports 'w' in pdist for 'sqeuclidean' and 'canberra'; skip if not.
+    try:
+        _ = pdist(np.array([[0.0], [1.0]]), metric="sqeuclidean", w=np.array([1.0]))
+        _ = pdist(np.array([[0.0], [1.0]]), metric="canberra", w=np.array([1.0]))
+    except TypeError:
+        pytest.skip("SciPy version does not support 'w' in pdist for required metrics.")
+
+    # 2D: first column numeric (constant -> zero ordered distance), second column factor [0,1,2]
+    X = np.array([
+        [0.0, 0.0],
+        [0.0, 1.0],
+        [0.0, 2.0],
+    ], dtype=np.float64)
+    # var_type marks the second column as 'factor'
+    model = _init_model_for_build_psi(X, var_type=["num", "factor"], n_theta=2, theta10=[1.0, 1.0])
+
+    Psi_upper = model.build_Psi()
+
+    # Ordered contribution is zero (first column constant).
+    # Factor contribution using canberra on 1D:
+    # (0,1): |0-1| / (0+1) = 1
+    # (0,2): |0-2| / (0+2) = 1
+    # (1,2): |1-2| / (1+2) = 1/3
+    e = np.exp
+    expected = np.array([
+        [0.0, e(-1.0),    e(-1.0)],
+        [0.0, 0.0,        e(-(1.0/3.0))],
+        [0.0, 0.0,        0.0],
+    ])
+
+    assert Psi_upper.shape == (3, 3)
+    # Ensure we got an upper triangular matrix
+    assert np.allclose(np.tril(Psi_upper), np.zeros_like(Psi_upper))
+    # Check expected values
+    assert np.allclose(Psi_upper, expected, atol=1e-12)
+    assert not model.inf_Psi
+    assert np.isfinite(model.cnd_Psi)
