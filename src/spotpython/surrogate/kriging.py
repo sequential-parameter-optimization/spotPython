@@ -18,7 +18,7 @@ class Kriging(BaseEstimator, RegressorMixin):
     Attributes:
         eps (float): A small regularization term to reduce ill-conditioning.
         penalty (float): The penalty value used if the correlation matrix is ill-conditioned.
-        logtheta_lambda_ (np.ndarray): Best-fit log(theta) parameters from fit().
+        logtheta_loglambda_p_ (np.ndarray): Best-fit log(theta), log(lambda), and p parameters from fit().
         U_ (np.ndarray): The Cholesky factor of the correlation matrix after fit().
         X_ (np.ndarray): The training input data (n x d).
         y_ (np.ndarray): The training target values (n,).
@@ -92,7 +92,7 @@ class Kriging(BaseEstimator, RegressorMixin):
             name (str, optional):
                 Name of the Kriging model instance. Defaults to "Kriging".
             seed (int, optional):
-                Random seed for reproducibility. Defaults to 124.
+                Random seed for reproducibility. Used by the optimizer. Defaults to 124.
             model_optimizer (callable, optional):
                 Optimization algorithm for hyperparameter tuning. Defaults to
                 scipy.optimize.differential_evolution.
@@ -184,7 +184,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.log["p"] = []
         self.log["Lambda"] = []
 
-        self.logtheta_lambda_ = None
+        self.logtheta_loglambda_p_ = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
@@ -283,7 +283,17 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> X_values = model.get_model_params()["X"]
             >>> print("X values:", X_values)
         """
-        return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "negLnLike": self.negLnLike, "inf_Psi": self.inf_Psi, "cnd_Psi": self.cnd_Psi}
+        return {
+            "n": self.n,
+            "k": self.k,
+            "logtheta_loglambda_p_": self.logtheta_loglambda_p_,
+            "U": self.U_,
+            "X": self.X_,
+            "y": self.y_,
+            "negLnLike": self.negLnLike,
+            "inf_Psi": self.inf_Psi,
+            "cnd_Psi": self.cnd_Psi,
+        }
 
     def _update_log(self) -> None:
         """
@@ -389,24 +399,24 @@ class Kriging(BaseEstimator, RegressorMixin):
             n_p = self.n_p if hasattr(self, "n_p") else self.k
             bounds += [(self.min_p, self.max_p)] * n_p
 
-        self.logtheta_lambda_, _ = self.max_likelihood(bounds)
+        self.logtheta_loglambda_p_, _ = self.max_likelihood(bounds)
 
         # store theta and Lambda in log scale
-        self.theta = self.logtheta_lambda_[: self.n_theta]
+        self.theta = self.logtheta_loglambda_p_[: self.n_theta]
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # select the first n_theta values from logtheta_lambda_:
-            self.Lambda = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
+            # select the first n_theta values from logtheta_loglambda_p_:
+            self.Lambda = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + 1]
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
             self.Lambda = None
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta : self.n_theta + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + self.n_p]
         else:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
         # Once logtheta_lambda is found, compute the final correlation matrix
-        self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
+        self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_loglambda_p_)
 
         # Update log with the current values
         self._update_log()
@@ -696,18 +706,18 @@ class Kriging(BaseEstimator, RegressorMixin):
         y = self.y_.flatten()
 
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            self.theta = self.logtheta_lambda_[: self.n_theta]
-            lambda_ = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
+            self.theta = self.logtheta_loglambda_p_[: self.n_theta]
+            lambda_ = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + 1]
             # lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
-            self.theta = self.logtheta_lambda_[: self.n_theta]
+            self.theta = self.logtheta_loglambda_p_[: self.n_theta]
             # use the original, untransformed eps:
             lambda_ = self.eps
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta : self.n_theta + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + self.n_p]
         else:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
@@ -790,11 +800,11 @@ class Kriging(BaseEstimator, RegressorMixin):
                 print("Minimized negative log-likelihood:", best_fun)
         """
 
-        def objective(logtheta_loglambda_p: np.ndarray) -> float:
-            neg_ln_like, _, _ = self.likelihood(logtheta_loglambda_p)
+        def objective(logtheta_loglambda_p_: np.ndarray) -> float:
+            neg_ln_like, _, _ = self.likelihood(logtheta_loglambda_p_)
             return neg_ln_like
 
-        result = differential_evolution(objective, bounds)
+        result = differential_evolution(func=objective, bounds=bounds, seed=self.seed)
         return result.x, result.fun
 
     def plot(self, i: int = 0, j: int = 1, show: Optional[bool] = True, add_points: bool = True) -> None:

@@ -40,7 +40,7 @@ def test_fit_regression_default_bounds_and_state_updated(monkeypatch):
 
     assert np.allclose(model.theta, np.array([0.1, -0.2]))
     assert np.allclose(model.Lambda, np.array([-6.0]))
-    assert np.allclose(model.logtheta_lambda_, np.array([0.1, -0.2, -6.0]))
+    assert np.allclose(model.logtheta_loglambda_p_, np.array([0.1, -0.2, -6.0]))
     assert model.negLnLike == pytest.approx(3.14)
     assert np.allclose(model.Psi_, np.eye(X.shape[0]))
     assert np.allclose(model.U_, np.eye(X.shape[0]))
@@ -73,7 +73,7 @@ def test_fit_interpolation_bounds_no_lambda_and_lambda_none(monkeypatch):
 
     assert np.allclose(model.theta, np.array([0.25, -0.75]))
     assert model.Lambda is None
-    assert np.allclose(model.logtheta_lambda_, np.array([0.25, -0.75]))
+    assert np.allclose(model.logtheta_loglambda_p_, np.array([0.25, -0.75]))
     assert model.negLnLike == pytest.approx(1.23)
     assert np.allclose(model.Psi_, np.eye(X.shape[0]))
     assert np.allclose(model.U_, np.eye(X.shape[0]))
@@ -107,7 +107,7 @@ def test_fit_reinterpolation_bounds_and_state_updated(monkeypatch):
 
     assert np.allclose(model.theta, np.array([0.0, 0.1, 0.2]))
     assert np.allclose(model.Lambda, np.array([-3.0]))
-    assert np.allclose(model.logtheta_lambda_, np.array([0.0, 0.1, 0.2, -3.0]))
+    assert np.allclose(model.logtheta_loglambda_p_, np.array([0.0, 0.1, 0.2, -3.0]))
     assert model.negLnLike == pytest.approx(0.77)
     assert np.allclose(model.Psi_, np.eye(X.shape[0]))
     assert np.allclose(model.U_, np.eye(X.shape[0]))
@@ -142,8 +142,8 @@ def test_fit_isotropic_uses_k_theta_bounds_but_sets_n_theta_1(monkeypatch):
     assert np.allclose(model.theta, np.array([0.5]))
     # Lambda is taken from the first param after n_theta
     assert np.allclose(model.Lambda, np.array([0.4]))
-    # logtheta_lambda_ still holds all optimized parameters
-    assert np.allclose(model.logtheta_lambda_, np.array([0.5, 0.4, 0.3, -4.0]))
+    # logtheta_loglambda_p_ still holds all optimized parameters
+    assert np.allclose(model.logtheta_loglambda_p_, np.array([0.5, 0.4, 0.3, -4.0]))
 
 
 def test_fit_respects_explicit_bounds_override(monkeypatch):

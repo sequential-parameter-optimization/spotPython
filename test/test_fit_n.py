@@ -32,7 +32,7 @@ def test_fit_standard_kriging(simple_data):
     assert model.k == X.shape[1]
 
     # 3. Check if hyperparameters and model components are set
-    assert model.logtheta_lambda_ is not None
+    assert model.logtheta_loglambda_p_ is not None
     assert model.theta is not None
     assert model.Lambda is not None  # Default is 'regression'
     assert model.negLnLike is not None
@@ -56,8 +56,8 @@ def test_fit_with_custom_bounds(simple_data):
     model.fit(X, y, bounds=custom_bounds)
 
     # Check if the optimized parameters are within the custom bounds
-    log_thetas = model.logtheta_lambda_[:2]
-    log_lambda = model.logtheta_lambda_[2]
+    log_thetas = model.logtheta_loglambda_p_[:2]
+    log_lambda = model.logtheta_loglambda_p_[2]
 
     assert np.all(log_thetas >= -1) and np.all(log_thetas <= 1)
     assert -5 <= log_lambda <= -1
@@ -75,7 +75,7 @@ def test_fit_interpolation_method(simple_data):
     # For interpolation, Lambda should be None and not optimized
     assert model.Lambda is None
     # The optimized vector should only contain theta values
-    assert len(model.logtheta_lambda_) == model.n_theta
+    assert len(model.logtheta_loglambda_p_) == model.n_theta
 
 
 def test_fit_with_optim_p(simple_data):
@@ -91,5 +91,5 @@ def test_fit_with_optim_p(simple_data):
     assert model.p_val is not None
     assert isinstance(model.p_val, np.ndarray)
     # The optimized vector should contain theta, lambda, and p
-    assert len(model.logtheta_lambda_) == model.n_theta + 1 + model.n_p
+    assert len(model.logtheta_loglambda_p_) == model.n_theta + 1 + model.n_p
 

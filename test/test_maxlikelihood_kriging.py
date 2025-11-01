@@ -4,7 +4,6 @@ from types import SimpleNamespace
 import spotpython.surrogate.kriging as kriging_mod
 from spotpython.surrogate.kriging import Kriging
 
-
 def test_max_likelihood_calls_objective_and_returns_de_result(monkeypatch):
     model = Kriging(method="regression", n_theta=2)
 
@@ -17,11 +16,11 @@ def test_max_likelihood_calls_objective_and_returns_de_result(monkeypatch):
 
     monkeypatch.setattr(model, "likelihood", fake_likelihood, raising=True)
 
-    def fake_de(objective, bounds):
+    def fake_de(*, func=None, bounds=None, **kwargs):
         # Capture bounds, evaluate objective at a chosen candidate
         calls["bounds"] = bounds
         best_x = np.array([0.0, 0.0, -6.0], dtype=float)
-        fun = objective(best_x)  # should call model.likelihood(best_x)
+        fun = func(best_x)  # should call model.likelihood(best_x)
         return SimpleNamespace(x=best_x, fun=fun)
 
     # Patch the module-level DE used inside Kriging.max_likelihood
@@ -42,7 +41,7 @@ def test_max_likelihood_propagates_de_output_even_if_objective_not_used(monkeypa
     model = Kriging(method="regression", n_theta=2)
 
     # Ensure that even if DE doesn't call objective, return values are passed through
-    def fake_de(objective, bounds):
+    def fake_de(*, func=None, bounds=None, **kwargs):
         return SimpleNamespace(x=np.array([1.0, -1.0, -3.0]), fun=-123.456)
 
     monkeypatch.setattr(kriging_mod, "differential_evolution", fake_de, raising=True)
@@ -62,9 +61,9 @@ def test_max_likelihood_passes_bounds_correctly(monkeypatch):
     # Minimal likelihood to satisfy objective
     monkeypatch.setattr(model, "likelihood", lambda x: (0.0, None, None), raising=True)
 
-    def fake_de(objective, bounds):
+    def fake_de(*, func=None, bounds=None, **kwargs):
         seen["bounds"] = bounds
-        return SimpleNamespace(x=np.zeros(len(bounds)), fun=objective(np.zeros(len(bounds))))
+        return SimpleNamespace(x=np.zeros(len(bounds)), fun=func(np.zeros(len(bounds))))
 
     monkeypatch.setattr(kriging_mod, "differential_evolution", fake_de, raising=True)
 
