@@ -676,3 +676,93 @@ class Analytical:
         y[nan_mask] = np.nan
 
         return self._add_noise(y)
+
+    def fun_ackley(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """
+        Ackley function.
+        Global minimum at x_i = 0 for all i, f(x*) = 0.
+        Typical domain: x_i in [-32.768, 32.768] for all i.
+
+        Args:
+            X (np.ndarray): Input array of shape (n_samples, n_features).
+            fun_control (dict, optional): Control dict for noise etc.
+
+        Returns:
+            np.ndarray: Function values of shape (n_samples,).
+
+        Examples:
+            >>> from spotpython.fun.objectivefunctions import Analytical
+            >>> import numpy as np
+            >>> X = np.zeros((2, 3))
+            >>> fun = Analytical()
+            >>> fun.fun_ackley(X)
+            array([0., 0.])
+        """
+        X = self._prepare_input_data(X, fun_control)
+        a = 20
+        b = 0.2
+        c = 2 * np.pi
+        n_dim = X.shape[1]
+        sum_sq = np.sum(X**2, axis=1)
+        sum_cos = np.sum(np.cos(c * X), axis=1)
+        term1 = -a * np.exp(-b * np.sqrt(sum_sq / n_dim))
+        term2 = -np.exp(sum_cos / n_dim)
+        y = term1 + term2 + a + np.exp(1)
+        return self._add_noise(y)
+
+    def fun_michalewicz(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """
+        Michalewicz function.
+        Global minimum depends on dimension, typical domain: x_i in [0, pi].
+        Default m=10 as in the reference.
+
+        Args:
+            X (np.ndarray): Input array of shape (n_samples, n_features).
+            fun_control (dict, optional): Control dict for noise etc. Can set 'm'.
+
+        Returns:
+            np.ndarray: Function values of shape (n_samples,).
+
+        Examples:
+            >>> from spotpython.fun.objectivefunctions import Analytical
+            >>> import numpy as np
+            >>> X = np.array([[2.20, 1.57], [2.20, 1.20]])
+            >>> fun = Analytical()
+            >>> fun.fun_michalewicz(X)
+            array([-1.8013..., -1.5274...])
+        """
+        X = self._prepare_input_data(X, fun_control)
+        m = 10
+        if fun_control is not None and "m" in fun_control:
+            m = fun_control["m"]
+        i = np.arange(1, X.shape[1] + 1)
+        # Broadcasting: (n_samples, n_features)
+        y = -np.sum(np.sin(X) * (np.sin(i * X**2 / np.pi)) ** (2 * m), axis=1)
+        return self._add_noise(y)
+
+    def fun_rosenbrock(self, X: np.ndarray, fun_control: Optional[Dict] = None) -> np.ndarray:
+        """
+        Rosenbrock function (general n-dim).
+        Global minimum at x_i = 1 for all i, f(x*) = 0.
+        Typical domain: x_i in [-5, 10].
+
+        Args:
+            X (np.ndarray): Input array of shape (n_samples, n_features).
+            fun_control (dict, optional): Control dict for noise etc.
+
+        Returns:
+            np.ndarray: Function values of shape (n_samples,).
+
+        Examples:
+            >>> from spotpython.fun.objectivefunctions import Analytical
+            >>> import numpy as np
+            >>> X = np.ones((2, 3))
+            >>> fun = Analytical()
+            >>> fun.fun_rosenbrock(X)
+            array([0., 0.])
+        """
+        X = self._prepare_input_data(X, fun_control)
+        b = 100
+        # Rosenbrock sum over d-1 dimensions: sum_{i=1}^{d-1} [b*(x_{i+1} - x_i^2)^2 + (x_i - 1)^2]
+        y = np.sum(b * (X[:, 1:] - X[:, :-1] ** 2) ** 2 + (X[:, :-1] - 1) ** 2, axis=1)
+        return self._add_noise(y)

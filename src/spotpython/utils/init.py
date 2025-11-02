@@ -218,7 +218,7 @@ def fun_control_init(
         max_time (int):
             The maximum time in minutes.
         max_surrogate_points (int):
-            The maximum number of points in the surrogate model. Default is inf.
+            The maximum number of points in the surrogate model. Has no effect. Moved to surrogate_control_init().
         metric_sklearn (object):
             The metric object from the scikit-learn library. Default is None.
         metric_sklearn_name (str):
@@ -749,6 +749,10 @@ def surrogate_control_init(
     theta_init_zero=False,
     var_type=None,
     metric_factorial="canberra",
+    use_nystrom=False,
+    nystrom_m=20,
+    nystrom_seed=1234,
+    max_surrogate_points=30,
 ) -> dict:
     """Initialize surrogate_control dictionary.
 
@@ -793,6 +797,14 @@ def surrogate_control_init(
             Note: Will be set in the Spot class.
         metric_factorial (str):
             The metric to be used for the factorial design. Default is "canberra".
+        use_nystrom (bool):
+            Whether to use the Nystrom approximation or not. Default is False.
+        nystrom_m (int):
+            The number of Nystrom points to be used. Default is 20.
+        nystrom_seed (int):
+            The seed to use for the Nystrom approximation. Default is 1234.
+        max_surrogate_points (int):
+            The maximum number of points in the surrogate model. Has only an effect if use_nystrom is False. Default is 30.
 
     Returns:
         surrogate_control (dict):
@@ -836,6 +848,10 @@ def surrogate_control_init(
         "theta_init_zero": theta_init_zero,
         "var_type": var_type,
         "metric_factorial": metric_factorial,
+        "use_nystrom": use_nystrom,
+        "nystrom_m": nystrom_m,
+        "nystrom_seed": nystrom_seed,
+        "max_surrogate_points": max_surrogate_points,
     }
     return surrogate_control
 

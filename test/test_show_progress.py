@@ -9,6 +9,7 @@ def test_show_progress():
     from spotpython.utils.init import (
         fun_control_init,
         design_control_init,
+        surrogate_control_init
     )
 
     # number of initial points:

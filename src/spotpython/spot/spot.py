@@ -352,7 +352,7 @@ class Spot:
 
     def _set_additional_attributes(self) -> None:
         """
-        Set additional attributes based on the fun_control dictionary
+        Set additional attributes based on the fun_control or surrogate_control dictionary
         """
         self.fun_evals = self.fun_control["fun_evals"]
         self.fun_repeats = self.fun_control["fun_repeats"]
@@ -365,12 +365,15 @@ class Spot:
         self.show_progress = self.fun_control["show_progress"]
         self.infill_criterion = self.fun_control["infill_criterion"]
         self.n_points = self.fun_control["n_points"]
-        self.max_surrogate_points = self.fun_control["max_surrogate_points"]
         self.progress_file = self.fun_control["progress_file"]
         self.tkagg = self.fun_control["tkagg"]
         if self.tkagg:
             matplotlib.use("TkAgg")
         self.verbosity = self.fun_control["verbosity"]
+        self.max_surrogate_points = self.surrogate_control["max_surrogate_points"]
+        self.use_nystrom = self.surrogate_control["use_nystrom"]
+        self.nystrom_m = self.surrogate_control["nystrom_m"]
+        self.nystrom_seed = self.surrogate_control["nystrom_seed"]
 
         # Internal attributes:
         self.X = None
@@ -449,6 +452,9 @@ class Spot:
                 - optim_p: Whether to optimize p parameters
                 - min/max_Lambda: Bounds for lambda parameters
                 - metric_factorial: Metric for factorial parameters
+                - use_nystrom: Whether to use Nystrom approximation
+                - nystrom_m: Number of Nystrom points
+                - nystrom_seed: Seed for Nystrom approximation
 
         Examples:
             >>> import numpy as np
@@ -511,6 +517,9 @@ class Spot:
                 spot_writer=self.spot_writer,
                 counter=self.design_control["init_size"] * self.design_control["repeats"] - 1,
                 metric_factorial=self.surrogate_control["metric_factorial"],
+                use_nystrom=self.surrogate_control["use_nystrom"],
+                nystrom_m=self.surrogate_control["nystrom_m"],
+                nystrom_seed=self.surrogate_control["nystrom_seed"],
             )
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
@@ -1339,7 +1348,7 @@ class Spot:
         surrogate model `surrogate`. The default surrogate model is
         an instance from spotpython's `Kriging` class.
         If `show_models` is `True`, the model is plotted.
-        If the number of points is greater than `max_surrogate_points`,
+        If the number of points is greater than `max_surrogate_points` and `use_nyström` is `False`,
         the surrogate model is fitted to a subset of the data points.
         The subset is selected using the `select_distant_points()` function.
 
@@ -1398,7 +1407,7 @@ class Spot:
         X_points = self.X.shape[0]
         y_points = self.y.shape[0]
         if X_points == y_points:
-            if X_points > self.max_surrogate_points:
+            if (X_points > self.max_surrogate_points) and (self.use_nystrom is False):
                 logger.info("Selecting distant points for surrogate fitting.")
                 X_S, y_S = select_distant_points(X=self.X, y=self.y, k=self.max_surrogate_points)
             else:
