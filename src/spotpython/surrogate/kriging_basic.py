@@ -9,6 +9,9 @@ from numpy import linspace, append
 from scipy.spatial.distance import cdist, pdist, squareform
 from spotpython.surrogate.plot import plotkd
 
+# the old Kriging class w/o Nystrom method
+# can be ignored / deleted after verifying that Kriging works as expected
+
 
 class Kriging(BaseEstimator, RegressorMixin):
     """
@@ -18,7 +21,7 @@ class Kriging(BaseEstimator, RegressorMixin):
     Attributes:
         eps (float): A small regularization term to reduce ill-conditioning.
         penalty (float): The penalty value used if the correlation matrix is ill-conditioned.
-        logtheta_lambda_ (np.ndarray): Best-fit log(theta) parameters from fit().
+        logtheta_loglambda_p_ (np.ndarray): Best-fit log(theta), log(lambda), and p parameters from fit().
         U_ (np.ndarray): The Cholesky factor of the correlation matrix after fit().
         X_ (np.ndarray): The training input data (n x d).
         y_ (np.ndarray): The training target values (n,).
@@ -46,12 +49,12 @@ class Kriging(BaseEstimator, RegressorMixin):
         eps: float = None,
         penalty: float = 1e4,
         method="regression",
-        noise: bool = False,
         var_type: List[str] = ["num"],
         name: str = "Kriging",
         seed: int = 124,
         model_optimizer=None,
         model_fun_evals: Optional[int] = None,
+        n_theta: Optional[int] = None,
         min_theta: float = -3.0,
         max_theta: float = 2.0,
         theta_init_zero: bool = False,
@@ -67,6 +70,8 @@ class Kriging(BaseEstimator, RegressorMixin):
         counter=None,
         metric_factorial="canberra",
         isotropic: bool = False,
+        theta: Optional[np.ndarray] = None,
+        Lambda: Optional[float] = None,
         **kwargs,
     ):
         """
@@ -83,9 +88,61 @@ class Kriging(BaseEstimator, RegressorMixin):
                 not positive-definite. Defaults to 1e4.
             method (str, optional):
                 The type how the model uis fitted. Can be "interpolation", "regression", or "reinterpolation". Defaults to "regression".
+            var_type (List[str], optional):
+                List specifying the variable types for each input dimension.
+                Possible values are "num", "int", "factor", and "ordered".
+                Defaults to ["num"].
+            name (str, optional):
+                Name of the Kriging model instance. Defaults to "Kriging".
+            seed (int, optional):
+                Random seed for reproducibility. Used by the optimizer. Defaults to 124.
+            model_optimizer (callable, optional):
+                Optimization algorithm for hyperparameter tuning. Defaults to
+                scipy.optimize.differential_evolution.
+            model_fun_evals (int, optional):
+                Maximum number of function evaluations for the optimizer.
+                Defaults to 100.
+            n_theta (int, optional):
+                Number of theta values to be used. If None, it will be set during fitting.
+                Defaults to None.
+            min_theta (float, optional):
+                Minimum bound for log(theta) during optimization. Defaults to -3.0.
+            max_theta (float, optional):
+                Maximum bound for log(theta) during optimization. Defaults to 2.0.
+            theta_init_zero (bool, optional):
+                If True, initializes theta values to zero before fitting.
+                Defaults to False.
+            p_val (float, optional):
+                Initial power exponent value for the correlation function. Defaults to 2.0.
+            n_p (int, optional):
+                Number of p values to be used. Defaults to 1.
+            optim_p (bool, optional):
+                If True, optimizes the p values during fitting. Defaults to False.
+            min_p (float, optional):
+                Minimum bound for p during optimization. Defaults to 1.0.
+            max_p (float, optional):
+                Maximum bound for p during optimization. Defaults to 2.0.
+            min_Lambda (float, optional):
+                Minimum bound for log(Lambda) during optimization. Defaults to -9.0.
+            max_Lambda (float, optional):
+                Maximum bound for log(Lambda) during optimization. Defaults to 2.0.
+            log_level (int, optional):
+                Logging level for the model. Defaults to 0 (no logging).
+            spot_writer (object, optional):
+                Writer object for logging (e.g., TensorBoard writer). Defaults to None.
+            counter (int, optional):
+                Counter for logging iterations. Defaults to None.
+            metric_factorial (str, optional):
+                Metric to be used for factorial design. Defaults to "canberra".
             isotropic (bool, optional):
                 If True, the model is isotropic, meaning all variables are treated equally (only one theta value is used).
                 If False, the model can handle different theta values, one for each dimension. Defaults to False.
+            theta (np.ndarray, optional):
+                Initial theta values for the model. If None, theta values are initialized during fitting. Note that theta is in log10 scale. Defaults to None.
+            Lambda (float, optional):
+                Currently ignored. Initial Lambda value for the model. If None, Lambda is initialized during fitting. Note that Lambda is in log10 scale. Defaults to None.
+            **kwargs:
+                Additional keyword arguments.
         """
         if eps is None:
             self.eps = self._get_eps()
@@ -95,8 +152,6 @@ class Kriging(BaseEstimator, RegressorMixin):
                 raise ValueError("eps must be positive")
             self.eps = eps
         self.penalty = penalty
-
-        self.noise = noise
         self.var_type = var_type
         self.name = name
         self.seed = seed
@@ -110,12 +165,14 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.max_Lambda = max_Lambda
         self.min_p = min_p
         self.max_p = max_p
-        self.n_theta = None  # Will be set in fit()
+        self.n_theta = n_theta  # Will be set during fit
         self.isotropic = isotropic
         self.p_val = p_val
         self.n_p = n_p
         self.optim_p = optim_p
         self.theta_init_zero = theta_init_zero
+        self.theta = theta
+        self.Lambda = Lambda
         self.model_optimizer = model_optimizer
         if self.model_optimizer is None:
             self.model_optimizer = differential_evolution
@@ -130,7 +187,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.log["p"] = []
         self.log["Lambda"] = []
 
-        self.logtheta_lambda_ = None
+        self.logtheta_loglambda_p_ = None
         self.U_ = None
         self.X_ = None
         self.y_ = None
@@ -141,6 +198,11 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.method = method
         self.return_ei = False
         self.return_std = False
+
+        # Nyström-specific attributes
+        self.landmarks_ = None
+        self.W_cho_ = None  # Cholesky factor of W matrix
+        self.nystrom_alpha_ = None  # Solved term for Nyström prediction
 
     def _get_eps(self) -> float:
         """
@@ -170,7 +232,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 var_type = ["num", "int", "float"]
                 n_theta=2
                 n_p=2
-                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True, noise=True)
+                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True)
                 S._initialize_variables(nat_X, nat_y)
                 S._set_variable_types()
                 assert S.var_type == ["num", "int", "float"]
@@ -197,14 +259,44 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def get_model_params(self) -> Dict[str, float]:
         """
-        Get the model parameters (in addition to sklearn's get_params method).
-
+        Get the (internal) model parameters (in addition to sklearn's get_params method).
         This method is NOT required for scikit-learn compatibility.
 
         Returns:
-            dict: Parameter names not included in get_params() mapped to their values.
+            dict:
+                Parameter names not included in get_params() mapped to their values. This includes the following keys:
+                    - "log_theta_lambda"
+                    - "U"
+                    - "X"
+                    - "y"
+                    - "negLnLike"
+                    - "inf_Psi"
+                    - "cnd_Psi"
+
+        Examples:
+            >>> import numpy as np
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> # Training data
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> # Initialize and fit the Kriging model
+            >>> model = Kriging()
+            >>> model.fit(X_train, y_train)
+            >>> # get theta values of the fitted model
+            >>> X_values = model.get_model_params()["X"]
+            >>> print("X values:", X_values)
         """
-        return {"log_theta_lambda": self.logtheta_lambda_, "U": self.U_, "X": self.X_, "y": self.y_, "negLnLike": self.negLnLike}
+        return {
+            "n": self.n,
+            "k": self.k,
+            "logtheta_loglambda_p_": self.logtheta_loglambda_p_,
+            "U": self.U_,
+            "X": self.X_,
+            "y": self.y_,
+            "negLnLike": self.negLnLike,
+            "inf_Psi": self.inf_Psi,
+            "cnd_Psi": self.cnd_Psi,
+        }
 
     def _update_log(self) -> None:
         """
@@ -242,11 +334,44 @@ class Kriging(BaseEstimator, RegressorMixin):
                 self.spot_writer.add_scalars("spot_p", {f"p_{i}": p[i] for i in range(self.n_p)}, self.counter + self.log_length)
             self.spot_writer.flush()
 
+    def _set_theta(self) -> None:
+        if self.isotropic:
+            # If isotropic, set n_theta to 1
+            self.n_theta = 1
+        else:
+            self.n_theta = self.k
+
+    def _get_theta10_from_logtheta(self) -> np.ndarray:
+        theta10 = np.power(10.0, self.theta)
+        if self.n_theta == 1:
+            theta10 = theta10 * np.ones(self.k)
+        return theta10
+
+    def _reshape_X(self, X: np.ndarray) -> np.ndarray:
+        # Ensure X has shape (n_samples, n_features=self.k)
+        X = np.asarray(X)
+        if X.ndim == 1:
+            X = X.reshape(-1, self.k)
+        else:
+            if X.shape[1] != self.k:
+                if X.shape[0] == self.k:  # common case: row/col swap for 1D
+                    X = X.T
+                elif self.k == 1:
+                    X = X.reshape(-1, 1)
+                else:
+                    raise ValueError(f"X has shape {X.shape}, expected (*, {self.k}).")
+        return X
+
     def fit(self, X: np.ndarray, y: np.ndarray, bounds: Optional[List[Tuple[float, float]]] = None) -> "Kriging":
         """
         Fits the Kriging model to training data X and y. This method is compatible
         with scikit-learn and uses differential evolution to optimize the hyperparameters
         (log(theta)).
+        Fitting pipeline (Forrester, Ch. 2–3):
+          - Set masks and θ dimensionality (isotropic → n_theta=1, else n_theta=k).
+          - Assemble bounds on [log10 θ] (+ [log10 λ] for regression/reinterpolation; + p if enabled).
+          - Maximize the concentrated likelihood (Ch. 3) to get [log10 θ, log10 λ, p].
+          - Build R and store U, μ-related quantities implicitly via U (used at prediction).
 
         Args:
             X (np.ndarray):
@@ -269,7 +394,10 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Initialize and fit the Kriging model
             >>> model = Kriging()
             >>> model.fit(X_train, y_train)
-            >>> print("Fitted log(theta):", model.logtheta_lambda_)
+            >>> for param, value in model.get_params(deep=True).items():
+            >>>     print(f"{param} -> {value}")
+            >>> theta_values = model.get_params()["theta"]
+            >>> print("Fitted theta values:", theta_values)
         """
         X = np.asarray(X)
         y = np.asarray(y).flatten()
@@ -277,16 +405,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.y_ = y
         self.n, self.k = self.X_.shape
         self._set_variable_types()
-        if self.isotropic:
-            # If isotropic, set n_theta to 1
-            self.n_theta = 1
-            print(f"Isotropic model: n_theta set to {self.n_theta}")
-        else:
-            self.n_theta = self.k
-            print(f"Anisotropic model: n_theta set to {self.n_theta}")
+        if self.n_theta is None:
+            self._set_theta()
         # Calculate and store min and max of X
         self.min_X = np.min(self.X_, axis=0)
         self.max_X = np.max(self.X_, axis=0)
+
+        # Bounds: [θ] for interpolation; [θ, λ] for regression/reinterpolation; [+ p] if optim_p
         if bounds is None:
             if self.method == "interpolation":
                 bounds = [(self.min_theta, self.max_theta)] * self.k
@@ -299,23 +424,27 @@ class Kriging(BaseEstimator, RegressorMixin):
             n_p = self.n_p if hasattr(self, "n_p") else self.k
             bounds += [(self.min_p, self.max_p)] * n_p
 
-        self.logtheta_lambda_, _ = self.max_likelihood(bounds)
+        # ML optimization (Forrester, Ch. 3)
+        self.logtheta_loglambda_p_, _ = self.max_likelihood(bounds)
 
         # store theta and Lambda in log scale
+        # Store parameters on log10 scale; convert to linear only where needed
+        self.theta = self.logtheta_loglambda_p_[: self.n_theta]
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # select the first n_theta values from logtheta_lambda_:
-            self.theta = self.logtheta_lambda_[: self.n_theta]
-            self.Lambda = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
+            # select the first n_theta values from logtheta_loglambda_p_:
+            self.Lambda = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + 1]
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
-        else:
-            self.theta = self.logtheta_lambda_[: self.n_theta]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
+        elif self.method == "interpolation":
             self.Lambda = None
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta : self.n_theta + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + self.n_p]
+        else:
+            raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
         # Once logtheta_lambda is found, compute the final correlation matrix
-        self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_lambda_)
+        # Finalize: compute R and its Cholesky at the found hyperparameters
+        self.negLnLike, self.Psi_, self.U_ = self.likelihood(self.logtheta_loglambda_p_)
 
         # Update log with the current values
         self._update_log()
@@ -325,6 +454,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Predicts the Kriging response at a set of points X. This method is compatible
         with scikit-learn and returns predictions for the input points.
+        Batch prediction wrapper around _pred:
+          - Shapes normalized so X is (n_samples, k).
+          - Forrester (Ch. 3/6): returns f̂(x), and optionally s(x) and EI
+            (EI returned as −log10(EI) internally for stability).
 
         Args:
             X (np.ndarray):
@@ -360,7 +493,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> print("Predictions:", y_pred)
         """
         self.return_std = return_std
-        X = np.atleast_2d(X)
+        X = self._reshape_X(X)
+
         if return_std:
             # Return predictions and standard deviations
             # Compatibility with scikit-learn
@@ -395,6 +529,15 @@ class Kriging(BaseEstimator, RegressorMixin):
         This method uses `theta`, `p`, and coded `X` values to construct the
         correlation matrix as described in [Forr08a, p.57].
 
+        Notes:
+            - Correlation follows the stationary Gaussian kernel used in Kriging:
+              R = exp(-D), with D a weighted distance. See Forrester et al. (2008),
+                Ch. 2, correlation modelling.
+            - The code builds D as a sum of per-dimension distance contributions
+              scaled by 10**theta (theta is stored in log10), then applies exp(-D).
+            - Returns only the upper triangle; the symmetric and diagonal parts
+              are handled by the caller.
+
         Attributes:
             Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
             cnd_Psi (float): Condition number of Psi.
@@ -404,59 +547,43 @@ class Kriging(BaseEstimator, RegressorMixin):
             LinAlgError: If building Psi fails.
 
         Examples:
-            >>> from spotpython.build.kriging import Kriging
-                import numpy as np
-                nat_X = np.array([[0], [1]])
-                nat_y = np.array([0, 1])
-                n=1
-                p=1
-                S=Kriging(name='kriging', seed=124, n_theta=n, n_p=p, optim_p=True, noise=False)
-                S._initialize_variables(nat_X, nat_y)
-                S._set_variable_types()
-                print(S.nat_X)
-                print(S.nat_y)
-                S._set_theta_values()
-                print(f"S.theta: {S.theta}")
-                S._initialize_matrices()
-                S._set_de_bounds()
-                new_theta_p_Lambda = S._optimize_model()
-                S._extract_from_bounds(new_theta_p_Lambda)
-                print(f"S.theta: {S.theta}")
-                S.build_Psi()
-                print(f"S.Psi: {S.Psi}")
-                    [[0]
-                    [1]]
-                    [0 1]
-                    S.theta: [0.]
-                    S.theta: [1.60036366]
-                    S.Psi: [[1.00000001e+00 4.96525625e-18]
-                    [4.96525625e-18 1.00000001e+00]]
+            >>> import numpy as np
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> # Training data
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> # Fit the Kriging model
+            >>> model = Kriging().fit(X_train, y_train)
+            >>> # Build the correlation matrix Psi
+            >>> Psi = model.build_Psi()
+            >>> print("Correlation matrix Psi:\n", Psi)
         """
         try:
             n, k = self.X_.shape
-            theta10 = np.power(10.0, self.theta)
-
-            # Ensure theta has the correct length
-            if self.n_theta == 1:
-                theta10 = theta10 * np.ones(k)
+            # weights: 10**theta; isotropic expands to k values
+            theta10 = self._get_theta10_from_logtheta()
 
             # Initialize the Psi matrix
             Psi = np.zeros((n, n), dtype=np.float64)
 
             # Calculate the distance matrix using ordered variables
+            # Ordered/numeric part: squared Euclidean with weights (Forrester, Ch. 2)
             if self.ordered_mask.any():
                 X_ordered = self.X_[:, self.ordered_mask]
                 D_ordered = squareform(pdist(X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]))
                 Psi += D_ordered
 
+            # Factorial part: categorical metric wrapped by exp(-D) (still stationary envelope)
             # Add the contribution of factor variables to the distance matrix
             if self.factor_mask.any():
                 X_factor = self.X_[:, self.factor_mask]
                 D_factor = squareform(pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]))
                 Psi += D_factor
 
-            # Calculate correlation from distance
+            # Correlation from distance: R = exp(-D) (Forrester, Ch. 2)
             Psi = np.exp(-Psi)
+
+            # Diagnostics (not in Forrester): inf/cond for stability
             # Check for infinite values
             self.inf_Psi = np.isinf(Psi).any()
             # Calculate condition number
@@ -469,44 +596,18 @@ class Kriging(BaseEstimator, RegressorMixin):
             print("Building Psi failed. Error: %s, Type: %s", err, type(err))
             raise
 
-    def _kernel(self, X: np.ndarray, theta: np.ndarray, p: float) -> np.ndarray:
-        """
-        Computes the correlation matrix Psi using vectorized operations.
-
-        Args:
-            X (np.ndarray): Input data of shape (n_samples, n_features).
-            theta (np.ndarray): Theta parameters of shape (n_features,).
-            p (float): Power exponent.
-
-        Returns:
-            np.ndarray: The upper triangle of the correlation matrix Psi.
-        """
-        n_samples, n_features = X.shape
-        Psi = np.zeros((n_samples, n_samples), dtype=float)
-        # Calculate all pairwise differences:
-        # X_expanded_rows will have shape (n_samples, 1, n_features)
-        # X_expanded_cols will have shape (1, n_samples, n_features)
-        # diff will have shape (n_samples, n_samples, n_features)
-        diff = np.abs(X[:, np.newaxis, :] - X[np.newaxis, :, :]) ** p
-        # Apply theta and sum over features
-        # dist_matrix will have shape (n_samples, n_samples)
-        dist_matrix = np.sum(theta * diff, axis=2)
-        # Compute Psi using the exponential kernel
-        Psi = np.exp(-dist_matrix)
-        # Return only the upper triangle, as the matrix is symmetric
-        # and the diagonal will be handled later.
-        return np.triu(Psi, k=1)
-
     def likelihood(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
         """
         Computes the negative of the concentrated log-likelihood for a given set
-        of log(theta) parameters using a power exponent p=1.99. Returns the
-        negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.
+        of log(theta) parameters. Returns the negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.
+        Negative concentrated log-likelihood (Forrester, Ch. 3):
+          - Given R (here Psi with diagonal and nugget), μ = (1^T R^{-1} y)/(1^T R^{-1} 1),
+            σ^2 = (r^T R^{-1} r)/n with r = y - 1·μ,
+          - Concentrated −log L = (n/2) log(σ^2) + (1/2) log |R| (constants omitted).
 
         Args:
             x (np.ndarray):
-                1D array of log(theta) parameters of length k. If self.method is "regression" or
-                "reinterpolation", length is k+1 and the last element of x is the log(noise) parameter.
+                1D array of log(theta), log(Lambda) (if method is "regression" or "reinterpolation"), and p values (if optim_p is True).
 
         Returns:
             (float, np.ndarray, np.ndarray):
@@ -514,24 +615,36 @@ class Kriging(BaseEstimator, RegressorMixin):
                 - negLnLike (float): The negative concentrated log-likelihood.
                 - Psi (np.ndarray): The correlation matrix.
                 - U (np.ndarray): The Cholesky factor (or None if ill-conditioned).
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                log_theta = np.array([0.0, 0.0, -6.0]) # nugget: -6 => 10**(-6) = 1e-6
+                negLnLike, Psi, U = model.likelihood(log_theta)
+                print("Negative Log-Likelihood:", negLnLike)
+                print("Correlation matrix Psi:\n", Psi)
+                print("Cholesky factor U (lower triangular):\n", U)
         """
-        # Extract data
         X = self.X_
         y = self.y_.flatten()
 
+        # First entries are log10(theta); optionally followed by log10(lambda) and p
+        self.theta = x[: self.n_theta]
+
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # theta = x[:-1]
-            self.theta = x[: self.n_theta]
-            # lambda_ = x[-1]
             lambda_ = x[self.n_theta : self.n_theta + 1]
-            # lambda is in log scale, so transform it back:
+            # nugget on linear scale; lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
                 self.p_val = x[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
-            # theta = x
-            self.theta = x[: self.n_theta]
             # use the original, untransformed eps:
+            # small “nugget” for interpolation (Forrester, sec. on interpolation)
             lambda_ = self.eps
             if self.optim_p:
                 self.p_val = x[self.n_theta : self.n_theta + self.n_p]
@@ -541,42 +654,45 @@ class Kriging(BaseEstimator, RegressorMixin):
         n = X.shape[0]
         one = np.ones(n)
 
-        # Build the correlation matrix Psi (modified in 0.31.0)
-        # theta = self.theta
-        # theta is in log scale, so transform it back:
-        # theta10 = 10.0**theta
-        # p = self.p_val
-        # Build correlation matrix (preparation for build_Psi())
-        # Psi_upper_triangle = self._kernel(X, theta10, p)
-
+        # Build the correlation matrix Psi.
+        # Build correlation R = upper + upper^T + I + λ I (Forrester, Ch. 3)
         Psi_upper_triangle = self.build_Psi()
-
         Psi = Psi_upper_triangle + Psi_upper_triangle.T + np.eye(n) + np.eye(n) * lambda_
 
+        # Cholesky factorization R = U U^T
         try:
             U = np.linalg.cholesky(Psi)
         except LinAlgError:
+            # Penalize ill-conditioning (implementation detail)
             return self.penalty, Psi, None
 
+        # log |R| via Cholesky (Forrester, Ch. 3)
         LnDetPsi = 2.0 * np.sum(np.log(np.abs(np.diag(U))))
 
+        # R^{-1}y and R^{-1}1 via triangular solves
         temp_y = np.linalg.solve(U, y)
         temp_one = np.linalg.solve(U, one)
         vy = np.linalg.solve(U.T, temp_y)
         vone = np.linalg.solve(U.T, temp_one)
 
+        # μ̂ (ordinary Kriging constant mean) (Forrester, Ch. 3)
         mu = (one @ vy) / (one @ vone)
+
+        # σ̂^2 (concentrated variance) (Forrester, Ch. 3)
         resid = y - one * mu
         tresid = np.linalg.solve(U, resid)
         tresid = np.linalg.solve(U.T, tresid)
         SigmaSqr = (resid @ tresid) / n
 
+        # Concentrated −log L (Forrester, Ch. 3)
         negLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetPsi
         return negLnLike, Psi, U
 
     def build_psi_vec(self, x: np.ndarray) -> None:
         """
         Build the psi vector required for predictive methods.
+        ψ(x) := [exp(-D(x, x_i))]_{i=1..n}, i.e., correlation between a new x and the training sites
+        using the same D as for R (Forrester, Ch. 2).
 
         Args:
             x (ndarray): Point to calculate the psi vector for.
@@ -589,50 +705,36 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Examples:
             >>> import numpy as np
-                from spotpython.build.kriging import Kriging
-                X_train = np.array([[1., 2.],
-                                    [2., 4.],
-                                    [3., 6.]])
-                y_train = np.array([1., 2., 3.])
-                S = Kriging(name='kriging',
-                            seed=123,
-                            log_level=50,
-                            n_theta=1,
-                            noise=False,
-                            cod_type="norm")
-                S.fit(X_train, y_train)
-                # force theta to simple values:
-                S.theta = np.array([0.0])
-                nat_X = np.array([1., 0.])
-                S.psi = np.zeros((S.n, 1))
-                S.build_psi_vec(nat_X)
-                res = np.array([[np.exp(-4)],
-                    [np.exp(-17)],
-                    [np.exp(-40)]])
-                assert np.array_equal(S.psi, res)
-                print(f"S.psi: {S.psi}")
-                print(f"Control value res: {res}")
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                x_new = np.array([0.25, 0.25])
+                psi_vector = model.build_psi_vec(x_new)
+                print("Psi vector for new point:\n", psi_vector)
         """
         try:
             n = self.X_.shape[0]
             psi = np.zeros(n)
-            theta10 = np.power(10.0, self.theta)
-            if self.n_theta == 1:
-                theta10 = theta10 * np.ones(self.k)
-
+            theta10 = self._get_theta10_from_logtheta()
             D = np.zeros(n)
 
             # Compute ordered distance contributions
+            # Ordered contributions to D(x, X) (weighted squared Euclidean)
             if self.ordered_mask.any():
                 X_ordered = self.X_[:, self.ordered_mask]
                 x_ordered = x[self.ordered_mask]
                 D += cdist(x_ordered.reshape(1, -1), X_ordered, metric="sqeuclidean", w=theta10[self.ordered_mask]).ravel()
             # Compute factor distance contributions
+            # Factorial contributions (categorical distance)
             if self.factor_mask.any():
                 X_factor = self.X_[:, self.factor_mask]
                 x_factor = x[self.factor_mask]
                 D += cdist(x_factor.reshape(1, -1), X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]).ravel()
 
+            # Forrester, Ch. 2: R = exp(-D)
             psi = np.exp(-D)
             return psi
 
@@ -643,6 +745,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Computes a single-point Kriging prediction using the correlation matrix
         information. Internal helper method.
+        Ordinary Kriging predictor (Forrester, Ch. 3):
+          - f̂(x) = μ̂ + ψ(x)^T R^{-1} (y − 1 μ̂)
+          - s^2(x) ~ σ̂^2 [1 + λ − ψ(x)^T R^{-1} ψ(x)]
+            Note: The classic OK variance includes a mean-uncertainty term
+            (1 − 1^T R^{-1} ψ)^2 / (1^T R^{-1} 1). This implementation uses a
+            simplified form common in engineering Kriging codes.
+        Expected improvement (EI) (Forrester, Ch. 6) computed for minimization.
 
         Args:
             x (np.ndarray): 1D array of length k for the point at which to predict.
@@ -654,22 +763,20 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         y = self.y_.flatten()
 
+        # Load θ and λ (λ transformed to linear scale where needed)
         if (self.method == "regression") or (self.method == "reinterpolation"):
-            # theta = x[:-1]
-            self.theta = self.logtheta_lambda_[: self.n_theta]
-            # lambda_ = x[-1]
-            lambda_ = self.logtheta_lambda_[self.n_theta : self.n_theta + 1]
+            self.theta = self.logtheta_loglambda_p_[: self.n_theta]
+            lambda_ = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + 1]
             # lambda is in log scale, so transform it back:
             lambda_ = 10.0**lambda_
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
         elif self.method == "interpolation":
-            # theta = x
-            self.theta = self.logtheta_lambda_[: self.n_theta]
+            self.theta = self.logtheta_loglambda_p_[: self.n_theta]
             # use the original, untransformed eps:
             lambda_ = self.eps
             if self.optim_p:
-                self.p_val = self.logtheta_lambda_[self.n_theta : self.n_theta + self.n_p]
+                self.p_val = self.logtheta_loglambda_p_[self.n_theta : self.n_theta + self.n_p]
         else:
             raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
 
@@ -678,39 +785,36 @@ class Kriging(BaseEstimator, RegressorMixin):
         one = np.ones(n)
 
         # Compute mu
+        # μ̂ via backsolves (Forrester, Ch. 3)
         y_tilde = np.linalg.solve(U, y)
         y_tilde = np.linalg.solve(U.T, y_tilde)
         one_tilde = np.linalg.solve(U, one)
         one_tilde = np.linalg.solve(U.T, one_tilde)
         mu = (one @ y_tilde) / (one @ one_tilde)
 
+        # Residual backsolve for R^{-1}(y − 1 μ̂)
         resid = y - one * mu
         resid_tilde = np.linalg.solve(U, resid)
         resid_tilde = np.linalg.solve(U.T, resid_tilde)
 
-        # Build psi (modified in 0.31.0)
-        # X = self.X_
-        # p = self.p_val
-        # theta = self.theta
-        # # theta is in log scale, so transform it back:
-        # theta10 = 10.0**theta
-        # psi = np.ones(n)
-        # for i in range(n):
-        #     dist_vec = np.abs(X[i, :] - x) ** p
-        #     psi[i] = np.exp(-np.sum(theta10 * dist_vec))
-
         psi = self.build_psi_vec(x)
 
         # Compute SigmaSqr and SSqr
+        # σ̂^2 (Forrester, Ch. 3)
+        # Note: identical to likelihood computation to maintain consistency
+        #       (up to small numerical differences).
         if (self.method == "interpolation") or (self.method == "regression"):
             SigmaSqr = (resid @ resid_tilde) / n
             # Compute SSqr
+            # s^2(x) ≈ σ̂^2 [1 + λ − ψ^T R^{-1} ψ]
             psi_tilde = np.linalg.solve(U, psi)
             psi_tilde = np.linalg.solve(U.T, psi_tilde)
             # Eq. (3.1) in [forr08a] without lambda:
+            # cf. Forrester (Ch. 3) variance structure; simplified here
             SSqr = SigmaSqr * (1 + lambda_ - psi @ psi_tilde)
         else:
             # method is "reinterpolation"
+            # Reinterpolation: variance with nugget removed and ε added in R for the variance solve
             Psi_adjusted = self.Psi_ - np.eye(n) * lambda_ + np.eye(n) * self.eps
             SigmaSqr = (resid @ np.linalg.solve(U.T, np.linalg.solve(U, Psi_adjusted @ resid_tilde))) / n
             # Compute Uint (Cholesky factor of the adjusted Psi matrix)
@@ -725,9 +829,12 @@ class Kriging(BaseEstimator, RegressorMixin):
         s = np.abs(SSqr) ** 0.5
 
         # Final prediction
+        # f̂(x) (Forrester, Ch. 3)
         f = mu + psi @ resid_tilde
 
         # Compute ExpImp
+        # EI (minimization), following standard closed form (Forrester, Ch. 6).
+        # Implementation uses erf for Φ and returns −log10(EI) for numerical stability.
         if self.return_ei:
             yBest = np.min(y)
             EITermOne = (yBest - f) * (0.5 + 0.5 * erf((1 / np.sqrt(2)) * ((yBest - f) / s)))
@@ -741,20 +848,36 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Maximizes the Kriging likelihood function using differential evolution
         over the range of log(theta) specified by bounds.
+        Hyperparameter estimation via maximum likelihood (Forrester, Ch. 3).
+        Objective is the concentrated −log L above, optimized with differential evolution.
 
         Args:
             bounds (List[Tuple[float, float]]): Sequence of (low, high) bounds for log(theta).
 
         Returns:
             (np.ndarray, float): (best_x, best_fun) where best_x is the
-            optimal log(theta) array and best_fun is the minimized negative log-likelihood.
+            optimal [log(theta) log(lambda) p] array and best_fun is the minimized negative log-likelihood.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                bounds = [(-3.0, 2.0), (-3.0, 2.0), (-9.0, 2.0)] # Example bounds for log(theta) and log(lambda)
+                best_x, best_fun = model.max_likelihood(bounds)
+                print("Optimal parameters (log(theta),log(theta), log(lambda)):", best_x)
+                print("Minimized negative log-likelihood:", best_fun)
         """
 
-        def objective(logtheta_lambda):
-            neg_ln_like, _, _ = self.likelihood(logtheta_lambda)
+        def objective(logtheta_loglambda_p_: np.ndarray) -> float:
+            neg_ln_like, _, _ = self.likelihood(logtheta_loglambda_p_)
             return neg_ln_like
 
-        result = differential_evolution(objective, bounds)
+        # Use keyword args for easier test patching
+        result = differential_evolution(func=objective, bounds=bounds, seed=self.seed)
         return result.x, result.fun
 
     def plot(self, i: int = 0, j: int = 1, show: Optional[bool] = True, add_points: bool = True) -> None:
@@ -778,9 +901,9 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             None
 
-        Note:
-            * This method provides only a basic plot. For more advanced plots,
-                use the `plot_contour()` method of the `Spot` class.
+        Notes:
+            * This method is a wrapper around the `plotkd` function for 2D plots.
+            * For 1D plots, it generates a line plot of the surrogate model.
 
         Examples:
             >>> import numpy as np
@@ -788,7 +911,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 from spotpython.spot import spot
                 from spotpython.utils.init import fun_control_init, design_control_init
                 # 1-dimensional example
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control=fun_control_init(lower = np.array([-1]),
                                             upper = np.array([1]),
                                             noise=False)
@@ -801,7 +924,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 S.fit_surrogate()
                 S.surrogate.plot()
                 # 2-dimensional example
-                fun = analytical().fun_sphere
+                fun = Analytical().fun_sphere
                 fun_control=fun_control_init(lower = np.array([-1, -1]),
                                             upper = np.array([1, 1]),
                                             noise=False)
@@ -816,10 +939,15 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         if self.k == 1:
             n_grid = 100
-            x = linspace(self.min_X[0], self.max_X[0], num=n_grid)
+            x = linspace(self.min_X[0], self.max_X[0], num=n_grid).reshape(-1, 1)
             y = self.predict(x)
             plt.figure()
-            plt.plot(x, y, "k")
+            plt.plot(x.ravel(), y, "k")
+            # add the original points
+            if add_points:
+                plt.plot(self.X_[:, 0], self.y_, "ro")
+            # add grid
+            plt.grid()
             if show:
                 plt.show()
         else:
