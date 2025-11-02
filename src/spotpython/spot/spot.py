@@ -2013,8 +2013,6 @@ class Spot:
                 The objective function value `y` that is used as a base value for the
                 infill criterion is calculated in natural units.
 
-        Note:
-            This is step (S-12) in [bart21i].
         """
         # Reshape x to have shape (1, -1) because the predict method expects a 2D array
         X = x.reshape(1, -1)
