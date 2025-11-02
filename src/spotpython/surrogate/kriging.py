@@ -640,68 +640,122 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Low-rank (Nyström) concentrated likelihood using matrix determinant lemma and Woodbury.
         Returns (negLnLike, None, None) to match the exact signature.
+
+        Args:
+            x (np.ndarray): Parameter vector containing [log(theta)..., log10(lambda), p...].
+                Length depends on method and optim_p setting.
+
+        Returns:
+            Tuple[float, None, None]: (negative log likelihood, None, None)
+
+        Notes:
+            1. Build K_mm (W) and K_nm (C) for current theta.
+            2. Compute M = W + (1/λ) C^T C and its Cholesky.
+            3. Compute log|R| via determinant lemma.
+            4. Compute R^{-1} y and R^{-1} 1 via Woodbury.
+            5. Compute μ̂ and σ̂^2.
+            6. Return negative concentrated log-likelihood.
+            7. If σ̂^2 ≤ 0 or non-finite, return penalty.
+
+        Raises:
+            ValueError: If input parameter vector has wrong length.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0], [0.25, 0.25], [0.75, 0.75]])
+                y_train = np.array([0.1, 0.2, 0.3, 0.15, 0.25])
+                # Fit the Kriging model with Nyström approximation
+                model = Kriging(use_nystrom=True, nystrom_m=3).fit(X_train, y_train)
+                log_theta = np.array([0.0, 0.0, -6.0]) # nugget: -6 => 10**(-6) = 1e-6
+                negLnLike, _, _ = model._likelihood_nystrom(log_theta)
+                print("Negative Log-Likelihood (Nyström):", negLnLike)
         """
+        # Input validation
+        x = np.asarray(x, dtype=float)
+        expected_dim = self.n_theta
+        if self.method in ["regression", "reinterpolation"]:
+            expected_dim += 1  # Add lambda parameter
+        if self.optim_p:
+            expected_dim += self.k  # Add p parameters
+
+        if x.size != expected_dim:
+            return self.penalty, None, None  # Return penalty for wrong dimensions
+
+        # Get data
         X = self.X_
         y = self.y_.flatten()
+        n = X.shape[0]
+
+        # Extract parameters
         self.theta = x[: self.n_theta]
 
-        if (self.method == "regression") or (self.method == "reinterpolation"):
-            lambda_lin = 10.0 ** x[self.n_theta : self.n_theta + 1]
-            lambda_lin = float(lambda_lin)
+        # Handle lambda based on method
+        if self.method in ["regression", "reinterpolation"]:
+            lambda_idx = self.n_theta
+            try:
+                self.lambda_lin_ = float(10.0 ** x[lambda_idx])
+            except (IndexError, TypeError):
+                return self.penalty, None, None
+
             if self.optim_p:
                 self.p_val = x[self.n_theta + 1 : self.n_theta + 1 + self.n_p]
-        elif self.method == "interpolation":
-            lambda_lin = float(self.eps)
+        else:  # interpolation
+            self.lambda_lin_ = float(self.eps)
             if self.optim_p:
                 self.p_val = x[self.n_theta : self.n_theta + self.n_p]
-        else:
-            raise ValueError("method must be one of 'interpolation', 'regression', or 'reinterpolation'")
-
-        self.lambda_lin_ = lambda_lin
 
         # Build Nyström structures for current theta
         self._nystrom_setup()
         C = self.C_
         W_chol = self.W_chol_
-        W = W_chol @ W_chol.T
-
-        n = X.shape[0]
-        m = W.shape[0]
+        m = W_chol.shape[0]  # number of landmarks
         one = np.ones(n)
 
-        # M = W + (1/λ) C^T C
+        # Compute W = W_chol @ W_chol.T and M = W + (1/λ)C^TC
+        W = W_chol @ W_chol.T
         CtC = C.T @ C
-        M = W + (CtC / lambda_lin)
+        M = W + CtC / self.lambda_lin_
 
-        # Cholesky of M
+        # Get Cholesky of M with jitter if needed
         try:
             self.M_chol_ = np.linalg.cholesky(M)
         except LinAlgError:
-            # add jitter
-            M_jit = M + 1e-12 * np.eye(m)
-            self.M_chol_ = np.linalg.cholesky(M_jit)
+            M_jit = M + 1e-10 * np.eye(m)
+            try:
+                self.M_chol_ = np.linalg.cholesky(M_jit)
+            except LinAlgError:
+                return self.penalty, None, None
 
-        # log|R| via determinant lemma:
-        # |R| = λ^n det(I_m + (1/λ) W^{-1} C^T C) = λ^n det(W^{-1} M)
-        # log|R| = n log λ + log|M| − log|W|
-        logdetW = 2.0 * np.sum(np.log(np.diag(W_chol)))
-        logdetM = 2.0 * np.sum(np.log(np.diag(self.M_chol_)))
-        LnDetR = n * np.log(lambda_lin) + (logdetM - logdetW)
+        # Compute log|R| via matrix determinant lemma
+        logdetW = 2.0 * np.sum(np.log(np.abs(np.diag(W_chol))))
+        logdetM = 2.0 * np.sum(np.log(np.abs(np.diag(self.M_chol_))))
+        LnDetR = n * np.log(self.lambda_lin_) + (logdetM - logdetW)
 
-        # R^{-1} y and R^{-1} 1 via Woodbury
-        Rinv_y = self._woodbury_solve(y)
-        Rinv_one = self._woodbury_solve(one)
-
-        # μ̂ and σ̂^2
-        mu = (one @ Rinv_y) / (one @ Rinv_one)
-        r = y - one * mu
-        Rinv_r = Rinv_y - Rinv_one * mu
-        SigmaSqr = (r @ Rinv_r) / n
-
-        if SigmaSqr <= 0 or not np.isfinite(SigmaSqr):
+        # Compute R^{-1}y and R^{-1}1 via Woodbury
+        try:
+            Rinv_y = self._woodbury_solve(y)
+            Rinv_one = self._woodbury_solve(one)
+        except (ValueError, LinAlgError):
             return self.penalty, None, None
 
+        # Compute mu_hat and sigma2_hat
+        mu = (one @ Rinv_y) / (one @ Rinv_one)
+        r = y - one * mu
+        Rinv_r = self._woodbury_solve(r)
+        SigmaSqr = (r @ Rinv_r) / n
+
+        # Check validity
+        if SigmaSqr <= 0 or not np.isfinite(SigmaSqr) or not np.isfinite(LnDetR):
+            return self.penalty, None, None
+
+        # Compute negative concentrated log likelihood
         negLnLike = (n / 2.0) * np.log(SigmaSqr) + 0.5 * LnDetR
+
+        if not np.isfinite(negLnLike):
+            return self.penalty, None, None
+
         return negLnLike, None, None
 
     # -------- Unified likelihood --------
@@ -710,6 +764,31 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Computes the negative concentrated log-likelihood.
         Exact (Cholesky) if use_nystrom is False; otherwise Nyström.
+
+        Args:
+            x (np.ndarray): Parameter vector containing [log(theta)..., log10(lambda), p...].
+                Length depends on method and optim_p setting.
+
+        Returns:
+            Tuple[float, Optional[np.ndarray], Optional[np.ndarray]]:
+                (negLnLike, Psi, U) where:
+                - negLnLike (float): The negative concentrated log-likelihood.
+                - Psi (np.ndarray or None): The correlation matrix (None if Nyström).
+                - U (np.ndarray or None): The Cholesky factor (None if Nyström).
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                log_theta = np.array([0.0, 0.0, -6.0]) # nugget: -6 => 10**(-6) = 1e-6
+                negLnLike, Psi, U = model.likelihood(log_theta)
+                print("Negative Log-Likelihood:", negLnLike)
+                print("Correlation matrix Psi:\n", Psi)
+                print("Cholesky factor U (lower triangular):\n", U)
         """
         if self.use_nystrom:
             return self._likelihood_nystrom(x)
@@ -721,6 +800,23 @@ class Kriging(BaseEstimator, RegressorMixin):
     def max_likelihood(self, bounds: List[Tuple[float, float]]) -> Tuple[np.ndarray, float]:
         """
         Hyperparameter estimation via maximum likelihood (Forrester, Ch. 3).
+
+        Args:
+            bounds (List[Tuple[float, float]]): Bounds for the optimization variables.
+        Returns:
+            Tuple[np.ndarray, float]: (optimal parameters, optimal negative log-likelihood)
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                bounds = [(-3, 3), (-3, 3), (-6, 0)] # Example bounds for log(theta) and log10(lambda)
+                optimal_params, optimal_negLnLike = model.max_likelihood(bounds)
+                print("Optimal parameters:", optimal_params)
+                print("Optimal Negative Log-Likelihood:", optimal_negLnLike)
         """
 
         def objective(logtheta_loglambda_p_: np.ndarray) -> float:
@@ -734,9 +830,48 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Fits the Kriging model. Public behavior matches the baseline class.
         Nyström path stores additional solver state for fast prediction.
+
+        Args:
+            X (np.ndarray): Training input data of shape (n_samples, n_features).
+            y (np.ndarray): Training output data of shape (n_samples,).
+            bounds (Optional[List[Tuple[float, float]]]): Bounds for hyperparameter optimization.
+                If None, default bounds are used.
+
+        Returns:
+            Kriging: The fitted Kriging model instance.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                print("Fitted theta:", model.theta)
+                print("Fitted Lambda:", model.Lambda)
+                print("Fitted p:", model.p_val)
+                # Print negative log-likelihood at optimum
+                print("Negative Log-Likelihood at optimum:", model.negLnLike)
+                # Print other relevant information
+                print("Fitted hyperparameters:", model.logtheta_loglambda_p_)
+                print("Fitted noise variance:", model.sigma2_)
+                print("Fitted mu:", model.mu_)
+                print("Fitted hyperparameters:", model.logtheta_loglambda_p_)
         """
         X = np.asarray(X)
-        y = np.asarray(y).flatten()
+        y = np.asarray(y)
+
+        # --- Explicit shape checks BEFORE flattening y ---
+        if X.ndim != 2:
+            raise ValueError(f"X must be 2-dimensional, got shape {X.shape}")
+        if y.ndim != 1:
+            raise ValueError(f"y must be 1-dimensional, got shape {y.shape}")
+        if X.shape[0] != y.shape[0]:
+            raise ValueError(f"X and y must have the same number of samples, got {X.shape[0]} and {y.shape[0]}")
+
+        y = y.flatten()
+
         self.X_ = X
         self.y_ = y
         self.n, self.k = self.X_.shape
@@ -823,6 +958,35 @@ class Kriging(BaseEstimator, RegressorMixin):
     # -------- Prediction --------
 
     def _pred_exact(self, x: np.ndarray) -> Tuple[float, float, Optional[float]]:
+        """
+        Exact prediction using Cholesky state:
+                f̂(x) = μ̂ + ψ(x)^T R^{-1} r
+                s^2(x) = σ̂^2 [1 + λ − ψ(x)^T R^{-1} ψ(x)]
+
+        Args:
+            x (np.ndarray): Point to predict at.
+
+        Returns:
+            Tuple[float, float, Optional[float]]: (f, s, ExpImp) where:
+                - f (float): Predicted mean.
+                - s (float): Predicted standard deviation.
+                - ExpImp (Optional[float]): Expected improvement (log10 scale) if return_ei is True; otherwise None.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                x_new = np.array([0.25, 0.25])
+                f, s, exp_imp = model._pred_exact(x_new)
+                print("Predicted mean f:", f)
+                print("Predicted standard deviation s:", s)
+                if exp_imp is not None:
+                    print("Expected Improvement (log10 scale):", exp_imp)
+        """
         y = self.y_.flatten()
 
         if (self.method == "regression") or (self.method == "reinterpolation"):
@@ -884,6 +1048,30 @@ class Kriging(BaseEstimator, RegressorMixin):
         Prediction using Nyström state:
           f̂(x) = μ̂ + ψ(x)^T R^{-1} r
           s^2(x) = σ̂^2 [1 + λ − ψ(x)^T R^{-1} ψ(x)]
+
+        Args:
+            x (np.ndarray): Point to predict at.
+
+        Returns:
+            Tuple[float, float, Optional[float]]: (f, s, ExpImp) where:
+                - f (float): Predicted mean.
+                - s (float): Predicted standard deviation.
+                - ExpImp (Optional[float]): Expected improvement (log10 scale) if return_ei is True; otherwise None.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0], [0.25, 0.25], [0.75, 0.75]])
+                y_train = np.array([0.1, 0.2, 0.3, 0.15, 0.25])
+                # Fit the Kriging model with Nyström approximation
+                model = Kriging(use_nystrom=True, nystrom_m=3).fit(X_train, y_train)
+                x_new = np.array([0.5, 0.5])
+                f, s, exp_imp = model._pred_nystrom(x_new)
+                print("Predicted mean f:", f)
+                print("Predicted standard deviation s:", s)
+                if exp_imp is not None:
+                    print("Expected Improvement (log10 scale):", exp_imp)
         """
         # Ensure state is available
         if self.C_ is None or self.M_chol_ is None or self.Rinv_r_ is None:
@@ -910,6 +1098,48 @@ class Kriging(BaseEstimator, RegressorMixin):
     def _pred(self, x: np.ndarray) -> Tuple[float, float, Optional[float]]:
         """
         Computes a single-point Kriging prediction (exact or Nyström).
+
+        Args:
+            x (np.ndarray): Point to predict at.
+
+        Returns:
+            Tuple[float, float, Optional[float]]: (f, s, ExpImp) where:
+                - f (float): Predicted mean.
+                - s (float): Predicted standard deviation.
+                - ExpImp (Optional[float]): Expected improvement (log10 scale) if return_ei is True; otherwise None.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                import matplotlib.pyplot as plt
+
+                # 1D Training data
+                X_train = np.array([[0.0], [0.3], [0.6], [1.0]])
+                y_train = np.sin(2 * np.pi * X_train).ravel()  # Example: noisy sine
+
+                # Fit the Kriging model (exact)
+                model = Kriging().fit(X_train, y_train)
+
+                # Fit the Kriging model (Nyström)
+                model_nystrom = Kriging(use_nystrom=True, nystrom_m=2).fit(X_train, y_train)
+
+                # Predict on a grid
+                x_grid = np.linspace(0, 1, 200).reshape(-1, 1)
+                y_pred_exact = model.predict(x_grid)
+                y_pred_nystrom = model_nystrom.predict(x_grid)
+
+                # Plot
+                plt.figure(figsize=(8, 4))
+                plt.plot(x_grid, y_pred_exact, label='Exact Kriging')
+                plt.plot(x_grid, y_pred_nystrom, '--', label='Nyström Kriging')
+                plt.scatter(X_train, y_train, color='red', label='Training Data')
+                plt.xlabel('x')
+                plt.ylabel('y')
+                plt.legend()
+                plt.title('Kriging and Nyström Kriging (1D Example)')
+                plt.grid()
+                plt.show()
+
         """
         if self.use_nystrom:
             return self._pred_nystrom(x)
@@ -919,6 +1149,34 @@ class Kriging(BaseEstimator, RegressorMixin):
     def predict(self, X: np.ndarray, return_std=False, return_val: str = "y") -> np.ndarray:
         """
         Batch prediction wrapper around _pred, identical public behavior to baseline.
+
+        Args:
+            X (np.ndarray): Points to predict at, shape (n_samples, n_features).
+            return_std (bool): Whether to return standard deviations.
+            return_val (str): What to return: "y" (default), "s", "ei", or "all".
+
+        Returns:
+            np.ndarray: Predictions, standard deviations, and/or expected improvements.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                # Predict at new points
+                X_new = np.array([[0.25, 0.25], [0.75, 0.75]])
+                predictions = model.predict(X_new)
+                print("Predictions:", predictions)
+                # Predict with standard deviations
+                predictions, std_devs = model.predict(X_new, return_std=True)
+                print("Predictions:", predictions)
+                print("Standard Deviations:", std_devs)
+                # Predict expected improvements
+                eis = model.predict(X_new, return_val="ei")
+                print("Expected Improvements (log10 scale):", eis)
         """
         self.return_std = return_std
         X = self._reshape_X(X)
@@ -947,6 +1205,31 @@ class Kriging(BaseEstimator, RegressorMixin):
     # -------- Plot (same behavior as baseline) --------
 
     def plot(self, i: int = 0, j: int = 1, show: Optional[bool] = True, add_points: bool = True) -> None:
+        """
+        Plots the Kriging model. For 1D, plots the prediction curve. For 2D, creates a contour plot.
+        Uses Nyström prediction if enabled.
+
+        Args:
+            i (int): Index of the first variable to plot (default is 0).
+            j (int): Index of the second variable to plot (default is 1).
+            show (Optional[bool]): Whether to display the plot immediately (default is True).
+            add_points (bool): Whether to add training data points to the plot (default is True).
+
+        Returns:
+            None
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                import matplotlib.pyplot as plt
+                # 1D Training data
+                X_train = np.array([[0.0], [0.3], [0.6], [1.0]])
+                y_train = np.sin(2 * np.pi * X_train).ravel()  # Example: noisy sine
+                # Fit the Kriging model with Nyström approximation
+                model = Kriging(use_nystrom=True, nystrom_m=2).fit(X_train, y_train)
+                # Plot the model
+                model.plot()
+        """
         if self.k == 1:
             n_grid = 100
             x = linspace(self.min_X[0], self.max_X[0], num=n_grid).reshape(-1, 1)
