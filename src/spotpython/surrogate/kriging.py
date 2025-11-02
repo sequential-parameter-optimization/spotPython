@@ -76,6 +76,39 @@ class Kriging(BaseEstimator, RegressorMixin):
         nystrom_seed: int = 1234,
         **kwargs,
     ):
+        """Initialize the Kriging model.
+
+        Args:
+            eps (float): Small regularization term for numerical stability.
+            penalty (float): Penalty value for ill-conditioned correlation matrices.
+            method (str): "interpolation", "regression", or "reinterpolation".
+            var_type (List[str]): Variable types for each dimension.
+            name (str): Name of the model.
+            seed (int): Random seed for reproducibility.
+            model_optimizer: Optimizer function for hyperparameter tuning.
+            model_fun_evals (Optional[int]): Max function evaluations for optimizer.
+            n_theta (Optional[int]): Number of theta parameters.
+            min_theta (float): Minimum log10(theta) bound.
+            max_theta (float): Maximum log10(theta) bound.
+            theta_init_zero (bool): If True, initialize theta at zero.
+            p_val (float): Initial p value for correlation function.
+            n_p (int): Number of p parameters if optim_p is True.
+            optim_p (bool): If True, optimize p parameters.
+            min_p (float): Minimum p bound.
+            max_p (float): Maximum p bound.
+            min_Lambda (float): Minimum log10(Lambda) bound.
+            max_Lambda (float): Maximum log10(Lambda) bound.
+            log_level (int): Logging level.
+            spot_writer: Writer object for logging metrics.
+            counter: Counter for logging steps.
+            metric_factorial (str): Distance metric for factor variables.
+            isotropic (bool): If True, use isotropic theta.
+            theta (Optional[np.ndarray]): Initial theta values.
+            Lambda (Optional[float]): Initial Lambda value.
+            use_nystrom (bool): If True, use Nyström approximation.
+            nystrom_m (Optional[int]): Number of landmarks for Nyström.
+            nystrom_seed (int): Seed for landmark selection in Nyström.
+        """
         if eps is None:
             self.eps = self._get_eps()
         else:
@@ -148,10 +181,47 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.Rinv_r_ = None  # R^{-1} r (n,)
 
     def _get_eps(self) -> float:
+        """
+        Computes a small epsilon value for numerical stability.
+        Returns the square root of the machine epsilon.
+
+        Returns:
+            float: A small epsilon value.
+        """
         eps = np.finfo(float).eps
         return np.sqrt(eps)
 
     def _set_variable_types(self) -> None:
+        """
+        Sets the variable types and their corresponding masks.
+        Ensures that var_type has length k by repeating "num" if necessary. Sets the variable types for the class instance.
+        This method sets the variable types for the class instance based
+        on the `var_type` attribute. If the length of `var_type` is less
+        than `k`, all variable types are forced to 'num' and a warning is logged.
+        The method then creates Boolean masks for each variable
+        type ('num', 'factor', 'int', 'ordered') using numpy arrays, e.g.,
+        `num_mask = array([ True,  True])` if two numerical variables are present.
+
+        Examples:
+            >>> from spotpython.build import Kriging
+                import numpy as np
+                nat_X = np.array([[1, 2], [3, 4], [5, 6]])
+                nat_y = np.array([1, 2, 3])
+                var_type = ["num", "int", "float"]
+                n_theta=2
+                n_p=2
+                S=Kriging(var_type=var_type, seed=124, n_theta=n_theta, n_p=n_p, optim_p=True)
+                S._initialize_variables(nat_X, nat_y)
+                S._set_variable_types()
+                assert S.var_type == ["num", "int", "float"]
+                assert S.num_mask.all() == False
+                assert S.factor_mask.all() == False
+                assert S.int_mask.all() == False
+                assert S.ordered_mask.all() == True
+                assert np.all(S.num_mask == np.array([True, False, False]))
+                assert np.all(S.int_mask == np.array([False, True, False]))
+                assert np.all(S.ordered_mask == np.array([True, True, True]))
+        """
         if len(self.var_type) < self.k:
             self.var_type = ["num"] * self.k
         var_type_array = np.array(self.var_type)
@@ -161,6 +231,25 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.ordered_mask = np.isin(var_type_array, ["int", "num", "float"])
 
     def get_model_params(self) -> Dict[str, float]:
+        """
+        Returns the model parameters as a dictionary.
+
+        Returns:
+            Dict[str, float]: A dictionary containing model parameters.
+
+        Examples:
+            >>> import numpy as np
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> # Training data
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> # Initialize and fit the Kriging model
+            >>> model = Kriging()
+            >>> model.fit(X_train, y_train)
+            >>> # get theta values of the fitted model
+            >>> X_values = model.get_model_params()["X"]
+            >>> print("X values:", X_values)
+        """
         return {
             "n": self.n,
             "k": self.k,
@@ -174,6 +263,18 @@ class Kriging(BaseEstimator, RegressorMixin):
         }
 
     def _update_log(self) -> None:
+        """
+        If spot_writer is not None, this method writes the current values of
+        negLnLike, theta, p (if optim_p is True),
+        and Lambda (if method is not "interpolation") to the spot_writer object.
+
+        Args:
+            self (object): The Kriging object.
+
+        Returns:
+            None
+
+        """
         self.log["negLnLike"] = append(self.log["negLnLike"], self.negLnLike)
         self.log["theta"] = append(self.log["theta"], self.theta)
         if self.optim_p:
@@ -221,7 +322,39 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def build_Psi(self) -> np.ndarray:
         """
-        Constructs the correlation matrix upper triangle Psi (R = exp(-D)), see Forrester Ch. 2.
+        Constructs a new (n x n) correlation matrix Psi to reflect new data
+        or a change in hyperparameters.
+        This method uses `theta`, `p`, and coded `X` values to construct the
+        correlation matrix as described in [Forr08a, p.57].
+
+        Notes:
+            - Correlation follows the stationary Gaussian kernel used in Kriging:
+              R = exp(-D), with D a weighted distance. See Forrester et al. (2008),
+                Ch. 2, correlation modelling.
+            - The code builds D as a sum of per-dimension distance contributions
+              scaled by 10**theta (theta is stored in log10), then applies exp(-D).
+            - Returns only the upper triangle; the symmetric and diagonal parts
+              are handled by the caller.
+
+        Attributes:
+            Psi (np.matrix): Correlation matrix Psi. Shape (n,n).
+            cnd_Psi (float): Condition number of Psi.
+            inf_Psi (bool): True if Psi is infinite, False otherwise.
+
+        Raises:
+            LinAlgError: If building Psi fails.
+
+        Examples:
+            >>> import numpy as np
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> # Training data
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> # Fit the Kriging model
+            >>> model = Kriging().fit(X_train, y_train)
+            >>> # Build the correlation matrix Psi
+            >>> Psi = model.build_Psi()
+            >>> print("Correlation matrix Psi:\n", Psi)
         """
         try:
             n, k = self.X_.shape
@@ -253,6 +386,27 @@ class Kriging(BaseEstimator, RegressorMixin):
         """
         Cross-correlation matrix K(A,B) using the same distance definition as build_Psi/build_psi_vec.
         Returns exp(-D) with D composed from ordered and factor contributions.
+
+        Args:
+            A (np.ndarray): First set of points (m x k).
+            B (np.ndarray): Second set of points (n x k).
+
+        Returns:
+            np.ndarray: Cross-correlation matrix K(A,B) of shape (m, n).
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                # Create two sets of points A and B
+                A = np.array([[0.0, 0.0], [1.0, 1.0]])
+                B = np.array([[0.5, 0.5], [1.5, 1.5]])
+                # Compute the cross-correlation matrix K(A, B)
+                K_AB = model._kernel_cross(A, B)
+                print("Cross-correlation matrix K(A, B):\n", K_AB)
         """
         A = np.asarray(A)
         B = np.asarray(B)
@@ -276,7 +430,30 @@ class Kriging(BaseEstimator, RegressorMixin):
 
     def build_psi_vec(self, x: np.ndarray) -> np.ndarray:
         """
-        ψ(x) = K(x, X) with the same metric as build_Psi, Forrester Ch. 2.
+        Build the psi vector required for predictive methods.
+        ψ(x) := [exp(-D(x, x_i))]_{i=1..n}, i.e., correlation between a new x and the training sites
+        using the same D as for R (Forrester, Ch. 2).
+
+        Args:
+            x (ndarray): Point to calculate the psi vector for.
+
+        Returns:
+            None
+
+        Modifies:
+            self.psi (np.ndarray): Updates the psi vector.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                x_new = np.array([0.25, 0.25])
+                psi_vector = model.build_psi_vec(x_new)
+                print("Psi vector for new point:\n", psi_vector)
         """
         try:
             psi = self._kernel_cross(np.asarray(x), self.X_).ravel()
@@ -288,6 +465,39 @@ class Kriging(BaseEstimator, RegressorMixin):
     # -------- Exact (Cholesky) likelihood --------
 
     def _likelihood_exact(self, x: np.ndarray) -> Tuple[float, np.ndarray, np.ndarray]:
+        """
+        Computes the negative of the concentrated log-likelihood for a given set
+        of log(theta) parameters. Returns the negative log-likelihood, the correlation matrix Psi, and its Cholesky factor U.
+        Negative concentrated log-likelihood (Forrester, Ch. 3):
+          - Given R (here Psi with diagonal and nugget), μ = (1^T R^{-1} y)/(1^T R^{-1} 1),
+            σ^2 = (r^T R^{-1} r)/n with r = y - 1·μ,
+          - Concentrated −log L = (n/2) log(σ^2) + (1/2) log |R| (constants omitted).
+
+        Args:
+            x (np.ndarray):
+                1D array of log(theta), log(Lambda) (if method is "regression" or "reinterpolation"), and p values (if optim_p is True).
+
+        Returns:
+            (float, np.ndarray, np.ndarray):
+                (negLnLike, Psi, U) where:
+                - negLnLike (float): The negative concentrated log-likelihood.
+                - Psi (np.ndarray): The correlation matrix.
+                - U (np.ndarray): The Cholesky factor (or None if ill-conditioned).
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+                y_train = np.array([0.1, 0.2, 0.3])
+                # Fit the Kriging model
+                model = Kriging().fit(X_train, y_train)
+                log_theta = np.array([0.0, 0.0, -6.0]) # nugget: -6 => 10**(-6) = 1e-6
+                negLnLike, Psi, U = model._likelihood_exact(log_theta)
+                print("Negative Log-Likelihood:", negLnLike)
+                print("Correlation matrix Psi:\n", Psi)
+                print("Cholesky factor U (lower triangular):\n", U)
+        """
         X = self.X_
         y = self.y_.flatten()
         self.theta = x[: self.n_theta]
@@ -336,6 +546,19 @@ class Kriging(BaseEstimator, RegressorMixin):
     def _nystrom_setup(self) -> None:
         """
         Selects landmarks and builds K_mm (W) and K_nm (C) for the current theta.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0], [0.25, 0.25], [0.75, 0.75]])
+                y_train = np.array([0.1, 0.2, 0.3, 0.15, 0.25])
+                # Fit the Kriging model with Nyström approximation
+                model = Kriging(use_nystrom=True, nystrom_m=3).fit(X_train, y_train)
+                model._nystrom_setup()
+                print("Landmark indices:", model.landmark_idx_)
+                print("Landmark points (X_m_):\n", model.X_m_)
+                print("Cholesky factor of W (W_chol_):\n", model.W_chol_)
         """
         n = self.n
         m = self.nystrom_m or max(10, min(n // 2, 300))
@@ -363,18 +586,55 @@ class Kriging(BaseEstimator, RegressorMixin):
     def _woodbury_solve(self, v: np.ndarray) -> np.ndarray:
         """
         Applies R^{-1} v using Woodbury:
-          R = λ I + C W^{-1} C^T  has inverse
-          R^{-1} = (1/λ) I − (1/λ^2) C (W + (1/λ) C^T C)^{-1} C^T.
+        R = λ I + C W^{-1} C^T  has inverse
+        R^{-1} = (1/λ) I − (1/λ^2) C (W + (1/λ) C^T C)^{-1} C^T.
         Uses precomputed self.M_chol_ (chol of W + (1/λ) C^T C).
+
+        Args:
+            v (np.ndarray): Vector to solve against (n,).
+
+        Returns:
+            np.ndarray: Result of R^{-1} v (n,).
+
+        Raises:
+            RuntimeError: If required matrices not initialized
+            ValueError: If input vector has wrong length
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.surrogate.kriging import Kriging
+                # Training data
+                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0], [0.25, 0.25], [0.75, 0.75]])
+                y_train = np.array([0.1, 0.2, 0.3, 0.15, 0.25])
+                # Fit the Kriging model with Nyström approximation
+                model = Kriging(use_nystrom=True, nystrom_m=3).fit(X_train, y_train)
+                model._nystrom_setup()
+                v = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+                Rinv_v = model._woodbury_solve(v)
+                print("Result of R^{-1} v:\n", Rinv_v)
+                # Note: Ensure that model.M_chol_ is computed before calling this method.
         """
+        # Input validation and reshaping
+        v = np.asarray(v).reshape(-1)  # Flatten to 1D
+        if v.size != self.n:
+            raise ValueError(f"Input vector has wrong length: {v.size} != {self.n}")
+
+        if getattr(self, "C_", None) is None or getattr(self, "M_chol_", None) is None:
+            raise RuntimeError("Required matrices not initialized. Call _nystrom_setup() first.")
+
         lam = float(self.lambda_lin_)
         C = self.C_
+
         # rhs = C^T v
         rhs = C.T @ v
-        # Solve α from M α = rhs
-        alpha = np.linalg.solve(self.M_chol_, np.linalg.solve(self.M_chol_.T, rhs))
-        # R^{-1} v
-        return (v / lam) - (C @ alpha) / (lam * lam)
+
+        # Solve M α = rhs via two triangular solves with M_chol
+        temp = np.linalg.solve(self.M_chol_, rhs)
+        alpha = np.linalg.solve(self.M_chol_.T, temp)
+
+        # Apply Woodbury formula: (1/λ)v - (1/λ^2)C α
+        result = (v - C @ alpha) / lam
+        return result
 
     def _likelihood_nystrom(self, x: np.ndarray) -> Tuple[float, None, None]:
         """
