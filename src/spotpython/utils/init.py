@@ -64,6 +64,7 @@ def fun_control_init(
     max_surrogate_points=30,
     metric_sklearn=None,
     metric_sklearn_name=None,
+    min_success_rate=0.0,
     noise=False,
     n_points=1,
     n_samples=None,
@@ -228,6 +229,10 @@ def fun_control_init(
             The metric object from the scikit-learn library. Default is None.
         metric_sklearn_name (str):
             The name of the metric object from the scikit-learn library. Default is None.
+        min_success_rate (float):
+            The minimum success rate for the Spot optimization to continue.
+            If the success rate falls below this value, a random point is proposed based on the acquisition_failure_strategy.
+            Default is 0.0.
         noise (bool):
             Whether the objective function is noiy or not. Default is False.
             Affects the repeat of the function evaluations.
@@ -395,6 +400,7 @@ def fun_control_init(
                 'metric_sklearn_name': None,
                 'metric_torch': None,
                 'metric_params': {},
+                'min_success_rate': 0.0,
                 'model_dict': {},
                 'noise': False,
                 'n_points': 1,
@@ -489,6 +495,7 @@ def fun_control_init(
         "metric_sklearn_name": metric_sklearn_name,
         "metric_torch": None,
         "metric_params": {},
+        "min_success_rate": min_success_rate,
         "model_dict": {},
         "noise": noise,
         "n_points": n_points,

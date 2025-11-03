@@ -215,7 +215,7 @@ class Spot:
         self.success_rate = 0.0
         self.success_counter = 0
         self.window_size = 100
-        self.min_success_rate = 0.01
+        self.min_success_rate = 0.0
         # small value:
         self.eps = sqrt(spacing(1))
 
@@ -373,6 +373,7 @@ class Spot:
         self.n_points = self.fun_control["n_points"]
         self.progress_file = self.fun_control["progress_file"]
         self.tkagg = self.fun_control["tkagg"]
+        self.min_success_rate = self.fun_control["min_success_rate"]
         # self.success_counter = 0
         if self.tkagg:
             matplotlib.use("TkAgg")
@@ -1714,7 +1715,7 @@ class Spot:
         # the last window_size evaluations:
         self._update_success_rate(y_new=y0)
         # Append New Solutions (only if they are not nan):
-        if (y0.shape[0] > 0) and (self._get_success_rate() >= self.min_success_rate):
+        if y0.shape[0] > 0:
             self.X = np.append(self.X, X0, axis=0)
             self.y = np.append(self.y, y0)
         else:
