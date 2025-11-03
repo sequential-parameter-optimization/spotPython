@@ -1007,3 +1007,66 @@ def mmphi_intensive_update(X: np.ndarray, new_point: np.ndarray, J: np.ndarray, 
     intensive_phiq = (sum_term / M) ** (1.0 / q)
 
     return intensive_phiq, updated_J, updated_d
+
+
+def propose_mmphi_intensive_minimizing_point(
+    X: np.ndarray,
+    n_candidates: int = 1000,
+    q: float = 2.0,
+    p: float = 2.0,
+    seed: Optional[int] = None,
+    lower: Optional[np.ndarray] = None,
+    upper: Optional[np.ndarray] = None,
+) -> np.ndarray:
+    """
+    Propose a new point that, when added to X, minimizes the intensive Morris-Mitchell (mmphi_intensive) criterion.
+
+    Args:
+        X (np.ndarray): Existing points, shape (n_points, n_dim).
+        n_candidates (int): Number of random candidates to sample.
+        q (float): Exponent for mmphi_intensive.
+        p (float): Distance norm for mmphi_intensive.
+        seed (int, optional): Random seed.
+        lower (np.ndarray, optional): Lower bounds for each dimension (default: 0).
+        upper (np.ndarray, optional): Upper bounds for each dimension (default: 1).
+
+    Returns:
+        np.ndarray: Proposed new point, shape (1, n_dim).
+
+    Examples:
+        >>> import numpy as np
+            from spotpython.utils.sampling import propose_mmphi_intensive_minimizing_point
+            # Existing design with 3 points in 2D
+            X = np.array([[1.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            # Propose a new point
+            new_point = propose_mmphi_intensive_minimizing_point    (X, n_candidates=500, q=2, p=2, seed=42)
+            print(new_point)
+            # plot the existing points and the new proposed point
+            import matplotlib.pyplot as plt
+            plt.scatter(X[:, 0], X[:, 1], color='blue', label='Existing Points')
+            plt.scatter(new_point[0, 0], new_point[0, 1], color='red', label='Proposed Point')
+            plt.legend()
+            # add grid and labels
+            plt.grid()
+            plt.title('MM-PHI Proposed Point')
+            plt.xlabel('X1')
+            plt.ylabel('X2')
+            plt.show()
+    """
+    rng = np.random.default_rng(seed)
+    n_dim = X.shape[1]
+    if lower is None:
+        lower = np.zeros(n_dim)
+    if upper is None:
+        upper = np.ones(n_dim)
+    # Generate candidate points uniformly
+    candidates = rng.uniform(lower, upper, size=(n_candidates, n_dim))
+    best_phi = np.inf
+    best_point = None
+    for cand in candidates:
+        X_aug = np.vstack([X, cand])
+        phi, _, _ = mmphi_intensive(X_aug, q=q, p=p)
+        if phi < best_phi:
+            best_phi = phi
+            best_point = cand
+    return best_point.reshape(1, -1)

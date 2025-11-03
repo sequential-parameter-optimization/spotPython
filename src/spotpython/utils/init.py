@@ -27,6 +27,7 @@ def fun_control_init(
     PREFIX=None,
     TENSORBOARD_CLEAN=False,
     accelerator="auto",
+    acquisition_failure_strategy="random",
     check_finite=True,
     collate_fn_name=None,
     converters=None,
@@ -132,6 +133,10 @@ def fun_control_init(
             The accelerator to be used by the Lighting Trainer.
             It can be either "auto", "dp", "ddp", "ddp2", "ddp_spawn", "ddp_cpu", "gpu", "tpu".
             Default is "auto".
+        acquisition_failure_strategy (str):
+            Strategy to handle acquisition function failure.
+            Can be "random" to fall back to random sampling when the acquisition function fails.
+            Default is "random".
         check_finite (bool):
             When set True, stops training when the monitor becomes NaN or infinite.
             Default is True.
@@ -367,6 +372,7 @@ def fun_control_init(
                 '_L_out': 11,
                 '_L_cond': None,
                 'accelerator': "auto",
+                'acquisition_failure_strategy': "random",
                 'check_finite': True,
                 'core_model': None,
                 'core_model_name': None,
@@ -440,6 +446,7 @@ def fun_control_init(
         "_L_cond": _L_cond,
         "_torchmetric": _torchmetric,
         "accelerator": accelerator,
+        "acquisition_failure_strategy": acquisition_failure_strategy,
         "check_finite": check_finite,
         "collate_fn_name": collate_fn_name,
         "converters": converters,

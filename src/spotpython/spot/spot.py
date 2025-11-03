@@ -17,6 +17,7 @@ from multiprocessing import set_start_method, get_start_method
 from spotpython.surrogate.kriging import Kriging
 from spotpython.utils.repair import apply_penalty_NA
 from spotpython.utils.seed import set_all_seeds
+from spotpython.utils.sampling import propose_mmphi_intensive_minimizing_point
 import numpy as np
 import pandas as pd
 import pylab
@@ -367,9 +368,11 @@ class Spot:
         self.n_points = self.fun_control["n_points"]
         self.progress_file = self.fun_control["progress_file"]
         self.tkagg = self.fun_control["tkagg"]
+        # self.success_counter = 0
         if self.tkagg:
             matplotlib.use("TkAgg")
         self.verbosity = self.fun_control["verbosity"]
+        self.acquisition_failure_strategy = self.fun_control["acquisition_failure_strategy"]
         self.max_surrogate_points = self.surrogate_control["max_surrogate_points"]
         self.use_nystrom = self.surrogate_control["use_nystrom"]
         self.nystrom_m = self.surrogate_control["nystrom_m"]
@@ -870,8 +873,18 @@ class Spot:
             return repeat(X0, self.fun_repeats, axis=0)
         # If no X0 found, then generate self.n_points new solutions:
         else:
-            self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
-            X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
+            # No new X0 found on surrogate:
+            # use morris-mitchell ("mm") or random design as fallback
+            if self.acquisition_failure_strategy == "mm":
+                X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=1000, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
+                # ensure that X0 is repeated according to repeats=self.design_control["repeats"]
+                X0 = repeat(X0, self.design_control["repeats"], axis=0)
+                print("Using mmphi minimizing point as fallback.")
+            else:
+                # fallback to spacefilling design (acquisition_failure_strategy == "random"):
+                self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
+                X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
+                print("Using spacefilling design as fallback.")
             X0 = repair_non_numeric(X0, self.var_type)
             logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
             return X0
@@ -1578,6 +1591,19 @@ class Spot:
         # Apply penalty for NA values works only on so values:
         y0 = apply_penalty_NA(y0, self.fun_control["penalty_NA"], verbosity=self.verbosity)
         X0, y0 = remove_nan(X0, y0, stop_on_zero_return=False)
+        # check if the new y0 value is smaller that the min of the self.y values so far and
+        # in this case increase the success_counter. Calculate the success rate, which is defined as
+        # the number of successful improvements divided by the total number of function evaluations over
+        # the last window_size evaluations:
+        # self.success_window_size = 10
+        # if y0.shape[0] > 0:
+        #     for y_val in y0:
+        #         if y_val < self.min_y:
+        #             self.success_counter += 1
+        #     total_evaluations = self.counter + y0.shape[0]
+        #     window_size = min(total_evaluations, self.success_window_size)
+        #     self.success_rate = self.success_counter / window_size
+        #     print(f"Success rate over the last {window_size} evaluations: {self.success_rate:.4f}")
         # Append New Solutions (only if they are not nan):
         if y0.shape[0] > 0:
             self.X = np.append(self.X, X0, axis=0)

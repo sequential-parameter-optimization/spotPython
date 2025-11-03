@@ -34,6 +34,7 @@ def test_get_spot_attributes_as_df():
 
     # Define expected attribute names (ensure these match your Spot class' attributes)
     expected_attributes = ['X',
+                            'acquisition_failure_strategy',
                             'all_lower',
                             'all_upper',
                             'all_var_name',
