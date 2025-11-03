@@ -32,7 +32,7 @@ from numpy import repeat
 from numpy import sqrt
 from numpy import spacing
 from numpy import append
-from numpy import min, max
+
 from spotpython.utils.convert import get_shape
 from spotpython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotpython.utils.compare import selectNew
@@ -211,6 +211,11 @@ class Spot:
         self.optimizer_control = optimizer_control
         self.surrogate_control = surrogate_control
 
+        self.counter = 0
+        self.success_rate = 0.0
+        self.success_counter = 0
+        self.window_size = 100
+        self.min_success_rate = 0.01
         # small value:
         self.eps = sqrt(spacing(1))
 
@@ -383,7 +388,6 @@ class Spot:
         self.y = None
 
         # Logging information:
-        self.counter = 0
         self.min_y = None
         self.min_X = None
         self.min_mean_X = None
@@ -392,6 +396,119 @@ class Spot:
         self.mean_y = None
         self.var_y = None
         self.y_mo = None
+
+    def _get_counter(self) -> int:
+        """Return the current evaluation counter, always as an integer >= 0.
+
+        Returns:
+            (int): current evaluation counter
+
+        Examples:
+            >>> from spotpython.spot import spot
+            >>> S = spot.Spot(fun=lambda x: x)
+            >>> print(S._get_counter())
+            0
+        """
+        return int(getattr(self, "counter", 0) or 0)
+
+    def _set_counter(self, value):
+        """Set the evaluation counter, ensuring it is a non-negative integer.
+
+        Args:
+            value (int): new evaluation counter value
+
+        Raises:
+            ValueError: If the provided value is not a non-negative integer.
+
+        Returns:
+            None
+
+        Examples:
+            >>> from spotpython.spot import spot
+            >>> S = spot.Spot(fun=lambda x: x)
+            >>> S._set_counter(5)
+            >>> print(S._get_counter())
+            5
+        """
+        if not isinstance(value, int) or value < 0:
+            raise ValueError("Counter must be a non-negative integer.")
+        self.counter = value
+
+    def _increment_counter(self, n=1):
+        """Increment the evaluation counter by a specified amount.
+
+        Args:
+            n (int, optional): amount to increment the counter by. Defaults to 1.
+
+        Returns:
+            None
+
+        Examples:
+            >>> from spotpython.spot import spot
+            >>> S = spot.Spot(fun=lambda x: x)
+            >>> S._increment_counter()
+            >>> print(S._get_counter())
+            1
+        """
+        if not isinstance(n, int) or n < 1:
+            raise ValueError("Increment must be a positive integer.")
+        if not hasattr(self, "counter") or self.counter is None:
+            self.counter = 0
+        self.counter += n
+
+    def _update_success_rate(self, y_new) -> None:
+        """
+        Updates the rolling success rate of the optimization process.
+        A success is counted only if the new value y0 is better (smaller) than the best found y value so far.
+        The success rate is calculated based on the last `window_size` successes.
+
+        Args:
+            y_new (np.ndarray): The new function values to consider for the success rate update.
+
+        Returns:
+            float: The rolling success rate of the optimization process.
+        """
+        # Initialize or update the rolling history of successes (1 for success, 0 for failure)
+        if not hasattr(self, "_success_history") or self._success_history is None:
+            self._success_history = []
+
+        # Track the best y value so far
+        best_y = min(self.y) if self.y is not None and len(self.y) > 0 else float("inf")
+        successes = []
+
+        for val in y_new:
+            if val < best_y:
+                successes.append(1)
+                best_y = val  # update best_y if new minimum is found
+            else:
+                successes.append(0)
+
+        # Add new successes to the history
+        self._success_history.extend(successes)
+        # Keep only the last window_size successes
+        self._success_history = self._success_history[-self.window_size :]
+
+        # Calculate the rolling success rate
+        window_size = len(self._success_history)
+        num_successes = sum(self._success_history)
+        self.success_rate = num_successes / window_size if window_size > 0 else 0.0
+        # Optionally, print for debugging:
+        # print(f"Updated rolling success rate (last {window_size}): {self.success_rate}")
+
+    def _get_success_rate(self) -> float:
+        """
+        Get the current success rate of the optimization process.
+
+        Returns:
+            float: The current success rate.
+
+        Examples:
+            >>> from spotpython.spot import spot
+            >>> S = spot.Spot(fun=lambda x: x)
+            >>> print(S._get_success_rate())
+            0.0
+        """
+        return float(getattr(self, "success_rate", 0.0) or 0.0)
 
     def _design_setup(self, design) -> None:
         """
@@ -876,13 +993,13 @@ class Spot:
             # No new X0 found on surrogate:
             # use morris-mitchell ("mm") or random design as fallback
             if self.acquisition_failure_strategy == "mm":
-                X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=1000, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
+                X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=100, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
                 # ensure that X0 is repeated according to repeats=self.design_control["repeats"]
                 X0 = repeat(X0, self.design_control["repeats"], axis=0)
                 print("Using mmphi minimizing point as fallback.")
             else:
                 # fallback to spacefilling design (acquisition_failure_strategy == "random"):
-                self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self.counter)
+                self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self._get_counter())
                 X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
                 print("Using spacefilling design as fallback.")
             X0 = repair_non_numeric(X0, self.var_type)
@@ -1265,7 +1382,7 @@ class Spot:
         # TODO: Error if only nan values are returned
         logger.debug("New y value: %s", self.y)
 
-        self.counter = self.y.size
+        self._set_counter(self.y.size)
         self.X, self.y = remove_nan(self.X, self.y, stop_on_zero_return=True)
 
         if self.X.shape[0] == 0:
@@ -1338,8 +1455,8 @@ class Spot:
         """
         self.min_y = min(self.y)
         self.min_X = self.X[argmin(self.y)]
-        self.counter = self.y.size
-        self.fun_control.update({"counter": self.counter})
+        self._set_counter(self.y.size)
+        self.fun_control.update({"counter": self._get_counter()})
         # Update aggregated x and y values (if noise):
         if self.noise:
             Z = aggregate_mean_var(X=self.X, y=self.y)
@@ -1595,17 +1712,9 @@ class Spot:
         # in this case increase the success_counter. Calculate the success rate, which is defined as
         # the number of successful improvements divided by the total number of function evaluations over
         # the last window_size evaluations:
-        # self.success_window_size = 10
-        # if y0.shape[0] > 0:
-        #     for y_val in y0:
-        #         if y_val < self.min_y:
-        #             self.success_counter += 1
-        #     total_evaluations = self.counter + y0.shape[0]
-        #     window_size = min(total_evaluations, self.success_window_size)
-        #     self.success_rate = self.success_counter / window_size
-        #     print(f"Success rate over the last {window_size} evaluations: {self.success_rate:.4f}")
+        self._update_success_rate(y_new=y0)
         # Append New Solutions (only if they are not nan):
-        if y0.shape[0] > 0:
+        if (y0.shape[0] > 0) and (self._get_success_rate() >= self.min_success_rate):
             self.X = np.append(self.X, X0, axis=0)
             self.y = np.append(self.y, y0)
         else:
@@ -1789,7 +1898,7 @@ class Spot:
                 print("No tensorboard log created.")
 
     def should_continue(self, timeout_start) -> bool:
-        return (self.counter < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
+        return (self._get_counter() < self.fun_evals) and (time.time() < timeout_start + self.max_time * 60)
 
     def generate_random_point(self):
         """Generate a random point in the design space.
@@ -1824,13 +1933,28 @@ class Spot:
                 assert np.all(X0 <= S.upper)
                 assert y0 >= 0
         """
-        X0 = self.generate_design(
-            size=1,
-            repeats=1,
-            lower=self.lower,
-            upper=self.upper,
-        )
-        X0 = repair_non_numeric(X=X0, var_type=self.var_type)
+        # X0 = self.generate_design(
+        #     size=1,
+        #     repeats=1,
+        #     lower=self.lower,
+        #     upper=self.upper,
+        # )
+
+        # No new X0 found:
+        # use morris-mitchell ("mm") or random design as fallback
+        if self.acquisition_failure_strategy == "mm":
+            X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=1000, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
+            # ensure that X0 is repeated according to repeats=self.design_control["repeats"]
+            X0 = repeat(X0, self.design_control["repeats"], axis=0)
+            print("Using mmphi minimizing point as fallback.")
+        else:
+            # fallback to spacefilling design (acquisition_failure_strategy == "random"):
+            self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self._get_counter())
+            X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
+            print("Using spacefilling design as fallback.")
+        X0 = repair_non_numeric(X0, self.var_type)
+
+        # X0 = repair_non_numeric(X=X0, var_type=self.var_type)
         X_all = self.to_all_dim_if_needed(X0)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
@@ -1858,9 +1982,9 @@ class Spot:
         if not self.show_progress:
             return
         if isfinite(self.fun_evals):
-            progress_bar(progress=self.counter / self.fun_evals, y=self.min_y, filename=self.progress_file)
+            progress_bar(progress=self._get_counter() / self.fun_evals, y=self.min_y, filename=self.progress_file, success_rate=self._get_success_rate())
         else:
-            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y, filename=self.progress_file)
+            progress_bar(progress=(time.time() - timeout_start) / (self.max_time * 60), y=self.min_y, filename=self.progress_file, success_rate=self._get_success_rate())
 
     def generate_design(self, size, repeats, lower, upper) -> np.array:
         """Generate a design with `size` points in the interval [lower, upper].
@@ -1908,9 +2032,9 @@ class Spot:
                 X_min = self.min_X.copy()
                 # y_min: best y value so far
                 # y_last: last y value, can be worse than y_min
-                self.spot_writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self.counter)
+                self.spot_writer.add_scalars("spot_y", {"min": y_min, "last": y_last}, self._get_counter())
                 # X_min: X value of the best y value so far
-                self.spot_writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self.counter)
+                self.spot_writer.add_scalars("spot_X", {f"X_{i}": X_min[i] for i in range(self.k)}, self._get_counter())
             else:
                 # get the last n y values:
                 y_last_n = self.y[-self.fun_repeats :].copy()
@@ -1920,13 +2044,13 @@ class Spot:
                 X_min_mean = self.min_mean_X.copy()
                 # y_min_var: variance of the min y value so far
                 y_min_var = self.min_var_y.copy()
-                self.spot_writer.add_scalar("spot_y_min_var", y_min_var, self.counter)
+                self.spot_writer.add_scalar("spot_y_min_var", y_min_var, self._get_counter())
                 # y_min_mean: best mean y value so far (see above)
-                self.spot_writer.add_scalar("spot_y", y_min_mean, self.counter)
+                self.spot_writer.add_scalar("spot_y", y_min_mean, self._get_counter())
                 # last n y values (noisy):
-                self.spot_writer.add_scalars("spot_y", {f"y_last_n{i}": y_last_n[i] for i in range(self.fun_repeats)}, self.counter)
+                self.spot_writer.add_scalars("spot_y", {f"y_last_n{i}": y_last_n[i] for i in range(self.fun_repeats)}, self._get_counter())
                 # X_min_mean: X value of the best mean y value so far (see above)
-                self.spot_writer.add_scalars("spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self.counter)
+                self.spot_writer.add_scalars("spot_X_noise", {f"X_min_mean{i}": X_min_mean[i] for i in range(self.k)}, self._get_counter())
             # get last value of self.X and convert to dict. take the values from self.var_name as keys:
             X_last = self.X[-1].copy()
             config = {self.var_name[i]: X_last[i] for i in range(self.k)}
@@ -2209,9 +2333,9 @@ class Spot:
             plt.legend(loc="best")
             # plt.title(self.surrogate.__class__.__name__ + ". " + str(self.counter) + ": " + str(self.min_y))
             if self.noise:
-                plt.title("fun_evals: " + str(self.counter) + ". min_y (noise): " + str(np.round(self.min_y, 6)) + " min_mean_y: " + str(np.round(self.min_mean_y, 6)))
+                plt.title("fun_evals: " + str(self._get_counter()) + ". min_y (noise): " + str(np.round(self.min_y, 6)) + " min_mean_y: " + str(np.round(self.min_mean_y, 6)))
             else:
-                plt.title("fun_evals: " + str(self.counter) + ". min_y: " + str(np.round(self.min_y, 6)))
+                plt.title("fun_evals: " + str(self._get_counter()) + ". min_y: " + str(np.round(self.min_y, 6)))
             plt.show()
 
     def print_results(self, print_screen=True, dict=None) -> list[str]:

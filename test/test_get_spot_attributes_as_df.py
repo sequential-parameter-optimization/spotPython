@@ -34,7 +34,8 @@ def test_get_spot_attributes_as_df():
 
     # Define expected attribute names (ensure these match your Spot class' attributes)
     expected_attributes = ['X',
-                            'acquisition_failure_strategy',
+                           '_success_history',
+                           'acquisition_failure_strategy',
                             'all_lower',
                             'all_upper',
                             'all_var_name',
@@ -59,6 +60,7 @@ def test_get_spot_attributes_as_df():
                             'min_X',
                             'min_mean_X',
                             'min_mean_y',
+                            'min_success_rate',
                             'min_y',
                             'n_points',
                             'noise',
@@ -72,6 +74,8 @@ def test_get_spot_attributes_as_df():
                             'show_models',
                             'show_progress',
                             'spot_writer',
+                            'success_counter',
+                            'success_rate',
                             'surrogate',
                             'surrogate_control',
                             'tkagg',
@@ -82,6 +86,7 @@ def test_get_spot_attributes_as_df():
                             'var_type',
                             'var_y',
                             'verbosity',
+                            'window_size',
                             'y',
                             'y_mo']
 

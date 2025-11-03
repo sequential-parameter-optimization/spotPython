@@ -1,7 +1,7 @@
 from sys import stdout
 
 
-def progress_bar(progress: float, bar_length: int = 10, message: str = "spotpython tuning:", y=None, filename=None) -> None:
+def progress_bar(progress: float, success_rate: float, bar_length: int = 10, message: str = "spotpython tuning:", y=None, filename=None) -> None:
     """
     Displays or updates a console progress bar.
 
@@ -10,6 +10,8 @@ def progress_bar(progress: float, bar_length: int = 10, message: str = "spotpyth
             a float between 0 and 1. Any int will be converted to a float.
             A value under 0 represents a halt.
             A value at 1 or bigger represents 100%.
+        success_rate (float):
+            a float between 0 and 1 representing the success rate
         bar_length (int):
             length of the progress bar
         message (str):
@@ -30,7 +32,7 @@ def progress_bar(progress: float, bar_length: int = 10, message: str = "spotpyth
         progress = 1
         status = "Done...\r\n"
     block = int(round(bar_length * progress))
-    text = f"{message} [{'#' * block + '-' * (bar_length - block)}] {progress * 100:.2f}% {status}\r\n"
+    text = f"{message} [{'#' * block + '-' * (bar_length - block)}] {progress * 100:.2f}%. Success rate: {success_rate * 100:.2f}% {status}\r\n"
     if filename is not None:
         file.write(text)
         file.flush()
