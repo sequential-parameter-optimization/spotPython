@@ -902,6 +902,33 @@ class Spot:
         else:
             return X
 
+    def _handle_acquisition_failure(self) -> np.array:
+        """
+        Handle acquisition failure by proposing new design points.
+        This method is called when no new design points can be suggested
+        by the surrogate model. Depending on the specified strategy,
+        it either proposes a Morris-Mitchell minimizing point or generates
+        a new space-filling design as a fallback.
+
+        Returns:
+            np.ndarray: New design points proposed as a fallback.
+        """
+        # No new X0 found on surrogate:
+        # use morris-mitchell ("mm") or random design as fallback
+        if self.acquisition_failure_strategy == "mm":
+            X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=100, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
+            # ensure that X0 is repeated according to repeats=self.design_control["repeats"]
+            X0 = repeat(X0, self.design_control["repeats"], axis=0)
+            print("Using mmphi minimizing point as fallback.")
+        else:
+            # fallback to spacefilling design (acquisition_failure_strategy == "random"):
+            self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self._get_counter())
+            X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
+            print("Using spacefilling design as fallback.")
+        X0 = repair_non_numeric(X0, self.var_type)
+        logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
+        return X0
+
     def get_new_X0(self) -> np.array:
         """
         Generate new design points for the optimization process.
@@ -991,21 +1018,7 @@ class Spot:
             return repeat(X0, self.fun_repeats, axis=0)
         # If no X0 found, then generate self.n_points new solutions:
         else:
-            # No new X0 found on surrogate:
-            # use morris-mitchell ("mm") or random design as fallback
-            if self.acquisition_failure_strategy == "mm":
-                X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=100, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
-                # ensure that X0 is repeated according to repeats=self.design_control["repeats"]
-                X0 = repeat(X0, self.design_control["repeats"], axis=0)
-                print("Using mmphi minimizing point as fallback.")
-            else:
-                # fallback to spacefilling design (acquisition_failure_strategy == "random"):
-                self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self._get_counter())
-                X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
-                print("Using spacefilling design as fallback.")
-            X0 = repair_non_numeric(X0, self.var_type)
-            logger.warning("No new XO found on surrogate. Generate new solution %s", X0)
-            return X0
+            return self._handle_acquisition_failure()
 
     def run(self, X_start: np.ndarray = None) -> Spot:
         """
@@ -1934,28 +1947,7 @@ class Spot:
                 assert np.all(X0 <= S.upper)
                 assert y0 >= 0
         """
-        # X0 = self.generate_design(
-        #     size=1,
-        #     repeats=1,
-        #     lower=self.lower,
-        #     upper=self.upper,
-        # )
-
-        # No new X0 found:
-        # use morris-mitchell ("mm") or random design as fallback
-        if self.acquisition_failure_strategy == "mm":
-            X0 = propose_mmphi_intensive_minimizing_point(X=self.X, n_candidates=1000, q=2, p=2, seed=1, lower=self.lower, upper=self.upper)
-            # ensure that X0 is repeated according to repeats=self.design_control["repeats"]
-            X0 = repeat(X0, self.design_control["repeats"], axis=0)
-            print("Using mmphi minimizing point as fallback.")
-        else:
-            # fallback to spacefilling design (acquisition_failure_strategy == "random"):
-            self.design = SpaceFilling(k=self.k, seed=self.fun_control["seed"] + self._get_counter())
-            X0 = self.generate_design(size=self.n_points, repeats=self.design_control["repeats"], lower=self.lower, upper=self.upper)
-            print("Using spacefilling design as fallback.")
-        X0 = repair_non_numeric(X0, self.var_type)
-
-        # X0 = repair_non_numeric(X=X0, var_type=self.var_type)
+        X0 = self._handle_acquisition_failure()
         X_all = self.to_all_dim_if_needed(X0)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: X_all: %s", X_all)
         logger.debug("In Spot() generate_random_point(), before calling self.fun: fun_control: %s", self.fun_control)
