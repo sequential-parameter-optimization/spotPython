@@ -51,6 +51,8 @@ def test_get_spot_attributes_as_df():
                             'ident',
                             'infill_criterion',
                             'k',
+                            'kernel',
+                            'kernel_params',
                             'log_level',
                             'lower',
                             'max_surrogate_points',

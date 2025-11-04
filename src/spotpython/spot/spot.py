@@ -212,6 +212,13 @@ class Spot:
         self.optimizer_control = optimizer_control
         self.surrogate_control = surrogate_control
 
+        # Kernel selection from fun_control (NEW)
+        self.kernel = None
+        self.kernel_params = None
+        if fun_control is not None:
+            self.kernel = fun_control.get("kernel", "gauss")
+            self.kernel_params = fun_control.get("kernel_params", {})
+
         self.counter = 0
         self.success_rate = 0.0
         self.success_counter = 0
@@ -710,6 +717,8 @@ class Spot:
                 use_nystrom=self.surrogate_control["use_nystrom"],
                 nystrom_m=self.surrogate_control["nystrom_m"],
                 nystrom_seed=self.surrogate_control["nystrom_seed"],
+                kernel=self.kernel,
+                kernel_params=self.kernel_params,
             )
 
     def get_spot_attributes_as_df(self) -> pd.DataFrame:
@@ -1695,6 +1704,10 @@ class Spot:
         logger.debug("In fit_surrogate(): self.y: %s", self.y)
         logger.debug("In fit_surrogate(): self.X.shape: %s", self.X.shape)
         logger.debug("In fit_surrogate(): self.y.shape: %s", self.y.shape)
+        # Pass kernel options to surrogate if Kriging is used
+        if hasattr(self.surrogate, "kernel"):
+            self.surrogate.kernel = self.kernel
+            self.surrogate.kernel_params = self.kernel_params
         X_points = self.X.shape[0]
         y_points = self.y.shape[0]
         if X_points == y_points:

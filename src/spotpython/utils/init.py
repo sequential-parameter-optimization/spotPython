@@ -57,6 +57,8 @@ def fun_control_init(
     horizon=None,
     hyperdict=None,
     infill_criterion="y",
+    kernel="gauss",
+    kernel_params={},
     log_every_n_steps=50,
     log_level=50,
     lower=None,
@@ -208,6 +210,11 @@ def fun_control_init(
             For example: `spotriver.hyperdict.river_hyper_dict import RiverHyperDict`
         infill_criterion (str):
             Can be `"y"`, `"s"`, `"ei"` (negative expected improvement), or `"all"`. Default is "y".
+        kernel (str):
+            The kernel to be used by the Kriging surrogate model.
+            Can be either "gauss", "matern32", "matern52", or "exponential". Default is "gauss".
+        kernel_params (dict):
+            The parameters for the kernel function. Default is an empty dictionary.
         log_every_n_steps (int):
             Lightning: How often to log within steps. Default: 50.
         log_level (int):
@@ -392,6 +399,8 @@ def fun_control_init(
                 'horizon': 7,
                 'infill_criterion': 'y',
                 'k_folds': None,
+                'kernel': 'gauss',
+                'kernel_params': {},
                 'loss_function': None,
                 'lower': None,
                 'max_surrogate_points': 100,
@@ -483,6 +492,8 @@ def fun_control_init(
         "hyperdict": hyperdict,
         "infill_criterion": infill_criterion,
         "k_folds": 3,
+        "kernel": kernel,
+        "kernel_params": kernel_params,
         "log_every_n_steps": log_every_n_steps,
         "log_graph": False,
         "log_level": log_level,
