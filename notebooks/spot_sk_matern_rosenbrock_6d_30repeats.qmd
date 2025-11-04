@@ -1,0 +1,212 @@
+---
+title: 'SPOT Kriging in 6 Dimensions: Exact (Rosenbrock Function)'
+jupyter: python3
+---
+
+
+This notebook demonstrates how to use the `Spot` class from `spotpython` for Kriging surrogates on the 6-dimensional Rosenbrock function.
+We use a maximum of 100 function evaluations.
+
+
+```{python}
+import warnings
+warnings.filterwarnings("ignore")
+import numpy as np
+from spotpython.fun.objectivefunctions import Analytical
+from spotpython.spot import Spot
+from spotpython.utils.init import fun_control_init, design_control_init, surrogate_control_init
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import Matern, ConstantKernel
+```
+
+## Define the 6D Rosenbrock Function
+
+```{python}
+dim = 6
+lower = np.full(dim, -2)
+upper = np.full(dim, 2)
+fun = Analytical().fun_rosenbrock
+fun_evals = 100
+```
+
+## Set up SPOT Controls
+
+## Regression and y as Infill Criterion
+
+```{python}
+#| eval: false
+init_size = dim
+use_nystrom = False
+method = "regression"
+infill_criterion = "y"
+tolerance_x = 1e-9
+seed = 321
+max_surrogate_points = fun_evals
+min_Lambda = -4
+max_Lambda = 3
+min_theta = -3
+max_theta = 2
+isotropic = False
+kernel = "matern"
+kernel_params = {"nu": 1.5}
+selection_method = "distance"
+min_success_rate = 0.2
+max_time = 60
+TENSORBOARD_CLEAN=False
+tensorboard_log=False
+```
+
+```{python}
+#| eval: false
+fun_control = fun_control_init(
+    lower=lower,
+    upper=upper,
+    fun_evals=fun_evals,
+    seed=seed,
+    show_progress=True,
+    infill_criterion=infill_criterion,
+    tolerance_x=tolerance_x,
+    TENSORBOARD_CLEAN=TENSORBOARD_CLEAN,
+    tensorboard_log=tensorboard_log,
+    kernel=kernel,
+    kernel_params=kernel_params,
+    selection_method=selection_method,
+    min_success_rate=min_success_rate,
+    max_time=max_time
+)
+design_control = design_control_init(init_size=init_size)
+surrogate_control_exact = surrogate_control_init(use_nystrom=use_nystrom, method=method, max_surrogate_points=max_surrogate_points, min_Lambda=min_Lambda, max_Lambda=max_Lambda, min_theta=min_theta, max_theta=max_theta, isotropic=isotropic)
+
+kernel = ConstantKernel(1.0, (1e-2, 1e12)) * Matern(length_scale=1.0, length_scale_bounds=(1e-4, 1e2), nu=2.5)
+S_GP = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=100)
+
+spot_exact_sk = Spot(
+    fun=fun,
+    fun_control=fun_control,
+    design_control=design_control,
+    surrogate_control=surrogate_control_exact,
+    surrogate=S_GP,
+)
+spot_exact_sk.run()
+```
+
+
+
+```{python}
+print(f"[6D] Exact Kriging y: min y = {spot_exact_sk.min_y:.4f} at x = {spot_exact_sk.min_X}")
+```
+
+## Repeats
+
+```{python}
+import json
+import numpy as np
+from spotpython.fun.objectivefunctions import Analytical
+from spotpython.spot import Spot
+from spotpython.utils.init import fun_control_init, design_control_init, surrogate_control_init
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import Matern, ConstantKernel
+
+# Problem setup
+dim = 6
+lower = np.full(dim, -2)
+upper = np.full(dim, 2)
+fun = Analytical().fun_rosenbrock
+fun_evals = 100
+init_size = dim
+use_nystrom = False
+method = "regression"
+infill_criterion = "y"
+tolerance_x = 1e-9
+selection_method = "distance"
+min_success_rate = 0.2
+max_time = 60
+min_Lambda = -4
+max_Lambda = 3
+min_theta = -3
+max_theta = 2
+isotropic = False
+kernel = "matern"
+kernel_params = {"nu": 2.5}
+TENSORBOARD_CLEAN = False
+tensorboard_log = False
+max_surrogate_points = fun_evals
+
+results = {
+    "problem_metadata": {
+        "test_function": "Rosenbrock_Function",
+        "dimensionality": dim,
+        "lower_bounds": lower.tolist(),
+        "upper_bounds": upper.tolist(),
+        "replication_number": 30
+    },
+    "algorithm_parameters": {
+        "acquisition_function": "y",
+        "kernel": "Matern52",
+        "initial_samples": init_size,
+        "BO_iterations": fun_evals,
+        "total_samples": fun_evals,
+        "batch_size": 1,
+        "other_params": {},
+        "seed_start": 12345
+    },
+    "extra_info": {
+        "team_notes": "SPOT Kriging 30 repeats with different seeds",
+        "code_reference": "",
+        "other_files": []
+    },
+    "search_iterations": []
+}
+
+seed_start = 12345
+for i in range(30):
+    seed = seed_start + i
+    fun_control = fun_control_init(
+        lower=lower,
+        upper=upper,
+        fun_evals=fun_evals,
+        seed=seed,
+        show_progress=False,
+        infill_criterion=infill_criterion,
+        tolerance_x=tolerance_x,
+        TENSORBOARD_CLEAN=TENSORBOARD_CLEAN,
+        tensorboard_log=tensorboard_log,
+        kernel=kernel,
+        kernel_params=kernel_params,
+        selection_method=selection_method,
+        min_success_rate=min_success_rate,
+        max_time=max_time
+    )
+    design_control = design_control_init(init_size=init_size)
+    surrogate_control_exact = surrogate_control_init(
+        use_nystrom=use_nystrom,
+        method=method,
+        max_surrogate_points=max_surrogate_points,
+        min_Lambda=min_Lambda,
+        max_Lambda=max_Lambda,
+        min_theta=min_theta,
+        max_theta=max_theta,
+        isotropic=isotropic
+    )
+    gp_kernel = ConstantKernel(1.0, (1e-2, 1e12)) * Matern(length_scale=1.0, length_scale_bounds=(1e-4, 1e2), nu=2.5)
+    S_GP = GaussianProcessRegressor(kernel=gp_kernel, n_restarts_optimizer=100)
+    spot_exact_sk = Spot(
+        fun=fun,
+        fun_control=fun_control,
+        design_control=design_control,
+        surrogate_control=surrogate_control_exact,
+        surrogate=S_GP,
+    )
+    spot_exact_sk.run()
+    results["search_iterations"].append({
+        "iterations": i + 1,
+        "batch_size": 1,
+        "sampled_locations": [{
+            "locations": spot_exact_sk.min_X.tolist(),
+            "evaluations": float(spot_exact_sk.min_y)
+        }]
+    })
+
+with open("spot_results.json", "w") as f:
+    json.dump(results, f, indent=2)
+```
