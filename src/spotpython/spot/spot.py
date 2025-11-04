@@ -2325,6 +2325,34 @@ class Spot:
             (numpy.ndarray): value based on infill criterion, e.g., `"ei"`. Shape `(1,)`.
                 The objective function value `y` that is used as a base value for the
                 infill criterion is calculated in natural units.
+        
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import Spot
+                from spotpython.fun import Analytical
+                from spotpython.utils.init import fun_control_init
+                nn = 3
+                fun_sphere = Analytical().fun_sphere
+                fun_control = fun_control_init(
+                        lower = np.array([-1, -1]),
+                        upper = np.array([1, 1]),
+                        n_points=nn,
+                        )
+                S = Spot(
+                    fun=fun_sphere,
+                    fun_control=fun_control,
+                    )
+                S.X = S.design.scipy_lhd(
+                    S.design_control["init_size"], lower=S.lower, upper=S.upper
+                )
+                print(f"S.X: {S.X}")
+                S.y = S.fun(S.X)
+                print(f"S.y: {S.y}")
+                S.fit_surrogate()
+                x = np.array([0.5, 0.5])
+                y_infill = S.infill(x)
+                print(f"y_infill: {y_infill}")
+                assert np.isscalar(y_infill) or y_infill.shape == (1,)
 
         """
         # Reshape x to have shape (1, -1) because the predict method expects a 2D array
@@ -2702,7 +2730,7 @@ class Spot:
         """Process each entry in the `z00` array according to the corresponding type
         in the `self.var_type` list.
         Specifically, if the type is "float", the function will calculate the mean of the two `z00` values.
-        If the type is not "float", the function will retrun the maximum of the two `z00` values.
+        If the type is not "float", the function will retrun the minimum  of the two `z00` values.
 
         Args:
             z00 (numpy.ndarray):
@@ -2714,13 +2742,25 @@ class Spot:
             (list): Processed values.
 
         Examples:
-            from spotpython.spot import spot
             import numpy as np
-            import random
+            from spotpython.spot import Spot
+            from spotpython.fun import Analytical
+            from spotpython.utils.init import fun_control_init
+            nn = 3
+            fun_sphere = Analytical().fun_sphere
+            fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1]),
+                    n_points=nn,
+                    )
+            S = Spot(
+                fun=fun_sphere,
+                fun_control=fun_control,
+                )
             z00 = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
-            spot.var_type = ["float", "int", "int", "float"]
-            spot.process_z00(z00)
-            [3, 6, 7, 6]
+            S.var_type = ["float", "int", "int", "float"]
+            S.process_z00(z00)
+            [np.float64(3.0), np.int64(2), np.int64(3), np.float64(6.0)]
 
         """
         result = []
