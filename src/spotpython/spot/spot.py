@@ -2325,7 +2325,7 @@ class Spot:
             (numpy.ndarray): value based on infill criterion, e.g., `"ei"`. Shape `(1,)`.
                 The objective function value `y` that is used as a base value for the
                 infill criterion is calculated in natural units.
-        
+
         Examples:
             >>> import numpy as np
                 from spotpython.spot import Spot

@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.linalg import LinAlgError, cond
-from typing import Dict, Tuple, List, Optional
+from typing import Dict, Tuple, List, Optional, Callable, Union
 from scipy.optimize import differential_evolution
 from sklearn.base import BaseEstimator, RegressorMixin
 from scipy.special import erf
@@ -9,17 +9,67 @@ from numpy import linspace, append
 from scipy.spatial.distance import cdist, pdist, squareform
 from spotpython.surrogate.plot import plotkd
 
+# --- Kernel functions ---
+
+
+def gauss_kernel(D):
+    """Gaussian (RBF) kernel: exp(-D)"""
+    return np.exp(-D)
+
+
+def matern_kernel(D, nu=2.5):
+    """Matern kernel (default nu=2.5, smooth)."""
+    if nu == 0.5:
+        return np.exp(-np.sqrt(D))
+    elif nu == 1.5:
+        sqrt3D = np.sqrt(3.0 * D)
+        return (1.0 + sqrt3D) * np.exp(-sqrt3D)
+    elif nu == 2.5:
+        sqrt5D = np.sqrt(5.0 * D)
+        return (1.0 + sqrt5D + (5.0 / 3.0) * D) * np.exp(-sqrt5D)
+    else:
+        # Fallback to Gaussian for unsupported nu
+        return np.exp(-D)
+
+
+def exponential_kernel(D):
+    """Exponential kernel: exp(-sqrt(D))"""
+    return np.exp(-np.sqrt(D))
+
+
+def cubic_kernel(D):
+    """Cubic kernel: 1 - D^3"""
+    return 1.0 - D**3
+
+
+def linear_kernel(D):
+    """Linear kernel: 1 - D"""
+    return 1.0 - D
+
+
+def rational_quadratic_kernel(D, alpha=1.0):
+    """Rational Quadratic kernel: (1 + D/(2*alpha))^(-alpha)"""
+    return (1.0 + D / (2.0 * alpha)) ** (-alpha)
+
+
+def poly_kernel(D, degree=2):
+    """Polynomial kernel: (1 + D)^degree"""
+    return (1.0 + D) ** degree
+
+
 # --- The New Kriging Class with Nyström Approximation as introduced in v0.34.0 ---
 
 
 class Kriging(BaseEstimator, RegressorMixin):
     """
     A scikit-learn compatible Kriging model class for regression tasks,
-    extended with an optional Nyström approximation for scaling.
+    extended with an optional Nyström approximation for scaling and explicit kernel selection.
 
     Public API and core behavior match src/spotpython/surrogate/kriging.py.
     The same basis function/correlation definitions are used. When use_nystrom=True,
     training and prediction use low-rank Woodbury solves based on m inducing points.
+
+    Kernel selection is explicit via the `kernel` and `kernel_params` arguments.
 
     Attributes:
         eps (float): A small regularization term to reduce ill-conditioning.
@@ -35,11 +85,28 @@ class Kriging(BaseEstimator, RegressorMixin):
         use_nystrom (bool): If True, use Nyström low-rank solves.
         nystrom_m (int): Number of inducing points (landmarks).
         nystrom_seed (int): RNG seed for landmark selection.
+        kernel (str or callable): Kernel type ("gauss", "matern", "exp", "cubic", "linear", "rq", "poly") or a custom callable.
+        kernel_params (dict): Parameters for the kernel (e.g., nu for Matern, alpha for rational quadratic, degree for poly).
 
     Notes (Forrester et al., Engineering Design via Surrogate Modelling, Ch. 2/3/6):
-        - Correlation: R = exp(-D), with D weighted distances (Ch. 2).
+        - Correlation: R = kernel(D), with D weighted distances (Ch. 2).
         - Ordinary Kriging μ, σ^2, concentrated likelihood (Ch. 3).
         - Prediction f̂, variance s^2, and Expected Improvement (Ch. 3 & 6).
+
+    Examples:
+        >>> import numpy as np
+        >>> from spotpython.surrogate.kriging import Kriging
+        >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+        >>> y_train = np.array([0.1, 0.2, 0.3])
+        >>> # Gaussian kernel (default)
+        >>> model = Kriging(kernel="gauss").fit(X_train, y_train)
+        >>> # Matern kernel (nu=1.5)
+        >>> model_matern = Kriging(kernel="matern", kernel_params={"nu": 1.5}).fit(X_train, y_train)
+        >>> # Rational Quadratic kernel
+        >>> model_rq = Kriging(kernel="rq", kernel_params={"alpha": 2.0}).fit(X_train, y_train)
+        >>> # Custom kernel
+        >>> def custom_kernel(D): return np.exp(-D**2)
+        >>> model_custom = Kriging(kernel=custom_kernel).fit(X_train, y_train)
     """
 
     def __init__(
@@ -74,9 +141,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         use_nystrom: bool = False,
         nystrom_m: Optional[int] = None,
         nystrom_seed: int = 1234,
+        # Kernel options
+        kernel: Union[str, Callable] = "gauss",
+        kernel_params: Optional[dict] = None,
         **kwargs,
     ):
-        """Initialize the Kriging model.
+        """
+        Initialize the Kriging model.
 
         Args:
             eps (float): Small regularization term for numerical stability.
@@ -108,6 +179,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             use_nystrom (bool): If True, use Nyström approximation.
             nystrom_m (Optional[int]): Number of landmarks for Nyström.
             nystrom_seed (int): Seed for landmark selection in Nyström.
+            kernel (str or callable): Kernel type ("gauss", "matern", "exp", "cubic", "linear", "rq", "poly") or a custom callable.
+            kernel_params (dict): Parameters for the kernel (e.g., nu for Matern, alpha for rational quadratic, degree for poly).
         """
         if eps is None:
             self.eps = self._get_eps()
@@ -139,6 +212,10 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.Lambda = Lambda
         self.model_optimizer = model_optimizer or differential_evolution
         self.model_fun_evals = model_fun_evals or 100
+
+        # Kernel selection
+        self.kernel = kernel
+        self.kernel_params = kernel_params or {}
 
         # Logging information
         self.log = {}
@@ -179,6 +256,42 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.sigma2_ = None  # σ̂^2
         self.Rinv_one_ = None  # R^{-1} 1 (n,)
         self.Rinv_r_ = None  # R^{-1} r (n,)
+
+    # --- Kernel dispatch ---
+
+    def _correlation(self, D):
+        """
+        Dispatches to the selected kernel function.
+
+        Args:
+            D (np.ndarray): Distance matrix.
+
+        Returns:
+            np.ndarray: Correlation matrix.
+        """
+        if callable(self.kernel):
+            return self.kernel(D, **self.kernel_params)
+        elif self.kernel == "gauss":
+            return gauss_kernel(D)
+        elif self.kernel == "matern":
+            nu = self.kernel_params.get("nu", 2.5)
+            return matern_kernel(D, nu=nu)
+        elif self.kernel == "exp":
+            return exponential_kernel(D)
+        elif self.kernel == "cubic":
+            return cubic_kernel(D)
+        elif self.kernel == "linear":
+            return linear_kernel(D)
+        elif self.kernel == "rq":
+            alpha = self.kernel_params.get("alpha", 1.0)
+            return rational_quadratic_kernel(D, alpha=alpha)
+        elif self.kernel == "poly":
+            degree = self.kernel_params.get("degree", 2)
+            return poly_kernel(D, degree=degree)
+        else:
+            raise ValueError(f"Unknown kernel: {self.kernel}")
+
+    # -------- Basis correlation construction (identical to kriging.py) --------
 
     def _get_eps(self) -> float:
         """
@@ -325,14 +438,13 @@ class Kriging(BaseEstimator, RegressorMixin):
         Constructs a new (n x n) correlation matrix Psi to reflect new data
         or a change in hyperparameters.
         This method uses `theta`, `p`, and coded `X` values to construct the
-        correlation matrix as described in [Forr08a, p.57].
+        correlation matrix as described in [Forrester et al., p.57].
 
         Notes:
-            - Correlation follows the stationary Gaussian kernel used in Kriging:
-              R = exp(-D), with D a weighted distance. See Forrester et al. (2008),
-                Ch. 2, correlation modelling.
+            - Correlation follows the selected kernel:
+              R = kernel(D), with D a weighted distance.
             - The code builds D as a sum of per-dimension distance contributions
-              scaled by 10**theta (theta is stored in log10), then applies exp(-D).
+              scaled by 10**theta (theta is stored in log10), then applies the kernel.
             - Returns only the upper triangle; the symmetric and diagonal parts
               are handled by the caller.
 
@@ -350,9 +462,8 @@ class Kriging(BaseEstimator, RegressorMixin):
             >>> # Training data
             >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
             >>> y_train = np.array([0.1, 0.2, 0.3])
-            >>> # Fit the Kriging model
-            >>> model = Kriging().fit(X_train, y_train)
-            >>> # Build the correlation matrix Psi
+            >>> # Fit the Kriging model with a Matern kernel
+            >>> model = Kriging(kernel="matern", kernel_params={"nu": 1.5}).fit(X_train, y_train)
             >>> Psi = model.build_Psi()
             >>> print("Correlation matrix Psi:\n", Psi)
         """
@@ -372,7 +483,7 @@ class Kriging(BaseEstimator, RegressorMixin):
                 D_factor = squareform(pdist(X_factor, metric=self.metric_factorial, w=theta10[self.factor_mask]))
                 Psi += D_factor
 
-            Psi = np.exp(-Psi)
+            Psi = self._correlation(Psi)
 
             self.inf_Psi = np.isinf(Psi).any()
             self.cnd_Psi = cond(Psi)
@@ -385,7 +496,7 @@ class Kriging(BaseEstimator, RegressorMixin):
     def _kernel_cross(self, A: np.ndarray, B: np.ndarray) -> np.ndarray:
         """
         Cross-correlation matrix K(A,B) using the same distance definition as build_Psi/build_psi_vec.
-        Returns exp(-D) with D composed from ordered and factor contributions.
+        Returns kernel(D) with D composed from ordered and factor contributions.
 
         Args:
             A (np.ndarray): First set of points (m x k).
@@ -396,17 +507,14 @@ class Kriging(BaseEstimator, RegressorMixin):
 
         Examples:
             >>> import numpy as np
-                from spotpython.surrogate.kriging import Kriging
-                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
-                y_train = np.array([0.1, 0.2, 0.3])
-                # Fit the Kriging model
-                model = Kriging().fit(X_train, y_train)
-                # Create two sets of points A and B
-                A = np.array([[0.0, 0.0], [1.0, 1.0]])
-                B = np.array([[0.5, 0.5], [1.5, 1.5]])
-                # Compute the cross-correlation matrix K(A, B)
-                K_AB = model._kernel_cross(A, B)
-                print("Cross-correlation matrix K(A, B):\n", K_AB)
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> model = Kriging(kernel="poly", kernel_params={"degree": 3}).fit(X_train, y_train)
+            >>> A = np.array([[0.0, 0.0], [1.0, 1.0]])
+            >>> B = np.array([[0.5, 0.5], [1.5, 1.5]])
+            >>> K_AB = model._kernel_cross(A, B)
+            >>> print("Cross-correlation matrix K(A, B):\n", K_AB)
         """
         A = np.asarray(A)
         B = np.asarray(B)
@@ -426,34 +534,29 @@ class Kriging(BaseEstimator, RegressorMixin):
             Bf = B[:, self.factor_mask]
             D += cdist(Af, Bf, metric=self.metric_factorial, w=theta10[self.factor_mask])
 
-        return np.exp(-D)
+        return self._correlation(D)
 
     def build_psi_vec(self, x: np.ndarray) -> np.ndarray:
         """
         Build the psi vector required for predictive methods.
-        ψ(x) := [exp(-D(x, x_i))]_{i=1..n}, i.e., correlation between a new x and the training sites
-        using the same D as for R (Forrester, Ch. 2).
+        ψ(x) := [kernel(D(x, x_i))]_{i=1..n}, i.e., correlation between a new x and the training sites
+        using the same D as for R.
 
         Args:
             x (ndarray): Point to calculate the psi vector for.
 
         Returns:
-            None
-
-        Modifies:
-            self.psi (np.ndarray): Updates the psi vector.
+            np.ndarray: The psi vector.
 
         Examples:
             >>> import numpy as np
-                from spotpython.surrogate.kriging import Kriging
-                # Training data
-                X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
-                y_train = np.array([0.1, 0.2, 0.3])
-                # Fit the Kriging model
-                model = Kriging().fit(X_train, y_train)
-                x_new = np.array([0.25, 0.25])
-                psi_vector = model.build_psi_vec(x_new)
-                print("Psi vector for new point:\n", psi_vector)
+            >>> from spotpython.surrogate.kriging import Kriging
+            >>> X_train = np.array([[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]])
+            >>> y_train = np.array([0.1, 0.2, 0.3])
+            >>> model = Kriging(kernel="rq", kernel_params={"alpha": 2.0}).fit(X_train, y_train)
+            >>> x_new = np.array([0.25, 0.25])
+            >>> psi_vector = model.build_psi_vec(x_new)
+            >>> print("Psi vector for new point:\n", psi_vector)
         """
         try:
             psi = self._kernel_cross(np.asarray(x), self.X_).ravel()
