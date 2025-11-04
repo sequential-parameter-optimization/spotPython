@@ -1350,6 +1350,41 @@ class Spot:
         self.X = repair_non_numeric(X0, self.var_type)
 
     def _store_mo(self, y_mo) -> None:
+        """
+        Store multi-objective values in self.y_mo.
+
+        Args:
+            y_mo (numpy.ndarray):
+                If multi-objective values are present, this is an array of shape (n, m), where ``m`` is
+                the number of objectives and ``n`` is the number of data points.
+                Otherwise, it is an array of shape (n,) with single-objective values.
+        Returns:
+            None
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import Spot
+                from spotpython.utils.init import fun_control_init
+                fun_control = fun_control_init(
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1])
+                )
+                fun = lambda x: np.array([[x[0]**2 + x[1]**2, (x[0]-1)**2 + (x[1]-1)**2] for x in x])
+                S = Spot(fun=fun, fun_control=fun_control)
+                y_mo_1 = np.array([[1.0, 2.0], [3.0, 4.0]])
+                S._store_mo(y_mo_1)
+                print(f"S.y_mo after first call: {S.y_mo}")
+                    S.y_mo after first call: [[1. 2.]
+                    [3. 4.]]
+                y_mo_2 = np.array([[5.0, 6.0], [7.0, 8.0]])
+                S._store_mo(y_mo_2)
+                print(f"S.y_mo after second call: {S.y_mo}")
+                    S.y_mo after second call: [[1. 2.]
+                    [3. 4.]
+                    [5. 6.]
+                    [7. 8.]]
+
+        """
         # store y_mo in self.y_mo (append new values) if mo, otherwise self.y_mo is None
         if self.y_mo is None and y_mo.ndim == 2:
             self.y_mo = y_mo
@@ -1381,6 +1416,28 @@ class Spot:
         Returns:
             numpy.ndarray:
                 A 1D array of shape (n,) with single-objective values.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import Spot
+                from spotpython.utils.init import fun_control_init
+                fun_control = fun_control_init(
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1])
+                )
+                fun = lambda x: np.array([[x[0]**2 + x[1]**2, (x[0]-1)**2 + (x[1]-1)**2] for x in x])
+                S = Spot(fun=fun, fun_control=fun_control)
+                y_mo = np.array([[1.0, 2.0], [3.0, 4.0]])
+                y_so = S._mo2so(y_mo)
+                print(f"Single-objective values (default): {y_so}")
+                    Single-objective values (default): [1. 3.]
+                # Now define a custom function to convert multi-objective to single-objective
+                def custom_mo2so(y_mo):
+                    return y_mo[:, 0] + y_mo[:, 1]
+                S.fun_control["fun_mo2so"] = custom_mo2so
+                y_so_custom = S._mo2so(y_mo)
+                print(f"Single-objective values (custom): {y_so_custom}")
+                    Single-objective values (custom): [3. 7.]
 
         """
         n, m = get_shape(y_mo)
@@ -1534,6 +1591,27 @@ class Spot:
             self.var_y (numpy.ndarray): variance of y values
             self.min_mean_y (float): minimum mean y value
             self.min_mean_X (numpy.ndarray): X value of the minimum mean y value
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
+                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                    )
+                # number of initial points:
+                ni = 0
+                X_start = np.array([[0, 0], [0, 1], [1, 0], [1, 1], [1, 1]])
+                fun = Analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1])
+                    )
+                design_control=design_control_init(init_size=ni)
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control
+                            )
 
         """
         self.min_y = min(self.y)
@@ -1830,6 +1908,25 @@ class Spot:
 
         Returns:
             None
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import Spot
+                from spotpython.utils.init import fun_control_init
+                fun_control = fun_control_init(
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1])
+                )
+                fun = Analytical().fun_sphere
+                S = Spot(fun=fun, fun_control=fun_control)
+                S.initialize_design()
+                S.evaluate_initial_design()
+                S.update_stats()
+                S.fit_surrogate()
+                S.update_design()
+                S.save_result()
+                    Experiment saved to result_res.pkl
         """
         PREFIX = self.fun_control.get("PREFIX", "result")
         if filename is None:
@@ -2083,6 +2180,10 @@ class Spot:
                     [59.32133757,  0.93854273],
                     [27.4698033 ,  0.3959685 ]])
         """
+        if size <= 0:
+            raise ValueError("Number of points (size) must be positive.")
+        if np.any(lower > upper):
+            raise ValueError("Lower bounds must not exceed upper bounds.")
         return self.design.scipy_lhd(n=size, repeats=repeats, lower=lower, upper=upper)
 
     def update_writer(self) -> None:
