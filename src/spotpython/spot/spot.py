@@ -36,7 +36,7 @@ from numpy import append
 from spotpython.utils.convert import get_shape
 from spotpython.utils.init import fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
 from spotpython.utils.compare import selectNew
-from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points
+from spotpython.utils.aggregate import aggregate_mean_var, select_distant_points, select_best_cluster
 from spotpython.utils.repair import remove_nan, repair_non_numeric
 from spotpython.utils.file import get_experiment_filename, get_result_filename
 from spotpython.budget.ocba import get_ocba_X
@@ -215,10 +215,6 @@ class Spot:
         # Kernel selection from fun_control (NEW)
         self.kernel = None
         self.kernel_params = None
-        if fun_control is not None:
-            self.kernel = fun_control.get("kernel", "gauss")
-            self.kernel_params = fun_control.get("kernel_params", {})
-
         self.counter = 0
         self.success_rate = 0.0
         self.success_counter = 0
@@ -227,6 +223,7 @@ class Spot:
         # small value:
         self.eps = sqrt(spacing(1))
 
+        self.selection_method = "distant"  # or "best"
         self._set_fun(fun)
 
         self._set_bounds_and_dim()
@@ -449,11 +446,16 @@ class Spot:
         self.progress_file = self.fun_control["progress_file"]
         self.tkagg = self.fun_control["tkagg"]
         self.min_success_rate = self.fun_control["min_success_rate"]
+        self.selection_method = self.fun_control["selection_method"]
         # self.success_counter = 0
         if self.tkagg:
             matplotlib.use("TkAgg")
         self.verbosity = self.fun_control["verbosity"]
         self.acquisition_failure_strategy = self.fun_control["acquisition_failure_strategy"]
+        self.kernel = self.fun_control["kernel"]
+        self.kernel_params = self.fun_control["kernel_params"]
+
+        # Surrogate control attributes:
         self.max_surrogate_points = self.surrogate_control["max_surrogate_points"]
         self.use_nystrom = self.surrogate_control["use_nystrom"]
         self.nystrom_m = self.surrogate_control["nystrom_m"]
@@ -1640,6 +1642,57 @@ class Spot:
             # variance of the best mean y value so far:
             self.min_var_y = self.var_y[argmin(self.mean_y)]
 
+    def selection_dispatcher(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Dispatcher for selection methods.
+        Depending on the value of `self.selection_method`,
+        it calls the appropriate selection function.
+        Args:
+            self (object): Spot object
+        Returns:
+            Tuple[numpy.ndarray, numpy.ndarray]:
+                selected design points and their corresponding function values
+        Attributes:
+            self.selection_method (str):
+                selection method to use
+            self.X (numpy.ndarray):
+                design points
+            self.y (numpy.ndarray):
+                function values
+            self.max_surrogate_points (int):
+                maximum number of points to select
+        Examples:
+            >>> import numpy as np
+                from spotpython.fun.objectivefunctions import Analytical
+                from spotpython.spot import spot
+                from spotpython.utils.init import (
+                    fun_control_init, optimizer_control_init, surrogate_control_init, design_control_init
+                    )
+                # number of initial points:
+                ni = 0
+                X_start = np.array([[0, 0], [0, 1], [   1, 0], [1, 1], [1, 1]])
+                fun = Analytical().fun_sphere
+                fun_control = fun_control_init(
+                    lower = np.array([-1, -1]),
+                    upper = np.array([1, 1])
+                    )
+                design_control=design_control_init(init_size=ni)
+                S = spot.Spot(fun=fun,
+                            fun_control=fun_control,
+                            design_control=design_control,)
+                S.initialize_design(X_start=X_start)
+                S.update_stats()
+                X_S, y_S = S.selection_dispatcher()
+                print(f"Selected X_S: {X_S}")
+                print(f"Selected y_S: {y_S}")
+        """
+        if self.selection_method == "distant":
+            return select_distant_points(X=self.X, y=self.y, k=self.max_surrogate_points)
+        elif self.selection_method == "best":
+            return select_best_cluster(X=self.X, y=self.y, k=self.max_surrogate_points)
+        # If no selection is needed, return all points:
+        return self.X, self.y
+
     def fit_surrogate(self) -> None:
         """
         Fit surrogate model. The surrogate model
@@ -1705,15 +1758,15 @@ class Spot:
         logger.debug("In fit_surrogate(): self.X.shape: %s", self.X.shape)
         logger.debug("In fit_surrogate(): self.y.shape: %s", self.y.shape)
         # Pass kernel options to surrogate if Kriging is used
-        if hasattr(self.surrogate, "kernel"):
+        if hasattr(self.surrogate, "kernel") and isinstance(self.surrogate, Kriging):
             self.surrogate.kernel = self.kernel
             self.surrogate.kernel_params = self.kernel_params
         X_points = self.X.shape[0]
         y_points = self.y.shape[0]
         if X_points == y_points:
             if (X_points > self.max_surrogate_points) and (self.use_nystrom is False):
-                logger.info("Selecting distant points for surrogate fitting.")
-                X_S, y_S = select_distant_points(X=self.X, y=self.y, k=self.max_surrogate_points)
+                logger.info("Selecting subset of points for surrogate fitting.")
+                X_S, y_S = self.selection_dispatcher()
             else:
                 X_S = self.X
                 y_S = self.y

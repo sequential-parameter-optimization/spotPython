@@ -296,3 +296,41 @@ def select_distant_points(X, y, k):
     # Select the corresponding y values
     selected_y = y[indices]
     return selected_points, selected_y
+
+
+def select_best_cluster(X, y, k):
+    """
+    Selects all points from the cluster whose center has the smallest mean y value.
+
+    Args:
+        X (numpy.ndarray): X array, shape `(n, k)`.
+        y (numpy.ndarray): values, shape `(n,)`.
+        k (int): number of clusters.
+
+    Returns:
+        (numpy.ndarray): selected `X` values from the best cluster, shape `(m, k)`.
+        (numpy.ndarray): selected `y` values from the best cluster, shape `(m,)`.
+
+    Examples:
+        >>> X = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+        >>> y = np.array([5, 4, 3, 2, 1])
+        >>> X_best, y_best = select_best_cluster(X, y, 2)
+        >>> print(X_best)
+        >>> print(y_best)
+    """
+    # Perform k-means clustering
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto").fit(X)
+    labels = kmeans.labels_
+    # Compute mean y for each cluster
+    cluster_means = []
+    for cluster_idx in range(k):
+        cluster_y = y[labels == cluster_idx]
+        if len(cluster_y) == 0:
+            cluster_means.append(np.inf)
+        else:
+            cluster_means.append(np.mean(cluster_y))
+    # Find cluster with smallest mean y
+    best_cluster = np.argmin(cluster_means)
+    # Select all points from the best cluster
+    mask = labels == best_cluster
+    return X[mask], y[mask]

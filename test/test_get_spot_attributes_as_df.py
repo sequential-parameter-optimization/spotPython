@@ -73,6 +73,7 @@ def test_get_spot_attributes_as_df():
                             'progress_file',
                             'red_dim',
                             'rng',
+                            'selection_method',
                             'show_models',
                             'show_progress',
                             'spot_writer',

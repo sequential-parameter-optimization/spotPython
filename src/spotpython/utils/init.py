@@ -88,6 +88,7 @@ def fun_control_init(
     scaler_name=None,
     scenario=None,
     seed=123,
+    selection_method="distant",
     show_config=False,
     show_models=False,
     show_progress=True,
@@ -291,6 +292,10 @@ def fun_control_init(
             The scenario to use. Default is None. Can be "river", "sklearn", or "lightning".
         seed (int):
             The seed to use for the random number generator. Default is 123.
+        selection_method (str):
+            The method to select points for surrogate fitting when the number of points
+            exceeds max_surrogate_points. Can be either "distant" or "best".
+            Default is "distant".
         sigma (float):
             The standard deviation of the noise of the objective function.
         show_progress (bool):
@@ -423,6 +428,7 @@ def fun_control_init(
                 'prep_model_name': None,
                 'scenario': "lightning",
                 'seed': 1234,
+                'selection_method': "distant",
                 'show_batch_interval': 1000000,
                 'shuffle': None,
                 'sigma': 0.0,
@@ -530,6 +536,7 @@ def fun_control_init(
         "scaler_name": scaler_name,
         "scenario": scenario,
         "seed": seed,
+        "selection_method": selection_method,
         "show_batch_interval": 1_000_000,
         "show_config": show_config,
         "show_models": show_models,

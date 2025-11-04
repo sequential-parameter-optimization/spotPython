@@ -5,7 +5,7 @@ from spotpython.spot.spot import Spot
 @pytest.fixture
 def spot_instance():
     # Minimal Spot instance with required attributes
-    fun_control = {"lower": np.array([-1, -1]), "upper": np.array([1, 1]), "var_type": ["num", "num"], "fun_evals": 10, "fun_repeats": 1, "max_time": 1e6, "noise": False, "tolerance_x": 0, "ocba_delta": 0, "log_level": 50, "show_models": False, "show_progress": False, "infill_criterion": "ei", "n_points": 1, "seed": 1, "progress_file": None, "tkagg": False, "verbosity": 0, "acquisition_failure_strategy": "random", "fun_mo2so": None, "penalty_NA": 0, "PREFIX": "test", "tensorboard_log": False, "spot_tensorboard_path": None, "save_experiment": False, "db_dict_name": None, "save_result": False, "var_name": ["x0", "x1"], "min_success_rate": 0.0}
+    fun_control = {"lower": np.array([-1, -1]), "upper": np.array([1, 1]), "var_type": ["num", "num"], "fun_evals": 10, "fun_repeats": 1, "max_time": 1e6, "noise": False, "tolerance_x": 0, "ocba_delta": 0, "log_level": 50, "show_models": False, "show_progress": False, "infill_criterion": "ei", "n_points": 1, "seed": 1, "progress_file": None, "tkagg": False, "verbosity": 0, "acquisition_failure_strategy": "random", "fun_mo2so": None, "penalty_NA": 0, "PREFIX": "test", "tensorboard_log": False, "spot_tensorboard_path": None, "save_experiment": False, "db_dict_name": None, "save_result": False, "var_name": ["x0", "x1"], "min_success_rate": 0.0, "selection_method": "distant", "kernel": "gauss", "kernel_params": {}}
     design_control = {"init_size": 5, "repeats": 1}
     from spotpython.utils.init import surrogate_control_init, optimizer_control_init
     surrogate_control = surrogate_control_init()
