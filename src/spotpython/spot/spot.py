@@ -133,13 +133,14 @@ class Spot:
     Examples:
         >>> import numpy as np
             from math import inf
+            from scipy.optimize import differential_evolution
             from spotpython.spot import spot
             from spotpython.utils.init import (
                 fun_control_init,
                 design_control_init,
                 surrogate_control_init,
                 optimizer_control_init)
-            def objective_function(X, fun_control=None):
+            def objective_function(X, **kwargs):
                 if not isinstance(X, np.ndarray):
                     X = np.array(X)
                 if X.shape[1] != 2:
@@ -303,6 +304,22 @@ class Spot:
             Exception: No objective function specified.
             Exception: Objective function is not callable
 
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
+
+                def objective_function(X):
+                    return np.sum(X, axis=1)
+
+                fun_control = fun_control_init(
+                    lower=np.array([0, 0]),
+                    upper=np.array([5, 5]),
+                    seed=12345
+                )
+
+                S = spot.Spot(fun=objective_function, fun_control=fun_control)
+                print(S.fun(np.array([[1, 2], [3, 4]])))
         """
         self.fun = fun
         if self.fun is None:
@@ -317,6 +334,21 @@ class Spot:
 
         Returns:
             (NoneType): None
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
+
+                fun_control = fun_control_init(
+                    lower=np.array([-1, -1]),
+                    upper=np.array([1, 1])
+                )
+
+                S = spot.Spot(fun=lambda x: x, fun_control=fun_control)
+                print("Lower bounds:", S.lower)
+                print("Upper bounds:", S.upper)
+                print("Number of dimensions (k):", S.k)
 
         """
         # lower attribute updates:
@@ -336,6 +368,20 @@ class Spot:
         Set the variable types based on the fun_control dictionary.
         If the variable types are not specified,
         all variable types are forced to 'num'.
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
+
+                fun_control = fun_control_init(
+                    lower=np.array([0, 0]),
+                    upper=np.array([10, 10]),
+                    var_type=["num", "cat"]
+                )
+
+                S = spot.Spot(fun=lambda x: x, fun_control=fun_control)
+                print("Variable types:", S.var_type)
         """
         self.var_type = self.fun_control["var_type"]
         # Force numeric type as default in every dim:
@@ -345,11 +391,33 @@ class Spot:
             self.var_type = self.var_type * self.k
             logger.warning("All variable types forced to 'num'.")
 
+        # --- check for allowed variable types ---
+        allowed_types = {"num", "int", "float", "factor"}
+        for vt in self.var_type:
+            if vt not in allowed_types:
+                raise ValueError(f"Invalid var_type '{vt}'. Allowed types are: {allowed_types}.")
+        # "num" is the superset of "int" and "float"
+        # (no further action needed, just a check)
+
     def _set_var_name(self) -> None:
         """
         Set the variable names based on the fun_control dictionary.
         If the variable names are not specified,
         all variable names are set to x0, x1, x2, ...
+
+        Examples:
+            >>> import numpy as np
+                from spotpython.spot import spot
+                from spotpython.utils.init import fun_control_init
+
+                fun_control = fun_control_init(
+                    lower=np.array([0, 0]),
+                    upper=np.array([10, 10]),
+                    var_name=["length", "width"]
+                )
+
+                S = spot.Spot(fun=lambda x: x, fun_control=fun_control)
+                print("Variable names:", S.var_name)
         """
         self.var_name = self.fun_control["var_name"]
         # use x0, x1, ... as default variable names:
@@ -523,6 +591,7 @@ class Spot:
     def _optimizer_setup(self, optimizer) -> None:
         """
         Optimizer setup. If no optimizer is specified, use Differential Evolution.
+        The current implementation of _optimizer_setup always overwrites self.optimizer with the default if optimizer is None, even if self.optimizer was already set.
         """
         self.optimizer = optimizer
         if self.optimizer is None:
@@ -536,7 +605,7 @@ class Spot:
         # to the value of the key "method" from the fun_control dictionary.
         # If the value is set (i.e., not None), it is not updated.
         if self.surrogate_control["method"] is None:
-            self.surrogate_control.update({"method": self.fun_control.method})
+            self.surrogate_control.update({"method": self.fun_control["method"]})
         if self.surrogate_control["model_fun_evals"] is None:
             self.surrogate_control.update({"model_fun_evals": self.optimizer_control["max_iter"]})
         # self.optimizer is not None here. If 1) the key "model_optimizer"
