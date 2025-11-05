@@ -1,0 +1,45 @@
+# Evaluation spotpython runs
+```{python}
+import json
+import numpy as np
+
+# Load results from spot_rosen.json
+with open("spot_rosen.json", "r") as f:
+    data = json.load(f)
+
+# Extract all "evaluations" values
+evals = [
+    iteration["sampled_locations"][0]["evaluations"]
+    for iteration in data["search_iterations"]
+]
+
+# Compute mean and standard deviation
+mean_eval = np.mean(evals)
+std_eval = np.std(evals)
+
+print(f"Mean of evaluations: {mean_eval:.6f}")
+print(f"Standard deviation of evaluations: {std_eval:.6f}")
+```
+
+
+```{python}
+import json
+import numpy as np
+
+# Load results from spot_rosen.json
+with open("spot_michalewicz.json", "r") as f:
+    data = json.load(f)
+
+# Extract all "evaluations" values
+evals = [
+    iteration["sampled_locations"][0]["evaluations"]
+    for iteration in data["search_iterations"]
+]
+
+# Compute mean and standard deviation
+mean_eval = np.mean(evals)
+std_eval = np.std(evals)
+
+print(f"Mean of evaluations: {mean_eval:.6f}")
+print(f"Standard deviation of evaluations: {std_eval:.6f}")
+```
