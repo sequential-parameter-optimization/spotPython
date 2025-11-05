@@ -91,18 +91,10 @@ def plotModel(
     point_color_below="blue",
     point_color_above="red",
     atol=1e-6,
+    plot_3d=False,
 ) -> None:
     """
-    Generate 2D contour and 3D surface plots for a model's predictions.
-
-    Even if the data is not strictly 3D, each point in X_points will have its
-    "predicted surface z-value" computed by:
-      1) Taking the i-th and j-th coordinates directly from that point.
-      2) Setting all other dimensions (leftover dims) based on use_min, use_max,
-         or their mean (if both are False).
-    Then, we compare the newly-computed "actual z" for that point with its
-    model-predicted z-value. If 'actual z' < 'predicted z', the point is colored
-    with point_color_below; otherwise, it is colored with point_color_above.
+    Generate 2D contour and optionally 3D surface plots for a model's predictions.
 
     Args:
         model (object): A model with a predict method.
@@ -131,15 +123,13 @@ def plotModel(
         plot_points (bool): Whether to plot X_points. Defaults to True.
         points_color (str): Fallback color for data points. Defaults to "white".
         points_size (int): Marker size for data points. Defaults to 30.
-        point_color_below (str): Color if actual z < predicted z. Defaults to "lightgrey".
-        point_color_above (str): Color if actual z >= predicted z. Defaults to "white".
+        point_color_below (str): Color if actual z < predicted z. Defaults to "blue".
+        point_color_above (str): Color if actual z >= predicted z. Defaults to "red".
         atol (float): Absolute tolerance for comparing actual and predicted z-values. Defaults to 1e-6.
+        plot_3d (bool): Whether to plot the 3D surface plot. Defaults to False.
 
     Returns:
         (fig, (ax_contour, ax_surface)): Figure and axes for the contour and surface plots.
-
-    Raises:
-        ValueError: For mismatched dimensions or invalid i/j indices.
     """
     # --- Validate inputs ---
     lower = np.asarray(lower)
@@ -198,9 +188,13 @@ def plotModel(
         max_z = np.max(Z_pred)
 
     # --- Set up figure ---
-    fig = plt.figure(figsize=figsize)
-    ax_contour = fig.add_subplot(1, 2, 1)
-    ax_surface = fig.add_subplot(1, 2, 2, projection="3d")
+    if plot_3d:
+        fig = plt.figure(figsize=figsize)
+        ax_contour = fig.add_subplot(1, 2, 1)
+        ax_surface = fig.add_subplot(1, 2, 2, projection="3d")
+    else:
+        fig, ax_contour = plt.subplots(figsize=figsize)
+        ax_surface = None
 
     # --- 2D contour ---
     cont = ax_contour.contourf(
@@ -222,30 +216,28 @@ def plotModel(
         ax_contour.set_aspect("equal")
 
     # --- 3D surface ---
-    surf = ax_surface.plot_surface(
-        X_grid,
-        Y_grid,
-        Z_pred,
-        cmap=cmap,
-        vmin=min_z,
-        vmax=max_z,
-        linewidth=0,
-        antialiased=True,
-        alpha=0.8,
-    )
-    cb2 = fig.colorbar(surf, ax=ax_surface, shrink=0.7, pad=0.1)
-    cb2.ax.tick_params(labelsize=legend_fontsize - 2)
+    if plot_3d:
+        surf = ax_surface.plot_surface(
+            X_grid,
+            Y_grid,
+            Z_pred,
+            cmap=cmap,
+            vmin=min_z,
+            vmax=max_z,
+            linewidth=0,
+            antialiased=True,
+            alpha=0.8,
+        )
+        cb2 = fig.colorbar(surf, ax=ax_surface, shrink=0.7, pad=0.1)
+        cb2.ax.tick_params(labelsize=legend_fontsize - 2)
 
-    ax_surface.set_xlabel(var_name[i], fontsize=legend_fontsize)
-    ax_surface.set_ylabel(var_name[j], fontsize=legend_fontsize)
-    ax_surface.set_zlabel("f(x)", fontsize=legend_fontsize)
-    ax_surface.tick_params(labelsize=legend_fontsize - 2)
+        ax_surface.set_xlabel(var_name[i], fontsize=legend_fontsize)
+        ax_surface.set_ylabel(var_name[j], fontsize=legend_fontsize)
+        ax_surface.set_zlabel("f(x)", fontsize=legend_fontsize)
+        ax_surface.tick_params(labelsize=legend_fontsize - 2)
 
     # --- Optionally plot points ---
     if plot_points and X_points is not None:
-        # Build + predict each point individually, using the same i/j from the row
-        # and the use_min/use_max logic for leftover dims. Store these predicted values
-        # as "z_pred_for_point".
         z_pred_for_point = []
         for row_idx in range(X_points.shape[0]):
             single_p = np.zeros(n_dims)
@@ -255,7 +247,7 @@ def plotModel(
                 if dim_idx not in (i, j):
                     single_p[dim_idx] = hidden_value(dim_idx)
             val = model.predict(single_p.reshape(1, -1))
-            val = np.atleast_1d(val)  # ensure at least 1D
+            val = np.atleast_1d(val)
             if isinstance(val, dict):
                 val = val.get("mean", list(val.values())[0])
             elif isinstance(val, tuple):
@@ -263,8 +255,7 @@ def plotModel(
             z_pred_for_point.append(val[0] if hasattr(val, "__len__") else val)
         z_pred_for_point = np.array(z_pred_for_point)
 
-        # Use the ground-truth y_points directly:
-        z_actual = np.array(y_points).flatten()  # ensures a 1D shape
+        z_actual = np.array(y_points).flatten()
 
         on_mask = np.isclose(z_actual, z_pred_for_point, atol=atol)
         below_mask = z_actual - atol / 2.0 < z_pred_for_point
@@ -300,39 +291,40 @@ def plotModel(
             zorder=5,
         )
         # 3D plot scatter
-        ax_surface.scatter(
-            X_points[below_mask, i],
-            X_points[below_mask, j],
-            z_actual[below_mask],
-            c=point_color_below,
-            edgecolor="black",
-            s=points_size,
-            alpha=0.9,
-            zorder=10,  # Ensure points are rendered on top
-        )
-        ax_surface.scatter(
-            X_points[above_mask, i],
-            X_points[above_mask, j],
-            z_actual[above_mask],
-            c=point_color_above,
-            edgecolor="black",
-            s=points_size,
-            alpha=0.9,
-            zorder=10,  # Ensure points are rendered on top
-        )
-        ax_surface.scatter(
-            X_points[on_mask, i],
-            X_points[on_mask, j],
-            z_actual[on_mask],
-            c=points_color,
-            edgecolor="black",
-            s=points_size,
-            alpha=0.9,
-            zorder=10,  # Ensure points are rendered on top
-        )
+        if plot_3d:
+            ax_surface.scatter(
+                X_points[below_mask, i],
+                X_points[below_mask, j],
+                z_actual[below_mask],
+                c=point_color_below,
+                edgecolor="black",
+                s=points_size,
+                alpha=0.9,
+                zorder=10,
+            )
+            ax_surface.scatter(
+                X_points[above_mask, i],
+                X_points[above_mask, j],
+                z_actual[above_mask],
+                c=point_color_above,
+                edgecolor="black",
+                s=points_size,
+                alpha=0.9,
+                zorder=10,
+            )
+            ax_surface.scatter(
+                X_points[on_mask, i],
+                X_points[on_mask, j],
+                z_actual[on_mask],
+                c=points_color,
+                edgecolor="black",
+                s=points_size,
+                alpha=0.9,
+                zorder=10,
+            )
 
     # --- Optionally set aspect in 3D ---
-    if aspect_equal:
+    if plot_3d and aspect_equal:
         x_range = upper[i] - lower[i]
         y_range = upper[j] - lower[j]
         z_range = max_z - min_z if max_z > min_z else 1
@@ -341,7 +333,7 @@ def plotModel(
 
     # --- Title, save, and show ---
     if title:
-        updated_title = f"{title}  Correct Points: {num_correct}"
+        updated_title = f"{title}  Correct Points: {num_correct if plot_points and X_points is not None else ''}"
         fig.suptitle(updated_title, fontsize=legend_fontsize + 2)
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
@@ -352,7 +344,10 @@ def plotModel(
     if show:
         plt.show()
 
-    return fig, (ax_contour, ax_surface)
+    if plot_3d:
+        return fig, (ax_contour, ax_surface)
+    else:
+        return fig, (ax_contour, None)
 
 
 def plotCombinations(
