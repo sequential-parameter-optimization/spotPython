@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.gaussian_process.kernels import Kernel, NormalizedKernelMixin, Hyperparameter
 
 
-def _correlation(kernel, D, kernel_params=None):
+def _spot_correlation(kernel, D, kernel_params=None):
     """
     Dispatches to the selected kernel function.
     Args:
@@ -49,7 +49,7 @@ def _correlation(kernel, D, kernel_params=None):
         raise ValueError(f"Unknown kernel: {kernel}")
 
 
-# Example: Custom sklearn-compatible RBF kernel using _correlation
+# Example: Custom sklearn-compatible RBF kernel using _spot_correlation
 class CustomRBF(NormalizedKernelMixin, Kernel):
     def __init__(self, length_scale=1.0, length_scale_bounds=(1e-5, 1e5)):
         self.length_scale = length_scale
@@ -61,7 +61,7 @@ class CustomRBF(NormalizedKernelMixin, Kernel):
 
     def __call__(self, D, eval_gradient=False):
         # D is assumed to be the squared distance matrix
-        K = _correlation("gauss", D)
+        K = _spot_correlation("gauss", D)
         if eval_gradient:
             # Gradient not implemented
             return K, np.empty((K.shape[0], K.shape[1], 0))
@@ -85,7 +85,7 @@ class CustomMatern(NormalizedKernelMixin, Kernel):
         return Hyperparameter("length_scale", "numeric", self.length_scale_bounds)
 
     def __call__(self, D, eval_gradient=False):
-        K = _correlation("matern", D, {"nu": self.nu})
+        K = _spot_correlation("matern", D, {"nu": self.nu})
         if eval_gradient:
             # Gradient not implemented
             return K, np.empty((K.shape[0], K.shape[1], 0))

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from numpy import linspace, append
 from scipy.spatial.distance import cdist, pdist, squareform
 from spotpython.surrogate.plot import plotkd
-from spotpython.surrogate.kernels import _correlation  # Only import _correlation
+from spotpython.surrogate.kernels import _spot_correlation
 
 
 # --- The New Kriging Class with Nyström Approximation as introduced in v0.34.0 ---
@@ -222,7 +222,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             np.ndarray: Correlation matrix.
         """
-        return _correlation(self.kernel, D, self.kernel_params)
+        return _spot_correlation(self.kernel, D, self.kernel_params)
 
     # -------- Basis correlation construction (identical to kriging.py) --------
 
