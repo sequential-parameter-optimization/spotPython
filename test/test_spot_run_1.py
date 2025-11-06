@@ -36,13 +36,12 @@ fun_control = fun_control_init(
     tolerance_x=tolerance_x,
     TENSORBOARD_CLEAN=True,
     tensorboard_log=True,
-    kernel=kernel,
-    kernel_params=kernel_params,
     selection_method=selection_method,
     min_success_rate=min_success_rate
 )
 design_control = design_control_init(init_size=init_size)
-surrogate_control_exact = surrogate_control_init(use_nystrom=use_nystrom, method=method, max_surrogate_points=max_surrogate_points, min_Lambda=min_Lambda, max_Lambda=max_Lambda, min_theta=min_theta, max_theta=max_theta, isotropic=isotropic)
+surrogate_control_exact = surrogate_control_init(use_nystrom=use_nystrom, method=method, max_surrogate_points=max_surrogate_points, min_Lambda=min_Lambda, max_Lambda=max_Lambda, min_theta=min_theta, max_theta=max_theta, isotropic=isotropic,    kernel=kernel,
+    kernel_params=kernel_params)
 
 def test_run_1():
     spot_exact_y = Spot(

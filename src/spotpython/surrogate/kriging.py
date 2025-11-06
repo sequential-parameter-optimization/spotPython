@@ -8,53 +8,7 @@ import matplotlib.pyplot as plt
 from numpy import linspace, append
 from scipy.spatial.distance import cdist, pdist, squareform
 from spotpython.surrogate.plot import plotkd
-
-# --- Kernel functions ---
-
-
-def gauss_kernel(D):
-    """Gaussian (RBF) kernel: exp(-D)"""
-    return np.exp(-D)
-
-
-def matern_kernel(D, nu=2.5):
-    """Matern kernel (default nu=2.5, smooth)."""
-    if nu == 0.5:
-        return np.exp(-np.sqrt(D))
-    elif nu == 1.5:
-        sqrt3D = np.sqrt(3.0 * D)
-        return (1.0 + sqrt3D) * np.exp(-sqrt3D)
-    elif nu == 2.5:
-        sqrt5D = np.sqrt(5.0 * D)
-        return (1.0 + sqrt5D + (5.0 / 3.0) * D) * np.exp(-sqrt5D)
-    else:
-        # Fallback to Gaussian for unsupported nu
-        return np.exp(-D)
-
-
-def exponential_kernel(D):
-    """Exponential kernel: exp(-sqrt(D))"""
-    return np.exp(-np.sqrt(D))
-
-
-def cubic_kernel(D):
-    """Cubic kernel: 1 - D^3"""
-    return 1.0 - D**3
-
-
-def linear_kernel(D):
-    """Linear kernel: 1 - D"""
-    return 1.0 - D
-
-
-def rational_quadratic_kernel(D, alpha=1.0):
-    """Rational Quadratic kernel: (1 + D/(2*alpha))^(-alpha)"""
-    return (1.0 + D / (2.0 * alpha)) ** (-alpha)
-
-
-def poly_kernel(D, degree=2):
-    """Polynomial kernel: (1 + D)^degree"""
-    return (1.0 + D) ** degree
+from spotpython.surrogate.kernels import _correlation  # Only import _correlation
 
 
 # --- The New Kriging Class with Nyström Approximation as introduced in v0.34.0 ---
@@ -258,10 +212,9 @@ class Kriging(BaseEstimator, RegressorMixin):
         self.Rinv_r_ = None  # R^{-1} r (n,)
 
     # --- Kernel dispatch ---
-
     def _correlation(self, D):
         """
-        Dispatches to the selected kernel function.
+        Dispatches to the selected kernel function using the shared _correlation() from kernels.py.
 
         Args:
             D (np.ndarray): Distance matrix.
@@ -269,27 +222,7 @@ class Kriging(BaseEstimator, RegressorMixin):
         Returns:
             np.ndarray: Correlation matrix.
         """
-        if callable(self.kernel):
-            return self.kernel(D, **self.kernel_params)
-        elif self.kernel == "gauss":
-            return gauss_kernel(D)
-        elif self.kernel == "matern":
-            nu = self.kernel_params.get("nu", 2.5)
-            return matern_kernel(D, nu=nu)
-        elif self.kernel == "exp":
-            return exponential_kernel(D)
-        elif self.kernel == "cubic":
-            return cubic_kernel(D)
-        elif self.kernel == "linear":
-            return linear_kernel(D)
-        elif self.kernel == "rq":
-            alpha = self.kernel_params.get("alpha", 1.0)
-            return rational_quadratic_kernel(D, alpha=alpha)
-        elif self.kernel == "poly":
-            degree = self.kernel_params.get("degree", 2)
-            return poly_kernel(D, degree=degree)
-        else:
-            raise ValueError(f"Unknown kernel: {self.kernel}")
+        return _correlation(self.kernel, D, self.kernel_params)
 
     # -------- Basis correlation construction (identical to kriging.py) --------
 

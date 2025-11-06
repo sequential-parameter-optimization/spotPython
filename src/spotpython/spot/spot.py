@@ -49,10 +49,11 @@ from spotpython.hyperparameters.values import (
     get_ith_hyperparameter_name_from_fun_control,
 )
 import plotly.graph_objects as go
-from typing import Callable
+from typing import Callable, Tuple
 from spotpython.utils.numpy2json import NumpyEncoder
 from spotpython.utils.file import load_result
 from spotpython.surrogate.plot import plotkd
+
 
 # Setting up the backend to use QtAgg
 # matplotlib.use("TkAgg")
@@ -452,14 +453,14 @@ class Spot:
             matplotlib.use("TkAgg")
         self.verbosity = self.fun_control["verbosity"]
         self.acquisition_failure_strategy = self.fun_control["acquisition_failure_strategy"]
-        self.kernel = self.fun_control["kernel"]
-        self.kernel_params = self.fun_control["kernel_params"]
 
         # Surrogate control attributes:
         self.max_surrogate_points = self.surrogate_control["max_surrogate_points"]
         self.use_nystrom = self.surrogate_control["use_nystrom"]
         self.nystrom_m = self.surrogate_control["nystrom_m"]
         self.nystrom_seed = self.surrogate_control["nystrom_seed"]
+        self.kernel = self.surrogate_control["kernel"]
+        self.kernel_params = self.surrogate_control["kernel_params"]
 
         # Internal attributes:
         self.X = None
