@@ -715,12 +715,13 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
     model.eval()
 
     target = fun_control.get("xai_target", None)
+    xai_mode = fun_control.get("xai_mode", None)
+    metric = fun_control.get("xai_metric", "corr")
 
     if "KernelShap" in fun_control["xai_methods"]:
         attr_ks = KernelShap(model)
         n_features = X_val_tensor.shape[1]
         samples_ks = min(2000, 100 * n_features)
-        print("KernelShap: Using", samples_ks, "samples for attribution.")
         with torch.no_grad():
             attribution_ks = attr_ks.attribute(
                 X_val_tensor,
@@ -730,16 +731,27 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
                 target=target,
                 show_progress=False,
             )
-        ks_sum = attribution_ks.detach().cpu().numpy().sum(axis=0)
-        # Remove NaN and Inf values
-        ks_sum = np.nan_to_num(ks_sum, nan=0.0, posinf=0.0, neginf=0.0)
-        # Safe normalization (no division by ~0)
-        l2_norm = np.linalg.norm(ks_sum)
-        if not np.isfinite(l2_norm) or l2_norm < 1e-12:
-            l2_normalized_ks = np.zeros_like(ks_sum)
-        else:
-            l2_normalized_ks = ks_sum / l2_norm
-        attributions_dict["KernelShap"] = l2_normalized_ks
+        ks_tensor = attribution_ks.detach().cpu().numpy()  # Shape: N_samples x N_features
+        ks_tensor = np.nan_to_num(ks_tensor, nan=0.0, posinf=0.0, neginf=0.0)
+
+        if xai_mode == "local":
+            print("local consensus calculation")
+            # normalize each sample individually
+            norms = np.linalg.norm(ks_tensor, axis=1, keepdims=True)
+            norms[norms < 1e-12] = 1.0  # avoid division by zero
+            ks_normalized = ks_tensor / norms
+            # attributions_dict now stores per-sample normalized attributions
+            attributions_dict["KernelShap"] = ks_normalized
+
+        else: # global attributions
+            print("global consensus calculation")
+            ks_sum = ks_tensor.sum(axis=0)
+            l2_norm = np.linalg.norm(ks_sum)
+            if not np.isfinite(l2_norm) or l2_norm < 1e-12:
+                ks_normalized = np.zeros_like(ks_sum)
+            else:
+                ks_normalized = ks_sum / l2_norm
+            attributions_dict["KernelShap"] = ks_normalized
 
     if "IntegratedGradients" in fun_control["xai_methods"]:
         attr_ig = IntegratedGradients(model)
@@ -750,13 +762,26 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
                 baselines=baseline,
                 target=target,
             )
-        ig_sum = attribution_ig.detach().cpu().numpy().sum(axis=0)
-        ig_sum = np.nan_to_num(ig_sum, nan=0.0, posinf=0.0, neginf=0.0)
-        l2 = np.linalg.norm(ig_sum)
-        if not np.isfinite(l2) or l2 < 1e-12:
-            attributions_dict["IntegratedGradients"] = np.zeros_like(ig_sum)
-        else:
-            attributions_dict["IntegratedGradients"] = ig_sum / l2
+        ig_tensor = attribution_ig.detach().cpu().numpy()  # Shape: N_samples x N_features
+        ig_tensor = np.nan_to_num(ig_tensor, nan=0.0, posinf=0.0, neginf=0.0)
+
+        if xai_mode == "local":
+            # normalize each sample individually
+            norms = np.linalg.norm(ig_tensor, axis=1, keepdims=True)
+            norms[norms < 1e-12] = 1.0  # avoid division by zero
+            ig_normalized = ig_tensor / norms
+            # attributions_dict now stores per-sample normalized attributions
+            attributions_dict["IntegratedGradients"] = ig_normalized
+
+        else: # global attributions
+            # alte Variante: Summe über Samples
+            ig_sum = ig_tensor.sum(axis=0)
+            l2_norm = np.linalg.norm(ig_sum)
+            if not np.isfinite(l2_norm) or l2_norm < 1e-12:
+                ig_normalized = np.zeros_like(ig_sum)
+            else:
+                ig_normalized = ig_sum / l2_norm
+            attributions_dict["IntegratedGradients"] = ig_normalized
 
     if "DeepLift" in fun_control["xai_methods"]:
         attr_dl = DeepLift(model)
@@ -766,28 +791,59 @@ def train_model_xai(config: dict, fun_control: dict, timestamp: bool = True) -> 
                 baselines=baseline,
                 target=target,
             )
-        dl_sum = attribution_dl.detach().cpu().numpy().sum(axis=0)
-        dl_sum = np.nan_to_num(dl_sum, nan=0.0, posinf=0.0, neginf=0.0)
-        l2_norm = np.linalg.norm(dl_sum)
-        if not np.isfinite(l2_norm) or l2_norm < 1e-12:
-            l2_normalized_dl = np.zeros_like(dl_sum)
-        else:
-            l2_normalized_dl = dl_sum / l2_norm
-        attributions_dict["DeepLift"] = l2_normalized_dl
+        dl_tensor = attribution_dl.detach().cpu().numpy()  # Shape: N_samples x N_features
+        dl_tensor = np.nan_to_num(dl_tensor, nan=0.0, posinf=0.0, neginf=0.0)
 
-    attributions_list = [attributions_dict[method] for method in fun_control["xai_methods"]]
-    attributions = np.stack(attributions_list, axis=0)
+        if xai_mode == "local":
+            # normalize each sample individually
+            norms = np.linalg.norm(dl_tensor, axis=1, keepdims=True)
+            norms[norms < 1e-12] = 1.0  # avoid division by zero
+            dl_normalized = dl_tensor / norms
+            # attributions_dict now stores per-sample normalized attributions
+            attributions_dict["DeepLift"] = dl_normalized
 
-    # Calculate corr:
-    if fun_control["xai_metric"] not in ["corr", "cosine", "euclidean", "spearman"]:
-        raise ValueError(f"Invalid xai_metric: {fun_control['xai_metric']}. Valid metrics are: 'corr', 'cosine', 'euclidean', 'spearman'")
-    if fun_control["xai_metric"] == "corr":
-        result_xai = calculate_xai_consistency_corr(attributions)
-    elif fun_control["xai_metric"] == "cosine":
-        result_xai = calculate_xai_consistency_cosine(attributions)
-    elif fun_control["xai_metric"] == "euclidean":
-        result_xai = calculate_xai_consistency_euclidean(attributions)
-    elif fun_control["xai_metric"] == "spearman":
-        result_xai = calculate_xai_consistency_spearman(attributions)
+        else: # global attributions
+            # alte Variante: Summe über Samples
+            dl_sum = dl_tensor.sum(axis=0)
+            l2_norm = np.linalg.norm(dl_sum)
+            if not np.isfinite(l2_norm) or l2_norm < 1e-12:
+                dl_normalized = np.zeros_like(dl_sum)
+            else:
+                dl_normalized = dl_sum / l2_norm
+            attributions_dict["DeepLift"] = dl_normalized
+        
+
+    if xai_mode == "local":
+        # Konsens pro Sample
+        N_samples = attributions_dict[fun_control["xai_methods"][0]].shape[0]
+        per_sample_consensus = []
+        for i in range(N_samples):
+            sample_attrs = np.stack([attributions_dict[m][i] for m in fun_control["xai_methods"]], axis=0)
+            # sample_attrs: n_methods x n_features
+            if metric == "corr":
+                sample_consensus = calculate_xai_consistency_corr(sample_attrs)
+            elif metric == "cosine":
+                sample_consensus = calculate_xai_consistency_cosine(sample_attrs)
+            elif metric == "euclidean":
+                sample_consensus = calculate_xai_consistency_euclidean(sample_attrs)
+            elif metric == "spearman":
+                sample_consensus = calculate_xai_consistency_spearman(sample_attrs)
+            per_sample_consensus.append(sample_consensus)
+        result_xai = np.mean(per_sample_consensus)
+        print("aggregated local consensus:", result_xai)
+
+    else:
+        # global modus
+        attributions_list = [attributions_dict[m] for m in fun_control["xai_methods"]]
+        attributions = np.stack(attributions_list, axis=0)  # n_methods x n_features
+        if metric == "corr":
+            result_xai = calculate_xai_consistency_corr(attributions)
+        elif metric == "cosine":
+            result_xai = calculate_xai_consistency_cosine(attributions)
+        elif metric == "euclidean":
+            result_xai = calculate_xai_consistency_euclidean(attributions)
+        elif metric == "spearman":
+            result_xai = calculate_xai_consistency_spearman(attributions)
+        print("global consensus:", result_xai)
 
     return result["val_loss"], result_xai

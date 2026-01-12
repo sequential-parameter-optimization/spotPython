@@ -214,15 +214,11 @@ def calculate_xai_consistency_corr(attributions) -> float:
     """
     global_attr_np = np.array(attributions)
     corr_matrix = np.corrcoef(global_attr_np)
-    print("Attribution Correlation Matrix:")
-    print(corr_matrix)
 
     # Calculate the mean of the upper triangle of the correlation matrix
     upper_triangle_indices = np.triu_indices_from(corr_matrix, k=1)
     upper_triangle_values = corr_matrix[upper_triangle_indices]
     result_xai = upper_triangle_values.mean()
-    print("XAI Consistency (mean of upper triangle of correlation matrix):")
-    print(result_xai)
     return result_xai
 
 
@@ -240,15 +236,11 @@ def calculate_xai_consistency_cosine(attributions) -> float:
     """
     global_attr_np = np.array(attributions)
     cosine_sim_matrix = np.array([[np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)) for b in global_attr_np] for a in global_attr_np])
-    print("Attribution Cosine Similarity Matrix:")
-    print(cosine_sim_matrix)
 
     # Calculate the mean of the upper triangle of the cosine similarity matrix
     upper_triangle_indices = np.triu_indices_from(cosine_sim_matrix, k=1)
     upper_triangle_values = cosine_sim_matrix[upper_triangle_indices]
     result_xai = upper_triangle_values.mean()
-    print("XAI Consistency (mean of upper triangle of cosine similarity matrix):")
-    print(result_xai)
     return result_xai
 
 
@@ -266,15 +258,11 @@ def calculate_xai_consistency_euclidean(attributions) -> float:
     """
     global_attr_np = np.array(attributions)
     euclidean_dist_matrix = euclidean_distances(global_attr_np)
-    print("Attribution Euclidean Distance Matrix:")
-    print(euclidean_dist_matrix)
 
     # Calculate the mean of the upper triangle of the Euclidean distance matrix
     upper_triangle_indices = np.triu_indices_from(euclidean_dist_matrix, k=1)
     upper_triangle_values = euclidean_dist_matrix[upper_triangle_indices]
     result_xai = upper_triangle_values.mean()
-    print("XAI Consistency (mean of upper triangle of Euclidean distance matrix):")
-    print(result_xai)
     return result_xai
 
 
@@ -300,9 +288,4 @@ def calculate_xai_consistency_spearman(attributions) -> float:
             spearman_corr_matrix[i, j] = corr
 
     upper_triangle_values = spearman_corr_matrix[np.triu_indices(n_methods, k=1)]
-    print("Attribution Spearman Correlation Matrix:")
-    print(spearman_corr_matrix)
-
-    print("XAI Consistency (mean of upper triangle of Spearman correlation matrix):")
-    print(upper_triangle_values.mean())
     return upper_triangle_values.mean()
